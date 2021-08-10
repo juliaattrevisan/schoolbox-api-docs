@@ -62,7 +62,7 @@ export default {
         }
     },
     mounted() {
-        this.$root.$on(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
+        document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
         this.load();
     },
     methods: {

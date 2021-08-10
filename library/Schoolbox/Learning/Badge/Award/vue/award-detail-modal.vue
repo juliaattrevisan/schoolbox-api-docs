@@ -5,7 +5,8 @@ import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
 import userProfileMixin from '../../../vue/user-profile/mixin';
-import moment from "moment";
+import axios from 'axios';
+import { animateBadgeImage } from '../js/animateBadgeImage'
 
 /**
  * Award detail modal.
@@ -101,29 +102,82 @@ export default {
         /**
          * Open this modal.
          */
-        open(award) {
+        open (award) {
             this.award = award;
-
             this.$refs.modal.open();
+            this.checkForBadgeAnimation();
         },
 
-        awardAchievement() {
-            let self = this;
-            self.toastActivate('Awarding...');
-            self.convertToAchievement(self.award)
+        /**
+         * check to see whether this is the first time the user has viewed this badge achievement
+         * and if so animate it to add a little sparkle
+         */
+        checkForBadgeAnimation () {
+            this.$nextTick(() => {
+                if (this.canAnimateBadgeImage()) {
+                    this.checkBadgeAnimationCleanedUp();
+                    this.animateBadgeImage();
+                } else {
+                    this.checkBadgeAnimationCleanedUp();
+                }
+            });
+        },
+
+        /**
+         * To determine whether we should show the animation
+         * 
+         * @returns { Boolean }
+         */
+        canAnimateBadgeImage () {
+            return this.award.viewedOn === null //hasn't been looked at before
+                && this.award.recipient.id === window.schoolboxUser.id //is the awarded user
+                && this.award.isGoal === false; //has been awarded
+        },
+
+        /**
+         * This badge or another could have been animated, in which case we'll ensure 
+         * it displays as expected when the user re-opens the modal window after
+         * closing it the first time.
+         */
+        checkBadgeAnimationCleanedUp () {
+            const badgeImageClone = this.$refs.badgeImage.$el.querySelector('[data-is-badge-clone]');
+            if (badgeImageClone) { //remove the animated background
+                badgeImageClone.remove();
+            }
+            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
+            badgeImage.style = ''; //gsap applies some style attributes, which should be cleared again
+        },
+
+        /**
+         * animate the badge and notify that it's been viewed so 
+         * it won't be animated again
+         */
+        animateBadgeImage () {
+            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
+            animateBadgeImage(badgeImage);
+            this.award.viewedOn = ''; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
+            axios.post(`/learning/badge/award/${this.award.id}/view`); //to update viewedOn in the backend
+        },
+
+        /**
+         * Award the achievement
+         */
+        awardAchievement () {
+            this.toastActivate('Awarding...');
+            this.convertToAchievement(this.award)
                 .then((response) => {
-                    self.toastSuccess('Achievement awarded');
+                    this.toastSuccess('Achievement awarded');
 
                     // Once awarded: update the award within this object
-                    self.award = response.data[0];
+                    this.award = response.data[0];
 
                     // And post a message to the other components that this
                     // user's awards have updated
                     // TODO investigate Vuex state management
-                    self.emitUpdateToAllUserProfileFeeds();
+                    this.emitUpdateToAllUserProfileFeeds();
                 })
                 .catch(() => {
-                    self.toastError('Failed to award achievement')
+                    this.toastError('Failed to award achievement')
                 })
         }
     }
@@ -134,7 +188,7 @@ export default {
         <template v-if="award.badge">
             <div class="badge-modal">
                 <div class="badge-img-container">
-                    <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
+                    <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>
                     <template v-if="award.count > 1">
                         <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
                     </template>
@@ -165,7 +219,6 @@ export default {
 
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />
-
                     <p class="meta">
                         Curriculum Codes:
                         <template v-for="curriculumNode in award.badge.curriculumNodes">

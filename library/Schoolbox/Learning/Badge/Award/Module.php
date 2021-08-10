@@ -139,6 +139,13 @@ class Module extends BaseModule
             $preloadBadge
         );
 
+        $this->register(
+            self::METHOD_POST,
+            '/{awardId}/view',
+            'setViewedOn',
+            $setGoalForSelfRule,
+            Closure::fromCallable([$this, 'preloadAward'])
+        );
 
         // Forms for mass creation of goals/achievements
         // /learning/badge/award/user/{userIds}/{achievement|goal}
@@ -257,6 +264,25 @@ class Module extends BaseModule
         }
 
         return ['users' => $users,];
+    }
+
+
+    /**
+     * Preload the requested award
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function preloadAward(array $params): array
+    {
+        return [
+            'award' => $this->getMapperFactory()
+                            ->get(Mapper::class)
+                            ->findById($params['awardId']),
+        ];
     }
 
 
