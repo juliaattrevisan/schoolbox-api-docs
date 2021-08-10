@@ -547,13 +547,15 @@ export default {
          *
          * @param selectedFilters
          */
-        updateSelectedFilters(selectedFilters) {
+        async updateSelectedFilters(selectedFilters) {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
-
-            axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, })).then(
-                this.calendarApi.refetchEvents()
-            );
+            try {
+                await axios.post(URL_EVENT_FILTER, qs.stringify({filters: this.config.selectedFilters,}));
+                this.calendarApi.refetchEvents();
+            } catch (error) {
+                console.warn(error);
+            }
         },
 
         /**
