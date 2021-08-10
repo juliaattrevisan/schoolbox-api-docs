@@ -10,10 +10,10 @@
 
 namespace Schoolbox;
 
-use function array_key_exists;
-
 use BadMethodCallException;
 use CallbackFilterIterator;
+
+use function array_key_exists;
 
 /**
  * TODO - this probably shouldn't extend Collection anymore, as many Collection methods will
@@ -31,7 +31,7 @@ class MappingCollection extends Collection
      *
      * @var string[]
      */
-    private $columnToPropertyMap = [];
+    private array $columnToPropertyMap = [];
 
     /**
      * Retrieves an iterator which filters out any element in the collection
@@ -39,7 +39,7 @@ class MappingCollection extends Collection
      *
      * @return \Traversable
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new CallbackFilterIterator(parent::getIterator(), array($this, 'accept'));
     }
@@ -53,12 +53,12 @@ class MappingCollection extends Collection
      * * Keys with any other "enabled" field are enabled if that field == true
      *
      * @param array     $current
-     * @param int       $key
+     * @param mixed       $key
      * @param \Iterator $iterator
      *
      * @return bool
      */
-    public function accept($current, $key, $iterator)
+    public function accept(array $current, $key, \Iterator $iterator): bool
     {
         if (!isset($current['enabled'])) {
             return true;
@@ -88,7 +88,7 @@ class MappingCollection extends Collection
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): self
     {
         return $this->setOffset($offset, $value);
     }
@@ -103,7 +103,7 @@ class MappingCollection extends Collection
      * @see getOffsetByColumn()
      * @inheritDoc
      */
-    public function setOffset($index, $value)
+    public function setOffset($index, $value): self
     {
         if (array_key_exists('column', $value)) {
             // If the column exists on this table, we only need the column name.

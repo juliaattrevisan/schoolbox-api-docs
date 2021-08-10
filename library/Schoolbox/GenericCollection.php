@@ -34,6 +34,7 @@ class GenericCollection extends Collection
     /** @var string|null $elementType What type the elements in this Collection are allowed to be. Class/interface name */
     private $elementType = null;
 
+
     /**
      * Constructor
      *
@@ -62,7 +63,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function emptyClone()
+    public function emptyClone(): GenericCollection
     {
         return new static($this->getElementClass());
     }
@@ -74,7 +75,7 @@ class GenericCollection extends Collection
      * @return self
      * @throws UnexpectedValueException
      */
-    protected function setStack($stack)
+    protected function setStack(array $stack): self
     {
         foreach ($stack as $item) {
             $this->checkType($item);
@@ -90,7 +91,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function add($element)
+    public function add($element): self
     {
         $this->checkType($element);
         parent::add($element);
@@ -104,7 +105,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function prepend($element)
+    public function prepend($element): self
     {
         $this->checkType($element);
         parent::prepend($element);
@@ -119,7 +120,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): self
     {
         $this->checkType($value);
         parent::offsetSet($offset, $value);
@@ -135,7 +136,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException If $value is of an invalid type
      */
-    public function setOffset($index, $value)
+    public function setOffset($index, $value): self
     {
         $this->checkType($value);
         parent::offsetSet($index, $value);
@@ -147,7 +148,7 @@ class GenericCollection extends Collection
      *
      * @return string
      */
-    public function getElementClass()
+    public function getElementClass(): string
     {
         return $this->elementType;
     }
@@ -249,7 +250,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws DomainException If collection has wrong member-item type
      */
-    public function replaceWith(Collection $collection)
+    public function replaceWith(Collection $collection): self
     {
         // Short-circuit via generics if we can
         if ($collection instanceof static && $this->assertSameItemClass($collection)) {

@@ -11,12 +11,13 @@
 namespace Schoolbox;
 
 use Alaress\Json\Decorator\IDecorator;
+use Alaress\Json\Serializable;
 use ArrayAccess;
 use InvalidArgumentException;
 use ArrayIterator;
 use ICollection;
 
-class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
+class Collection implements ICollection, Serializable, ArrayAccess
 {
     /**
      * Consts corresponding to ordering
@@ -24,23 +25,18 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     public const ORDER_ASCENDING = 'asc';
     public const ORDER_DESCENDING = 'desc';
 
+    protected array $stack;
 
-    /** @var array */
-    protected $stack = array();
-
-    /** @var int */
-    protected $position = 0;
+    protected int $position = 0;
 
     /**
      * Only set a stack parameter if it's an array
      *
      * @param array $stack
      */
-    public function __construct($stack = array())
+    public function __construct(array $stack = [])
     {
-        if (is_array($stack)) {
-            $this->setStack($stack);
-        }
+        $this->setStack($stack);
     }
 
     /**
@@ -49,17 +45,16 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param mixed $element
      * @return $this
      */
-    public function add($element)
+    public function add($element): self
     {
         $this->stack[] = $element;
-
         return $this;
     }
 
     /**
      * @return static
      */
-    public function emptyClone()
+    public function emptyClone(): Collection
     {
         return new static();
     }
@@ -81,7 +76,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return array
      */
-    public function getAll()
+    public function getAll(): array
     {
         return $this->getStack();
     }
@@ -97,7 +92,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param mixed $item
      * @return bool
      */
-    public function contains($item)
+    public function contains($item): bool
     {
         foreach ($this->stack as $stackItem) {
             if ($stackItem === $item) {
@@ -115,7 +110,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return $this
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): self
     {
         if (!isset($offset)) {
             $this->stack[] = $value;
@@ -148,7 +143,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->stack[$offset]);
     }
@@ -160,7 +155,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return $this
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): self
     {
         unset($this->stack[$offset]);
         return $this;
@@ -172,7 +167,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param array $stack
      * @return $this
      */
-    protected function setStack($stack)
+    protected function setStack(array $stack): self
     {
         $this->stack = $stack;
         return $this;
@@ -183,7 +178,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return array
      */
-    protected function getStack()
+    protected function getStack(): array
     {
         return $this->stack;
     }
@@ -193,7 +188,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->getStack());
     }
@@ -203,7 +198,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return \Traversable
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new ArrayIterator($this->stack);
     }
@@ -212,7 +207,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * Rewind
      * @return $this
      */
-    public function rewind()
+    public function rewind(): self
     {
         $this->position = 0;
         return $this;
@@ -241,7 +236,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * @return array
      */
-    public function keys()
+    public function keys(): array
     {
         return array_keys($this->getStack());
     }
@@ -255,7 +250,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param string $key
      * @return bool
      */
-    public function keyExists($key)
+    public function keyExists($key): bool
     {
         return array_key_exists($key, $this->stack);
     }
@@ -301,7 +296,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->stack[$this->position]);
     }
@@ -316,7 +311,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return string
      */
-    protected function getGetMethodName($property)
+    protected function getGetMethodName($property): string
     {
         return 'get' . ucfirst($property);
     }
@@ -329,7 +324,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return object|null
      */
-    public function getBy($field, $value)
+    public function getBy(string $field, $value)
     {
         $method_name = $this->getGetMethodName($field);
         foreach ($this as $item) {
@@ -352,7 +347,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @throws InvalidArgumentException if the input given is neither a
      *                                  Collection nor an array
      */
-    public static function arrayColumn($input, $column): array
+    public static function arrayColumn($input, string $column): array
     {
         if ($input instanceof self) {
             return $input->getPropertyValues($column);
@@ -373,7 +368,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @deprecated 17.5 Use 'getPropertyValues' instead. Retained for backwards comparability
      * @todo Remove 18.0
      */
-    public function getColumnValues($property)
+    public function getColumnValues(string $property): array
     {
         return $this->getPropertyValues($property);
     }
@@ -384,7 +379,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param string $property
      * @return mixed[]|array
      */
-    public function getPropertyValues($property)
+    public function getPropertyValues(string $property)
     {
         $parts = [];
         $methodName = $this->getGetMethodName($property);
@@ -461,7 +456,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return $this
      */
-    public function sortBy($field, $direction, $compareFunction = null, $maintainIndexAssociation = false)
+    public function sortBy($field, $direction, $compareFunction = null, bool $maintainIndexAssociation = false): self
     {
         $fields = (array)$field;
         $directions = (array)$direction;
@@ -530,7 +525,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param bool         $maintainIndexAssociation Should we maintain key association?
      * @return $this
      */
-    public function sortByMultiFields(array $fields, $maintainIndexAssociation = false)
+    public function sortByMultiFields(array $fields, bool $maintainIndexAssociation = false): self
     {
         $fieldNames = [];
         $directions = [];
@@ -560,7 +555,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return $this
      */
-    public function sortByCallback($callback, $maintainIndexAssociation = false)
+    public function sortByCallback($callback, bool $maintainIndexAssociation = false): self
     {
         $stack = $this->getStack();
         if ($maintainIndexAssociation) {
@@ -582,7 +577,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return static
      */
-    public function limit($count = null, $preserveKeys = false)
+    public function limit(?int $count = null, bool $preserveKeys = false): Collection
     {
         return $this->slice(0, $count, $preserveKeys);
     }
@@ -594,7 +589,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param Collection $collection
      * @return $this
      */
-    public function replaceWith(Collection $collection)
+    public function replaceWith(Collection $collection): self
     {
         return $this->setStack($collection->getStack());
     }
@@ -608,7 +603,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param Collection $other
      * @return static
      */
-    public function merge(Collection $other)
+    public function merge(Collection $other): Collection
     {
         $merged = $this->emptyClone();
         $merged->setStack(array_merge($this->getStack(), $other->getStack()));
@@ -626,7 +621,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param Collection $other
      * @return static
      */
-    public function union(Collection $other)
+    public function union(Collection $other): Collection
     {
         $merged = $this->emptyClone();
         $merged->setStack($this->getStack() + $other->getStack());
@@ -644,12 +639,12 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return static
      */
-    public function mergeUnique(Collection $other, $column = null)
+    public function mergeUnique(Collection $other, string $column = null): Collection
     {
         $merged = clone $this;
         if ($column) {
             $getColumn = $merged->getGetMethodName($column);
-            $testValues = $merged->getColumnValues($column);
+            $testValues = $merged->getPropertyValues($column);
             foreach ($other as $item) {
                 $value = $item->$getColumn();
 
@@ -683,7 +678,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @return Collection
      * @throws \UnexpectedValueException
      */
-    public function getUnique($column)
+    public function getUnique(string $column): Collection
     {
         $results = $this->emptyClone();
 
@@ -721,7 +716,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param mixed $value
      * @return $this
      */
-    public function setOffset($index, $value)
+    public function setOffset($index, $value): self
     {
         $this->stack[$index] = $value;
         return $this;
@@ -746,7 +741,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * want to restore 0-based indexes)
      * @return $this
      */
-    public function reindex()
+    public function reindex(): self
     {
         $this->stack = array_values($this->getStack());
         return $this;
@@ -762,7 +757,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return static
      */
-    public function diffBy(Collection $otherCollection, $field)
+    public function diffBy(Collection $otherCollection, string $field): Collection
     {
         $getMethod = $this->getGetMethodName($field);
         return $this->diff(
@@ -783,7 +778,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *                                Defaults to == comparison.
      * @return static
      */
-    public function diff(Collection $otherCollection, $diffMethod = null)
+    public function diff(Collection $otherCollection, $diffMethod = null): Collection
     {
         $diff = $this->emptyClone();
 
@@ -848,7 +843,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param  bool $includeNull
      * @return Collection
      */
-    public function map($callback, $includeNull = true)
+    public function map($callback, $includeNull = true): Collection
     {
         $return = new Collection();
         foreach ($this as $key => $item) {
@@ -1029,7 +1024,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return static
      */
-    public function deepClone()
+    public function deepClone(): Collection
     {
         $clone = $this->emptyClone();
         foreach ($this as $key => $value) {
@@ -1049,7 +1044,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @return static
      */
-    public function shallowClone()
+    public function shallowClone(): Collection
     {
         $newCollection = $this->emptyClone();
         foreach ($this->stack as $idx => $item) {
@@ -1076,7 +1071,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * @param IDecorator ...$decorators
      * @return array
      */
-    public function jsonSerialize(IDecorator ...$decorators)
+    public function jsonSerialize(IDecorator ...$decorators): array
     {
         if (\count($decorators) === 0) {
             return $this->getStack();
