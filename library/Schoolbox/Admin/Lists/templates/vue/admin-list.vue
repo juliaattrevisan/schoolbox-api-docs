@@ -60,7 +60,7 @@ export default {
         },  
 
         /**
-         * Whether to the admin-list-pop-out.vue is requred
+         * Whether the admin-list-pop-out.vue is requred
          * 
          * @returns { Boolean }
          */
