@@ -1,8 +1,8 @@
 <script>
 
 /**
- * Update an invidual rows permissions
- *
+ * Update an individual rows pop out options
+ * Currently only checkboxes are being considered, can be extended as required
  */
 
 import { gsap } from 'gsap/all';
@@ -48,12 +48,49 @@ export default {
          */
         changePopOutFields () {
             if (this.headerField.changePopOut && this.selectedRow.id) {
-                const selectedRowChangePopOutValue = this.selectedRow[this.headerField.changePopOut];
-                const changePopOutOptions = this.headerField.changePopOutOptions[selectedRowChangePopOutValue];
-                return this.fields.filter((field) => changePopOutOptions.includes(field.id));
+                const selectedRowChangePopOutValue = this.selectedRow[this.headerField.changePopOut]; //eg: for 'Role Type', could be 'Staff' or 'Student' 
+                const changePopOutOptions = this.headerField.changePopOutOptions[selectedRowChangePopOutValue]; //eg: only the options linked to the selected 'Role Type'
+                return this.fields.filter((field) => changePopOutOptions.includes(field.id)); //now only those fields linked to the value
             } else {
-                return this.fields;
+                return this.fields; //otherwise when there's no 'changePopOut' just return as normal
             }
+        },
+
+        /**
+         * Retrieve all checkboxes in the pop out
+         *
+         * @returns { Array }
+         */
+        checkboxFieldList () {
+            return this.changePopOutFields.filter((field) => field.checkbox);
+        },
+
+        /**
+         * If there's a few checkboxes in the list, we should show a 'Select All' checkbox
+         * for easier selection
+         *
+         * @returns { Boolean }
+         */
+        canShowSelectAllCheckbox () {
+            return this.checkboxFieldList.length > 2;
+        },
+
+        /**
+         * Retrieve all selected check boxes
+         *
+         * @returns { Array }
+         */
+        selectedCheckboxFieldList () {
+            return this.checkboxFieldList.filter((field) => this.selectedRow[field.id]); //will return those checkboxes with a true value
+        },
+
+        /**
+         * To determine the status of the Select All checkbox
+         *
+         * @returns { Boolean }
+         */
+        isAllCheckboxesSelected () {
+            return this.selectedCheckboxFieldList.length === this.checkboxFieldList.length; //whether all checkboxes are selected (set as true) or not
         }
 
     },
@@ -108,6 +145,14 @@ export default {
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
             <a href="#close-pop-out" class="close-button icon-close" @click.prevent="$emit('on-pop-out-closed')"></a>
             <ul class="option-list" data-option-list>
+                <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px;">
+                    <input
+                        id="select-all"
+                        type="checkbox"
+                        :checked="isAllCheckboxesSelected"
+                    />
+                    <label for="select-all">Select All</label>
+                </li>
                 <li v-for="(field, index) in changePopOutFields" :key="index">
                     <input
                         :id="field.caption"
