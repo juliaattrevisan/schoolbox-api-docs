@@ -303,9 +303,10 @@
 
                         // do different things depending on which action was clicked
                         if (removeBtn.data('remove')) {
+                            
                             // send deletion request to server
                             $.post(opt.component.url, removeBtn.closest('form').serialize());
-
+                               
                             // animate a disappearance (P.S. this is revolting)
                             removeBtn.closest(opt.component.selector).animate({ opacity: 0 }, 300, function () {
                                 $(this).slideUp(200, function () {
@@ -313,9 +314,14 @@
                                     // if it was the last component in a column, reshow the placeholder
                                     masonry.refreshColumns();
                                     masonry.refreshPalette();
+                                    document.dispatchEvent(new CustomEvent('jquery.masonry__onComponentRemoved', { //dispatch to allow sortableComponents.js to remove from sortable list
+                                        detail: {
+                                            componentID: removeBtn.closest('form')[0].querySelector('[data-remove-component-id]').value //id will be used to remove the sortable
+                                        }
+                                    })); 
                                 });
                             });
-
+                            
                         } else {
                             target.off('click', opt.component.removeActionSelector).slideUp();
                             targetBtns.data('state', 'closed');
@@ -660,6 +666,15 @@
             if (masonry.spectrum) {
                 masonry.spectrum.masonrySpectrum('reapplyColors');
             }
+
+            if (animate) { //only new components are animated, so can be used to dispatch event
+                document.dispatchEvent(new CustomEvent('jquery.masonry__onComponentAdded', { //dispatch to allow sortableComponents.js to add to sortable list
+                    detail: {
+                        componentID: response.attr('id') //id will be used to set the new sortable
+                    }
+                })); 
+            }
+
         };
 
         if (animate) {
