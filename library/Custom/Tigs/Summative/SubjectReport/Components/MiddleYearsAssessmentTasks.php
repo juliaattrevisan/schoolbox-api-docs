@@ -124,6 +124,14 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             }
         }
 
+        /* For middle years students, only get assessments that are due in the current year
+         */
+        foreach ($cohortAssessments as $assessable) {
+            if (!$this->isDueWithinReportWindow($assessable)) {
+                $cohortAssessments->offsetUnset($assessable->getId());
+            }
+        }
+
         // Does the set include an assessment imported to this class and in which the student is participating?
         $classAssessment = null;
         foreach ($cohortAssessments as $assessment) {
