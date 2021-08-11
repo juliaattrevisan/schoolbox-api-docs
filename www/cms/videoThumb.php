@@ -98,7 +98,9 @@ if (isset($type, $id)) {
                     $preSignedUrlDataObject = $preSignedUrlService->generate(
                         $videoQueue->getStorage(),
                         Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
-                        $imageFilename
+                        $imageFilename,
+                        'private',
+                        'image/jpeg'
                     );
 
                     $preSignedUrlService->download($preSignedUrlDataObject);
