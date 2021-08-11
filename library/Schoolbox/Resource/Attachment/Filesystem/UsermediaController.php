@@ -27,21 +27,24 @@ use SitePage;
 class UsermediaController extends AbstractController
 {
     /**
-     * @param bool          $multi
-     * @param string|null   $mimeFilter
+     * @param bool   $multi
+     * @param string $mimeFilter
+     * @param bool   $useFolder
+     * @param int    $defaultFolderId
      * @throws OutOfRangeException
      */
     public function __construct($multi, $mimeFilter = null, $useFolder = true, $defaultFolderId = 0)
     {
         //$mimeFilter = 'image/*';
         if ($this->notRecordable($mimeFilter)) {
-            throw new OutOfRangeException("Unable to record image only.");
+            throw new OutOfRangeException("mimeType is not recordable.");
         }
         parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
     }
 
     /**
      * checks to see if the mimetype is able to be recorded.
+     * (voice, video, screencapture)
      * @param string|null   $mimeFilter
      * @returns bool
      */
