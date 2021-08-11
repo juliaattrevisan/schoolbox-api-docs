@@ -14,9 +14,7 @@ export default {
         },
 
         /**
-         * Which folder's textboxes are in this component?
-         *
-         * Don't show usages of textboxes in this folder.
+         * Which folder's textboxes are being shown in this component?
          */
         folderId: {
             type: Number,
@@ -38,6 +36,29 @@ export default {
             })
     },
     methods: {
+        /**
+         * Does this textbox usage record contain a usage for this component's
+         * folder?
+         *
+         * Show it as "this folder" in the list of pages instead.
+         *
+         * @param {Object} usage
+         * @returns {Boolean}
+         */
+        inUseOnThisFolder(usage) {
+            return usage.folders.some((folder) => folder.id === this.folderId);
+        },
+
+        /**
+         * The folders other than the this component which this textbox is
+         * being used on.
+         *
+         * @param {Object} usage
+         * @returns {Array}
+         */
+        otherFolders(usage) {
+            return usage.folders.filter((folder) => folder.id !== this.folderId);
+        }
     },
     computed: {
     },
@@ -59,14 +80,16 @@ export default {
 
                         <p class="meta" v-if="usage.folders.length > 0">
                             Pages:
-                            <template v-for="(folder, index) in usage.folders">
-                                <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < usage.folders.length">, </template>
+                            <template v-if="inUseOnThisFolder(usage)">
+                                this page<template v-if="otherFolders(usage).length > 0">, </template>
+                            </template>
+                            <template v-for="(folder, index) in otherFolders(usage)">
+                                <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
                             </template>
                         </p>
 
                         <p class="meta" v-if="usage.dashboards.length > 0">
-                            Dashboards:
-                            <template>{{ usage.dashboards.map((v) => v.name).join(', ') }}</template>
+                            Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
                         </p>
                     </div>
                 </div>
