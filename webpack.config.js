@@ -176,6 +176,9 @@ module.exports = {
         evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/initEvidenceMediaRecording.js',
         checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
 
+        // Textboxes
+        textboxList: './library/Schoolbox/Resource/Textbox/vue/init-textbox-list.js',
+
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
