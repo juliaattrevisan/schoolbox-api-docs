@@ -57,7 +57,6 @@ export default {
     updated() {
         let self = this;
         // Apply the validation rule to each input
-        console.log(self.jQuery(self.$refs.form).find('input[type=text]'));
         self.jQuery(self.$refs.form).find('input[type=text]').each(function(index, element) {
             $(element).rules('add', {
                 requiredNotBlank: true
@@ -113,7 +112,7 @@ export default {
                             <div class="small-12 column">
                                 <label>
                                     <span class="hide-for-medium-up">Textbox</span>
-                                    <input type="text" v-model="usage.textbox.heading">
+                                    <input :name="'textbox[' + String(index) + '][heading]'" type="text" v-model="usage.textbox.heading">
                                 </label>
 
                                 <p class="meta" v-if="usage.folders.length > 0">
