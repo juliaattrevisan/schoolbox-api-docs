@@ -560,16 +560,15 @@ const submitNewComponentOrder = async () => {
         if (__hasSortChange) {
             const response = await axios.post('/homepage/configForm.php', getNewComponentOrderFormData());
             // if (response.data.hasComponentBeenDeleted) {
-                notifyOfDeletedComponent();
+                updateDeletedComponent();
             // }
             __hasSortChange = false;
-            updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
-        } else {
-            updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
-        }
+        } 
     } catch (error) {
         console.warn(error);
-    } 
+    } finally {
+        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    }
 }
 
 /**
@@ -620,7 +619,7 @@ const getComponentID = (componentElement) => {
  * The component has been deleted elsewhere, so notify the user
  * and suggest a page refresh for the latest data
  */
-const notifyOfDeletedComponent = () => {
+const updateDeletedComponent = () => {
 
     __activeElement.querySelector(SORTABLES_TRIGGER_SELECTOR).remove(); //remove the drag trigger 
     __activeElement.querySelector('[data-component-titlebar-container] > nav').remove(); //as well as the edit controls to prevent any further interactions on this component
