@@ -14,6 +14,14 @@ export default {
         },
 
         /**
+         * Endpoint for posting textbox changes.
+         */
+        postChangesEndpoint: {
+            type: String,
+            required: true,
+        },
+
+        /**
          * Which folder's textboxes are being shown in this component?
          */
         folderId: {
@@ -62,7 +70,14 @@ export default {
          */
         otherFolders(usage) {
             return usage.folders.filter((folder) => folder.id !== this.folderId);
-        }
+        },
+
+        /**
+         * Post changes to the list of textboxes.
+         */
+        postChanges() {
+            // Post changes here?
+        },
     },
     computed: {
     },
@@ -71,40 +86,46 @@ export default {
 
 </script>
 <template>
-    <ul class="information-list unsortable expandable-card">
-        <li v-for="(usage, index) in textboxes">
-            <div class="actions-small-1">
-                <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
-                <div class="list-item">
-                    <div class="small-12 column">
-                        <label>
-                            <span class="hide-for-medium-up">Textbox</span>
-                            <input type="text" v-model="usage.textbox.heading">
-                        </label>
+    <form method="post" ref="form" :action="postChangesEndpoint" @submit.prevent="postChanges">
+        <section>
+            <ul class="information-list unsortable expandable-card">
+                <li v-for="(usage, index) in textboxes">
+                    <div class="actions-small-1">
+                        <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
+                        <div class="list-item">
+                            <div class="small-12 column">
+                                <label>
+                                    <span class="hide-for-medium-up">Textbox</span>
+                                    <input type="text" v-model="usage.textbox.heading">
+                                </label>
 
-                        <p class="meta" v-if="usage.folders.length > 0">
-                            Pages:
-                            <template v-if="inUseOnThisFolder(usage)">
-                                this page<template v-if="otherFolders(usage).length > 0">, </template>
-                            </template>
-                            <template v-for="(folder, index) in otherFolders(usage)">
-                                <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
-                            </template>
-                        </p>
+                                <p class="meta" v-if="usage.folders.length > 0">
+                                    Pages:
+                                    <template v-if="inUseOnThisFolder(usage)">
+                                        this page<template v-if="otherFolders(usage).length > 0">, </template>
+                                    </template>
+                                    <template v-for="(folder, index) in otherFolders(usage)">
+                                        <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
+                                    </template>
+                                </p>
 
-                        <p class="meta" v-if="usage.dashboards.length > 0">
-                            Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
-                        </p>
+                                <p class="meta" v-if="usage.dashboards.length > 0">
+                                    Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
+                                </p>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-delete" :href="usage.textbox._links.delete" title="Delete"></a>
+                        </nav>
                     </div>
-                </div>
-                <nav>
-                    <a class="icon-delete" :href="usage.textbox._links.delete" title="Delete"></a>
-                </nav>
-            </div>
-            <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
-                <article class="content" v-html="usage.textbox.body">
-                </article>
-            </div>
-        </li>
-    </ul>
+                    <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
+                        <article class="content" v-html="usage.textbox.body">
+                        </article>
+                    </div>
+                </li>
+            </ul>
+
+            <input type="submit" value="Save" />
+        </section>
+    </form>
 </template>

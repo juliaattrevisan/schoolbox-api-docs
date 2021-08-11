@@ -37,7 +37,8 @@
         <h1>Manage Text Boxes on {{ folder.title }}</h1>
 
         <div id="textbox-list">
-            <textbox-list textbox-usage-endpoint="{{ routeLookup('textbox.getUsageForFolder', {folderId: folder.id}) }}"
+            <textbox-list textbox-usage-endpoint="{{ routeLookupIfAuthorized('textbox.getUsageForFolder', {folderId: folder.id, folder: folder}) }}"
+                          post-changes-endpoint="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}"
                           :folder-id="Number('{{ folder.id }}')"
             >
             </textbox-list>
