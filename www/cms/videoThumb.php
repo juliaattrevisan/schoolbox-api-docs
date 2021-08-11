@@ -15,6 +15,8 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
+use Schoolbox\Resource\Storage\Transform\Mapper;
+use Schoolbox\Resource\Storage\Transform\Model;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -113,6 +115,18 @@ if (isset($type, $id)) {
                 header('Content-Type: image/jpeg');
                 header("Content-Length: {$image->getSize()}");
                 fpassthru($image->readStream());
+
+                $fileName = explode('-', basename($image->getPath()));
+
+                /**
+                 * Insert video thumbnail transforms on-demand if it exists on disk but not in storage_transform table yet.
+                 */
+                $transformMapper = Mapper::getInstance();
+                $transformModel  = $transformMapper->findByHashAndCacheKey($fileName[0], $size);
+
+                if (!$transformModel) {
+                    $transformMapper->createRecord($fileName[0], $fileName[1], $image->getSize(), Model::STATE_DONE);
+                }
                 exit;
             }
 
