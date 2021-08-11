@@ -47,13 +47,15 @@ class UsermediaController extends AbstractController
      */
     protected function notRecordable($mimeFilter)
     {
-        //image/*,audio/*,video/*
-        $tmp = explode('/', $mimeFilter);
-        if (in_array($tmp[0], array("video","audio","*",""))) {
-            return false;
-        } else {
-            return true;
+        $recordable = false;
+        $csv = str_getcsv($mimeFilter);
+        foreach ($csv as $mime) {
+            $tmp = explode('/', $mime);
+            if (in_array($tmp[0], array("video","audio","*",""))) {
+                $recordable = true;
+            }
         }
+        return !$recordable;
     }
 
     /**
