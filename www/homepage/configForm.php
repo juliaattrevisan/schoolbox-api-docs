@@ -72,11 +72,10 @@ if (is_numeric($_REQUEST['cid'])) {
             if (is_object($instance)) {
                 $cClass = $instance->getDefinition()->getClass();
             } else {
-                exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
+                $page->outputJson(['hasComponentBeenDeleted'=>true], false, 409);
+                die();
             }
-            $controller = new $cClass($instance, $page->getDi()->get('session')->get('user'), $page);
-            $renderer   = new Component_Renderer();
-            $renderer->renderHomepageComponent($page, $folderMapper->findById($_POST['cid']), $controller);
+            $page->outputJson(['hasComponentBeenDeleted'=>false], false, 200);
         }
     } elseif ($_POST['cid'] && is_numeric($_POST['delete'])) { // AJAX request to delete component from homepage
 // locate the instance, locate its config instances, then blast them away
