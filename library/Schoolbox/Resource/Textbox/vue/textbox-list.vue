@@ -11,7 +11,17 @@ export default {
         textboxUsageEndpoint: {
             type: String,
             required: true,
-        }
+        },
+
+        /**
+         * Which folder's textboxes are in this component?
+         *
+         * Don't show usages of textboxes in this folder.
+         */
+        folderId: {
+            type: Number,
+            required: true,
+        },
     },
     data() {
         return {
