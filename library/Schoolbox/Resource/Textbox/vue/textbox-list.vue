@@ -60,7 +60,7 @@ export default {
                         <p class="meta" v-if="usage.folders.length > 0">
                             Pages:
                             <template v-for="(folder, index) in usage.folders">
-                                <a :href="folder._links.view">{{ folder.title }}</a><template v-if="(index + 1) < usage.folders.length">, </template>
+                                <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < usage.folders.length">, </template>
                             </template>
                         </p>
 
