@@ -5,8 +5,7 @@
  *
  */
 
-import { mapState } from 'vuex';
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import axios from 'axios';
 import { gsap } from 'gsap/all'
 import AdminListHeader from './admin-list-header';
@@ -39,10 +38,9 @@ export default {
             hasDataLoadError: false, 
             // data: null, //contains the loaded data
             rows: [], //to display and possibly edit the rows 
-            popOutHeight: 0, //so the popout 
+            popOutHeight: 0, //so the popout can allow enough vertical space to fit the pop out
             saveStatus: 'Save', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
-            selectedNameInPopOut: '', //to highlight all other rows that have that permission
             isProcessing: false, //to prevent multiple rapid-fire submissions
             isSaving: false,
         }
@@ -58,16 +56,7 @@ export default {
 
         ...mapGetters([
             'headerFields'
-        ]),
-
-        /**
-         * Retrieve only those fields that will appear in the header
-         * 
-         * @returns { Array of Objects }
-         */
-        // headerFields () {
-        //     return this.data.fields.filter((field) => field.hasOwnProperty('width')); //use width to determine if it's to display in the header
-        // },  
+        ]), 
 
         /**
          * Whether the admin-list-pop-out.vue is requred
@@ -76,29 +65,6 @@ export default {
          */
         hasPopOut () {
             return this.data.fields.some((field) => field.hasOwnProperty('isPopOutList')); 
-        }, 
-
-        /**
-         * the popOut field that's used in the header, and is the reference for 
-         * the following popOutFields
-         * 
-         * @returns { Object }
-         */
-        popOutHeaderField () {
-            const popOutHeaderField = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
-            if (typeof popOutHeaderField !== 'undefined') {
-                return popOutHeaderField;
-            } 
-            return {};
-        }, 
-        
-        /**
-         * Just those fields that are used in a popoutList
-         * 
-         * @returns { Array of Objects }
-         */
-        popOutFields () {
-            return this.data.fields.filter((field) => field.popOutList);
         }, 
 
         /**
@@ -302,7 +268,7 @@ export default {
          */
         updateSequenceOrder () {
             const allRowElements = document.querySelector('[data-list]').children;
-            Array.from(allRowElements).forEach( (rowElement, index) => {
+            Array.from(allRowElements).forEach((rowElement, index) => {
                 const rowId = rowElement.dataset.rowId;
                 const matchingRowData = this.rows.find((row) => Number(row.id) === Number(rowId));
                 matchingRowData.sequence = ++index;
@@ -377,19 +343,6 @@ export default {
             }
         },
 
-        /**
-         * To highlight all rows which also have the same pop out option
-         * for an easier visual way to check which rows have the same pop out option
-         */
-        onPopOutNameSelected (popOutName) {
-            if (this.selectedNameInPopOut === popOutName) { //so can toggle on/off
-                this.selectedNameInPopOut = '';
-            } else {
-                this.selectedNameInPopOut = popOutName;
-            }
-
-        }
-
     }
 
 }
@@ -425,6 +378,7 @@ export default {
                                     :style="listStyles"
                                     v-bind:css="false"
                                     data-sortable 
+                                    data-list
                                     @before-enter="onBeforeEnter"
                                     @enter="onEnter"
                                     @leave="onLeave"
@@ -434,18 +388,12 @@ export default {
                                         :key="`${row.id}-${index}`"
                                         :header-fields="headerFields"
                                         :row="row"
-                                        :pop-out-header-field="popOutHeaderField"
-                                        :pop-out-fields="popOutFields"
-                                        :selected-pop-out-name="selectedNameInPopOut"
-                                        @on-pop-out-name-selected="onPopOutNameSelected"
                                         @on-delete-row-selected="onDeleteRowSelected"
                                     />
                                 </transition-group>
 
                                 <admin-list-pop-out
                                     v-if="hasPopOut"
-                                    :header-field="popOutHeaderField"
-                                    :fields="popOutFields" 
                                     :save-status="saveStatus" 
                                     :is-processing="isProcessing" 
                                     @on-pop-out-mounted="onPopOutMounted"

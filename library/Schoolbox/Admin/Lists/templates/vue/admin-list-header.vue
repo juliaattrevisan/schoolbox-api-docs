@@ -1,13 +1,11 @@
 <script>
-import { PlotLineOrBand } from 'highcharts';
 
 /**
  * The list header to display the record titles
  *
  */
 
-import { mapState } from 'vuex';
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex';
 
 export default {
 

@@ -5,20 +5,12 @@
  * Currently only checkboxes are being considered, can be extended as required
  */
 
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { gsap } from 'gsap/all';
 
 export default {
 
     props: {
-        headerField: { //the header field object
-            type: Object,
-            required: true
-        },
-        fields: { //the fields to display within the pop out
-            type: Array,
-            required: true
-        },
         saveStatus: { //to update the button text when saving
             type: String,
             required: true
@@ -34,6 +26,11 @@ export default {
         ...mapState({
             selectedRow: state => state.selectedRow,
             isOpen: state => state.isPopOutOpen,
+        }),
+
+        ...mapGetters({
+            headerField: 'popOutHeaderField', //the header field object
+            fields: 'popOutFields' //the fields to display within the pop out
         }),
 
         /**
@@ -150,7 +147,7 @@ export default {
     <div class="outer-container" ref="outerContainer">
         <div class="inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
-            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="$store.commit('closePopUp')"></a>
+            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="$store.commit('closePopOut')"></a>
             <ul class="option-list" data-option-list>
                 <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px;">
                     <input

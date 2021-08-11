@@ -3,8 +3,10 @@
 /**
  * A 'pop out' for a row, it's a list of options that animate out from the right side
  * Providing a clearer focus on the list of options available to the current row. 
- * Its intent is to minimise the clutter of a checkbox farm that can become pretty messy UI wise. 
+ * Its current intent is to minimise the clutter of a checkbox farm that can become pretty messy UI wise. 
  */
+
+import { mapState, mapGetters } from 'vuex';
 
 export default {
 
@@ -12,18 +14,6 @@ export default {
         row: { //row to display
             type: Object,
             required: true
-        },
-        popOutHeaderField: { //the title of the pop out
-            type: Object,
-            required: false
-        },
-        popOutFields: { //when a #admin-list-pop-out.vue is in use
-            type: Array,
-            required: false    
-        },
-        selectedPopOutName: { //to show all rows with the same permission
-            type: String,
-            required: false
         },
     },
 
@@ -35,6 +25,15 @@ export default {
 
     computed: {
         
+        ...mapState({
+            selectedPopOutName: state => state.selectedPopOutName, //to show all rows with the same pop out option active
+        }),
+
+        ...mapGetters({
+            headerField: 'popOutHeaderField', //the header field object
+            fields: 'popOutFields' //the fields to display within the pop out
+        }),
+
         /**
          * To retrieve a list of key/value pairs contained within the row object
          *
@@ -53,10 +52,10 @@ export default {
          *
          * @returns { Array of Objects }
          */
-        activePopOutFields () {
-            const fieldIdList = this.popOutFields.map((field) => field.id); //a list of just field.id to get the relevant key/value in rowKeyValueList
+        activeFields () {
+            const fieldIdList = this.fields.map((field) => field.id); //a list of just field.id to get the relevant key/value in rowKeyValueList
             const popOutKeyValueList = this.rowKeyValueList.filter((row) => fieldIdList.some((fieldId) => fieldId === row.key)); //pull out those rowKeyValue object pairs that are part of the pop out 
-            return this.popOutFields.filter((field, index) => popOutKeyValueList[index].value); //when the value is set to true, put in the list
+            return this.fields.filter((field, index) => popOutKeyValueList[index].value); //when the value is set to true, put in the list
         },
 
     },
@@ -73,10 +72,10 @@ export default {
          * So say for 'Guest' there will be less permissions available then for 'Staff'
          */
         checkChangePopOut () {
-            if (this.popOutHeaderField.changePopOut) {
+            if (this.headerField.changePopOut) {
                 this.enableChangePopOutWatcher(); //start tracking changes
-                const currentChangePopOutSelection = this.row[this.popOutHeaderField.changePopOut]; //eg: this will return the current selection of 'Role Type' on Lists > Roles
-                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[currentChangePopOutSelection];  //the list of options available based on the selection of 'changePopOut'
+                const currentChangePopOutSelection = this.row[this.headerField.changePopOut]; //eg: this will return the current selection of 'Role Type' on Lists > Roles
+                const changePopOutOptions = this.headerField.changePopOutOptions[currentChangePopOutSelection];  //the list of options available based on the selection of 'changePopOut'
                 this.updatePopOut(changePopOutOptions);
             }
         },
@@ -87,8 +86,8 @@ export default {
          * For example if there's 'Role Type' like in Lists > Roles, we would hide all fields if 'Guest' was selected
          */
         enableChangePopOutWatcher () {
-            this.$watch(`row.${this.popOutHeaderField.changePopOut}`, (newValue) => {
-                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[newValue]; //the list of options available based on the selection of 'changePopOut' 
+            this.$watch(`row.${this.headerField.changePopOut}`, (newValue) => {
+                const changePopOutOptions = this.headerField.changePopOutOptions[newValue]; //the list of options available based on the selection of 'changePopOut' 
                 this.updatePopOut(changePopOutOptions);
             });
         },
@@ -104,7 +103,7 @@ export default {
             } else {
                 this.isPopOutDisabled = true;
             }
-            this.popOutFields.forEach((option) => { //loop through and set those options to true that are available in the current changePopOutOption
+            this.fields.forEach((option) => { //loop through and set those options to true that are available in the current changePopOutOption
                 if (changePopOutOptions.includes(option.id)) {
                     this.row[option.id] = true;
                 } else {
@@ -113,32 +112,17 @@ export default {
             });
         },
 
-        /**
-         * Show the pop out fields
-         */
-        onPopOutSelected () {
-            this.$store.commit('openPopUp', this.row);
-            // this.$emit('on-pop-out-name-selected', '');
-        },
-
-        /**
-         * Higlight the currently selected pop out name
-         */
-        onPopOutNameSelected (popOutName) {
-            this.$emit('on-pop-out-name-selected', popOutName);
-        }
-
     }
 
 }
 </script>
 
 <template>
-    <div class="pop-out-list-container">
-        <transition-group name="pop-out-list" tag="div" class="pop-out-list">
-            <button v-for="field in activePopOutFields" :key="field.caption" :class="[ selectedPopOutName === field.caption ? 'pop-out-list-item-active' : '', 'pop-out-list-item']" @click.prevent="onPopOutNameSelected(field.caption)">{{ field.caption }}</button>
+    <div class="list-container">
+        <transition-group name="list" tag="div" class="list">
+            <button v-for="field in activeFields" :key="field.caption" :class="[ selectedPopOutName === field.caption ? 'item-active' : '', 'item']" @click.prevent="$store.commit('onPopOutNameSelected', field.caption)">{{ field.caption }}</button>
         </transition-group>
-        <button @click.prevent="onPopOutSelected" :disabled="isPopOutDisabled" class="update-pop-out-button button icon-modify" title="Modify"></button>
+        <button @click.prevent="$store.commit('openPopOut', row)" :disabled="isPopOutDisabled" class="update-button button icon-modify" title="Modify"></button>
     </div>
 </template>
 
@@ -146,29 +130,29 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-.pop-out-list-container { //to contain the .pop-out-list and the .update-pop-out-button
+.list-container { //to contain the .pop-out-list and the .update-button
     display: flex;
     align-items: stretch;
     width: 100%;
     border: 1px solid $form-border-color;
 }
 
-.pop-out-list {
+.list {
     width: 100%;
     padding: 2px;
     transition: height 0.3s;
 }
 
-.pop-out-list-enter, .pop-out-list-leave-to { //to animate on/off when toggling in #roles-list-permissions.vue
+.list-enter, .list-leave-to { //to animate on/off when toggling in #roles-list-permissions.vue
     opacity: 0;
     transform: translateY(5px);
 }
 
-.pop-out-list-leave-active {
+.list-leave-active {
     position: absolute;
 }
 
-.pop-out-list-item {
+.item {
     min-height: auto;
     margin: 2px;
     padding: 5px 10px;
@@ -182,11 +166,11 @@ export default {
     }
 }
 
-.pop-out-list-item-active {
+.item-active {
     background: $content-ui-background;
 }
 
-.update-pop-out-button {
+.update-button {
     flex: 0 0 40px;
     margin: 0px;
     padding: 0.5rem;

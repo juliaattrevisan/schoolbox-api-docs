@@ -4,7 +4,7 @@
  * Display an indivudal row, providing access to view and edit permissions and delete
  */
 
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import AdminListRowLookup from './admin-list-row-lookup';
 import AdminListRowColour from './admin-list-row-colour';
 import AdminListRowPopOut from './admin-list-row-pop-out';
@@ -18,34 +18,27 @@ export default {
     },
 
     props: {
-        headerFields: { //the headerFields to display within the list item
-            type: Array,
-            required: true
-        },
         row: { //row to display
             type: Object,
             required: true
         },
-        popOutHeaderField: { //the title of the pop out
-            type: Object,
-            required: false
-        },
-        popOutFields: { //when a #admin-list-pop-out.vue is in use
-            type: Array,
-            required: false    
-        },
-        selectedPopOutName: { //to show all rows with the same permission
-            type: String,
-            required: false
-        },
     },
 
-    computed: mapState({
+    computed: {
 
-        isSortable: state => state.data.isSortable,
-        canDelete: state => state.data.canDelete,
-        selectedRow: state => state.selectedRow,
-        isPopOutOpen: state => state.isPopOutOpen,
+        ...mapState({
+            isSortable: state => state.data.isSortable,
+            canDelete: state => state.data.canDelete,
+            selectedRow: state => state.selectedRow,
+            isPopOutOpen: state => state.isPopOutOpen,
+            selectedPopOutName: state => state.selectedPopOutName,
+        }),
+
+        ...mapGetters([
+            'headerFields', //the headerFields to display within the list item
+            'popOutHeaderField', //the title field of the pop out
+            'popOutFields', //when a #admin-list-pop-out.vue is in use
+        ]),
 
         /**
          * To retrieve a list of key/value pairs contained within the row object
@@ -69,16 +62,9 @@ export default {
             return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
-    }),
+    },
 
     methods: {
-
-        /**
-         * Higlight the currently selected pop out name
-         */
-        onPopOutNameSelected (popOutName) {
-            this.$emit('on-pop-out-name-selected', popOutName);
-        },
 
         /**
          * To confirm whether should delete the row
@@ -140,10 +126,6 @@ export default {
                         <template v-else-if="field.isPopOutList">
                             <admin-list-row-pop-out
                                 :row="row"
-                                :pop-out-header-field="popOutHeaderField"
-                                :pop-out-fields="popOutFields"
-                                :selected-pop-out-name="selectedPopOutName"
-                                @on-pop-out-name-selected="onPopOutNameSelected"
                             />
                         </template>
 
