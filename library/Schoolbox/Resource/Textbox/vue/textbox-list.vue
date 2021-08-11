@@ -36,8 +36,15 @@ export default {
             jQuery: window.jQuery,
         }
     },
-    mounted: function () {
+    mounted() {
         let self = this;
+        // Apply the validator to the form
+        self.jQuery(self.$refs.form).alaressValidate({
+            submitHandler(form, event) {
+                event.preventDefault();
+                self.postChanges();
+            }
+        });
         axios
             .get(self.textboxUsageEndpoint)
             .then(function (response) {
@@ -45,7 +52,17 @@ export default {
 
                 // Apply the collapser
                 self.$nextTick(() => self.jQuery('[data-collapser^="collapser-textbox"]').collapsable());
-            })
+            });
+    },
+    updated() {
+        let self = this;
+        // Apply the validation rule to each input
+        console.log(self.jQuery(self.$refs.form).find('input[type=text]'));
+        self.jQuery(self.$refs.form).find('input[type=text]').each(function(index, element) {
+            $(element).rules('add', {
+                requiredNotBlank: true
+            });
+        });
     },
     methods: {
         /**
@@ -86,7 +103,7 @@ export default {
 
 </script>
 <template>
-    <form method="post" ref="form" :action="postChangesEndpoint" @submit.prevent="postChanges">
+    <form method="post" ref="form" :action="postChangesEndpoint">
         <section>
             <ul class="information-list unsortable expandable-card">
                 <li v-for="(usage, index) in textboxes">
