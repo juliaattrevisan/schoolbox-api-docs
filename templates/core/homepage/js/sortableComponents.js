@@ -559,9 +559,9 @@ const submitNewComponentOrder = async () => {
     try {
         if (__hasSortChange) {
             const response = await axios.post('/homepage/configForm.php', getNewComponentOrderFormData());
-            // if (response.data.hasComponentBeenDeleted) {
+            if (response.data.hasComponentBeenDeleted) {
                 updateDeletedComponent();
-            // }
+            }
             __hasSortChange = false;
         } 
     } catch (error) {

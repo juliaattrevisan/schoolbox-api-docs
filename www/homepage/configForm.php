@@ -72,7 +72,7 @@ if (is_numeric($_REQUEST['cid'])) {
             if (is_object($instance)) {
                 $cClass = $instance->getDefinition()->getClass();
             } else {
-                $page->outputJson(['hasComponentBeenDeleted'=>true], false, 409);
+                $page->outputJson(['hasComponentBeenDeleted'=>true], false, 200);
                 die();
             }
             $page->outputJson(['hasComponentBeenDeleted'=>false], false, 200);
