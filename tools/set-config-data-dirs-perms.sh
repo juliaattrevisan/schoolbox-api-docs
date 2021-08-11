@@ -256,9 +256,9 @@ function update_directories(){
       fi
       # TODO Should be 755/644, but need this for www-data to write vagrant-owned dirs/files in dev environment. See IST-1088
       debug "Setting directory modes to $MODE_DIR"
-      find "$dir_path" -type d -exec chmod -c $MODE_DIR {} +
+      find "$dir_path" -type d -not -perm $MODE_DIR -exec chmod -c $MODE_DIR '{}' +
       debug "Setting file modes to $MODE_DIR_FILES"
-      find "$dir_path" -type f -exec chmod -c $MODE_DIR_FILES {} +
+      find "$dir_path" -type f -not -perm $MODE_DIR_FILES -exec chmod -c $MODE_DIR_FILES '{}' +
     fi
   done
 }
