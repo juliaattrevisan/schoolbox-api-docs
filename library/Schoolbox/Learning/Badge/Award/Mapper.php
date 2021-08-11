@@ -194,34 +194,41 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find awarded badges in the last year (the most recent rolling 12 months)
      *
-     * @param User                     $user
-     * @param string                   $awardStatus
+     * @param array                    $userIds
+     * @param string|null              $awardStatus
      * @param Alaress_Date_Format|null $expiryDate  If provided, only get awards
+     * @param array|null               $badgeIds
      *                                              which aren't expired by this
      *                                              date.
      * @return GenericCollection
      */
     public function findRecentForUser(
-        User $user,
-        string $awardStatus,
-        ?Alaress_Date_Format $expiryDate
+        array $userIds,
+        ?string $awardStatus,
+        ?Alaress_Date_Format $expiryDate,
+        ?array $badgeIds = null
     ): GenericCollection {
         /* Ensure $awardStatus is one we allow; empty collection returned if invalid
          */
-        if (!in_array($awardStatus, [ Model::AWARD_STATUS_GOAL, Model::AWARD_STATUS_ACHIEVEMENT ], true)) {
+        if ($awardStatus && !in_array($awardStatus, [Model::AWARD_STATUS_GOAL, Model::AWARD_STATUS_ACHIEVEMENT], true)) {
             return $this->createCollection();
         }
 
         /* Otherwise get the $awardStatus records
          */
         $from = Alaress_Date_Format::now()->addYears(-1);
-        $to = Alaress_Date_Format::now();
+        $to   = Alaress_Date_Format::now();
 
         $pb = $this->getPredicateBuilder()
-            ->equals('recipient_id', $user->getId())
-            ->equals('status', $awardStatus)
-            ->isNull('award_id')
-            ->betweenDates('awarded_at', $from, $to);
+                   ->in('recipient_id', $userIds)
+                   ->isNull('award_id')
+                   ->betweenDates('awarded_at', $from, $to);
+        if ($awardStatus) {
+            $pb = $pb->equals('status', $awardStatus);
+        }
+        if (is_array($badgeIds) and count($badgeIds) > 0) {
+            $pb = $pb->in('badge_id', $badgeIds);
+        }
         if ($expiryDate) {
             $pb = $pb->any(
                 $this->getPredicateBuilder()
@@ -230,11 +237,14 @@ class Mapper extends \Schoolbox\Mapper
             );
         }
 
-        return $this->findByPredicates($pb, [
-            'order' => [
-                'awarded_at' => 'desc'
+        return $this->findByPredicates(
+            $pb,
+            [
+                'order' => [
+                    'awarded_at' => 'desc',
+                ],
             ]
-        ]);
+        );
     }
 
 

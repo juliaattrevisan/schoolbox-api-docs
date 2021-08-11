@@ -56,6 +56,7 @@ class Definition extends AbstractDefinition
         return $configLoader->get('curriculum_tagging_enabled')
             ? [
                 Page\Model::PAGE_BADGE_LIST,
+                Page\Model::PAGE_AWARD_LIST,
             ]
             : [];
     }

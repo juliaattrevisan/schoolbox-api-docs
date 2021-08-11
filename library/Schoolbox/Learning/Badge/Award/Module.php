@@ -15,7 +15,9 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
 use Schoolbox\Filter\Mapper as FilterMapper;
+use Schoolbox\Filter\Selection\Mapper as FilterSelectionMapper;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -184,6 +186,22 @@ class Module extends BaseModule
             'getSetAsGoalForSelfForm',
             $setGoalForSelfRule
         );
+
+        $this->register(
+            self::METHOD_GET,
+            '/list/{folderId}/data',
+            'getListByFolderId',
+            $viewAwardedBadges,
+            Closure::fromCallable([$this, 'preloadFolder'])
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/list/{folderId}',
+            'getListPage',
+            $viewAwardedBadges,
+            Closure::fromCallable([$this, 'preloadFolder'])
+        );
     }
 
 
@@ -209,7 +227,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     private function preloadUser(array $params): array
     {
@@ -227,8 +245,7 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
      */
     private function preloadBadge(array $params): array
     {
@@ -247,7 +264,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     private function preloadUsers(array $params): array
     {
@@ -273,8 +290,7 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException
      */
     private function preloadAward(array $params): array
     {
@@ -283,6 +299,31 @@ class Module extends BaseModule
                             ->get(Mapper::class)
                             ->findById($params['awardId']),
         ];
+    }
+
+
+    /**
+     * Loads Folder Model instance from route params
+     *
+     * @param array $params
+     * @return array
+     * @throws MapperException
+     */
+    private function preloadFolder(array $params): array
+    {
+        $folder   = 'folder';
+        $folderId = 'folderId';
+
+        if (($params[$folder] ?? null) instanceof \Schoolbox\Resource\Folder\Model) {
+            $preload[$folder] = $params[$folder];
+        } elseif (!array_key_exists($folderId, $params)) {
+            throw new \UnexpectedValueException("No 'folderId' found in route params");
+        } else {
+            $preload[$folder] = $this->getMapperFactory()
+                                     ->get(\Schoolbox\Resource\Folder\Mapper::class)->findById($params[$folderId]);
+        }
+
+        return $preload;
     }
 
 
@@ -305,11 +346,12 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'mapper'               => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'badgeMapper'          => $this->getMapperFactory()->getLazy(BadgeMapper::class),
-                    'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
-                    'filterMapper'         => $this->getMapperFactory()->getLazy(FilterMapper::class),
-                    'userMapper'           => $this->getMapperFactory()->getLazy(UserMapper::class),
+                    'mapper'                => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'badgeMapper'           => $this->getMapperFactory()->getLazy(BadgeMapper::class),
+                    'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
+                    'filterMapper'          => $this->getMapperFactory()->getLazy(FilterMapper::class),
+                    'filterSelectionMapper' => $this->getMapperFactory()->getLazy(FilterSelectionMapper::class),
+                    'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
                 ]
             )
         );

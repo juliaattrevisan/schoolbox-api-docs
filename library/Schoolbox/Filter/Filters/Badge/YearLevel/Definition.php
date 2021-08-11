@@ -64,6 +64,7 @@ class Definition extends AbstractDefinition
     {
         return [
             Filter\Page\Model::PAGE_BADGE_LIST,
+            Filter\Page\Model::PAGE_AWARD_LIST,
         ];
     }
 

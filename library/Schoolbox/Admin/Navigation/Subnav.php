@@ -260,6 +260,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the goal and achievements search page.',
                     ],
+                    '/adminv2/filters/awardList'      => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_AWARD_LIST),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_AWARD_LIST),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the goal and achievements search page.',
+                    ],
                     '/adminv2/filters/classMarkbook'  => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK),
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK),

@@ -51,6 +51,9 @@ class LabelBuilder
             case Model::PAGE_BADGE_LIST:
                 return "Badge List";
 
+            case Model::PAGE_AWARD_LIST:
+                return "Badge Report";
+
             case Model::PAGE_LEARNING_ANALYTICS:
                 // I don't think this filter is in use at all:
                 // it does have a label though

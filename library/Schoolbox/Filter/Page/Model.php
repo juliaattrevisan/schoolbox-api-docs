@@ -31,6 +31,7 @@ class Model
     public const PAGE_UPCOMING_ASSESSMENTS = 'dueWorkCal';
     public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
     public const PAGE_BADGE_LIST          = 'badgeList';
+    public const PAGE_AWARD_LIST          = 'awardList';
 
 
     /**
@@ -113,6 +114,9 @@ class Model
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,
+            ],
+            self::PAGE_AWARD_LIST => [
+                Role::STAFF,
             ],
         ];
     }
