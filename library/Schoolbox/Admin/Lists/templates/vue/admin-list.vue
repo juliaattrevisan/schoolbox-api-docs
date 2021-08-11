@@ -214,7 +214,7 @@ export default {
          *
          * @param { Number }
          */
-        onDeleteRow (selectedRow) {
+        onDeleteRowSelected (selectedRow) {
             this.selectedRow = selectedRow;
             if (selectedRow.isNew) { //hasn't been placed int he DB yet, so no need to confirm its removal
                 this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
@@ -442,7 +442,7 @@ export default {
                                         :selected-pop-out-name="selectedNameInPopOut"
                                         @on-pop-out-selected="onPopOutSelected"
                                         @on-pop-out-name-selected="onPopOutNameSelected"
-                                        @on-delete-row-selected="onDeleteRow"
+                                        @on-delete-row-selected="onDeleteRowSelected"
                                     />
                                 </transition-group>
 
