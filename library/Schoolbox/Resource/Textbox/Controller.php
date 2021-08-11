@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Textbox;
 use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
 use Component_Instance;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -148,7 +149,7 @@ class Controller extends Base
      * A list of all the textboxes that exist in $folderId
      * Also get an index of their usages
      *
-     * @api GET /textbox/folder/{id}
+     * @api GET /textbox/folder/{folderId}
      * @param FolderModel $folder
      */
     public function getIndexForFolder(FolderModel $folder): void
@@ -173,14 +174,13 @@ class Controller extends Base
     /**
      * Output textbox usage for this folder, as a JSON response.
      *
-     * @api GET /textbox/folder/{id}/usage
+     * @api GET /textbox/folder/{folderId}/usage
+     * @since 21.1
      *
      * @param FolderModel $folder
      */
     public function getUsageForFolder(FolderModel $folder): void
     {
-        $usages = $this->mapper->findUsage($folder->getId());
-
         // Convert `$usages` to an array structure
         $translateFolder = static function (FolderModel $folder) {
             return [
@@ -188,25 +188,37 @@ class Controller extends Base
                 'name'  => $folder->getName(),
                 'title' => $folder->getTitle(),
                 'codes' => $folder->getCodes(),
+                '_links'   => [
+                    'view' => '/homepage/' . $folder->getId(),
+                ],
             ];
         };
-        foreach ($usages as $textboxId => $usage) {
-            $usages[$textboxId]['folders'] = $usage['folders']->map($translateFolder);
+
+        $usages = [];
+        foreach ($this->mapper->findUsage($folder->getId()) as $usage) {
             /** @var Model $textbox */
-            $textbox = $usages[$textboxId]['textbox'];
-            $usages[$textboxId]['textbox'] = [
-                'id'       => $textbox->getId(),
-                'body'     => $textbox->getBody(),
-                'category' => $translateFolder($textbox->getCategory()),
-                '_links'   => [
-                    'delete' => $this->getRouteIfAuthorized(
-                        'textbox.deleteTextbox',
-                        [
-                            'textbox' => $textbox,
-                            'folder'  => $textbox->getCategory(),
-                            'id'      => $textbox->getId(),
-                        ]
-                    ),
+            $textbox = $usage['textbox'];
+
+            /** @var GenericCollection|FolderModel[] $folders */
+            $folders  = $usage['folders'] ?? new GenericCollection(FolderModel::class);
+            $usages[] = [
+                'dashboards' => $usage['dashboards'],
+                'folders'    => $folders->map($translateFolder),
+                'textbox'    => [
+                    'id'       => $textbox->getId(),
+                    'heading'  => $textbox->getHeading(),
+                    'body'     => $textbox->getBody(),
+                    'category' => $translateFolder($textbox->getCategory()),
+                    '_links'   => [
+                        'delete' => $this->getRouteIfAuthorized(
+                            'textbox.deleteTextbox',
+                            [
+                                'textbox' => $textbox,
+                                'folder'  => $textbox->getCategory(),
+                                'id'      => $textbox->getId(),
+                            ]
+                        ),
+                    ]
                 ]
             ];
         }
