@@ -501,15 +501,15 @@ class Queue extends ResourceVideo
      */
     private function createStorageTransform(string $fileName, ?int $fileSize): void
     {
-        $fileName = explode('-', basename($fileName));
+        $baseFileName = explode('-', basename($fileName));
         $transformMapper = Mapper::getInstance();
 
-        $transformModel = $transformMapper->findByHashAndCacheKey($fileName[0], $fileName[1]);
+        $transformModel = $transformMapper->findByHashAndCacheKey($baseFileName[0], $baseFileName[1]);
 
         if ($transformModel) {
             $transformMapper->save($transformModel->setSize($fileSize)->setState(Model::STATE_DONE));
         } else {
-            $transformMapper->createRecord($fileName[0], $fileName[1], $fileSize, Model::STATE_DONE);
+            $transformMapper->createRecord($baseFileName[0], $baseFileName[1], $fileSize, Model::STATE_DONE);
         }
     }
 
