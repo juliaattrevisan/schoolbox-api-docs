@@ -5,6 +5,7 @@
  * Currently only checkboxes are being considered, can be extended as required
  */
 
+import { mapState } from 'vuex';
 import { gsap } from 'gsap/all';
 
 export default {
@@ -18,14 +19,6 @@ export default {
             type: Array,
             required: true
         },
-        selectedRow: { //to know which row to display
-            type: Object,
-            required: true
-        },
-        isOpen: { //to open and close the list
-            type: Boolean,
-            required: true
-        },
         saveStatus: { //to update the button text when saving
             type: String,
             required: true
@@ -37,6 +30,11 @@ export default {
     },
 
     computed: {
+
+        ...mapState({
+            selectedRow: state => state.selectedRow,
+            isOpen: state => state.isPopOutOpen,
+        }),
 
         /**
          * When 'changePopOut' is set on the popOutList, we need to consider 
@@ -152,7 +150,7 @@ export default {
     <div class="outer-container" ref="outerContainer">
         <div class="inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
-            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="$emit('on-pop-out-closed')"></a>
+            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="$store.commit('closePopUp')"></a>
             <ul class="option-list" data-option-list>
                 <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px;">
                     <input

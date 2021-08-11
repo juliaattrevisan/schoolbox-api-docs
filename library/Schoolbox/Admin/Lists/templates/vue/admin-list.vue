@@ -5,6 +5,8 @@
  *
  */
 
+import { mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import axios from 'axios';
 import { gsap } from 'gsap/all'
 import AdminListHeader from './admin-list-header';
@@ -35,11 +37,9 @@ export default {
         return {
             isDataLoaded: false, 
             hasDataLoadError: false, 
-            data: null, //contains the loaded data
+            // data: null, //contains the loaded data
             rows: [], //to display and possibly edit the rows 
-            isPopOutOpen: false, //to open and close the list
             popOutHeight: 0, //so the popout 
-            selectedRow: {}, //to track which row is selected
             saveStatus: 'Save', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
             selectedNameInPopOut: '', //to highlight all other rows that have that permission
@@ -50,14 +50,24 @@ export default {
 
     computed: {
 
+        ...mapState({
+            data: state => state.data,
+            selectedRow: state => state.selectedRow,
+            isPopOutOpen: state => state.isPopOutOpen,
+        }),
+
+        ...mapGetters([
+            'headerFields'
+        ]),
+
         /**
          * Retrieve only those fields that will appear in the header
          * 
          * @returns { Array of Objects }
          */
-        headerFields () {
-            return this.data.fields.filter((field) => field.hasOwnProperty('width')); //use width to determine if it's to display in the header
-        },  
+        // headerFields () {
+        //     return this.data.fields.filter((field) => field.hasOwnProperty('width')); //use width to determine if it's to display in the header
+        // },  
 
         /**
          * Whether the admin-list-pop-out.vue is requred
@@ -100,6 +110,18 @@ export default {
             return this.rows.slice().sort((a, b) => a.sequence - b.sequence);
         },
 
+        /**
+         * 
+         *
+         * @returns { Object }
+         */
+        listStyles () {
+            return {
+                minHeight: this.popOutHeight + 'px',
+                pointerEvents: this.isPopOutOpen ? 'none' : 'auto' //prevent editing/sorting while popoutList is open
+            }
+        }
+
     },
 
     mounted () {
@@ -114,7 +136,8 @@ export default {
         async getData () {
             try {
                 const response = await axios.get(`/adminv2/lists/data/${this.tableName}`);
-                this.data = response.data; 
+                // this.data = response.data; 
+                this.$store.commit('setData', response.data);
                 this.initRows();
             } catch (error) {
                 this.hasDataLoadError = true; //show load error
@@ -151,24 +174,7 @@ export default {
         onPopOutMounted (popOutHeight) {
             this.popOutHeight = popOutHeight;
         },
-
-        /**
-         * Show the popout options
-         */
-        onPopOutSelected (selectedRow) {
-            this.selectedRow = selectedRow;
-            this.isPopOutOpen = true;
-            document.querySelector('[data-list]').style.pointerEvents = 'none'; //prevent editing/sorting while popoutList is open
-        },
-
-        /**
-         * Close the pop out options
-         */
-        onPopOutClosed () {
-            this.isPopOutOpen = false; 
-            document.querySelector('[data-list]').style.pointerEvents = 'auto';
-        },
-
+        
         /**
          * Push in a new row, retrieving the default value for each property and 
          * then adding in additional values required to track and add
@@ -410,20 +416,15 @@ export default {
 
                             <div class="list-container">
 
-                                <admin-list-header 
-                                    :header-fields="headerFields"
-                                    :is-sortable="data.isSortable"
-                                    :is-deletable="data.canDelete"
-                                />
+                                <admin-list-header />
 
                                 <transition-group
                                     name="staggered-fade"
                                     tag="ul"
                                     :class="`information-list ${ data.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
-                                    :style="{ minHeight: popOutHeight + 'px' }"
+                                    :style="listStyles"
                                     v-bind:css="false"
                                     data-sortable 
-                                    data-list 
                                     @before-enter="onBeforeEnter"
                                     @enter="onEnter"
                                     @leave="onLeave"
@@ -433,14 +434,9 @@ export default {
                                         :key="`${row.id}-${index}`"
                                         :header-fields="headerFields"
                                         :row="row"
-                                        :selected-row="selectedRow"
-                                        :is-sortable="data.isSortable"
-                                        :can-delete="data.canDelete"
                                         :pop-out-header-field="popOutHeaderField"
                                         :pop-out-fields="popOutFields"
-                                        :is-pop-out-open="isPopOutOpen"
                                         :selected-pop-out-name="selectedNameInPopOut"
-                                        @on-pop-out-selected="onPopOutSelected"
                                         @on-pop-out-name-selected="onPopOutNameSelected"
                                         @on-delete-row-selected="onDeleteRowSelected"
                                     />
@@ -450,13 +446,10 @@ export default {
                                     v-if="hasPopOut"
                                     :header-field="popOutHeaderField"
                                     :fields="popOutFields" 
-                                    :selected-row="selectedRow"
-                                    :is-open="isPopOutOpen" 
                                     :save-status="saveStatus" 
                                     :is-processing="isProcessing" 
                                     @on-pop-out-mounted="onPopOutMounted"
                                     @on-pop-out-saved="onSaveSelected"
-                                    @on-pop-out-closed="onPopOutClosed"
                                 />
 
                                 <div v-if="!data.noNewRecords" class="component-action">

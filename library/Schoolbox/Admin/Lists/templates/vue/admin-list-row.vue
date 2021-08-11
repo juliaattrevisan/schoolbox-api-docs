@@ -4,6 +4,7 @@
  * Display an indivudal row, providing access to view and edit permissions and delete
  */
 
+import { mapState } from 'vuex';
 import AdminListRowLookup from './admin-list-row-lookup';
 import AdminListRowColour from './admin-list-row-colour';
 import AdminListRowPopOut from './admin-list-row-pop-out';
@@ -25,18 +26,6 @@ export default {
             type: Object,
             required: true
         },
-        selectedRow: { //to determine display whether it's the currently selected row
-            type: Object,
-            required: true
-        },
-        isSortable: { //whether drag n drop is enabled
-            type: Boolean,
-            required: true
-        },
-        canDelete: { //allows space for the delete UI
-            type: Boolean,
-            required: true
-        },
         popOutHeaderField: { //the title of the pop out
             type: Object,
             required: false
@@ -45,17 +34,18 @@ export default {
             type: Array,
             required: false    
         },
-        isPopOutOpen: { //to change display of row while open
-            type: Boolean,
-            required: false
-        },
         selectedPopOutName: { //to show all rows with the same permission
             type: String,
             required: false
         },
     },
 
-    computed: {
+    computed: mapState({
+
+        isSortable: state => state.data.isSortable,
+        canDelete: state => state.data.canDelete,
+        selectedRow: state => state.selectedRow,
+        isPopOutOpen: state => state.isPopOutOpen,
 
         /**
          * To retrieve a list of key/value pairs contained within the row object
@@ -79,17 +69,9 @@ export default {
             return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
-    },
+    }),
 
     methods: {
-
-        /**
-         * Show the pop out fields
-         */
-        onPopOutSelected (row) {
-            this.$emit('on-pop-out-selected', row);
-            this.$emit('on-pop-out-name-selected', '');
-        },
 
         /**
          * Higlight the currently selected pop out name
@@ -160,9 +142,7 @@ export default {
                                 :row="row"
                                 :pop-out-header-field="popOutHeaderField"
                                 :pop-out-fields="popOutFields"
-                                :is-pop-out-open="isPopOutOpen"
                                 :selected-pop-out-name="selectedPopOutName"
-                                @on-pop-out-selected="onPopOutSelected"
                                 @on-pop-out-name-selected="onPopOutNameSelected"
                             />
                         </template>

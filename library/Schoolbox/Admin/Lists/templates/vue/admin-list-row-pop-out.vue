@@ -21,10 +21,6 @@ export default {
             type: Array,
             required: false    
         },
-        isPopOutOpen: { //to change display of row while open
-            type: Boolean,
-            required: false
-        },
         selectedPopOutName: { //to show all rows with the same permission
             type: String,
             required: false
@@ -38,7 +34,7 @@ export default {
     },
 
     computed: {
-
+        
         /**
          * To retrieve a list of key/value pairs contained within the row object
          *
@@ -121,8 +117,8 @@ export default {
          * Show the pop out fields
          */
         onPopOutSelected () {
-            this.$emit('on-pop-out-selected', this.row);
-            this.$emit('on-pop-out-name-selected', '');
+            this.$store.commit('openPopUp', this.row);
+            // this.$emit('on-pop-out-name-selected', '');
         },
 
         /**
