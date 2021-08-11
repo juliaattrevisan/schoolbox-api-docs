@@ -198,6 +198,16 @@ class Controller extends Base
                 'id'       => $textbox->getId(),
                 'body'     => $textbox->getBody(),
                 'category' => $translateFolder($textbox->getCategory()),
+                '_links'   => [
+                    'delete' => $this->getRouteIfAuthorized(
+                        'textbox.deleteTextbox',
+                        [
+                            'textbox' => $textbox,
+                            'folder'  => $textbox->getCategory(),
+                            'id'      => $textbox->getId(),
+                        ]
+                    ),
+                ]
             ];
         }
 
