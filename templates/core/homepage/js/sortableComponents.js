@@ -558,7 +558,10 @@ const removePlaceHolderComponents = () => {
 const submitNewComponentOrder = async () => {
     try {
         if (__hasSortChange) {
-            await axios.post('/homepage/configForm.php', getNewComponentOrderFormData());
+            const response = await axios.post('/homepage/configForm.php', getNewComponentOrderFormData());
+            // if (response.data.hasComponentBeenDeleted) {
+                notifyOfDeletedComponent();
+            // }
             __hasSortChange = false;
             updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
         } else {
@@ -611,6 +614,26 @@ const getContainerComponentIDs = (componentContainer) => {
  */
 const getComponentID = (componentElement) => {
     return componentElement.id.replace('component', ''); //strip the 'component' at the start to just get the id number
+}
+
+/**
+ * The component has been deleted elsewhere, so notify the user
+ * and suggest a page refresh for the latest data
+ */
+const notifyOfDeletedComponent = () => {
+
+    __activeElement.querySelector(SORTABLES_TRIGGER_SELECTOR).remove(); //remove the drag trigger 
+    __activeElement.querySelector('[data-component-titlebar-container] > nav').remove(); //as well as the edit controls to prevent any further interactions on this component
+
+    const errorElement = document.createElement('div');
+    errorElement.classList.add('alert', 'alert-box');
+    errorElement.innerHTML = `<b>Warning:</b> This component has been deleted from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
+
+    const insideComponentElement = __activeElement.querySelector('[data-collapsable] > div > section');
+    insideComponentElement.replaceChildren(errorElement);
+
+    gsap.from(errorElement, { opacity: 0, duration: 0.5 } );
+
 }
 
 /**
