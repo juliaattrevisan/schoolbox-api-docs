@@ -36,6 +36,16 @@
     <div class="small-12 island">
         <h1>Manage Text Boxes on {{ folder.title }}</h1>
 
+        <div id="textbox-list">
+            <textbox-list textbox-usage-endpoint="{{ routeLookup('textbox.getUsageForFolder', {folderId: folder.id}) }}"
+                          :folder-id="Number('{{ folder.id }}')"
+            >
+            </textbox-list>
+        </div>
+
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/textboxList.js?v={{ config.site_version }}"></script>
+
+
         {% if usages|length %}
         <script type="text/javascript">
             $(function() {
