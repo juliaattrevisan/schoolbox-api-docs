@@ -9,21 +9,26 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\User;
 
 /**
  * Model for due work grade levels.
  */
-class Model
+class Model implements ISoftDeletable
 {
-    use Id;
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
 
     /**
      * Group this belongs to
      *
      * @var Group\Model
      */
-    protected $group;
+    protected Group\Model $group;
 
     /**
      * Lower bound for grades.
@@ -33,7 +38,7 @@ class Model
      *
      * @var float
      */
-    protected $lowerBound;
+    protected float $lowerBound;
 
     /**
      * Raw grade (0-100) for this selected grade.
@@ -43,7 +48,7 @@ class Model
      *
      * @var float
      */
-    protected $rawGrade;
+    protected float $rawGrade;
 
     /**
      * Caption for this grade level.
@@ -51,8 +56,17 @@ class Model
      *
      * @var string
      */
-    protected $caption;
+    protected string $caption;
 
+    /**
+     * @var User|null
+     */
+    protected ?User $createdBy = null;
+
+    /**
+     * @var User|null
+     */
+    protected ?User $updatedBy = null;
 
     /**
      * @return string
@@ -124,5 +138,49 @@ class Model
     {
         $this->rawGrade = $rawGrade;
         return $this;
+    }
+
+    /**
+     * User that first authored this grade level
+     *
+     * @param User $createdBy
+     * @return $this
+     */
+    public function setCreatedBy(User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    /**
+     * User that first authored this grade level
+     *
+     * @return User|null
+     */
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * User that has made the most recent changes to this grade level group
+     *
+     * @param User $updatedBy
+     * @return $this
+     */
+    public function setUpdatedBy(User $updatedBy): self
+    {
+        $this->updatedBy = $updatedBy;
+        return $this;
+    }
+
+    /**
+     * User that has made the most recent changes to this grade level group
+     *
+     * @return User|null
+     */
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
     }
 }

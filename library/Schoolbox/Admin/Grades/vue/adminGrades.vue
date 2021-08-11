@@ -1,17 +1,21 @@
 <script>
 
 import axios from 'axios'
+import RevealModal from "@schoolbox/reveal-modal";
 import Toast from "@schoolbox/toast";
 
 export default {
     components: {
+        RevealModal,
         Toast,
     },
     data() {
         return {
-            gradeGroups:    [],
+            currentGroupIndex: null,
+            currentLevelIndex: null,
+            gradeGroups: [],
             saveInProgress: false,
-            validator:      null,
+            validator: null,
         }
     },
     created() {
@@ -42,9 +46,60 @@ export default {
          *
          * @param {Number} groupIndex The index of the group to remove
          */
-        removeGroup(groupIndex) {
-            this.gradeGroups = this.gradeGroups.filter((g, i) => i !== groupIndex);
+        deleteGradeGroup(groupIndex) {
+            this.$refs.toast.activate('Deleting Grade Group...');
+
+            let currentGradeGroup = this.gradeGroups[groupIndex];
+
+            /**
+             * not yet persisted, so removing from the UI is enough
+             */
+            if (currentGradeGroup.id == null) {
+                this.$refs.toast.timeout('Group `' + currentGradeGroup.name + '` successfully removed', true);
+
+                this.gradeGroups = this.gradeGroups.filter((g, i) => i !== groupIndex);
+                this.closeDeleteGradeGroupModal();
+                this.applyValidator();
+
+                return;
+            }
+
+            /**
+             * this grade group has been persisted, so we need to remove it and any associated grade levels
+             */
+            let adjustedGradeGroups = this.gradeGroups.filter((v) => v.id !== currentGradeGroup.id);
+
+            axios.delete(currentGradeGroup._links.delete)
+                .then(() => {
+                    this.gradeGroups = [];
+                    this.$refs.toast.timeout('Group `' + currentGradeGroup.name + '` successfully removed', true);
+                    this.$nextTick(() => {
+                        this.gradeGroups = adjustedGradeGroups;
+                    });
+                })
+                .catch(() => this.$refs.toast.timeout('Failed to remove Grade Group', false))
+                .finally(() => {
+                    this.closeDeleteGradeGroupModal()
+                })
+
             this.applyValidator();
+        },
+
+        /**
+         * Opens a modal window for deleting this grade group
+         *
+         * @param {Number} groupIndex
+         */
+        openDeleteGradeGroupModal(groupIndex) {
+            this.currentGroupIndex = groupIndex;
+            this.$refs.deleteGradeGroupModal.open();
+        },
+
+        /**
+         * Closes a modal window for deleting this grade group.
+         */
+        closeDeleteGradeGroupModal() {
+            this.$refs.deleteGradeGroupModal.close();
         },
 
         /**
@@ -68,8 +123,39 @@ export default {
          * @param {Number} groupIndex The index of the group to remove from
          * @param {Number} levelIndex The index of the level to remove
          */
-        removeLevel(groupIndex, levelIndex) {
-            this.gradeGroups[groupIndex].levels = this.gradeGroups[groupIndex].levels.filter((g, i) => i !== levelIndex);
+        deleteGradeLevel(groupIndex, levelIndex) {
+            this.$refs.toast.activate('Deleting Grade...');
+
+            let currentGradeLevel = this.gradeGroups[groupIndex].levels[levelIndex];
+
+            /**
+             * not yet persisted, so removing from the UI is enough
+             */
+            if (currentGradeLevel.id == null) {
+                this.$refs.toast.timeout('Grade `' + currentGradeLevel.caption + '` successfully removed', true);
+
+                this.gradeGroups[groupIndex].levels = this.gradeGroups[groupIndex].levels.filter((g, i) => i !== levelIndex);
+                this.closeDeleteGradeGroupModal();
+                this.applyValidator();
+
+                return;
+            }
+
+            /**
+             * this grade level has been persisted, so we need to delete it
+             */
+            let adjustedGradeLevels = this.gradeGroups[groupIndex].levels.filter((v) => v.id !== currentGradeLevel.id);
+
+            axios.delete(currentGradeLevel._links.delete)
+                .then(() => {
+                    this.gradeGroups[groupIndex].levels = [];
+                    this.$refs.toast.timeout('Group `' + currentGradeLevel.caption + '` successfully removed', true);
+                    this.$nextTick(() => {
+                        this.gradeGroups[groupIndex].levels = adjustedGradeLevels;
+                    });
+                })
+                .catch(() => this.$refs.toast.timeout('Failed to remove grade level', false))
+
             this.applyValidator();
         },
 
@@ -136,11 +222,10 @@ export default {
                         />
                     </div>
                     <nav>
-                        <a v-if="group.id === null"
-                           href="#"
+                        <a href="#"
                            title="Remove Grouping"
                            :class="{'icon-delete': true, disabled: saveInProgress}"
-                           @click.prevent="removeGroup(groupIndex)"></a>
+                           @click.prevent="openDeleteGradeGroupModal(groupIndex)"></a>
                     </nav>
                 </div>
             </div>
@@ -189,11 +274,10 @@ export default {
                                 />
                             </div>
                             <nav>
-                                <a v-if="level.id === null"
-                                   title="Remove Level"
+                                <a title="Remove Level"
                                    href="#"
                                    :class="{'icon-delete': true, disabled: saveInProgress}"
-                                   @click.prevent="removeLevel(groupIndex, levelIndex)"></a>
+                                   @click.prevent="deleteGradeLevel(groupIndex, levelIndex)"></a>
                             </nav>
                         </div>
                     </td>
@@ -228,5 +312,17 @@ export default {
         </ul>
 
         <toast ref="toast"></toast>
+
+        <reveal-modal ref="deleteGradeGroupModal">
+            <h2>Please confirm you wish to delete this grade group.</h2>
+            <div data-alert class="alert-box alert">
+                Deleting these grades will not impact existing grades, but you will no longer be able to use these grades on new assessments.
+            </div>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="deleteGradeGroup(currentGroupIndex)" class="button submit">Confirm Deletion</a></li>
+                <li><a @click.prevent="closeDeleteGradeGroupModal()" class="button">Cancel</a></li>
+            </ul>
+        </reveal-modal>
+
     </form>
 </template>

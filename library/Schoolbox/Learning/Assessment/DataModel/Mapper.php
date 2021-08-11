@@ -441,7 +441,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
-            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg')}
+            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}

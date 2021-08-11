@@ -11,21 +11,26 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevelModel;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\User;
 
 /**
  * Model for due work grade groups.
  */
-class Model
+class Model implements ISoftDeletable
 {
-    use Id;
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
 
     /**
      * Name of this group
      *
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * Collection of grade levels that belong to this group
@@ -33,6 +38,16 @@ class Model
      * @var Collection|GradeLevelModel[]
      */
     protected $gradeLevels;
+
+    /**
+     * @var User|null The first user to author the grade level group
+     */
+    protected ?User $createdBy = null;
+
+    /**
+     * @var User|null The most recent user to change the grade level group
+     */
+    protected ?User $updatedBy = null;
 
     /**
      * @return string
@@ -80,6 +95,50 @@ class Model
     {
         // Don't add more than once
         $this->getGradeLevels()->setOffset($level->getId(), $level);
+        return $this;
+    }
+
+    /**
+     * User that first authored this grade level group
+     *
+     * @return User|null
+     */
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * User that first authored this grade level group
+     *
+     * @param User $createdBy
+     * @return $this
+     */
+    public function setCreatedBy(User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    /**
+     * User that has made the most recent changes to this grade level group
+     *
+     * @return User|null
+     */
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    /**
+     * User that has made the changes to this grade level group
+     *
+     * @param User $updatedBy
+     * @return $this
+     */
+    public function setUpdatedBy(User $updatedBy): self
+    {
+        $this->updatedBy = $updatedBy;
         return $this;
     }
 }

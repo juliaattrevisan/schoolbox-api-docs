@@ -63,23 +63,31 @@
          #}
         <option value="" disabled {% if humanReadableMark|length == 0 %}selected{% endif %}>(no grade)</option>
 
-        {# If humanReadableMark has a value, look for it among the current Grade Group dropdown options.
-         # If it's not here, then it might be one of the Submission States
-         #}
-        <optgroup label="{{ locale.grades.properPlural }}">
-            {% for level in markScheme.gradeGroup.gradeLevels %}
-                {% set selected = '' %}
-
-                {% if humanReadableMark == level.caption %}
-                    {% set found = true %}
-                    {% set selected = 'selected' %}
-                {% endif %}
-
-                <option {{ selected }} value="{{ level.caption }}">
-                    {{ level.caption }}
+        {% if markScheme.gradeGroup.gradeLevels|length == 0 %}
+            <optgroup label="Original {{ locale.grades.properPlural }} Deleted">
+                <option selected value="-1" disabled>
+                    empty
                 </option>
-            {% endfor %}
-        </optgroup>
+            </optgroup>
+        {% else %}
+            {# If humanReadableMark has a value, look for it among the current Grade Group dropdown options.
+             # If it's not here, then it might be one of the Submission States
+             #}
+            <optgroup label="{{ locale.grades.properPlural }}">
+                {% for level in markScheme.gradeGroup.gradeLevels %}
+                    {% set selected = '' %}
+
+                    {% if humanReadableMark == level.caption %}
+                        {% set found = true %}
+                        {% set selected = 'selected' %}
+                    {% endif %}
+
+                    <option {{ selected }} value="{{ level.caption }}">
+                        {{ level.caption }}
+                    </option>
+                {% endfor %}
+            </optgroup>
+        {% endif %}
 
         {# If it didn't exist in the Grade Group, it might have been one of the Submission States
          # like Submitted/Absent/Pending etc. so look there as well
@@ -110,9 +118,17 @@
          # Use -1 as an illegal value flag so alaressValidate can understand that this selected option
          # should be changed to an actual option
          #}
+
+
+        {#this covers the scenario where the grade level has been deleted#}
         {% if humanReadableMark|length and not found %}
-            <option value="-1" selected style="display:none"></option>
+            <optgroup label="Original Deleted Grade">
+                <option selected value="-1" disabled>
+                    {{ humanReadableMark }}
+                </option>
+            </optgroup>
         {% endif %}
+
     </select>
 {% endif %}
 
