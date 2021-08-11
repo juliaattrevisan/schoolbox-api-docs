@@ -14,6 +14,7 @@ use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Scrub;
 
 /**
  * Controller for textbox actions.
@@ -216,7 +217,7 @@ class Controller extends Base
                 'textbox'    => [
                     'id'       => $textbox->getId(),
                     'heading'  => $textbox->getHeading(),
-                    'body'     => $textbox->getBody(),
+                    'body'     => Scrub::html($textbox->getBody()),
                     'category' => $translateFolder($textbox->getCategory()),
                     '_links'   => [
                         'delete' => $this->getRouteIfAuthorized(
