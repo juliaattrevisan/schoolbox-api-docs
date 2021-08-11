@@ -49,13 +49,6 @@
                                         {% endif %}
                                     {% endblock details_formTeacher %}
 
-                                    {% block details_yearLevel %}
-                                        {% if externalUser.StudentYearLevel is defined %}
-                                            <dt class="small-4 medium-3 columns">Year Level:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>
-                                        {% endif %}
-                                    {% endblock details_yearLevel %}
-
                                     {% block details_school %}
                                         {# SA-12418 #}
                                         {% if user.year.name is defined %}
@@ -99,13 +92,6 @@
                                         {#</dd>#}
                                         {#{% endif %}#}
                                     {% endblock details_coordTeacher %}
-
-                                    {% block details_house %}
-                                        {% if externalUser.StudentHouseDescription ?? false %}
-                                            <dt class="small-4 medium-3 columns">House:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
-                                        {% endif %}
-                                    {% endblock details_house %}
 
                                     {% block details_tutorGroup %}
                                         {% if showClasses %}
