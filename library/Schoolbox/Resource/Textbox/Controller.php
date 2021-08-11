@@ -149,9 +149,9 @@ class Controller extends Base
      * Also get an index of their usages
      *
      * @api GET /textbox/folder/{id}
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param FolderModel $folder
      */
-    public function getIndexForFolder(\Schoolbox\Resource\Folder\Model $folder): void
+    public function getIndexForFolder(FolderModel $folder): void
     {
         $allBreadcrumbs = [
             [$folder->getNameWithCodes(), "/homepage/{$folder->getId()}"],
@@ -171,6 +171,43 @@ class Controller extends Base
 
 
     /**
+     * Output textbox usage for this folder, as a JSON response.
+     *
+     * @api GET /textbox/folder/{id}/usage
+     *
+     * @param FolderModel $folder
+     */
+    public function getUsageForFolder(FolderModel $folder): void
+    {
+        $usages = $this->mapper->findUsage($folder->getId());
+
+        // Convert `$usages` to an array structure
+        $translateFolder = static function (FolderModel $folder) {
+            return [
+                'id'    => $folder->getId(),
+                'name'  => $folder->getName(),
+                'title' => $folder->getTitle(),
+                'codes' => $folder->getCodes(),
+            ];
+        };
+        foreach ($usages as $textboxId => $usage) {
+            $usages[$textboxId]['folders'] = $usage['folders']->map($translateFolder);
+            /** @var Model $textbox */
+            $textbox = $usages[$textboxId]['textbox'];
+            $usages[$textboxId]['textbox'] = [
+                'id'       => $textbox->getId(),
+                'body'     => $textbox->getBody(),
+                'category' => $translateFolder($textbox->getCategory()),
+            ];
+        }
+
+        $this->response->content->set(
+            $this->buildJsonOutput($usages)
+        );
+    }
+
+
+    /**
      * Mass rename textboxes from a set of (textboxId, name) tuples
      *
      * @param FolderModel $folder
@@ -178,7 +215,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postRename(\Schoolbox\Resource\Folder\Model $folder): void
+    public function postRename(FolderModel $folder): void
     {
         $tuples = $this->getRequest()->post['textbox'] ?? [];
 
