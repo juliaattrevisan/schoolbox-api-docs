@@ -25,6 +25,7 @@ export default {
         return {
             textboxes: [],
             loading: true,
+            jQuery: window.jQuery,
         }
     },
     mounted: function () {
@@ -33,6 +34,9 @@ export default {
             .get(self.textboxUsageEndpoint)
             .then(function (response) {
                 self.textboxes = response.data;
+
+                // Apply the collapser
+                self.$nextTick(() => self.jQuery('[data-collapser^="collapser-textbox"]').collapsable());
             })
     },
     methods: {
@@ -70,7 +74,7 @@ export default {
     <ul class="information-list unsortable expandable-card">
         <li v-for="(usage, index) in textboxes">
             <div class="actions-small-1">
-                <div class="expander" :data-collapser="'collapser-' + String(index)"></div>
+                <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
                 <div class="list-item">
                     <div class="small-12 column">
                         <label>
@@ -97,9 +101,8 @@ export default {
                     <a class="icon-delete" :href="usage.textbox._links.delete" title="Delete"></a>
                 </nav>
             </div>
-            <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-' + String(index)">
-                <article class="content">
-                    {{ usage.textbox.body }}
+            <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
+                <article class="content" v-html="usage.textbox.body">
                 </article>
             </div>
         </li>
