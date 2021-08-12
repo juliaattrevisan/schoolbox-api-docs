@@ -16,8 +16,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
-use Schoolbox\Resource\Storage\Transform\Mapper;
-use Schoolbox\Resource\Storage\Transform\Model;
+use Schoolbox\Resource\Storage\Transform;
 use Schoolbox\User;
 use UnexpectedValueException;
 
@@ -508,14 +507,14 @@ class Queue extends ResourceVideo
             throw new UnexpectedValueException("Expected 2 parts, found " . count($fileNameParts));
         }
         [$hash, $cacheKey] = $fileNameParts;
-        $transformMapper = Mapper::getInstance();
+        $transformMapper = Transform\Mapper::getInstance();
 
         $transformModel = $transformMapper->findByHashAndCacheKey($hash, $cacheKey);
 
         if ($transformModel) {
-            $transformMapper->save($transformModel->setSize($fileSize)->setState(Model::STATE_DONE));
+            $transformMapper->save($transformModel->setSize($fileSize)->setState(Transform\Model::STATE_DONE));
         } else {
-            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Model::STATE_DONE);
+            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Transform\Model::STATE_DONE);
         }
     }
 
