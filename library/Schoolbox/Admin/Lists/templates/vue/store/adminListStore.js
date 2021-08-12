@@ -1,7 +1,7 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex'
-import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW } from './adminListMutationTypes';
+import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, ON_DELETE_ROW, ON_ROW_DELETED } from './adminListMutationTypes';
 
 Vue.use(Vuex);
 
@@ -11,6 +11,7 @@ export default new Vuex.Store({
         loadedData: null, //contains the loaded data
         rows: [], //to display and possibly edit the rows 
         selectedRow: {}, //to track which row is selected
+        rowToDelete: {}, //to track which row could be deleted
         isPopOutOpen: false, //to open and close the list
         selectedPopOutName: '', //to highlight all other rows that have that permission
         saveStatus: 'Save', //to update the button text when saving
@@ -82,7 +83,14 @@ export default new Vuex.Store({
         /**
          * 
          */
-        deleteRow (state, rowToDelete) {
+        [ON_DELETE_ROW] (state, rowToDelete) {
+            state.rowToDelete = rowToDelete;
+        },
+
+        /**
+         * Now the row is deleted, remove it from the rows list
+         */
+        [ON_ROW_DELETED] (state, rowToDelete) {
             state.rows = state.rows.filter((row) => row.id !== rowToDelete.id);
         },
 

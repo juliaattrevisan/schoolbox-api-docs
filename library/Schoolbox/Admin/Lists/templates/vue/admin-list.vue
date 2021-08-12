@@ -13,8 +13,8 @@ import AdminListPopOut from './admin-list-pop-out';
 import AdminListNoRows from './admin-list-no-rows';
 import AdminListRow from './row/admin-list-row';
 import AdminListAddRow from './admin-list-add-row';
+import AdminListDeleteRow from './admin-list-delete-row';
 import Toast from '@schoolbox/toast';
-import RevealModal from '@schoolbox/reveal-modal';
 import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW } from './store/adminListMutationTypes';
 
 
@@ -26,8 +26,8 @@ export default {
         AdminListNoRows,
         AdminListRow,
         AdminListAddRow,
+        AdminListDeleteRow,
         Toast,
-        RevealModal,
     },
 
     props: {
@@ -130,65 +130,6 @@ export default {
          */
         onPopOutMounted (popOutHeight) {
             this.popOutHeight = popOutHeight;
-        },
-
-        /**
-         * Open the delete modal, storing the selected row index for possible deletion
-         *
-         * @param { Number }
-         */
-        onDeleteRowSelected (selectedRow) {
-            this.$store.commit(UPDATE_SELECTED_ROW, selectedRow);
-            if (selectedRow.isNew) { //hasn't been placed in the DB yet, so no need to confirm its removal
-                const rowToRemove = this.rows.find((row) => row.id === this.selectedRow.id);
-                this.$store.commit('deleteRow', rowToRemove);
-            } else {
-                this.$refs.deleteModal.open();
-            }
-        },
-
-        /**
-         * Notify the DB and pull out the selectedRow
-         * on delete confirmation
-         */
-        async onConfirmDeleteRowSelected () {
-            try {
-                this.$store.commit('setIsProcessing', true);
-                this.$refs.toast.activate('Deleting row...');
-                const response = await axios.post(this.loadedData.deleteRoute, this.getDeleteRowFormData());
-                if (response.result !== false) {
-                    const deletedRow = this.rows.find((row) => row.id === this.selectedRow.id);
-                    this.$store.commit('deleteRow', deletedRow);
-                    this.$refs.toast.timeout('Row Deleted', true, 2000);
-                } else {
-                    this.$refs.toast.timeout('Unable to delete', false, 2000);
-                }
-            } catch (error) {
-                console.warn(error);
-                this.$refs.toast.timeout('Unable to delete', false, 2000);
-            } finally {
-                this.$refs.deleteModal.close();
-                this.$store.commit('setIsProcessing', false);
-            }
-        },
-
-        /**
-         * Send through the data to delete the row
-         * 
-         * @returns { FormData }
-         */
-        getDeleteRowFormData () {
-            const formData = new FormData();
-            formData.append('table', this.tableName);
-            formData.append('id', this.selectedRow.id);
-            return formData;
-        },
-
-        /**
-         * Cancel the the selected row deletion
-         */
-        onCancelDeleteRowSelected () {
-            this.$refs.deleteModal.close();
         },
 
         /**
@@ -327,9 +268,8 @@ export default {
                                 >    
                                     <admin-list-row
                                         v-for="(row, index) in rowsSortedBySequence"
-                                        :key="index"
+                                        :key="`key-${index}`"
                                         :row="row"
-                                        @on-delete-row-selected="onDeleteRowSelected"
                                     />
                                 </transition-group>
 
@@ -355,14 +295,10 @@ export default {
 
             <toast ref="toast"></toast>
 
-            <reveal-modal v-if="loadedData.canDelete" ref="deleteModal">
-                <h2>Please Confirm</h2>
-                <div data-alert class="alert-box warning">{{ loadedData.deleteWarning }}</div>
-                <ul class="flex-list buttons">
-                    <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
-                    <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
-                </ul>
-            </reveal-modal>
+            <admin-list-delete-row 
+                v-if="loadedData.canDelete" 
+                :table-name="tableName" 
+            />
 
         </div><!-- v-if="isDataLoaded" -->
 
