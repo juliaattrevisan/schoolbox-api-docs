@@ -172,8 +172,10 @@ export default {
                             </nav>
                         </div>
                         <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
-                            <article class="content" v-html="usage.textbox.body">
-                            </article>
+                            <textarea :name="'textbox[' + String(index) + '][heading]'"
+                                      :id="'textbox-' + String(index) + '-heading'"
+                                      v-model="usage.textbox.body">
+                            </textarea>
                         </div>
                     </li>
                 </ul>
