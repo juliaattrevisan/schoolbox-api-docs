@@ -65,10 +65,13 @@ if (is_numeric($_GET['id'])) {
             LogMapper::getInstance()->logRead($file, $_SESSION['user']);
         } catch (Schoolbox\Mapper\Exception $e) {
             error(Mapper::ERROR_FILE_NOT_FOUND);
+            exit;
         }
     }
 
-    $attachmentType = (!$file->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';
+    $disposition = (!$file->getMimetype()->getInline() || $_GET['save'])
+        ? PreSignedUrlService::DISPOSITION_ATTACHMENT
+        : PreSignedUrlService::DISPOSITION_INLINE;
     $contentType    = ($file->getMime()) ?: 'application/octet-stream';
     $basename       = $file->getBasename();
     /** @var Storage $storage */
@@ -91,7 +94,7 @@ if (is_numeric($_GET['id'])) {
                 Alaress_Date_Format::now()->addDays(1),
                 $storage->getPath(),
                 $cacheControl,
-                $attachmentType
+                $disposition
             );
 
             $preSignedUrlService->download($preSignedUrlDataObject);
@@ -104,7 +107,7 @@ if (is_numeric($_GET['id'])) {
     header("Pragma: ");
     header("Cache-control: private");
     header("Content-Ranges: none");
-    header("Content-Disposition: $attachmentType filename=\"" . $basename . "\"");
+    header("Content-Disposition: $disposition; filename=\"$basename\"");
     header("Content-Length: {$file->getSize()}");
     fpassthru($file->readStream());
     exit;

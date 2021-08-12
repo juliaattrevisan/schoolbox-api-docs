@@ -11,8 +11,14 @@
 
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\File\Mimetype;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
+use Schoolbox\Resource\Storage\Transform;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
+use Schoolbox\Video\ResourceVideo;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -24,10 +30,10 @@ $type = $_GET['type'];
 $id   = $_GET['id'];
 
 // If no size was specified, assume thumbnail else poster
-if (strlen($_GET['size']) === 0) {
-    $size = 'thumbnail';
+if (strlen($_GET['size'] ?? '') === 0) {
+    $size = ResourceVideo::THUMBNAIL;
 } else {
-    $size = 'poster';
+    $size = ResourceVideo::POSTER;
 }
 
 // TODO: Destroy these shenanigans
@@ -77,19 +83,48 @@ if (isset($type, $id)) {
         try {
             // Try to find a video record with associated poster and thumbnail links
 
-            if ($size == 'poster') {
+            if ($size === ResourceVideo::POSTER) {
                 $imageFilename = $videoQueue->getPosterPath();
             } else {
                 $imageFilename = $videoQueue->getThumbnailPath();
             }
 
-            /** @var \League\Flysystem\FilesystemInterface $filesystem */
             $filesystem = $videoQueue->getStorage()->getFilesystem();
+
+            /** @var IConfigLoader $config */
+            $config   = $kernel->get('config');
+            $mimeType = 'image/jpeg';
+            if (
+                $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3 &&
+                $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
+            ) {
+                $preSignedUrlService = new PreSignedUrlService($config);
+
+                $preSignedUrlDataObject = $preSignedUrlService->generate(
+                    $videoQueue->getStorage()->setMimetype(new Mimetype()),
+                    Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+                    $imageFilename,
+                    'private',
+                    PreSignedUrlService::DISPOSITION_INLINE,
+                    $mimeType,
+                    // In the event a user selects 'save as', derive hinted filename from original video name + transcode size
+                    sprintf('%s-%s.jpeg', $videoQueue->getStorage()->getFilename(), $size)
+                );
+                $preSignedUrlService->download($preSignedUrlDataObject);
+
+                // Insert video thumbnail transforms on-demand if it exists on disk but not in storage_transform table yet.
+                if ($filesystem->has($imageFilename)) {
+                    $image = $filesystem->get($imageFilename);
+                    [$hash, $cacheKey] = explode('-', basename($image->getPath()));
+                    Transform\Mapper::getInstance()->createRecord($hash, $cacheKey, $image->getSize(), Transform\Model::STATE_DONE);
+                }
+                $preSignedUrlService->download($preSignedUrlDataObject);
+            }
 
             if ($filesystem->has($imageFilename)) {
                 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
                 $image = $filesystem->get($imageFilename);
-                header('Content-Type: image/jpeg');
+                header("Content-Type: $mimeType");
                 header("Content-Length: {$image->getSize()}");
                 fpassthru($image->readStream());
                 exit;

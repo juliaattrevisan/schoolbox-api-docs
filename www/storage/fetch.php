@@ -27,12 +27,14 @@ try {
         $page->initSession();
 
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
-        $attachmentType = (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';
+        $disposition = (!$resource->getMimetype()->getInline() || $_GET['save'])
+            ? PreSignedUrlService::DISPOSITION_ATTACHMENT
+            : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $basename = $resource->getBasename();
         $fileSystem = $resource->getFilesystem();
         $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
-        $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && !$attachmentType;
+        $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
 
         /* Optionally override filename
          *
@@ -61,7 +63,7 @@ try {
                     Alaress_Date_Format::now()->addDays(1),
                     $resource->getPath(),
                     $cacheControl,
-                    $attachmentType
+                    $disposition
                 );
 
                 $preSignedUrlService->download($preSignedUrlDataObject);
@@ -72,7 +74,7 @@ try {
         header("Content-Type: $contentType");
         header("Cache-control: private");
         header("Content-Ranges: none");
-        header("Content-Disposition: $attachmentType filename=\"$basename\"");
+        header("Content-Disposition: $disposition; filename=\"$basename\"");
         header("Content-Length: " . $resource->getSize());
         fpassthru($resource->readStream());
         exit;

@@ -12,10 +12,14 @@ namespace Schoolbox\Resource\Storage\Transform;
 use InvalidArgumentException;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Video\ResourceVideo;
 
 /**
- * Class Model
- * @package Schoolbox\Resource\Storage\Transform
+ * This represents a transformation of a file.
+ *
+ * Normally the file is a storage file, but it may be a static file included in the codebase.
+ * We currently support both 'image => image' and 'video => image' transforms.
+ * In the case of images, the format is the same as the original image's format. For video's, it is always JPEG.
  */
 class Model
 {
@@ -44,6 +48,10 @@ class Model
      * This is the latter fragment of the fileName, eg "[hash]-[cacheKey]"
      * The transformKey is just a name of some transformation, but that transformation may have
      * different parameters, and hence a single transform key can generate many cache keys.
+     *
+     * For video => image transforms, this will be just the name of the image size:
+     * @see ResourceVideo::POSTER
+     * @see ResourceVideo::THUMBNAIL
      *
      * @var string
      */

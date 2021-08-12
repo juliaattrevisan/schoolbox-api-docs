@@ -16,7 +16,9 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Resource\Storage\Transform;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Class Queue
@@ -466,12 +468,13 @@ class Queue extends ResourceVideo
     /**
      * Upload preview image to storage
      *
-     * @param string $fileName Local filename to be uploaded
+     * @param string $fileName        Local filename to be uploaded
      * @param string $destinationPath Destination to which the image should be uploaded
      * @throws \League\Flysystem\FileExistsException
      * @throws \League\Flysystem\FileNotFoundException
+     * @throws MapperException
      */
-    private function uploadPreviewImage(string $fileName, string $destinationPath)
+    private function uploadPreviewImage(string $fileName, string $destinationPath): void
     {
 
         // If it already exists we have to update, otherwise write
@@ -482,12 +485,38 @@ class Queue extends ResourceVideo
             $this->getStorage()->getFilesystem()->write($destinationPath, file_get_contents($fileName));
         }
 
+        $this->createStorageTransform($destinationPath, filesize($fileName));
         // Remove the thumbnail
+
+        $this->log('filename: ' . $destinationPath);
 
         $this->log("Deleting temporary preview image file from disk.");
         unlink($fileName);
     }
 
+    /**
+     * @param string   $fileName
+     * @param int|null $fileSize
+     * @throws MapperException
+     * @throws UnexpectedValueException If $fileName is not of expected structure
+     */
+    private function createStorageTransform(string $fileName, ?int $fileSize): void
+    {
+        $fileNameParts = explode('-', basename($fileName));
+        if (count($fileNameParts) !== 2) {
+            throw new UnexpectedValueException("Expected 2 parts, found " . count($fileNameParts));
+        }
+        [$hash, $cacheKey] = $fileNameParts;
+        $transformMapper = Transform\Mapper::getInstance();
+
+        $transformModel = $transformMapper->findByHashAndCacheKey($hash, $cacheKey);
+
+        if ($transformModel) {
+            $transformMapper->save($transformModel->setSize($fileSize)->setState(Transform\Model::STATE_DONE));
+        } else {
+            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Transform\Model::STATE_DONE);
+        }
+    }
 
     // ----------------------------------------------------------------------------------------------------------------
     // Functions to help determine dimensions when scaling videos and thumbnails

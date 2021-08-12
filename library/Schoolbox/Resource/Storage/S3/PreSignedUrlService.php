@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Date_Format as AlaressDateFormat;
-use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
@@ -18,9 +17,14 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
 use Schoolbox\Video\QueueMapper as VideoQueueMapper;
+use Schoolbox\Video\ResourceVideo;
 
 class PreSignedUrlService
 {
+    # Supported ContentDisposition response header dispositions
+    public const DISPOSITION_INLINE = 'inline';            // Display inline
+    public const DISPOSITION_ATTACHMENT = 'attachment';    // Prompt browser to download
+
     /**
      * @var S3Client
      */
@@ -54,7 +58,8 @@ class PreSignedUrlService
      * @param AlaressDateFormat $expireAt
      * @param string            $path
      * @param string            $cacheControl
-     * @param string            $attachmentType
+     * @param string            $disposition
+     * @param string|null       $mimeTypeOverride If non-null, override the storage object's mime type
      *
      * @return PreSignedUrlDataObject
      */
@@ -63,19 +68,21 @@ class PreSignedUrlService
         AlaressDateFormat $expireAt,
         string $path,
         string $cacheControl = 'private',
-        string $attachmentType = ''
+        string $disposition = self::DISPOSITION_INLINE,
+        string $mimeTypeOverride = null,
+        string $fileNameOverride = null
     ): PreSignedUrlDataObject {
+        $expires  = $expireAt->__toString();
+        $fileName = utf8_encode($fileNameOverride ?? $storage->getBasename());
 
-        $expires = $expireAt->__toString();
-
-        $commandObject = $this->getObject(
-            $path,
-            $cacheControl,
-            $attachmentType,
-            $storage->getBasename(),
-            $storage->getMime() ?: 'application/octet-stream',
-            $expires
-        );
+        $commandObject = $this->s3Client->getCommand('GetObject', [
+            'Bucket'                     => $this->bucket,
+            'Key'                        => FilesystemFactory::PREFIX_STORAGE . $path,
+            'ResponseCacheControl'       => $cacheControl,
+            'ResponseContentDisposition' => "$disposition; filename=\"{$fileName}\"",
+            'ResponseContentType'        => $mimeTypeOverride ?? $storage->getMime() ?: 'application/octet-stream',
+            'ResponseExpires'            => $expires,
+        ]);
 
         $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
@@ -97,14 +104,14 @@ class PreSignedUrlService
         $itemPath   = $dataObject->getItemPath();
         $hash       = $dataObject->getHash();
 
-        $transformType = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
+        $cacheKey = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
 
-        if ($transformType && $transformType === 'transcode') {
+        if ($cacheKey === ResourceVideo::TRANSCODE) {
             return $this->fileExistsInVideoQueue($hash);
         }
 
-        return $transformType
-            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $transformType)
+        return $cacheKey
+            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $cacheKey)
             : Storage\Mapper::getInstance()->countByColumn('hash', $hash) > 0;
     }
 
@@ -139,35 +146,5 @@ class PreSignedUrlService
             header_remove('pragma');
             exit;
         }
-    }
-
-    /**
-     * @param string $resourcePath
-     * @param string $cacheControl
-     * @param string $attachmentType
-     * @param string $resourceBaseName
-     * @param string $contentType
-     * @param string $expires
-     *
-     * @return CommandInterface
-     */
-    private function getObject(
-        string $resourcePath,
-        string $cacheControl,
-        string $attachmentType,
-        string $resourceBaseName,
-        string $contentType,
-        string $expires
-    ): CommandInterface {
-        $basename = utf8_encode($resourceBaseName);
-
-        return $this->s3Client->getCommand('GetObject', [
-            'Bucket'                     => $this->bucket,
-            'Key'                        => FilesystemFactory::PREFIX_STORAGE . $resourcePath,
-            'ResponseCacheControl'       => $cacheControl,
-            'ResponseContentDisposition' => "$attachmentType filename=\"{$basename}\"",
-            'ResponseContentType'        => $contentType,
-            'ResponseExpires'            => $expires,
-        ]);
     }
 }
