@@ -55,6 +55,7 @@ class PreSignedUrlService
      * @param string            $path
      * @param string            $cacheControl
      * @param string            $attachmentType
+     * @param string|null       $mimeTypeOverride If non-null, override the storage object's mime type
      *
      * @return PreSignedUrlDataObject
      */
@@ -63,19 +64,21 @@ class PreSignedUrlService
         AlaressDateFormat $expireAt,
         string $path,
         string $cacheControl = 'private',
-        string $attachmentType = ''
+        string $attachmentType = '',
+        string $mimeTypeOverride = null
     ): PreSignedUrlDataObject {
+        $expires  = $expireAt->__toString();
+        $mimeType = $mimeTypeOverride ?? $storage->getMime() ?: 'application/octet-stream';
+        $basename = utf8_encode($storage->getBasename());
 
-        $expires = $expireAt->__toString();
-
-        $commandObject = $this->getObject(
-            $path,
-            $cacheControl,
-            $attachmentType,
-            $storage->getBasename(),
-            $storage->getMime() ?: 'application/octet-stream',
-            $expires
-        );
+        $commandObject = $this->s3Client->getCommand('GetObject', [
+            'Bucket'                     => $this->bucket,
+            'Key'                        => FilesystemFactory::PREFIX_STORAGE . $path,
+            'ResponseCacheControl'       => $cacheControl,
+            'ResponseContentDisposition' => "$attachmentType filename=\"{$basename}\"",
+            'ResponseContentType'        => $mimeType,
+            'ResponseExpires'            => $expires,
+        ]);
 
         $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
@@ -139,35 +142,5 @@ class PreSignedUrlService
             header_remove('pragma');
             exit;
         }
-    }
-
-    /**
-     * @param string $resourcePath
-     * @param string $cacheControl
-     * @param string $attachmentType
-     * @param string $resourceBaseName
-     * @param string $contentType
-     * @param string $expires
-     *
-     * @return CommandInterface
-     */
-    private function getObject(
-        string $resourcePath,
-        string $cacheControl,
-        string $attachmentType,
-        string $resourceBaseName,
-        string $contentType,
-        string $expires
-    ): CommandInterface {
-        $basename = utf8_encode($resourceBaseName);
-
-        return $this->s3Client->getCommand('GetObject', [
-            'Bucket'                     => $this->bucket,
-            'Key'                        => FilesystemFactory::PREFIX_STORAGE . $resourcePath,
-            'ResponseCacheControl'       => $cacheControl,
-            'ResponseContentDisposition' => "$attachmentType filename=\"{$basename}\"",
-            'ResponseContentType'        => $contentType,
-            'ResponseExpires'            => $expires,
-        ]);
     }
 }

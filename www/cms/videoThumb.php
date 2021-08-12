@@ -12,6 +12,8 @@
 use League\Flysystem\Filesystem;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\File\Mimetype;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -92,16 +94,18 @@ if (isset($type, $id)) {
             $filesystem = $videoQueue->getStorage()->getFilesystem();
 
             if ($filesystem instanceof Filesystem && $filesystem->getAdapter() instanceof S3Adapter) {
+                /** @var IConfigLoader $config */
                 $config = $kernel->get('config');
 
                 if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
                     $preSignedUrlService = new PreSignedUrlService($config);
 
                     $preSignedUrlDataObject = $preSignedUrlService->generate(
-                        $videoQueue->getStorage(),
+                        $videoQueue->getStorage()->setMimetype(new Mimetype()),
                         Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
                         $imageFilename,
                         'private',
+                        '',
                         'image/jpeg'
                     );
 
