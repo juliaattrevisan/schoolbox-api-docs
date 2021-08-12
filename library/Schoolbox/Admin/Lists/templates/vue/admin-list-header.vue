@@ -12,8 +12,8 @@ export default {
     computed: {
 
         ...mapState({
-            isSortable: state => state.data.isSortable, //allows space for the drag/n drop UI
-            canDelete: state => state.data.canDelete, //allows space for the delete UI
+            isSortable: state => state.loadedData.isSortable, //allows space for the drag/n drop UI
+            canDelete: state => state.loadedData.canDelete, //allows space for the delete UI
         }),
         
         ...mapGetters([

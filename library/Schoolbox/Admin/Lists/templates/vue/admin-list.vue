@@ -10,7 +10,9 @@ import axios from 'axios';
 import { gsap } from 'gsap/all'
 import AdminListHeader from './admin-list-header';
 import AdminListPopOut from './admin-list-pop-out';
+import AdminListNoRows from './admin-list-no-rows';
 import AdminListRow from './admin-list-row';
+import AdminListAddRow from './admin-list-add-row';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 
@@ -20,7 +22,9 @@ export default {
     components: {
         AdminListHeader,
         AdminListPopOut,
+        AdminListNoRows,
         AdminListRow,
+        AdminListAddRow,
         Toast,
         RevealModal,
     },
@@ -36,22 +40,19 @@ export default {
         return {
             isDataLoaded: false, 
             hasDataLoadError: false, 
-            // data: null, //contains the loaded data
-            rows: [], //to display and possibly edit the rows 
             popOutHeight: 0, //so the popout can allow enough vertical space to fit the pop out
-            saveStatus: 'Save', //to update the button text when saving
-            newId: 0, //to add another row to the db, decrement with each new row added,
-            isProcessing: false, //to prevent multiple rapid-fire submissions
-            isSaving: false,
         }
     },
 
     computed: {
 
         ...mapState({
-            data: state => state.data,
+            loadedData: state => state.loadedData,
+            rows: state => state.rows,
             selectedRow: state => state.selectedRow,
             isPopOutOpen: state => state.isPopOutOpen,
+            saveStatus: state => state.saveStatus,
+            isProcessing: state => state.isProcessing,
         }),
 
         ...mapGetters([
@@ -64,11 +65,11 @@ export default {
          * @returns { Boolean }
          */
         hasPopOut () {
-            return this.data.fields.some((field) => field.hasOwnProperty('isPopOutList')); 
+            return this.loadedData.fields.some((field) => field.hasOwnProperty('isPopOutList')); 
         }, 
 
         /**
-         * To display the rows how they have been sorted
+         * To display the rows based on how they have been sorted
          *
          * @returns { Array of Objects }
          */
@@ -77,13 +78,13 @@ export default {
         },
 
         /**
-         * 
+         * Retrieve any styles of the list that change with state
          *
          * @returns { Object }
          */
         listStyles () {
             return {
-                minHeight: this.popOutHeight + 'px',
+                minHeight: this.popOutHeight + 'px', //so the popout can allow enough vertical space to fit the pop out
                 pointerEvents: this.isPopOutOpen ? 'none' : 'auto' //prevent editing/sorting while popoutList is open
             }
         }
@@ -102,10 +103,9 @@ export default {
         async getData () {
             try {
                 const response = await axios.get(`/adminv2/lists/data/${this.tableName}`);
-                // this.data = response.data; 
-                this.$store.commit('setData', response.data);
-                this.initRows();
+                this.$store.commit('setLoadedData', response.data);
             } catch (error) {
+                console.warn(error);
                 this.hasDataLoadError = true; //show load error
             } finally {
                 this.isDataLoaded = true; //update the display to show the list
@@ -114,20 +114,10 @@ export default {
         },
 
         /**
-         * Add a boolean to know whether the row is one being newly added
-         */
-        initRows () {
-            this.rows = _.cloneDeep(this.data.rows);
-            this.rows.forEach((row) => { 
-                row.isNew = false;
-            });
-        },
-
-        /**
          * Init the sortable feature
          */
         initSortable () {
-            if (this.data.isSortable) {
+            if (this.loadedData.isSortable) {
                 this.$nextTick(() => {
                     $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
                 });
@@ -140,46 +130,6 @@ export default {
         onPopOutMounted (popOutHeight) {
             this.popOutHeight = popOutHeight;
         },
-        
-        /**
-         * Push in a new row, retrieving the default value for each property and 
-         * then adding in additional values required to track and add
-         */
-        onNewRowSelected () {
-            const newRow = {}
-            this.data.fields.forEach((field) => {
-                if (Object.keys(field).includes('default')) {
-                    newRow[`${field.id}`] = field.default;
-                } else if (Object.keys(field).includes('lookup')) { //for lookups, use the first value as default
-                    newRow[`${field.id}`] = field.lookup[0]?.key ? field.lookup[0].key : '';
-                }
-            });
-            newRow.sequence = this.getNextSequence();
-            newRow.id = this.getNextId(),
-            newRow.isNew = true;
-            this.rows = [...this.rows, newRow];
-        },
-
-        /**
-         * The new row is placed at the bottom of the list, so it'll
-         * be the last number in the sequence
-         *
-         * @param { Number }
-         */
-        getNextSequence () {
-            return this.rows.length + 1;
-        },
-
-        /**
-         * Retrieve the lowest id and decrement for it to
-         * be used for the new row
-         *
-         * @param { String }
-         */
-        getNextId () {
-            this.newId--;
-            return this.newId.toString();
-        },
 
         /**
          * Open the delete modal, storing the selected row index for possible deletion
@@ -187,9 +137,10 @@ export default {
          * @param { Number }
          */
         onDeleteRowSelected (selectedRow) {
-            this.selectedRow = selectedRow;
-            if (selectedRow.isNew) { //hasn't been placed int he DB yet, so no need to confirm its removal
-                this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
+            this.$store.commit('setSelectedRow', selectedRow);
+            if (selectedRow.isNew) { //hasn't been placed in the DB yet, so no need to confirm its removal
+                const rowToRemove = this.rows.find((row) => row.id === this.selectedRow.id);
+                this.$store.commit('deleteRow', rowToRemove);
             } else {
                 this.$refs.deleteModal.open();
             }
@@ -200,21 +151,23 @@ export default {
          * on delete confirmation
          */
         async onConfirmDeleteRowSelected () {
-            this.isProcessing = true;
-            this.$refs.toast.activate('Deleting row...');
             try {
-                const response = await axios.post(this.data.deleteRoute, this.getDeleteRowFormData());
+                this.$store.commit('setIsProcessing', true);
+                this.$refs.toast.activate('Deleting row...');
+                const response = await axios.post(this.loadedData.deleteRoute, this.getDeleteRowFormData());
                 if (response.result !== false) {
-                    this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
+                    const deletedRow = this.rows.find((row) => row.id === this.selectedRow.id);
+                    this.$store.commit('deleteRow', deletedRow);
                     this.$refs.toast.timeout('Row Deleted', true, 2000);
                 } else {
                     this.$refs.toast.timeout('Unable to delete', false, 2000);
                 }
             } catch (error) {
+                console.warn(error);
                 this.$refs.toast.timeout('Unable to delete', false, 2000);
             } finally {
                 this.$refs.deleteModal.close();
-                this.isProcessing = false;
+                this.$store.commit('setIsProcessing', false);
             }
         },
 
@@ -241,13 +194,12 @@ export default {
          * Save all data
          */
         async onSaveSelected () {
-            this.isSaving = true;
-            this.isProcessing = true;
-            this.saveStatus = 'Saving...';
-            this.$refs.toast.activate('Saving...');
+            this.$store.commit('setIsProcessing', true);
+            this.$store.commit('setSaveStatus', 'Saving...');
+            this.$refs.toast.activate(this.saveStatus);
             this.updateSequenceOrder();
             try {
-                const response = await axios.post(this.data.saveRoute, this.getSaveAllFormData());
+                const response = await axios.post(this.loadedData.saveRoute, this.getSaveAllFormData());
                 if (response.status === 200) {
                     this.updateNewRowIds(response.data.newRowIdList);
                     this.$refs.toast.timeout('Save successful', true, 2000);
@@ -255,11 +207,13 @@ export default {
                     this.$refs.toast.timeout('Unable to save', false, 2000);
                 }
             } catch (error) {
+                console.warn(error);
                 this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
-                this.isSaving = false;
-                this.isProcessing = false;
-                this.saveStatus = 'Save';
+                this.$nextTick(() => { //to avoid animating any newly inserted rows in onBeforeEnter 
+                    this.$store.commit('setIsProcessing', false);
+                    this.$store.commit('setSaveStatus', 'Save');
+                });
             }
         },
 
@@ -310,7 +264,7 @@ export default {
          * @param {DOMElement} element - the element that's animating
          */
         onBeforeEnter (row) {
-            if (!this.isSaving) {
+            if (!this.isProcessing) {
                 gsap.set(row, { height: 0 } );
             }
         },
@@ -322,7 +276,7 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onEnter (row, done) {
-            if (this.isSaving) {
+            if (this.isProcessing) {
                 done();
             } else {
                 gsap.to(row, 0.3, { height: 'auto', onComplete: done } );
@@ -336,7 +290,7 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onLeave (row, done) {
-            if (this.isSaving) {
+            if (this.isProcessing) {
                 done();
             } else {
                 gsap.to(row, 0.3, { height: 0, onComplete: done } );
@@ -357,11 +311,8 @@ export default {
             <div class="small-12 island">
                 
                 <transition name="fade" mode="out-in">
-
-                    <div v-if="rows.length === 0" id="listEmptyState" class="empty-state" key="empty-list">
-                        <i class="icon-list"></i>
-                        <p>The {{ data.title }} list is empty.<br><a @click.prevent="onNewRowSelected" href="#add-an-item" data-button="add-row">Add an item to this list</a>.</p>
-                    </div>
+                    
+                    <admin-list-no-rows v-if="rows.length === 0" key="empty-list" />
 
                     <form v-else method="post" action="/adminv2/lists/save" key="list">
 
@@ -374,7 +325,7 @@ export default {
                                 <transition-group
                                     name="staggered-fade"
                                     tag="ul"
-                                    :class="`information-list ${ data.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
+                                    :class="`information-list ${ loadedData.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
                                     :style="listStyles"
                                     v-bind:css="false"
                                     data-sortable 
@@ -394,17 +345,11 @@ export default {
 
                                 <admin-list-pop-out
                                     v-if="hasPopOut"
-                                    :save-status="saveStatus" 
-                                    :is-processing="isProcessing" 
                                     @on-pop-out-mounted="onPopOutMounted"
                                     @on-pop-out-saved="onSaveSelected"
                                 />
 
-                                <div v-if="!data.noNewRecords" class="component-action">
-                                    <section>
-                                        <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
-                                    </section>
-                                </div>
+                                <admin-list-add-row v-if="!loadedData.noNewRecords" />
 
                             </div><!-- .list-container -->
 
@@ -420,9 +365,9 @@ export default {
 
             <toast ref="toast"></toast>
 
-            <reveal-modal v-if="data.canDelete" ref="deleteModal">
+            <reveal-modal v-if="loadedData.canDelete" ref="deleteModal">
                 <h2>Please Confirm</h2>
-                <div data-alert class="alert-box warning">{{ data.deleteWarning }}</div>
+                <div data-alert class="alert-box warning">{{ loadedData.deleteWarning }}</div>
                 <ul class="flex-list buttons">
                     <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
                     <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>

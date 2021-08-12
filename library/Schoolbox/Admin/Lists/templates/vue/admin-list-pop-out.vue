@@ -10,22 +10,13 @@ import { gsap } from 'gsap/all';
 
 export default {
 
-    props: {
-        saveStatus: { //to update the button text when saving
-            type: String,
-            required: true
-        },
-        isProcessing: { //to prevent multiple rapid-fire submissions
-            type: Boolean,
-            required: true
-        }
-    },
-
     computed: {
 
         ...mapState({
             selectedRow: state => state.selectedRow,
             isOpen: state => state.isPopOutOpen,
+            saveStatus: state => state.saveStatus,
+            isProcessing: state => state.isProcessing,
         }),
 
         ...mapGetters({

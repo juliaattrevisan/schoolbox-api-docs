@@ -27,8 +27,8 @@ export default {
     computed: {
 
         ...mapState({
-            isSortable: state => state.data.isSortable,
-            canDelete: state => state.data.canDelete,
+            isSortable: state => state.loadedData.isSortable,
+            canDelete: state => state.loadedData.canDelete,
             selectedRow: state => state.selectedRow,
             isPopOutOpen: state => state.isPopOutOpen,
             selectedPopOutName: state => state.selectedPopOutName,
@@ -71,7 +71,6 @@ export default {
          */
         onDeleteRowSelected () {
             this.$emit('on-delete-row-selected', this.row);
-            this.$emit('on-pop-out-name-selected', '');
         }
 
     }
