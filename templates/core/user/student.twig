@@ -323,9 +323,8 @@
                         {% if showPastoral and pastoralCounts|length > 0 %}
                             <div class="pastoralAlerts">
                                     {% for pastoralCount in pastoralCounts %}
-                                        <a href="{{ pastoralUrl ? pastoralUrl~'?type='~pastoralCount.typeId~'&subtype='~pastoralCount.subtypeId : '' }}">
-                                        <span id="pastoralFlag{{ pastoralCount.typeId }}-{{ pastoralCount.subtypeId }}"
-                                              class="label neutral icon-{{ pastoralCount.icon }}"
+                                        <a href="{{ pastoralCount.destinationUrl }}">
+                                        <span class="label neutral icon-{{ pastoralCount.icon }}"
                                               data-tooltip title="{{ pastoralCount.title }}"
                                               style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
                                         >{{ pastoralCount.count }}</span></a>

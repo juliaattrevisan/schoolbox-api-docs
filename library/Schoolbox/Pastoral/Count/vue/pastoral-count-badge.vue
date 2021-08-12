@@ -10,9 +10,6 @@ export default {
     props: {
         /**
          * The url which leads to the students pastoral page
-         *
-         * note that this url includes its named parameter `studentId` as a token
-         * which needs to be replaced
          */
         destinationUrl: {
             default: '',
@@ -57,19 +54,17 @@ export default {
 }
 </script>
 <template>
-    <div>
-        <a :href="destinationUrl">
-            <span :class="`label neutral icon-${icon}`"
-                  :title="description"
-                  :style="{
-                      'background-color': bgColor,
-                      'color': fgColor,
-                  }"
-            >
-                {{ count }}
-            </span>
-        </a>
-    </div>
+    <a :href="destinationUrl">
+        <span :class="`label neutral icon-${icon}`"
+              :title="description"
+              :style="{
+                  'background-color': bgColor,
+                  'color': fgColor,
+              }"
+        >
+            {{ count }}
+        </span>
+    </a>
 </template>
 
 <style scoped>
