@@ -20,6 +20,7 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\Resource\Storage\Transform\Mapper;
 use Schoolbox\Resource\Storage\Transform\Model;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
+use Schoolbox\Video\ResourceVideo;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -32,9 +33,9 @@ $id   = $_GET['id'];
 
 // If no size was specified, assume thumbnail else poster
 if (strlen($_GET['size']) === 0) {
-    $size = 'thumbnail';
+    $size = ResourceVideo::THUMBNAIL;
 } else {
-    $size = 'poster';
+    $size = ResourceVideo::POSTER;
 }
 
 // TODO: Destroy these shenanigans
@@ -84,7 +85,7 @@ if (isset($type, $id)) {
         try {
             // Try to find a video record with associated poster and thumbnail links
 
-            if ($size == 'poster') {
+            if ($size === ResourceVideo::POSTER) {
                 $imageFilename = $videoQueue->getPosterPath();
             } else {
                 $imageFilename = $videoQueue->getThumbnailPath();

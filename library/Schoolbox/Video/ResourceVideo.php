@@ -36,13 +36,13 @@ class ResourceVideo
     protected $config;
 
     /** @const string TRANSCODE Location of compressed transcode (video or audio only) version of file */
-    private const TRANSCODE = '-transcode';
+    public const TRANSCODE = 'transcode';
 
     /** @const string THUMBNAIL Location of small thumbnail representing compressed video */
-    private const THUMBNAIL = '-thumbnail';
+    public const THUMBNAIL = 'thumbnail';
 
     /** @const string POSTER Location of poster for compressed video */
-    private const POSTER = '-poster';
+    public const POSTER = 'poster';
 
     /**
      * Creates object and sets up sub-objects.
@@ -217,7 +217,7 @@ class ResourceVideo
      */
     public function getTranscodePath()
     {
-        return $this->getStorage()->getPath() . self::TRANSCODE;
+        return $this->getTransformPath(self::TRANSCODE);
     }
 
     /**
@@ -227,7 +227,7 @@ class ResourceVideo
      */
     public function getPosterPath()
     {
-        return $this->getStorage()->getPath() . self::POSTER;
+        return $this->getTransformPath(self::POSTER);
     }
 
     /**
@@ -237,6 +237,17 @@ class ResourceVideo
      */
     public function getThumbnailPath()
     {
-        return $this->getStorage()->getPath() . self::THUMBNAIL;
+        return $this->getTransformPath(self::THUMBNAIL);
+    }
+
+    /**
+     * Consistently generate a transform's path
+     *
+     * @param string $transform
+     * @return string
+     */
+    private function getTransformPath(string $transform): string
+    {
+        return "{$this->getStorage()->getPath()}-$transform";
     }
 }
