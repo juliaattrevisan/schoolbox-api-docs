@@ -125,7 +125,44 @@ export default {
          * Post changes to the list of textboxes.
          */
         postChanges() {
-            // Post changes here?
+            let self     = this,
+                requests = [];
+
+            // DOM updates: disable button, add toast
+            self.$refs.saveButton.disabled = true;
+
+
+            // Create a new set of textbox data to post
+            self.textboxes.forEach(function (usage) {
+                let textbox = usage.textbox,
+                    deleted = usage.deleted ?? false;
+                if (deleted) {
+                    // Check if this textbox has a delete link.
+                    // If it doesn't it's new, so just don't create it.
+                    let deleteEndpoint = textbox?._links?.delete;
+                    if (deleteEndpoint) {
+                        // add to the list of promises
+                        requests.push(axios.delete(deleteEndpoint));
+                    }
+                } else {
+                    // Check if this textbox has an update link.
+                    // If it doesn't it's new, so create it: otherwise update.
+                    let updateEndpoint = textbox?._links?.update;
+                    if (updateEndpoint) {
+                        requests.push(axios.put(updateEndpoint, textbox));
+                    } else {
+                        requests.push(axios.post(self.createTextboxEndpoint, textbox));
+                    }
+                }
+            });
+
+            Promise.all(requests)
+                .then(function () {
+                    // remove the toast
+                })
+                .finally(function () {
+                    self.window.location.href = self.returnUrl;
+                })
         },
 
         /**
@@ -259,7 +296,7 @@ export default {
 
                 <ul class="flex-list buttons">
                     <li><button @click.prevent="addTextbox">Add new</button></li>
-                    <li><input type="submit" value="Save" /></li>
+                    <li><input type="submit" ref="saveButton" value="Save" /></li>
                 </ul>
             </template>
         </section>
