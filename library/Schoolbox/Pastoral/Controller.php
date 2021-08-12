@@ -56,7 +56,7 @@ use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\TokenReplacer\Simple;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -262,7 +262,7 @@ class Controller extends Base
      */
     public function getStudentsCount(Collection $students): void
     {
-        $pastoralCountHelper = new PastoralCountHelper($this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
         $output              = $pastoralCountHelper->countStudentsEventsByTypes($this->getUser(), $students);
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));

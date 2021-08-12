@@ -1,9 +1,11 @@
 <script>
 
-import axios from 'axios'
+import axios from 'axios';
+import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 
 export default {
     name: 'class-list',
+    components: {PastoralCountBadge},
     props: {
         /**
          * The title of the subject for which the class list is shown, including
@@ -204,7 +206,7 @@ export default {
          */
         getStudentsPastoralCountsUrl: {
             type: String,
-            required: true,
+            required: false,
         },
 
         /**
@@ -295,7 +297,7 @@ export default {
             /**
              * immediately check to see if we need to grab pastoral count information
              */
-            studentLists.then(function (result) {
+            studentLists.then(function () {
                 //pastoral is disabled, theres no need to load in pastoral counts
                 if (!self.pastoralEnabled) {
                     return;
@@ -639,15 +641,15 @@ export default {
                             <span class="show-for-print"><br>{{ student.email }}</span><br>
 
                             <p class="meta">
-                                <span v-for="(studentBadge) in studentPastoralCounts[student.id]"
-                                      :class="'label neutral icon-' + studentBadge.icon"
-                                      data-tooltip :title="studentBadge.title"
-                                      :style="{
-                                              'background-color': studentBadge.bgColor,
-                                              'color': studentBadge.fgColor}"
-                                >
-                                        {{ studentBadge.count }}
-                                    </span>
+                                <PastoralCountBadge v-for="(studentBadge) in studentPastoralCounts[student.id]" :key="studentBadge.id"
+                                                    :destinationUrl="studentBadge.destinationUrl"
+                                                    :userId="student.id"
+                                                    :bgColor="studentBadge.bgColor"
+                                                    :count="studentBadge.count"
+                                                    :description="studentBadge.title"
+                                                    :fgColor="studentBadge.fgColor"
+                                                    :icon="studentBadge.icon"
+                                ></PastoralCountBadge>
                             </p>
 
                             <p class="meta">

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Count;
 
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Router;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -50,18 +52,22 @@ class Helper
      */
     private $pastoralSubTypesWhitelist;
 
+    private Router $router;
+
     /**
      * helper to bundle similar counts related to pastoral events of students
      *
+     * @param Router                $router
      * @param PastoralTypeMapper    $pastoralTypeMapper
      * @param PastoralSubTypeMapper $pastoralSubTypeMapper
      * @param PastoralDataSource    $pastoralDataSource
      */
-    public function __construct(PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource)
+    public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource)
     {
         $this->pastoralTypeMapper    = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper = $pastoralSubTypeMapper;
         $this->pastoralDataSource    = $pastoralDataSource;
+        $this->router                = $router;
         $this->colorHelper           = new ColorHelper();
 
         $this->pastoralTypesWhitelist = $this->pastoralTypeMapper->findByPredicates(
@@ -81,6 +87,7 @@ class Helper
      * @param Collection|null $typesWhitelist    optional whitelist of pastoral types that should be counted
      * @param Collection|null $subTypesWhitelist optional whitelist of pastoral subtypes that should be counted
      * @return Collection
+     * @throws RouteNotFound
      */
     public function countStudentsEventsByTypes(User $viewer, Collection $students, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
     {
@@ -114,6 +121,7 @@ class Helper
      * @param Collection|null $typesWhitelist
      * @param Collection|null $subTypesWhitelist
      * @return Collection
+     * @throws RouteNotFound
      */
     public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
     {
@@ -153,7 +161,15 @@ class Helper
                     ->setOffset('subSequence', 0)
                     ->setOffset('sequence', $type->getSequence());
             }
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $destinationUrl = sprintf(
+                "%s?type=%s&subtype=%s",
+                $this->router->generate('pastoral.getStudent', ['studentId' => $student->getId()]),
+                $studentCount->getOffset('typeId'),
+                $studentCount->getOffset('subtypeId')
+            );
             $studentCount
+                ->setOffset('destinationUrl', $destinationUrl)
                 ->setOffset('bgColor', $this->colorHelper->calculateBackground($foregroundColor)->getAsRgba())
                 ->setOffset('fgColor', $foregroundColor->getAsRgba());
 

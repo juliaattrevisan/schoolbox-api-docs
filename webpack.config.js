@@ -198,9 +198,12 @@ module.exports = {
         // Class List
         classList: './library/Schoolbox/Learning/vue/init-class-list.js',
 
+        // Pastoral Count Badge
+        pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/initPastoralCountBadge.js',
+
         // Google Files
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
-        
+
         //Sortable components for homepages
         sortableComponents: './templates/core/homepage/js/sortableComponents.js',
 
@@ -348,6 +351,7 @@ module.exports = {
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
             '@schoolbox': path.resolve(__dirname, 'vue/components'),
+            '@schoolboxLibrary': path.resolve(__dirname, 'library/Schoolbox'),
             '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
