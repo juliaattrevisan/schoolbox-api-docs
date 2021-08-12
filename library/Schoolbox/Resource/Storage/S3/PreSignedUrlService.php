@@ -18,6 +18,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
 use Schoolbox\Video\QueueMapper as VideoQueueMapper;
+use Schoolbox\Video\ResourceVideo;
 
 class PreSignedUrlService
 {
@@ -102,7 +103,7 @@ class PreSignedUrlService
 
         $cacheKey = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
 
-        if ($cacheKey === 'transcode') {
+        if ($cacheKey === ResourceVideo::TRANSCODE) {
             return $this->fileExistsInVideoQueue($hash);
         }
 
