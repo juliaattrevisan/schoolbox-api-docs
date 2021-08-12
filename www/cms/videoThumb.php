@@ -94,6 +94,7 @@ if (isset($type, $id)) {
             /** @var \League\Flysystem\FilesystemInterface $filesystem */
             $filesystem = $videoQueue->getStorage()->getFilesystem();
 
+            $mimeType = 'image/jpeg';
             if ($filesystem instanceof Filesystem && $filesystem->getAdapter() instanceof S3Adapter) {
                 /** @var IConfigLoader $config */
                 $config = $kernel->get('config');
@@ -107,7 +108,7 @@ if (isset($type, $id)) {
                         $imageFilename,
                         'private',
                         '',
-                        'image/jpeg'
+                        $mimeType
                     );
 
                     $preSignedUrlService->download($preSignedUrlDataObject);
@@ -117,7 +118,7 @@ if (isset($type, $id)) {
             if ($filesystem->has($imageFilename)) {
                 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
                 $image = $filesystem->get($imageFilename);
-                header('Content-Type: image/jpeg');
+                header("Content-Type: $mimeType");
                 header("Content-Length: {$image->getSize()}");
                 fpassthru($image->readStream());
 
