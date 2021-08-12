@@ -185,6 +185,8 @@ class External_Tass_User implements External_UserInterface
             '' AS StudentEnrolmentDate,
             '' AS StudentLeavingDate,
             '' AS StudentIBFlag,
+            '' AS IndigenousFlag,
+            '' AS StudentTSIFlag,
             '' AS ParentsSeparatedFlag,
             0 AS countIndividualEducationPlans
         FROM student AS s

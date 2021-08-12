@@ -298,6 +298,8 @@ class External_Synergetic_User implements External_UserInterface
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
                         vStudentsAll.StudentIBFlag,
+                        vStudentsAll.IndigenousFlag,
+                        vStudentsAll.StudentTSIFlag,
                         $learningPlanQuery
             FROM        dbo.vStudentsAll vStudentsAll
             LEFT JOIN   CommunityAlerts ON

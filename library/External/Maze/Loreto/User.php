@@ -75,6 +75,8 @@ class External_Maze_Loreto_User extends External_Maze_User
                 '' AS StudentEnrolmentDate,
                 '' AS StudentLeavingDate,
 				'' AS StudentIBFlag,
+                '' AS IndigenousFlag,
+                '' AS StudentTSIFlag,
 			    '' AS ParentsSeparatedFlag,
 				ST.ROLL_GROUP,
 				0 AS countIndividualEducationPlans
