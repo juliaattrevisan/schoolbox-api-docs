@@ -154,9 +154,16 @@ export default {
             });
         },
 
+        /**
+         * Set up collapsers for each textbox.
+         */
         setupCollapsers() {
             // Apply the collapser
-            self.$nextTick(() => self.jQuery('[data-collapser^="collapser-textbox"]').collapsable());
+            this.$nextTick(() => {
+                let $collapsers = this.jQuery('[data-collapser^="collapser-textbox"]');
+                $collapsers.destroyCollapsable();
+                $collapsers.collapsable();
+            })
         },
     },
     computed: {
