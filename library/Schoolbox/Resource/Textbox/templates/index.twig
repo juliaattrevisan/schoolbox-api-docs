@@ -38,7 +38,9 @@
 
         <div id="textbox-list">
             <textbox-list textbox-usage-endpoint="{{ routeLookupIfAuthorized('textbox.getUsageForFolder', {folderId: folder.id, folder: folder}) }}"
+                          create-textbox-endpoint="{{ routeLookupIfAuthorized('textbox.createTextboxInFolder', {folderId: folder.id, folder: folder}) }}"
                           post-changes-endpoint="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}"
+                          return-url="{{ RETURN_URL.previous.decoded ?? ('/homepage/' ~ folder.id) }}"
                           :folder-id="Number('{{ folder.id }}')"
             >
             </textbox-list>

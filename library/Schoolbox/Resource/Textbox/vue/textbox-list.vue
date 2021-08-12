@@ -14,6 +14,14 @@ export default {
         },
 
         /**
+         * Endpoint for creating textboxes.
+         */
+        createTextboxEndpoint: {
+            type: String,
+            required: true,
+        },
+
+        /**
          * Endpoint for posting textbox changes.
          */
         postChangesEndpoint: {
@@ -28,6 +36,14 @@ export default {
             type: Number,
             required: true,
         },
+
+        /**
+         * Where will the user be redirected after the list is saved?
+         */
+        returnUrl: {
+            type: String,
+            required: true,
+        }
     },
     data() {
         return {
