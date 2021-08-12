@@ -11,10 +11,11 @@ import { gsap } from 'gsap/all'
 import AdminListHeader from './admin-list-header';
 import AdminListPopOut from './admin-list-pop-out';
 import AdminListNoRows from './admin-list-no-rows';
-import AdminListRow from './admin-list-row';
+import AdminListRow from './row/admin-list-row';
 import AdminListAddRow from './admin-list-add-row';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW } from './store/adminListMutationTypes';
 
 
 export default {
@@ -103,7 +104,7 @@ export default {
         async getData () {
             try {
                 const response = await axios.get(`/adminv2/lists/data/${this.tableName}`);
-                this.$store.commit('setLoadedData', response.data);
+                this.$store.commit(UPDATE_LOADED_DATA, response.data);
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
@@ -137,7 +138,7 @@ export default {
          * @param { Number }
          */
         onDeleteRowSelected (selectedRow) {
-            this.$store.commit('setSelectedRow', selectedRow);
+            this.$store.commit(UPDATE_SELECTED_ROW, selectedRow);
             if (selectedRow.isNew) { //hasn't been placed in the DB yet, so no need to confirm its removal
                 const rowToRemove = this.rows.find((row) => row.id === this.selectedRow.id);
                 this.$store.commit('deleteRow', rowToRemove);

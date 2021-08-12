@@ -1,6 +1,7 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex'
+import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW } from './adminListMutationTypes';
 
 Vue.use(Vuex);
 
@@ -57,13 +58,18 @@ export default new Vuex.Store({
         /**
          * 
          */
-        setLoadedData (state, loadedData) {
-
+        [UPDATE_LOADED_DATA] (state, loadedData) {
             state.loadedData = loadedData;
-
             state.rows = _.cloneDeep(state.loadedData.rows); //cloneDeep is from underscore.js
             state.rows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
+        },
 
+        /**
+         * 
+         */
+        [UPDATE_SELECTED_ROW] (state, row) {
+            state.selectedRow = row;
+            state.selectedPopOutName = '';
         },
 
         /**
@@ -78,14 +84,6 @@ export default new Vuex.Store({
          */
         deleteRow (state, rowToDelete) {
             state.rows = state.rows.filter((row) => row.id !== rowToDelete.id);
-        },
-
-        /**
-         * 
-         */
-        setSelectedRow (state, row) {
-            state.selectedRow = row;
-            state.selectedPopOutName = '';
         },
 
         /**
