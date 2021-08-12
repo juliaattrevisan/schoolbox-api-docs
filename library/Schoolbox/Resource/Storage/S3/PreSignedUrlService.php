@@ -100,14 +100,14 @@ class PreSignedUrlService
         $itemPath   = $dataObject->getItemPath();
         $hash       = $dataObject->getHash();
 
-        $transformType = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
+        $cacheKey = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
 
-        if ($transformType && $transformType === 'transcode') {
+        if ($cacheKey === 'transcode') {
             return $this->fileExistsInVideoQueue($hash);
         }
 
-        return $transformType
-            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $transformType)
+        return $cacheKey
+            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $cacheKey)
             : Storage\Mapper::getInstance()->countByColumn('hash', $hash) > 0;
     }
 
