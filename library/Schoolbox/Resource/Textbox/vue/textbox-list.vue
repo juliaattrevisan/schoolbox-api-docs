@@ -1,9 +1,11 @@
 <script>
 
 import axios from 'axios';
+import Toast from '@schoolbox/toast';
 
 export default {
     name: 'textbox-list',
+    components: {Toast},
     props: {
         /**
          * Endpoint for fetching textbox usages.
@@ -53,6 +55,7 @@ export default {
             jQuery: window.jQuery,
             showSkeletonLoader: true,
             validator: null,
+            saveInProgress: false,
         }
     },
     mounted() {
@@ -129,8 +132,8 @@ export default {
                 requests = [];
 
             // DOM updates: disable button, add toast
-            self.$refs.saveButton.disabled = true;
-
+            self.saveInProgress = true;
+            self.$refs.toast.activate('Saving textboxes...');
 
             // Create a new set of textbox data to post
             self.textboxes.forEach(function (usage) {
@@ -157,12 +160,14 @@ export default {
             });
 
             Promise.all(requests)
-                .then(function () {
-                    // remove the toast
-                })
-                .finally(function () {
+                .then(() => {
+                    self.$refs.toast.timeout('Saved', true);
                     self.window.location.href = self.returnUrl;
                 })
+                .catch(() => {
+                    self.$refs.toast.timeout('Could not save all textboxes', false);
+                    self.saveInProgress = false
+                });
         },
 
         /**
@@ -295,10 +300,11 @@ export default {
                 </div>
 
                 <ul class="flex-list buttons">
-                    <li><button @click.prevent="addTextbox">Add new</button></li>
-                    <li><input type="submit" ref="saveButton" value="Save" /></li>
+                    <li><button @click.prevent="addTextbox" :disabled="saveInProgress">Add new</button></li>
+                    <li><input type="submit" ref="saveButton" value="Save" :disabled="saveInProgress" /></li>
                 </ul>
             </template>
         </section>
+        <toast ref="toast"></toast>
     </form>
 </template>
