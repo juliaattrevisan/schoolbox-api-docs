@@ -9,16 +9,14 @@
  * @link        https://schoolbox.com.au/
  */
 
-use League\Flysystem\Filesystem;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
-use Schoolbox\Resource\Storage\Transform\Mapper;
-use Schoolbox\Resource\Storage\Transform\Model;
+use Schoolbox\Resource\Storage\Transform;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
 use Schoolbox\Video\ResourceVideo;
 
@@ -32,7 +30,7 @@ $type = $_GET['type'];
 $id   = $_GET['id'];
 
 // If no size was specified, assume thumbnail else poster
-if (strlen($_GET['size']) === 0) {
+if (strlen($_GET['size'] ?? '') === 0) {
     $size = ResourceVideo::THUMBNAIL;
 } else {
     $size = ResourceVideo::POSTER;
@@ -91,28 +89,34 @@ if (isset($type, $id)) {
                 $imageFilename = $videoQueue->getThumbnailPath();
             }
 
-            /** @var \League\Flysystem\FilesystemInterface $filesystem */
             $filesystem = $videoQueue->getStorage()->getFilesystem();
 
+            /** @var IConfigLoader $config */
+            $config   = $kernel->get('config');
             $mimeType = 'image/jpeg';
-            if ($filesystem instanceof Filesystem && $filesystem->getAdapter() instanceof S3Adapter) {
-                /** @var IConfigLoader $config */
-                $config = $kernel->get('config');
+            if (
+                $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3 &&
+                $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
+            ) {
+                $preSignedUrlService = new PreSignedUrlService($config);
 
-                if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
-                    $preSignedUrlService = new PreSignedUrlService($config);
+                $preSignedUrlDataObject = $preSignedUrlService->generate(
+                    $videoQueue->getStorage()->setMimetype(new Mimetype()),
+                    Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+                    $imageFilename,
+                    'private',
+                    '',
+                    $mimeType
+                );
+                $preSignedUrlService->download($preSignedUrlDataObject);
 
-                    $preSignedUrlDataObject = $preSignedUrlService->generate(
-                        $videoQueue->getStorage()->setMimetype(new Mimetype()),
-                        Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
-                        $imageFilename,
-                        'private',
-                        '',
-                        $mimeType
-                    );
-
-                    $preSignedUrlService->download($preSignedUrlDataObject);
+                // Insert video thumbnail transforms on-demand if it exists on disk but not in storage_transform table yet.
+                if ($filesystem->has($imageFilename)) {
+                    $image = $filesystem->get($imageFilename);
+                    [$hash, $cacheKey] = explode('-', basename($image->getPath()));
+                    Transform\Mapper::getInstance()->createRecord($hash, $cacheKey, $image->getSize(), Transform\Model::STATE_DONE);
                 }
+                $preSignedUrlService->download($preSignedUrlDataObject);
             }
 
             if ($filesystem->has($imageFilename)) {
@@ -121,18 +125,6 @@ if (isset($type, $id)) {
                 header("Content-Type: $mimeType");
                 header("Content-Length: {$image->getSize()}");
                 fpassthru($image->readStream());
-
-                $fileName = explode('-', basename($image->getPath()));
-
-                /**
-                 * Insert video thumbnail transforms on-demand if it exists on disk but not in storage_transform table yet.
-                 */
-                $transformMapper = Mapper::getInstance();
-                $transformModel  = $transformMapper->findByHashAndCacheKey($fileName[0], $size);
-
-                if (!$transformModel) {
-                    $transformMapper->createRecord($fileName[0], $fileName[1], $image->getSize(), Model::STATE_DONE);
-                }
                 exit;
             }
 
