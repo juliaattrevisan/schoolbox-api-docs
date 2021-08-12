@@ -67,18 +67,21 @@ class PreSignedUrlService
         string $attachmentType = '',
         string $mimeTypeOverride = null
     ): PreSignedUrlDataObject {
-        $expires  = $expireAt->__toString();
-        $mimeType = $mimeTypeOverride ?? $storage->getMime() ?: 'application/octet-stream';
-        $basename = utf8_encode($storage->getBasename());
+        $expires            = $expireAt->__toString();
+        $mimeType           = $mimeTypeOverride ?? $storage->getMime() ?: 'application/octet-stream';
+        $basename           = utf8_encode($storage->getBasename());
+        $args = [
+            'Bucket'               => $this->bucket,
+            'Key'                  => FilesystemFactory::PREFIX_STORAGE . $path,
+            'ResponseCacheControl' => $cacheControl,
+            'ResponseContentType'  => $mimeType,
+            'ResponseExpires'      => $expires,
+        ];
+        if ($attachmentType) {
+            $args['ResponseContentDisposition'] = "$attachmentType filename=\"{$basename}\"";
+        }
 
-        $commandObject = $this->s3Client->getCommand('GetObject', [
-            'Bucket'                     => $this->bucket,
-            'Key'                        => FilesystemFactory::PREFIX_STORAGE . $path,
-            'ResponseCacheControl'       => $cacheControl,
-            'ResponseContentDisposition' => "$attachmentType filename=\"{$basename}\"",
-            'ResponseContentType'        => $mimeType,
-            'ResponseExpires'            => $expires,
-        ]);
+        $commandObject = $this->s3Client->getCommand('GetObject', $args);
 
         $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
