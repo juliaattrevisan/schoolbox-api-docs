@@ -103,8 +103,12 @@ if (!$attempt['finish']) {
     /* Notify the survey author when someone completes this
      */
     if ($survey['notify_author']) {
-        $notification = new Survey_Notification($survey, $attempt);
-        $notification->send();
+        try {
+            $notification = new Survey_Notification($survey, $attempt);
+            $notification->send();
+        } catch (TypeError $error) {
+            //author has no email, email will fail
+        }
     }
 } else {
     $finishDate = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
