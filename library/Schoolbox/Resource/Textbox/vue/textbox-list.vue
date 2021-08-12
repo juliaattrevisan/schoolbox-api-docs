@@ -73,10 +73,12 @@ export default {
 
         /**
          * Deletes a textbox from the list of textboxes.
+         *
+         * Currently this only hides the textbox from view, it does not remove
+         * it because `$index` might be reused by another textbox.
          */
         deleteTextbox(index) {
-            // let usage = this.textboxes[index];
-            this.textboxes.splice(index, 1)
+            this.$set(this.textboxes[index], 'deleted', true);
         },
 
         /**
@@ -167,6 +169,14 @@ export default {
         },
     },
     computed: {
+        /**
+         * All textboxes which are not marked as deleted.
+         *
+         * @returns {*[]}
+         */
+        undeletedTextboxes() {
+            return this.textboxes.filter(v => v?.deleted !== true)
+        }
     },
     filters: {}
 }
@@ -186,43 +196,50 @@ export default {
             </ul>
             <template v-else>
                 <ul class="information-list unsortable expandable-card">
-                    <li v-for="(usage, index) in textboxes">
-                        <div class="actions-small-1">
-                            <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
-                            <div class="list-item">
-                                <div class="small-12 column">
-                                    <label>
-                                        <span class="hide-for-medium-up">Textbox</span>
-                                        <input :name="'textbox[' + String(index) + '][heading]'" type="text" v-model="usage.textbox.heading">
-                                    </label>
+                    <template v-for="(usage, index) in textboxes">
+                        <li v-if="usage.deleted !== true">
+                            <div class="actions-small-1">
+                                <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
+                                <div class="list-item">
+                                    <div class="small-12 column">
+                                        <label>
+                                            <span class="hide-for-medium-up">Textbox</span>
+                                            <input :name="'textbox[' + String(index) + '][heading]'" type="text" v-model="usage.textbox.heading">
+                                        </label>
 
-                                    <p class="meta" v-if="usage.folders.length > 0">
-                                        Pages:
-                                        <template v-if="inUseOnThisFolder(usage)">
-                                            this page<template v-if="otherFolders(usage).length > 0">, </template>
-                                        </template>
-                                        <template v-for="(folder, index) in otherFolders(usage)">
-                                            <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
-                                        </template>
-                                    </p>
+                                        <p class="meta" v-if="usage.folders.length > 0">
+                                            Pages:
+                                            <template v-if="inUseOnThisFolder(usage)">
+                                                this page<template v-if="otherFolders(usage).length > 0">, </template>
+                                            </template>
+                                            <template v-for="(folder, index) in otherFolders(usage)">
+                                                <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
+                                            </template>
+                                        </p>
 
-                                    <p class="meta" v-if="usage.dashboards.length > 0">
-                                        Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
-                                    </p>
+                                        <p class="meta" v-if="usage.dashboards.length > 0">
+                                            Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
+                                        </p>
+                                    </div>
                                 </div>
+                                <nav>
+                                    <a class="icon-delete" href="#" @click.prevent="deleteTextbox(index)" title="Delete"></a>
+                                </nav>
                             </div>
-                            <nav>
-                                <a class="icon-delete" href="#" @click.prevent="deleteTextbox(index)" title="Delete"></a>
-                            </nav>
-                        </div>
-                        <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
+                            <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
                             <textarea :name="'textbox[' + String(index) + '][heading]'"
                                       :id="'textbox-' + String(index) + '-heading'"
                                       v-model="usage.textbox.body">
                             </textarea>
-                        </div>
-                    </li>
+                            </div>
+                        </li>
+                    </template>
                 </ul>
+
+                <div class="empty-state" v-if="undeletedTextboxes.length === 0">
+                    <i class="icon-textbox"></i>
+                    <p>No textboxes currently exist on this page.</p>
+                </div>
 
                 <ul class="flex-list buttons">
                     <li><button @click.prevent="addTextbox">Add new</button></li>
