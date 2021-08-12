@@ -76,7 +76,7 @@ class PageMapper extends Schoolbox\Mapper
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('owner', 'o')}
             FROM        {$this->getTable()}
-            INNER JOIN  {$this->getJoinSql('owner', '', 'o', true)}
+            INNER JOIN  {$this->getJoinSql('owner', '', 'o')}
         ";
     }
 
