@@ -21,6 +21,10 @@ use Schoolbox\Video\ResourceVideo;
 
 class PreSignedUrlService
 {
+    # Supported ContentDisposition response header dispositions
+    public const DISPOSITION_INLINE = 'inline';            // Display inline
+    public const DISPOSITION_ATTACHMENT = 'attachment';    // Prompt browser to download
+
     /**
      * @var S3Client
      */
@@ -54,7 +58,7 @@ class PreSignedUrlService
      * @param AlaressDateFormat $expireAt
      * @param string            $path
      * @param string            $cacheControl
-     * @param string            $attachmentType
+     * @param string            $disposition
      * @param string|null       $mimeTypeOverride If non-null, override the storage object's mime type
      *
      * @return PreSignedUrlDataObject
@@ -64,24 +68,21 @@ class PreSignedUrlService
         AlaressDateFormat $expireAt,
         string $path,
         string $cacheControl = 'private',
-        string $attachmentType = '',
-        string $mimeTypeOverride = null
+        string $disposition = self::DISPOSITION_INLINE,
+        string $mimeTypeOverride = null,
+        string $fileNameOverride = null
     ): PreSignedUrlDataObject {
-        $expires            = $expireAt->__toString();
-        $mimeType           = $mimeTypeOverride ?? $storage->getMime() ?: 'application/octet-stream';
-        $basename           = utf8_encode($storage->getBasename());
-        $args = [
-            'Bucket'               => $this->bucket,
-            'Key'                  => FilesystemFactory::PREFIX_STORAGE . $path,
-            'ResponseCacheControl' => $cacheControl,
-            'ResponseContentType'  => $mimeType,
-            'ResponseExpires'      => $expires,
-        ];
-        if ($attachmentType) {
-            $args['ResponseContentDisposition'] = "$attachmentType filename=\"{$basename}\"";
-        }
+        $expires  = $expireAt->__toString();
+        $fileName = utf8_encode($fileNameOverride ?? $storage->getBasename());
 
-        $commandObject = $this->s3Client->getCommand('GetObject', $args);
+        $commandObject = $this->s3Client->getCommand('GetObject', [
+            'Bucket'                     => $this->bucket,
+            'Key'                        => FilesystemFactory::PREFIX_STORAGE . $path,
+            'ResponseCacheControl'       => $cacheControl,
+            'ResponseContentDisposition' => "$disposition; filename=\"{$fileName}\"",
+            'ResponseContentType'        => $mimeTypeOverride ?? $storage->getMime() ?: 'application/octet-stream',
+            'ResponseExpires'            => $expires,
+        ]);
 
         $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 

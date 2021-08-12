@@ -85,7 +85,6 @@ if (isset($type) && isset($id)) {
     // Retrieve mime type
     // ----------------------------------------------------------------------------------------------------------------
 
-    /** @var string $mimeType */
     if ($storage->getMimetype() instanceof Mimetype) {
         if ($storage->getMimeType()->isAudio()) {
             // If audio trancode, assume transcode format is audio/mpeg (mp3)
@@ -93,6 +92,8 @@ if (isset($type) && isset($id)) {
         } elseif ($storage->getMimeType()->isVideo()) {
             // If video trancode, assume transcode format is video/mp4 (mp4)
             $mimeType = 'video/mp4';
+        } else {
+            $mimeType = 'application/octet-stream';
         }
     } else {
         // If unknown, just flail about and choose the original file mimetype
@@ -114,6 +115,7 @@ if (isset($type) && isset($id)) {
             Alaress_Date_Format::now()->addDays(1),
             $video->getTranscodePath(),
             $cacheControl,
+            PreSignedUrlService::DISPOSITION_INLINE,
             $mimeType
         );
 

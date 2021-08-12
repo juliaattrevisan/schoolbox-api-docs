@@ -105,8 +105,10 @@ if (isset($type, $id)) {
                     Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
                     $imageFilename,
                     'private',
-                    '',
-                    $mimeType
+                    PreSignedUrlService::DISPOSITION_INLINE,
+                    $mimeType,
+                    // In the event a user selects 'save as', derive hinted filename from original video name + transcode size
+                    sprintf('%s-%s.jpeg', $videoQueue->getStorage()->getFilename(), $size)
                 );
                 $preSignedUrlService->download($preSignedUrlDataObject);
 
