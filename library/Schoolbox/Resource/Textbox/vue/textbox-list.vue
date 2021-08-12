@@ -69,6 +69,29 @@ export default {
     },
     methods: {
         /**
+         * Adds a textbox to the list.
+         */
+        addTextbox() {
+            this.textboxes.push({
+                textbox: {
+                    id: null,
+                    heading: '',
+                    body: '',
+                },
+                folders: [],
+                dashboards: [],
+            });
+        },
+
+        /**
+         * Deletes a textbox from the list of textboxes.
+         */
+        deleteTextbox(index) {
+            // let usage = this.textboxes[index];
+            this.textboxes.splice(index, 1)
+        },
+
+        /**
          * Does this textbox usage record contain a usage for this component's
          * folder?
          *
@@ -117,44 +140,49 @@ export default {
                     </div>
                 </li>
             </ul>
-            <ul class="information-list unsortable expandable-card" v-else>
-                <li v-for="(usage, index) in textboxes">
-                    <div class="actions-small-1">
-                        <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
-                        <div class="list-item">
-                            <div class="small-12 column">
-                                <label>
-                                    <span class="hide-for-medium-up">Textbox</span>
-                                    <input :name="'textbox[' + String(index) + '][heading]'" type="text" v-model="usage.textbox.heading">
-                                </label>
+            <template v-else>
+                <ul class="information-list unsortable expandable-card">
+                    <li v-for="(usage, index) in textboxes">
+                        <div class="actions-small-1">
+                            <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
+                            <div class="list-item">
+                                <div class="small-12 column">
+                                    <label>
+                                        <span class="hide-for-medium-up">Textbox</span>
+                                        <input :name="'textbox[' + String(index) + '][heading]'" type="text" v-model="usage.textbox.heading">
+                                    </label>
 
-                                <p class="meta" v-if="usage.folders.length > 0">
-                                    Pages:
-                                    <template v-if="inUseOnThisFolder(usage)">
-                                        this page<template v-if="otherFolders(usage).length > 0">, </template>
-                                    </template>
-                                    <template v-for="(folder, index) in otherFolders(usage)">
-                                        <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
-                                    </template>
-                                </p>
+                                    <p class="meta" v-if="usage.folders.length > 0">
+                                        Pages:
+                                        <template v-if="inUseOnThisFolder(usage)">
+                                            this page<template v-if="otherFolders(usage).length > 0">, </template>
+                                        </template>
+                                        <template v-for="(folder, index) in otherFolders(usage)">
+                                            <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
+                                        </template>
+                                    </p>
 
-                                <p class="meta" v-if="usage.dashboards.length > 0">
-                                    Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
-                                </p>
+                                    <p class="meta" v-if="usage.dashboards.length > 0">
+                                        Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
+                                    </p>
+                                </div>
                             </div>
+                            <nav>
+                                <a class="icon-delete" href="#" @click.prevent="deleteTextbox(index)" title="Delete"></a>
+                            </nav>
                         </div>
-                        <nav>
-                            <a class="icon-delete" :href="usage.textbox._links.delete" title="Delete"></a>
-                        </nav>
-                    </div>
-                    <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
-                        <article class="content" v-html="usage.textbox.body">
-                        </article>
-                    </div>
-                </li>
-            </ul>
+                        <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
+                            <article class="content" v-html="usage.textbox.body">
+                            </article>
+                        </div>
+                    </li>
+                </ul>
 
-            <input type="submit" value="Save" v-if="!showSkeletonLoader" />
+                <ul class="flex-list buttons">
+                    <li><button @click.prevent="addTextbox">Add new</button></li>
+                    <li><input type="submit" value="Save" /></li>
+                </ul>
+            </template>
         </section>
     </form>
 </template>
