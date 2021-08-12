@@ -222,9 +222,9 @@ export default {
          */
         updateSequenceOrder () {
             const allRowElements = document.querySelector('[data-list]').children;
-            Array.from(allRowElements).forEach((rowElement, index) => {
-                const rowId = rowElement.dataset.rowId;
-                const matchingRowData = this.rows.find((row) => Number(row.id) === Number(rowId));
+            Array.from(allRowElements).forEach((rowElement, index) => { //loop through each row in order to set the correct sequence
+                const rowId = rowElement.dataset.rowId; //how else do we get the row id? 
+                const matchingRowData = this.rows.find((row) => Number(row.id) === Number(rowId)); //get the row data matched to the current row DOM element
                 matchingRowData.sequence = ++index;
             });
         },
@@ -264,9 +264,7 @@ export default {
          * @param {DOMElement} element - the element that's animating
          */
         onBeforeEnter (row) {
-            if (!this.isProcessing) {
-                gsap.set(row, { height: 0 } );
-            }
+            gsap.set(row, { height: 0 } );
         },
 
         /**
@@ -276,11 +274,7 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onEnter (row, done) {
-            if (this.isProcessing) {
-                done();
-            } else {
-                gsap.to(row, 0.3, { height: 'auto', onComplete: done } );
-            }
+            gsap.to(row, 0.3, { height: 'auto', onComplete: done } );
         },
 
         /**
@@ -290,11 +284,7 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onLeave (row, done) {
-            if (this.isProcessing) {
-                done();
-            } else {
-                gsap.to(row, 0.3, { height: 0, onComplete: done } );
-            }
+            gsap.to(row, 0.3, { height: 0, onComplete: done } );
         },
 
     }
@@ -336,8 +326,7 @@ export default {
                                 >    
                                     <admin-list-row
                                         v-for="(row, index) in rowsSortedBySequence"
-                                        :key="`${row.id}-${index}`"
-                                        :header-fields="headerFields"
+                                        :key="index"
                                         :row="row"
                                         @on-delete-row-selected="onDeleteRowSelected"
                                     />
