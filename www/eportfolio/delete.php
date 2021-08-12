@@ -9,26 +9,19 @@
 $currentUserId = $_SESSION['id'];
 /** @var SitePage $this */
 $ownerId = $this->arg[0];
-$pageId = $this->arg[1];
+$pageId  = $this->arg[1];
 
-try {
-    $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
-} catch (\Schoolbox\Mapper\Exception $e) {
-    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
-    exit;
-}
+if (is_numeric($pageId)) {
+    $eportfolioHandler = new Eportfolio($currentUserId, (int)$pageId);
+    $authenticator     = new Eportfolio_Authenticator(
+        $_SESSION['user'],
+        $eportfolioHandler->getPageInstance()->getOwner(),
+        $eportfolioHandler->getPageInstance()->getPageId()
+    );
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
-
-if ($authenticator->canModify()) {
-    if (is_numeric($pageId)) {
-        $eportfolioHandler = new Eportfolio($currentUserId, $pageId);
+    if ($authenticator->canModify()) {
         $eportfolioHandler->delete();
-    } else {
-        /* You cannot delete Profile or Showcase pages :>
-         */
-        error(19);
+        exit;
     }
-} else {
-    error(19);
 }
+error(19);

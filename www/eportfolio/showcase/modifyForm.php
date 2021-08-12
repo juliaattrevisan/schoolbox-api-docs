@@ -15,7 +15,6 @@ $page->initSession();
 
 $action  = $_POST['action'];
 $ownerId = $_POST['userId'];
-$pageId  = 'showcase';
 
 try {
     $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
@@ -24,7 +23,7 @@ try {
     exit;
 }
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner);
 
 if ($authenticator->canModify()) {
     if ($action == 'unpublish') {

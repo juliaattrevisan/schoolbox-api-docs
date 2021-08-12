@@ -24,11 +24,11 @@ class Eportfolio_Page_Factory
     {
         if (is_numeric($pageId)) {
             return new Eportfolio_Page_Instance($page, $userId, $pageId, $permissionValue);
-        } else if ($pageId == 'showcase') {
+        } else if ($pageId === \Eportfolio\Page::SHOWCASE) {
             return new Eportfolio_Page_Showcase($page, $userId, $pageId, $permissionValue);
-        } else if ($pageId == 'create') {
+        } else if ($pageId === \Eportfolio\Page::CREATE) {
             return new Eportfolio_Page_Create($page, $userId, $pageId, $permissionValue);
-        } else if ($pageId == 'profile') {
+        } else if ($pageId === \Eportfolio\Page::PROFILE) {
             return new Eportfolio_Page_Profile($page, $userId, $pageId, $permissionValue);
         }
 

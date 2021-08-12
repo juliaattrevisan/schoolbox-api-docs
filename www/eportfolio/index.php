@@ -8,9 +8,8 @@
 
 use Schoolbox\Permission\Access\UserAccess;
 
-$currentUserId = $_SESSION['id'];
 /** @var SitePage $this */
-$ownerId       = is_numeric($this->arg[0]) ? $this->arg[0] : $_SESSION['id'];
+$ownerId = is_numeric($this->arg[0]) ? (int)$this->arg[0] : $_SESSION['id'];
 
 try {
     $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
@@ -19,22 +18,29 @@ try {
     exit;
 }
 
-$pageId = $this->arg[1] ?: 'profile';
-
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
-
-if ($authenticator->pageExists()) {
-    if ($authenticator->canCreate() || $authenticator->canModify()) {
-        $eportfolioPage = (new Eportfolio_Page_Factory())->produce($this, $ownerId, $pageId, UserAccess::ACCESS_FULL);
-
-        null === $eportfolioPage ? $this->pageNotFound() : $eportfolioPage->renderPage();
-    } else if ($authenticator->canView()) {
-        $eportfolioPage = (new Eportfolio_Page_Factory())->produce($this, $ownerId, $pageId, UserAccess::ACCESS_READ);
-
-        null === $eportfolioPage ? $this->pageNotFound() : $eportfolioPage->renderPage();
-    } else {
-        error(19);
+$page = null;
+if (is_numeric($this->arg[1])) {
+    try {
+        $page = \Eportfolio\PageMapper::getInstance()->findById((int)$this->arg[1]);
+        $pageName = $page->getPageId();
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        $this->pageNotFound();
+        exit;
     }
+} elseif (in_array($this->arg[1], [\Eportfolio\Page::PROFILE, \Eportfolio\Page::SHOWCASE, \Eportfolio\Page::CREATE])) {
+    $pageName = $this->arg[1];
 } else {
-    $this->pageNotFound();
+    $pageName = \Eportfolio\Page::PROFILE;
 }
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page ? $page->getOwner() : $owner, $page ? $page->getPageId() : null);
+if ($authenticator->canCreate() || $authenticator->canModify()) {
+    $access = UserAccess::ACCESS_FULL;
+} elseif ($authenticator->canView()) {
+    $access = UserAccess::ACCESS_READ;
+} else {
+    error(19);
+    exit;
+}
+$eportfolioPage = (new Eportfolio_Page_Factory())->produce($this, $ownerId, $pageName, $access);
+null === $eportfolioPage ? $this->pageNotFound() : $eportfolioPage->renderPage();

@@ -161,7 +161,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* ePortfolio link
              */
-            $authenticator = new \Eportfolio_Authenticator($_SESSION['user'], $userChild, 'profile');
+            $authenticator = new \Eportfolio_Authenticator($_SESSION['user'], $userChild);
 
             if ($authenticator->canView()) {
                 $this->parse('eportfolio_block', 'eportfolio');

@@ -28,13 +28,13 @@ foreach ([$_SESSION['user'], $ownerId, $pageId] as $val) {
 }
 
 try {
-    $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
+    $page = \Eportfolio\PageMapper::getInstance()->findById((int)$pageId);
 } catch (\Schoolbox\Mapper\Exception $e) {
     error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
     exit;
 }
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
     /* Add a list item

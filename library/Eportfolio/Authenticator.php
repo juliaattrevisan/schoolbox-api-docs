@@ -10,7 +10,6 @@
 
 declare(strict_types=1);
 
-use Eportfolio\PageMapper;
 use Eportfolio\Permission;
 use Eportfolio\PermissionMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -36,18 +35,8 @@ class Eportfolio_Authenticator
 
     /**
      * The eportfolio page currently being viewed
-     *
-     * @var int|string
      */
-    private $pageId = -1;
-
-
-    /**
-     * These pages are always visible to everyone
-     *
-     * @var array
-     */
-    private array $publicPages = ['profile', 'showcase'];
+    private ?int $pageId;
 
     /**
      * Feature flag to enable or disable ePortfolio globally
@@ -58,50 +47,17 @@ class Eportfolio_Authenticator
     /**
      * Constructor
      *
-     * @param User       $currentUser
-     * @param User       $owner
-     * @param int|string $pageId
+     * @param User     $currentUser
+     * @param User     $owner
+     * @param int|null $pageId
      */
-    public function __construct(User $currentUser, User $owner, $pageId)
+    public function __construct(User $currentUser, User $owner, ?int $pageId = null)
     {
         $this->owner          = $owner;
         $this->currentUser    = $currentUser;
         $this->featureEnabled = (bool)ConfigLoader::getInstance()->get('eportfolio_enabled');
 
         $this->pageId = $pageId;
-    }
-
-    /**
-     * Determine if a particular person owns a particular page
-     * This excludes the hardcoded public pages
-     *
-     * @return bool
-     */
-    public function pageExists(): bool
-    {
-        /* Check whether eportfolio is even enabled in the first place
-         */
-        if (!$this->isEportfolioEnabled()) {
-            return false;
-        } elseif (in_array($this->pageId, $this->publicPages) || ($this->pageId == 'create')) {
-            return true;
-        } else {
-            $pageMapper = new PageMapper();
-
-            try {
-                // Check the page actually exists for the owner.
-                $pageMapper->findOneByColumnList(
-                    [
-                        'uid'     => $this->owner->getId(),
-                        'page_id' => $this->pageId,
-                    ]
-                );
-                return true;
-            } catch (Schoolbox\Mapper\Exception $e) {
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -140,7 +96,7 @@ class Eportfolio_Authenticator
 
         /* These pages are hardcoded and have special conditions
          */
-        if (in_array($this->pageId, $this->publicPages)) {
+        if (null === $this->pageId) {
             /* Parents of the page owner are allowed
              */
             if ($this->currentUser->getRole()->isParent()) {
@@ -232,8 +188,7 @@ class Eportfolio_Authenticator
         }
 
         // check whether the current user is public page owner
-        return in_array($this->pageId, $this->publicPages) &&
-            ($this->owner->getId() === $this->currentUser->getId());
+        return $this->owner->getId() === $this->currentUser->getId();
     }
 
     /**
