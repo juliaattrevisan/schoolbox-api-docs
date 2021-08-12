@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Date_Format as AlaressDateFormat;
-use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
