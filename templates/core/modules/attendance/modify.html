@@ -17,6 +17,7 @@
          */
         let reasonStack = {DROPDOWN_HASH};
 
+
         /* For each student's Type dropdown, figure out
          *  - the type currently selected
          *  - the corresponding Reason dropdown that needs to be replaced
@@ -51,6 +52,82 @@
              */
             $(destination).replaceWith(select);
         });
+
+        /**
+         * None of this is necessary if the pastoral module is disabled
+         */
+        let isPastoralEnabled = {PASTORAL_ENABLED};
+
+        if (isPastoralEnabled) {
+            let allStudentIds = {ALL_STUDENT_IDS};
+            let pastoralCountUrl      = "/pastoral/students/count/{studentIds}".replace('{studentIds}', allStudentIds.join(','));
+            let pastoralCountBadges   = [];
+
+            /**
+             * Build a reusable pastoral count badge, in javascript ;)
+             *
+             * @param studentId
+             * @param typeId
+             * @param subtypeId
+             * @param icon
+             * @param fgColor
+             * @param bgColor
+             * @param count
+             * @returns {`
+                <span id="pastoralCountBadge-${string}-${string}-${string}"
+                      class="label neutral icon-${string}"
+                      style="color: ${string}; background-color: ${string}"
+                >${string}</span>
+            `}
+             */
+            let tagPastoralCountBadge = function (studentId, typeId, subtypeId, icon, fgColor, bgColor, count) {
+                return `
+                <span id="pastoralCountBadge-${studentId}-${typeId}-${subtypeId}"
+                      class="label neutral icon-${icon}"
+                      style="color: ${fgColor}; background-color: ${bgColor}"
+                >${count}</span>
+            `
+            }
+
+            /**
+             * reach out and get a summary of which users have pastoral results
+             */
+            $.get(pastoralCountUrl)
+                    .done(function (response) {
+                        pastoralCountBadges = response;
+
+                        /**
+                         * for each of the students we receive a summary
+                         */
+                        for (let studentId in pastoralCountBadges) {
+
+                            /**
+                             * check whether they have any badges
+                             */
+                            if (pastoralCountBadges[studentId].length) {
+                                let studentCountBadgeContainer = $(`#pastoralCountBadges-${studentId}`);
+                                let tagMarkup = '';
+
+                                /**
+                                 * then build the markup for each badge
+                                 */
+                                for (let index in pastoralCountBadges[studentId]) {
+                                    let studentBadge = pastoralCountBadges[studentId][index];
+                                    tagMarkup = tagMarkup.concat(tagPastoralCountBadge(studentId, studentBadge.typeId, studentBadge.subtypeId, studentBadge.icon, studentBadge.fgColor, studentBadge.bgColor, studentBadge.count));
+                                }
+
+                                /**
+                                 * then write the badges for the student into the dom and un-hide the students container
+                                 */
+                                if (tagMarkup.length) {
+                                    studentCountBadgeContainer.html(tagMarkup);
+                                    studentCountBadgeContainer.removeClass('hide');
+                                }
+                            }
+                        }
+                    });
+        }
+
     });
 </script>
 <!-- END custom_head -->
@@ -116,6 +193,7 @@
                                 <p class="meta">{STUDENT_ATTENDANCESTRING}</p>
                                 <p class="meta">{STUDENT_NONATTENDREASON}</p>
                             </div>
+                            <div id="pastoralCountBadges-{STUDENT_UID}" class="content small-12 columns hide"></div>
                             <div class="content small-12 columns">
                                 <!-- BEGIN flags -->
                                     <span data-tooltip class="icon-{ICON} icon" title="{DESCRIPTION}"></span>

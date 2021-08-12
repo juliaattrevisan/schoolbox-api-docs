@@ -641,15 +641,10 @@ export default {
                             <span class="show-for-print"><br>{{ student.email }}</span><br>
 
                             <p class="meta">
-                                <PastoralCountBadge v-for="(studentBadge) in studentPastoralCounts[student.id]" :key="studentBadge.id"
-                                                    :destinationUrl="studentBadge.destinationUrl"
-                                                    :userId="student.id"
-                                                    :bgColor="studentBadge.bgColor"
-                                                    :count="studentBadge.count"
-                                                    :description="studentBadge.title"
-                                                    :fgColor="studentBadge.fgColor"
-                                                    :icon="studentBadge.icon"
-                                ></PastoralCountBadge>
+                                <pastoral-count-badge v-for="(studentBadge) in studentPastoralCounts[student.id]"
+                                                      :key="studentBadge.id"
+                                                      v-bind="studentBadge"
+                                ></pastoral-count-badge>
                             </p>
 
                             <p class="meta">

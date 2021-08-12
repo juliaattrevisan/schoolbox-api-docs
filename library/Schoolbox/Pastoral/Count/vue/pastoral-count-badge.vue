@@ -12,42 +12,42 @@ export default {
          * The url which leads to the students pastoral page
          */
         destinationUrl: {
-            default: '',
+            default: '/pastoral/student/25?type=1&subtype=1',
             type: String
         },
         /**
          * The icon used to display and represent this pastoral event
          */
         icon: {
-            default: '',
+            default: 'achievement',
             type: String
         },
         /**
          * the primary color used to display the font and icon
          */
         fgColor: {
-            default: '',
+            default: 'rgb(86, 172, 37)',
             type: String
         },
         /**
          * the secondary color used to fill in the badges background
          */
         bgColor: {
-            default: '',
+            default: 'rgb(215, 243, 199)',
             type: String
         },
         /**
          * the number of pastoral events recorded for this type & subtype combo
          */
         count: {
-            default: '',
+            default: '2',
             type: String
         },
         /**
          * the human readable description of the pastoral type & subtype combo
          */
         description: {
-            default: '',
+            default: 'Achievement',
             type: String
         }
     },
@@ -56,6 +56,7 @@ export default {
 <template>
     <a :href="destinationUrl">
         <span :class="`label neutral icon-${icon}`"
+              data-tooltip
               :title="description"
               :style="{
                   'background-color': bgColor,
@@ -69,6 +70,18 @@ export default {
 
 <style scoped>
     span {
+        margin-top: 5px;
         font-style: normal;
+    }
+
+    span[class*="icon-"]::before {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0.8rem;
+    }
+
+    .label {
+        padding: 0.6rem 0.7rem 0.6rem 2.6rem;
     }
 </style>
