@@ -136,6 +136,7 @@ export default {
             self.$refs.toast.activate('Saving textboxes...');
 
             // Create a new set of textbox data to post
+            self.syncEditorChangesToModel();
             self.textboxes.forEach(function (usage) {
                 let textbox = usage.textbox,
                     deleted = usage.deleted ?? false;
@@ -225,6 +226,20 @@ export default {
                 $collapsers.collapsable();
             })
         },
+
+        /**
+         * Sync changes made to a CKEditor instance to the data model.
+         *
+         * Required because changes made to the v-model linked textarea the
+         * CKEditor is created from aren't propagated to the model.
+         */
+        syncEditorChangesToModel() {
+            let self = this;
+            self.textboxes.forEach(function (usage, index) {
+                let editor = window.CKEDITOR.instances['textbox-' + String(index) + '-body'];
+                self.textboxes[index].textbox.body = editor.getData();
+            });
+        }
     },
     computed: {
         /**
@@ -285,8 +300,8 @@ export default {
                                 </nav>
                             </div>
                             <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
-                            <textarea :name="'textbox[' + String(index) + '][heading]'"
-                                      :id="'textbox-' + String(index) + '-heading'"
+                            <textarea :name="'textbox[' + String(index) + '][body]'"
+                                      :id="'textbox-' + String(index) + '-body'"
                                       v-model="usage.textbox.body">
                             </textarea>
                             </div>
