@@ -33,19 +33,14 @@ export default {
         return {
             textboxes: [],
             loading: true,
+            window: window,
             jQuery: window.jQuery,
             showSkeletonLoader: true,
+            validator: null,
         }
     },
     mounted() {
         let self = this;
-        // Apply the validator to the form
-        self.jQuery(self.$refs.form).alaressValidate({
-            submitHandler(form, event) {
-                event.preventDefault();
-                self.postChanges();
-            }
-        });
         axios
             .get(self.textboxUsageEndpoint)
             .then(function (response) {
@@ -53,19 +48,12 @@ export default {
             })
             .finally(function () {
                 self.showSkeletonLoader = false;
-
-                // Apply the collapser
-                self.$nextTick(() => self.jQuery('[data-collapser^="collapser-textbox"]').collapsable());
             });
     },
     updated() {
-        let self = this;
-        // Apply the validation rule to each input
-        self.jQuery(self.$refs.form).find('input[type=text]').each(function(index, element) {
-            $(element).rules('add', {
-                requiredNotBlank: true
-            });
-        });
+        this.setupValidation();
+        this.setupEditors();
+        this.setupCollapsers();
     },
     methods: {
         /**
@@ -120,6 +108,55 @@ export default {
          */
         postChanges() {
             // Post changes here?
+        },
+
+        /**
+         * Set up the validator, destroying and recreating it if it's already
+         * been set up.
+         */
+        setupValidation() {
+            let self  = this,
+                $form = self.jQuery(self.$refs.form);
+
+            if (self.validator) {
+                self.validator.destroy();
+            }
+
+            // Apply the validator to the form
+            self.validator = $form.alaressValidate({
+                submitHandler(form, event) {
+                    event.preventDefault();
+                    self.postChanges();
+                }
+            });
+
+            // Apply the validation rule to each input
+            $form.find('input[type=text]').each(function(index, element) {
+                $(element).rules('add', {
+                    requiredNotBlank: true
+                });
+            });
+        },
+
+        /**
+         * Set up editor instances on textareas within the form which don't
+         * already have them.
+         */
+        setupEditors() {
+            let self  = this,
+                $form = self.jQuery(self.$refs.form);
+            $form.find('textarea').each(function () {
+                if (!(this.id in window.CKEDITOR.instances)) {
+                    self.jQuery.fn.alaressEditor({
+                        targetElements: $(this)
+                    });
+                }
+            });
+        },
+
+        setupCollapsers() {
+            // Apply the collapser
+            self.$nextTick(() => self.jQuery('[data-collapser^="collapser-textbox"]').collapsable());
         },
     },
     computed: {
