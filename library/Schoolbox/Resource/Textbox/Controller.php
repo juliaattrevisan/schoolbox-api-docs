@@ -220,6 +220,14 @@ class Controller extends Base
                     'body'     => Scrub::html($textbox->getBody()),
                     'category' => $translateFolder($textbox->getCategory()),
                     '_links'   => [
+                        'update' => $this->getRouteIfAuthorized(
+                            'textbox.updateTextbox',
+                            [
+                                'textbox' => $textbox,
+                                'folder'  => $textbox->getCategory(),
+                                'id'      => $textbox->getId(),
+                            ]
+                        ),
                         'delete' => $this->getRouteIfAuthorized(
                             'textbox.deleteTextbox',
                             [
