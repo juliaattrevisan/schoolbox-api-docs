@@ -34,6 +34,7 @@ export default {
             textboxes: [],
             loading: true,
             jQuery: window.jQuery,
+            showSkeletonLoader: true,
         }
     },
     mounted() {
@@ -49,6 +50,9 @@ export default {
             .get(self.textboxUsageEndpoint)
             .then(function (response) {
                 self.textboxes = response.data;
+            })
+            .finally(function () {
+                self.showSkeletonLoader = false;
 
                 // Apply the collapser
                 self.$nextTick(() => self.jQuery('[data-collapser^="collapser-textbox"]').collapsable());
@@ -104,7 +108,16 @@ export default {
 <template>
     <form method="post" ref="form" :action="postChangesEndpoint">
         <section>
-            <ul class="information-list unsortable expandable-card">
+            <ul class="information-list" v-if="showSkeletonLoader">
+                <li class="row" v-for="n in 3" :key="n">
+                    <div class="small-12 card skeleton">
+                        <div class="img"></div>
+                        <h3></h3>
+                        <p class="meta"></p>
+                    </div>
+                </li>
+            </ul>
+            <ul class="information-list unsortable expandable-card" v-else>
                 <li v-for="(usage, index) in textboxes">
                     <div class="actions-small-1">
                         <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
@@ -141,7 +154,7 @@ export default {
                 </li>
             </ul>
 
-            <input type="submit" value="Save" />
+            <input type="submit" value="Save" v-if="!showSkeletonLoader" />
         </section>
     </form>
 </template>
