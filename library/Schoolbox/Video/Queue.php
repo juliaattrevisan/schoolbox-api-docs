@@ -19,6 +19,7 @@ use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Transform\Mapper;
 use Schoolbox\Resource\Storage\Transform\Model;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Class Queue
@@ -498,18 +499,23 @@ class Queue extends ResourceVideo
      * @param string   $fileName
      * @param int|null $fileSize
      * @throws MapperException
+     * @throws UnexpectedValueException If $fileName is not of expected structure
      */
     private function createStorageTransform(string $fileName, ?int $fileSize): void
     {
-        $baseFileName = explode('-', basename($fileName));
+        $fileNameParts = explode('-', basename($fileName));
+        if (count($fileNameParts) !== 2) {
+            throw new UnexpectedValueException("Expected 2 parts, found " . count($fileNameParts));
+        }
+        [$hash, $cacheKey] = $fileNameParts;
         $transformMapper = Mapper::getInstance();
 
-        $transformModel = $transformMapper->findByHashAndCacheKey($baseFileName[0], $baseFileName[1]);
+        $transformModel = $transformMapper->findByHashAndCacheKey($hash, $cacheKey);
 
         if ($transformModel) {
             $transformMapper->save($transformModel->setSize($fileSize)->setState(Model::STATE_DONE));
         } else {
-            $transformMapper->createRecord($baseFileName[0], $baseFileName[1], $fileSize, Model::STATE_DONE);
+            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Model::STATE_DONE);
         }
     }
 
