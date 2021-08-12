@@ -14,8 +14,9 @@ import AdminListNoRows from './admin-list-no-rows';
 import AdminListRow from './row/admin-list-row';
 import AdminListAddRow from './admin-list-add-row';
 import AdminListDeleteRow from './admin-list-delete-row';
+import mixinSaveRows from './mixins/mixinAdminListSaveRows';
 import Toast from '@schoolbox/toast';
-import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW } from './store/adminListMutationTypes';
+import { UPDATE_LOADED_DATA } from './store/adminListMutationTypes';
 
 
 export default {
@@ -29,6 +30,10 @@ export default {
         AdminListDeleteRow,
         Toast,
     },
+
+    mixins: [
+        mixinSaveRows
+    ],
 
     props: {
         tableName: { //the name of the current list, used to submit updates to the DB
@@ -51,9 +56,7 @@ export default {
             loadedData: state => state.loadedData,
             rows: state => state.rows,
             selectedRow: state => state.selectedRow,
-            isPopOutOpen: state => state.isPopOutOpen,
-            saveStatus: state => state.saveStatus,
-            isProcessing: state => state.isProcessing,
+            isPopOutOpen: state => state.isPopOutOpen
         }),
 
         ...mapGetters([
@@ -131,75 +134,9 @@ export default {
         onPopOutMounted (popOutHeight) {
             this.popOutHeight = popOutHeight;
         },
-
+        
         /**
-         * Save all data
-         */
-        async onSaveSelected () {
-            this.$store.commit('setIsProcessing', true);
-            this.$store.commit('setSaveStatus', 'Saving...');
-            this.$refs.toast.activate(this.saveStatus);
-            this.updateSequenceOrder();
-            try {
-                const response = await axios.post(this.loadedData.saveRoute, this.getSaveAllFormData());
-                if (response.status === 200) {
-                    this.updateNewRowIds(response.data.newRowIdList);
-                    this.$refs.toast.timeout('Save successful', true, 2000);
-                } else {
-                    this.$refs.toast.timeout('Unable to save', false, 2000);
-                }
-            } catch (error) {
-                console.warn(error);
-                this.$refs.toast.timeout('Unable to save', false, 2000);
-            } finally {
-                this.$nextTick(() => { //to avoid animating any newly inserted rows in onBeforeEnter 
-                    this.$store.commit('setIsProcessing', false);
-                    this.$store.commit('setSaveStatus', 'Save');
-                });
-            }
-        },
-
-        /**
-         * Ensure the correct sorting order is reflected 
-         */
-        updateSequenceOrder () {
-            const allRowElements = document.querySelector('[data-list]').children;
-            Array.from(allRowElements).forEach((rowElement, index) => { //loop through each row in order to set the correct sequence
-                const rowId = rowElement.dataset.rowId; //how else do we get the row id? 
-                const matchingRowData = this.rows.find((row) => Number(row.id) === Number(rowId)); //get the row data matched to the current row DOM element
-                matchingRowData.sequence = ++index;
-            });
-        },
-
-        /**
-         * Send through the data to save the whole list
-         * 
-         * @returns { FormData }
-         */
-        getSaveAllFormData () {
-            const formData = new FormData();
-            formData.append('table', this.tableName);
-            formData.append('rows', JSON.stringify(this.rows));
-            return formData;
-        },
-
-        /**
-         * The new rows have been assigned, so need to match the front end 
-         * 
-         * @param { Array or undefined }
-         */
-        updateNewRowIds (newRowIdList) {
-            if (typeof newRowIdList !== 'undefined') { //won't be returned currently if there's no new rows
-                const newRows = this.rows.filter((row) => row.id < 0);
-                newRows.forEach((row, index) => {
-                    row.id = newRowIdList[index];
-                    row.isNew = false;
-                });
-            }
-        },
-
-        /**
-         * animate settings to help context when filtering
+         * To make the new row 'grow' into the list
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
          *
@@ -210,7 +147,7 @@ export default {
         },
 
         /**
-         * how the element animates on
+         * How the element animates on
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
@@ -220,7 +157,7 @@ export default {
         },
 
         /**
-         * how the element animates off
+         * How the element animates off
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
@@ -275,8 +212,8 @@ export default {
 
                                 <admin-list-pop-out
                                     v-if="hasPopOut"
+                                    :table-name="tableName" 
                                     @on-pop-out-mounted="onPopOutMounted"
-                                    @on-pop-out-saved="onSaveSelected"
                                 />
 
                                 <admin-list-add-row v-if="!loadedData.noNewRecords" />
@@ -285,7 +222,11 @@ export default {
 
                         </section>
 
-                        <input type="submit" @click.prevent="onSaveSelected" :value="saveStatus" :disabled="isProcessing" />
+                        <input type="submit" 
+                            @click.prevent="mixinSaveRows_onSaveSelected" 
+                            :value="mixinSaveRows_saveStatus" 
+                            :disabled="mixinSaveRows_isProcessing" 
+                        />
 
                     </form>
 

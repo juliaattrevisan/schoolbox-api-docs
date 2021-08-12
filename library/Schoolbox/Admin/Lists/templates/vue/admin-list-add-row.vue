@@ -6,7 +6,7 @@
  */
 
 import { mapState } from 'vuex';
-import { mixinAddRow } from './mixinAdminListAddRow';
+import mixinAddRow from './mixins/mixinAdminListAddRow';
 
 export default {
 

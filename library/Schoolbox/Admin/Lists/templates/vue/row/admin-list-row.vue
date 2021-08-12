@@ -8,7 +8,7 @@ import { mapState, mapGetters } from 'vuex';
 import AdminListRowLookup from './admin-list-row-lookup';
 import AdminListRowColour from './admin-list-row-colour';
 import AdminListRowPopOut from './admin-list-row-pop-out';
-import { ON_DELETE_ROW } from '../store/adminListMutationTypes';
+import { DELETE_ROW_PROMPT } from '../store/adminListMutationTypes';
 
 export default {
 
@@ -72,7 +72,7 @@ export default {
          */
         onDeleteRowSelected () {
             // this.$emit('on-delete-row-selected', this.row);
-            this.$store.commit(ON_DELETE_ROW, this.row);
+            this.$store.commit(DELETE_ROW_PROMPT, this.row);
         }
 
     }

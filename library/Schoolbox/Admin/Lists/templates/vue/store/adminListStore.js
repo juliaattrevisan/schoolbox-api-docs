@@ -1,7 +1,9 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex'
-import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, ON_DELETE_ROW, ON_ROW_DELETED } from './adminListMutationTypes';
+import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, UPDATE_SELECTED_POP_OUT_NAME,
+         ADD_ROW, DELETE_ROW_PROMPT, DELETE_ROW_CONFIRMED, 
+         OPEN_POP_UP, CLOSE_POP_UP } from './adminListMutationTypes';
 
 Vue.use(Vuex);
 
@@ -14,8 +16,6 @@ export default new Vuex.Store({
         rowToDelete: {}, //to track which row could be deleted
         isPopOutOpen: false, //to open and close the list
         selectedPopOutName: '', //to highlight all other rows that have that permission
-        saveStatus: 'Save', //to update the button text when saving
-        isProcessing: false, //to prevent multiple rapid-fire submissions
     },
 
     getters: {
@@ -74,45 +74,10 @@ export default new Vuex.Store({
         },
 
         /**
-         * 
-         */
-        addRow (state, row) {
-            state.rows = [...state.rows, row];
-        },
-
-        /**
-         * 
-         */
-        [ON_DELETE_ROW] (state, rowToDelete) {
-            state.rowToDelete = rowToDelete;
-        },
-
-        /**
-         * Now the row is deleted, remove it from the rows list
-         */
-        [ON_ROW_DELETED] (state, rowToDelete) {
-            state.rows = state.rows.filter((row) => row.id !== rowToDelete.id);
-        },
-
-        /**
-         * 
-         */
-        setSaveStatus (state, saveStatus) {
-            state.saveStatus = saveStatus;
-        },
-
-        /**
-         * 
-         */
-        setIsProcessing (state, isProcessing) {
-            state.isProcessing = isProcessing;
-        },
-
-        /**
          * To highlight all rows which also have the same pop out option
          * for an easier visual way to check which rows have the same pop out option
          */
-        onPopOutNameSelected (state, popOutName) {
+         [UPDATE_SELECTED_POP_OUT_NAME] (state, popOutName) {
             if (state.selectedPopOutName === popOutName) { //so can toggle on/off
                 state.selectedPopOutName = '';
             } else {
@@ -121,9 +86,30 @@ export default new Vuex.Store({
         },
 
         /**
+         * 
+         */
+        [ADD_ROW] (state, row) {
+            state.rows = [...state.rows, row];
+        },
+
+        /**
+         * 
+         */
+        [DELETE_ROW_PROMPT] (state, rowToDelete) {
+            state.rowToDelete = rowToDelete;
+        },
+
+        /**
+         * Now the row is deleted, remove it from the rows list
+         */
+        [DELETE_ROW_CONFIRMED] (state, rowToDelete) {
+            state.rows = state.rows.filter((row) => row.id !== rowToDelete.id);
+        },
+
+        /**
          * Display the options within the pop out
          */
-        openPopOut (state, row) {
+        [OPEN_POP_UP] (state, row) {
             state.selectedRow = row;
             state.isPopOutOpen = true;
             state.selectedPopOutName = '';
@@ -132,7 +118,7 @@ export default new Vuex.Store({
         /**
          * Close the pop out
          */
-        closePopOut (state) {
+        [CLOSE_POP_UP] (state) {
             state.isPopOutOpen = false;
         }
 

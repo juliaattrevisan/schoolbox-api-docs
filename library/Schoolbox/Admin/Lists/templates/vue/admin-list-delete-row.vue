@@ -8,7 +8,7 @@
 import { mapState } from 'vuex';
 import axios from 'axios';
 import RevealModal from '@schoolbox/reveal-modal';
-import { ON_ROW_DELETED } from './store/adminListMutationTypes';
+import { DELETE_ROW_CONFIRMED } from './store/adminListMutationTypes';
 
 export default {
     
@@ -38,7 +38,7 @@ export default {
         rowToDelete (newValue) {
             if (newValue.isNew) { //hasn't been placed in the DB yet, so no need to confirm its removal
                 const rowToRemove = this.rows.find((row) => row.id === newValue.id);
-                this.$store.commit(ON_ROW_DELETED, rowToRemove);
+                this.$store.commit(DELETE_ROW_CONFIRMED, rowToRemove);
             } else { //otherwise open up the modal to confirm or cancel
                 this.$refs.deleteModal.open();
             }
@@ -59,7 +59,7 @@ export default {
                 const response = await axios.post(this.loadedData.deleteRoute, this.getDeleteRowFormData());
                 if (response.result !== false) {
                     const deletedRow = this.rows.find((row) => row.id === this.rowToDelete.id);
-                    this.$store.commit(ON_ROW_DELETED, deletedRow);
+                    this.$store.commit(DELETE_ROW_CONFIRMED, deletedRow);
                     // this.$refs.toast.timeout('Row Deleted', true, 2000);
                 } else {
                     // this.$refs.toast.timeout('Unable to delete', false, 2000);
@@ -101,7 +101,7 @@ export default {
 <template>
     <reveal-modal ref="deleteModal">
         <h2>Please Confirm</h2>
-        <div data-alert class="alert-box warning">{{ loadedData.deleteWarning }}</div>
+        <div data-alert class="alert-box warning">{{ loadedData.deleteWarning ? loadedData.deleteWarning : 'Are you sure you wish to delete this row?' }}</div>
         <ul class="flex-list buttons">
             <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
             <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>

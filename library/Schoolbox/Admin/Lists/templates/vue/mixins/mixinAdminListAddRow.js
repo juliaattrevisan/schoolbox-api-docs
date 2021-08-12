@@ -4,14 +4,9 @@
  */
 
 import { mapState } from 'vuex';
+import { ADD_ROW } from '../store/adminListMutationTypes';
 
-export const mixinAddRow = {
- 
-    data () {
-        return {
-            newId: 0 //to add another row to the db, decrement with each new row added,
-        }
-    },
+export default {
 
     computed: {
         ...mapState({
@@ -38,7 +33,7 @@ export const mixinAddRow = {
             newRow.sequence = this.getNextSequence();
             newRow.id = this.getNextId(),
             newRow.isNew = true;
-            this.$store.commit('addRow', newRow);
+            this.$store.commit(ADD_ROW, newRow);
         },
 
         /**
@@ -52,14 +47,14 @@ export const mixinAddRow = {
         },
 
         /**
-         * Retrieve the lowest id and decrement for it to
-         * be used for the new row
+         * New rows are set with an ever increasing negative increment to
+         * mark them as new for the back end
          *
          * @param { String }
          */
         getNextId () {
-            this.newId--;
-            return this.newId.toString();
+            const newId = this.loadedData.rows.length - (this.rows.length+1); //+1 as the row hasn't been added in yet, with each new row the id will decrement
+            return newId.toString();
         },
 
     }

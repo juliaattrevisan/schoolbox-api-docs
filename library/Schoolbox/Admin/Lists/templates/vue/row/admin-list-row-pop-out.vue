@@ -7,6 +7,7 @@
  */
 
 import { mapState, mapGetters } from 'vuex';
+import { UPDATE_SELECTED_POP_OUT_NAME, OPEN_POP_UP } from '../store/adminListMutationTypes'
 
 export default {
 
@@ -74,9 +75,6 @@ export default {
         checkChangePopOut () {
             if (this.headerField.changePopOut) {
                 this.enableChangePopOutWatcher(); //start tracking changes
-                const currentChangePopOutSelection = this.row[this.headerField.changePopOut]; //eg: this will return the current selection of 'Role Type' on Lists > Roles
-                const changePopOutOptions = this.headerField.changePopOutOptions[currentChangePopOutSelection];  //the list of options available based on the selection of 'changePopOut'
-                this.updatePopOut(changePopOutOptions);
             }
         },
 
@@ -112,6 +110,23 @@ export default {
             });
         },
 
+        /**
+         * To highlight all rows which also have the same pop out option
+         * for an easier visual way to check which rows have the same pop out option
+         * 
+         * @param { String }
+         */
+        onPopOutNameSelected (popOutName) {
+            this.$store.commit(UPDATE_SELECTED_POP_OUT_NAME, popOutName)
+        },
+
+        /**
+         * Display the options within the pop out
+         */
+        onOpenPopUpSelected () {
+            this.$store.commit(OPEN_POP_UP, this.row);
+        }
+
     }
 
 }
@@ -120,9 +135,9 @@ export default {
 <template>
     <div class="list-container">
         <transition-group name="list" tag="div" class="list">
-            <button v-for="field in activeFields" :key="field.caption" :class="[ selectedPopOutName === field.caption ? 'item-active' : '', 'item']" @click.prevent="$store.commit('onPopOutNameSelected', field.caption)">{{ field.caption }}</button>
+            <button v-for="field in activeFields" :key="field.caption" :class="[ selectedPopOutName === field.caption ? 'item-active' : '', 'item']" @click.prevent="onPopOutNameSelected(field.caption)">{{ field.caption }}</button>
         </transition-group>
-        <button @click.prevent="$store.commit('openPopOut', row)" :disabled="isPopOutDisabled" class="update-button button icon-modify" title="Modify"></button>
+        <button @click.prevent="onOpenPopUpSelected" :disabled="isPopOutDisabled" class="update-button button icon-modify" title="Modify"></button>
     </div>
 </template>
 
