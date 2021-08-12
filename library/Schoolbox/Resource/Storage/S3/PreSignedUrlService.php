@@ -99,7 +99,7 @@ class PreSignedUrlService
      *
      * @return bool
      */
-    public function fileExists(PreSignedUrlDataObject $dataObject): bool
+    private function fileExists(PreSignedUrlDataObject $dataObject): bool
     {
         $itemPath   = $dataObject->getItemPath();
         $hash       = $dataObject->getHash();
