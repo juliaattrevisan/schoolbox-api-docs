@@ -149,6 +149,7 @@ class ConfigMapper extends Mapper
     public const NAME_PASTORAL_ENABLED = 'pastoral_enabled';
     public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
     public const NAME_MOBILE_PUSH_NOTIF_ENABLED = 'push_notifications_enabled';
+    public const NAME_LMS_ENABLED = 'lms_enabled';
 
     public const NAME_WEBDAV_ENABLED         = 'webdav_enable';
     public const NAME_GOOGLEDRIVE_ENABLED    = 'googledrive_enabled';

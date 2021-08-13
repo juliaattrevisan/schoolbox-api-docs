@@ -16,6 +16,7 @@ config:
   webdav_enable: {edit: true}
   kami_enabled: {value: false, edit: false}
   geosnapshot_enabled: {edit: true}
+  lms_enabled: {value: false}
 
   #Pastoral
   external_pastoral: {hide: false}

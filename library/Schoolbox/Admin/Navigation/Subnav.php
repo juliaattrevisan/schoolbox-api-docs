@@ -176,7 +176,7 @@ class Subnav
                     ],
                     '/adminv2/engagement/index/dueWork'       => [
                         'name'        => 'Due Work',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Statistics on how much the LMS features are being utilised including feedback and online submissions.',
                     ],
@@ -262,25 +262,25 @@ class Subnav
                     ],
                     '/adminv2/filters/classMarkbook'  => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK),
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the class markbook.',
                     ],
                     '/adminv2/filters/courseMarkbook' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK),
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the course markbook.',
                     ],
                     '/adminv2/filters/dueWorkCal'     => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the students due work calendar.',
                     ],
                     '/adminv2/filters/grades'         => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES),
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
                     ],
@@ -292,7 +292,7 @@ class Subnav
                     ],
                     '/adminv2/filters/rubricMarkbook' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) &&  $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the class rubric markbook.',
                     ],
@@ -331,54 +331,54 @@ class Subnav
             ],
             '/adminv2/terms'                          => [
                 'name'       => 'LMS',
-                'visible'    => true,
+                'visible'    => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/terms'                         => [
                         'name'        => 'Academic Period',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
                     '/adminv2/rollover'                      => [
                         'name'        => 'Class Rollover',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
                     ],
                     '/adminv2/course-builder'                => [
                         'name'        => 'Course Builder',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default page templates and permissions for course and unit pages.',
                     ],
                     '/adminv2/setting/Document%20Management' => [
                         'name'        => 'Document Management',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0,
+                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0 && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
                     '/adminv2/grades'                        => [
                         'name'        => 'Grades',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the available grade scales that can be used for assessment and marking.',
                     ],
                     '/adminv2/setting/LMS%20Policy'          => [
                         'name'        => 'LMS Policy',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0,
+                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0 && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure policy related to continuous reporting, grades, due work, assessment and feedback.',
                     ],
                     '/adminv2/lti'                           => [
                         'name'        => 'LTI Providers',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
                     '/adminv2/rubric-results'                => [
                         'name'        => 'Rubrics',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.',
                     ],
@@ -481,7 +481,7 @@ class Subnav
                     ],
                     '/adminv2/lists/submission-errors'                => [
                         'name'        => 'Submission States',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
                     ],
@@ -499,7 +499,7 @@ class Subnav
                     ],
                     '/adminv2/lists/submission-type'                  => [
                         'name'        => 'Work Types',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Setup the categorisation for assessments, useful for filtering and report creation.',
                     ],
@@ -897,11 +897,11 @@ class Subnav
                 }
             }
         }
-
+        $adminSub = $this->generate();
         return $this->twig->render(
             'subnav.twig',
             [
-                'adminSubnav' => $this->generate(),
+                'adminSubnav' => $adminSub,
                 'pageCurrent' => $pageCurrent,
                 'subpageCurrent' => $subpageCurrent,
                 'titleOverride' => $title,
