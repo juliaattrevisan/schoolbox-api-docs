@@ -170,8 +170,6 @@ $startTime   = $definition['start'][$firstPeriodNumber];
 $endTime     = $definition['end'][$lastPeriodNumber];
 $periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);
 
-
-
 if ($class) {
     // Set up attendance time steps
     // Steps: 5min
@@ -310,9 +308,11 @@ if ($class) {
         $localeSpecialNeeds = $this->getDi()->get('l10n')->translate('specialNeeds', false, true);
 
         // Iterate each student
+        $schoolboxStudentIds = [];
 
         foreach ($allStudents as $currentStudent) {
-            $user = $userHandler->getBySynergy($currentStudent['ID']);
+            $user                  = $userHandler->getBySynergy($currentStudent['ID']);
+            $schoolboxStudentIds[] = $user['uid'];
 
             $pattern = '/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i';
 
@@ -428,6 +428,12 @@ if ($class) {
             $this->setVar('absence_options_block', '');
             $this->setVar('reason_options_block', '');
         }
+
+        $this->setVar([
+                          'ALL_STUDENT_IDS'  => json_encode($schoolboxStudentIds),
+                          'PASTORAL_ENABLED' => (bool)($configLoader->get('pastoral_enabled') && $_SESSION['user']->getRole()->getAccessPastoral()),
+                      ]);
+
 
         $folderMapper = FolderMapper::getInstance();
         $folder       = $folderMapper->findForCampusAndClass($class['ClassCampus'], $class['ClassCode']);

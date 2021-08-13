@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\User;
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base as BaseController;
@@ -21,14 +20,13 @@ use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Audience\ColorHelper;
-use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
-use Schoolbox\Pastoral\Type\Model as PastoralType;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\ValidDetailsVisible;
 use Schoolbox\Profile\ValidEmailVisible;
@@ -42,7 +40,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Timetable_ColourManager;
 use Timetable_ColourMapper;
-use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Twig\Environment;
 
 /**
@@ -660,59 +657,8 @@ class Controller extends BaseController
             $canEmailStaff = false;
         }
 
-        // Pastoral icons
-        $types    = $this->pastoralTypeMapper->findByPredicates(
-            $this->pastoralTypeMapper->getPredicateBuilder()->notNull('color')->notNull('icon')->isNull('deleted_at')
-        )->indexBy('id');
-        $subtypes = $this->pastoralSubTypeMapper->findByPredicates(
-            $this->pastoralSubTypeMapper->getPredicateBuilder()->notNull('color')->notNull('icon')->isNull('deleted_at')
-        )->indexBy('id');
-
-        $pastoralCounts = [];
-        if ($types->count() > 0 || $subtypes->count() > 0) {
-            $counts      = $this->pastoralDataSource->countRecordsByType(
-                $this->getUser(),
-                $student->getId(),
-                $types->getPropertyValues('id'),
-                $subtypes->getPropertyValues('id')
-            );
-            $transformer = new ColorHelper();
-
-            foreach ($counts as $count) {
-                if ($count['subtypeId']) {
-                    /** @var PastoralSubType|null $subtype */
-                    $subtype = $subtypes->getOffset($count['subtypeId']);
-                    if (!$subtype) {
-                        continue;
-                    }
-                    $foregroundColor      = $subtype->getColor();
-                    $count['icon']        = $subtype->getIcon();
-                    $count['title']       = "{$subtype->getPastoralType()->getName()}: {$subtype->getName()}";
-                    $count['subSequence'] = $subtype->getSequence();
-                    $count['sequence']    = $subtype->getPastoralType()->getSequence();
-                } else {
-                    /** @var PastoralType|null $type */
-                    $type = $types->getOffset($count['typeId']);
-                    if (!$type) {
-                        continue;
-                    }
-                    $foregroundColor      = $type->getColor();
-                    $count['icon']        = $type->getIcon();
-                    $count['title']       = $type->getName();
-                    $count['subSequence'] = 0;
-                    $count['sequence']    = $type->getSequence();
-                }
-                $count['bgColor'] = $transformer->calculateBackground($foregroundColor)->getAsRgba();
-                $count['fgColor'] = $foregroundColor->getAsRgba();
-                $pastoralCounts[] = $count;
-            }
-            usort($pastoralCounts, static function (array $a, array $b) {
-                if ($a['sequence'] === $b['sequence']) {
-                    return $a['subSequence'] > $b['subSequence'] ? 1 : -1;
-                }
-                return $a['sequence'] > $b['sequence'] ? 1 : -1;
-            });
-        }
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
+        $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student);
 
         $this->response->content->set(
             $this->buildHtmlOutput(

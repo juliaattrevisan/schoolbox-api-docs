@@ -56,8 +56,8 @@ class Module extends BaseModule
         // Define permissions for the routes
 
         $permissionPastoralModeratorModerate = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
-        $permissionPastoralModeratorWrite = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
-        $permissionPastoralModerator = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ);
+        $permissionPastoralModeratorWrite    = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
+        $permissionPastoralModerator         = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ);
 
         $permissionStaff =
             new Rule\All(
@@ -184,25 +184,26 @@ class Module extends BaseModule
         // Define routes and assign permissions to them
 
         $this->registerRoutesArray([
-            'GET'  => [
-                ''                                                                             => ['getIndex' => $permissionStaff],
-                '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
-                '/search'                                                                      => ['getSearch' => $permissionStaff],
-                '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
-                '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
-                '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
-                '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionAttachmentView],
-                '/student/{studentId:\d+}/record/insert'                                       => ['getStudentRecordInsertForm' => $permissionStaff],
-                '/student/{studentId:\d+}/record/{recordId:\d+}/update'                        => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
-            ],
-            'POST' => [
-                '/record/insert'                                        => ['postRecordInsert' => $permissionStaff],
-                '/record/{recordId:\d+}/update'                         => ['postRecordUpdate' => $permissionRecordUpdate],
-                '/record/{recordId:\d+}/delete'                         => ['postRecordDelete' => $permissionRecordDelete],
-                '/record/{recordId:\d+}/comment/insert'                 => ['postCommentInsert' => $permissionCommentInsert],
-                '/record/{recordId:\d+}/comment/{commentId:\d+}/delete' => ['postCommentDelete' => $permissionCommentDelete],
-            ],
-        ]);
+                                       'GET'  => [
+                                           ''                                                                             => ['getIndex' => $permissionStaff],
+                                           '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
+                                           '/search'                                                                      => ['getSearch' => $permissionStaff],
+                                           '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
+                                           '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentView],
+                                           '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
+                                           '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
+                                           '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionAttachmentView],
+                                           '/student/{studentId:\d+}/record/insert'                                       => ['getStudentRecordInsertForm' => $permissionStaff],
+                                           '/student/{studentId:\d+}/record/{recordId:\d+}/update'                        => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
+                                       ],
+                                       'POST' => [
+                                           '/record/insert'                                        => ['postRecordInsert' => $permissionStaff],
+                                           '/record/{recordId:\d+}/update'                         => ['postRecordUpdate' => $permissionRecordUpdate],
+                                           '/record/{recordId:\d+}/delete'                         => ['postRecordDelete' => $permissionRecordDelete],
+                                           '/record/{recordId:\d+}/comment/insert'                 => ['postCommentInsert' => $permissionCommentInsert],
+                                           '/record/{recordId:\d+}/comment/{commentId:\d+}/delete' => ['postCommentDelete' => $permissionCommentDelete],
+                                       ],
+                                   ]);
     }
 
 
@@ -313,9 +314,9 @@ class Module extends BaseModule
                     /** @var User $user */
                     $user = $this->getInjector()->get('user');
 
-                    $record = $pastoralDataSource->findById($user, $params['recordId']);
-                    $injectedValues['record'] = $record;
-                    $injectedValues['access'] = $record->getAccess();
+                    $record                      = $pastoralDataSource->findById($user, $params['recordId']);
+                    $injectedValues['record']    = $record;
+                    $injectedValues['access']    = $record->getAccess();
                     $injectedValues['studentId'] = $record->getStudent()->getId();
                 } catch (MapperException $e) {
                     throw $this->generateError(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
@@ -332,6 +333,38 @@ class Module extends BaseModule
                         throw $this->generateError(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                     }
                 }
+            }
+
+            /**
+             * load in several students
+             */
+            if (array_key_exists('studentIds', $params)) {
+                $studentIds = array_unique(explode(',', $params['studentIds']));
+
+                $students = User::createCollection();
+
+                /** @var UserMapper $userMapper */
+                $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+
+                try {
+
+                    foreach ($studentIds as $studentId) {
+                        $student = $userMapper->findWithSubjects($studentId);
+                        $student->loadTeachers();
+                        $student->loadParents();
+
+                        $students->add($student);
+                    }
+
+                } catch (MapperException $e) {
+                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                }
+
+                if (count($students) === 0) {
+                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                }
+
+                $injectedValues['students'] = $students;
             }
 
             return $injectedValues;

@@ -1,9 +1,11 @@
 <script>
 
-import axios from 'axios'
+import axios from 'axios';
+import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 
 export default {
     name: 'class-list',
+    components: {PastoralCountBadge},
     props: {
         /**
          * The title of the subject for which the class list is shown, including
@@ -197,6 +199,17 @@ export default {
         },
 
         /**
+         * The API url which returns a list of pastoral counts for students.
+         *
+         * note that this url includes its named parameter `studentIds` as a token
+         * which needs to be replaced with a comma separated list of student id's.
+         */
+        getStudentsPastoralCountsUrl: {
+            type: String,
+            required: false,
+        },
+
+        /**
          * The API endpoint which displays a form for awarding achievements.
          */
         getAwardAsAchievementFormEndpoint: {
@@ -223,6 +236,7 @@ export default {
     data() {
         return {
             studentLists: [],
+            studentPastoralCounts: [],
             showSkeletonLoader: true,
             selectedStudents: [],
             studentsCheckboxElements: undefined,
@@ -253,18 +267,45 @@ export default {
         window.addEventListener('popstate', () => self.setClassCode(window.location.hash.substring(1)));
     },
     methods: {
+        getStudentsPastoralCountsEndpoint: function () {
+            let self = this;
+
+            return self.getStudentsPastoralCountsUrl.replace("{studentIds}", self.allStudentIds.join(','));
+        },
         getStudents: function () {
-            let self     = this,
-            studentLists = new Promise(function (resolve) {
-                axios.get(self.getStudentListsEndpoint)
+            let self = this,
+                studentLists = new Promise(function (resolve) {
+                    axios.get(self.getStudentListsEndpoint)
+                        .then(function (response) {
+                            // Set all students to checked by default
+                            self.studentLists = response.data
+                                .map(function (student) {
+                                    student.isChecked = true;
+                                    return student;
+                                });
+                            resolve();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        })
+                        .finally(function () {
+                            // Hide skeleton loader and show class list table
+                            self.showSkeletonLoader = false;
+                        });
+                });
+
+            /**
+             * immediately check to see if we need to grab pastoral count information
+             */
+            studentLists.then(function () {
+                //pastoral is disabled, theres no need to load in pastoral counts
+                if (!self.pastoralEnabled) {
+                    return;
+                }
+
+                axios.get(self.getStudentsPastoralCountsEndpoint())
                     .then(function (response) {
-                        // Set all students to checked by default
-                        self.studentLists = response.data
-                            .map(function (student) {
-                                student.isChecked = true;
-                                return student;
-                            });
-                        resolve();
+                        self.studentPastoralCounts = response.data
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -414,6 +455,16 @@ export default {
         showCheckboxes: function () {
             return this.learningMomentsEnabled || this.mailEnabled;
         },
+        allStudentIds: function () {
+            let ids = [],
+                self = this;
+            self.studentLists.forEach(function (student) {
+                if (student.id) {
+                    ids.push(student.id);
+                }
+            });
+            return ids;
+        },
         allSelected: {
             get: function () {
                 return this.studentsForCurrentClassCode.every(function (student) {
@@ -433,7 +484,7 @@ export default {
                 });
             }
         },
-        studentsForCurrentClassCode() {
+        studentsForCurrentClassCode: function () {
             // Which students are in the current class code?
             return this.studentLists.filter(this.isStudentInCurrentClassCode);
         },
@@ -503,7 +554,8 @@ export default {
                 <dd :class="{active: currentClassCode === null}">
                     <a href="#" @click="setClassCode(null)">All classes</a>
                 </dd>
-                <dd v-for="classCode in classCodeList" :key="classCode" :class="{active: currentClassCode === classCode}">
+                <dd v-for="classCode in classCodeList" :key="classCode"
+                    :class="{active: currentClassCode === classCode}">
                     <a :href="'#' + classCode" @click="setClassCode(classCode)">{{ classCode }}</a>
                 </dd>
             </dl>
@@ -584,8 +636,16 @@ export default {
                             <template v-else>
                                 {{ student.lastname + ', ' + student.firstname }}
                             </template>
+
                             <span class="meta">({{ student.synergy_id }})</span>
-                            <span class="show-for-print"><br>{{ student.email }}</span>
+                            <span class="show-for-print"><br>{{ student.email }}</span><br>
+
+                            <p class="meta">
+                                <pastoral-count-badge v-for="(studentBadge) in studentPastoralCounts[student.id]"
+                                                      :key="studentBadge.id"
+                                                      v-bind="studentBadge"
+                                ></pastoral-count-badge>
+                            </p>
 
                             <p class="meta">
                                 <slot name="student-meta" v-bind:student="student">
@@ -616,14 +676,18 @@ export default {
                             </ul>
                         </td>
                         <td class="show-for-large-up">{{ student.yearlevel }}</td>
-                        <td class="show-for-medium-up" v-if="showTutorGroupColumn">{{ student.StudentTutorDescription }}</td>
+                        <td class="show-for-medium-up" v-if="showTutorGroupColumn">{{
+                                student.StudentTutorDescription
+                            }}
+                        </td>
                         <td class="show-for-medium-up" v-if="showCoreGroupColumn">{{ student.StudentForm }}</td>
                         <td class="show-for-medium-up" v-if="showHouseColumn">{{ student.house }}</td>
                         <td class="show-for-medium-up">{{ student.lastAccessTime }}</td>
                         <td class="no-pad">
                             <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                 <nav>
-                                    <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
+                                    <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more"
+                                       title="Actions"></a>
                                 </nav>
                             </div>
                         </td>
