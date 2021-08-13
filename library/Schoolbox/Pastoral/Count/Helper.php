@@ -43,12 +43,12 @@ class Helper
     private PastoralDataSource $pastoralDataSource;
 
     /**
-     * @var Collection|PastoralType
+     * @var Collection|PastoralType[]|null
      */
     private $pastoralTypesWhitelist;
 
     /**
-     * @var Collection|PastoralSubType
+     * @var Collection|PastoralSubType[]|null
      */
     private $pastoralSubTypesWhitelist;
 
@@ -64,11 +64,24 @@ class Helper
      */
     public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource)
     {
-        $this->pastoralTypeMapper    = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper = $pastoralSubTypeMapper;
-        $this->pastoralDataSource    = $pastoralDataSource;
-        $this->router                = $router;
-        $this->colorHelper           = new ColorHelper();
+        $this->pastoralTypeMapper        = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
+        $this->pastoralDataSource        = $pastoralDataSource;
+        $this->router                    = $router;
+        $this->colorHelper               = new ColorHelper();
+    }
+
+    /**
+     * initialise fallback whitelist of types and subtypes to use
+     */
+    private function initTypeWhitelists()
+    {
+        /**
+         * we only need to run this once
+         */
+        if ($this->pastoralTypesWhitelist && $this->pastoralSubTypesWhitelist) {
+            return;
+        }
 
         $this->pastoralTypesWhitelist = $this->pastoralTypeMapper->findByPredicates(
             $this->pastoralTypeMapper->getPredicateBuilder()->notNull('color')->notNull('icon')->isNull('deleted_at')
@@ -125,6 +138,8 @@ class Helper
      */
     public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
     {
+        $this->initTypeWhitelists();
+
         $pastoralTypes    = $typesWhitelist ?? $this->pastoralTypesWhitelist;
         $pastoralSubtypes = $subTypesWhitelist ?? $this->pastoralSubTypesWhitelist;
 
