@@ -57,6 +57,7 @@
                 <span class="hint has-tip tip-top" data-tooltip title="Multiple tags can be added to aid filtering and reporting. Try to reuse existing tags by searching first. If necessary you may create new tags.">?</span>
                 <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}"> </label>
         </div>
+        {% if config.pastoral_parent_access %}
         <div class="small-12 columns">
             <label for="parent-comments-allowed">Allow parents to comment <span class="hint has-tip tip-top" data-tooltip title="Turn this ON to allow parent(s) of the student to comment on this record.">?</span></label>
             <div class="switch">
@@ -68,5 +69,6 @@
                 </label>
             </div>
         </div>
+        {% endif %}
     </fieldset>
 </section>
