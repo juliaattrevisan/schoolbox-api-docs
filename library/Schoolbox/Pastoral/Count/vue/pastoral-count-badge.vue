@@ -46,7 +46,7 @@ export default {
         /**
          * the human readable description of the pastoral type & subtype combo
          */
-        description: {
+        title: {
             default: 'Achievement',
             type: String
         }
@@ -57,7 +57,7 @@ export default {
     <a :href="destinationUrl">
         <span :class="`label neutral icon-${icon}`"
               data-tooltip
-              :title="description"
+              :title="title"
               :style="{
                   'background-color': bgColor,
                   'color': fgColor,

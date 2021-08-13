@@ -259,6 +259,10 @@ class Controller extends Base
      * the logged-in user has permission to view
      *
      * @param Collection $students
+     *
+     * @throws RouteNotFound
+     * @api GET /pastoral/students/count/{studentIds:[\d\x2c]+}
+     * @since 21.1
      */
     public function getStudentsCount(Collection $students): void
     {

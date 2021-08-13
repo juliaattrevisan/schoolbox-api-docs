@@ -69,6 +69,7 @@
              * @param studentId
              * @param typeId
              * @param subtypeId
+             * @param title
              * @param icon
              * @param fgColor
              * @param bgColor
@@ -76,14 +77,16 @@
              * @returns {`
                 <span id="pastoralCountBadge-${string}-${string}-${string}"
                       class="label neutral icon-${string}"
+                      title="${string}"
                       style="color: ${string}; background-color: ${string}"
                 >${string}</span>
             `}
              */
-            let tagPastoralCountBadge = function (studentId, typeId, subtypeId, icon, fgColor, bgColor, count) {
+            let tagPastoralCountBadge = function (studentId, typeId, subtypeId, title, icon, fgColor, bgColor, count) {
                 return `
                 <span id="pastoralCountBadge-${studentId}-${typeId}-${subtypeId}"
                       class="label neutral icon-${icon}"
+                      title="${title}"
                       style="color: ${fgColor}; background-color: ${bgColor}"
                 >${count}</span>
             `
@@ -113,7 +116,7 @@
                                  */
                                 for (let index in pastoralCountBadges[studentId]) {
                                     let studentBadge = pastoralCountBadges[studentId][index];
-                                    tagMarkup = tagMarkup.concat(tagPastoralCountBadge(studentId, studentBadge.typeId, studentBadge.subtypeId, studentBadge.icon, studentBadge.fgColor, studentBadge.bgColor, studentBadge.count));
+                                    tagMarkup = tagMarkup.concat(tagPastoralCountBadge(studentId, studentBadge.typeId, studentBadge.subtypeId, studentBadge.title, studentBadge.icon, studentBadge.fgColor, studentBadge.bgColor, studentBadge.count));
                                 }
 
                                 /**

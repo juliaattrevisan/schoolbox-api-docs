@@ -431,7 +431,7 @@ if ($class) {
 
         $this->setVar([
                           'ALL_STUDENT_IDS'  => json_encode($schoolboxStudentIds),
-                          'PASTORAL_ENABLED' => (bool)($configLoader->get('pastoral_enabled') && $_SESSION['user']->getRole()->getAccessPastoral()),
+                          'PASTORAL_ENABLED' => json_encode((bool)($configLoader->get('pastoral_enabled') && $_SESSION['user']->getRole()->getAccessPastoral())),
                       ]);
 
 
