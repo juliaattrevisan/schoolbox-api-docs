@@ -9,9 +9,6 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
-use function array_key_exists;
-use function count;
-
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Schoolbox\GenericCollection;
@@ -24,10 +21,11 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 use function sprintf;
-
-use UnexpectedValueException;
+use function array_key_exists;
+use function count;
 
 class MiddleYearsAssessmentTasks extends BaseComponent
 {
@@ -126,13 +124,10 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             }
         }
 
-        /* For middle years students, only get assessments that are due in the current semester
-         * We don't need formative data from semester 1 when we are in semester 2
+        /* For middle years students, only get assessments that are due in the current year
          */
-        $semester = $this->getAttributes()->getCurriculumSemester();
-
         foreach ($cohortAssessments as $assessable) {
-            if (!$this->isDueWithinReportWindow($assessable, $semester)) {
+            if (!$this->isDueWithinReportWindow($assessable)) {
                 $cohortAssessments->offsetUnset($assessable->getId());
             }
         }
@@ -141,20 +136,17 @@ class MiddleYearsAssessmentTasks extends BaseComponent
         $classAssessment = null;
         foreach ($cohortAssessments as $assessment) {
             if (
-                $assessment->isParticipant($this->student) &&
-                (int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()
+                $assessment->isParticipant($this->student)
+                && (int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()
+                && $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)
+                && $this->isFeedbackVisibleToUser($assessment)
             ) {
                 $classAssessment = $assessment;
                 break;
             }
         }
-        if (!$classAssessment || !$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->getViewer(), true, null, false)) {
+        if (!$classAssessment) {
             // No assessment found, or found but not visible?
-            return null;
-        }
-
-        // Is grade visibility off for the current viewer?
-        if (!$this->isFeedbackVisibleToUser($classAssessment)) {
             return null;
         }
 

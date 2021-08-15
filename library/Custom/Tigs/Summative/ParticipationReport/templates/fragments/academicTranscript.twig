@@ -177,7 +177,7 @@ Data:
                                         {% set taskData = folderData.middleYearsTaskMarks %}
 
                                         {% if taskData.data[unitSpecData.id] ?? false %}
-                                            {% if taskData.data[unitSpecData.id].studentMark|length %}
+                                            {% if (taskData.data[unitSpecData.id].studentMark ?? '')|length %}
                                                 {% set hasFormativeFeedback = true %}
                                             {% endif %}
                                         {% endif %}
@@ -204,7 +204,8 @@ Data:
                                      #
                                      # Eventually you dig far enough to find a grade and comment etc.
                                      #}
-                                    {% if attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment.comment|length %}
+                                    {% if attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.2 is defined
+                                        and folderData.nesaGraphData.data.2.comment is defined and (folderData.nesaGraphData.data.2.comment.comment|length) %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark %}
                                         {% set nesaSemester = 2 %}
                                         {% set nesaError = folderData.nesaGraphData.data.2.error %}
@@ -221,7 +222,7 @@ Data:
                                          #}
                                         {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
                                         {% set nesaSemester = 1 %}
-                                        {% set nesaError = folderData.nesaGraphData.data.1.error %}
+                                        {% set nesaError = folderData.nesaGraphData.data.1.error ?? '' %}
                                         {% set comment = folderData.nesaGraphData.data.1.comment.comment %}
                                     {% elseif attributes.curriculumSemester == 1 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
@@ -287,7 +288,7 @@ Data:
                                                         {# Remember the data which the most recent publishAt
                                                          # Keep looking until there aren't any records more recent
                                                          #}
-                                                        {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                        {% if mostRecentData is null or taskMarks.publishAt > mostRecentData.publishAt %}
                                                             {% set mostRecentData = taskMarks %}
                                                             {% set comment = taskMarks.comment %}
                                                         {% endif %}
@@ -400,7 +401,7 @@ Data:
                                                 {# Remember the data which the most recent publishAt
                                                  # Keep looking until there aren't any records more recent
                                                  #}
-                                                {% if middleYearsTaskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                {% if mostRecentData is null or middleYearsTaskMarks.publishAt ?? '' > mostRecentData.publishAt ?? '' %}
                                                     {% set mostRecentData = middleYearsTaskMarks %}
 
                                                     {# Used to pop up a little notice to the user about transient mark data

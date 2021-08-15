@@ -21,12 +21,12 @@ Data:
         <div class="atl">
             {% include '@rubric/grid.twig' with {
                 rubricGrid: grid,
-                rubricMarkedGrid: markedGrid,
+                rubricMarkedGrid: markedGrid ?? null,
                 markVisibility: true,
-                useMarkRange: useMarkRange,
-                showDescriptorValue: showDescriptorValue,
-                showGroupTotal: showGroupTotal,
-                showRubricTotal: showRubricTotal
+                useMarkRange: useMarkRange ?? false,
+                showDescriptorValue: showDescriptorValue ?? false,
+                showGroupTotal: showGroupTotal ?? false,
+                showRubricTotal: showRubricTotal ?? false
             } only %}
         </div>
     {% endif %}

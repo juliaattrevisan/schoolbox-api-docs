@@ -25,7 +25,7 @@
 {# Show the assessment that had their Mark value, but only show it when
  # you're providing Formative information
 #}
-{% if hasInterimGrades and rankData.assessmentTitle|length %}
+{% if hasInterimGrades and (rankData.assessmentTitle ?? '')|length %}
     <div class="result-group">
         <div class="result-item hsc-rank-assessment-title">
             <span class="result-value">{{ rankData.assessmentTitle }}</span>
