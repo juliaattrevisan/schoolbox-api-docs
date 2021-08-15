@@ -63,6 +63,15 @@ export default {
             return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
+        message: {
+            get () {
+                return this.$store.state.obj.message
+            },
+            set (value) {
+                this.$store.commit('updateMessage', value)
+            }
+        }
+
     },
 
     methods: {
@@ -71,7 +80,6 @@ export default {
          * To confirm whether should delete the row
          */
         onDeleteRowSelected () {
-            // this.$emit('on-delete-row-selected', this.row);
             this.$store.commit(DELETE_ROW_PROMPT, this.row);
         }
 

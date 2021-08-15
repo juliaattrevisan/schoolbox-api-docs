@@ -75,6 +75,9 @@ export default {
         checkChangePopOut () {
             if (this.headerField.changePopOut) {
                 this.enableChangePopOutWatcher(); //start tracking changes
+                const currentChangePopOutSelection = this.row[this.headerField.changePopOut]; //eg: this will return the current selection of 'Role Type' on Lists > Roles
+                const changePopOutOptions = this.headerField.changePopOutOptions[currentChangePopOutSelection];  //the list of options available based on the selection of 'changePopOut'
+                this.checkIfDisabled(changePopOutOptions);
             }
         },
 
@@ -96,11 +99,29 @@ export default {
          * @param { Array }
          */
         updatePopOut (changePopOutOptions) {
+            this.checkIfDisabled(changePopOutOptions);
+            this.toggleOptionsOnChangePopOut(changePopOutOptions);
+        },
+
+        /**
+         * Pass through the array of options that fill out the pop out and dicate its display status
+         * 
+         * @param { Array }
+         */
+        checkIfDisabled (changePopOutOptions) {
             if (changePopOutOptions.length > 0) { //if there's no options avaiable in the current changePopOut value, opening the pop out should be disabled
                 this.isPopOutDisabled = false; 
             } else {
                 this.isPopOutDisabled = true;
             }
+        },
+
+        /**
+         * Pass through the array of options that fill out the pop out and dicate its display status
+         * 
+         * @param { Array }
+         */
+        toggleOptionsOnChangePopOut (changePopOutOptions) {
             this.fields.forEach((option) => { //loop through and set those options to true that are available in the current changePopOutOption
                 if (changePopOutOptions.includes(option.id)) {
                     this.row[option.id] = true;

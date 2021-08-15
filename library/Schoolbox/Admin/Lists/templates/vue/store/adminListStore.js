@@ -9,6 +9,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 
+    strict: true,
+
     state: {
         loadedData: null, //contains the loaded data
         rows: [], //to display and possibly edit the rows 
@@ -57,16 +59,16 @@ export default new Vuex.Store({
     mutations: {
 
         /**
-         * 
+         * The requested data is loaded from the backend
          */
         [UPDATE_LOADED_DATA] (state, loadedData) {
-            state.loadedData = loadedData;
+            state.loadedData = Object.freeze(loadedData); //freeze the loaded data to ensure it's not changed
             state.rows = _.cloneDeep(state.loadedData.rows); //cloneDeep is from underscore.js
             state.rows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
         },
 
         /**
-         * 
+         * Can be choosen by opening the pop out
          */
         [UPDATE_SELECTED_ROW] (state, row) {
             state.selectedRow = row;
@@ -86,14 +88,14 @@ export default new Vuex.Store({
         },
 
         /**
-         * 
+         * Add a row
          */
         [ADD_ROW] (state, row) {
             state.rows = [...state.rows, row];
         },
 
         /**
-         * 
+         * Provide a prompt to confirm deletion of row
          */
         [DELETE_ROW_PROMPT] (state, rowToDelete) {
             state.rowToDelete = rowToDelete;
