@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
+use OutOfRangeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
@@ -25,6 +26,41 @@ use SitePage;
  */
 class UsermediaController extends AbstractController
 {
+    /**
+     * @param bool   $multi
+     * @param string $mimeFilter
+     * @param bool   $useFolder
+     * @param int    $defaultFolderId
+     * @throws OutOfRangeException
+     */
+    public function __construct($multi, $mimeFilter = null, $useFolder = true, $defaultFolderId = 0)
+    {
+        //$mimeFilter = 'image/*';
+        if ($this->isRecordable($mimeFilter)) {
+            parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
+        } else {
+            throw new OutOfRangeException("mimeType is not recordable.");
+        }
+    }
+
+    /**
+     * checks to see if the mimetype is able to be recorded.
+     * (voice, video, screencapture)
+     * @param string|null   $mimeFilter
+     * @returns bool
+     */
+    protected function isRecordable($mimeFilter)
+    {
+        $recordable = false;
+        $csv = str_getcsv($mimeFilter);
+        foreach ($csv as $mime) {
+            $tmp = explode('/', $mime);
+            if (in_array($tmp[0], array("video","audio","*",""))) {
+                $recordable = true;
+            }
+        }
+        return $recordable;
+    }
 
     /**
      * @param SitePage $page
