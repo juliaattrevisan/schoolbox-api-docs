@@ -18,10 +18,12 @@ readonly L_ERROR=400
 
 # Global vars
 declare verbose=0
-declare package           # One of [schoolbox|schoolboxdev]
-declare site_root         # No trailing slash, eg '/vagrant'
-declare is_primary_host   # One of [0|1]
-declare instance_list     # Set of instances for this package
+declare single_instance_mode=0
+declare package                # One of [schoolbox|schoolboxdev]
+declare site_root              # No trailing slash, eg '/vagrant'
+declare is_primary_host        # One of [0|1]
+declare instance_list          # Set of instances for this package
+declare socketd_ports          # Use these if provided, otherwise fetch from IR. Eg '--socketd-ports vagrantx:9081'
 
 # Logging helpers
 function debug(){
@@ -43,11 +45,13 @@ function help(){
   echo "Usage:"
   echo "  $0 --is-primary-host [0|1] [-v|--verbose]"
   echo "Args:"
-  echo "  --is-primary-host  Required. Is this a primary (1) or non-primary (0) host."
-  echo "                               (Primary host has daemons/crons + runs SQL updates)"
-  echo "  --instance-id      Optional. The instance id to run the upgrade against"
-  echo "  -v,--verbose       Optional. Log with increased verbosity"
-  echo "  -h,--help          Optional. Print this help message and exit"
+  echo "  --is-primary-host      Required. Is this a primary (1) or non-primary (0) host."
+  echo "                                   (Primary host has daemons/crons + runs SQL updates)"
+  echo "  --instance-id          Optional. If specified, only upgrade this instance"
+  echo "  --socketd-ports [MAP]  Optional. If specified, use this [instance_id:port] map, otherwise fetch from IR."
+  echo "                                   Eg '--socketd-ports vagrantx:9081'"
+  echo "  -v,--verbose           Optional. Log with increased verbosity"
+  echo "  -h,--help              Optional. Print this help message and exit"
 }
 
 # Check script is running with sufficient permissions
@@ -84,6 +88,11 @@ function parse_args() {
         ;;
       --instance-id)
         instance_list=$2
+        single_instance_mode=1
+        shift; shift;
+        ;;
+      --socketd-ports)
+        socketd_ports=$2
         shift; shift;
         ;;
       *)
@@ -131,17 +140,9 @@ function parse_global_vars(){
   debug "site_root: '$site_root'"
   debug "package: '$package'"
   debug "instance_list: $(echo -e "$instance_list" | tr '\n' ' ')"
+  debug "single_instance_mode: $single_instance_mode"
 }
 
-
-# Ensures all data dirs defined by instances exist on disk
-function create_data_dirs(){
-  if [[ $verbose == 1 ]]; then
-    "$site_root"/tools/site/create-data-dirs.sh --verbose
-  else
-    "$site_root"/tools/site/create-data-dirs.sh
-  fi
-}
 
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
 function upgrade_instances(){
@@ -150,14 +151,20 @@ function upgrade_instances(){
   for i in $instance_list; do
   {
     # Ensure instance's log file's directory exists
-    mkdir -p /var/log/"$package"/"$i"
-    instance_log_file=/var/log/"$package"/"$i"/upgrade.log;
+    mkdir -p /var/log/schoolbox/"$i"
+    instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
     log "upgrade starting for instance $i - logging to $instance_log_file";
 
     # If log exists in old location, move to new location. TODO remove once all instances upgrade past 20.2.12
     old_filename=/var/lib/"$package"/"$i"_upgrade.log
     if [[ -f  "$old_filename" ]]; then
       mv "$old_filename" "$instance_log_file"
+    fi
+
+    # Ensure 'schoolboxdev' logs moved TODO remove once all instances upgrade 21.0.4+
+    if [[ -f /var/log/schoolboxdev/"$i"/upgrade.log ]]; then
+      cat /var/log/schoolboxdev/"$i"/upgrade.log >> /var/log/schoolbox/"$i"/upgrade.log
+      rm /var/log/schoolboxdev/"$i"/upgrade.log
     fi
 
     # TODO, consider case where:
@@ -217,8 +224,8 @@ function upgrade_instances(){
 }
 
 function restart_php_fpm(){
-  log "Restarting php7.4-fpm ..."
-  service php7.4-fpm restart         # Allow web requests again, ensure upgraded code is used
+  log "Reloading php7.4-fpm ..."
+  service php7.4-fpm reload         # Ensure web requests use upgraded code
 }
 
 function remove_maintenance_page(){
@@ -232,11 +239,14 @@ function remove_maintenance_page(){
 function rebuild_and_restart_daemons(){
   if [[ $is_primary_host == '1' ]]; then
     log "---rebuilding + restarting daemon on primary host---";
-    # TODO, if we want to run this script in vagrant, and for better performance when invoked from puppet, need to add support for the --socketd-ports flag
-    if [[ $verbose == 1 ]]; then
-      /usr/local/bin/schoolbox-rebuild-daemons --fetch -v
-    else
+    if [[ -z $socketd_ports ]] && [[ $verbose == 0 ]]; then
       /usr/local/bin/schoolbox-rebuild-daemons --fetch
+    elif [[ -z $socketd_ports ]] && [[ $verbose == 1 ]]; then
+      /usr/local/bin/schoolbox-rebuild-daemons --fetch -v
+    elif [[ -n $socketd_ports ]] && [[ $verbose == 0 ]]; then
+      /usr/local/bin/schoolbox-rebuild-daemons --socketd-ports "$socketd_ports"
+    else
+      /usr/local/bin/schoolbox-rebuild-daemons --socketd-ports "$socketd_ports" -v
     fi
     for instance in $instance_list; do
       ${package}cloud-restart-daemons "$instance";
@@ -252,7 +262,16 @@ function rebuild_cron_jobs(){
   else
     log "---removing cron jobs on secondary host---";
   fi
-  schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host"
+
+  if [[ $verbose == 0 ]] && [[ $single_instance_mode == 0 ]]; then
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host"
+  elif [[ $verbose == 0 ]] && [[ $single_instance_mode == 1 ]]; then
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" --instance "$instance_list"
+  elif [[ $verbose == 1 ]] && [[ $single_instance_mode == 0 ]]; then
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" -v
+  else
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" --instance "$instance_list" -v
+  fi
 }
 
 function reload_binding_cache(){
@@ -260,7 +279,7 @@ function reload_binding_cache(){
     log "---reloading binding cache (in parallel)---";
     for i in $instance_list; do
     {
-      instance_log_file_2=/var/log/"$package"/"$i"/upgrade.log;
+      instance_log_file_2=/var/log/schoolbox/"$i"/upgrade.log;
       log "binding cache refresh starting for instance $i - logging to $instance_log_file_2";
       ${package}cloud-reload-binding-cache "$i" >> "$instance_log_file_2" 2>&1;
       log "binding cache refresh finished for instance $i";
