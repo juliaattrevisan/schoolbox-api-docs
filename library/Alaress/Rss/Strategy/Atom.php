@@ -25,9 +25,16 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
      */
     public function get(Xml $input, int $limit): array
     {
-        $data = array();
+        $data = [];
 
         $allRss = $input->xml->entry;
+
+        /* the Xml and Entry nodes don't exist in this xml
+         * Nothing to parse and show; exit early
+         */
+        if (null === $allRss) {
+            return $data;
+        }
 
         /* Snap out at the limit. "All" is classified as zero
          * in the homepage component.

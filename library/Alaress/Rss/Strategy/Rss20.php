@@ -24,9 +24,16 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
      */
     public function get(Xml $input, int $limit): array
     {
-        $data = array();
+        $data = [];
 
         $allRss = $input->channel->item;
+
+        /* the Channel and Item nodes don't exist in this xml
+         * Nothing to parse and show; exit early
+         */
+        if (null === $allRss) {
+            return $data;
+        }
 
         /* Snap out at the limit. "All" is classified as zero
          * in the homepage component.
