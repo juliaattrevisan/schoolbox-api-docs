@@ -22,7 +22,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
      * @param int $limit
      * @return array
      */
-    public function get(Xml $input, $limit)
+    public function get(Xml $input, int $limit): array
     {
         $data = array();
 
@@ -76,7 +76,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
      * @param Xml $input
      * @return string
      */
-    public function getTitle($input)
+    public function getTitle(Xml $input): string
     {
         return $input->xml->channel->title;
     }
@@ -87,7 +87,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
      * @param Xml $input
      * @return string
      */
-    public function getLink($input)
+    public function getLink(Xml $input): string
     {
         return $input->xml->channel->link;
     }
