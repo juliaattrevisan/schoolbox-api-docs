@@ -12,18 +12,18 @@ SELECT
     a.weight                      AS assessment_weight,
 
     -- Rubric capability fields
-    rg.id                               AS capability_id,
-    rg.name                             AS capability_name,
-    rgu.max_value                       AS capability_max_value,
-    rgu.sequence                        AS capability_sequence,
+    rc.id                               AS capability_id,
+    rc.name                             AS capability_name,
+    rcu.max_value                       AS capability_max_value,
+    rcu.sequence                        AS capability_sequence,
     sb.rubric_capability_mark_type_id   AS capability_mark_type_id,
     sb.rubric_capability_grade_group_id AS capability_grade_group_id,
 
     -- Rubric indicator fields
-    rc.id                        AS indicator_id,
-    rc.name                      AS indicator_name,
-    rcu.sequence                 AS indicator_sequence,
-    rcu.max_value                AS indicator_max_value
+    ri.id                        AS indicator_id,
+    ri.name                      AS indicator_name,
+    riu.sequence                 AS indicator_sequence,
+    riu.max_value                AS indicator_max_value
 
 FROM assessment a
 
@@ -33,28 +33,28 @@ INNER JOIN rubric_level            rl  ON sb.id = rl.box_id
 
 -- Rubric indicator and capability joins
 -- Join through rubric_indicator_usage as I only care about indicators actually in use
-INNER JOIN rubric_capability_usage rgu ON sb.id                    = rgu.submission_box_id
-INNER JOIN rubric_capability       rg  ON rgu.rubric_capability_id = rg.id
+INNER JOIN rubric_capability_usage rcu ON sb.id                    = rcu.submission_box_id
+INNER JOIN rubric_capability       rc  ON rcu.rubric_capability_id = rc.id
 
-INNER JOIN rubric_indicator_usage  rcu ON sb.id                    = rcu.submission_box_id
-INNER JOIN rubric_indicator        rc  ON rcu.rubric_indicator_id  = rc.id
-                                       AND rc.rubric_capability_id = rg.id
+INNER JOIN rubric_indicator_usage  riu ON sb.id                    = riu.submission_box_id
+INNER JOIN rubric_indicator        ri  ON riu.rubric_indicator_id  = ri.id
+                                       AND ri.rubric_capability_id = rc.id
 
-INNER JOIN rubric_descriptor       rd  ON rd.rubric_indicator_id = rc.id
+INNER JOIN rubric_descriptor       rd  ON rd.rubric_indicator_id = ri.id
                                        AND rd.level_id           = rl.id
 
 -- Only valid rubric marks
 WHERE
     a.deleted_at  IS NULL AND
     sb.use_rubric IS TRUE AND
-    rg.deleted_at IS NULL AND
     rc.deleted_at IS NULL AND
+    ri.deleted_at IS NULL AND
     rd.deleted_at IS NULL
 
 ORDER BY
     a.id            ASC,
-    rgu.sequence    ASC,
-    rg.id           ASC,
     rcu.sequence    ASC,
-    rc.id           ASC
+    rc.id           ASC,
+    riu.sequence    ASC,
+    ri.id           ASC
 ;
