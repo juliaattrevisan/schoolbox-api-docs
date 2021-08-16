@@ -415,7 +415,7 @@ abstract class AbstractController extends BaseController
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function postFiles($folderId): void
+    public function postFiles(int $folderId): void
     {
         $folder  = $this->folderMapper->findById($folderId);
         $factory = new Resource\Attachment\Collector\CollectorFactory($this->fileMapper);
