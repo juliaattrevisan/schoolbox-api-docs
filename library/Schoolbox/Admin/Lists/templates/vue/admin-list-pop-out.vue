@@ -176,7 +176,7 @@ export default {
                     <label :for="field.caption">{{ field.caption }}<span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span></label>
                 </li>
             </ul>
-            <button @click.prevent="mixinSaveRows_onSaveSelected" class="save-button">{{ mixinSaveRows_saveStatus }}</button>
+            <button @click.prevent="mixinSaveRows_onSaveSelected" class="save-button">{{ mixinSaveRows_saveStatus }} {{ headerField.caption }}</button>
         </div>
     </div>
 </template>
