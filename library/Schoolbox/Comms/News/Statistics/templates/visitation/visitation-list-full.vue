@@ -63,6 +63,18 @@ export default {
                             }
                             return a.lastname <= b.lastname ? 1 : -1;
                         }
+                    },
+
+                    /* Sort by the visitation's occurrence date, using the unix timestamp
+                     * in the sorting algorithm instead of the human readable version
+                     */
+                    occursAt: (ascending) => {
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.occursAt.absolute >= b.occursAt.absolute ? 1 : -1;
+                            }
+                            return a.occursAt.absolute <= b.occursAt.absolute ? 1 : -1;
+                        }
                     }
                 }
             },
