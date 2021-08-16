@@ -598,6 +598,7 @@ class DataSource
                 $indicatorUsageModel = $indicatorUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)
                     ->setIndicator($indicatorModel)
+                    ->setMaxValue($indicatorUsage->calculateMaxValueFromDescriptors())
                     ->setSequence($indicatorSequence++);
                 $indicatorUsageModels->add($indicatorUsageModel);
 
