@@ -26,6 +26,7 @@ class Mapper extends Schoolbox\Mapper
     {
         $this->hasTable('rubric_indicator_usage');
         $this->hasModel(Model::class);
+        $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('rubric_indicator_id', IndicatorMapper::class, 'id', null, null, 'indicator', 'indicator');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
