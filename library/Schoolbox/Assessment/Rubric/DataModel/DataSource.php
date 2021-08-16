@@ -1180,7 +1180,7 @@ class DataSource
                 FROM v_rubric vr
                 JOIN assessment a ON vr.assessment_id = a.id
                 WHERE {$where}
-                ORDER BY a.due_date, vr.capability_sequence, vr.indicator_sequence;
+                ORDER BY a.due_date, vr.capability_sequence, vr.indicator_sequence, a.id;
             "
         );
         $capabilityStatement->execute($pb->getParams());
