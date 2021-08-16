@@ -182,7 +182,13 @@ class Controller extends Base
     {
         // Convert `$usages` to an array structure
         $translateFolder  = new Folder\Translator\ModelToArray\LinkOnly();
-        $translateTextbox = new Translator\ModelToArray($this->router, $this->authorizer, $this->getUser(), new ScrubAdapter());
+        $translateTextbox = new Translator\ModelToArray(
+            $translateFolder,
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            new ScrubAdapter()
+        );
 
         $usages = [];
         foreach ($this->mapper->findUsage($folder->getId()) as $usage) {

@@ -24,28 +24,39 @@ class ModelToArray
     use GetRouteIfAuthorized;
 
     /**
-     * @var IPurifier
+     * The folder translator, used to translate this model's folder.
+     *
+     * @var callable
+     */
+    private $folderTranslator;
+
+    /**
+     * Purifier instance, used to ensure that no non-purified textbox body
+     * content is output.
      */
     private IPurifier $purifier;
 
     /**
      * Constructor
      *
+     * @param callable   $folderTranslator,
      * @param Router     $router
      * @param Authorizer $authorizer
      * @param User       $currentUser
      * @param IPurifier  $purifier
      */
     public function __construct(
+        callable $folderTranslator,
         Router $router,
         Authorizer $authorizer,
         User $currentUser,
         IPurifier $purifier
     ) {
-        $this->router      = $router;
-        $this->authorizer  = $authorizer;
-        $this->currentUser = $currentUser;
-        $this->purifier    = $purifier;
+        $this->folderTranslator = $folderTranslator;
+        $this->router           = $router;
+        $this->authorizer       = $authorizer;
+        $this->currentUser      = $currentUser;
+        $this->purifier         = $purifier;
     }
 
     /**
@@ -58,6 +69,7 @@ class ModelToArray
             'id'      => $textbox->getId(),
             'heading' => $textbox->getHeading(),
             'body'    => $this->purifier->purify($textbox->getBody()),
+            'folder'  => call_user_func($this->folderTranslator, $textbox->getCategory()),
             '_links'  => [
                 'update' => $this->getRouteIfAuthorized(
                     'textbox.updateTextbox',
