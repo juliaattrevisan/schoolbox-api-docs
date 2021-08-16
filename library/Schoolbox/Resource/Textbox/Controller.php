@@ -147,8 +147,10 @@ class Controller extends Base
 
 
     /**
-     * A list of all the textboxes that exist in $folderId
-     * Also get an index of their usages
+     * Display the form for modifying textboxed in this folder.
+     *
+     * This no longer contains the textbox's usage: that is loaded separately in
+     * `getUsageForFolder`.
      *
      * @api GET /textbox/folder/{folderId}
      * @param FolderModel $folder
@@ -160,14 +162,9 @@ class Controller extends Base
             ['Text Boxes', null]
         ];
 
-        /* Textbox usage data struct
-         */
-        $usages = $this->mapper->findUsage($folder->getId());
-
         $this->response->content->set($this->buildHtmlOutput('@textbox/index.twig', [
-            'folder' => $folder,
+            'folder'         => $folder,
             'allBreadcrumbs' => $allBreadcrumbs,
-            'usages' => $usages,
         ]));
     }
 

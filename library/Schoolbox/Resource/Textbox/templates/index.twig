@@ -1,34 +1,9 @@
 {##
  # Index of folder usages
  #
- # @param array $usages  A list of textboxes in this homepage and their usage information
+ # @param \Schoolbox\Resource\Folder\Model $folder         The folder whose textboxes are shown
+ # @param array                            $allBreadcrumbs Breadcrumbs to show on this page
  #}
-<script type="text/javascript">
-    $(function() {
-        $('[data-collapser]').collapsable();
-
-        $('#container').on('click', 'a[data-delete]', function(event) {
-            event.preventDefault();
-
-            let element = $(this);
-
-            element.confirmDialog({
-                text: 'Are you sure you want to delete this item?',
-                confirmLabel: 'Delete',
-                confirmEvent: function() {
-                    $.ajax({
-                        url: element.attr('data-delete'),
-                        type: 'DELETE',
-                        success: function(response) {
-                            location.reload();
-                        }
-                    });
-                }
-            });
-        });
-    });
-</script>
-
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
