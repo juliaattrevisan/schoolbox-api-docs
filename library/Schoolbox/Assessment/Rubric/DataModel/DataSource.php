@@ -1160,27 +1160,27 @@ class DataSource
         }
 
         // Find rubric used in the assessments
-        $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('assessment_id', array_keys($feedbackIds));
+        $pb = new Builder($this->database->getQuoter(), 'vr');
+        $pb->in('a.id', array_keys($feedbackIds));
 
         $where               = implode(' AND ', $pb->getWhere());
         $capabilityStatement = $this->database->prepare(
             "
                 SELECT
-                    capability_id,
-                    capability_name,
-                    capability_max_value,
-                    indicator_id,
-                    indicator_name,
-                    assessment_id,
-                    assessment_title,
-                    capability_mark_type_id AS rubric_capability_mark_type_id,
-                    assessment_mark_type AS mark_type,
-                    indicator_max_value AS max_value
-                FROM v_rubric
-                JOIN assessment ON v_rubric.assessment_id = assessment.id
+                    vr.capability_id,
+                    vr.capability_name,
+                    vr.capability_max_value,
+                    vr.indicator_id,
+                    vr.indicator_name,
+                    vr.assessment_id,
+                    vr.assessment_title,
+                    vr.capability_mark_type_id AS rubric_capability_mark_type_id,
+                    vr.assessment_mark_type AS mark_type,
+                    vr.indicator_max_value AS max_value
+                FROM v_rubric vr
+                JOIN assessment a ON vr.assessment_id = a.id
                 WHERE {$where}
-                ORDER BY assessment.due_date, capability_sequence, indicator_sequence ASC;
+                ORDER BY a.due_date, vr.capability_sequence, vr.indicator_sequence;
             "
         );
         $capabilityStatement->execute($pb->getParams());
