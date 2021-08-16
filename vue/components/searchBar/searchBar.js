@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
-require('../bootstrap');
-require('../click-outside');
+require('../../../resources/js/bootstrap');
+require('./click-outside');
 
 Vue.component('search-bar', require('./components/search-bar').default);
 
