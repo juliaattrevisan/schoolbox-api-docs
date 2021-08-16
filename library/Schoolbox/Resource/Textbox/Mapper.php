@@ -197,6 +197,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $dashboardId = $row['id'];
 
             $stack[$textboxId]['dashboards'][$dashboardId] = [
+                'id'   => $dashboardId,
                 'name' => $row['name'],
             ];
         }

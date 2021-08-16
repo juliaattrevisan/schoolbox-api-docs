@@ -189,17 +189,8 @@ class Controller extends Base
 
             /** @var GenericCollection|Folder\Model[] $folders */
             $folders  = $usage['folders'] ?? new GenericCollection(Folder\Model::class);
-
-            $dashboards = [];
-            foreach ($usage['dashboards'] ?? [] as $dashboardId => $dashboard) {
-                $dashboards[] = [
-                    'id'   => $dashboardId,
-                    'name' => $dashboard['name'] ?? '',
-                ];
-            }
-
             $usages[] = [
-                'dashboards' => $dashboards,
+                'dashboards' => array_values($usage['dashboards'] ?? []),
                 'folders'    => $folders->map($translateFolder),
                 'textbox'    => [
                     'id'       => $textbox->getId(),
