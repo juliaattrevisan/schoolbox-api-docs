@@ -40,16 +40,12 @@ INNER JOIN rubric_indicator_usage  riu ON sb.id                    = riu.submiss
 INNER JOIN rubric_indicator        ri  ON riu.rubric_indicator_id  = ri.id
                                        AND ri.rubric_capability_id = rc.id
 
-INNER JOIN rubric_descriptor       rd  ON rd.rubric_indicator_id = ri.id
-                                       AND rd.level_id           = rl.id
-
 -- Only valid rubric marks
 WHERE
     a.deleted_at  IS NULL AND
     sb.use_rubric IS TRUE AND
     rc.deleted_at IS NULL AND
-    ri.deleted_at IS NULL AND
-    rd.deleted_at IS NULL
+    ri.deleted_at IS NULL
 
 ORDER BY
     a.id            ASC,
