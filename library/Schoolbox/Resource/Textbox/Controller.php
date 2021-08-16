@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Textbox;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
 use Component_Instance;
@@ -180,7 +181,8 @@ class Controller extends Base
     public function getUsageForFolder(Folder\Model $folder): void
     {
         // Convert `$usages` to an array structure
-        $translateFolder = new Folder\Translator\ModelToArray\LinkOnly();
+        $translateFolder  = new Folder\Translator\ModelToArray\LinkOnly();
+        $translateTextbox = new Translator\ModelToArray($this->router, $this->authorizer, $this->getUser(), new ScrubAdapter());
 
         $usages = [];
         foreach ($this->mapper->findUsage($folder->getId()) as $usage) {
@@ -192,30 +194,7 @@ class Controller extends Base
             $usages[] = [
                 'dashboards' => array_values($usage['dashboards'] ?? []),
                 'folders'    => $folders->map($translateFolder),
-                'textbox'    => [
-                    'id'       => $textbox->getId(),
-                    'heading'  => $textbox->getHeading(),
-                    'body'     => Scrub::html($textbox->getBody()),
-                    'category' => $translateFolder($textbox->getCategory()),
-                    '_links'   => [
-                        'update' => $this->getRouteIfAuthorized(
-                            'textbox.updateTextbox',
-                            [
-                                'textbox' => $textbox,
-                                'folder'  => $textbox->getCategory(),
-                                'id'      => $textbox->getId(),
-                            ]
-                        ),
-                        'delete' => $this->getRouteIfAuthorized(
-                            'textbox.deleteTextbox',
-                            [
-                                'textbox' => $textbox,
-                                'folder'  => $textbox->getCategory(),
-                                'id'      => $textbox->getId(),
-                            ]
-                        ),
-                    ]
-                ]
+                'textbox'    => $translateTextbox($textbox),
             ];
         }
 
