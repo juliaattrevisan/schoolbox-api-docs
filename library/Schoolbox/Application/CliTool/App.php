@@ -476,4 +476,27 @@ abstract class App
         }
         return $sentry->captureException($e);
     }
+
+
+    /**
+     * Prompts user to select an option from a list of choices, returns index of their choice
+     *
+     * @param string $prompt
+     * @param array  $choices
+     * @return int
+     */
+    protected function getChoice(string $prompt, array $choices): int
+    {
+        echo "$prompt\n";
+        foreach ($choices as $idx => $choice) {
+            echo "$idx. $choice\n";
+        }
+        while (true) {
+            $input = readline("Choice: ");
+            if (array_key_exists($input, $choices)) {
+                return (int)$input;
+            }
+            echo "Invalid choice '$input', please try again\n";
+        }
+    }
 }
