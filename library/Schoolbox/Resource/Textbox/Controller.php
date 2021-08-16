@@ -13,7 +13,7 @@ use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
 use Component_Instance;
 use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder;
 use Scrub;
 
 /**
@@ -52,9 +52,9 @@ class Controller extends Base
      * @api   POST /textbox/folder/{folderId}
      * @since 20.1
      *
-     * @param FolderModel $folder
+     * @param Folder\Model $folder
      */
-    public function createTextboxInFolder(FolderModel $folder): void
+    public function createTextboxInFolder(Folder\Model $folder): void
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
@@ -69,10 +69,10 @@ class Controller extends Base
      * @api   POST /textbox/folder/{folderId}/component/{componentId}
      * @since 20.1
      *
-     * @param FolderModel        $folder
+     * @param Folder\Model        $folder
      * @param Component_Instance $component
      */
-    public function createTextboxInFolderAndComponent(FolderModel $folder, Component_Instance $component): void
+    public function createTextboxInFolderAndComponent(Folder\Model $folder, Component_Instance $component): void
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
@@ -153,9 +153,9 @@ class Controller extends Base
      * `getUsageForFolder`.
      *
      * @api GET /textbox/folder/{folderId}
-     * @param FolderModel $folder
+     * @param Folder\Model $folder
      */
-    public function getIndexForFolder(FolderModel $folder): void
+    public function getIndexForFolder(Folder\Model $folder): void
     {
         $allBreadcrumbs = [
             [$folder->getNameWithCodes(), "/homepage/{$folder->getId()}"],
@@ -175,30 +175,20 @@ class Controller extends Base
      * @api GET /textbox/folder/{folderId}/usage
      * @since 21.1
      *
-     * @param FolderModel $folder
+     * @param Folder\Model $folder
      */
-    public function getUsageForFolder(FolderModel $folder): void
+    public function getUsageForFolder(Folder\Model $folder): void
     {
         // Convert `$usages` to an array structure
-        $translateFolder = static function (FolderModel $folder) {
-            return [
-                'id'    => $folder->getId(),
-                'name'  => $folder->getName(),
-                'title' => $folder->getTitle(),
-                'codes' => $folder->getCodes(),
-                '_links'   => [
-                    'view' => '/homepage/' . $folder->getId(),
-                ],
-            ];
-        };
+        $translateFolder = new Folder\Translator\ModelToArray\LinkOnly();
 
         $usages = [];
         foreach ($this->mapper->findUsage($folder->getId()) as $usage) {
             /** @var Model $textbox */
             $textbox = $usage['textbox'];
 
-            /** @var GenericCollection|FolderModel[] $folders */
-            $folders  = $usage['folders'] ?? new GenericCollection(FolderModel::class);
+            /** @var GenericCollection|Folder\Model[] $folders */
+            $folders  = $usage['folders'] ?? new GenericCollection(Folder\Model::class);
 
             $dashboards = [];
             foreach ($usage['dashboards'] ?? [] as $dashboardId => $dashboard) {
@@ -247,12 +237,12 @@ class Controller extends Base
     /**
      * Mass rename textboxes from a set of (textboxId, name) tuples
      *
-     * @param FolderModel $folder
+     * @param Folder\Model $folder
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postRename(FolderModel $folder): void
+    public function postRename(Folder\Model $folder): void
     {
         $tuples = $this->getRequest()->post['textbox'] ?? [];
 
