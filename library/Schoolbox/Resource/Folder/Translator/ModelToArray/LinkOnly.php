@@ -33,7 +33,9 @@ class LinkOnly
             'id'    => $folder->getId(),
             'name'  => $folder->getName(),
             'title' => $folder->getTitle(),
-            'codes' => $folder->getCodes(),
+            'codes' => $folder->getCodes()
+                ? $folder->getCodes()->getPropertyValues('code')
+                : [],
             '_links'   => [
                 'view' => '/homepage/' . $folder->getId(),
             ],
