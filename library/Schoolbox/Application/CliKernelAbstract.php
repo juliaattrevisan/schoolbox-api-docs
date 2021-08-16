@@ -100,8 +100,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             $class = \get_class($e);
             $this->logger()->alert("FATAL $class: {$e->getMessage()} on line {$e->getLine()} in {$e->getFile()}", ['exception' => $e]);
             $this->logger()->error($e->getTraceAsString());
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (IOException $e) {
+        } catch (IOException $e) {
             // can't do anything, logging stream has been closed
         }
         exit(self::EXIT_STATUS_KERNEL_ERROR);
@@ -136,8 +135,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         $message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'], $error['line']);
         try {
             $this->logger()->alert($message);
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (IOException $e) {
+        } catch (IOException $e) {
             // can't do anything, logging stream has been closed
         }
 
