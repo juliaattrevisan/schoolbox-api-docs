@@ -1,4 +1,5 @@
 -- Redefine rubric view so it references `rubric_indicator_usage.max_value`.
+-- This also means that the GROUP BY on the rubric indicator ID can be removed.
 CREATE OR REPLACE VIEW v_rubric AS
 
 SELECT
@@ -30,8 +31,8 @@ FROM assessment a
 INNER JOIN submission_box          sb  ON a.id = sb.assessment_id
 INNER JOIN rubric_level            rl  ON sb.id = rl.box_id
 
--- Rubric indicator, descriptor joins
--- Join through rubric_criterion_usage as I only care about indicators actually in use
+-- Rubric indicator and capability joins
+-- Join through rubric_indicator_usage as I only care about indicators actually in use
 INNER JOIN rubric_capability_usage rgu ON sb.id                    = rgu.submission_box_id
 INNER JOIN rubric_capability       rg  ON rgu.rubric_capability_id = rg.id
 
@@ -49,8 +50,6 @@ WHERE
     rg.deleted_at IS NULL AND
     rc.deleted_at IS NULL AND
     rd.deleted_at IS NULL
-
-GROUP BY sb.id, rc.id
 
 ORDER BY
     a.id            ASC,
