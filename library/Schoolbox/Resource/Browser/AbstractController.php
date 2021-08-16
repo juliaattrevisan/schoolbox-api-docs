@@ -420,22 +420,29 @@ abstract class AbstractController extends BaseController
         $folder  = $this->folderMapper->findById($folderId);
         $factory = new Resource\Attachment\Collector\CollectorFactory($this->fileMapper);
 
-        /** @var Resource\AbstractFile[] $results */
-        $results = $factory->build($this->request->post->get('attachment'))->getAll();
+        /* Uploading an illegal file type causes the attachment key to be null
+         * In that case, no files to upload
+         */
+        if (null !== $this->request->post->get('attachment')) {
 
-        $defaultToHidden = $this->getConfigLoader()->get('file_default_to_hidden');
+            /** @var Resource\AbstractFile[] $results */
+            $results = $factory->build($this->request->post->get('attachment'))->getAll();
 
-        foreach ($results as $file) {
-            // Do something with the file
-            // Different files have different attributes
-            $file
-                ->setOwner($this->getUser())
-                ->setFolder($folder)
-                ->setTitle($file->getFilename())
-                ->setFilename($file->getFilename())
-                ->setHidden($defaultToHidden);
+            $defaultToHidden = $this->getConfigLoader()->get('file_default_to_hidden');
+
+            foreach ($results as $file) {
+                // Do something with the file
+                // Different files have different attributes
+                $file
+                    ->setOwner($this->getUser())
+                    ->setFolder($folder)
+                    ->setTitle($file->getFilename())
+                    ->setFilename($file->getFilename())
+                    ->setHidden($defaultToHidden);
+            }
+
+            $this->fileMapper->save($results);
         }
-        $this->fileMapper->save($results);
 
         // Output something: I guess whatever the contents of the folder are now
         $this->getResponse()->content->set([
