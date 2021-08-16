@@ -19,6 +19,7 @@ use Aura\Di;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
+use Schoolbox\User;
 
 /**
  * Common ancestor for all Web Requests
@@ -229,6 +230,30 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         if (!$session->isStarted()) {
             $session->start();
         }
+    }
+
+    /** @inheritDoc */
+    protected function getKnownUserClassesFromSession(Di\Container $di): array
+    {
+        // Get known user-to-class mapping from the session and inject into factory
+        $knownUserClasses = [];
+
+        /** @var Session $session */
+        $session = $di->get('session');
+
+        /** @var User $user */
+        $user = $session->get('user');
+
+        // Self case
+        $subjects = $session->get('subjects');
+        if ($subjects) {
+            $knownUserClasses[$user->getId()] = $subjects;
+        }
+        // Parent case
+        foreach ($session->get('children', []) as $childData) {
+            $knownUserClasses[$childData['id']] = $childData['subjects'];
+        }
+        return $knownUserClasses;
     }
 
 
