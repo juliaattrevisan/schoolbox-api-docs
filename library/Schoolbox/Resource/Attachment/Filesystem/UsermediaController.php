@@ -36,10 +36,11 @@ class UsermediaController extends AbstractController
     public function __construct($multi, $mimeFilter = null, $useFolder = true, $defaultFolderId = 0)
     {
         //$mimeFilter = 'image/*';
-        if ($this->notRecordable($mimeFilter)) {
+        if ($this->isRecordable($mimeFilter)) {
+            parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
+        } else {
             throw new OutOfRangeException("mimeType is not recordable.");
         }
-        parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
     }
 
     /**
@@ -48,7 +49,7 @@ class UsermediaController extends AbstractController
      * @param string|null   $mimeFilter
      * @returns bool
      */
-    protected function notRecordable($mimeFilter)
+    protected function isRecordable($mimeFilter)
     {
         $recordable = false;
         $csv = str_getcsv($mimeFilter);
@@ -58,7 +59,7 @@ class UsermediaController extends AbstractController
                 $recordable = true;
             }
         }
-        return !$recordable;
+        return $recordable;
     }
 
     /**
