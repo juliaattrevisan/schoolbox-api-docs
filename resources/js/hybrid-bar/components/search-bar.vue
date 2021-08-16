@@ -5,8 +5,8 @@
                name="keyword"
                placeholder="Search"
                autocomplete="off"
-               v-model.trim="keyword"
-               @input="onChange"
+               :value="keyword"
+               @input="keyword = $event.target.value"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.enter.prevent="onEnter"
@@ -76,19 +76,20 @@
             }
         },
 
-        methods: {
+        watch: {
 
-            onChange:  _.debounce(function (e) {
-                e.target.composing = false; //enable checking while predictive text is active, so on some devices you don't need to first select or finish a word for the checking to fire
-                var self = this;
-
-                if (self.keyword.length >= self.minKeywordLength) {
-                    self.isOpen = true;
-                    self.isLoading = true;
-                    self.results = [];
-                    self.filterResults();
+            keyword () {
+                if (this.keyword.length >= this.minKeywordLength) {
+                    this.isOpen = true;
+                    this.isLoading = true;
+                    this.results = [];
+                    this.filterResults();
                 }
-            }, 500),
+            }
+
+        },
+
+        methods: {
 
             onArrowDown: function() {
                 if (this.arrowCounter < this.results.length - 1) {
@@ -155,18 +156,16 @@
                 window.location.href = path;
             },
 
-            filterResults: function() {
-                var self = this;
-
-                axios.get(self.paths.searchEndpoint + self.keyword).then(function (response) {
-                    self.totalCount = response.data.totalCount;
-                    self.results = response.data.results;
-                }).finally(function () {
-                    self.isLoading = false;
-                }).catch(function (error) {
-                    console.log(error);
+            filterResults: _.debounce(function () {
+                axios.get(this.paths.searchEndpoint + this.keyword).then((response) => {
+                    this.totalCount = response.data.totalCount;
+                    this.results = response.data.results;
+                }).finally(() => {
+                    this.isLoading = false;
+                }).catch((error) => {
+                    console.warn(error);
                 });
-            },
+            }, 500),
 
             formatPortrait: function(id) {
                 return this.paths.portrait + id + '&size=square64';
