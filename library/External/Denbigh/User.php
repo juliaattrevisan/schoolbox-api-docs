@@ -189,6 +189,8 @@ class External_Denbigh_User implements External_UserInterface
                             '' AS StudentEnrolmentDate,
                             '' AS StudentLeavingDate,
                             '' AS StudentIBFlag,
+                            '' AS IndigenousFlag,
+                            '' AS StudentTSIFlag,
                             '' AS ParentsSeparatedFlag
                 FROM        People pe
                 LEFT JOIN   Students stu ON stu.peopleDenbighID = pe.denbighID
@@ -232,6 +234,8 @@ class External_Denbigh_User implements External_UserInterface
             'StudentBoarder'           => '',
             'Comment'                  => '',
             'StudentIBFlag'            => '',
+            'IndigenousFlag'           => '',
+            'StudentTSIFlag'           => '',
             'StudentStudiesCode'       => '',
         ];
 

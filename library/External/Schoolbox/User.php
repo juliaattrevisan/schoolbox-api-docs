@@ -113,6 +113,8 @@ class External_Schoolbox_User implements External_UserInterface
                           '' AS StudentLeavingDate,
                           '' AS ParentsSeparatedFlag,
                           ib AS StudentIBFlag,
+                          '' AS IndigenousFlag,
+                          '' AS StudentTSIFlag,
                           individual_learning_plans AS countIndividualEducationPlans
                 FROM      `sis_user_profile` sup
                 JOIN      `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id

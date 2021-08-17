@@ -130,6 +130,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               '' AS STUDENTENROLMENTDATE,
               '' AS STUDENTLEAVINGDATE,
               '' AS STUDENTIBFLAG,
+              '' AS INDIGENOUSFLAG,
+              '' AS STUDENTTSIFLAG,
               '' AS STUDENTSTUDIESCODE,
               '' AS ENGLISHSECONDFLAG,
               '' AS PARENTSSEPARATEDFLAG,

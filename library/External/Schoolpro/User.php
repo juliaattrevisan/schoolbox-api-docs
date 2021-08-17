@@ -194,6 +194,8 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentEnrolmentDate'    => '',
                 'StudentLeavingDate'      => '',
                 'StudentIBFlag'           => '',
+                'IndigenousFlag'          => '',
+                'StudentTSIFlag'          => '',
                 'ParentsSeparatedFlag'    => '',
             );
 

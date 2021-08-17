@@ -293,6 +293,8 @@ class External_Maze_User implements External_UserInterface
                 '' AS StudentEnrolmentDate,
                 '' AS StudentLeavingDate,
 				'' AS StudentIBFlag,
+                '' AS IndigenousFlag,
+                '' AS StudentTSIFlag,
 			    '' AS ParentsSeparatedFlag,
 				ST.ROLL_GROUP,
 				0 AS countIndividualEducationPlans

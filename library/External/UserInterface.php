@@ -62,6 +62,8 @@ interface External_UserInterface extends External\IConnector
      * @internal string return['StudentEnrolmentDate']
      * @internal string return['StudentLeavingDate']
      * @internal string return['StudentIBFlag']
+     * @internal string return['IndigenousFlag']
+     * @internal string return['StudentTSIFlag']
      * @internal string return['countIndividualEducationPlans']
      *
      * @importance high - used on student profile page
