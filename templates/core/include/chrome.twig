@@ -345,10 +345,6 @@
                     $(function () {
                         // launch the notifier
                         $('#msgs').notifier({
-                            host:     '{{ ws.host }}',
-                            port:     Number('{{ ws.port }}'),
-                            path:     '{{ ws.path }}',
-                            secure:   Boolean('{{ ws.secure }}'),
                             unread:   Number('{{ ws.unread }}'),
                             maxstack: Number('{{ ws.stackLimit }}')
                         });

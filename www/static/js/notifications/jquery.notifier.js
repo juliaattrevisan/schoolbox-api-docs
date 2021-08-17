@@ -18,10 +18,6 @@
 
             // socket configuration
 
-            secure:    'false',
-            host:      '192.168.1.1',
-            port:      '8080',
-            path:      '/',
             prefetch:  5,
             maxstack:  3,
             debug:     false,
@@ -58,9 +54,6 @@
         }, options);
 
         var backoff = 0;
-
-        // cast boolean from potential string
-        settings.secure = (settings.secure === 'true' || settings.secure === true);
 
         return this.each(function() {
 
@@ -578,12 +571,7 @@
             if(settings.debug) { console.log('Constructing Notifier on', this); }
 
             var self = this;
-            var url = (settings.secure ? 'wss' : 'ws')
-                + '://'
-                + settings.host
-                + ':'
-                + settings.port
-                + settings.path;
+            let url = 'wss://' + window.location.host + '/websocket';
             var conn;
             var messages = {};
             var attemptReconnect = true;

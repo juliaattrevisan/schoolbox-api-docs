@@ -20,7 +20,7 @@ fi
 # Names of config that should be preserved when performing a restoration
 readonly PRESERVED_CONFIG=(
   # Retrieve some of the Schoolbox config from MySQL using provided credentials
-  "site_hostname" "site_domain" "amqp_user" "amqp_pass" "amqp_vhost" "websocket_port" "websocket_port_ssl"
+  "site_hostname" "site_domain" "amqp_user" "amqp_pass" "amqp_vhost"
 
   # External DB Config
   "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
@@ -850,7 +850,7 @@ umount $backup_dir 2>/dev/null;
 
 echo -e "\nManual Task Reminders:";
 echo -e "* check all the following config settings in the config table";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT name,value FROM config WHERE name in ('site_hostname','site_domain','external_db_host','external_portal','websocket_port','websocket_port_ssl','amqp_vhost','amqp_user','amqp_pass','title')";
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT name,value FROM config WHERE name in ('site_hostname','site_domain','external_db_host','external_portal','amqp_vhost','amqp_user','amqp_pass','title')";
 echo "";
 
 exit;

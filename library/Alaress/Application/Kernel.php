@@ -697,7 +697,6 @@ abstract class Kernel
                         $config,
                         $session->getAuthUser(),
                         new UnreadRetriever($redis),
-                        $_SERVER,
                         INSTANCE_ID
                     )
                 )
