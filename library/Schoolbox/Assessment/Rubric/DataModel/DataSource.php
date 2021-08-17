@@ -1650,27 +1650,27 @@ class DataSource
         // Step 2: Get max mark per indicator and dueWork for each due work
         $results = [];
         $pb = new Builder($this->database->getQuoter(), '');
-        $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
+        $pb->in('rc.parent_id', $folderIds)
+           ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
            ->greaterThan('rd.max_value', 0.0);
 
         $where             = implode(' AND ', $pb->getWhere());
         $maxMarksStatement = $this->database->prepare("
             SELECT
                 a.id,
-                rc.id     AS criterionId,
-                rg.name   AS grouping,
-                rc.name,
+                ri.id     AS criterionId,
+                rc.name   AS grouping,
+                ri.name,
                 MAX(rd.max_value) AS maxMark
             FROM rubric_descriptor rd
-            JOIN rubric_indicator  rc ON rc.id = rd.rubric_indicator_id AND rc.deleted_at IS NULL
-            JOIN rubric_capability rg ON rg.id = rc.rubric_capability_id AND rg.deleted_at IS NULL
+            JOIN rubric_indicator  ri ON ri.id = rd.rubric_indicator_id AND ri.deleted_at IS NULL
+            JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL
             JOIN rubric_level      rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
             JOIN submission_box    sb ON rl.box_id = sb.id
             JOIN assessment         a ON sb.assessment_id = a.id
             WHERE {$where}
-            GROUP BY rl.box_id, rc.id
-            ORDER BY rl.box_id, rc.id
+            GROUP BY rl.box_id, ri.id
+            ORDER BY rl.box_id, ri.id
         ");
         $maxMarksStatement->execute($pb->getParams());
 
