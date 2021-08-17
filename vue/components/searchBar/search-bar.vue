@@ -1,3 +1,132 @@
+<script>
+
+import ResultMeta from "./search-bar-results-meta";
+
+export default {
+    components: {ResultMeta},
+
+    data: function () {
+        return {
+            isFocused: false,
+            keyword: '',
+            results: [],
+            isOpen: false,
+            isLoading: true,
+            minKeywordLength: 2,
+            totalCount: 0,
+            arrowCounter: -1, // Want to automatically select the first result? set this to 0
+            paths: {
+                'portrait': '/portrait.php?id=',
+                'searchEndpoint': '/user/search?keyword=',
+                'userPage': '/search/user/',
+                'searchPage': '/search?keyword=',
+            }
+        }
+    },
+
+    watch: {
+
+        keyword () {
+            if (this.keyword.length >= this.minKeywordLength) {
+                this.isOpen = true;
+                this.isLoading = true;
+                this.results = [];
+                this.filterResults();
+            }
+        }
+
+    },
+
+    mounted () {
+        console.warn(axios);
+    },
+
+    methods: {
+
+        onArrowDown: function() {
+            if (this.arrowCounter < this.results.length - 1) {
+                this.arrowCounter = this.arrowCounter + 1;
+            }
+        },
+
+        onArrowUp: function() {
+            if (this.arrowCounter > -1) {
+                this.arrowCounter = this.arrowCounter - 1;
+            }
+        },
+
+        onEnter: function(id) {
+            if (this.arrowCounter > 0) {
+                this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
+            } else {
+                document.getElementById('search').submit();
+            }
+        },
+
+        lostFocus: function(event) {
+            this.isFocused = false;
+            this.arrowCounter = -1; // Reset arrow pointer to none
+
+            /**
+             * Revert back the z-index value back to the default value of 1001
+             */
+            document.querySelector('#menu-toggle').classList.remove('search-is-active');
+        },
+
+        onFocusOver: function(event) {
+
+            if (event.type === 'focus') {
+                var offCanvasWrap = document.getElementById('off-canvas-wrap');
+
+                // If left nav is unpinned and currently open, close it
+                if (offCanvasWrap.classList.contains('move-right')) {
+                    offCanvasWrap.classList.remove('move-right');
+                }
+
+                this.isFocused = true;
+            }
+
+            /**
+             * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
+             * the user does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the
+             * search-is-active class
+             *
+             * Unfortunately, we can't just remove this class especially when the left menu is unpinned.
+             * Reason is: If the user does a mouseover in results row, mouseout gets triggered.
+             * And if we remove this injected class, when we do a mouseover, the hamburger menu will overlap with
+             * the text in the search field.
+             *
+             * Since we don't have the whole chrome in VueJS yet, for now, we'll need to do this in a not so elegant
+             * way as this component doesn't have the ability to communicate with the rest of the chrome elements yet.
+             *
+             * TODO: Convert the whole chrome to VueJS to prevent/minimise this kinds of implementation
+             */
+            document.querySelector('#menu-toggle').classList.add('search-is-active');
+        },
+
+        goToPath: function(path) {
+            window.location.href = path;
+        },
+
+        filterResults: _.debounce(function () {
+            axios.get(this.paths.searchEndpoint + this.keyword).then((response) => {
+                this.totalCount = response.data.totalCount;
+                this.results = response.data.results;
+            }).finally(() => {
+                this.isLoading = false;
+            }).catch((error) => {
+                console.warn(error);
+            });
+        }, 500),
+
+        formatPortrait: function(id) {
+            return this.paths.portrait + id + '&size=square64';
+        }
+    }
+}
+
+</script>
+
 <template>
     <form id="search" class="global-search" action="/search" v-bind:class="{focus: isFocused}">
         <input id="search-field"
@@ -50,129 +179,6 @@
         <label data-jsubmit for="search-field" class="icon-search no-text"></label>
     </form>
 </template>
-
-<script>
-    import ResultMeta from "./slots/search-bar-results-meta";
-
-    export default {
-        components: {ResultMeta},
-
-        data: function () {
-            return {
-                isFocused: false,
-                keyword: '',
-                results: [],
-                isOpen: false,
-                isLoading: true,
-                minKeywordLength: 2,
-                totalCount: 0,
-                arrowCounter: -1, // Want to automatically select the first result? set this to 0
-                paths: {
-                    'portrait': '/portrait.php?id=',
-                    'searchEndpoint': '/user/search?keyword=',
-                    'userPage': '/search/user/',
-                    'searchPage': '/search?keyword=',
-                }
-            }
-        },
-
-        watch: {
-
-            keyword () {
-                if (this.keyword.length >= this.minKeywordLength) {
-                    this.isOpen = true;
-                    this.isLoading = true;
-                    this.results = [];
-                    this.filterResults();
-                }
-            }
-
-        },
-
-        methods: {
-
-            onArrowDown: function() {
-                if (this.arrowCounter < this.results.length - 1) {
-                    this.arrowCounter = this.arrowCounter + 1;
-                }
-            },
-
-            onArrowUp: function() {
-                if (this.arrowCounter > -1) {
-                    this.arrowCounter = this.arrowCounter - 1;
-                }
-            },
-
-            onEnter: function(id) {
-                if (this.arrowCounter > 0) {
-                    this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
-                } else {
-                    document.getElementById('search').submit();
-                }
-            },
-
-            lostFocus: function(event) {
-                this.isFocused = false;
-                this.arrowCounter = -1; // Reset arrow pointer to none
-
-                /**
-                 * Revert back the z-index value back to the default value of 1001
-                 */
-                document.querySelector('#menu-toggle').classList.remove('search-is-active');
-            },
-
-            onFocusOver: function(event) {
-
-                if (event.type === 'focus') {
-                    var offCanvasWrap = document.getElementById('off-canvas-wrap');
-
-                    // If left nav is unpinned and currently open, close it
-                    if (offCanvasWrap.classList.contains('move-right')) {
-                        offCanvasWrap.classList.remove('move-right');
-                    }
-
-                    this.isFocused = true;
-                }
-
-                /**
-                 * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
-                 * the user does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the
-                 * search-is-active class
-                 *
-                 * Unfortunately, we can't just remove this class especially when the left menu is unpinned.
-                 * Reason is: If the user does a mouseover in results row, mouseout gets triggered.
-                 * And if we remove this injected class, when we do a mouseover, the hamburger menu will overlap with
-                 * the text in the search field.
-                 *
-                 * Since we don't have the whole chrome in VueJS yet, for now, we'll need to do this in a not so elegant
-                 * way as this component doesn't have the ability to communicate with the rest of the chrome elements yet.
-                 *
-                 * TODO: Convert the whole chrome to VueJS to prevent/minimise this kinds of implementation
-                 */
-                document.querySelector('#menu-toggle').classList.add('search-is-active');
-            },
-
-            goToPath: function(path) {
-                window.location.href = path;
-            },
-
-            filterResults: _.debounce(function () {
-                axios.get(this.paths.searchEndpoint + this.keyword).then((response) => {
-                    this.totalCount = response.data.totalCount;
-                    this.results = response.data.results;
-                }).finally(() => {
-                    this.isLoading = false;
-                }).catch((error) => {
-                    console.warn(error);
-                });
-            }, 500),
-
-            formatPortrait: function(id) {
-                return this.paths.portrait + id + '&size=square64';
-            }
-        }
-    }
-</script>
 
 <style scoped>
     .inner-wrap:not(.left-open):not(.right-open) .global-search:hover,

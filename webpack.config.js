@@ -146,7 +146,7 @@ module.exports = {
         clipboard: './www/static/js/clipboard/clipboard.main.js',
         strtotime: './www/static/js/alaress-datetime-picker/strtotime.main.js',
 
-        searchBar: path.resolve(__dirname, './vue/components/searchBar/searchBar.js'),
+        searchBar: './vue/components/searchBar/searchBar.js',
 
         //Calendars
         fullCalendar: './library/Schoolbox/Calendar/vue/initSbFullCalendar.main.js',
