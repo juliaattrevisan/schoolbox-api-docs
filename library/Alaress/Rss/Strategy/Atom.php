@@ -27,6 +27,7 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
     {
         $data = [];
 
+        /** @var SimpleXMLElement|null $allRss */
         $allRss = $input->xml->entry;
 
         /* the Xml and Entry nodes don't exist in this xml
@@ -40,7 +41,7 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
          * in the homepage component.
          */
         for ($i = 0; ($i < count($allRss)); $i++) {
-            if (($limit != 0) && ($i == $limit)) {
+            if (($limit !== 0) && ($i === $limit)) {
                 break;
             }
 

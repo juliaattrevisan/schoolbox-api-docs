@@ -26,6 +26,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
     {
         $data = [];
 
+        /** @var SimpleXMLElement|null $allRss */
         $allRss = $input->channel->item;
 
         /* the Channel and Item nodes don't exist in this xml
@@ -39,7 +40,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
          * in the homepage component.
          */
         for ($i = 0; ($i < count($allRss)); $i++) {
-            if (($limit != 0) && ($i == $limit)) {
+            if (($limit !== 0) && ($i === $limit)) {
                 break;
             }
 
