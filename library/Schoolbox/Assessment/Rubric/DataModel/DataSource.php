@@ -1652,25 +1652,24 @@ class DataSource
         $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('rc.parent_id', $folderIds)
            ->equals('rc.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
-           ->greaterThan('rd.max_value', 0.0);
+           ->notNull('riu.max_value')
+           ->greaterThan('riu.max_value', 0.0);
 
         $where             = implode(' AND ', $pb->getWhere());
         $maxMarksStatement = $this->database->prepare("
             SELECT
                 a.id,
-                ri.id     AS criterionId,
-                rc.name   AS grouping,
+                ri.id         AS criterionId,
+                rc.name       AS grouping,
                 ri.name,
-                MAX(rd.max_value) AS maxMark
-            FROM rubric_descriptor rd
-            JOIN rubric_indicator  ri ON ri.id = rd.rubric_indicator_id AND ri.deleted_at IS NULL
-            JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL
-            JOIN rubric_level      rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-            JOIN submission_box    sb ON rl.box_id = sb.id
-            JOIN assessment         a ON sb.assessment_id = a.id
+                riu.max_value AS maxMark
+            FROM rubric_indicator        ri
+            JOIN rubric_capability       rc ON rc.id = ri.rubric_capability_id AND rc.deleted_at IS NULL
+            JOIN rubric_indicator_usage riu ON ri.id = riu.rubric_indicator_id
+            JOIN submission_box          sb ON riu.submission_box_id = sb.id
+            JOIN assessment               a ON sb.assessment_id = a.id
             WHERE {$where}
-            GROUP BY rl.box_id, ri.id
-            ORDER BY rl.box_id, ri.id
+            ORDER BY riu.submission_box_id, ri.id
         ");
         $maxMarksStatement->execute($pb->getParams());
 
