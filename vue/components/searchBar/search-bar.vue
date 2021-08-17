@@ -1,11 +1,15 @@
 <script>
 
-import ResultMeta from "./search-bar-results-meta";
+import axios from 'axios';
+import ResultMeta from './search-bar-results-meta';
 
 export default {
-    components: {ResultMeta},
 
-    data: function () {
+    components: {
+        ResultMeta
+    },
+
+    data () {
         return {
             isFocused: false,
             keyword: '',
@@ -37,25 +41,30 @@ export default {
 
     },
 
-    mounted () {
-        console.warn(axios);
-    },
-
     methods: {
 
-        onArrowDown: function() {
+        /**
+         * Arrow pressed down, moving to next result
+         */
+        onArrowDown () {
             if (this.arrowCounter < this.results.length - 1) {
                 this.arrowCounter = this.arrowCounter + 1;
             }
         },
 
-        onArrowUp: function() {
+        /**
+         * Arrow pressed up, moving to previous result
+         */
+        onArrowUp () {
             if (this.arrowCounter > -1) {
                 this.arrowCounter = this.arrowCounter - 1;
             }
         },
 
-        onEnter: function(id) {
+        /**
+         * Navigate to the chosen result
+         */
+        onEnter () {
             if (this.arrowCounter > 0) {
                 this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
             } else {
@@ -63,7 +72,10 @@ export default {
             }
         },
 
-        lostFocus: function(event) {
+        /**
+         * Close the search results as focus has been lost
+         */
+        lostFocus () {
             this.isFocused = false;
             this.arrowCounter = -1; // Reset arrow pointer to none
 
@@ -73,7 +85,12 @@ export default {
             document.querySelector('#menu-toggle').classList.remove('search-is-active');
         },
 
-        onFocusOver: function(event) {
+        /**
+         * Display the search results
+         * 
+         * @param { Event }
+         */
+        onFocusOver (event) {
 
             if (event.type === 'focus') {
                 var offCanvasWrap = document.getElementById('off-canvas-wrap');
@@ -104,10 +121,19 @@ export default {
             document.querySelector('#menu-toggle').classList.add('search-is-active');
         },
 
-        goToPath: function(path) {
+        /**
+         * To a new browser page
+         * 
+         * @param { String }
+         */
+        goToPath (path) {
             window.location.href = path;
         },
 
+        /**
+         * Submit the current query, using underscore.js _debounce to accommodate for key presses 
+         * so not sending on every key press
+         */
         filterResults: _.debounce(function () {
             axios.get(this.paths.searchEndpoint + this.keyword).then((response) => {
                 this.totalCount = response.data.totalCount;
@@ -119,10 +145,19 @@ export default {
             });
         }, 500),
 
-        formatPortrait: function(id) {
+        /**
+         * To display the users portrait image
+         * 
+         * @param { String }
+         *
+         * @returns { String }
+         */
+        formatPortrait (id) {
             return this.paths.portrait + id + '&size=square64';
         }
+
     }
+
 }
 
 </script>
