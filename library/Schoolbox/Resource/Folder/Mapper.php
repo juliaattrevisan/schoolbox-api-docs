@@ -748,7 +748,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param int  $id
      * @param bool $recurse
-     * @return GenericCollection<Model>|Model[]
+     * @return GenericCollection
      */
     public function findAllChildren(int $id, bool $recurse = false): GenericCollection
     {
@@ -1725,7 +1725,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * Does not hydrate any joins
      *
-     * @param int $folderId TODO Upgrade this type-hint to a type-declaration in signature
+     * @param int|string $folderId TODO Upgrade this type-hint to a type-declaration in signature
      * @return Model
      * @throws DefinitionException
      * @throws Exception
@@ -1751,7 +1751,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             'order'   => [],
         ];
 
-        /** @var Model $folder */
+        /** @var Model|null $folder */
         $folder = $this->executeSelect(
             "SELECT {$this->getColumnString()}",
             "FROM {$this->getTable()}",
@@ -1761,6 +1761,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         )->first();
         if ($folder) {
             if ($folder->isDeleted()) {
+                $this->invalidateHydrateCache(['id' => $folder->getId()]);
                 throw (new Exception\Deleted())->setDeletedObject($folder);
             }
             return $folder;
