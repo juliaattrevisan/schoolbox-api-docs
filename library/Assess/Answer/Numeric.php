@@ -22,18 +22,24 @@ class Assess_Answer_Numeric extends Evaluation_Answer_Numeric implements IAutoma
      */
     public function mark($currentResponse): void
     {
-        if ((float)$currentResponse['answer'] == (float)$currentResponse['response']) {
+        $total = 0;
+
+        /* Special case: someone didn't provide an answer at all
+         * They don't get the marks for this question
+         *
+         * Someone can only get the marks if they provided a response and
+         * the response was numerically equivalent to the expected answer
+         */
+        if ((float)$currentResponse['answer'] === (float)$currentResponse['response'] && ('' !== trim((string)$currentResponse['response']))) {
             $total = $currentResponse['marks'];
-        } else {
-            $total = 0;
         }
 
         /* Total marks for this question
          */
-        $marks = array(
+        $marks = [
             'response_id' => $currentResponse['response_id'],
             'mark' => $total,
-        );
+        ];
 
         $this->getResponseHandler()->update($marks);
     }
