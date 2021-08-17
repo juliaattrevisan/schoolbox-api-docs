@@ -5,6 +5,7 @@
  *
  */
 
+import axios from 'axios';
 import 'video.js/dist/video-js.css';
 import videojs from 'video.js';
 import { gsap } from 'gsap/all';

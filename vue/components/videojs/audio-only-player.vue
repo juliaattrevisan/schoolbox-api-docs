@@ -5,6 +5,7 @@
  *
  */
 
+import axios from 'axios';
 import 'video.js/dist/video-js.css';
 import 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css'
 import videojs from 'video.js';
