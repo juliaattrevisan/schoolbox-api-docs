@@ -1,10 +1,11 @@
 import Vue from 'vue';
+import SearchBar from './search-bar';
 
-require('../../../resources/js/bootstrap');
 require('./click-outside');
 
-Vue.component('search-bar', require('./components/search-bar').default);
-
 new Vue({
-    el: '#hybrid-bar'
+    el: '#hybrid-bar',
+    components: {
+        SearchBar
+    }
 });

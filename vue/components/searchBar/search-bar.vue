@@ -52,7 +52,7 @@
 </template>
 
 <script>
-    import ResultMeta from "./slots/result-meta";
+    import ResultMeta from "./slots/search-bar-results-meta";
 
     export default {
         components: {ResultMeta},
