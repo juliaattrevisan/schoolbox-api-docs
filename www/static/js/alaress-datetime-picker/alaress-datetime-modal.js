@@ -1016,7 +1016,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * @param {Integer} day
      */
     function applyHeatToDay(element, yr, mo, day) {
-        let date          = String(yr).padStart(4, '0') + String(mo).padStart(2, '0') + String(day).padStart(2, '0'),
+        let date          = String(yr).padStart(4, '0') + '-' + String(mo).padStart(2, '0') + '-' + String(day).padStart(2, '0'),
             lastMonth     = (mo === 1) ? 12 : mo - 1,
             lastMonthYear = (mo === 1) ? yr - 1 : yr,
             nextMonth     = (mo === 12) ? 1 : mo + 1,
@@ -1053,22 +1053,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         mo = parseInt(mo);
 
         fetchHeat(yr, mo, folderId, onSuccess);
-
-        // TODO: very open to a better way of handling the month/year wraparound
-
-        // also process previous month
-        if (mo === 1) {
-            fetchHeat(yr - 1, 12, folderId, onSuccess);
-        } else {
-            fetchHeat(yr, mo - 1, folderId, onSuccess);
-        }
-
-        // also also process next month
-        if (mo === 12) {
-            fetchHeat(yr + 1, 1, folderId, onSuccess);
-        } else {
-            fetchHeat(yr, mo + 1, folderId, onSuccess);
-        }
     }
 
     /**
