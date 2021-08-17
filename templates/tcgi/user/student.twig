@@ -2,7 +2,7 @@
 {% block specialAlert %}
     {% if isStaffWhoCanView and externalUser.IndigenousFlag ?? false %}
         <div class="alert-box highlight">
-        <img src="{{ CDN_PREFIX }}/images/tcgi/aboriginal.jpeg" alt="Indigenous descent"> Indigenous Descent
+        <img src="{{ CDN_PREFIX }}/images/tcgi/aboriginal.jpeg" alt="Indigenous descent"> Indigenous descent
         </div>
     {% endif %}
     {% if isStaffWhoCanView and externalUser.StudentTSIFlag ?? false %}
