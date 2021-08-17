@@ -170,6 +170,20 @@ if (isset($_POST['userID'])) {
 
     // Do not attempt to add existing members
     $newMemberList = $userList->diff($memberList);
+
+    // Check whether userGroup already exists and create one if not
+    try {
+        /** @var \Schoolbox\Resource\Group $group */
+        $group = $groupMapper->findOneByColumn('cid', $categoryId);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        $folder = $catMapper->findById($categoryId);
+        $group  = $groupMapper->createModel()
+                              ->setFolder($folder)
+                              ->setType(\Schoolbox\Resource\Group::PRIVATE_GROUP)
+                              ->setForceFollow(false);
+        $groupMapper->save($group);
+    }
+
     foreach ($newMemberList as $userObject) {
         $ua->setUser($userObject)
             ->setAccessLevel(UserAccess::ACCESS_READ);
