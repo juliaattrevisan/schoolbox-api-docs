@@ -667,12 +667,6 @@ else
 		# Backup Source, set the file location of the db backup
 		sourcedb="$backup_dir/$sourcep2/schoolbox-$sourcep2.sql";
 	fi
-
-  # Truncate storage_transform table if it is a DB only sync
-	echo "Truncating 'storage_transform' table";
-  temp_ini_file="/etc/$package/instances.ini"
-  read_ini
-  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE storage_transform";
 fi
 
 if [ -z $sourcedb ];
@@ -812,6 +806,12 @@ then
 	setsqlconfig;
 	setdebugstacktrace;
 	truncateTables;
+fi
+
+# Truncate storage_transform table if it is a DB only sync
+if [[ $syncType == "db" ]]; then
+  echo "DB-only restore. Truncating 'storage_transform' table" >&2
+  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE storage_transform";
 fi
 
 # If a shared host, need to truncate etherpad to prevent updates/deletes from staging destroying production data
