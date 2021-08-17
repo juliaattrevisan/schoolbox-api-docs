@@ -12,9 +12,11 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge;
 use Schoolbox\Learning\Badge\Award;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -93,7 +95,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param PDOStatement $statement
      * @return GenericCollection|Model[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -194,41 +196,34 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find awarded badges in the last year (the most recent rolling 12 months)
      *
-     * @param array                    $userIds
-     * @param string|null              $awardStatus
+     * @param User                     $user
+     * @param string                   $awardStatus
      * @param Alaress_Date_Format|null $expiryDate  If provided, only get awards
-     * @param array|null               $badgeIds
      *                                              which aren't expired by this
      *                                              date.
      * @return GenericCollection
      */
     public function findRecentForUser(
-        array $userIds,
-        ?string $awardStatus,
-        ?Alaress_Date_Format $expiryDate,
-        ?array $badgeIds = null
+        User $user,
+        string $awardStatus,
+        ?Alaress_Date_Format $expiryDate
     ): GenericCollection {
         /* Ensure $awardStatus is one we allow; empty collection returned if invalid
          */
-        if ($awardStatus && !in_array($awardStatus, [Model::AWARD_STATUS_GOAL, Model::AWARD_STATUS_ACHIEVEMENT], true)) {
+        if (!in_array($awardStatus, [ Model::AWARD_STATUS_GOAL, Model::AWARD_STATUS_ACHIEVEMENT ], true)) {
             return $this->createCollection();
         }
 
         /* Otherwise get the $awardStatus records
          */
         $from = Alaress_Date_Format::now()->addYears(-1);
-        $to   = Alaress_Date_Format::now();
+        $to = Alaress_Date_Format::now();
 
         $pb = $this->getPredicateBuilder()
-                   ->in('recipient_id', $userIds)
-                   ->isNull('award_id')
-                   ->betweenDates('awarded_at', $from, $to);
-        if ($awardStatus) {
-            $pb = $pb->equals('status', $awardStatus);
-        }
-        if (is_array($badgeIds) and count($badgeIds) > 0) {
-            $pb = $pb->in('badge_id', $badgeIds);
-        }
+            ->equals('recipient_id', $user->getId())
+            ->equals('status', $awardStatus)
+            ->isNull('award_id')
+            ->betweenDates('awarded_at', $from, $to);
         if ($expiryDate) {
             $pb = $pb->any(
                 $this->getPredicateBuilder()
@@ -237,14 +232,101 @@ class Mapper extends \Schoolbox\Mapper
             );
         }
 
-        return $this->findByPredicates(
-            $pb,
-            [
-                'order' => [
-                    'awarded_at' => 'desc',
-                ],
+        return $this->findByPredicates($pb, [
+            'order' => [
+                'awarded_at' => 'desc'
             ]
-        );
+        ]);
+    }
+
+
+    /**
+     * Find awards in specific badge categories given to users
+     * Logic should be similar to $this->findRecentForUser
+     * @param int[] $userIds
+     * @param int[] $categoryIds
+     * @param string[] $status
+     * @param int[] $termIds
+     * @return GenericCollection|Model[]
+     * @throws MapperException
+     */
+    public function findForUsers(array $userIds, array $categoryIds, array $status, array $termIds): Collection
+    {
+        $pb = $this->getPredicateBuilder();
+        if (!empty($categoryIds)) {
+            $pb = $pb->in('b.category_id', $categoryIds);
+        }
+        if (!empty($status)) {
+            $pb = $pb->in('status', $status);
+        }
+        if (!empty($userIds)) {
+            $pb->in('recipient_id', $userIds);
+        }
+        $pb = $pb->isNull('award_id');
+
+        // Terms .. attempt to get simplified ranges from given terms
+        $terms  = \Schoolbox\Assessment\Term\Mapper::getInstance()->findByColumnList(['id' => $termIds])->sortBy('start', Collection::ORDER_ASCENDING);
+        $ranges = [];
+        /** @var \Schoolbox\Assessment\Term\Model $term */
+        foreach ($terms as $term) {
+            if (empty($ranges)) {
+                $ranges[] = [
+                    'from' => $term->getStart(),
+                    'to'   => $term->getActualFinish(),
+                ];
+                continue;
+            }
+            $noWrap = true;
+
+            foreach ($ranges as $key => $range) {
+                // if the current term's range does not exist
+                if (
+                    (!$term->getActualFinish()->isnull() && $term->getActualFinish()->diffInDays($range['from']) < -1)
+                    || (!$range['to']->isNull() && $term->getStart()->diffInDays($range['to']) > 1)
+                ) {
+                    continue;
+                }
+                $noWrap = false;
+                // if the current term (likely be a transition term) wraps existing term
+                // and current start is before existing start
+                if ($term->getStart()->lt($range['from'])) {
+                    $ranges[$key]['from'] = $term->getStart();
+                }
+                // and current end is later than existing end
+                if ($term->getActualFinish()->isNull() || (!$range['to']->isNull() && $term->getActualFinish()->gt($range['to']))) {
+                    $ranges[$key]['to'] = $term->getActualFinish();
+                }
+            }
+            if ($noWrap) {
+                $ranges[] = [
+                    'from' => $term->getStart(),
+                    'to'   => $term->getActualFinish(),
+                ];
+            }
+        }
+        $pbTerms = $this->getPredicateBuilder();
+        foreach ($ranges as $range) {
+            $pbTerm = $this->getPredicateBuilder();
+            $pbTerm->greaterThanOrEqualTo('awarded_at', $range['from']->getDatabaseDate());
+            if (!$range['to']->isNull()) {
+                $pbTerm->lessThanOrEqualTo('awarded_at', $range['to']->getDatabaseDate());
+            }
+            $pbTerms->all($pbTerm);
+        }
+        if (!empty($ranges)) {
+            $pb->any($pbTerms);
+        }
+        // end terms...
+
+        $query  = $this->getSelectString() . ' JOIN ' . $this->getJoinSql('badge', '', 'b');
+        $wheres = $pb->getWhere();
+        if (count($wheres) > 0) {
+            $query .= ' WHERE (' . implode(') AND (', $wheres) . ')';
+        }
+        $query     .= ' ORDER BY badge_user.awarded_at DESC ';
+        $statement = $this->getDatabase()->query($query, $pb->getParams());
+
+        return $this->hydrateSelect($statement);
     }
 
 

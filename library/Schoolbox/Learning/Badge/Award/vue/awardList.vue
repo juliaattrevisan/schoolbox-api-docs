@@ -65,8 +65,8 @@ export default {
                 <ul class="action-list">
                     <template>
                         <template v-for="(student, index) in data">
-                            <li class="action-small-1">
-                                <div class="card small-4">
+                            <li class="action-small-1 feed-item">
+                                <div class="card wrap-down">
                                     <a :href="'/search/user/' + student.id">
                                         <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
                                              :alt="student.fullName">
@@ -74,7 +74,7 @@ export default {
                                     </a>
                                 </div>
                                 <template v-for="(award, index) in student.awards">
-                                    <div class="left">
+                                    <div class="left badge-card" style="width:100px;height:120px;overflow:hidden;text-align:center">
                                         <a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">
                                             <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                                             {{ award.badge.name }}

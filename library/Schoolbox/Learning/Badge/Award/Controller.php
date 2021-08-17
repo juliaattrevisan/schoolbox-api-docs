@@ -287,7 +287,7 @@ class Controller extends Base
      */
     public function getAwardedBadges(User $user, string $awardStatus): void
     {
-        $awards = $this->mapper->findRecentForUser([$user->getId()], $awardStatus, Alaress_Date_Format::now());
+        $awards = $this->mapper->findRecentForUser($user, $awardStatus, Alaress_Date_Format::now());
 
         $stack = [];
 
@@ -676,8 +676,8 @@ class Controller extends Base
         $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
         $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
 
-        $idFinder = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->badgeMapper);
-        $badgeIds = $idFinder->findIdsByFilters($filters);
+        /** @var Filter\Filters\Award\Finder $finder */
+        $finder = Filter\Filters\Award\Finder::getInstance($this->filterMapper, $this->mapper);
 
         // Save selected filters
         $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
@@ -687,7 +687,8 @@ class Controller extends Base
         $students         = $userAccessMapper
             ->findUsersInCategory($folder, Role::STUDENT)
             ->sortByCallback((new SortUsersByName())->getCallable(), true);
-        $awards           = $this->mapper->findRecentForUser($students->getPropertyValues('id'), null, Alaress_Date_Format::now(), $badgeIds);
+
+        $awards = $finder->findListForStudentsByFilters($students->getPropertyValues('id'), $filters);
 
         // Process data
         $studentAwards = [];
