@@ -28,10 +28,6 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
         /* Pattern match spans to find answers
          */
         $matches = [];
-
-        /* https://stackoverflow.com/questions/9253027/get-everything-between-tag-and-tag-with-php
-         * @ "You can use the following:" by piouPiouM (I modified his response a bit)
-         */
         $pattern = self::FILLGAP_TOKEN_REGEX;
 
         preg_match_all($pattern, $answer, $matches);

@@ -18,6 +18,9 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
 
     /**
      * This regex is used to identify the bits that students provided to fill in the gaps
+     *
+     * https://stackoverflow.com/questions/9253027/get-everything-between-tag-and-tag-with-php
+     * @ "You can use the following:" by piouPiouM (I modified his response a bit)
      */
     public const FILLGAP_TOKEN_REGEX = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
 
