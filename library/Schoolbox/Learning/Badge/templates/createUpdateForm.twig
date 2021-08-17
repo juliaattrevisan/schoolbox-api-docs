@@ -415,17 +415,22 @@
                 // Toast then post
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
-
-                axios
-                    .post(form.action, payload)
-                    .then(() => {
-                        toast.toastTimeout({text: 'Saved'});
-                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadgeListPage') }}';
-                    })
-                    .catch(() => {
-                        toast.toastTimeout({text: 'Save failed', css: 'alert'});
-                        submit.prop('disabled', false);
-                    });
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(() => {
+                    toast.toastTimeout({text: 'Saved'});
+                    window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadgeListPage') }}';
+                })
+                .catch(() => {
+                    toast.toastTimeout({text: 'Save failed', css: 'alert'});
+                    submit.prop('disabled', false);
+                });
             }
         })
     });
