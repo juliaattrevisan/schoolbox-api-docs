@@ -1016,8 +1016,22 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * @param {Integer} day
      */
     function applyHeatToDay(element, yr, mo, day) {
-        if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
-            element.attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
+        let date          = String(yr).padStart(4, '0') + String(mo).padStart(2, '0') + String(day).padStart(2, '0'),
+            lastMonth     = (mo === 1) ? 12 : mo - 1,
+            lastMonthYear = (mo === 1) ? yr - 1 : yr,
+            nextMonth     = (mo === 12) ? 1 : mo + 1,
+            nextMonthYear = (mo === 12) ? yr + 1 : yr;
+
+        let cache = null;
+        if (yr in heatCache && mo in heatCache[yr] && date in heatCache[yr][mo]) {
+            cache = heatCache[yr][mo][date];
+        } else if (lastMonthYear in heatCache && lastMonth in heatCache[lastMonthYear] && date in heatCache[lastMonthYear][lastMonth]) {
+            cache = heatCache[lastMonthYear][lastMonth][date];
+        } else if (nextMonthYear in heatCache && nextMonth in heatCache[nextMonthYear] && date in heatCache[nextMonthYear][nextMonth]) {
+            cache = heatCache[nextMonthYear][nextMonth][date];
+        }
+        if (cache) {
+            element.attr('data-heat', parseInt(cache / 20));
         } else {
             element.attr('data-heat', '');
         }
