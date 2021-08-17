@@ -67,12 +67,13 @@ class Controller extends Component_Homepage_ControllerAbstract
         /* If you're a WRITE access user, tell them their Google setup is misconfigured
          * Otherwise hide the component
          */
+        $googleFileMapper  = Mapper::getInstance();
         if (!$this->isGoogleEnabled()) {
+            $this->googleFiles = $googleFileMapper->createCollection();
             $this->hasError = true;
             return $this->hasWriteAccess();
         }
 
-        $googleFileMapper  = Mapper::getInstance();
         $this->googleFiles = $googleFileMapper->findByColumn('folder_id', $this->getContext()->getId())
                                               ->sortByCallback(
                                                   static function ($a, $b) {
