@@ -148,7 +148,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $ans = $currentAnswer['answer'];
 
             foreach ($existingAnswer as $val) {
-                $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+                $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
                 $replace = " <input spellcheck='false' name='fillgap_{$question_id}[]' type='text' value=\"$val\" /> ";
 
                 $ans = preg_replace($pattern, $replace, $ans, 1, $x);
@@ -164,7 +164,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             /* Prepare a special way to show Fillgap answers. This replaces
              * %%token%% tokens with inputs.
              */
-            $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+            $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
             $replace = " <input spellcheck='false' name='fillgap_{$question_id}[]' type='text' value='' /> ";
 
             $page->setVar(array(
@@ -337,7 +337,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         /* Pattern match spans to find answers
            */
         $matches = array();
-        $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
 
         preg_match_all($pattern, $decodedAnswer, $matches);
 
@@ -360,7 +360,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $i = 0;
 
             foreach ($existingAnswer as $val) {
-                $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+                $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
                 $val = Scrub::text($val);
 
                 /* Indicate matching/non-matching responses to answers
@@ -387,7 +387,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             /* Prepare a special way to show Fillgap answers. This replaces
                 * %%token%% tokens with inputs.
                 */
-            $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+            $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
             $replace = " <span class='fillgap incorrect'>&nbsp;</span> ";
 
             $page->setVar(array(
@@ -425,7 +425,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         /* Pattern match spans to find answers
            */
         $matches = array();
-        $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
 
         preg_match_all($pattern, $currentAnswer['answer'], $matches);
 
@@ -455,7 +455,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $i = 0;
 
             foreach ($existingAnswer as $val) {
-                $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+                $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
                 $val = Scrub::text($val);
 
                 /* Indicate matching/non-matching responses to answers
@@ -481,10 +481,8 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             /* Prepare a special way to show Fillgap answers. This replaces
              * %%token%% tokens with inputs.
              */
-            $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+            $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
             $replace = " <span class='submitted-late label'>&nbsp;</span> ";
-
-
 
             $page->setVar(array(
                 'ANSWER' => preg_replace($pattern, $replace, Scrub::html($currentAnswer['answer'])),
@@ -518,7 +516,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         /* Pattern match spans to find answers
          */
         $matches = array();
-        $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
 
         preg_match_all($pattern, $currentAnswer['answer'], $matches);
 

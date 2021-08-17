@@ -26,18 +26,22 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
         $answer = html_entity_decode($currentResponse['answer'], ENT_IGNORE | ENT_QUOTES);
 
         /* Pattern match spans to find answers
-           */
-        $matches = array();
-        $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+         */
+        $matches = [];
+
+        /* https://stackoverflow.com/questions/9253027/get-everything-between-tag-and-tag-with-php
+         * @ "You can use the following:" by piouPiouM (I modified his response a bit)
+         */
+        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
 
         preg_match_all($pattern, $answer, $matches);
 
         $actualAnswers = $matches[1];
 
         /* Find out how much each phrase is worth
-           * If the number of Fillgap answers is 0 (ie. no blank for students to fill), skip it.
-           * TODO: It should be noted that a teacher should be prevented from creating a cloze question that doesn't have any blanks in it...
-           */
+         * If the number of Fillgap answers is 0 (ie. no blank for students to fill), skip it.
+         * TODO: It should be noted that a teacher should be prevented from creating a cloze question that doesn't have any blanks in it...
+         */
         $actualAnswerCount = count($actualAnswers);
         $totalMarks        = null;
         if ($actualAnswerCount > 0) {
@@ -54,7 +58,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
         }
 
         /* Total marks for this question
-           */
+         */
         $marks = array(
             'response_id' => $currentResponse['response_id'],
             'mark' => $totalMarks,
