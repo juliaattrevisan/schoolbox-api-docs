@@ -54,17 +54,19 @@ class Survey_Notification
 
         $author = $this->getUserMapper()->findById($this->getAuthorId());
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
+        $authorEmail = $author->getEmail();
+        if ($authorEmail != null) {
+            $email = new Mailer($this->getEmailTemplateFile(), $subject, $authorEmail);
 
-        $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
+            $email->setVar([
+                               'SURVEY_SURVEY_ID'   => $survey['assess_id'],
+                               'SURVEY_TITLE'       => Scrub::text($survey['title']),
+                               'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
+                               'ATTEMPT_ATTEMPT_ID' => $attempt['attempt_id'],
+                           ]);
 
-        $email->setVar(array(
-            'SURVEY_SURVEY_ID'   => $survey['assess_id'],
-            'SURVEY_TITLE'       => Scrub::text($survey['title']),
-            'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
-            'ATTEMPT_ATTEMPT_ID' => $attempt['attempt_id'],
-        ));
-
-        $this->setEmail($email);
+            $this->setEmail($email);
+        }
     }
 
     /**
@@ -72,7 +74,9 @@ class Survey_Notification
      */
     public function send()
     {
-        $this->getEmail()->send();
+        if ($this->email) {
+            $this->getEmail()->send();
+        }
     }
 
     /* Getters/Setters
