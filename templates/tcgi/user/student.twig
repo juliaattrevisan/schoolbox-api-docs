@@ -1,13 +1,13 @@
 {% extends '@core/user/student.twig' %}
 {% block specialAlert %}
-    {% if isStaffWhoCanView and (externalUser.IndigenousFlag ?? false or externalUser.StudentTSIFlag ?? false) %}
+    {% if isStaffWhoCanView and externalUser.IndigenousFlag ?? false %}
         <div class="alert-box highlight">
-            {% if isStaffWhoCanView and externalUser.IndigenousFlag ?? false %}
-                <img src="{{ CDN_PREFIX }}/images/tcgi/aboriginal.jpeg" alt="Aboriginal descent">
-            {% endif %}
-            {% if isStaffWhoCanView and externalUser.StudentTSIFlag ?? false %}
-                <img src="{{ CDN_PREFIX }}/images/tcgi/tsiflag.bmp" alt="Torres Strait Islander descent">
-            {% endif %}
+        <img src="{{ CDN_PREFIX }}/images/tcgi/aboriginal.jpeg" alt="Indigenous descent"> Indigenous Descent
+        </div>
+    {% endif %}
+    {% if isStaffWhoCanView and externalUser.StudentTSIFlag ?? false %}
+        <div class="alert-box highlight">
+        <img src="{{ CDN_PREFIX }}/images/tcgi/tsiflag.bmp" alt="Torres Strait Islander descent"> Torres Strait Islander descent
         </div>
     {% endif %}
     {{ parent() }}
