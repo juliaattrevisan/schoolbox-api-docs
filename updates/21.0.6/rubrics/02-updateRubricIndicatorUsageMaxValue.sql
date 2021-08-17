@@ -3,9 +3,9 @@
 -- Next query will update v_rubric so it uses this value.
 UPDATE rubric_indicator_usage riu_update
 INNER JOIN (
-    SELECT sb.id         AS box_id,
-           ri.id         AS indicator_id,
-           riu.max_value AS indicator_max_value
+    SELECT sb.id             AS box_id,
+           ri.id             AS indicator_id,
+           MAX(rd.max_value) AS indicator_max_value
     FROM assessment a
 
     -- Due work joins
