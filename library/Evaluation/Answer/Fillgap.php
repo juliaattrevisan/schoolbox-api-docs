@@ -15,6 +15,13 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
 {
     use Comparison;
 
+
+    /**
+     * This regex is used to identify the bits that students provided to fill in the gaps
+     */
+    public const FILLGAP_TOKEN_REGEX = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+
+
     /**
      * Javascript class to use when creating UI
      *
@@ -148,7 +155,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $ans = $currentAnswer['answer'];
 
             foreach ($existingAnswer as $val) {
-                $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+                $pattern = self::FILLGAP_TOKEN_REGEX;
                 $replace = " <input spellcheck='false' name='fillgap_{$question_id}[]' type='text' value=\"$val\" /> ";
 
                 $ans = preg_replace($pattern, $replace, $ans, 1, $x);
@@ -164,7 +171,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             /* Prepare a special way to show Fillgap answers. This replaces
              * %%token%% tokens with inputs.
              */
-            $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+            $pattern = self::FILLGAP_TOKEN_REGEX;
             $replace = " <input spellcheck='false' name='fillgap_{$question_id}[]' type='text' value='' /> ";
 
             $page->setVar(array(
@@ -337,7 +344,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         /* Pattern match spans to find answers
            */
         $matches = array();
-        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+        $pattern = self::FILLGAP_TOKEN_REGEX;
 
         preg_match_all($pattern, $decodedAnswer, $matches);
 
@@ -360,7 +367,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $i = 0;
 
             foreach ($existingAnswer as $val) {
-                $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+                $pattern = self::FILLGAP_TOKEN_REGEX;
                 $val = Scrub::text($val);
 
                 /* Indicate matching/non-matching responses to answers
@@ -385,9 +392,9 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             ));
         } else {
             /* Prepare a special way to show Fillgap answers. This replaces
-                * %%token%% tokens with inputs.
-                */
-            $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+             * %%token%% tokens with inputs.
+             */
+            $pattern = self::FILLGAP_TOKEN_REGEX;
             $replace = " <span class='fillgap incorrect'>&nbsp;</span> ";
 
             $page->setVar(array(
@@ -425,7 +432,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         /* Pattern match spans to find answers
            */
         $matches = array();
-        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+        $pattern = self::FILLGAP_TOKEN_REGEX;
 
         preg_match_all($pattern, $currentAnswer['answer'], $matches);
 
@@ -455,7 +462,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $i = 0;
 
             foreach ($existingAnswer as $val) {
-                $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+                $pattern = self::FILLGAP_TOKEN_REGEX;
                 $val = Scrub::text($val);
 
                 /* Indicate matching/non-matching responses to answers
@@ -481,7 +488,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             /* Prepare a special way to show Fillgap answers. This replaces
              * %%token%% tokens with inputs.
              */
-            $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+            $pattern = self::FILLGAP_TOKEN_REGEX;
             $replace = " <span class='submitted-late label'>&nbsp;</span> ";
 
             $page->setVar(array(
@@ -516,7 +523,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         /* Pattern match spans to find answers
          */
         $matches = array();
-        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+        $pattern = self::FILLGAP_TOKEN_REGEX;
 
         preg_match_all($pattern, $currentAnswer['answer'], $matches);
 

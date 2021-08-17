@@ -32,7 +32,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
         /* https://stackoverflow.com/questions/9253027/get-everything-between-tag-and-tag-with-php
          * @ "You can use the following:" by piouPiouM (I modified his response a bit)
          */
-        $pattern = '#<?span class="selected-word">(.*?)</span\b[^>]*>#ms';
+        $pattern = self::FILLGAP_TOKEN_REGEX;
 
         preg_match_all($pattern, $answer, $matches);
 
