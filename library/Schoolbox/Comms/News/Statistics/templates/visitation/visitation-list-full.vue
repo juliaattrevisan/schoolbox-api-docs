@@ -116,11 +116,13 @@ export default {
          * @returns {String} - eg: Mar 19, 2021 08:52am (4 minutes ago)
          */
         formatLastVisited (value) {
-            return value.nice + ' (' + value.relative + ')';
-        }
-        
-    }
+            if (value.nice.length) {
+                return value.nice + ' (' + value.relative + ')';
+            }
 
+            return '';
+        }
+    }
 }
 
 </script>

@@ -162,7 +162,11 @@ class Full
         foreach ($tempUsers as $tempUser) {
             $users[$tempUser['id']] = [
                 'id' => $tempUser['id'],
-                'occursAt' => null,
+                'occursAt' => [
+                    'relative' => '',
+                    'nice' => '',
+                    'absolute' => ''
+                ],
                 'title' => $tempUser['title'],
                 'firstname' => $tempUser['firstname'],
                 'lastname' => $tempUser['lastname'],
