@@ -19,21 +19,29 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
      * Output should consist of an array containing
      * title, link, description, publish date
      *
-     * @param Xml  $input
+     * @param Xml $input
      * @param int $limit
      * @return array
      */
-    public function get(Xml $input, $limit)
+    public function get(Xml $input, int $limit): array
     {
-        $data = array();
+        $data = [];
 
+        /** @var SimpleXMLElement|null $allRss */
         $allRss = $input->xml->entry;
+
+        /* the Xml and Entry nodes don't exist in this xml
+         * Nothing to parse and show; exit early
+         */
+        if (null === $allRss) {
+            return $data;
+        }
 
         /* Snap out at the limit. "All" is classified as zero
          * in the homepage component.
          */
         for ($i = 0; ($i < count($allRss)); $i++) {
-            if (($limit != 0) && ($i == $limit)) {
+            if (($limit !== 0) && ($i === $limit)) {
                 break;
             }
 
@@ -66,7 +74,7 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
      * @param Xml $input
      * @return string
      */
-    public function getTitle($input)
+    public function getTitle(Xml $input): string
     {
         return $input->xml->title;
     }
@@ -77,7 +85,7 @@ class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
      * @param  Xml $input
      * @return string
      */
-    public function getLink($input)
+    public function getLink(Xml $input): string
     {
         return $input->xml->link[0]->attributes()->href;
     }
