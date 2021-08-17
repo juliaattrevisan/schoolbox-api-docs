@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Mapper;
@@ -55,7 +56,8 @@ class Module extends BaseModule
         // - Instructors of the class
         $canViewPage = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsConfigOn('rubric_markbook_enable', $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_LMS_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new IsInstructor(Access::getInstance())

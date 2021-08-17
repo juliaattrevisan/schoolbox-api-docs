@@ -48,7 +48,8 @@ class Module extends BaseModule
     {
         $basicPermissions = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsConfigOn(ConfigMapper::NAME_GRADES_ENABLED, $this->getConfig())
+            new Rule\IsConfigOn(ConfigMapper::NAME_GRADES_ENABLED, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_LMS_ENABLED, $this->getConfig()),
         );
         $permissions      = new Rule\LazyCallback(function () use ($basicPermissions) {
             return new Rule\All(
