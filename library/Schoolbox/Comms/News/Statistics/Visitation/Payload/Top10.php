@@ -59,6 +59,8 @@ class Top10
             FROM {$this->statisticsMapper->getTable()} s1
             LEFT JOIN {$this->statisticsMapper->getTable()} s2
                 ON s1.user_id = s2.user_id
+                AND s1.article_id = :articleId
+                AND s2.article_id = :articleId
                 AND s1.occurs_at < s2.occurs_at
             LEFT JOIN `user` u ON s1.user_id = u.id
             LEFT JOIN `groups` r ON u.group_id = r.id
