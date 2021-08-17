@@ -176,9 +176,9 @@ export default {
                @keydown.enter.prevent="onEnter"
                @focus="onFocusOver"
                @mouseover="onFocusOver"
-               v-click-outside="lostFocus"
                @blur="isFocused=false"
                @focusout="isFocused=false"
+               v-click-outside="lostFocus"
                maxlength="2048"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">

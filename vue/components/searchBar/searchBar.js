@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import SearchBar from './search-bar';
 
-require('./click-outside');
+require('./directives/directiveClickOutside');
 
 new Vue({
     el: '#hybrid-bar',
