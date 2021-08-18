@@ -1,0 +1,60 @@
+{% if countSummaryByMonth.categories|length and countSummaryByMonth.series|length %}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/highcharts-release/highcharts.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        Highcharts.chart('graph-countSummaryByMonth-{{ student.id }}', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: {{ countSummaryByMonth.categories|json_encode|raw }}
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                }
+            },
+            legend: {
+                reversed: false
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal',
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        align: 'center',
+                        inside: true,
+                        formatter: function() {
+                            let str = '';
+
+                            if (this.y > 0) {
+                                str = this.y;
+                            }
+
+                            return str;
+                        }
+                    },
+                    events: {
+                        click: function (event) {
+                            window.location.href = event.point.series.userOptions.url;
+                        }
+                    },
+                }
+            },
+            series: {{ countSummaryByMonth.series|json_encode|raw }}
+        });
+    });
+</script>
+
+<div class="small-6 island">
+    <section class="no-pad">
+        <div id="graph-countSummaryByMonth-{{ student.id }}"></div>
+    </section>
+</div>
+{% endif %}

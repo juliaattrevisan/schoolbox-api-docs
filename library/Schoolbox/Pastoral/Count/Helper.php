@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Count;
 
+use Alaress\Color\Color;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\Collection;
@@ -19,6 +20,7 @@ use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\User;
+use Alaress_Date_Format;
 
 class Helper
 {
@@ -64,17 +66,17 @@ class Helper
      */
     public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource)
     {
-        $this->pastoralTypeMapper        = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
-        $this->pastoralDataSource        = $pastoralDataSource;
-        $this->router                    = $router;
-        $this->colorHelper               = new ColorHelper();
+        $this->pastoralTypeMapper    = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper = $pastoralSubTypeMapper;
+        $this->pastoralDataSource    = $pastoralDataSource;
+        $this->router                = $router;
+        $this->colorHelper           = new ColorHelper();
     }
 
     /**
      * initialise fallback whitelist of types and subtypes to use
      */
-    private function initTypeWhitelists()
+    private function initTypeWhitelists(bool $allowWithoutIcons = false)
     {
         /**
          * we only need to run this once
@@ -83,13 +85,20 @@ class Helper
             return;
         }
 
-        $this->pastoralTypesWhitelist = $this->pastoralTypeMapper->findByPredicates(
-            $this->pastoralTypeMapper->getPredicateBuilder()->notNull('color')->notNull('icon')->isNull('deleted_at')
-        );
-
-        $this->pastoralSubTypesWhitelist = $this->pastoralSubTypeMapper->findByPredicates(
-            $this->pastoralSubTypeMapper->getPredicateBuilder()->notNull('color')->notNull('icon')->isNull('deleted_at')
-        );
+        /**
+         * ensure we arent displaying deleted types
+         */
+        $pastoralTypePredicate    = $this->pastoralTypeMapper->getPredicateBuilder()->isNull('deleted_at');
+        $pastoralSubTypePredicate = $this->pastoralSubTypeMapper->getPredicateBuilder()->isNull('deleted_at');
+        /**
+         * but do we want types that have colors/icons
+         */
+        if ($allowWithoutIcons === false) {
+            $pastoralTypePredicate->notNull('color')->notNull('icon');
+            $pastoralSubTypePredicate->notNull('color')->notNull('icon');
+        }
+        $this->pastoralTypesWhitelist    = $this->pastoralTypeMapper->findByPredicates($pastoralTypePredicate);
+        $this->pastoralSubTypesWhitelist = $this->pastoralSubTypeMapper->findByPredicates($pastoralSubTypePredicate);
     }
 
     /**
@@ -133,24 +142,32 @@ class Helper
      * @param User            $student
      * @param Collection|null $typesWhitelist
      * @param Collection|null $subTypesWhitelist
+     * @param bool            $partitionByMonth
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
+    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, bool $partitionByMonth = false): Collection
     {
-        $this->initTypeWhitelists();
+        /**
+         * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
+         * regardless of whether they have icon and colors attached to them
+         */
+        $this->initTypeWhitelists($partitionByMonth);
 
         $pastoralTypes    = $typesWhitelist ?? $this->pastoralTypesWhitelist;
         $pastoralSubtypes = $subTypesWhitelist ?? $this->pastoralSubTypesWhitelist;
 
         $output = new Collection();
 
-        $studentCounts = new Collection($this->pastoralDataSource->countRecordsByType(
-            $viewer,
-            $student->getId(),
-            $pastoralTypes->getPropertyValues('id'),
-            $pastoralSubtypes->getPropertyValues('id')
-        ));
+        $studentCounts = new Collection(
+            $this->pastoralDataSource->countRecordsByType(
+                $viewer,
+                $student->getId(),
+                $pastoralTypes->getPropertyValues('id'),
+                $pastoralSubtypes->getPropertyValues('id'),
+                $partitionByMonth
+            )
+        );
 
         foreach ($studentCounts as $studentCount) {
             $studentCount = new Collection($studentCount);
@@ -183,10 +200,25 @@ class Helper
                 $studentCount->getOffset('typeId'),
                 $studentCount->getOffset('subtypeId')
             );
-            $studentCount
-                ->setOffset('destinationUrl', $destinationUrl)
-                ->setOffset('bgColor', $this->colorHelper->calculateBackground($foregroundColor)->getAsRgba())
-                ->setOffset('fgColor', $foregroundColor->getAsRgba());
+            $studentCount->setOffset('destinationUrl', $destinationUrl);
+
+            /**
+             * not all the types and subtypes will have a color provided
+             */
+            if ($foregroundColor instanceof Color) {
+                $studentCount->setOffset('fgColor', $foregroundColor->getAsRgba())
+                             ->setOffset('bgColor', $this->colorHelper->calculateBackground($foregroundColor)->getAsRgba());
+            }
+
+            if ($partitionByMonth === true) {
+                $summaryMonthLabel = (new Alaress_Date_Format())
+                    ->setDay(1)
+                    ->setMonth($studentCount->getOffset('partition_month'))
+                    ->setYear($studentCount->getOffset('partition_year'))
+                    ->getShortMonthYear();
+
+                $studentCount->setOffset('partition_label', $summaryMonthLabel);
+            }
 
             $output->add($studentCount);
         }
@@ -199,5 +231,91 @@ class Helper
         });
 
         return $output;
+    }
+
+    /**
+     * returns counts of pastoral evens types(and subtypes) for a single student but additionally partitioned by the
+     * month and year they were created in
+     *
+     * @param User            $viewer
+     * @param User            $student
+     * @param Collection|null $typesWhitelist
+     * @param Collection|null $subTypesWhitelist
+     * @return Collection
+     * @throws RouteNotFound
+     */
+    public function countStudentEventsByTypesByMonth(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
+    {
+        return $this->countStudentEventsByTypes($viewer, $student, $typesWhitelist, $subTypesWhitelist, true);
+    }
+
+    /**
+     * build the orthogonal datasets that a stacked barchart needs: categories and series
+     *
+     * @param Collection $data
+     * @return array
+     */
+    public function buildMonthlyBarChart(Collection $data): array
+    {
+        $fieldName = [
+            'series'   => 'title',
+            'category' => 'partition_label',
+            'count'    => 'count',
+            'color'    => 'fgColor',
+            'url'      => 'destinationUrl',
+        ];
+
+        /**
+         * a unique array of months and the year
+         */
+        $categories = [];
+        /**
+         * a unique array of type and subtypes that contain counts for a month, in a year
+         */
+        $series = [];
+
+        foreach ($data as $row) {
+            /**
+             * extract any month & years as categories in lookup table
+             */
+            $categories[$row[$fieldName['category']]] = true;
+            /**
+             * save this pastoral type & subtype into the series and
+             * take a copy of the preferred color
+             */
+            if (!isset($series[$row[$fieldName['series']]])) {
+                $series[$row[$fieldName['series']]] = [
+                    'name'  => $row[$fieldName['series']],
+                    'color' => $row['fgColor'],
+                    'url'   => $row['destinationUrl'],
+                    'data'  => [],
+                ];
+            }
+            /**
+             * finally, make sure we capture the number of events in this type + subtype + month + year
+             */
+            $series[$row[$fieldName['series']]]['data'][$row[$fieldName['category']]] = (int)$row[$fieldName['count']];
+        }
+        /**
+         * flip the category lookup, so we have a unique list of month + years
+         */
+        $categories = array_keys($categories);
+
+        /**
+         * go back over the series and fill in any that had no counts
+         */
+        foreach ($series as &$row) {
+            if (count($row['data']) < count($categories)) {
+                foreach ($categories as $category) {
+                    $row['data'][$category] ??= 0;
+                }
+            }
+            /**
+             * strip out the lookup index
+             */
+            $row['data'] = array_values($row['data']);
+        }
+
+        return [$categories, array_values($series)];
     }
 }
