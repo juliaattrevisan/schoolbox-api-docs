@@ -39,7 +39,7 @@ class Sync extends Base implements ISync
                 Surname                             AS student_surname,
                 ''                                  AS student_gender,
                 ''                                  AS student_home_email,
-                ''                                  AS student_default_email,
+                p.EmailID                           AS student_default_email,
                 ''                                  AS student_work_email,
                 YearGroup                           AS student_year_level,
                 House                               AS student_house_description,
