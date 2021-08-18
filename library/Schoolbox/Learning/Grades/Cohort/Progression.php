@@ -296,7 +296,7 @@ class Progression
                 sb.mark_type,
                 rl.name as level,
                 rd.description,
-                (SELECT MAX(rd2.max_value) FROM rubric_descriptor rd2 WHERE rd2.rubric_indicator_id = rd.rubric_indicator_id ) as max_value,
+                riu.max_value as max_value,
                 rim.value
             FROM rubric_indicator_mark         rim
             INNER JOIN rubric_capability_mark  rcm ON rim.rubric_capability_mark_id = rcm.id
@@ -307,6 +307,7 @@ class Progression
             INNER JOIN submission_return       sr  ON rcm.return_id = sr.id
             INNER JOIN submission_box          sb  ON sr.box_id = sb.id
             INNER JOIN rubric_capability_usage rcu ON rc.id = rcu.rubric_capability_id AND rcu.submission_box_id = sb.id
+            INNER JOIN rubric_indicator_usage  riu ON ri.id = riu.rubric_indicator_id AND riu.submission_box_id = sb.id
             INNER JOIN assessment              a   ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY a.due_date ASC;

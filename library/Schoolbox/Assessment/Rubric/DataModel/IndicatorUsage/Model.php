@@ -30,6 +30,11 @@ class Model
     private $submission_box;
 
     /**
+     * This indicator usage's max value.
+     */
+    private ?float $maxValue = null;
+
+    /**
      * @var int
      */
     private $sequence;
@@ -68,6 +73,26 @@ class Model
     public function getSubmissionBox()
     {
         return $this->submission_box;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getMaxValue(): ?float
+    {
+        return $this->maxValue;
+    }
+
+
+    /**
+     * @param float|null $maxValue
+     * @return static
+     */
+    public function setMaxValue(?float $maxValue): self
+    {
+        $this->maxValue = $maxValue;
+        return $this;
     }
 
 
