@@ -133,8 +133,9 @@ class Processor extends CliTool\App
                     $log->info($this->getDisplayFileMime($storage));
 
                     // Update video to indicate processing has begun
-
+                    // Also clear the message field
                     $mediaCurrent->setStatus(QueueMapper::STATUS_PROCESSING);
+                    $mediaCurrent->setMessage('');
                     $queueMapper->save($mediaCurrent);
 
                     // ------------------------------------------------------------------------------------------------

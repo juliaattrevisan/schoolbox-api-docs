@@ -218,6 +218,7 @@ class Queue extends ResourceVideo
             "nice {$commandTranscode}" .
             ' -y' .
             ' -nostats' .
+            ' -hide_banner' .
             " -i {$filenameSourceEscaped}" .
             ' -map 0:a' .
             " -b {$audioBitrateEscaped}" .
@@ -290,6 +291,7 @@ class Queue extends ResourceVideo
 
         $infoCommandline =
             "{$commandMediaInformation} " .
+            ' -hide_banner' .
             " -show_streams {$filenameSourceEscaped} " .
             ' 2>&1';
 
@@ -304,6 +306,7 @@ class Queue extends ResourceVideo
             "nice {$commandTranscode}" .
             ' -y' .
             ' -nostats' .
+            ' -hide_banner' .
             " -i {$filenameSourceEscaped}" .
             ' -max_muxing_queue_size 1024' .  //Set queue size larger to work around bug in some videos
             " -c:v libx264 {$videoMetadata["videoScale"]}" .
@@ -349,6 +352,7 @@ class Queue extends ResourceVideo
                 "nice {$commandTranscode}" .
                 " -y" .
                 ' -nostats' .
+                ' -hide_banner' .
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
@@ -372,6 +376,7 @@ class Queue extends ResourceVideo
                 "nice {$commandTranscode} " .
                 ' -y' .
                 ' -nostats' .
+                ' -hide_banner' .
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
