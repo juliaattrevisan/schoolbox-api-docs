@@ -130,7 +130,8 @@ class Controller extends Base
 
         // Special case for folder, only show involved folders in the list
         if (Audience\Segment\Strategy\Folder::getEntityType() === $entityType) {
-            $involvedFolders = $this->folderMapper->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE);
+            $involvedFolders = $this->folderMapper->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE)->sortNaturally('name');
+
             if ($involvedFolders->count()) {
                 $valueLabels = [];
                 foreach ($involvedFolders as $folder) {
@@ -150,6 +151,7 @@ class Controller extends Base
             'canTargetNull'      => $strategy->canAudienceToEntityValue($this->getUser(), null),
             'valueLabels'        => $valueLabels,
         ];
+
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
