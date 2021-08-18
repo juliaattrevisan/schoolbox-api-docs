@@ -52,11 +52,11 @@ class Survey_Notification
         $sectionHandler = new Assess_Section();
         $firstSection = $sectionHandler->getFirst($survey['assess_id']);
 
-        $author = $this->getUserMapper()->findById($this->getAuthorId());
+        $author = $this->getUserMapper()->findByIdWithFallback($this->getAuthorId());
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
-        $authorEmail = $author->getEmail();
-        if ($authorEmail != null) {
-            $email = new Mailer($this->getEmailTemplateFile(), $subject, $authorEmail);
+
+        if ($author->getEmail() != null &&  $author->isDeleted() === false) {
+            $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
 
             $email->setVar([
                                'SURVEY_SURVEY_ID'   => $survey['assess_id'],
