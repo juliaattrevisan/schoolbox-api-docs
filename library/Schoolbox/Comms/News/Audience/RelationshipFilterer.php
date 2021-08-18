@@ -126,7 +126,6 @@ class RelationshipFilterer
             return [];
         }
 
-        $roleType         = Role::PARENT;
         $externalIdBindings = Builder::getArrayBindings($parentExternalIds);
 
         $query = "
@@ -134,11 +133,11 @@ class RelationshipFilterer
             FROM user u
             JOIN groups g on u.group_id = g.id
             WHERE u.synergy_id IN ({$externalIdBindings['placeholders']})
-            AND g.group_type = '{$roleType}'
+            AND g.group_type = ?
             AND u.deleted_at IS NULL
         ";
 
-        return array_map('intval', $this->db->executeQuery($query, $externalIdBindings['bindings'])->fetchAll(PDO::FETCH_COLUMN));
+        return array_map('intval', $this->db->executeQuery($query, array_merge($externalIdBindings['bindings'], [Role::PARENT]))->fetchAll(PDO::FETCH_COLUMN));
     }
 
 
