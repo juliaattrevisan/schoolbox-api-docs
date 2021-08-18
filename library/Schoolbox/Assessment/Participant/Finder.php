@@ -125,12 +125,14 @@ class Finder
             $query                  = $this->database->getQueryIterator(
                 "
                     SELECT
-                        assessment_id,
-                        due_date,
-                        excluded_at
-                    FROM v_assessment_participation
-                    WHERE student_id = :studentId
-                    AND   assessment_id IN {$assessmentPlaceholders}
+                        a.id                              AS assessment_id,
+                        COALESCE(pp.due_date, a.due_date) AS due_date,
+                        p.excluded_at
+                    FROM assessment a
+                    INNER JOIN participant_plan pp ON a.id  = pp.assessment_id AND pp.deleted_at IS NULL
+                    INNER JOIN participant      p  ON pp.id = p.participant_plan_id
+                    WHERE p.user_id = :studentId
+                    AND   a.id IN {$assessmentPlaceholders}
                 ",
                 $assessmentParams + [
                     'studentId' => $studentId,

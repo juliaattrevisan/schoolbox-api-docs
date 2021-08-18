@@ -215,6 +215,10 @@ class Controller extends Base
         $end = clone $start;
         $end = $end->endOfMonth();
 
+        // Fetch +- 1 week from the start/end of the month
+        $start = $start->addDays(-7);
+        $end   = $end->addDays(7);
+
         $students = $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP);
 
         foreach ($students as $student) {
@@ -482,7 +486,7 @@ class Controller extends Base
                 $assessmentList[$assessmentId] = [
                     'id'      => $assessmentId,
                     'title'   => $participation['title'],
-                    'duedate' => $participation['dueDate']->getDay(),
+                    'duedate' => $participation['dueDate']->getDatabaseDate(),
                     'duetime' => $participation['dueDate']->getTimeOnly(),
                     'context' => $participation['folderName'],
                 ];
