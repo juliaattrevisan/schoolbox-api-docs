@@ -56,6 +56,25 @@ class QueueMapper extends Mapper
         $this->uses('duration', self::TYPE_INTEGER);
         $this->uses('createdOn', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
         $this->uses('modifiedOn', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'truncateMessage']);
+    }
+
+
+    /**
+     * Pre-save callback: truncate message to 65535 characters (TEXT field size)
+     * if somehow it's larger than that.
+     *
+     * TODO make truncation a column-level responsibility
+     *
+     * @param Queue $queue
+     * @return bool
+     */
+    public function truncateMessage(Queue $queue): bool
+    {
+        $queue->setMessage(
+            mb_strcut($queue->getMessage(), 0, 65535, 'UTF-8')
+        );
+        return true;
     }
 
 
