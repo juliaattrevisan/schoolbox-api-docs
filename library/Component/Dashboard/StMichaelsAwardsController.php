@@ -52,11 +52,18 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
     public function execute()
     {
         // Not St Michaels? This isn't for you
-        if (!(Config::get('site_location') == 'stmichaels')) {
+        if (!(Config::get('site_location') === 'stmichaels')) {
             return false;
         }
 
         $userId = $this->getUser()->getExternalId();
+
+        /* This user doesn't have an externalId; we can't query for more data
+         * Just exit early
+         */
+        if ('' === (string)$userId) {
+            return false;
+        }
 
 //        // Here's some test data, because this only works on St Michaels servers
 //        $this->detentionList = array(
