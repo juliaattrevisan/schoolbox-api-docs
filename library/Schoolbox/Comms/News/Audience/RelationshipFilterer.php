@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -114,10 +115,10 @@ class RelationshipFilterer
 
         foreach ($userContacts as $userContact) {
             if ($userContact['StudentContactID']) {
-                $parentExternalIds[] = "'{$userContact['StudentContactID']}'";
+                $parentExternalIds[] = $userContact['StudentContactID'];
             }
             if ($userContact['StudentContactSpouseID']) {
-                $parentExternalIds[] = "'{$userContact['StudentContactSpouseID']}'";
+                $parentExternalIds[] = $userContact['StudentContactSpouseID'];
             }
         }
 
@@ -125,19 +126,18 @@ class RelationshipFilterer
             return [];
         }
 
-        $roleType         = Role::PARENT;
-        $externalIdString = \implode(',', $parentExternalIds);
+        $externalIdBindings = Builder::getArrayBindings($parentExternalIds);
 
         $query = "
             SELECT u.id
             FROM user u
             JOIN groups g on u.group_id = g.id
-            WHERE u.synergy_id IN ({$externalIdString})
-            AND g.group_type = '{$roleType}'
+            WHERE u.synergy_id IN ({$externalIdBindings['placeholders']})
+            AND g.group_type = ?
             AND u.deleted_at IS NULL
         ";
 
-        return array_map('intval', $this->db->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN));
+        return array_map('intval', $this->db->executeQuery($query, array_merge($externalIdBindings['bindings'], [Role::PARENT]))->fetchAll(PDO::FETCH_COLUMN));
     }
 
 
