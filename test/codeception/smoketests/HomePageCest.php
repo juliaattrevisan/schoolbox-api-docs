@@ -197,7 +197,7 @@ class HomePageCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', "https://vagrant.dev.schoolbox.cloud/");
+        $i->seeHttpHeader('location', "/");
         $i->sendGET("https://vagrant.dev.schoolbox.cloud/");
         $i->seeResponseCodeIs(200);
     }
@@ -235,7 +235,7 @@ class HomePageCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', 'https://vagrant.dev.schoolbox.cloud/group/modify/' . $homePage->getId());
+        $i->seeHttpHeader('location', '/group/modify/' . $homePage->getId());
 
         #WHEN
         $accessLevelPayload = new Payload\Group\ModifyAccessLevel($homePage->getId());
@@ -246,7 +246,7 @@ class HomePageCest
 
         #THEN
         $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', 'https://vagrant.dev.schoolbox.cloud/group/modify/' . $homePage->getId());
+        $i->seeHttpHeader('location', '/group/modify/' . $homePage->getId());
     }
 
 
@@ -343,7 +343,7 @@ class HomePageCest
         $i->amGoingTo('send request delete text box content on homepage #' . $homePage->getId());
         $i->sendRequest($textBoxDelete);
         $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', "https://vagrant.dev.schoolbox.cloud/homepage/{$homePage->getId()}");
+        $i->seeHttpHeader('location', "/homepage/{$homePage->getId()}");
 
         $i->sendGET("https://vagrant.dev.schoolbox.cloud/homepage/{$homePage->getId()}");
         $i->seeResponseCodeIs(200);
