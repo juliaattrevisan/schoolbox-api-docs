@@ -16,6 +16,7 @@ use Alaress_Date_Format;
 use Alaress_Rss_Stream;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
+use GuzzleHttp;
 use InvalidArgumentException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Psr\Log\AbstractLogger;
@@ -469,6 +470,9 @@ class Controller extends Base
             ],
             'region'      => $s3Region,
             'version'     => $s3Version,
+            'http'    => [
+                GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
+            ],
         ]);
 
         $cloudWatchClient = new CloudWatchClient([

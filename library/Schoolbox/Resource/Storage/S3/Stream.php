@@ -8,6 +8,7 @@
 namespace Schoolbox\Resource\Storage\S3;
 
 use Aws\S3\S3Client;
+use GuzzleHttp;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 
@@ -51,6 +52,9 @@ class Stream
             'credentials' => [
                 'key'    => $key,
                 'secret' => $secret,
+            ],
+            'http'    => [
+                GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
             ],
         ]);
 
