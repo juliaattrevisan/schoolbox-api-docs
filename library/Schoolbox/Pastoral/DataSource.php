@@ -145,9 +145,9 @@ class DataSource
             return [];
         }
 
-        $typeWheres         = [];
-        $typeParams         = [];
-        $supplementalFields = "";
+        $typeWheres           = [];
+        $typeParams           = [];
+        $supplementalFields   = "";
         $supplementalGrouping = "";
 
         if (!empty($typeIds)) {
@@ -162,7 +162,7 @@ class DataSource
         }
 
         if ($partitionByMonth === true) {
-            $supplementalFields .= ", month(p.created_at) as partition_month, year(p.created_at) as partition_year";
+            $supplementalFields   .= ", month(p.created_at) as partition_month, year(p.created_at) as partition_year";
             $supplementalGrouping .= ", year(p.created_at), month(p.created_at)";
         }
 
