@@ -297,8 +297,10 @@ class SitePage extends Page
         // Validate the session ID - it has no right to be empty after it's started
         $sessionHandler = new Session();
         if (!$sessionHandler->validateSessionId(session_id())) {
-            // Have a valid ID instead
-            session_regenerate_id(true);
+            // Have a valid ID instead (as long as a session is actually active)
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                session_regenerate_id(true);
+            }
             $sessionHandler->destroy();
             $this->goLoginPage();
         }
