@@ -14,6 +14,7 @@ namespace Schoolbox\Video;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Column\Base;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
@@ -72,7 +73,7 @@ class QueueMapper extends Mapper
     public function truncateMessage(Queue $queue): bool
     {
         $queue->setMessage(
-            mb_strcut($queue->getMessage(), 0, 65535, 'UTF-8')
+            mb_strcut($queue->getMessage(), 0, Base::TEXT_MAX_LENGTH, 'UTF-8')
         );
         return true;
     }

@@ -13,6 +13,25 @@ namespace Schoolbox\Column;
 
 class Base implements IColumnType
 {
+    /**
+     * Maximum character length of a TINYTEXT field.
+     */
+    public const TINYTEXT_MAX_LENGTH = 255;
+
+    /**
+     * Maximum character length of a TEXT field.
+     */
+    public const TEXT_MAX_LENGTH = 65535;
+
+    /**
+     * Maximum character length of a MEDIUMTEXT field.
+     */
+    public const MEDIUMTEXT_MAX_LENGTH = 16777215;
+
+    /**
+     * Maximum character length of a LONGTEXT field.
+     */
+    public const LONGTEXT_MAX_LENGTH = 4294967295;
 
     public function hydrate($value, $mapper = null)
     {
