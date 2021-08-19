@@ -51,6 +51,12 @@ class CapabilityMark
 
 
     /**
+     * The human-readable mark value given for this capability mark.
+     */
+    private ?string $humanReadableValue;
+
+
+    /**
      * The value that was given for this capability.
      *
      * This is a raw value, and is not scaled based on the capability usage's
@@ -118,7 +124,7 @@ class CapabilityMark
     public function getIndicatorMarkSumScaled()
     {
         $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
-        $rowMaxSum = $this->capabilityUsage->calculateMaxValueFromIndicators();
+        $rowMaxSum          = $this->capabilityUsage->calculateMaxValueFromIndicators();
         return $this->markScheme->getValueForJS($this->calculateIndicatorMarkSum(), $maxCapabilityValue, $rowMaxSum);
     }
 
@@ -134,7 +140,7 @@ class CapabilityMark
             return null;
         }
         $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
-        $normMark = $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
+        $normMark           = $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
         return round($normMark, self::PRECISION);
     }
 
@@ -217,6 +223,27 @@ class CapabilityMark
     public function setIndicatorMarks(GenericCollection $indicatorMarks): self
     {
         $this->indicatorMarks = $indicatorMarks;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getHumanReadableValue(): ?string
+    {
+        // TODO replace with property getter
+        return $this->retrieveHumanReadableMark();
+    }
+
+
+    /**
+     * @param string|null $value
+     * @return $this
+     */
+    public function setHumanReadableValue(?string $value): self
+    {
+        // TODO replace with property setter
         return $this;
     }
 

@@ -800,6 +800,7 @@ class DataSource
                 ->setSubmissionReturn($returnedWork)
                 ->setCapability($capabilityModel)
                 ->setValue($capabilityMark->getValue())
+                ->setHumanReadableValue($capabilityMark->getHumanReadableValue())
                 ->setValid(true);
 
 
