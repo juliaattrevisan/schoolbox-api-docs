@@ -321,10 +321,10 @@
                             </dl>
                         {% endblock details %}
                         {% if showPastoral and pastoralCounts|length > 0 %}
-                            <div class="pastoralAlerts">
+                            <div class="pastoral-flags">
                                     {% for pastoralCount in pastoralCounts %}
                                         <a href="{{ pastoralCount.destinationUrl }}">
-                                        <span class="label neutral icon-{{ pastoralCount.icon }}"
+                                        <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
                                               data-tooltip title="{{ pastoralCount.title }}"
                                               style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
                                         >{{ pastoralCount.count }}</span></a>
