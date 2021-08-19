@@ -10,16 +10,19 @@ import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 import mixinLoadCKEditor from '@vue/mixins/ckeditor/mixinLoadCKEditor';
 
 export default {
+
     components: {
         MediaArticle,
         Storage,
         Toast,
         RevealModal
     },
+
     mixins: [
         cdnPrefixMixin,
         mixinLoadCKEditor
     ],
+
     props: {
         thread: {
             type: Object,
@@ -44,6 +47,7 @@ export default {
             required: true
         }
     },
+
     data() {
         return {
             commentThread: this.thread,
@@ -52,6 +56,7 @@ export default {
             commentIndexToDelete: null
         }
     },
+
     computed: {
 
         dateDisplayFormats: () => window.dateDisplayFormats,
@@ -138,19 +143,18 @@ export default {
          */
         loadMoreComments() {
             // What's the cursor?
-            let cursor = this.commentThread?.children?.metadata?.cursor?.next,
-                getUrl = this.commentThread?._links?.getComments?.href,
-                self   = this;
+            const cursor = this.commentThread?.children?.metadata?.cursor?.next;
+            const getUrl = this.commentThread?._links?.getComments?.href;
             if (getUrl && cursor) {
-                self.$refs.toast.activate('Loading...');
+                this.$refs.toast.activate('Loading...');
                 axios
-                    .get(getUrl, {params: {cursor: cursor}})
+                    .get(getUrl, { params: { cursor: cursor } })
                     .then((response) => {
-                        self.commentThread.children.data = self.commentThread.children.data.concat(response.data.data);
-                        self.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
+                        this.commentThread.children.data = this.commentThread.children.data.concat(response.data.data);
+                        this.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
                         this.$refs.toast.timeout('Loaded comments', true, 2000);
                     })
-                    .catch(() => self.$refs.toast.timeout('Loading comments failed', false, 5000))
+                    .catch(() => this.$refs.toast.timeout('Loading comments failed', false, 5000))
             }
         },
 
@@ -163,11 +167,10 @@ export default {
          */
         postComment() {
             // maybe there's not a thread at all. If not: create one, then post
-            let prePromise = Promise.resolve(),
-                self       = this;
+            let prePromise = Promise.resolve();
 
-            self.saveInProgress = true;
-            self.$refs.toast.activate('Saving...');
+            this.saveInProgress = true;
+            this.$refs.toast.activate('Saving...');
 
             if (!this.hasThread) {
                 prePromise = axios
@@ -175,8 +178,8 @@ export default {
                     .then((response) => {
                         // Set the comment thread to the one just created,
                         // and forge an empty set of comments
-                        self.commentThread = response.data;
-                        self.commentThread.children = {
+                        this.commentThread = response.data;
+                        this.commentThread.children = {
                             data: [],
                             metadata: {
                                 count: 0,
@@ -189,17 +192,17 @@ export default {
                     })
             }
             prePromise
-                .then(() => axios.post(self.commentThread._links.createComment.href, {content: self.pendingComment}))
+                .then(() => axios.post(this.commentThread._links.createComment.href, {content: this.pendingComment}))
                 .then((response) => {
                     // Update the comment count, add the new comment to the
                     // thread, clear the pending comment box
-                    self.commentThread.children.metadata.count += 1;
-                    self.commentThread.children.data.unshift(response.data);
-                    self.$refs.toast.timeout('Comment posted', true, 2000);
-                    self.pendingComment = '';
+                    this.commentThread.children.metadata.count += 1;
+                    this.commentThread.children.data.unshift(response.data);
+                    this.$refs.toast.timeout('Comment posted', true, 2000);
+                    this.pendingComment = '';
                 })
-                .catch(() => self.$refs.toast.timeout('Comment post failed', false, 5000))
-                .finally(() => self.saveInProgress = false)
+                .catch(() => this.$refs.toast.timeout('Comment post failed', false, 5000))
+                .finally(() => this.saveInProgress = false)
         },
 
 
@@ -221,20 +224,19 @@ export default {
          * @param {Number} index
          */
         deleteComment(index) {
-            let self       = this,
-                comment    = self.commentThread.children.data[index],
-                deleteLink = comment?._links?.delete?.href;
-            self.$refs.deleteModal.close();
+            const comment = this.commentThread.children.data[index];
+            const deleteLink = comment?._links?.delete?.href;
+            this.$refs.deleteModal.close();
             if (deleteLink) {
-                self.$refs.toast.activate('Deleting...');
+                this.$refs.toast.activate('Deleting...');
                 axios
                     .delete(deleteLink)
                     .then(() => {
-                        self.commentThread.children.data.splice(index, 1);
-                        self.commentThread.children.metadata.count -= 1;
-                        self.$refs.toast.timeout('Deleted', true, 2000);
+                        this.commentThread.children.data.splice(index, 1);
+                        this.commentThread.children.metadata.count -= 1;
+                        this.$refs.toast.timeout('Deleted', true, 2000);
                     })
-                    .catch(() => self.$refs.toast.timeout('Delete failed', false, 5000))
+                    .catch(() => this.$refs.toast.timeout('Delete failed', false, 5000))
             }
         }
     },
