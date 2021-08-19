@@ -9,6 +9,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Web\Router\RouterFactory;
 use Schoolbox\Campus;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -430,8 +431,9 @@ if ($class) {
         }
 
         $this->setVar([
-                          'ALL_STUDENT_IDS'  => json_encode($schoolboxStudentIds),
-                          'PASTORAL_ENABLED' => json_encode((bool)($configLoader->get('pastoral_enabled') && $_SESSION['user']->getRole()->getAccessPastoral())),
+                          'ALL_STUDENT_IDS'      => json_encode($schoolboxStudentIds),
+                          'PASTORAL_STUDENT_URL' => "/pastoral/student/{studentId}?type={typeId}&subtype={subTypeId}",
+                          'PASTORAL_ENABLED'     => json_encode((bool)($configLoader->get('pastoral_enabled') && $_SESSION['user']->getRole()->getAccessPastoral())),
                       ]);
 
 

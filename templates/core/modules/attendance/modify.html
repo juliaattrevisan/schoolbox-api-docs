@@ -59,9 +59,10 @@
         let isPastoralEnabled = {PASTORAL_ENABLED};
 
         if (isPastoralEnabled) {
-            let allStudentIds = {ALL_STUDENT_IDS};
-            let pastoralCountUrl      = "/pastoral/students/count/{studentIds}".replace('{studentIds}', allStudentIds.join(','));
-            let pastoralCountBadges   = [];
+            let allStudentIds       = {ALL_STUDENT_IDS};
+            let pastoralCountUrl    = "/pastoral/students/count/{studentIds}".replace('{studentIds}', allStudentIds.join(','));
+            let pastoralStudentUrl  = "{PASTORAL_STUDENT_URL}";
+            let pastoralCountBadges = [];
 
             /**
              * Build a reusable pastoral count badge, in javascript ;)
@@ -84,11 +85,12 @@
              */
             let tagPastoralCountBadge = function (studentId, typeId, subtypeId, title, icon, fgColor, bgColor, count) {
                 return `
+                <a href="${pastoralStudentUrl.replace('{studentId}', studentId).replace('{typeId}',typeId).replace('{subTypeId}', !subtypeId ? "" : subtypeId)}">
                 <span id="pastoralCountBadge-${studentId}-${typeId}-${subtypeId}"
                       class="label neutral icon-${icon}"
                       title="${title}"
                       style="color: ${fgColor}; background-color: ${bgColor}"
-                >${count}</span>
+                >${count}</span></a>
             `
             }
 
