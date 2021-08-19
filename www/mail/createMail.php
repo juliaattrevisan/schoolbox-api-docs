@@ -72,7 +72,7 @@ if (Config::get('mail_enable') == 1) {
 
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
-            $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
+            $emailAddresses = Mailer::parseAddressString($_REQUEST[$type]);
 
             /* Remember some invalid emails, if any were found
              */
