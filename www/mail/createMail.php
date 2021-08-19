@@ -83,7 +83,7 @@ if (Config::get('mail_enable') == 1) {
              * before either the cc or bcc structs, as defined by $addressLists initialisation
              */
             if ('replyto' === $type) {
-                $replyToEmailAddresses = array_keys($emailAddresses['valid']);
+                $replyToEmailAddresses = array_keys($emailAddresses[AbstractMailer::KEY_VALID]);
             }
 
             if (!empty($emailAddresses[AbstractMailer::KEY_VALID])) {
