@@ -467,9 +467,9 @@ class Controller extends Base
     /**
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
-     * @param int[]      $assessments
-     * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
-     * @param null|array $selectedIndicators   Null if rubricUsage filter not enabled for page
+     * @param array<int,array> $assessments
+     * @param null|array       $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array       $selectedIndicators   Null if rubricUsage filter not enabled for page
      * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
@@ -517,19 +517,20 @@ class Controller extends Base
 
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
             SELECT
-                vrm.assessment_id             AS assessment_id,
-                vrm.student_id                AS student_id,
-                u.firstname                   AS student_firstname,
-                u.lastname                    AS student_lastname,
-                vrm.capability_id             AS capability_id,
-                vrm.capability_mark           AS capability_mark,
-                vrm.capability_max_value      AS capability_max_value,
-                vrm.capability_mark_type_id   AS capability_mark_type_id,
-                vrm.capability_grade_group_id AS capability_grade_group_id,
-                vrm.descriptor_name      AS descriptor_name,
-                vrm.indicator_id         AS indicator_id,
-                vrm.indicator_mark       AS indicator_mark,
-                vrm.indicator_max_value  AS indicator_max_value
+                vrm.assessment_id                  AS assessment_id,
+                vrm.student_id                     AS student_id,
+                u.firstname                        AS student_firstname,
+                u.lastname                         AS student_lastname,
+                vrm.capability_id                  AS capability_id,
+                vrm.capability_mark                AS capability_mark,
+                vrm.capability_human_readable_mark AS capability_human_readable_mark,
+                vrm.capability_max_value           AS capability_max_value,
+                vrm.capability_mark_type_id        AS capability_mark_type_id,
+                vrm.capability_grade_group_id      AS capability_grade_group_id,
+                vrm.descriptor_name                AS descriptor_name,
+                vrm.indicator_id                   AS indicator_id,
+                vrm.indicator_mark                 AS indicator_mark,
+                vrm.indicator_max_value            AS indicator_max_value
             FROM (
                 SELECT
                     sb.assessment_id,
@@ -586,9 +587,11 @@ class Controller extends Base
             $capData = [
                 'indicators' => $indicatorMarks,
             ];
+            $isMarkPerCapability = $assessments[$row['assessment_id']]['isMarkPerCapability'] ?? false;
             if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                $capData['databaseMark'] = $assessments[$row['assessment_id']]['isMarkPerCapability'] ? $row['capability_mark'] : null;
-                $capData['maxMark']      = $row['capability_max_value'];
+                $capData['databaseMark']      = $isMarkPerCapability ? $row['capability_mark'] : null;
+                $capData['humanReadableMark'] = $isMarkPerCapability ? $row['capability_human_readable_mark'] : null;
+                $capData['maxMark']           = $row['capability_max_value'];
 
                 /* Capabilities' Mark Type and Grade Group can be represented differently to
                  * their Assessments' Mark Type and Grade Group
@@ -673,8 +676,6 @@ class Controller extends Base
 
                 foreach ($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
-
-
                     if ($capabilityDatabaseMark !== null) {
                         $capabilityMaxMark = $decimalHydrator->hydrate($capabilityMarks['maxMark']);
 
@@ -685,10 +686,8 @@ class Controller extends Base
                         $capabilityMarkModel  = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
                         $capabilityMarkModel->setValue($capabilityDatabaseMark);
 
-                        // TODO use HR mark from DB instead
-                        $humanReadableCapabilityMark                                                                            = $capabilityMarkModel->retrieveHumanReadableMark();
                         $normalisedCapabilityMark                                                                               = $capabilityMarkModel->retrieveNormalizedMark();
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $capabilityMarks['humanReadableMark'];
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
                     } else {
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = null;
