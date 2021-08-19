@@ -721,6 +721,7 @@ class DataSource
                 $capabilityUsage->getMaxValue()
             );
             $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
+                ->setHumanReadableValue($capabilityMarkModel->getHumanReadableValue())
                 ->setValue($capabilityMarkModel->getValue());
 
             // Associate indicator mark models with indicator marks

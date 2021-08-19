@@ -82,13 +82,17 @@ class Factory
                             $capabilityUnscaledMark = (float)$capabilityUnscaledMark;
                         }
                     }
-                    $capabilityMark->setValue($capabilityUnscaledMark);
+                    $capabilityMark
+                        ->setHumanReadableValue($capabilityMark->getMarkScheme()->getHumanReadableMark($capabilityCustomMarkInput))
+                        ->setValue($capabilityUnscaledMark);
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
                 }
             } else {
                 // If mark per cap is off, set capability mark to null; the model knows how to handle this.
-                $capabilityMark->setValue(null);
+                $capabilityMark
+                    ->setHumanReadableValue(null)
+                    ->setValue(null);
             }
 
             // Set marks for indicators
