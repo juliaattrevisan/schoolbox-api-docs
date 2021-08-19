@@ -62,22 +62,51 @@ if (Config::get('mail_enable') == 1) {
         }
     }
 
+    /* A list of email addresses that appeared in the To field
+     */
+    $replyToEmailAddresses = [];
+
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
             $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
+
+            /* Remember some invalid emails, if any were found
+             */
+            $invalidEmails[] = $emailAddresses[AbstractMailer::KEY_INVALID];
+
+            /* Remember a list of email addresses that were in the To field
+             * There's a sequential dependency here, such that replyto must be processed
+             * before either the cc or bcc structs, as defined by $addressLists initialisation
+             */
+            if ('replyto' === $type) {
+                $replyToEmailAddresses = array_keys($emailAddresses['valid']);
+            }
+
             if (!empty($emailAddresses[AbstractMailer::KEY_VALID])) {
                 foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $email => $name) {
-                    $addressLists[$type][] = Mailer::buildAddress($email, $name);
+
+                    /* For the CC and BCC fields, if an email address was already in To field,
+                     * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
+                     * by the system rather than the human
+                     */
+                    if ('replyto' === $type || !in_array($email, $replyToEmailAddresses, true)) {
+                        $addressLists[$type][] = Mailer::buildAddress($email, $name);
+                    }
                 }
             }
         } elseif (!$buildEmailFromId && null === $_REQUEST[$type] && $type === 'bcc') {
-            $addressLists[$type][] = Mailer::buildAddress(
-                $_SESSION['user']->getEmail(),
-                $_SESSION['user']->getFullName()
-            );
-        }
 
-        $invalidEmails[] = $emailAddresses[AbstractMailer::KEY_INVALID];
+            /* For the CC and BCC fields, if an email address was already in To field,
+             * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
+             * by the system rather than the human
+             */
+            if (!in_array($_SESSION['user']->getEmail(), $replyToEmailAddresses, true)) {
+                $addressLists[$type][] = Mailer::buildAddress(
+                    $_SESSION['user']->getEmail(),
+                    $_SESSION['user']->getFullName()
+                );
+            }
+        }
     }
 
     $page->setFile(TEMPLATE_content, 'mail/send.html');
