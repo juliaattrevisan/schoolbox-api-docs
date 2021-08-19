@@ -38,6 +38,12 @@ class Model
 
 
     /**
+     * The human-readable value for this capability mark.
+     */
+    private ?string $humanReadableValue;
+
+
+    /**
      * @var float|null
      */
     private $value;
@@ -109,6 +115,26 @@ class Model
     public function setValid($valid): self
     {
         $this->valid = $valid;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getHumanReadableValue(): ?string
+    {
+        return $this->humanReadableValue;
+    }
+
+
+    /**
+     * @param string|null $humanReadableValue
+     * @return static
+     */
+    public function setHumanReadableValue(?string $humanReadableValue): self
+    {
+        $this->humanReadableValue = $humanReadableValue;
         return $this;
     }
 
