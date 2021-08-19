@@ -26,6 +26,10 @@ if (Config::get('mail_enable') == 1) {
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value
     $invalidEmails = [];
+
+    /* The replyto array key must come first, because we use it to dedupe replyto
+     * senders against cc and bcc fields, to prevent them self-spamming unnecessarily
+     */
     $addressLists = [
         'replyto' => [],
         'cc' => [],
