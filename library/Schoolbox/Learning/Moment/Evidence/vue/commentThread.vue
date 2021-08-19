@@ -1,14 +1,13 @@
 <script>
 
-import Vue from 'vue';
 import axios  from 'axios';
 import moment from 'moment';
-
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import mixinLoadCKEditor from '@vue/mixins/ckeditor/mixinLoadCKEditor';
 
 export default {
     components: {
@@ -17,7 +16,10 @@ export default {
         Toast,
         RevealModal
     },
-    mixins: [cdnPrefixMixin],
+    mixins: [
+        cdnPrefixMixin,
+        mixinLoadCKEditor
+    ],
     props: {
         thread: {
             type: Object,
@@ -47,41 +49,10 @@ export default {
             commentThread: this.thread,
             pendingComment: '',
             saveInProgress: false,
-            commentIndexToDelete: null,
-            editorUrl: this.cdnPrefix + '/js/ckeditor/ckeditor.js',
-            isCKEditorLoading: false,
-            isCKEditorLoaded: false,
-            isCKEditorReady: false,
-            ckeditorConfig: {
-                embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
-                removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed',
-                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-                toolbarGroups: [
-                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                    {name: 'insert', groups: ['insert']}
-                ],
-                contentsCss: [
-                    '/css/core/skin.css.php',
-                    this.cdnPrefix + '/css/core/editor.css',
-                ],
-                height: '4rem',
-                resize_enabled: false,
-                startupFocus: true,
-            }
+            commentIndexToDelete: null
         }
     },
     computed: {
-
-         /**
-         * The text within the comment prompt button, will change to loading when selected to notify
-         *
-         * @returns {String}
-         */
-        getAddCommentButtonText () {
-            if (this.isCKEditorLoading) return 'Loading';
-            else return 'Add a comment'
-        },
 
         dateDisplayFormats: () => window.dateDisplayFormats,
 
@@ -161,70 +132,6 @@ export default {
     },
 
     methods: {
-
-
-        /**
-         * Loads ckeditor only when required rather than on page load
-         *
-         */
-        loadCKEditor () {
-
-            //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
-            this.isCKEditorLoading = true;
-
-            const loadScripts = async () => {
-
-                try {
-                    
-                    await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
-                    await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
-
-                    $.fn.alaressEditor({
-                        targetElements: $('#comment'),
-                        startupFocus: true,
-                        height: '8rem',
-                        removePlugins: 'uploadimage,schoolboxanchor',
-                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
-                        toolbarGroups: [
-                            {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                            {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                            {name: 'insert', groups: ['insert']},
-                            {name: 'schoolbox', groups: ['schoolboxlink']}
-                        ],
-                        on: {
-                            change: (event) => {
-                                this.pendingComment = CKEDITOR.instances['comment'].getData(); // Bind the content of CKEditor into the comment model on change
-                            },
-                            instanceReady: (event) => { //can display the loaded CKEditor now
-                                this.isCKEditorLoading = false;
-                                this.isCKEditorLoaded = true;
-                            }
-                        }
-                    });
-
-                } catch (error) {
-                    this.$refs.toast.timeout('Loading comments failed', false, 5000);
-	            }
-            }
-
-            loadScripts();
-
-        },
-
-        /**
-         * Async inject a <script> tag into the DOM
-         * https://stackoverflow.com/a/39008859
-         *
-         */
-        injectScript (src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.addEventListener('load', resolve);
-                script.addEventListener('error', e => reject(e.error));
-                document.head.appendChild(script);
-            });
-        },
 
         /**
          * Loads the next cursor of comments.
@@ -344,10 +251,9 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
-                    <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                    <div :style="[isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                        <textarea id="comment" name="comment" rows="5"></textarea>
+                    <button class="btn-show-ckeditor" v-show="!loadCKEditor_isCKEditorLoaded" @click.once="loadCKEditor_init">{{ loadCKEditor_getAddCommentButtonText }}</button>
+                    <div :style="loadCKEditor_getStyles">
+                        <textarea :id="`comment-${uuid}`" rows="4"></textarea>
                         <a class="button submit"
                             @click="postComment"
                             :disabled="isPostCommentDisabled">Post comment</a>
