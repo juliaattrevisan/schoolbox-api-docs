@@ -36,6 +36,7 @@ class CapabilityMark
      * overall mark for the capability is validated and rendered.
      *
      * TODO this belongs on the capability usage, not the capability
+     * TODO this may no longer be needed now HR mark is a first-class property
      *
      * @var IMarkScheme
      */

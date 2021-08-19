@@ -685,6 +685,7 @@ class Controller extends Base
                         $capabilityMarkModel  = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
                         $capabilityMarkModel->setValue($capabilityDatabaseMark);
 
+                        // TODO use HR mark from DB instead
                         $humanReadableCapabilityMark                                                                            = $capabilityMarkModel->retrieveHumanReadableMark();
                         $normalisedCapabilityMark                                                                               = $capabilityMarkModel->retrieveNormalizedMark();
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
