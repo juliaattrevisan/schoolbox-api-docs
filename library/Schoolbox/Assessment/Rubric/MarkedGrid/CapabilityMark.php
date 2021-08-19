@@ -148,6 +148,9 @@ class CapabilityMark
      * Render the capability's mark in human-readable format.
      *
      * @return null|string
+     * @deprecated Human-readable mark is now a first-class property and not
+     *             a derived value: use `getHumanReadableValue` instead
+     *
      */
     public function retrieveHumanReadableMark(): ?string
     {
@@ -232,18 +235,17 @@ class CapabilityMark
      */
     public function getHumanReadableValue(): ?string
     {
-        // TODO replace with property getter
-        return $this->retrieveHumanReadableMark();
+        return $this->humanReadableValue;
     }
 
 
     /**
-     * @param string|null $value
+     * @param string|null $humanReadableValue
      * @return $this
      */
-    public function setHumanReadableValue(?string $value): self
+    public function setHumanReadableValue(?string $humanReadableValue): self
     {
-        // TODO replace with property setter
+        $this->humanReadableValue = $humanReadableValue;
         return $this;
     }
 
