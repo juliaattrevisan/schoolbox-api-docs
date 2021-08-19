@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
     {% autoescape 'js' %}
-        $(window).load( function() {
+        $(window).on('load', function () {
             const url = '{{ routeLookup('adminHome.dismissUpgradeReminder') }}';
 
             {# if the user closes the upgrade reminder alert, lets make sure we
