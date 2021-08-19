@@ -122,6 +122,15 @@ class Model implements ISoftDeletable
      */
     private ?bool $courseManaged = null;
 
+
+    /**
+     * A flag denoting whether this assessment requires the SEB Safe Exam Browser
+     *
+     * @var bool|null
+     */
+    private ?bool $sebEnabled = null;
+
+
     /**
      * The task which may or may not be associated with this assessment.
      *
@@ -831,6 +840,26 @@ class Model implements ISoftDeletable
     public function setCourseManaged(?bool $courseManaged): self
     {
         $this->courseManaged = $courseManaged;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getSebEnabled(): ?bool
+    {
+        return $this->sebEnabled;
+    }
+
+
+    /**
+     * @param bool|null $sebEnabled
+     * @return Model
+     */
+    public function setSebEnabled(?bool $sebEnabled): self
+    {
+        $this->sebEnabled = $sebEnabled;
         return $this;
     }
 }
