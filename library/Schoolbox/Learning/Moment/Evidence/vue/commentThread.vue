@@ -145,6 +145,19 @@ export default {
             return comments === null ? [] : comments;
         },
 
+        /**
+         * Ensure there's something (anything) in the comment and that the form is not already processing
+         *
+         * @returns {Boolean}
+         */
+        isPostCommentDisabled () {
+            if (this.pendingComment.trim() === '' || this.isProcessActive) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
     },
 
     methods: {
@@ -152,31 +165,65 @@ export default {
 
         /**
          * Loads ckeditor only when required rather than on page load
+         *
          */
         loadCKEditor () {
-            
+
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
 
-            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js
-            //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
-            import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
-                .then(({ default: CKEditor }) => {
-                    Vue.component('ckeditor', CKEditor.component); //register the component for use once ready
-                    this.isCKEditorLoaded = true;
-                })
-                .catch(err => {
+            const loadScripts = async () => {
+
+                try {
+                    
+                    await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
+                    await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
+
+                    $.fn.alaressEditor({
+                        targetElements: $('#comment'),
+                        startupFocus: true,
+                        height: '8rem',
+                        removePlugins: 'uploadimage,schoolboxanchor',
+                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
+                        toolbarGroups: [
+                            {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                            {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                            {name: 'insert', groups: ['insert']},
+                            {name: 'schoolbox', groups: ['schoolboxlink']}
+                        ],
+                        on: {
+                            change: (event) => {
+                                this.pendingComment = CKEDITOR.instances['comment'].getData(); // Bind the content of CKEditor into the comment model on change
+                            },
+                            instanceReady: (event) => { //can display the loaded CKEditor now
+                                this.isCKEditorLoading = false;
+                                this.isCKEditorLoaded = true;
+                            }
+                        }
+                    });
+
+                } catch (error) {
                     this.$refs.toast.timeout('Loading comments failed', false, 5000);
-                });
+	            }
+            }
+
+            loadScripts();
 
         },
 
         /**
-         * Once CKEditor is ready, we can display it and hide the prompt button
+         * Async inject a <script> tag into the DOM
+         * https://stackoverflow.com/a/39008859
+         *
          */
-        onCKEditorReady (event) {
-            this.isCKEditorReady = true;
-            this.isCKEditorLoading = false;
+        injectScript (src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.addEventListener('load', resolve);
+                script.addEventListener('error', e => reject(e.error));
+                document.head.appendChild(script);
+            });
         },
 
         /**
@@ -297,13 +344,13 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
+                    <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                     <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                    <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]"> 
-                        <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                    <div :style="[isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
+                        <textarea id="comment" name="comment" rows="5"></textarea>
                         <a class="button submit"
-                        @click="postComment"
-                        :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
+                            @click="postComment"
+                            :disabled="isPostCommentDisabled">Post comment</a>
                     </div>
                 </template>
                 <template v-if="hasComments">
