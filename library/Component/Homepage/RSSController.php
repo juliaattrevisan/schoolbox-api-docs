@@ -34,20 +34,15 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $noConfig   = true;
         } else {
             // Initialise feed
-            if (filter_var($this->getConfig('url'), FILTER_VALIDATE_URL)) {
-                $rss = new Alaress_Rss_Stream($this->getConfig('url'));
-                $rss->setLimit($this->getConfig('size'));
-                $rss->stream();
+            $rss = new Alaress_Rss_Stream($this->getConfig('url'));
+            $rss->setLimit($this->getConfig('size'));
+            $rss->stream();
 
-                // Process each item in feed
-                $allRss = $rss->getOutput();
+            // Process each item in feed
+            $allRss = $rss->getOutput();
 
-                if (count($allRss) == 0) {
-                    $emptyState = true;
-                }
-            } else {
+            if (count($allRss) == 0) {
                 $emptyState = true;
-
             }
         }
 

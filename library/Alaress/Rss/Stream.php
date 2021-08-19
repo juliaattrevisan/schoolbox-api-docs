@@ -55,7 +55,7 @@ class Alaress_Rss_Stream
      */
     public function __construct($source = null)
     {
-        if ($source !== null) {
+        if ($source !== null && filter_var($source, FILTER_VALIDATE_URL)) {
             $this->setSource($source);
         }
     }
