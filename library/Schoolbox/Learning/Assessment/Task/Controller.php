@@ -152,6 +152,18 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+        /* Check whether SEB was required
+         */
+        if (!(new Assessment\ValidSebCheck())->isSatisfiedBy(
+            'https://' . $this->getRequest()->server->get('HTTP_HOST') . $this->getRequest()->server->get('REQUEST_URI'),
+            $assessment->getSebEnabled(),
+            $this->getRequest()->server->getArrayCopy(),
+            'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
+            'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f'
+        )) {
+            die('seb check failed, download the stuff');
+        }
+
         $previewFragment = [];
 
         /* If there was a specified url, it could be to some external location
