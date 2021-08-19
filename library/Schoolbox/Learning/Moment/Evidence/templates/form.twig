@@ -175,19 +175,25 @@
                 // Toast then post
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
-
+                
                 // Redirect to the return URL provided
-                axios.{{ isCreate ? 'post' : 'put' }}(form.action, payload)
-                    .then(() => {
-                        toast.toastTimeout({text: 'Saved'});
-                        window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
-                        isSubmittingForm = false;
-                    })
-                    .catch(() => {
-                        toast.toastTimeout({text: 'Save failed', css: 'alert'});
-                        submit.prop('disabled', false);
-                        isSubmittingForm = false;
-                    });
+                fetch(form.action, {
+                    method: '{{ isCreate ? 'POST' : 'PUT' }}',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(() => {
+                    toast.toastTimeout({text: 'Saved'});
+                    window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                    isSubmittingForm = false;
+                })
+                .catch(() => {
+                    toast.toastTimeout({text: 'Save failed', css: 'alert'});
+                    submit.prop('disabled', false);
+                    isSubmittingForm = false;
+                });
 
             }
         }

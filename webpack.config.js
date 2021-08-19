@@ -244,13 +244,6 @@ module.exports = {
                 },
             },
             {
-                test: require.resolve('axios'),
-                loader: 'expose-loader',
-                options: {
-                    exposes: {globalName: 'axios', override: true}
-                },
-            },
-            {
                 test: require.resolve('lodash'),
                 loader: 'expose-loader',
                 options: {
