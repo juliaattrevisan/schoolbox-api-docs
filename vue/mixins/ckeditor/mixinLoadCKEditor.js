@@ -1,10 +1,9 @@
 /**
- * 
+ * To load CKEditor on request and ensure consistent display of CKEditor options etc
  */
 
 
-
-let __uuid = 0;
+let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
  
 export default {
  
@@ -16,8 +15,7 @@ export default {
     },
 
     beforeCreate () {
-        this.uuid = __uuid.toString();
-        __uuid += 1;
+        this.incrementUniqueId();
     },
 
     computed: {
@@ -46,6 +44,14 @@ export default {
     methods: {
         
         /**
+         * Ensure multiple instances of CKEditor on the same page have unique ids
+         */
+        incrementUniqueId () {
+            this.uniqueId = __uniqueId.toString();
+            __uniqueId += 1;
+        },
+
+        /**
          * Loads ckeditor only when required rather than on page load
          */
         loadCKEditor_init () {
@@ -54,14 +60,14 @@ export default {
             this.isCKEditorLoading = true;
 
             const loadScripts = async () => {
-                console.warn(`#comment-${this.uuid}`);
+                
                 try {
                     
                     await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
                     await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
 
                     $.fn.alaressEditor({
-                        targetElements: $(`#comment-${this.uuid}`),
+                        targetElements: $(`#comment-${this.uniqueId}`),
                         startupFocus: true,
                         height: '4rem',
                         removePlugins: 'uploadimage,schoolboxanchor',
@@ -74,7 +80,7 @@ export default {
                         ],
                         on: {
                             change: (event) => {
-                                this.pendingComment = CKEDITOR.instances[`comment-${this.uuid}`].getData(); // Bind the content of CKEditor into the comment model on change
+                                this.pendingComment = CKEDITOR.instances[`comment-${this.uniqueId}`].getData(); // Bind the content of CKEditor into the comment model on change
                             },
                             instanceReady: (event) => { //can display the loaded CKEditor now
                                 this.isCKEditorLoading = false;
