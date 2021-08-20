@@ -57,7 +57,7 @@ class Survey_Notification
         } catch (\Schoolbox\Mapper\Exception $e) {
             return;
         }
-        if ($author->getEmail() === null) {
+        if (empty($author->getEmail())) {
             return;
         }
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
