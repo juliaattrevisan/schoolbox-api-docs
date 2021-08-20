@@ -57,7 +57,7 @@
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark ? capabilityMark.value : null }}"/> / {{ capabilityMaxValue }}
+                               value="{{ capabilityMark ? capabilityMark.humanReadableValue : null }}" /> / {{ capabilityMaxValue }}
 
                     {% elseif markType.mode == 'letter' %}
                         <select data-group-mark
@@ -87,8 +87,8 @@
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark and capabilityMark.retrieveNormalizedMark is not null
-                                ? (capabilityMark.retrieveNormalizedMark | round(2))
+                               value="{{ capabilityMark and capabilityMark.humanReadableValue is not null
+                                ? (capabilityMark.humanReadableValue | round(2))
                                 : null }}"/> %
                     {% endif %}
 
