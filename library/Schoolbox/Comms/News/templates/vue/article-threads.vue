@@ -6,7 +6,7 @@ import MediaArticle from '@vue/components/media-article';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
-import mixinLoadCKEditor from '@vue/mixins/ckeditor/mixinLoadCKEditor';
+import mixinCKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
 
 export default {
 
@@ -20,7 +20,7 @@ export default {
 
     mixins: [
         cdnPrefixMixin,
-        mixinLoadCKEditor
+        mixinCKEditor
     ],
 
     props: {
@@ -216,7 +216,7 @@ export default {
                 this.totalCommentsCount++;
 
                 this.newComment = '';
-                CKEDITOR.instances[`comment-${this.loadCKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
+                CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
 
                 this.$refs.toast.timeout('Comment has been added', true);
 
@@ -306,12 +306,12 @@ export default {
                 <template v-if="!isInitialLoad">
                     <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
-                            <button class="btn-show-ckeditor" v-show="!loadCKEditor_isCKEditorLoaded" @click.once="loadCKEditor_init">{{ loadCKEditor_getAddCommentButtonText }}</button>
-                            <div :style="loadCKEditor_getStyles">
-                                <textarea :id="`comment-${loadCKEditor_uniqueId}`" rows="4"></textarea>
+                            <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="cKEditor_init">{{ cKEditor_getAddCommentButtonText }}</button>
+                            <div :style="cKEditor_getStyles">
+                                <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
                                 <a class="button submit"
                                     @click="postComment"
-                                    :disabled="loadCKEditor_isPostCommentDisabled">Post comment</a>
+                                    :disabled="cKEditor_isPostCommentDisabled">Post comment</a>
                             </div>
                         </template>
                         <template v-else>

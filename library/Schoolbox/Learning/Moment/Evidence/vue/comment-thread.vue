@@ -2,12 +2,22 @@
 
 import axios  from 'axios';
 import moment from 'moment';
+<<<<<<< HEAD
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 import mixinLoadCKEditor from '@vue/mixins/ckeditor/mixinLoadCKEditor';
+=======
+
+import MediaArticle from '@schoolbox/media-article';
+import Storage from '@schoolbox/storage';
+import Toast from '@schoolbox/toast';
+import RevealModal from '@schoolbox/reveal-modal';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
+import mixinCKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
+>>>>>>> b8359ecd0a0... Rename mixin [SA-12493]
 
 export default {
 
@@ -20,7 +30,7 @@ export default {
 
     mixins: [
         cdnPrefixMixin,
-        mixinLoadCKEditor
+        mixinCKEditor
     ],
 
     props: {
@@ -187,7 +197,7 @@ export default {
                     this.commentThread.children.data.unshift(response.data);
                     this.$refs.toast.timeout('Comment posted', true, 2000);
                     this.newComment = '';
-                    CKEDITOR.instances[`comment-${this.loadCKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
+                    CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
                 })
                 .catch(() => this.$refs.toast.timeout('Comment post failed', false, 5000))
                 .finally(() => this.isProcessing = false)
@@ -258,12 +268,12 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <button class="btn-show-ckeditor" v-show="!loadCKEditor_isCKEditorLoaded" @click.once="loadCKEditor_init">{{ loadCKEditor_getAddCommentButtonText }}</button>
-                    <div :style="loadCKEditor_getStyles">
-                        <textarea :id="`comment-${loadCKEditor_uniqueId}`" rows="4"></textarea>
+                    <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="cKEditor_init">{{ cKEditor_getAddCommentButtonText }}</button>
+                    <div :style="cKEditor_getStyles">
+                        <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
                         <a class="button submit"
                             @click="postComment"
-                            :disabled="loadCKEditor_isPostCommentDisabled">Post comment</a>
+                            :disabled="cKEditor_isPostCommentDisabled">Post comment</a>
                     </div>
                 </template>
                 <template v-if="hasComments">

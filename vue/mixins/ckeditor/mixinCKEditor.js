@@ -9,13 +9,13 @@ export default {
  
     data () {
         return {
-            loadCKEditor_isCKEditorLoading: false,
-            loadCKEditor_isCKEditorLoaded: false,
+            cKEditor_isCKEditorLoading: false,
+            cKEditor_isCKEditorLoaded: false,
         }
     },
 
     beforeCreate () {
-        this.loadCKEditor_uniqueId = __uniqueId.toString();
+        this.cKEditor_uniqueId = __uniqueId.toString();
         __uniqueId += 1;
     },
 
@@ -26,8 +26,8 @@ export default {
          *
          * @returns { String }
          */
-        loadCKEditor_getAddCommentButtonText () {
-            if (this.loadCKEditor_isCKEditorLoading) return 'Loading';
+        cKEditor_getAddCommentButtonText () {
+            if (this.cKEditor_isCKEditorLoading) return 'Loading';
             else return 'Add a comment'
         },
 
@@ -36,8 +36,8 @@ export default {
          *
          * @returns { Object }
          */
-        loadCKEditor_getStyles () {
-            return this.loadCKEditor_isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' };
+        cKEditor_getStyles () {
+            return this.cKEditor_isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' };
         },
 
         /**
@@ -45,7 +45,7 @@ export default {
          *
          * @returns {Boolean}
          */
-        loadCKEditor_isPostCommentDisabled () {
+        cKEditor_isPostCommentDisabled () {
             if (this.newComment.trim() === '' || this.isProcessing) {
                 return true;
             } else {
@@ -60,9 +60,9 @@ export default {
         /**
          * Loads ckeditor only when required rather than on page load
          */
-        loadCKEditor_init () {
+        cKEditor_init () {
 
-            this.loadCKEditor_isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+            this.cKEditor_isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
 
             const loadScripts = async () => {
                 
@@ -72,7 +72,7 @@ export default {
                     await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
 
                     $.fn.alaressEditor({
-                        targetElements: $(`#comment-${this.loadCKEditor_uniqueId}`),
+                        targetElements: $(`#comment-${this.cKEditor_uniqueId}`),
                         startupFocus: true,
                         height: '4rem',
                         removePlugins: 'uploadimage,schoolboxanchor',
@@ -85,17 +85,17 @@ export default {
                         ],
                         on: {
                             change: (event) => {
-                                this.newComment = CKEDITOR.instances[`comment-${this.loadCKEditor_uniqueId}`].getData(); // Bind the content of CKEditor into the comment model on change
+                                this.newComment = CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].getData(); // Bind the content of CKEditor into the comment model on change
                             },
                             instanceReady: (event) => { //can display the loaded CKEditor now
-                                this.loadCKEditor_isCKEditorLoading = false;
-                                this.loadCKEditor_isCKEditorLoaded = true;
+                                this.cKEditor_isCKEditorLoading = false;
+                                this.cKEditor_isCKEditorLoaded = true;
                             }
                         }
                     });
 
                 } catch (error) {
-                    this.$refs.toast.timeout('Loading comments failed', false, 5000);
+                    this.$refs.toast.timeout('Loading comment box failed', false, 5000);
                 }
             }
 
