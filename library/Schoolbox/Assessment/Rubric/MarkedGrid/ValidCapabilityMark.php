@@ -33,7 +33,13 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
             return true;
         }
 
-        $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($capabilityMark);
+        try {
+            $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($capabilityMark);
+        } catch (\RangeException|\InvalidArgumentException $e) {
+            // This cap mark is out of range or an unparseable value.
+            // Either way:
+            return false;
+        }
         return $normalisedCapabilityMark >= IMarkScheme::NORMALISED_MARK_MIN
             && $normalisedCapabilityMark <= IMarkScheme::NORMALISED_MARK_MAX;
     }
