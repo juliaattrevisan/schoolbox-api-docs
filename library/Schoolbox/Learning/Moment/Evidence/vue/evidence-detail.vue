@@ -107,26 +107,60 @@ export default {
             }
             return '';
         },
+
+        /**
+         * Format each except last with a comma
+         *
+         * @param { Number }
+         * 
+         * @return { String }
+         */
+        curriculumCodeWithComma (index) {
+            if (index !== (this.evidence.curriculumNodes.length-1)) {
+                return `${this.evidence.curriculumNodes[index].code},`;
+            } else if (index === (this.evidence.curriculumNodes.length-1) && this.evidence.tags.length > 0) {
+                return `${this.evidence.curriculumNodes[index].code},`;
+            } else {
+                return this.evidence.curriculumNodes[index].code;
+            }
+        },
+
+        /**
+         * Format each except last with a comma
+         *
+         * @param { Number }
+         * 
+         * @return { String }
+         */
+        tagNameWithComma (index) {
+            if (index !== this.evidence.tags.length-1) {
+                return `${this.evidence.tags[index].name},`;
+            } else {
+                return this.evidence.tags[index].name;
+            }
+        }
+
     }
+
 }
 </script>
 <template>
     <div class="evidence-detail">
-        <template v-if="this.hasRoutes()">
+        <template v-if="hasRoutes()">
             <div class="row">
                 <div class="small-12 columns">
                     <div class="actions-small-1">
                         <nav>
-                            <template v-if="this.evidence._links.delete">
+                            <template v-if="evidence._links.delete">
                                 <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
                             </template>
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                            <li v-if="this.evidence._links.modifyForm">
-                                <a class="icon-modify" :href="this.createModifyFormUrl()">Modify</a>
+                            <li v-if="evidence._links.modifyForm">
+                                <a class="icon-modify" :href="createModifyFormUrl()">Modify</a>
                             </li>
-                            <template v-if="this.evidence._links.delete">
-                                <li><a class="icon-delete" :href="this.evidence._links.delete" data-delete>Delete</a></li>
+                            <template v-if="evidence._links.delete">
+                                <li><a class="icon-delete" :href="evidence._links.delete" data-delete>Delete</a></li>
                             </template>
                         </ul>
                     </div>
@@ -140,34 +174,29 @@ export default {
                         <div class="small-12 island">
                             <section class="banner content">
                                 <!-- Is there an attachment? Display it appropriately -->
-                                <article v-if="this.evidence.filename && this.evidence.storage">
-                                    <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
+                                <article v-if="evidence.filename && evidence.storage">
+                                    <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
                                 </article>
                             </section>
                             <section class="detail content">
                                 <p class="meta">By
                                     <a :href="evidence.creator._links.profile" title="View Profile">
-                                        {{ this.evidence.creator.fullName }}
+                                        {{ evidence.creator.fullName }}
                                     </a>
                                     &mdash;
-                                    <relative-time :datetime="this.evidence.createdAt"></relative-time>
+                                    <relative-time :datetime="evidence.createdAt"></relative-time>
                                     <!-- Display curriculum codes and tags -->
                                     <br>
-                                    <template v-if="this.evidence.curriculumNodes.length > 0 || this.evidence.tags.length > 0">
-                                      Tags:
-                                      <template v-for="(curriculumNode, index) in this.evidence.curriculumNodes">
-                                        <template v-if="index !== 0">, </template><span
-                                          :title="curriculumNode.name">{{ curriculumNode.code }}</span>
-                                      </template><template v-if="this.evidence.curriculumNodes.length > 0 && this.evidence.tags.length > 0">, </template>
-                                      <template v-for="(tag, index) in this.evidence.tags">
-                                        <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
-                                      </template>
+                                    <template v-if="evidence.curriculumNodes.length > 0 || evidence.tags.length > 0">
+                                        Tags:
+                                        <span v-for="(curriculumNode, index) in evidence.curriculumNodes" :key="curriculumNode.name" :title="curriculumNode.name"> {{ curriculumCodeWithComma(index) }}</span>
+                                        <span v-for="(tag, index) in evidence.tags" :key="tag.name"> {{ tagNameWithComma(index) }}</span>
                                     </template>
                                 </p>
 
                                 <!-- Display evidence body, with media players initialised -->
-                                <media-article v-if="this.evidence.body">
-                                    <div v-html="this.evidence.body" />
+                                <media-article v-if="evidence.body">
+                                    <div v-html="evidence.body" />
                                 </media-article>
                             </section>
                         </div>
@@ -176,7 +205,7 @@ export default {
                         <comment-thread 
                             :thread="evidence.discussionThread"
                             :create-thread-endpoint="evidence._links.createThread"
-                            :can-comment="this.canComment"
+                            :can-comment="canComment"
                             :cdn-prefix="cdnPrefix"
                             :site-version="siteVersion"
                         />
