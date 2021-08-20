@@ -14,7 +14,7 @@ class Survey_Notification
     /** @var string */
     protected $emailTemplateFile = '../survey/email/authorNotification.html';
 
-    /** @var Mailer */
+    /** @var Mailer|null */
     protected $email = null;
 
     /** @var array */
@@ -52,17 +52,24 @@ class Survey_Notification
         $sectionHandler = new Assess_Section();
         $firstSection = $sectionHandler->getFirst($survey['assess_id']);
 
-        $author = $this->getUserMapper()->findById($this->getAuthorId());
+        try {
+            $author = $this->getUserMapper()->findById($this->getAuthorId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return;
+        }
+        if (empty($author->getEmail())) {
+            return;
+        }
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
 
         $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
 
-        $email->setVar(array(
-            'SURVEY_SURVEY_ID'   => $survey['assess_id'],
-            'SURVEY_TITLE'       => Scrub::text($survey['title']),
-            'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
-            'ATTEMPT_ATTEMPT_ID' => $attempt['attempt_id'],
-        ));
+        $email->setVar([
+                           'SURVEY_SURVEY_ID'   => $survey['assess_id'],
+                           'SURVEY_TITLE'       => Scrub::text($survey['title']),
+                           'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
+                           'ATTEMPT_ATTEMPT_ID' => $attempt['attempt_id'],
+                       ]);
 
         $this->setEmail($email);
     }
@@ -72,7 +79,9 @@ class Survey_Notification
      */
     public function send()
     {
-        $this->getEmail()->send();
+        if ($this->email) {
+            $this->getEmail()->send();
+        }
     }
 
     /* Getters/Setters
@@ -121,7 +130,7 @@ class Survey_Notification
     /**
      * Get email
      *
-     * @return Mailer
+     * @return Mailer|null
      */
     protected function getEmail()
     {
