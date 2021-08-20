@@ -243,8 +243,10 @@ export default {
          *
          * @param { Date } 
          * @param { String } 
+         * 
+         * @returns { String }
          */
-        dateFormat (date, format) {
+        formatDate (date, format) {
             return moment(date).format(format);
         },        
 
@@ -252,6 +254,8 @@ export default {
          * Get the date as from now
          *
          * @param { Date } 
+         * 
+         * @returns { String } ie: 2 hours ago
          */
         fromNow (date) {
             return moment(date).fromNow();
@@ -285,8 +289,8 @@ export default {
                                         <img :src="comment.author._links.avatar.href" alt="View Profile" />
                                         <p>{{ comment.author.fullName }}</p>
                                         <time class="pipe meta"
-                                              :datetime="dateFormat(comment.createdAt.json)"
-                                              :title="dateFormat(comment.createdAt.json, dateDisplayFormats.momentJsDatetime)"
+                                              :datetime="formatDate(comment.createdAt.json)"
+                                              :title="formatDate(comment.createdAt.json, dateDisplayFormats.momentJsDatetime)"
                                         >{{ fromNow(comment.createdAt.json) }}</time>
                                     </a>
                                 </div>

@@ -276,16 +276,29 @@ export default {
 
         },
 
-    },
-
-    filters: {
-        fromNow: function (date) {
+        /**
+         * Return the date from now, 
+         *
+         * @param { Date } 
+         * 
+         * @returns { String } ie: 2 hours ago
+         */
+        fromNow (date) {
             return moment(date.database).fromNow();
         },
-        fullString: function (date) {
+
+        /**
+         * Dispaly the full date
+         *
+         * @param { Date } 
+         * 
+         * @returns { String }
+         */
+        fullString (date) {
             return moment(date.database).format(dateDisplayFormats.momentJsDatetime);
         }
-    }
+
+    },
 
 }
 </script>
@@ -347,7 +360,7 @@ export default {
                                     <a :href="'/search/user/' + comment.author.id" title="View Profile">
                                         <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'">
                                         {{ comment.author.fullName }}
-                                        <span class="pipe meta" :title="comment.createdAt | fullString ">Posted {{ comment.createdAt | fromNow }}</span>
+                                        <span class="pipe meta" :title="fullString(comment.createdAt)">Posted {{ fromNow(comment.createdAt) }}</span>
                                     </a>
                                 </div>
                             </div>
