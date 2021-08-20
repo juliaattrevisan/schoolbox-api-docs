@@ -238,12 +238,29 @@ export default {
                     })
                     .catch(() => this.$refs.toast.timeout('Delete failed', false, 5000))
             }
-        }
-    },
-    filters: {
-        dateFormat: (date, format) => moment(date).format(format),
-        fromNow:    (date)         => moment(date).fromNow(),
-    },
+        },
+
+        /**
+         * Format the date as specified
+         *
+         * @param { Date } 
+         * @param { String } 
+         */
+        dateFormat (date, format) {
+            return moment(date).format(format);
+        },        
+
+        /**
+         * Get the date as from now
+         *
+         * @param { Date } 
+         */
+        fromNow (date) {
+            return moment(date).fromNow();
+        },  
+
+    }
+    
 }
 </script>
 
@@ -270,9 +287,9 @@ export default {
                                         <img :src="comment.author._links.avatar.href" alt="View Profile" />
                                         <p>{{ comment.author.fullName }}</p>
                                         <time class="pipe meta"
-                                              :datetime="comment.createdAt.json | dateFormat"
-                                              :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                        >{{ comment.createdAt.json | fromNow }}</time>
+                                              :datetime="dateFormat(comment.createdAt.json)"
+                                              :title="dateFormat(comment.createdAt.json, dateDisplayFormats.momentJsDatetime)"
+                                        >{{ fromNow(comment.createdAt.json) }}</time>
                                     </a>
                                 </div>
                             </div>
