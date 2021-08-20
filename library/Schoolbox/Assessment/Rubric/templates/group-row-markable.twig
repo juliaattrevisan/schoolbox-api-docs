@@ -70,15 +70,31 @@
                                     <option value="" selected disabled>empty</option>
                                 </optgroup>
                             {% endif %}
-                            <option value="" {% if letterGradeBracket is null %}selected{% endif %}>(no grade)</option>
-                            {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
-                                <option value="{{ gradeLevel.rawGrade }}"
-                                        data-lower-bound="{{ gradeLevel.lowerBound }}"
-                                        {% if letterGradeBracket is not null and letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
-                                        data-letter="{{ gradeLevel.caption }}">
-                                    {{ gradeLevel.caption }}
-                                </option>
-                            {% endfor %}
+
+                            {# Output letter grade select options #}
+                            {% set selectedLetterGrade = capabilityMark ? capabilityMark.humanReadableValue : null %}
+                            {% set found = false %}
+                            <option value=""
+                                    {% if selectedLetterGrade is null %}{% set found = true %}selected{% endif %}>(no grade)</option>
+
+                            <optgroup label="{{ locale.grades.properPlural }}">
+                                {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
+                                    <option value="{{ gradeLevel.caption }}"
+                                            data-lower-bound="{{ gradeLevel.lowerBound }}"
+                                            {% if selectedLetterGrade == gradeLevel.caption %}{% set found = true %}selected{% endif %}
+                                            data-letter="{{ gradeLevel.caption }}">
+                                        {{ gradeLevel.caption }}
+                                    </option>
+                                {% endfor %}
+                            </optgroup>
+
+                            {% if not found %}
+                                <optgroup label="Original Deleted Grade">
+                                    <option selected value="-1" disabled>
+                                        {{ selectedLetterGrade }}
+                                    </option>
+                                </optgroup>
+                            {% endif %}
                         </select>
 
                     {% elseif markType.mode == 'percent' %}
