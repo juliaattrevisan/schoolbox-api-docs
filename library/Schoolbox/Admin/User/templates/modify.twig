@@ -116,9 +116,16 @@
                         <div>
                             <label for="title">Title</label>
                             <select id="title" name="title">
+                                {%  set blank = false %}
                                 {% for title in titles %}
+                                    {% if title.title is null %}
+                                        {%  set blank = true %}
+                                    {% endif %}
                                     <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
                                 {% endfor %}
+                                {% if not blank %}
+                                    <option value="" {% if user.title == "" %}selected{% endif %}></option>
+                                {% endif %}
                             </select>
                         </div>
 
