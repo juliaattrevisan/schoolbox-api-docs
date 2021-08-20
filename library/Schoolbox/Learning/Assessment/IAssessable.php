@@ -665,14 +665,14 @@ interface IAssessable extends ISoftDeletable
      */
     public function getSebEnabled(): ?bool;
 
-    
+
     /**
      * @param bool|null $sebEnabled
      * @return AbstractAssessment
      */
     public function setSebEnabled(?bool $sebEnabled): self;
-    
-    
+
+
     /**
      * Get the weight
      *
