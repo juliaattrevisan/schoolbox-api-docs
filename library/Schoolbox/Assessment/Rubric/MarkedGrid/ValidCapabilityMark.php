@@ -15,9 +15,6 @@ use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 
 class ValidCapabilityMark extends \Alaress\Specification\Base
 {
-    private const NORMALISED_MARK_MIN = 0;
-    private const NORMALISED_MARK_MAX = 100;
-
     private ?float $capabilityMax;
     private IMarkScheme $markScheme;
 
@@ -37,16 +34,7 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
         }
 
         $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($capabilityMark);
-        return $normalisedCapabilityMark >= self::NORMALISED_MARK_MIN
-            && $normalisedCapabilityMark <= self::NORMALISED_MARK_MAX;
-
-//        // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
-//        $max = $this->markScheme instanceof TotalMarkAbstract ? $this->capabilityMax : 100;
-//
-//        // TODO for debugging only, remove later
-//        $isNumeric = is_numeric($capabilityMark);
-//        $greaterOrEqualToZero = $capabilityMark >= 0;
-//        $lessThanOrEqualToMax = $capabilityMark <= $max;
-//        return $isNumeric && $greaterOrEqualToZero && $lessThanOrEqualToMax;
+        return $normalisedCapabilityMark >= IMarkScheme::NORMALISED_MARK_MIN
+            && $normalisedCapabilityMark <= IMarkScheme::NORMALISED_MARK_MAX;
     }
 }
