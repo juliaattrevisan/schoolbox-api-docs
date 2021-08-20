@@ -9,13 +9,14 @@ export default {
  
     data () {
         return {
-            isCKEditorLoading: false,
+            loadCKEditor_isCKEditorLoading: false,
             loadCKEditor_isCKEditorLoaded: false,
         }
     },
 
     beforeCreate () {
-        this.incrementUniqueId();
+        this.loadCKEditor_uniqueId = __uniqueId.toString();
+        __uniqueId += 1;
     },
 
     computed: {
@@ -26,7 +27,7 @@ export default {
          * @returns { String }
          */
         loadCKEditor_getAddCommentButtonText () {
-            if (this.isCKEditorLoading) return 'Loading';
+            if (this.loadCKEditor_isCKEditorLoading) return 'Loading';
             else return 'Add a comment'
         },
 
@@ -39,25 +40,29 @@ export default {
             return this.loadCKEditor_isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' };
         },
 
+        /**
+         * Ensure there's something (anything) in the comment and that the form is not already processing
+         *
+         * @returns {Boolean}
+         */
+        loadCKEditor_isPostCommentDisabled () {
+            if (this.newComment.trim() === '' || this.isProcessing) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
     },
  
     methods: {
-        
-        /**
-         * Ensure multiple instances of CKEditor on the same page have unique ids
-         */
-        incrementUniqueId () {
-            this.uniqueId = __uniqueId.toString();
-            __uniqueId += 1;
-        },
 
         /**
          * Loads ckeditor only when required rather than on page load
          */
         loadCKEditor_init () {
 
-            //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
-            this.isCKEditorLoading = true;
+            this.loadCKEditor_isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
 
             const loadScripts = async () => {
                 
@@ -67,7 +72,7 @@ export default {
                     await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
 
                     $.fn.alaressEditor({
-                        targetElements: $(`#comment-${this.uniqueId}`),
+                        targetElements: $(`#comment-${this.loadCKEditor_uniqueId}`),
                         startupFocus: true,
                         height: '4rem',
                         removePlugins: 'uploadimage,schoolboxanchor',
@@ -80,10 +85,10 @@ export default {
                         ],
                         on: {
                             change: (event) => {
-                                this.pendingComment = CKEDITOR.instances[`comment-${this.uniqueId}`].getData(); // Bind the content of CKEditor into the comment model on change
+                                this.newComment = CKEDITOR.instances[`comment-${this.loadCKEditor_uniqueId}`].getData(); // Bind the content of CKEditor into the comment model on change
                             },
                             instanceReady: (event) => { //can display the loaded CKEditor now
-                                this.isCKEditorLoading = false;
+                                this.loadCKEditor_isCKEditorLoading = false;
                                 this.loadCKEditor_isCKEditorLoaded = true;
                             }
                         }

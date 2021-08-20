@@ -51,8 +51,8 @@ export default {
     data() {
         return {
             commentThread: this.thread,
-            pendingComment: '',
-            saveInProgress: false,
+            newComment: '',
+            isProcessing: false,
             commentIndexToDelete: null
         }
     },
@@ -121,19 +121,6 @@ export default {
             return comments === null ? [] : comments;
         },
 
-        /**
-         * Ensure there's something (anything) in the comment and that the form is not already processing
-         *
-         * @returns {Boolean}
-         */
-        isPostCommentDisabled () {
-            if (this.pendingComment.trim() === '' || this.isProcessActive) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
     },
 
     methods: {
@@ -169,7 +156,7 @@ export default {
             // maybe there's not a thread at all. If not: create one, then post
             let prePromise = Promise.resolve();
 
-            this.saveInProgress = true;
+            this.isProcessing = true;
             this.$refs.toast.activate('Saving...');
 
             if (!this.hasThread) {
@@ -192,17 +179,18 @@ export default {
                     })
             }
             prePromise
-                .then(() => axios.post(this.commentThread._links.createComment.href, {content: this.pendingComment}))
+                .then(() => axios.post(this.commentThread._links.createComment.href, {content: this.newComment}))
                 .then((response) => {
                     // Update the comment count, add the new comment to the
                     // thread, clear the pending comment box
                     this.commentThread.children.metadata.count += 1;
                     this.commentThread.children.data.unshift(response.data);
                     this.$refs.toast.timeout('Comment posted', true, 2000);
-                    this.pendingComment = '';
+                    this.newComment = '';
+                    CKEDITOR.instances[`comment-${this.loadCKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
                 })
                 .catch(() => this.$refs.toast.timeout('Comment post failed', false, 5000))
-                .finally(() => this.saveInProgress = false)
+                .finally(() => this.isProcessing = false)
         },
 
 
@@ -272,10 +260,10 @@ export default {
                 <template v-if="canComment">
                     <button class="btn-show-ckeditor" v-show="!loadCKEditor_isCKEditorLoaded" @click.once="loadCKEditor_init">{{ loadCKEditor_getAddCommentButtonText }}</button>
                     <div :style="loadCKEditor_getStyles">
-                        <textarea :id="`comment-${uuid}`" rows="4"></textarea>
+                        <textarea :id="`comment-${loadCKEditor_uniqueId}`" rows="4"></textarea>
                         <a class="button submit"
                             @click="postComment"
-                            :disabled="isPostCommentDisabled">Post comment</a>
+                            :disabled="loadCKEditor_isPostCommentDisabled">Post comment</a>
                     </div>
                 </template>
                 <template v-if="hasComments">
