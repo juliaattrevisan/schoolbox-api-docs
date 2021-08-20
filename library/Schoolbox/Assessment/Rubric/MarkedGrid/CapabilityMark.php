@@ -64,6 +64,9 @@ class CapabilityMark
      * max mark, or the mark scheme: it is instead out of the capability
      * usage's maximum value based on its indicators.
      *
+     * For example: if the percentage mark is 50%, and the capability usage's
+     * max mark is 12, then this value should be 6.
+     *
      * @var float|null
      */
     private $value;
@@ -80,6 +83,26 @@ class CapabilityMark
         $this->capabilityUsage = $capabilityUsage;
         $this->markScheme      = $markScheme;
         $this->indicatorMarks  = new GenericCollection(IndicatorMark::class);
+    }
+
+
+    /**
+     * Calculates what `$this->value` should be, given a candidate value for
+     * `$this->humanReadableValue`.
+     *
+     * @param string|null $humanReadableValue
+     * @return float|null
+     */
+    public function calculateValueFromHumanReadableValue(?string $humanReadableValue): ?float
+    {
+        if (!isset($humanReadableValue)) {
+            return null;
+        }
+        $normalisedMark = $this->markScheme->getNormalisedMark($humanReadableValue);
+        if (!isset($normalisedMark)) {
+            return null;
+        }
+        return $normalisedMark / 100 * $this->capabilityUsage->getMaxValue();
     }
 
 

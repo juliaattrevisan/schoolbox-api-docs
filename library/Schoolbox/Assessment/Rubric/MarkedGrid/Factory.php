@@ -55,12 +55,11 @@ class Factory
 
 
             // Set its value
-            $capabilityId        = $capabilityUsage->getCapability()->getId();
+            $capabilityId = $capabilityUsage->getCapability()->getId();
 
             // If mark per cap is off, this will be empty as no capability data gets posted
             if ($postCapabilities) {
                 // This is the literal string the user entered into the capability mark input field
-                // (or its percentage bracket equivalent, if letter grade)
                 $capabilityCustomMarkInput = $isSelfReflection
                     ? null
                     : $postCapabilities[$capabilityId]['customMark'];
@@ -70,21 +69,12 @@ class Factory
                 // Validate the input string first
                 $capMarkSpec = new ValidCapabilityMark($capabilityUsage->getMaxValue(), $capabilityMark->getMarkScheme());
                 if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
-                    // Set the capability mark normalised to a value out of the total descriptor points for the capability
-                    $capabilityUnscaledMark = null;
-                    if (!$isSelfReflection) {
-                        // If the mark is passed as an empty string:
-                        // treat that as a null cap mark, not zero
-                        $capabilityUnscaledMark = $postCapabilities[$capabilityId]['unscaledMark'] ?? '';
-                        if ($capabilityUnscaledMark === '') {
-                            $capabilityUnscaledMark = null;
-                        } else {
-                            $capabilityUnscaledMark = (float)$capabilityUnscaledMark;
-                        }
-                    }
+                    // Set the capability mark's values:
+                    // human-readable: whatever was passed in the form
+                    // standard value: calculated based on the human-readable value
                     $capabilityMark
-                        ->setHumanReadableValue($capabilityMark->getMarkScheme()->getHumanReadableMark($capabilityCustomMarkInput))
-                        ->setValue($capabilityUnscaledMark);
+                        ->setHumanReadableValue($capabilityCustomMarkInput)
+                        ->setValue($capabilityMark->calculateValueFromHumanReadableValue($capabilityCustomMarkInput));
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
                 }
