@@ -278,6 +278,7 @@ class Controller extends Assessment\Controller
         /* Check whether SEB was required
          */
         if (!(new Assessment\ValidSebCheck())->isSatisfiedBy(
+            $this->getUser(),
             'https://' . $this->getRequest()->server->get('HTTP_HOST') . $this->getRequest()->server->get('REQUEST_URI'),
             $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),
