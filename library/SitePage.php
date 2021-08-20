@@ -486,6 +486,10 @@ class SitePage extends Page
      */
     public static function localRedir($file, $keepProcessing = false, $responseCode = null)
     {
+        // If somehow $file is empty, redir to the dashboard
+        if (($file ?? '') === '') {
+            $file = '/';
+        }
         header('Location: ' . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
         if ($keepProcessing) {
