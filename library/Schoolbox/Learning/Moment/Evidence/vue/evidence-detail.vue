@@ -62,7 +62,6 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        debugger;
     },
 
     /**
