@@ -88,7 +88,6 @@ if (Config::get('mail_enable') == 1) {
 
             if (!empty($emailAddresses[AbstractMailer::KEY_VALID])) {
                 foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $email => $name) {
-
                     /* For the CC and BCC fields, if an email address was already in To field,
                      * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
                      * by the system rather than the human
@@ -99,7 +98,6 @@ if (Config::get('mail_enable') == 1) {
                 }
             }
         } elseif (!$buildEmailFromId && null === $_REQUEST[$type] && $type === 'bcc') {
-
             /* For the CC and BCC fields, if an email address was already in To field,
              * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
              * by the system rather than the human
