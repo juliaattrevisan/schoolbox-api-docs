@@ -72,15 +72,15 @@ class ValidCapabilityMarkTest extends TestCase
 
         /* Total Mark type */
         // The mark needs to respect the cap max; 0 is permitted
-        yield [$capabilityMax1, $markSchemeTotalMark, $capabilityMark1, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark1, true];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark13, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark14, false];
-        yield [$capabilityMax3, $markSchemeTotalMark, $capabilityMark10, true];
-        yield [$capabilityMax4, $markSchemeTotalMark, $capabilityMark9, true];
-        yield [$capabilityMax4, $markSchemeTotalMark, $capabilityMark3, true];
-        yield [$capabilityMax5, $markSchemeTotalMark, $capabilityMark12, false];
-        yield [$capabilityMax6, $markSchemeTotalMark, $capabilityMark4, false];
+        yield [$capabilityMax1, new TotalMarkFractional($capabilityMax1), $capabilityMark1, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark1, true];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark13, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark14, false];
+        yield [$capabilityMax3, new TotalMarkFractional($capabilityMax3), $capabilityMark10, true];
+        yield [$capabilityMax4, new TotalMarkFractional($capabilityMax4), $capabilityMark9, true];
+        yield [$capabilityMax4, new TotalMarkFractional($capabilityMax4), $capabilityMark3, true];
+        yield [$capabilityMax5, new TotalMarkFractional($capabilityMax5), $capabilityMark12, false];
+        yield [$capabilityMax6, new TotalMarkFractional($capabilityMax6), $capabilityMark4, false];
 
         /* Percentage based marks */
         // Percentage mark type always has max of 100, so cap max shouldn't make any difference
@@ -114,31 +114,31 @@ class ValidCapabilityMarkTest extends TestCase
         /* Always invalid marks */
         // Nonsensical values are always nonsensical and should fail, regardless of mark type.
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid1, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid1, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid1, false];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid1, false];
 
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid2, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid2, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid2, false];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid2, false];
 
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid3, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid3, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid3, false];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid3, false];
 
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid4, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid4, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid4, false];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid4, false];
 
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid5, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid5, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid5, false];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid5, false];
 
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid6, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid6, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid6, false];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid6, false];
 
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid7, false];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid7, false];
+        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid7, false];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid7, false];
     }
 
