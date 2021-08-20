@@ -66,36 +66,36 @@ class ValidCapabilityMarkTest extends TestCase
 
         /* Null cap mark */
         // means we are self-reflecting, so should always return true as cap marks are not given in reflection
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkNull, true];
-        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkNull, true];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkNull, true];
+        yield 'percent scheme, null' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkNull, true];
+        yield 'total mark scheme, null' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkNull, true];
+        yield 'letter grade scheme, null' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkNull, true];
 
         /* Total Mark type */
         // The mark needs to respect the cap max; 0 is permitted
-        yield [$capabilityMax1, new TotalMarkFractional($capabilityMax1), $capabilityMark1, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark1, true];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark13, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark14, false];
-        yield [$capabilityMax3, new TotalMarkFractional($capabilityMax3), $capabilityMark10, true];
-        yield [$capabilityMax4, new TotalMarkFractional($capabilityMax4), $capabilityMark9, true];
-        yield [$capabilityMax4, new TotalMarkFractional($capabilityMax4), $capabilityMark3, true];
-        yield [$capabilityMax5, new TotalMarkFractional($capabilityMax5), $capabilityMark12, false];
-        yield [$capabilityMax6, new TotalMarkFractional($capabilityMax6), $capabilityMark4, false];
+        yield 'total mark scheme, 6/5' => [$capabilityMax1, new TotalMarkFractional($capabilityMax1), $capabilityMark1, false];
+        yield 'total mark scheme, 6/8' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark1, true];
+        yield 'total mark scheme, 8.33/8' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark13, false];
+        yield 'total mark scheme, 9/8' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMark14, false];
+        yield 'total mark scheme, 13/16' => [$capabilityMax3, new TotalMarkFractional($capabilityMax3), $capabilityMark10, true];
+        yield 'total mark scheme, 0.01/1' => [$capabilityMax4, new TotalMarkFractional($capabilityMax4), $capabilityMark9, true];
+        yield 'total mark scheme, 0/1' => [$capabilityMax4, new TotalMarkFractional($capabilityMax4), $capabilityMark3, true];
+        yield 'total mark scheme, 110/100' => [$capabilityMax5, new TotalMarkFractional($capabilityMax5), $capabilityMark12, false];
+        yield 'total mark scheme, 55.55/55' => [$capabilityMax6, new TotalMarkFractional($capabilityMax6), $capabilityMark4, false];
 
         /* Percentage based marks */
         // Percentage mark type always has max of 100, so cap max shouldn't make any difference
-        yield [$capabilityMax1, $markSchemePercentage, $capabilityMark1, true];
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMark2, false];
-        yield [$capabilityMax3, $markSchemePercentage, $capabilityMark3, true];
-        yield [$capabilityMax4, $markSchemePercentage, $capabilityMark4, true];
-        yield [$capabilityMax5, $markSchemePercentage, $capabilityMark5, false];
-        yield [$capabilityMax6, $markSchemePercentage, $capabilityMark6, true];
-        yield [$capabilityMax1, $markSchemePercentage, $capabilityMark7, true];
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMark8, true];
-        yield [$capabilityMax3, $markSchemePercentage, $capabilityMark9, true];
-        yield [$capabilityMax4, $markSchemePercentage, $capabilityMark10, true];
-        yield [$capabilityMax5, $markSchemePercentage, $capabilityMark11, true];
-        yield [$capabilityMax6, $markSchemePercentage, $capabilityMark12, false];
+        yield 'percent scheme, 6%' => [$capabilityMax1, $markSchemePercentage, $capabilityMark1, true];
+        yield 'percent scheme, 101%' => [$capabilityMax2, $markSchemePercentage, $capabilityMark2, false];
+        yield 'percent scheme, 0%' => [$capabilityMax3, $markSchemePercentage, $capabilityMark3, true];
+        yield 'percent scheme, 55.55%' => [$capabilityMax4, $markSchemePercentage, $capabilityMark4, true];
+        yield 'percent scheme, 110%' => [$capabilityMax5, $markSchemePercentage, $capabilityMark5, false];
+        yield 'percent scheme, 99%' => [$capabilityMax6, $markSchemePercentage, $capabilityMark6, true];
+        yield 'percent scheme, 24.66%' => [$capabilityMax1, $markSchemePercentage, $capabilityMark7, true];
+        yield 'percent scheme, 87.67%' => [$capabilityMax2, $markSchemePercentage, $capabilityMark8, true];
+        yield 'percent scheme, 0.01%' => [$capabilityMax3, $markSchemePercentage, $capabilityMark9, true];
+        yield 'percent scheme, 13%' => [$capabilityMax4, $markSchemePercentage, $capabilityMark10, true];
+        yield 'percent scheme, 45.3%' => [$capabilityMax5, $markSchemePercentage, $capabilityMark11, true];
+        yield 'percent scheme, 100.01%' => [$capabilityMax6, $markSchemePercentage, $capabilityMark12, false];
 
         // This should also be the case for letter grade mark type
         yield [$capabilityMax1, $markSchemeLetterGrade, $capabilityMark1, true];
