@@ -81,6 +81,7 @@
                                 {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
                                     <option value="{{ gradeLevel.caption }}"
                                             data-lower-bound="{{ gradeLevel.lowerBound }}"
+                                            data-raw-grade="{{ gradeLevel.rawGrade }}"
                                             {% if selectedLetterGrade == gradeLevel.caption %}{% set found = true %}selected{% endif %}
                                             data-letter="{{ gradeLevel.caption }}">
                                         {{ gradeLevel.caption }}
