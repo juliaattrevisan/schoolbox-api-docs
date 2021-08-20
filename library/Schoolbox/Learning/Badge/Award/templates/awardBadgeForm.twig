@@ -21,9 +21,13 @@
 {% endautoescape %}
 
 <div class="row">
-    <div class="small-12 columns">
+    <div class="button-action small-12 columns">
         <h1>{{ messages.pageHeader }}</h1>
-
+           {% if routeLookupIfAuthorized('learningBadge.getCreateForm') %}
+                <a href="{{ routeLookup('learningBadge.getCreateForm') }}?{{ RETURN_URL.name }}={{ returnUrl }}" class="icon-add button" title="Create Badge">Create Badge</a>
+            {% endif %}
+    </div>
+    <div class="small-12 columns">
         {% if otherUsers is not empty %}
             <ul class="meta">
                 <li>
