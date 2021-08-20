@@ -27,8 +27,36 @@ class ValidCapabilityMarkTest extends TestCase
     {
         /* Mark types */
         $markSchemePercentage = new Percentage();
-        $markSchemeTotalMark = new TotalMarkFractional();
-        $markSchemeLetterGrade = new LetterGrade((new GradeGroup())->setGradeLevels(new GenericCollection(GradeLevel\Model::class)));
+        $markSchemeLetterGrade = new LetterGrade(
+            (new GradeGroup())
+                ->setName('Test')
+                ->setGradeLevels(
+                    (new GenericCollection(GradeLevel\Model::class))
+                        ->add(
+                            (new GradeLevel\Model())
+                                ->setCaption('D')
+                                ->setLowerBound(0)
+                                ->setRawGrade(12.5)
+                        )
+                        ->add(
+                            (new GradeLevel\Model())
+                                ->setCaption('C')
+                                ->setLowerBound(25)
+                                ->setRawGrade(37.5)
+                        )
+                        ->add(
+                            (new GradeLevel\Model())
+                                ->setCaption('B')
+                                ->setLowerBound(50)
+                                ->setRawGrade(62.5)
+                        )
+                        ->add(
+                            (new GradeLevel\Model())
+                                ->setCaption('A')
+                                ->setLowerBound(75)
+                                ->setRawGrade(87.5)
+                        )
+                ));
 
         /* Cap maximums */
         $capabilityMax1 = 5;
@@ -54,6 +82,12 @@ class ValidCapabilityMarkTest extends TestCase
         $capabilityMark12 = "100.01";
         $capabilityMark13 = "8.33";
         $capabilityMark14 = "9";
+
+        /* Letter grades */
+        $capabilityMarkA = "A";
+        $capabilityMarkB = "B";
+        $capabilityMarkC = "C";
+        $capabilityMarkD = "D";
 
         /* Always-invalid cap marks */
         $capabilityMarkInvalid1 = "abc";
@@ -98,48 +132,52 @@ class ValidCapabilityMarkTest extends TestCase
         yield 'percent scheme, 100.01%' => [$capabilityMax6, $markSchemePercentage, $capabilityMark12, false];
 
         // This should also be the case for letter grade mark type
-        yield [$capabilityMax1, $markSchemeLetterGrade, $capabilityMark1, true];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMark2, false];
-        yield [$capabilityMax3, $markSchemeLetterGrade, $capabilityMark3, true];
-        yield [$capabilityMax4, $markSchemeLetterGrade, $capabilityMark4, true];
-        yield [$capabilityMax5, $markSchemeLetterGrade, $capabilityMark5, false];
-        yield [$capabilityMax6, $markSchemeLetterGrade, $capabilityMark6, true];
-        yield [$capabilityMax1, $markSchemeLetterGrade, $capabilityMark7, true];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMark8, true];
-        yield [$capabilityMax3, $markSchemeLetterGrade, $capabilityMark9, true];
-        yield [$capabilityMax4, $markSchemeLetterGrade, $capabilityMark10, true];
-        yield [$capabilityMax5, $markSchemeLetterGrade, $capabilityMark11, true];
-        yield [$capabilityMax6, $markSchemeLetterGrade, $capabilityMark12, false];
+        yield 'letter grade scheme, A' => [$capabilityMax1, $markSchemeLetterGrade, $capabilityMarkA, true];
+        yield 'letter grade scheme, B' => [$capabilityMax1, $markSchemeLetterGrade, $capabilityMarkB, true];
+        yield 'letter grade scheme, C' => [$capabilityMax1, $markSchemeLetterGrade, $capabilityMarkC, true];
+        yield 'letter grade scheme, D' => [$capabilityMax1, $markSchemeLetterGrade, $capabilityMarkD, true];
+        yield 'letter grade scheme, 6%' => [$capabilityMax1, $markSchemeLetterGrade, $capabilityMark1, false];
+        yield 'letter grade scheme, 101%' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMark2, false];
+        yield 'letter grade scheme, 0%' => [$capabilityMax3, $markSchemeLetterGrade, $capabilityMark3, false];
+        yield 'letter grade scheme, 55.55%' => [$capabilityMax4, $markSchemeLetterGrade, $capabilityMark4, false];
+        yield 'letter grade scheme, 110%' => [$capabilityMax5, $markSchemeLetterGrade, $capabilityMark5, false];
+        yield 'letter grade scheme, 99%' => [$capabilityMax6, $markSchemeLetterGrade, $capabilityMark6, false];
+        yield 'letter grade scheme, 24.66%' => [$capabilityMax1, $markSchemeLetterGrade, $capabilityMark7, false];
+        yield 'letter grade scheme, 87.67%' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMark8, false];
+        yield 'letter grade scheme, 0.01%' => [$capabilityMax3, $markSchemeLetterGrade, $capabilityMark9, false];
+        yield 'letter grade scheme, 13%' => [$capabilityMax4, $markSchemeLetterGrade, $capabilityMark10, false];
+        yield 'letter grade scheme, 45.3%' => [$capabilityMax5, $markSchemeLetterGrade, $capabilityMark11, false];
+        yield 'letter grade scheme, 100.01%' => [$capabilityMax6, $markSchemeLetterGrade, $capabilityMark12, false];
 
         /* Always invalid marks */
         // Nonsensical values are always nonsensical and should fail, regardless of mark type.
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid1, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid1, false];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid1, false];
+        yield 'percent scheme, abc' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid1, false];
+        yield 'total mark scheme, abc' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid1, false];
+        yield 'letter grade scheme, abc' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid1, false];
 
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid2, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid2, false];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid2, false];
+        yield 'percent scheme, -1' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid2, false];
+        yield 'total mark scheme, -1' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid2, false];
+        yield 'letter grade scheme, -1' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid2, false];
 
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid3, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid3, false];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid3, false];
+        yield 'percent scheme, -8' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid3, false];
+        yield 'total mark scheme, -8' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid3, false];
+        yield 'letter grade scheme, -8' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid3, false];
 
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid4, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid4, false];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid4, false];
+        yield 'percent scheme, -0.5' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid4, false];
+        yield 'total mark scheme, -0.5' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid4, false];
+        yield 'letter grade scheme, -0.5' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid4, false];
 
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid5, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid5, false];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid5, false];
+        yield 'percent scheme, f00d' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid5, false];
+        yield 'total mark scheme, f00d' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid5, false];
+        yield 'letter grade scheme, f00d' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid5, false];
 
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid6, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid6, false];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid6, false];
+        yield 'percent scheme, l8' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid6, false];
+        yield 'total mark scheme, l8' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid6, false];
+        yield 'letter grade scheme, l8' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid6, false];
 
-        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid7, false];
-        yield [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid7, false];
-        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid7, false];
+        yield 'percent scheme, 1inux' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid7, false];
+        yield 'total mark scheme, 1inux' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid7, false];
+        yield 'letter grade scheme, 1inux' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid7, false];
     }
 
     /**
