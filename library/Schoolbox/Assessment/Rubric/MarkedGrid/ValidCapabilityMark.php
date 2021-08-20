@@ -10,14 +10,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 
 class ValidCapabilityMark extends \Alaress\Specification\Base
 {
-    private $capabilityMax;
-    private $markScheme;
+    private const NORMALISED_MARK_MIN = 0;
+    private const NORMALISED_MARK_MAX = 100;
 
-    public function __construct($capabilityMax, $markScheme)
+    private ?float $capabilityMax;
+    private IMarkScheme $markScheme;
+
+    public function __construct(?float $capabilityMax, IMarkScheme $markScheme)
     {
         $this->capabilityMax = $capabilityMax;
         $this->markScheme = $markScheme;
@@ -32,13 +36,17 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
             return true;
         }
 
-        // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
-        $max = $this->markScheme instanceof TotalMarkAbstract ? $this->capabilityMax : 100;
+        $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($capabilityMark);
+        return $normalisedCapabilityMark >= self::NORMALISED_MARK_MIN
+            && $normalisedCapabilityMark <= self::NORMALISED_MARK_MAX;
 
-        // TODO for debugging only, remove later
-        $isNumeric = is_numeric($capabilityMark);
-        $greaterOrEqualToZero = $capabilityMark >= 0;
-        $lessThanOrEqualToMax = $capabilityMark <= $max;
-        return $isNumeric && $greaterOrEqualToZero && $lessThanOrEqualToMax;
+//        // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
+//        $max = $this->markScheme instanceof TotalMarkAbstract ? $this->capabilityMax : 100;
+//
+//        // TODO for debugging only, remove later
+//        $isNumeric = is_numeric($capabilityMark);
+//        $greaterOrEqualToZero = $capabilityMark >= 0;
+//        $lessThanOrEqualToMax = $capabilityMark <= $max;
+//        return $isNumeric && $greaterOrEqualToZero && $lessThanOrEqualToMax;
     }
 }
