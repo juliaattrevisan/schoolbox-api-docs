@@ -286,9 +286,7 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e) {
             $assessment = $e->getDeletedObject();
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }

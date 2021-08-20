@@ -1,14 +1,15 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\User;
-
 
 /**
  * Check if you can view this assessment with a normal browser
@@ -60,7 +61,6 @@ class ValidSebCheck
         /* Otherwise check whether the two superglobal keys exist
          */
         if (isset($serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'], $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'])) {
-
             /* Both keys that were transmitted by the browser must match
              * the values we expected to receive
              */

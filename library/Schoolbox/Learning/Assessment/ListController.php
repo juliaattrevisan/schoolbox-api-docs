@@ -119,10 +119,7 @@ class ListController extends Web\Controller\Base
      */
     public function getSebDownload(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput(
-            '@learningAssessment/sebDownload.twig', [
-            ]
-        ));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/sebDownload.twig', []));
     }
 
 

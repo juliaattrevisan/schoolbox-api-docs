@@ -241,7 +241,8 @@ class Model implements ISoftDeletable
         $this->deletedAt       = new Alaress_Date_NullDate();
     }
 
-    function __clone()
+
+    public function __clone()
     {
         $this->id = null;
         if ($this->hasQuiz()) {
