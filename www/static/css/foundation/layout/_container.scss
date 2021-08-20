@@ -40,6 +40,10 @@
     #admin-nav {
         grid-area: nav;
         @include mobile-padding();
+
+        @media #{$small-only} {
+            padding-bottom: 1rem;
+        }
     }
 
     .admin-content {
@@ -47,8 +51,8 @@
         min-width: 0;
 
         @media #{$medium-down} {
-            padding-left: 1rem;
-            padding-right: 1rem;
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
         }
     }
 }
