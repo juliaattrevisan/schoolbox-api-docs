@@ -243,6 +243,10 @@ class Controller extends Base
             }
         }
 
+        // requires filter params and returnUrl
+        unset($queryArgs['page']);
+        $returnUrl =  $_GET["page"] . '?' . http_build_query($queryArgs);
+
         $translator = new User\Translator\Author\ModelToArray();
         $this->response->content->set(
             $this->buildHtmlOutput(
@@ -252,6 +256,7 @@ class Controller extends Base
                     'users'          => $targetUsers->map($translator),
                     'otherUsers'     => $otherUsers->map($translator),
                     'filterPanel'    => $filterPanel,
+                    'returnUrl'      => Redirect::encode($returnUrl),
                 ],
                 $title
             )
