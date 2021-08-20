@@ -115,6 +115,18 @@ class ListController extends Web\Controller\Base
 
 
     /**
+     * Offer a SEB Safe Exam Browser download screen
+     */
+    public function getSebDownload(): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput(
+            '@learningAssessment/sebDownload.twig', [
+            ]
+        ));
+    }
+
+
+    /**
      * Retrieve a list of assessments that exist, by context
      *
      * NOTE: this is a debug route that is only available to supers, so don't go referencing this route in twigs...

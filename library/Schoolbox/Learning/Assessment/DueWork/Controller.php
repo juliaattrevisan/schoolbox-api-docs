@@ -285,7 +285,8 @@ class Controller extends Assessment\Controller
             'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
             'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f'
         )) {
-            die('seb check failed, download the stuff');
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload'));
+            return;
         }
 
         $participant = $assessment->getParticipantIfExtant($student);
