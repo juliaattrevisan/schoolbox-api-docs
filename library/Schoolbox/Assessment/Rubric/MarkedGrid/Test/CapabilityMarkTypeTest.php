@@ -230,14 +230,15 @@ class CapabilityMarkTypeTest extends TestCase
              */
             $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($dueWork, $capabilityUsage->getMaxValue());
 
-            // Mark-per-capability?
             // Use the actual input value (which may be null) instead of the
             // calculated mark.
-            $capabilityValue = $markedGrid->getGrid()->isMarkPerCapability() ? $capabilityMark->getValue() : $capabilityMark->calculateScaledMark();
+            $capabilityValue = $markedGrid->getGrid()->isMarkPerCapability()
+                ? $capabilityMark->getValue()
+                : $capabilityMark->calculateScaledMark();
 
-            $stack[] = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
-                ->setValue($capabilityValue)
-                ->retrieveHumanReadableMark();
+            $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
+                ->setValue($capabilityValue);
+            $stack[] = $capabilityMarkScheme->getHumanReadableMark($capabilityMark->retrieveNormalizedMark());
         }
 
         return $stack;
