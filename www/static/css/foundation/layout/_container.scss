@@ -54,5 +54,35 @@
             padding-left: 1rem;
             padding-right: 1rem;
         }
+
+        /* For some reason the styles in admin are special which is
+         * possibly due to the admin-nav and admin-content arrangement
+         */
+        @media #{$mediumwide-up} {
+            .row {
+                &.actions-small-1 > nav,
+                &.actions-small-2 > nav {
+                    margin-right: 1rem;
+                }
+            }
+        }
+
+        @media #{$medium-only} {
+            .row {
+                &.actions-small-1 > nav,
+                &.actions-small-2 > nav {
+                    margin-right: 0.75rem;
+                }
+            }
+        }
+
+        @media #{$small-only} {
+            .row {
+                &.actions-small-1 > nav,
+                &.actions-small-2 > nav {
+                    margin-right: 0.5rem;
+                }
+            }
+        }
     }
 }
