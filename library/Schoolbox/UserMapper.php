@@ -930,7 +930,7 @@ class UserMapper extends Mapper
     public function verifyValidLocalEmail(User $user)
     {
         if ($user->getLocalEmail() === null) {
-            throw new UnexpectedValueException('Local email flag cannot be null');
+            throw new UnexpectedValueException('Email Address from Username cannot be null');
         }
 
         return true;
