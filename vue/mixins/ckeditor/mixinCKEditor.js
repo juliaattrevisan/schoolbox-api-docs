@@ -4,6 +4,7 @@
 
 
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
+let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts once
  
 export default {
  
@@ -68,8 +69,14 @@ export default {
                 
                 try {
                     
-                    await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
-                    await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
+                    if (__isFirstCKEditorLoad) {
+
+                        await this.injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
+                        await this.injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
+                        
+                        __isFirstCKEditorLoad = false;
+
+                    }
 
                     $.fn.alaressEditor({
                         targetElements: $(`#comment-${this.cKEditor_uniqueId}`),
@@ -78,10 +85,10 @@ export default {
                         removePlugins: 'uploadimage,schoolboxanchor',
                         removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
                         toolbarGroups: [
-                            {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                            {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                            {name: 'insert', groups: ['insert']},
-                            {name: 'schoolbox', groups: ['schoolboxlink']}
+                            { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                            { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
+                            { name: 'insert', groups: ['insert'] },
+                            { name: 'schoolbox', groups: ['schoolboxlink'] }
                         ],
                         on: {
                             change: (event) => {
