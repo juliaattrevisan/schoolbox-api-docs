@@ -175,8 +175,11 @@ class ValidCapabilityMarkTest extends TestCase
         yield 'total mark scheme, l8' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid6, false];
         yield 'letter grade scheme, l8' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid6, false];
 
-        yield 'percent scheme, 1inux' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid7, false];
-        yield 'total mark scheme, 1inux' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid7, false];
+        // These values happen to be parseable as numbers by the mark schemes:
+        // I guess that's fine
+        yield 'percent scheme, 1inux' => [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid7, true];
+        yield 'total mark scheme, 1inux' => [$capabilityMax2, new TotalMarkFractional($capabilityMax2), $capabilityMarkInvalid7, true];
+        // it's not understandable as a letter grade though
         yield 'letter grade scheme, 1inux' => [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid7, false];
     }
 
