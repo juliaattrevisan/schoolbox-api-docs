@@ -1,29 +1,23 @@
-{% extends "schoolmail/row.twig" %}
-
-{% block image %}
-    {% set msg = row.messages | first %}
-    <table width="50" align="center">
-        <tr>
-            <td class="work-month">{{ msg.time|date('M') }}</td>
-        </tr>
-        <tr>
-            <td class="work-day">{{ msg.time|date('j') }}</td>
-        </tr>
-    </table>
-{% endblock %}
-
-{% block pretty %}
-    <table>
-        {% for msg in row.messages %}
+<tr class="island">
+    <td width="50" height="50" valign="top">
+        {% set msg = row.messages | first %}
+        <table width="50">
+            <tr>
+                <td class="work-month">{{ msg.time|date('M') }}</td>
+            </tr>
+            <tr>
+                <td class="work-day">{{ msg.time|date('j') }}</td>
+            </tr>
+        </table>
+    </td>
+    <td valign="middle">
+        <table>
+            {% for msg in row.messages %}
             <tr>
                 {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
                 <td><p>{{ msg.title | raw }}</p></td>
             </tr>
-        {% endfor %}
-    </table>
-{% endblock %}
-
-{% block meta %}
-    {# no meta #}
-{% endblock %}
-
+            {% endfor %}
+        </table>
+    </td>
+</tr>
