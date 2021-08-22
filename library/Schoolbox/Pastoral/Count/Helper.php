@@ -157,9 +157,23 @@ class Helper
             /**
              * it's important to derive the colors from subtype before the type - if it exists
              */
+            $studentSubTypeId = $studentCount->getOffset('subtypeId');
+            $studentTypeId    = $studentCount->getOffset('typeId');
+
+            /**
+             * handle the rare cases where a pastoral event has a subtype, but no icon and color
+             */
+            if ($studentCount->offsetExists('subtypeId') && !$pastoralSubtypes->offsetExists($studentSubTypeId)) {
+                continue;
+            }
+
+            /**
+             * checking whether the subtype is within the whitelist is important, because it's possible to assign a
+             * subtype after its been created and assigned.
+             */
             if ($studentCount->offsetExists('subtypeId')) {
                 /** @var PastoralSubType|null $subtype */
-                $subtype         = $pastoralSubtypes->getOffset($studentCount->getOffset('subtypeId'));
+                $subtype         = $pastoralSubtypes->getOffset($studentSubTypeId);
                 $foregroundColor = $subtype->getColor();
                 $studentCount
                     ->setOffset('icon', $subtype->getIcon())
@@ -168,7 +182,7 @@ class Helper
                     ->setOffset('sequence', $subtype->getPastoralType()->getSequence());
             } else {
                 /** @var PastoralType|null $type */
-                $type            = $pastoralTypes->getOffset($studentCount->getOffset('typeId'));
+                $type            = $pastoralTypes->getOffset($studentTypeId);
                 $foregroundColor = $type->getColor();
                 $studentCount
                     ->setOffset('icon', $type->getIcon())
