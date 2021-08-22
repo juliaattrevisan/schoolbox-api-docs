@@ -150,7 +150,9 @@
             </div>
         </section>
     </div>
-    {% elseif countSummaryByMonth.recordCount > 0 %}
+    {% endif %}
+
+    {% if countSummaryByMonth.recordCount > 0 %}
         {% include '@pastoral/student_section_summary_barchart.twig' with { countSummaryByMonth: countSummaryByMonth } %}
     {% endif %}
 </div>

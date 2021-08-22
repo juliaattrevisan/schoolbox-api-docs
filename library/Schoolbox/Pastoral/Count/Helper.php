@@ -85,13 +85,10 @@ class Helper
             return;
         }
 
+        $pastoralTypePredicate    = $this->pastoralTypeMapper->getPredicateBuilder();
+        $pastoralSubTypePredicate = $this->pastoralSubTypeMapper->getPredicateBuilder();
         /**
-         * ensure we arent displaying deleted types
-         */
-        $pastoralTypePredicate    = $this->pastoralTypeMapper->getPredicateBuilder()->isNull('deleted_at');
-        $pastoralSubTypePredicate = $this->pastoralSubTypeMapper->getPredicateBuilder()->isNull('deleted_at');
-        /**
-         * but do we want types that have colors/icons
+         * do we want types that have colors/icons
          */
         if ($allowWithoutIcons === false) {
             $pastoralTypePredicate->notNull('color')->notNull('icon');
