@@ -101,17 +101,18 @@ class Specification
                 'params' => [],
             ],
             [
-                // Blanks are valid here, but I need to differentiate between a
-                // invalid class code and permission denied message.
-                // If this returns a 500 error, then this is considered okay
                 'endpoint' => 'schedule/v1/GetStandardClassDetails',
                 'params' => [
                     'activityCode'      => '',
                     'academicGroupCode' => '',
                 ],
-                'responseCode500Ok' => true,
+                // The 500 HTTP error code is expected and acceptable when
+                // passing a blank activity code:
+                // this is what Compass responds with when the endpoint is
+                // available but the code doesn't exist on the Compass instance.
+                // Any other error code isn't acceptable.
+                'acceptableErrorCodes' => [500],
             ],
-
         ];
 
         $endpoints = [];
@@ -123,10 +124,10 @@ class Specification
             try {
                 $result = (bool)$this->api->retrieveDocument($path['endpoint'], $path['params']);
             } catch (\RuntimeException | \DomainException | \JsonException $e) {
-                $responseCode500Ok = $path['responseCode500Ok'] ?? false;
-                if ($responseCode500Ok && $e->getCode() === 500) {
+                $acceptableErrorCodes = $path['acceptableErrorCodes'] ?? [];
+                if (in_array($e->getCode(), $acceptableErrorCodes, true)) {
                     $result = true;
-                    $message .= ' (returned response code 500, but this is expected)';
+                    $message .= sprintf(' (returned acceptable HTTP response code %d)', $e->getCode());
                 } else {
                     $result = false;
                     $errorMessage = $e->getMessage();
