@@ -116,7 +116,6 @@
                         <div>
                             <label for="title">Title</label>
                             <select id="title" name="title">
-                                {%  set blank = false %}
                                 <option value="" {% if user.title == "" %}selected{% endif %}></option>
                                 {% for title in titles %}
                                     {% if title.title %}
