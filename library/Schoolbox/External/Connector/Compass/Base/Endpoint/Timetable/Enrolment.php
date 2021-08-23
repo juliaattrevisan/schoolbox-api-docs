@@ -84,6 +84,8 @@ class Enrolment
                     $isEnrolmentFinished = false;
                 }
 
+                // Enrol the student in this class if their enrolment is current
+                // (has started, and not finished)
                 if ($isEnrolmentStarted && !$isEnrolmentFinished) {
                     $studentCode = $enrolment['student']['code'] ?? null;
                     if (isset($studentCode)) {
@@ -91,6 +93,12 @@ class Enrolment
                     }
                 }
             }
+
+            // Assume for now that every teacher for every session is considered
+            // a teacher for this class.
+            // (Potentially we could attempt to only set a single teacher who's
+            //  actually teaching each class? `sis_class_period` has a single
+            //  `teacher_external_id` column.)
             foreach ($classDetail['sessions'] as $session) {
                 foreach ($session['teachers'] as $teacher) {
                     $teacherCode = $teacher['code'] ?? null;
