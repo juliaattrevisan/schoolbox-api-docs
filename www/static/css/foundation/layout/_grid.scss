@@ -113,16 +113,12 @@ $align-block-grid-to-grid: true;
 // yes, these are really really really specific, but it's for the greater good
 #content {
   > .row {
-    > .admin-content > .small-12,
-    > .admin-content > .medium-12,
     > .small-12,
     > .medium-12,
     > .list-item > .small-12,
     > .list-item > .medium-12 {
       @include mobile-padding();
     }
-    > .admin-content > .small-12,
-    > .admin-content > .medium-12,
     > .small-12,
     .medium-12 {
       > [class*="actions-"] {

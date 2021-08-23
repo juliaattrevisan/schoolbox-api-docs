@@ -340,10 +340,8 @@
                 </section>
             {% endfor %}
 
-            <div class="small-12 island">
-                <input type="submit" id="save_settings" value="Save Settings" data-href="{{ routeLookup('filters.postSavePageSettings', { page: page }) }}">
-                <div class="toast" data-toast></div>
-            </div>
+            <input type="submit" id="save_settings" value="Save Settings" data-href="{{ routeLookup('filters.postSavePageSettings', { page: page }) }}">
+            <div class="toast" data-toast></div>
         </form>
     </div>
 </div>
