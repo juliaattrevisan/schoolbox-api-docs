@@ -116,8 +116,11 @@
                         <div>
                             <label for="title">Title</label>
                             <select id="title" name="title">
+                                <option value="" {% if user.title == "" %}selected{% endif %}></option>
                                 {% for title in titles %}
+                                    {% if title.title %}
                                     <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
