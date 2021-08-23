@@ -37,18 +37,6 @@
                       data-rubric-id="{{ rubricGrid.id }}"
                       data-mark-type="{{ markType.mode }}">
 
-                    {# This is the value we insert into the database. #}
-                    <input type="hidden"
-                           data-db-mark
-                           value="{{ capabilityMark ? capabilityMark.value : null }}"
-                           name="{{ formField }}[groups][{{ capabilityId }}][unscaledMark]">
-
-                    {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
-                    {# TODO don't post this: instead use the marked grid to calculate it #}
-                    <input type="hidden"
-                           value="{{ capabilityMaxValue }}"
-                           name="{{ formField }}[groups][{{ capabilityId }}][max]">
-
                     <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
                     {% if markType.mode == 'raw' or markType.mode == 'none' %}
