@@ -156,7 +156,7 @@ export default {
     <div class="outer-container" ref="outerContainer">
         <div class="inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
-            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="onCloseSelected" :disabled="mixinSaveRows_isProcessing"></a>
+            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="onCloseSelected" :disabled="saveRows_isProcessing"></a>
             <ul class="option-list" data-option-list>
                 <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px;">
                     <input
@@ -176,7 +176,7 @@ export default {
                     <label :for="field.caption">{{ field.caption }}<span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span></label>
                 </li>
             </ul>
-            <button @click.prevent="mixinSaveRows_onSaveSelected" class="save-button">{{ mixinSaveRows_saveStatus }} {{ headerField.caption }}</button>
+            <button @click.prevent="saveRows_onSaveSelected" class="save-button">{{ saveRows_saveStatus }} {{ headerField.caption }}</button>
         </div>
     </div>
 </template>

@@ -9,8 +9,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 
-    strict: true,
-
     state: {
         loadedData: null, //contains the loaded data
         rows: [], //to display and possibly edit the rows 

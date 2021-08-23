@@ -10,8 +10,8 @@ export default {
     
     data () {
         return {
-            mixinSaveRows_isProcessing: false,
-            mixinSaveRows_saveStatus: 'Save'
+            saveRows_isProcessing: false,
+            saveRows_saveStatus: 'Save'
         }
     },
 
@@ -27,10 +27,10 @@ export default {
         /**
          * Save all data
          */
-        async mixinSaveRows_onSaveSelected () {
+        async saveRows_onSaveSelected () {
             try {
-                this.mixinSaveRows_isProcessing = true;
-                this.mixinSaveRows_saveStatus = 'Saving...';
+                this.saveRows_isProcessing = true;
+                this.saveRows_saveStatus = 'Saving...';
                 // this.$refs.toast.activate(this.saveStatus);
                 this.updateSequenceOrder();
                 const response = await axios.post(this.loadedData.saveRoute, this.getSaveAllFormData());
@@ -45,8 +45,8 @@ export default {
                 // this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
                 this.$nextTick(() => { //to avoid animating any newly inserted rows in onBeforeEnter 
-                    this.mixinSaveRows_isProcessing = false;
-                    this.mixinSaveRows_saveStatus = 'Save';
+                    this.saveRows_isProcessing = false;
+                    this.saveRows_saveStatus = 'Save';
                 });
             }
         },

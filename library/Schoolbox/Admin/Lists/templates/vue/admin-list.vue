@@ -222,10 +222,11 @@ export default {
 
                         </section>
 
+                        
                         <input type="submit" 
-                            @click.prevent="mixinSaveRows_onSaveSelected" 
-                            :value="mixinSaveRows_saveStatus" 
-                            :disabled="mixinSaveRows_isProcessing" 
+                            @click.prevent="saveRows_onSaveSelected" 
+                            :value="saveRows_saveStatus" 
+                            :disabled="saveRows_isProcessing" 
                         />
 
                     </form>
