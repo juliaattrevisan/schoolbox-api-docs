@@ -10,17 +10,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use Alaress\Specification\Base;
+use InvalidArgumentException;
+use RangeException;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 
-class ValidCapabilityMark extends \Alaress\Specification\Base
+class ValidCapabilityMark extends Base
 {
-    private ?float $capabilityMax;
     private IMarkScheme $markScheme;
 
-    public function __construct(?float $capabilityMax, IMarkScheme $markScheme)
+    public function __construct(IMarkScheme $markScheme)
     {
-        $this->capabilityMax = $capabilityMax;
         $this->markScheme = $markScheme;
     }
 
@@ -35,7 +35,7 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
 
         try {
             $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($capabilityMark);
-        } catch (\RangeException|\InvalidArgumentException $e) {
+        } catch (RangeException | InvalidArgumentException $e) {
             // This cap mark is out of range or an unparseable value.
             // Either way:
             return false;

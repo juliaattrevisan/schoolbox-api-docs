@@ -67,7 +67,7 @@ class Factory
                 $capabilityCustomMarkInput = $capabilityCustomMarkInput ?: null;
 
                 // Validate the input string first
-                $capMarkSpec = new ValidCapabilityMark($capabilityUsage->getMaxValue(), $capabilityMark->getMarkScheme());
+                $capMarkSpec = new ValidCapabilityMark($capabilityMark->getMarkScheme());
                 if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
                     // Set the capability mark's values:
                     // human-readable: whatever was passed in the form
