@@ -58,24 +58,33 @@ class Enrolment
         // Only things we need to know:
         $teachers = [];
         $students = [];
-        $now      = Alaress_Date_Format::now();
         foreach ($classDetails['d'] as $classDetail) {
             $leadTeacherCode = $classDetail['leadTeacherCode'] ?? null;
             if (isset($leadTeacherCode)) {
                 $teachers[$leadTeacherCode] = $leadTeacherCode;
             }
             foreach ($classDetail['enrolments'] as $enrolment) {
-                // Need to take enrolment start/finish into account
-                $enrolmentStartDate = isset($enrolment['enrolmentStartDate'])
-                    ? Alaress_Date_Format::newFromTimestamp(strtotime($enrolment['enrolmentStartDate']))
-                    : $now;
-                $enrolmentFinishDate = isset($enrolment['enrolmentFinishDate'])
-                    ? Alaress_Date_Format::newFromTimestamp(strtotime($enrolment['enrolmentFinishDate']))
-                    : $now;
-                if (
-                    ($enrolmentStartDate->isToday() || $enrolmentStartDate->lte($now))
-                    && ($enrolmentFinishDate->isToday() || $enrolmentFinishDate->gte($now))
-                ) {
+                // Need to take enrolment start/finish into account.
+                // If start date isn't provided: assume they started already
+                // If it is provided: verify the start date has been reached
+                if (isset($enrolment['enrolmentStartDate'])) {
+                    $enrolmentStartDate = Alaress_Date_Format::newFromTimestamp(strtotime($enrolment['enrolmentStartDate']));
+                    $isEnrolmentStarted = !$enrolmentStartDate->isFutureDate();
+                } else {
+                    $isEnrolmentStarted = true;
+                }
+
+                // Likewise:
+                // if finish date isn't provided, assume they haven't finished
+                // if it is provided: verify the finish date isn't in the past
+                if (isset($enrolment['enrolmentFinishDate'])) {
+                    $enrolmentFinishDate = Alaress_Date_Format::newFromTimestamp(strtotime($enrolment['enrolmentFinishDate']));
+                    $isEnrolmentFinished = $enrolmentFinishDate->isPastDate();
+                } else {
+                    $isEnrolmentFinished = false;
+                }
+
+                if ($isEnrolmentStarted && !$isEnrolmentFinished) {
                     $studentCode = $enrolment['student']['code'] ?? null;
                     if (isset($studentCode)) {
                         $students[$studentCode] = $studentCode;
