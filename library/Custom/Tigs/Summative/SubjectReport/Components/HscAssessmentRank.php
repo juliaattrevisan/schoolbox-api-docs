@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -83,7 +84,7 @@ class HscAssessmentRank extends BaseComponent
     {
         // Group cohort assessments per class
         /** @var Collection|GenericCollection[]|IAssessable[][] $cohortAssessmentsPerClass */
-        $cohortAssessmentsPerClass = $this->cohortAssessments->groupByCallback(function (IAssessable $assessable) {
+        $cohortAssessmentsPerClass = $this->cohortAssessments->sortBy('dueAt', Collection::ORDER_DESCENDING)->groupByCallback(function (IAssessable $assessable) {
             return $assessable->getBaseContext()->getFolder()->getId();
         });
 
@@ -102,39 +103,32 @@ class HscAssessmentRank extends BaseComponent
 
         // Check that students only participate in max 1 HscAssessmentRank assessment per Folder per ReportPeriod
         // (Note we are already in the context of a single ReportPeriod)
-        /** @var int[][] $participationCountsPerFolder Indexed by folderId, studentId */
-        $participationCountsPerFolder = [];
+        /** @var int[][] $participantPerFolder Indexed by folderId, studentId */
+        $participantPerFolder = [];
         foreach ($cohortAssessmentsPerClass as $folderId => $classAssessments) {
-            $participationCountsPerFolder[$folderId] = [];
+            $participantPerFolder[$folderId] = [];
             foreach ($classAssessments as $classAssessment) {
                 foreach ($classAssessment->getAllParticipants() as $participant) {
                     if ($participant->isExcluded()) {
                         continue;
                     }
                     $studentId = $participant->getUser()->getId();
-                    if (!array_key_exists($studentId, $participationCountsPerFolder[$folderId])) {
-                        $participationCountsPerFolder[$folderId][$studentId] = 0;
+                    if (!array_key_exists($studentId, $participantPerFolder[$folderId])) {
+                        $participantPerFolder[$folderId][$studentId] = $participant;
+                    } else {
+                        /** @var Participant $existingParticipant */
+                        $existingParticipant = $participantPerFolder[$folderId][$studentId];
+                        // if newer participation already exists for this assessment
+                        // replace it, only when feedback exists for older participation
+                        if (
+                            !$existingParticipant->getAuthoritativeFeedback(true)
+                            && $participant->getAuthoritativeFeedback(true)
+                        ) {
+                            $participantPerFolder[$folderId][$studentId] = $participant;
+                        }
                     }
-                    $participationCountsPerFolder[$folderId][$studentId]++;
                 }
             }
-        }
-        $errors = [];
-        foreach ($participationCountsPerFolder as $folderId => $participationCounts) {
-            /** @var IAssessable $firstAssessment */
-            $firstAssessment = $cohortAssessmentsPerClass[$folderId]->first();
-            $folder          = $firstAssessment->getBaseContext()->getFolder();
-            $folderLink      = sprintf('<a href="/homepage/%d">%s</a>', $folder->getId(), $folder->getTitle());
-            foreach ($participationCounts as $studentId => $count) {
-                if ($count >= 2) {
-                    $errors[] = "$folderLink: Student: $studentId, Count: $count";
-                }
-            }
-        }
-        if (count($errors)) {
-            $msg = "Invalid data. Students may only participate in 1 <strong>HSC Assessment Rank</strong> assessment per class per report period.<br>\n" .
-                implode("<br>\n", $errors);
-            throw new UnexpectedValueException($msg);
         }
 
         // Check that this class has an instance of the expected work type
@@ -147,15 +141,15 @@ class HscAssessmentRank extends BaseComponent
             return null;
         }
 
-        $feedback = $this->findStudentFeedback($cohortAssessmentsPerClass[$this->folder->getId()]);
-
+        /** @var Participant $participation */
+        $participation = $participantPerFolder[$this->folder->getId()][$this->student->getId()];
         /* Generate some stats about this student's performance among their peers
          */
         $statistics = (new CohortStatistics(
             $this->getViewer(),
             $this->getRoleTypeOverride(),
-            $this->cohortAssessments,
-            $feedback
+            (new GenericCollection(IAssessable::class))->add($participation->getAssessable()),
+            $participation->getAuthoritativeFeedback(true)
         ))->generate();
 
         // Year 12 students only see rank, not the mark
@@ -206,7 +200,10 @@ class HscAssessmentRank extends BaseComponent
         foreach ($classDueWorks as $dueWork) {
             $participant = $dueWork->getParticipantIfExtant($this->student);
             if ($participant && !$participant->isExcluded()) {
-                return $participant->getAuthoritativeFeedback(true);
+                $feedback = $participant->getAuthoritativeFeedback(true);
+                if ($feedback) {
+                    return $feedback;
+                }
             }
         }
         return null;
