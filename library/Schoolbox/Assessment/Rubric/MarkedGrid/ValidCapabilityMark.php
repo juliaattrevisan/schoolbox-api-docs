@@ -15,26 +15,43 @@ use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
+/**
+ * Spec pattern for whether a given human-readable mark is an appropriate mark
+ * for a capability.
+ */
 class ValidCapabilityMark extends Base
 {
+    /**
+     * The marking scheme used to validate the human-readable mark.
+     */
     private IMarkScheme $markScheme;
 
+    /**
+     * Constructor
+     *
+     * @param IMarkScheme $markScheme
+     */
     public function __construct(IMarkScheme $markScheme)
     {
         $this->markScheme = $markScheme;
     }
 
-    // Marks are intentionally validated in their scaled form here; it's easiest to compare the exact value the user typed in
-    // with the capability max to ensure it's within the range.
-    public function isSatisfiedBy($capabilityMark): bool
+    /**
+     * Is the given human-readable capability mark valid for the capability's
+     * mark scheme?
+     *
+     * @param mixed $candidate A candidate human-readable capability mark.
+     * @return bool
+     */
+    public function isSatisfiedBy($candidate): bool
     {
-        if (null === $capabilityMark) {
+        if (null === $candidate) {
             // This is a self reflection, so null cap mark is expected
             return true;
         }
 
         try {
-            $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($capabilityMark);
+            $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($candidate);
         } catch (RangeException | InvalidArgumentException $e) {
             // This cap mark is out of range or an unparseable value.
             // Either way:
