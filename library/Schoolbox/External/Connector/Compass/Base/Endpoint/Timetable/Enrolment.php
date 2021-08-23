@@ -64,23 +64,31 @@ class Enrolment
                 $teachers[$leadTeacherCode] = $leadTeacherCode;
             }
             foreach ($classDetail['enrolments'] as $enrolment) {
-                // Need to take enrolment start/finish into account.
-                // If start date isn't provided: assume they started already
-                // If it is provided: verify the start date has been reached
+                // Only enrol the student if:
+                // * their enrolment has started
+                // * their enrolment has not yet finished
+
+                // Check their start date:
+                // if it's in the future, do not enrol them
                 if (isset($enrolment['enrolmentStartDate'])) {
                     $enrolmentStartDate = Alaress_Date_Format::newFromTimestamp(strtotime($enrolment['enrolmentStartDate']));
                     $isEnrolmentStarted = !$enrolmentStartDate->isFutureDate();
                 } else {
+                    // If start date isn't provided: assume the start date is
+                    // some unspecified past date
+                    // (and thus they have started)
                     $isEnrolmentStarted = true;
                 }
 
-                // Likewise:
-                // if finish date isn't provided, assume they haven't finished
-                // if it is provided: verify the finish date isn't in the past
+                // Check their finish date:
+                // if it's in the past, do not enrol them
                 if (isset($enrolment['enrolmentFinishDate'])) {
                     $enrolmentFinishDate = Alaress_Date_Format::newFromTimestamp(strtotime($enrolment['enrolmentFinishDate']));
                     $isEnrolmentFinished = $enrolmentFinishDate->isPastDate();
                 } else {
+                    // if finish date isn't provided, assume the finish date is
+                    // an unspecified future date
+                    // (and thus they have not finished)
                     $isEnrolmentFinished = false;
                 }
 
