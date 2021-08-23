@@ -41,7 +41,7 @@
         grid-area: nav;
         @include mobile-padding();
 
-        @media #{$small-only} {
+        @media #{$medium-down} {
             padding-bottom: 1rem;
         }
     }
