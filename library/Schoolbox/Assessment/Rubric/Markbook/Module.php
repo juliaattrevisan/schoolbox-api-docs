@@ -57,7 +57,6 @@ class Module extends BaseModule
         $canViewPage = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsConfigOn(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED, $this->getConfig()),
-            new Rule\IsConfigOn(ConfigMapper::NAME_LMS_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new IsInstructor(Access::getInstance())
