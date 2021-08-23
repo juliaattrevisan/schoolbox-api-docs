@@ -262,7 +262,7 @@ class Api implements IApi
 
             /* Couldn't decode json, or tass server refused something, or something else died
              */
-            if (!$response ) {
+            if (!$response) {
                 throw new DomainException('Could not access Tass server, or bad json payload returned.');
             }
 
