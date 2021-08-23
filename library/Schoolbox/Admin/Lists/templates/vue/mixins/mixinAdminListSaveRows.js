@@ -31,18 +31,18 @@ export default {
             try {
                 this.saveRows_isProcessing = true;
                 this.saveRows_saveStatus = 'Saving...';
-                // this.$refs.toast.activate(this.saveStatus);
+                this.$refs.toast.activate(this.saveRows_saveStatus);
                 this.updateSequenceOrder();
                 const response = await axios.post(this.loadedData.saveRoute, this.getSaveAllFormData());
                 if (response.status === 200) {
                     this.updateNewRowIds(response.data.newRowIdList);
-                    // this.$refs.toast.timeout('Save successful', true, 2000);
+                    this.$refs.toast.timeout('Save successful', true, 2000);
                 } else {
-                    // this.$refs.toast.timeout('Unable to save', false, 2000);
+                    this.$refs.toast.timeout('Unable to save', false, 2000);
                 }
             } catch (error) {
                 console.warn(error);
-                // this.$refs.toast.timeout('Unable to save', false, 2000);
+                this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
                 this.$nextTick(() => { //to avoid animating any newly inserted rows in onBeforeEnter 
                     this.saveRows_isProcessing = false;

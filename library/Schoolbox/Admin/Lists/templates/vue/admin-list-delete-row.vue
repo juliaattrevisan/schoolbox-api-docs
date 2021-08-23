@@ -8,12 +8,14 @@
 import { mapState } from 'vuex';
 import axios from 'axios';
 import RevealModal from '@schoolbox/reveal-modal';
+import Toast from '@schoolbox/toast';
 import { DELETE_ROW_CONFIRMED } from './store/adminListMutationTypes';
 
 export default {
     
     components: {
         RevealModal,
+        Toast
     },
 
     props: {
@@ -54,22 +56,20 @@ export default {
          */
         async onConfirmDeleteRowSelected () {
             try {
-                this.$store.commit('setIsProcessing', true);
-                // this.$refs.toast.activate('Deleting row...');
+                this.$refs.toast.activate('Deleting row...');
                 const response = await axios.post(this.loadedData.deleteRoute, this.getDeleteRowFormData());
                 if (response.result !== false) {
                     const deletedRow = this.rows.find((row) => row.id === this.rowToDelete.id);
                     this.$store.commit(DELETE_ROW_CONFIRMED, deletedRow);
-                    // this.$refs.toast.timeout('Row Deleted', true, 2000);
+                    this.$refs.toast.timeout('Row Deleted', true, 2000);
                 } else {
-                    // this.$refs.toast.timeout('Unable to delete', false, 2000);
+                    this.$refs.toast.timeout('Unable to delete', false, 2000);
                 }
             } catch (error) {
                 console.warn(error);
-                // this.$refs.toast.timeout('Unable to delete', false, 2000);
+                this.$refs.toast.timeout('Unable to delete', false, 2000);
             } finally {
                 this.$refs.deleteModal.close();
-                this.$store.commit('setIsProcessing', false);
             }
         },
 
@@ -99,12 +99,15 @@ export default {
 </script>
 
 <template>
-    <reveal-modal ref="deleteModal">
-        <h2>Please Confirm</h2>
-        <div data-alert class="alert-box warning">{{ loadedData.deleteWarning ? loadedData.deleteWarning : 'Are you sure you wish to delete this row?' }}</div>
-        <ul class="flex-list buttons">
-            <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
-            <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
-        </ul>
-    </reveal-modal>
+    <div>
+        <reveal-modal ref="deleteModal">
+            <h2>Please Confirm</h2>
+            <div data-alert class="alert-box warning">{{ loadedData.deleteWarning ? loadedData.deleteWarning : 'Are you sure you wish to delete this row?' }}</div>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
+                <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
+            </ul>
+        </reveal-modal>
+        <toast ref="toast"></toast>
+    </div>
 </template>

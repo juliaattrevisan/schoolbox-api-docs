@@ -9,8 +9,13 @@ import { mapState, mapGetters } from 'vuex';
 import { gsap } from 'gsap/all';
 import mixinSaveRows from './mixins/mixinAdminListSaveRows';
 import { CLOSE_POP_UP } from './store/adminListMutationTypes'
+import Toast from '@schoolbox/toast';
 
 export default {
+
+    components: {
+        Toast
+    },
 
     props: {
         tableName: { //the name of the current list, used to submit updates to the DB
@@ -178,6 +183,7 @@ export default {
             </ul>
             <button @click.prevent="saveRows_onSaveSelected" class="save-button">{{ saveRows_saveStatus }} {{ headerField.caption }}</button>
         </div>
+        <toast ref="toast"></toast>
     </div>
 </template>
 
