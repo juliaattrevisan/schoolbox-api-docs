@@ -180,7 +180,7 @@ class Controller extends Base
 
             // set literal values
             foreach ($values as $field => $value) {
-                if (array_key_exists($field, $mandatoryValues) && ( trim($value[$currentIndex] ?? '') === '' && $field != "title")) {
+                if (array_key_exists($field, $mandatoryValues) && trim($value[$currentIndex] ?? '') === '') {
                     // do not save this field, if required and empty
                     continue 2;
                 }
