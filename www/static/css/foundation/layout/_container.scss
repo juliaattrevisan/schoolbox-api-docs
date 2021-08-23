@@ -57,30 +57,31 @@
 
         /* For some reason the styles in admin are special which is
          * possibly due to the admin-nav and admin-content arrangement
+         *
+         * See _list-actions.scss for how many buttons we support
          */
-        @media #{$mediumwide-up} {
-            .row {
-                &.actions-small-1 > nav,
-                &.actions-small-2 > nav {
-                    margin-right: 1rem;
+        @for $i from 1 through 4 {
+            @media #{$mediumwide-up} {
+                .row {
+                    &.actions-small-#{$i} > nav {
+                        margin-right: 1rem;
+                    }
                 }
             }
-        }
 
-        @media #{$medium-only} {
-            .row {
-                &.actions-small-1 > nav,
-                &.actions-small-2 > nav {
-                    margin-right: 0.75rem;
+            @media #{$medium-only} {
+                .row {
+                    &.actions-small-#{$i} > nav {
+                        margin-right: 0.75rem;
+                    }
                 }
             }
-        }
 
-        @media #{$small-only} {
-            .row {
-                &.actions-small-1 > nav,
-                &.actions-small-2 > nav {
-                    margin-right: 0.5rem;
+            @media #{$small-only} {
+                .row {
+                    &.actions-small-#{$i} > nav {
+                        margin-right: 0.5rem;
+                    }
                 }
             }
         }
