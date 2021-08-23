@@ -38,6 +38,15 @@ class Enrolment
         $this->api = $api;
     }
 
+    /**
+     * Generates a set of teachers and students for this academic group code and
+     * activity code.
+     *
+     * @param string $academicGroupCode
+     * @param string $activityCode
+     * @return array[] students: a list of student codes
+     *                 teachers: a list of teacher codes
+     */
     public function generate(string $academicGroupCode, string $activityCode): array
     {
         // Prebuild periods from structure
