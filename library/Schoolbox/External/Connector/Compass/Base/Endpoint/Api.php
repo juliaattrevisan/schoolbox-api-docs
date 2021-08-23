@@ -177,21 +177,25 @@ class Api implements IApi
          * This might as well have died
          */
         if ($response) {
-            throw new RuntimeException(sprintf(
-                'Bad endpoint %s: %s %s after %s retries. Payload: %s',
-                $method,
+            throw new RuntimeException(
+                sprintf(
+                    'Bad endpoint %s: %s %s after %s retries. Payload: %s',
+                    $method,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    self::NUM_RETRY,
+                    json_encode($params, JSON_THROW_ON_ERROR)
+                ),
                 $response->getStatusCode(),
-                $response->getReasonPhrase(),
-                self::NUM_RETRY,
-                json_encode($params, JSON_THROW_ON_ERROR)
-            ));
+                $e ?? null
+            );
         }
 
         /* Couldn't decode json, or server refused something, or something else died
          * Guzzle repeatedly failed too many times and kept throwing exceptions when $response
          * was being requested, so I guess you ended up here
          */
-        throw new DomainException('Could not access server, or bad json payload returned.');
+        throw new DomainException('Could not access server, or bad json payload returned.', 0, $e ?? null);
     }
 
 
