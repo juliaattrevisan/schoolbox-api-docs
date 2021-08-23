@@ -68,27 +68,33 @@ class PageMapper extends Schoolbox\Mapper
 
     /**
      * @inheritdoc
-     * @return string
      */
     protected function getSelectString()
     {
         return "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('owner', 'o')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString()
+    {
+        return "
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('owner', '', 'o')}
         ";
     }
 
     /**
-     * @param PDOStatement $statement
-     * @return GenericCollection
-     * @throws Schoolbox\Mapper\Exception
+     * @inheritdoc
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $userMapper = $this->getJoinMapper('owner');
-        $modelList = $this->createCollection();
+        $modelList  = $this->createCollection();
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
             if ($model instanceof Page) {
