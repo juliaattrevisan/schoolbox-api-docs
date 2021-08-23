@@ -95,6 +95,8 @@ DUANE;
 
             try {
                 $result = $this->api[$brokenPayload['module']]->retrieveDocument($brokenPayload['method'], $brokenPayload['params']);
+
+                new \Alaress_Probe($result);
             } catch (\Exception $e) {
                 new \Alaress_Probe($e->getMessage());
             }
