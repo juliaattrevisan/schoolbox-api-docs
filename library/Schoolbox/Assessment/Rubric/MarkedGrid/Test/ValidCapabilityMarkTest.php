@@ -10,23 +10,30 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
-use Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
+/**
+ * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark::isSatisfiedBy
+ */
 class ValidCapabilityMarkTest extends TestCase
 {
-
+    /**
+     * Data provider for `getTestIsSatisfiedByData`.
+     *
+     * @return iterable
+     */
     public function getTestIsSatisfiedByData(): iterable
     {
         /* Mark types */
-        $markSchemePercentage = new Percentage();
+        $markSchemePercentage  = new Percentage();
         $markSchemeLetterGrade = new LetterGrade(
             (new GradeGroup())
                 ->setName('Test')
@@ -56,7 +63,8 @@ class ValidCapabilityMarkTest extends TestCase
                                 ->setLowerBound(75)
                                 ->setRawGrade(87.5)
                         )
-                ));
+                )
+        );
 
         /* Cap maximums */
         $capabilityMax1 = 5;
@@ -68,20 +76,20 @@ class ValidCapabilityMarkTest extends TestCase
 
         /* Cap marks */
         $capabilityMarkNull = null;
-        $capabilityMark1 = "6";
-        $capabilityMark2 = "101";
-        $capabilityMark3 = "0";
-        $capabilityMark4 = "55.55";
-        $capabilityMark5 = "110";
-        $capabilityMark6 = "99";
-        $capabilityMark7 = "24.6";
-        $capabilityMark8 = "87.67";
-        $capabilityMark9 = "0.01";
-        $capabilityMark10 = "13";
-        $capabilityMark11 = "45.3";
-        $capabilityMark12 = "100.01";
-        $capabilityMark13 = "8.33";
-        $capabilityMark14 = "9";
+        $capabilityMark1    = "6";
+        $capabilityMark2    = "101";
+        $capabilityMark3    = "0";
+        $capabilityMark4    = "55.55";
+        $capabilityMark5    = "110";
+        $capabilityMark6    = "99";
+        $capabilityMark7    = "24.6";
+        $capabilityMark8    = "87.67";
+        $capabilityMark9    = "0.01";
+        $capabilityMark10   = "13";
+        $capabilityMark11   = "45.3";
+        $capabilityMark12   = "100.01";
+        $capabilityMark13   = "8.33";
+        $capabilityMark14   = "9";
 
         /* Letter grades */
         $capabilityMarkA = "A";
@@ -185,12 +193,12 @@ class ValidCapabilityMarkTest extends TestCase
 
     /**
      * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark::isSatisfiedBy
+     * @covers       \Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark::isSatisfiedBy
      *
      * @param IMarkScheme $markScheme
      * @param string|null $capabilityMark
-     * @param bool $expected                 Whether this test should assert true or false
-    */
+     * @param bool        $expected Whether this test should assert true or false
+     */
     public function testIsSatisfiedBy(IMarkScheme $markScheme, ?string $capabilityMark, bool $expected)
     {
         $spec = new ValidCapabilityMark($markScheme);
