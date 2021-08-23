@@ -68,15 +68,13 @@ require_once __DIR__ . '/../../../conf/core/require.php';
          */
         private function setupQueries(): void
         {
-            $this->updateCapabilityMarkQuery = $this->getDatabaseInternal()->prepareQuery(
-                "
+            $this->updateCapabilityMarkQuery = $this->getDatabaseInternal()->prepareQuery("
                 UPDATE rubric_capability_mark
                 SET human_readable_value = :value
                 WHERE id = :id
             ");
 
-            $this->findSubmissionGradeQuery = $this->getDatabaseInternal()->prepareQuery(
-                "
+            $this->findSubmissionGradeQuery = $this->getDatabaseInternal()->prepareQuery("
                 SELECT sg.caption
                 FROM       submission_grade_group sgg
                 INNER JOIN submission_grade       sg  ON sgg.id = sg.submission_grade_group_id

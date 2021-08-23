@@ -37,7 +37,7 @@ class CapabilityMarkTypeTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validCapabilityMarkType
+     * @dataProvider providerValidCapabilityMarkType
      * @param MarkType                    $dueWorkMarkType
      * @param MarkType                    $capabilityMarkType
      * @param GradeLevel\Group\Model|null $capabilityGradeGroup
@@ -88,7 +88,7 @@ class CapabilityMarkTypeTest extends TestCase
      *
      * @return array
      */
-    public function provider_validCapabilityMarkType(): array
+    public function providerValidCapabilityMarkType(): array
     {
         $markTypeNone = (new MarkType())->setId(MarkType::TYPE_NONE)->setSlug(MarkType::SLUG_NONE);
         $markTypeTotal = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);
