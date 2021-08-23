@@ -514,7 +514,7 @@ class Connector
             'appcode' => $this->appCode,
             'company' => $this->companyCode,
              'v'      => 2,
-            'token'   => $this->tokenBuilder->generateToken($params),
+            'token'   => $this->tokenBuilder->generateToken($params, true),
         ];
 
         try {

@@ -4861,16 +4861,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Tass/V53/Sync.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Api.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
-
-		-
 			message: "#^Result of \\|\\| is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php

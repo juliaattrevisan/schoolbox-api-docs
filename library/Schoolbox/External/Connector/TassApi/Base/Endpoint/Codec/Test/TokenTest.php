@@ -39,7 +39,7 @@ class TokenTest extends TestCase
      */
     public function testTokenGeneration(string $tassProductToken, array $data, string $encrypted)
     {
-        $outcome = (new Token($tassProductToken))->generateToken($data);
+        $outcome = (new Token($tassProductToken))->generateToken($data, true);
 
         $this->assertEquals($encrypted, $outcome);
     }
