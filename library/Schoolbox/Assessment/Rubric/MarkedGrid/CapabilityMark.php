@@ -21,26 +21,22 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
  */
 class CapabilityMark
 {
+    /**
+     * Number of decimal places to which the normalized mark is rounded.
+     */
     private const PRECISION = 2;
 
     /**
      * The capability usage for which this mark is for.
-     *
-     * @var CapabilityUsage
      */
-    private $capabilityUsage;
+    private CapabilityUsage $capabilityUsage;
 
 
     /**
      * The scheme via which the capability is marked. This controls how the
      * overall mark for the capability is validated and rendered.
-     *
-     * TODO this belongs on the capability usage, not the capability
-     * TODO this may no longer be needed now HR mark is a first-class property
-     *
-     * @var IMarkScheme
      */
-    private $markScheme;
+    private IMarkScheme $markScheme;
 
 
     /**
@@ -48,7 +44,7 @@ class CapabilityMark
      *
      * @var GenericCollection|IndicatorMark[]
      */
-    private $indicatorMarks;
+    private GenericCollection $indicatorMarks;
 
 
     /**
@@ -66,10 +62,8 @@ class CapabilityMark
      *
      * For example: if the percentage mark is 50%, and the capability usage's
      * max mark is 12, then this value should be 6.
-     *
-     * @var float|null
      */
-    private $value;
+    private ?float $value;
 
 
     /**
