@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\Seb;
 use Aura\Router\Router;
 use Schoolbox\Learning\Assessment\IAssessable;
 
-
 /**
  * Generate an xml payload for the given IAssessable
  *
@@ -109,7 +108,8 @@ class Payload
      * @param string $xml
      * @return string
      */
-    private function hash(string $xml): string {
+    private function hash(string $xml): string
+    {
         return hash(self::HASH_ALGORITHM, json_encode(simplexml_load_string($xml)));
     }
 }

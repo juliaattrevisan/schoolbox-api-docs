@@ -724,9 +724,9 @@
         <key>detectStoppedProcess</key>
         <true />
         <key>allowDisplayMirroring</key>
-        <false />
+        <true />
         <key>allowedDisplaysMaxNumber</key>
-        <integer>9</integer>
+        <integer>2</integer>
         <key>allowedDisplayBuiltin</key>
         <true />
         <key>insideSebEnableSwitchUser</key>

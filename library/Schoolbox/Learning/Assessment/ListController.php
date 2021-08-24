@@ -892,5 +892,4 @@ class ListController extends Web\Controller\Base
     {
         return $this->bakery;
     }
-
 }
