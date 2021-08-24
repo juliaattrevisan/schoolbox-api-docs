@@ -331,7 +331,7 @@ class Subnav
             ],
             '/adminv2/terms'                          => [
                 'name'       => 'LMS',
-                'visible'    => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                'visible'    => true,
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/terms'                         => [
@@ -342,7 +342,7 @@ class Subnav
                     ],
                     '/adminv2/rollover'                      => [
                         'name'        => 'Class Rollover',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => true,
                         'children'    => [],
                         'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
                     ],
@@ -354,7 +354,7 @@ class Subnav
                     ],
                     '/adminv2/setting/Document%20Management' => [
                         'name'        => 'Document Management',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0 && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0,
                         'children'    => [],
                         'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
@@ -372,7 +372,7 @@ class Subnav
                     ],
                     '/adminv2/lti'                           => [
                         'name'        => 'LTI Providers',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
