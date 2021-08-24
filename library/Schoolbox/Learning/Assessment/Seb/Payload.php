@@ -36,7 +36,7 @@ class Payload
     /**
      * Load this inaccessible file and swop out its vars, phplib style
      */
-    private const PATH = __DIR__ . '/config.seb';
+    private const PATH = __DIR__ . '/config.xml';
 
 
     /**
