@@ -1016,6 +1016,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Folder Codes: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
             if ($hydrateCodes) {
+                /** @var FolderCode\Model|null $folderCode */
                 $folderCode = $codeMapper->hydrate($row, 'cc');
                 if ($folderCode) {
                     $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
@@ -1038,6 +1039,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // is how you get ants!
             // TODO replace ant infestation with `\Schoolbox\Curriculum\Node\Mapper::findForOtherMapper`
             if ($hydrateCurriculumNodes) {
+                /** @var Node\Model|null $curriculumNode */
                 $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
                 if ($curriculumNode) {
                     $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
