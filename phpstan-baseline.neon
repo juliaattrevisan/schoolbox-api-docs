@@ -8888,4 +8888,4 @@ parameters:
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Api.php
+			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php

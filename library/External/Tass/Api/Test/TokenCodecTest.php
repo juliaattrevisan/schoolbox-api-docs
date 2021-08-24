@@ -23,13 +23,13 @@ class TokenCodecTest extends TestCase
     // ======================= Tests =========================== //
 
     /**
-     * @dataProvider provider_invalidApiKey
+     * @dataProvider providerInvalidApiKey
      * @param string $invalidApiKey
      * @return void
      * @throws PHPUnit\Framework\Exception
      * @throws InvalidApiKey
      */
-    public function test_invalidApiKey(string $invalidApiKey): void
+    public function testInvalidApiKey(string $invalidApiKey): void
     {
         $this->expectException(InvalidApiKey::class);
         new Token($invalidApiKey);
@@ -37,12 +37,12 @@ class TokenCodecTest extends TestCase
 
 
     /**
-     * @dataProvider provider_reversibility
+     * @dataProvider providerReversibility
      * @param Token $codec
      * @param array $data
      * @return void
      */
-    public function test_reversibility(Token $codec, array $data): void
+    public function testReversibility(Token $codec, array $data): void
     {
         $unpacked = $codec->unpackToken($codec->generateToken($data, true));
         $this->assertSame($data, $unpacked);
@@ -51,7 +51,7 @@ class TokenCodecTest extends TestCase
 
     // ======================= Data Providers =========================== //
 
-    public function provider_invalidApiKey(): array
+    public function providerInvalidApiKey(): array
     {
         return [
             [''],
@@ -64,7 +64,7 @@ class TokenCodecTest extends TestCase
     }
 
 
-    public function provider_reversibility(): array
+    public function providerReversibility(): array
     {
         $tokenCodec = $this->getTokenCodec();
 
