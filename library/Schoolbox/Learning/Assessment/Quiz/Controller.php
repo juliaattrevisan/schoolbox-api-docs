@@ -195,7 +195,10 @@ class Controller extends Assessment\Controller
         );
 
         if (!$sebCheckPasses) {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload'));
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload', [
+                'assessmentId' => $assessment->getId()
+            ]));
+
             return;
         }
 
