@@ -28,6 +28,12 @@ export default {
         mixinSaveRows
     ],
 
+    data () {
+        return {
+            isActive: true
+        }
+    },
+
     computed: {
 
         ...mapState({
@@ -113,8 +119,8 @@ export default {
     },
 
     mounted () {
-        this.$emit('on-pop-out-mounted', this.$refs.innerContainer.clientHeight);
-        this.$refs.outerContainer.style.display = 'none';
+        this.$emit('on-pop-out-mounted', this.$refs.innerContainer.clientHeight); //to ensure the parent container is tall enough to display the entire pop out
+        this.isActive = false;
     },
 
     methods: {
@@ -123,7 +129,7 @@ export default {
          * Animate the view on
          */
         open () {
-            this.$refs.outerContainer.style.display = 'block';
+            this.isActive = true;
             gsap.to(this.$refs.innerContainer, { right: 0, duration: 0.4 } );
         },
 
@@ -132,7 +138,7 @@ export default {
          */
         close () {
             gsap.to(this.$refs.innerContainer, { right: '-100%', duration: 0.3, onComplete: () => {
-                this.$refs.outerContainer.style.display = 'none'
+                this.isActive = false;
             } } );
         },
 
@@ -149,7 +155,7 @@ export default {
          * Close the pop out
          */
         onCloseSelected () {
-            this.$store.commit(CLOSE_POP_UP)
+            this.$store.commit(CLOSE_POP_UP);
         },
 
     }
@@ -158,7 +164,7 @@ export default {
 </script>
 
 <template>
-    <div class="outer-container" ref="outerContainer">
+    <div class="outer-container" :style="`display: ${ isActive ? 'block' : 'none' };`">
         <div class="inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
             <a href="#close-pop-out" class="close-button icon-close" @click.prevent="onCloseSelected" :disabled="saveRows_isProcessing"></a>
