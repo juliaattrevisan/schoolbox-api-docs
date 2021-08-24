@@ -129,7 +129,7 @@ class Controller extends Base
      */
     public function postImportResults(): void
     {
-        set_time_limit(600);
+        $this->extendExecutionTime();
 
         $post = $this->getRequest()->post;
 

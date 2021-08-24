@@ -108,7 +108,7 @@ class Controller extends Base
      */
     public function postPreview()
     {
-        set_time_limit(1800);
+        $this->extendExecutionTime();
 
         $logger = $this->buildLogger();
         try {
@@ -139,7 +139,7 @@ class Controller extends Base
      */
     public function postImport()
     {
-        set_time_limit(1800);
+        $this->extendExecutionTime();
 
         $logger = $this->buildLogger();
 
