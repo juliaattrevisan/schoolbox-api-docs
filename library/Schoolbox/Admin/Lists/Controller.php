@@ -706,6 +706,7 @@ class Controller extends Base
                     ],
                     'normaliseAs'   => [
                         'caption'   => 'Normalised Mark',
+                        'tooltip'   => 'Can be left blank if a mark does not apply',
                         'nullable'  => true,
                         'width'     => 2,
                         'default'   => '',
