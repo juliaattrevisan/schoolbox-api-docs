@@ -440,7 +440,7 @@ class Controller extends Base
 
                         // Give the script a chance to finish
 
-                        set_time_limit(60 * 15);
+//                        set_time_limit(60 * 15);
 
                         // Get all uploaded files
 
