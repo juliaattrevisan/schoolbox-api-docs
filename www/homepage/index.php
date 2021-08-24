@@ -177,7 +177,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
-    if (!$hasCourseSpec && !$hasUnitSpec) {
+    if (Config::get('lms_enabled') && (!$hasCourseSpec && !$hasUnitSpec)) {
         $this->parse('course_actions_block', 'course_actions');
     } else {
         $this->setVar('course_actions_block', '');

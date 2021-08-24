@@ -361,6 +361,9 @@ class Controller extends BaseController
             'resource_booking' => [NSMapper::NS_RESOURCE_BOOKING],
             'pastoral'         => [NSMapper::NS_PASTORAL, NSMapper::NS_PASTORAL_LOG, NSMapper::NS_PASTORAL_COMMENT],
             'fixtures'         => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT],
+            'lms'              => [NSMapper::NS_DUEWORK, NSMapper::NS_ONLINE_ASSESS, NSMapper::NS_REPORT_CARD],
+            'badges'           => [NSMapper::NS_BADGE],
+            'learning_moments' => [NSMapper::NS_EVIDENCE, NSMapper::NS_EVIDENCE_COMMENT]
         ];
 
         $config = $this->getConfigLoader();

@@ -63,10 +63,9 @@ class Learning extends ModuleLoader
             $this->loadModule($kernel, MarkbookModule::class, "/{$namespace}/markbook");
             $this->loadModule($kernel, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
             $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
+            $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
+            $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
         }
-
-        $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
-        $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
 
         // Student toolkit component: not feature flagged
         $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
