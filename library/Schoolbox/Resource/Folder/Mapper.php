@@ -748,7 +748,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param int  $id
      * @param bool $recurse
-     * @return GenericCollection<Model>|Model[]
+     * @return GenericCollection
      */
     public function findAllChildren(int $id, bool $recurse = false): GenericCollection
     {
@@ -1016,6 +1016,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Folder Codes: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
             if ($hydrateCodes) {
+                /** @var FolderCode\Model|null $folderCode */
                 $folderCode = $codeMapper->hydrate($row, 'cc');
                 if ($folderCode) {
                     $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
@@ -1038,6 +1039,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // is how you get ants!
             // TODO replace ant infestation with `\Schoolbox\Curriculum\Node\Mapper::findForOtherMapper`
             if ($hydrateCurriculumNodes) {
+                /** @var Node\Model|null $curriculumNode */
                 $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
                 if ($curriculumNode) {
                     $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
@@ -1725,7 +1727,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * Does not hydrate any joins
      *
-     * @param int $folderId TODO Upgrade this type-hint to a type-declaration in signature
+     * @param int|string $folderId TODO Upgrade this type-hint to a type-declaration in signature
      * @return Model
      * @throws DefinitionException
      * @throws Exception
@@ -1737,28 +1739,28 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         // First, check the local body cache to see if we've already loaded this folder
         if ($this->isCacheEnabled() && $this->localBodyCache->contains($this->getLocalKeyString($this, $folderId))) {
-            return $this->localBodyCache->get($this->getLocalKeyString($this, $folderId));
+            $folder = $this->localBodyCache->get($this->getLocalKeyString($this, $folderId));
+        } else {
+            // special case: 0 == root, but not in db
+            if ($folderId === Model::ROOT_ID || $folderId === (string)Model::ROOT_ID) {
+                return $this->findById($folderId);
+            }
+
+            // Need to override default 'ORDER BY' clause that assumes default joins
+            $options = [
+                'deleted' => true,
+                'order'   => [],
+            ];
+
+            /** @var Model|null $folder */
+            $folder = $this->executeSelect(
+                "SELECT {$this->getColumnString()}",
+                "FROM {$this->getTable()}",
+                $this->getPredicateBuilder(),
+                [$this->getIdentifierColumn() => $folderId],
+                $options
+            )->first();
         }
-
-        // special case: 0 == root, but not in db
-        if ($folderId === Model::ROOT_ID || $folderId === (string)Model::ROOT_ID) {
-            return $this->findById($folderId);
-        }
-
-        // Need to override default 'ORDER BY' clause that assumes default joins
-        $options = [
-            'deleted' => true,
-            'order'   => [],
-        ];
-
-        /** @var Model $folder */
-        $folder = $this->executeSelect(
-            "SELECT {$this->getColumnString()}",
-            "FROM {$this->getTable()}",
-            $this->getPredicateBuilder(),
-            [$this->getIdentifierColumn() => $folderId],
-            $options
-        )->first();
         if ($folder) {
             if ($folder->isDeleted()) {
                 throw (new Exception\Deleted())->setDeletedObject($folder);

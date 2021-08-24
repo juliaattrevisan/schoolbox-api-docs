@@ -111,7 +111,7 @@ class FinalUserAccess
                     $folder = $this->folderMapper->findCheaplyById($folderId);
                     $folderName = $folder->getName();
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $folderName = 'unknown folder';
+                    continue;
                 }
 
                 /* Record the mutations
