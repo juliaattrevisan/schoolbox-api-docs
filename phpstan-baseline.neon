@@ -8885,3 +8885,7 @@ parameters:
 			count: 1
 			path: tools/socket/socketd.php
 
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Api.php
