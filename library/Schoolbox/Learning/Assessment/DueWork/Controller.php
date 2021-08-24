@@ -277,7 +277,7 @@ class Controller extends Assessment\Controller
 
         /* Check whether SEB was required
          */
-        $requiresSeb = (new Assessment\ValidSebCheck())->isSatisfiedBy(
+        $sebCheckPasses = (new Assessment\ValidSebCheck())->isSatisfiedBy(
             $this->getUser(),
             'https://' . $this->getRequest()->server->get('HTTP_HOST') . $this->getRequest()->server->get('REQUEST_URI'),
             $assessment->getSebEnabled(),
@@ -286,7 +286,7 @@ class Controller extends Assessment\Controller
             'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f'
         );
 
-        if ($requiresSeb) {
+        if (!$sebCheckPasses) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload'));
             return;
         }
