@@ -1,6 +1,5 @@
 <script>
 
-import {stringify} from 'qs';
 import axios from 'axios';
 import foundationMixin from '@schoolbox/foundation-mixin';
 import Toast from "@schoolbox/toast";
@@ -11,6 +10,7 @@ import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdr
 import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
 import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import filterMixin from "./filter-mixin";
 
 const EVENT_CHANGE = 'change';
 
@@ -43,7 +43,10 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [foundationMixin],
+    mixins: [
+        foundationMixin,
+        filterMixin
+    ],
 
     components: {
         RelativeTime,
@@ -113,61 +116,12 @@ export default {
             selectedFilters: null,
         }
     },
+    computed: {
+        filterEndpoint() {
+            return this.getBadgesRoute;
+        },
+    },
     methods: {
-        /**
-         * Load badges.
-         *
-         * @param {Boolean} showToast Should the toast be activated on load of
-         *                            badges?
-         *                            The filter calls `onFilterChange` when its
-         *                            selections change, and that has its own
-         *                            toast so don't show another.
-         */
-        load(showToast) {
-            this.data = [];
-            this.append(null, showToast);
-        },
-
-        /**
-         * Appends badges to the data list.
-         *
-         * @param {String|null} cursor
-         * @param {Boolean}     showToast
-         */
-        append(cursor, showToast) {
-            // TODO this is very generic, a candidate to be factored into its own place
-            let params = {};
-            if (cursor) {
-                params.cursor = cursor;
-            }
-            if (this.selectedFilters) {
-                params.filters = this.selectedFilters;
-            }
-            if (showToast) {
-                this.$refs.toast.activate('Loading...');
-            }
-            let config = {
-                params:           params,
-                paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
-            }
-            axios
-                .get(this.getBadgesRoute, config)
-                .then(response => {
-                    this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
-                    this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
-                    this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
-                    if (showToast) {
-                        this.$refs.toast.timeout('Loaded', true);
-                    }
-                })
-                .catch(() => {
-                    if (showToast) {
-                        this.$refs.toast.timeout('Loading failed', false);
-                    }
-                })
-                .finally(() => this.showSkeletonLoader = false);
-        },
-
         /**
          * Opens a modal window for viewing this badge's full details.
          *
@@ -253,14 +207,6 @@ export default {
          */
         selectedBadges() {
             return this.data.filter(v => v.selected === true);
-        },
-
-        /**
-         * Helper for emitting the change event: this happens when selecting a
-         * badge, or reloading the filter.
-         */
-        emitChange() {
-            this.$emit(EVENT_CHANGE);
         },
 
         /**

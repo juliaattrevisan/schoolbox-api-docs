@@ -7,9 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
 
@@ -18,11 +16,6 @@ use Schoolbox\Resource\Folder;
  */
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
 
     /**
      * @var Term\Mapper
@@ -45,8 +38,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function execute()
     {
-        $this->userAccessMapper  = $this->getMapperFactory()->get(UserAccessMapper::class);
-        $this->termMapper        = $this->getMapperFactory()->get(Term\Mapper::class);
+        /** @var Term\Mapper $termMapper */
+        $termMapper              = $this->getMapperFactory()->get(Term\Mapper::class);
+        $this->termMapper        = $termMapper;
         $this->externalDbEnabled = (bool)Config::get('external_enable');
 
         // This component is always present on homepages (embedded in page tot menu)
@@ -105,6 +99,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $hasClassActions = false;
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
+        $this->setBlock($templateHandle, 'award_list_link', 'award_list_link_block');
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
         $this->setBlock($templateHandle, 'rubric_markbook_link', 'rubric_markbook_link_block');
         $this->setBlock($templateHandle, 'course_markbook_link', 'course_markbook_link_block');
@@ -165,6 +160,24 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                 $this->parse('course_markbook_link_block', 'course_markbook_link');
                 $hasClassActions = true;
             }
+        }
+
+        // Badge Report
+        if ($isStaffOrSuper && ($isClassPage || $isGroupPage)) {
+            $this->setVar(
+                'AWARD_LIST_LINK',
+                $this->getRouter()->generate(
+                    'learningBadgeAward.getListPage',
+                    [
+                        'folderId' => $this->getContext()->getId(),
+                        'folder'   => $this->getContext(),
+                    ]
+                )
+            );
+            $this->parse('award_list_link_block', 'award_list_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('award_list_link_block', '');
         }
 
         /* Assessment Calendar Link

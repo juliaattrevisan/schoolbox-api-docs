@@ -61,6 +61,7 @@ class AvailabilityChecker
                 return (bool)$this->config->get(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED);
 
             case Model::PAGE_BADGE_LIST:
+            case Model::PAGE_AWARD_LIST:
                 return (bool)$this->config->get(ConfigMapper::NAME_BADGES_ENABLED);
 
             default:
@@ -90,6 +91,7 @@ class AvailabilityChecker
             Model::PAGE_UPCOMING_ASSESSMENTS,
             Model::PAGE_RUBRIC_MARK_BOOK,
             Model::PAGE_BADGE_LIST,
+            Model::PAGE_AWARD_LIST,
         ];
         foreach ($allFilters as $filter) {
             if ($this->isAvailable($filter)) {

@@ -1076,16 +1076,6 @@ parameters:
 			path: library/Component/Homepage/ImageController.php
 
 		-
-			message: "#^Property Component_Homepage_ManageClassController\\:\\:\\$termMapper \\(Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Component/Homepage/ManageClassController.php
-
-		-
-			message: "#^Property Component_Homepage_ManageClassController\\:\\:\\$userAccessMapper \\(Schoolbox\\\\Permission\\\\Access\\\\UserAccessMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Component/Homepage/ManageClassController.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Component/Homepage/MembersController.php

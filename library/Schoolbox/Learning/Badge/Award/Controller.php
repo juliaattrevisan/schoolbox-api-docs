@@ -22,7 +22,10 @@ use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
+use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -58,6 +61,11 @@ class Controller extends Base
     private Filter\Mapper $filterMapper;
 
     /**
+     * Filter selection mapper
+     */
+    private Filter\Selection\Mapper $filterSelectionMapper;
+
+    /**
      * Mapper for users.
      */
     private UserMapper $userMapper;
@@ -66,24 +74,27 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Mapper                 $mapper
-     * @param BadgeMapper            $badgeMapper
-     * @param Filter\IFactoryFactory $filterFactoryFactory
-     * @param Filter\Mapper          $filterMapper
-     * @param UserMapper             $userMapper
+     * @param Mapper                  $mapper
+     * @param BadgeMapper             $badgeMapper
+     * @param Filter\IFactoryFactory  $filterFactoryFactory
+     * @param Filter\Mapper           $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param UserMapper              $userMapper
      */
     public function __construct(
         Mapper $mapper,
         BadgeMapper $badgeMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Mapper $filterMapper,
+        Filter\Selection\Mapper $filterSelectionMapper,
         UserMapper $userMapper
     ) {
-        $this->badgeMapper          = $badgeMapper;
-        $this->mapper               = $mapper;
-        $this->filterFactoryFactory = $filterFactoryFactory;
-        $this->filterMapper         = $filterMapper;
-        $this->userMapper           = $userMapper;
+        $this->badgeMapper           = $badgeMapper;
+        $this->mapper                = $mapper;
+        $this->filterFactoryFactory  = $filterFactoryFactory;
+        $this->filterMapper          = $filterMapper;
+        $this->filterSelectionMapper = $filterSelectionMapper;
+        $this->userMapper            = $userMapper;
     }
 
 
@@ -268,14 +279,11 @@ class Controller extends Base
      * Get a list of badges and their counts, awarded to $user
      *
      * @api GET /learning/badge/award/{userId}/awarded
-     *
-     * @param User $user
+     * @param User   $user
+     * @param string $awardStatus
      * @return void
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws MapperException
-     * @throws UnexpectedValueException
+     *
      */
     public function getAwardedBadges(User $user, string $awardStatus): void
     {
@@ -617,5 +625,91 @@ class Controller extends Base
             new PrefixGenerator($this->getConfigLoader()),
         );
         return $factory->build();
+    }
+
+
+    /**
+     * List students with awarded badges
+     *
+     * @param Folder $folder
+     * @since 21.1
+     * @api   GET /learning/badge/award/list/{folderId}
+     */
+    public function getListPage(Folder $folder): void
+    {
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            Filter\Page\Model::PAGE_AWARD_LIST,
+            null,
+            $this->getUser(),
+            [],
+            $this->request->query->getArrayCopy(),
+        );
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadgeAward/list.twig',
+                [
+                    'filterPanel' => $filterPanel,
+                    'folder'      => $folder,
+                ]
+            )->setTab('classes')->setTitle($folder->getName())
+        );
+    }
+
+
+    /**
+     * Get students in the folder with awards
+     *
+     * @param Folder $folder
+     * @throws MapperException
+     * @api   GET /learning/badge/award/list/{folderId}/data
+     * @since 21.1
+     */
+    public function getListByFolderId(Folder $folder): void
+    {
+        // Process filters
+        $page = Filter\Page\Model::PAGE_AWARD_LIST;
+
+        $qsFilters      = $this->request->query->get('filters', []);
+        $codec          = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+        $user           = $this->getUser();
+        $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
+        $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
+
+        /** @var Filter\Filters\Award\Finder $finder */
+        $finder = Filter\Filters\Award\Finder::getInstance($this->filterMapper, $this->mapper);
+
+        // Save selected filters
+        $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
+
+        // Get students
+        $userAccessMapper = UserAccessMapper::getInstance();
+        $students         = $userAccessMapper
+            ->findUsersInCategory($folder, Role::STUDENT)
+            ->sortByCallback((new SortUsersByName())->getCallable(), true);
+
+        $awards = $finder->findListForStudentsByFilters($students->getPropertyValues('id'), $filters);
+
+        // Process data
+        $studentAwards = [];
+        $translator    = $this->buildBadgeAwardModelToArrayTranslator();
+        /** @var \Schoolbox\Learning\Badge\Award\Model $award */
+        foreach ($awards as $award) {
+            if (!key_exists($award->getRecipient()->getId(), $studentAwards)) {
+                $studentAwards[$award->getRecipient()->getId()] = [];
+            }
+            $studentAwards[$award->getRecipient()->getId()][] = $translator($award);
+        }
+
+        $data = [];
+        foreach ($students as $student) {
+            $data[] = [
+                'id'       => $student->getId(),
+                'fullName' => $student->getFullName(),
+                'awards'   => $studentAwards[$student->getId()],
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput(['data' => $data]));
     }
 }

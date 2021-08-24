@@ -1443,6 +1443,7 @@ abstract class Kernel
                         new Filter\Filters\Assessment\FactoryFactory($mapperFactory, $config, $rosettaStone),
                         new Filter\Filters\Event\FactoryFactory($mapperFactory, $config),
                         new Filter\Filters\Badge\FactoryFactory($mapperFactory, $config),
+                        new Filter\Filters\Award\FactoryFactory($mapperFactory, $config),
                     );
                 }
             )

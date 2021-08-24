@@ -1,0 +1,28 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.title, '/homepage/' ~ folder.id ],
+    ['Badge Report']
+) }}
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            $('#award-list-container').on('filterContentLoaded', function (event, selectedFilters) {
+                window.awardList.$children[0].onFilterChange(selectedFilters);
+            });
+        });
+    </script>
+{% endautoescape %}
+{% include '@filters/panel.twig' with {
+    contentId: "award-list-container",
+    panel:     filterPanel,
+    quickload: false,
+} only %}
+<div class="row" id="award-list-container">
+    <award-list
+            subject-title="{{ folder.title }}"
+            get-student-lists-endpoint="{{ routeLookup('learningBadgeAward.getListByFolderId', {folderId: folder.getId, folder: folder}) }}"
+    >
+    </award-list>
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/awardList.js"></script>
+<div id="toaster" class="toast" data-toast></div>
