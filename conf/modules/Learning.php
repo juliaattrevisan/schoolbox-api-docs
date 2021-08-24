@@ -44,28 +44,32 @@ class Learning extends ModuleLoader
      */
     public function configure($kernel): void
     {
+        /** @var IConfigLoader $config */
+        $config = $kernel->getDependencyInjector()->get('config');
+
         $namespace = 'learning';
 
         // TODO - split 'LearningModule' into ClassModule + PendingModule
         $this->loadModule($kernel, LearningModule::class, "/{$namespace}");
 
-        $this->loadModule($kernel, Grades\Module::class, "/{$namespace}/grades");
-        $this->loadModule($kernel, AssessmentModule::class, "/{$namespace}");
-        $this->loadModule($kernel, DueworkFeedbackModule::class, "/{$namespace}");
-        $this->loadModule($kernel, DueworkFeedbackFileModule::class, "/{$namespace}/feedback");
-        $this->loadModule($kernel, DueworkResponseModule::class, "/{$namespace}");
-        $this->loadModule($kernel, QuizModule::class, "/{$namespace}");
-        $this->loadModule($kernel, MarkbookModule::class, "/{$namespace}/markbook");
-        $this->loadModule($kernel, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
-        $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
-        $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
-        $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
+        // LMS module required plan (Basic,Pro,Elite)
+        if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            $this->loadModule($kernel, Grades\Module::class, "/{$namespace}/grades");
+            $this->loadModule($kernel, AssessmentModule::class, "/{$namespace}");
+            $this->loadModule($kernel, DueworkFeedbackModule::class, "/{$namespace}");
+            $this->loadModule($kernel, DueworkFeedbackFileModule::class, "/{$namespace}/feedback");
+            $this->loadModule($kernel, DueworkResponseModule::class, "/{$namespace}");
+            $this->loadModule($kernel, QuizModule::class, "/{$namespace}");
+            $this->loadModule($kernel, MarkbookModule::class, "/{$namespace}/markbook");
+            $this->loadModule($kernel, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
+            $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
+            $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
+            $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
+        }
 
         // Student toolkit component: not feature flagged
         $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
 
-        /** @var IConfigLoader $config */
-        $config = $kernel->getDependencyInjector()->get('config');
 
         // Learning moment evidence: behind a feature flag
         if ($config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)) {

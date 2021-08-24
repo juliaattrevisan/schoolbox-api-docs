@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Config\ConfigMapper;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
@@ -56,7 +57,7 @@ class Module extends BaseModule
 
         $permissions = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsConfigOn('class_markbook_enable', $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new IsInstructor(Access::getInstance())
