@@ -18,6 +18,7 @@ use LogicException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
@@ -85,6 +86,12 @@ class ListController extends Web\Controller\Base
      * @var GenericCollection|null $existingParticipationPerUser
      */
     private $existingParticipationPerUser;
+
+
+    /**
+     * @var BreadcrumbFactory
+     */
+    protected BreadcrumbFactory $bakery;
 
 
     /**
@@ -869,4 +876,14 @@ class ListController extends Web\Controller\Base
         $this->access = $access;
         return $this;
     }
+
+
+    /**
+     * @return BreadcrumbFactory
+     */
+    protected function getBakery(): BreadcrumbFactory
+    {
+        return $this->bakery;
+    }
+
 }

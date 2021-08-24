@@ -48,12 +48,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 {
 
     /**
-     * @var BreadcrumbFactory
-     */
-    protected $bakery;
-
-
-    /**
      * @var WorkTypeMapper
      */
     private $workTypeMapper;
@@ -527,15 +521,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getAllGradeSchemes()
     {
         return GradeSchemeMapper::getInstance()->findAllWithGradeLevels();
-    }
-
-
-    /**
-     * @return BreadcrumbFactory
-     */
-    protected function getBakery(): BreadcrumbFactory
-    {
-        return $this->bakery;
     }
 
 
