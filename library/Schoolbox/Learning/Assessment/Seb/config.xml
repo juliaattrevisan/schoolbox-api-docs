@@ -28,23 +28,23 @@
     <string>ws://localhost:8706</string>
     <key>browserMessagingPingTime</key>
     <integer>120000</integer>
-    *<key>browserMessagingSocketEnabled</key>
+    <key>browserMessagingSocketEnabled</key>
     <false />
 
     <key>sebConfigPurpose</key>
     <integer>0</integer>
     <key>allowPreferencesWindow</key>
     <true />
-    *<key>cryptoIdentity</key>
-    <false />
+    <key>cryptoIdentity</key>
+    <integer>0</integer>
     <key>useAsymmetricOnlyEncryption</key>
-    <true />
+    <false />
 
     <key>browserViewMode</key>
     <integer>0</integer>
-    *<key>browserWindowAllowAddressBar</key>
+    <key>browserWindowAllowAddressBar</key>
     <true />
-    *<key>newBrowserWindowAllowAddressBar</key>
+    <key>newBrowserWindowAllowAddressBar</key>
     <true />
     <key>mainBrowserWindowWidth</key>
     <string>100%</string>
@@ -91,12 +91,6 @@
     <array></array>
     <key>additionalDictionaries</key>
     <array></array>
-    *<key>dictionaryData</key>
-    <false />
-    *<key>dictionaryFormat</key>
-    <false />
-    *<key>localeName</key>
-    <false />
 
     <key>audioMute</key>
     <false />
@@ -124,9 +118,9 @@
     <string>100%</string>
     <key>newBrowserWindowByLinkPositioning</key>
     <integer>2</integer>
-    *<key>newBrowserWindowShowURL</key>
+    <key>newBrowserWindowShowURL</key>
     <true />
-    *<key>browserWindowShowURL</key>
+    <key>browserWindowShowURL</key>
     <true />
     <key>enablePlugIns</key>
     <true />
@@ -176,14 +170,14 @@
     <string />
     <key>browserWindowTitleSuffix</key>
     <string />
-    *<key>allowPDFReaderToolbar</key>
+    <key>allowPDFReaderToolbar</key>
     <false />
-    *<key>allowFind</key>
+    <key>allowFind</key>
     <true />
 
     <key>allowDownUploads</key>
     <true />
-    *<key>allowCustomDownUploadLocation</key>
+    <key>allowCustomDownUploadLocation</key>
     <false />
     <key>downloadDirectoryOSX</key>
     <string>~/Downloads</string>
@@ -201,15 +195,15 @@
     <true />
     <key>backgroundOpenSEBConfig</key>
     <false />
-    *<key>useTemporaryDownUploadDirectory</key>
+    <key>useTemporaryDownUploadDirectory</key>
     <false />
 
     <key>examKeySalt</key>
     <data>0zVdSEqKAnK0ZNd4QFlwVKBTgw60o6xRjpfDokUYYnk=</data>
-    *<key>examSessionClearCookiesOnEnd</key>
-    <false />
-    *<key>examSessionClearCookiesOnStart</key>
-    <false />
+    <key>examSessionClearCookiesOnEnd</key>
+    <true />
+    <key>examSessionClearCookiesOnStart</key>
+    <true />
     <key>browserExamKey</key>
     <string />
     <key>browserURLSalt</key>
@@ -228,13 +222,13 @@
     <false />
     <key>restartExamPasswordProtected</key>
     <true />
-    *<key>examSessionReconfigureAllow</key>
+    <key>examSessionReconfigureAllow</key>
     <false />
-    *<key>examSessionReconfigureConfigURL</key>
+    <key>examSessionReconfigureConfigURL</key>
+    <string></string>
+    <key>quitURLRestart</key>
     <false />
-    *<key>quitURLRestart</key>
-    <false />
-    *<key>startURLAppendQueryParameter</key>
+    <key>startURLAppendQueryParameter</key>
     <false />
 
     <key>additionalResources</key>
@@ -362,8 +356,8 @@
 
     <key>sebServicePolicy</key>
     <integer>1</integer>
-    *<key>sebServiceIgnore</key>
-    <false />
+    <key>sebServiceIgnore</key>
+    <true />
     <key>allowVirtualMachine</key>
     <true />
     <key>allowScreenSharing</key>
@@ -375,13 +369,13 @@
     <true />
     <key>killExplorerShell</key>
     <false />
-    *<key>allowUserSwitching</key>
+    <key>allowUserSwitching</key>
     <false />
     <key>enableLogging</key>
     <true />
-    *<key>allowApplicationLog</key>
+    <key>allowApplicationLog</key>
     <false />
-    *<key>showApplicationLogButton</key>
+    <key>showApplicationLogButton</key>
     <false />
     <key>logDirectoryOSX</key>
     <string>~/Documents</string>
@@ -391,9 +385,9 @@
     <false />
     <key>lockOnMessageSocketClose</key>
     <true />
-    *<key>enableChromeNotifications</key>
+    <key>enableChromeNotifications</key>
     <false />
-    *<key>enableWindowsUpdate</key>
+    <key>enableWindowsUpdate</key>
     <false />
 
     <key>minMacOSVersion</key>
@@ -414,11 +408,11 @@
     <false />
 
     <key>allowedDisplaysMaxNumber</key>
-    <integer>1</integer>
+    <integer>3</integer>
     <key>allowedDisplayBuiltin</key>
     <true />
-    *<key>allowedDisplayBuiltinEnforce</key>
-    <true />
+    <key>allowedDisplayBuiltinEnforce</key>
+    <false />
     <key>allowedDisplaysIgnoreFailure</key>
     <true />
 
@@ -440,7 +434,7 @@
     <false />
     <key>insideSebEnableEnableNetworkConnectionSelector</key>
     <false />
-    *<key>setVmwareConfiguration</key>
+    <key>setVmwareConfiguration</key>
     <false />
 
     <key>hookKeys</key>
