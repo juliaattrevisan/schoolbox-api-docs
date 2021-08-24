@@ -658,9 +658,9 @@ abstract class Base
     protected function extendExecutionTime(int $seconds = 300)
     {
         $currentLimit = intval(ini_get('max_execution_time'));
+        // Don't extend time limit if there is no current limit
         if ($currentLimit !== 0) {
-            // Don't touch if there is no max execution time
-            set_time_limit($currentLimit + $seconds);
+            set_time_limit($seconds);
         }
     }
 }
