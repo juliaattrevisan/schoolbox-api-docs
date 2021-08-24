@@ -727,6 +727,8 @@
         <true />
         <key>allowedDisplaysMaxNumber</key>
         <integer>2</integer>
+        <key>allowedDisplaysIgnoreFailure</key>
+        <true />
         <key>allowedDisplayBuiltin</key>
         <true />
         <key>insideSebEnableSwitchUser</key>
