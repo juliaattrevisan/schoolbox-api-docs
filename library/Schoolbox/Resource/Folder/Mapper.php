@@ -1737,31 +1737,30 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         // First, check the local body cache to see if we've already loaded this folder
         if ($this->isCacheEnabled() && $this->localBodyCache->contains($this->getLocalKeyString($this, $folderId))) {
-            return $this->localBodyCache->get($this->getLocalKeyString($this, $folderId));
+            $folder = $this->localBodyCache->get($this->getLocalKeyString($this, $folderId));
+        } else {
+            // special case: 0 == root, but not in db
+            if ($folderId === Model::ROOT_ID || $folderId === (string)Model::ROOT_ID) {
+                return $this->findById($folderId);
+            }
+
+            // Need to override default 'ORDER BY' clause that assumes default joins
+            $options = [
+                'deleted' => true,
+                'order'   => [],
+            ];
+
+            /** @var Model|null $folder */
+            $folder = $this->executeSelect(
+                "SELECT {$this->getColumnString()}",
+                "FROM {$this->getTable()}",
+                $this->getPredicateBuilder(),
+                [$this->getIdentifierColumn() => $folderId],
+                $options
+            )->first();
         }
-
-        // special case: 0 == root, but not in db
-        if ($folderId === Model::ROOT_ID || $folderId === (string)Model::ROOT_ID) {
-            return $this->findById($folderId);
-        }
-
-        // Need to override default 'ORDER BY' clause that assumes default joins
-        $options = [
-            'deleted' => true,
-            'order'   => [],
-        ];
-
-        /** @var Model|null $folder */
-        $folder = $this->executeSelect(
-            "SELECT {$this->getColumnString()}",
-            "FROM {$this->getTable()}",
-            $this->getPredicateBuilder(),
-            [$this->getIdentifierColumn() => $folderId],
-            $options
-        )->first();
         if ($folder) {
             if ($folder->isDeleted()) {
-                $this->invalidateHydrateCache(['id' => $folder->getId()]);
                 throw (new Exception\Deleted())->setDeletedObject($folder);
             }
             return $folder;
