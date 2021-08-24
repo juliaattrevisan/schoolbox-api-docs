@@ -3,7 +3,6 @@
 /**
  * To record, playback and upload a camera recording into SB 
  * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
- *
  */
 
 import 'video.js/dist/video-js.css';
@@ -13,6 +12,7 @@ import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
+import RecordDeviceOptions from '@schoolbox/videojs-record/record-device-options';
 import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getRecordCameraOptions } from '@js/videojs/videojsOptions';
@@ -25,6 +25,7 @@ import { isOfMimeType } from '@js/util/fileUtils';
 export default {
 
     components: {
+        RecordDeviceOptions,
         RecordedMedia,
         OverMediaModal
     },
@@ -272,15 +273,7 @@ export default {
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
 
-        <div class="device-options">
-            <fieldset class="radiolist" data-equalizer-watch>
-                <legend>Device Options</legend>
-                <ul class="option-list">
-                    <li><input type="radio" value="Red" id="pokemonRed" checked><label for="pokemonRed">Red</label></li>
-                    <li><input type="radio" value="Blue" id="pokemonBlue"><label for="pokemonBlue">Blue</label></li>
-                </ul>
-            </fieldset>
-        </div>
+        <record-device-options />
 
         <recorded-media 
             v-if="hasPreRecordedData || hasNewRecording"
@@ -317,14 +310,5 @@ export default {
 <style lang="scss" scoped>
 
 @import '@schoolbox/videojs-record/videojs-record';
-
-.device-options {
-    position: absolute;
-    z-index: 2;
-    top: 10px;
-    left: 10px;
-    width: 300px;
-    height: 100px;
-}
 
 </style>
