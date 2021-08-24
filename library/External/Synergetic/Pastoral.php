@@ -259,7 +259,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Bump up the memory limit just to make sure we don't bomb out
 
         ini_set('memory_limit', '2048M');
-//        set_time_limit(30 * 60);
 
         // Log start of import
 

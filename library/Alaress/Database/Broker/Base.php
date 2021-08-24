@@ -102,7 +102,6 @@ abstract class Base implements IBroker
 
         $connectOptions = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-//            'LoginTimeout'    => self::LOGIN_TIMEOUT,
         ];
 
         $connectOptions += $this->connectionOptions;
