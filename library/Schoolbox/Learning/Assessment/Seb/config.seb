@@ -726,7 +726,7 @@
         <key>allowDisplayMirroring</key>
         <false />
         <key>allowedDisplaysMaxNumber</key>
-        <integer>1</integer>
+        <integer>9</integer>
         <key>allowedDisplayBuiltin</key>
         <true />
         <key>insideSebEnableSwitchUser</key>
