@@ -76,10 +76,10 @@ class Token
      * your json data in a specific way
      *
      * @param array $data
-     * @param bool  $type
+     * @param bool  $prettyPrint
      * @return string
      */
-    public function generateToken(array $data, bool $type): string
+    public function generateToken(array $data, bool $prettyPrint): string
     {
         /* For some records in some tass servers, JSON_PRETTY_PRINT is required.
          * For other records, you must NOT use it.
@@ -89,13 +89,13 @@ class Token
          *
          * Yes, it's insanity.
          */
-        if ($type) {
+        if ($prettyPrint) {
             $parameters = json_encode($data, JSON_PRETTY_PRINT);
         } else {
             $parameters = json_encode($data);
         }
 
-        $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
+        $encrypted = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
 
         return base64_encode($encrypted);
     }

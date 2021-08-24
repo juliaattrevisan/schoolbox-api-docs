@@ -210,13 +210,7 @@ class Api implements IApi
              *
              * Therefore you need to try both variants before dying entirely
              */
-            $queryArgs = [
-                'method'  => $method,
-                'appcode' => $this->credentials['appcode'],
-                'company' => $this->credentials['companycode'],
-                'token'   => $this->tokenCodec->generateToken($params, false),
-                'v'       => $version,
-            ];
+            $queryArgs['token'] = $this->tokenCodec->generateToken($params, false);
 
             return $this->tryPayload($method, $params, $queryArgs);
         }
