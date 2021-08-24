@@ -1,10 +1,10 @@
 /**
- * Helper for Vue.js FullCalendar implementations:
- * contains common code that can be shared between all implementations.
+ * To save the rows data to the db, used by both admin-list.vue and admin-list-pop-out.vue
  */
 
 import { mapState } from 'vuex';
 import axios from 'axios';
+import { UPDATE_SEQUENCE } from '../store/adminListMutationTypes';
  
 export default {
     
@@ -55,12 +55,12 @@ export default {
          * Ensure the correct sorting order is reflected 
          */
         updateSequenceOrder () {
+            const newSequenceList = [];
             const allRowElements = document.querySelector('[data-list]').children;
-            Array.from(allRowElements).forEach((rowElement, index) => { //loop through each row in order to set the correct sequence
-                const rowId = rowElement.dataset.rowId; //how else do we get the row id? 
-                const matchingRowData = this.rows.find((row) => Number(row.id) === Number(rowId)); //get the row data matched to the current row DOM element
-                matchingRowData.sequence = ++index;
+            Array.from(allRowElements).forEach((rowElement) => { //loop through each row in order to set the latest correct sequence
+                newSequenceList.push(rowElement.dataset.rowId);
             });
+            this.$store.commit(UPDATE_SEQUENCE, newSequenceList);
         },
 
         /**

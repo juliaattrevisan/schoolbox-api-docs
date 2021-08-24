@@ -73,15 +73,6 @@ export default {
         }, 
 
         /**
-         * To display the rows based on how they have been sorted
-         *
-         * @returns { Array of Objects }
-         */
-        rowsSortedBySequence () {
-            return this.rows.slice().sort((a, b) => a.sequence - b.sequence);
-        },
-
-        /**
          * Retrieve any styles of the list that change with state
          *
          * @returns { Object }
@@ -204,7 +195,7 @@ export default {
                                     @leave="onLeave"
                                 >    
                                     <admin-list-row
-                                        v-for="(row, index) in rowsSortedBySequence"
+                                        v-for="(row, index) in rows"
                                         :key="`key-${index}`"
                                         :row="row"
                                     />

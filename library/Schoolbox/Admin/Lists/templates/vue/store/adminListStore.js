@@ -3,7 +3,7 @@ import Vue from 'vue';
 import Vuex from 'vuex'
 import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, UPDATE_SELECTED_POP_OUT_NAME,
          ADD_ROW, DELETE_ROW_PROMPT, DELETE_ROW_CONFIRMED, 
-         OPEN_POP_UP, CLOSE_POP_UP } from './adminListMutationTypes';
+         OPEN_POP_UP, CLOSE_POP_UP, UPDATE_SEQUENCE } from './adminListMutationTypes';
 
 Vue.use(Vuex);
 
@@ -61,8 +61,10 @@ export default new Vuex.Store({
          */
         [UPDATE_LOADED_DATA] (state, loadedData) {
             state.loadedData = Object.freeze(loadedData); //freeze the loaded data to ensure it's not changed
-            state.rows = _.cloneDeep(state.loadedData.rows); //cloneDeep is from underscore.js
-            state.rows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
+            const loadedRows = _.cloneDeep(state.loadedData.rows); //cloneDeep is from underscore.js
+            const sortedRows = _.orderBy(loadedRows, 'sequence', 'asc'); //orderBy is from underscore.js, to display according to sequence
+            sortedRows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
+            state.rows = sortedRows;
         },
 
         /**
@@ -120,7 +122,17 @@ export default new Vuex.Store({
          */
         [CLOSE_POP_UP] (state) {
             state.isPopOutOpen = false;
-        }
+        },
+
+        /**
+         * 
+         */
+         [UPDATE_SEQUENCE] (state, sequenceList) {
+            sequenceList.forEach((item, index) => {
+                const matchingRowData = state.rows.find((row) => Number(row.id) === Number(item)); //get the row data matched to the current row DOM element
+                matchingRowData.sequence = ++index;
+            });
+        },
 
     },
     
