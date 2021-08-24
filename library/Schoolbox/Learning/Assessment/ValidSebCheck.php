@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\User;
 
 /**
@@ -17,12 +18,6 @@ use Schoolbox\User;
  */
 class ValidSebCheck
 {
-
-    /**
-     * Browser Exam Key and Config Key are hashed with SHA256
-     */
-    private const HASH_ALGORITHM = 'sha256';
-
 
     /**
      * If an assessment requires the SEB Safe Exam Browser to complete work,
@@ -63,9 +58,11 @@ class ValidSebCheck
         if (isset($serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'], $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'])) {
             /* Both keys that were transmitted by the browser must match
              * the values we expected to receive
+             *
+             * Browser Exam Key and Config Key are hashed with SHA256
              */
-            $bekMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'] === hash(self::HASH_ALGORITHM, "{$startUrl}{$browserExamKey}");
-            $configKeyMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] === hash(self::HASH_ALGORITHM, "{$startUrl}{$configKey}");
+            $bekMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$browserExamKey}");
+            $configKeyMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
 
             /* Both computed hashes must match what we expected
              */

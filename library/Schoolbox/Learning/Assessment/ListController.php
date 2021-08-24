@@ -20,6 +20,7 @@ use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -135,25 +136,12 @@ class ListController extends Web\Controller\Base
      */
     public function getSebConfig(IAssessable $assessment): void
     {
-        /* Load this inaccessible file and swop out its vars, phplib style
-         */
-        $path = __DIR__ . '/Seb/config.seb';
+        $sebPayload = new SebPayload(
+            $this->getRequest()->server->get('HTTP_HOST'),
+            $this->router
+        );
 
-        /* Figure out the absolute url for this assessment
-         */
-        $startUrl = 'https://' . $this->getRequest()->server->get('HTTP_HOST') . $this->router->generate('learningAssessment.getAssessment', [
-            'assessmentId' => $assessment->getId()
-        ]);
-
-        /* Manufacture a phplib style struct for strings and their replacements
-         */
-        $tokens = [
-            '{{ startUrl }}' => $startUrl
-        ];
-
-        /* Perform the replacements
-         */
-        $contents = strtr(file_get_contents($path), $tokens);
+        $contents = $sebPayload->generate($assessment);
 
         /* Send as a downloadable file
          */
