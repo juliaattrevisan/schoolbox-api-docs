@@ -12,6 +12,8 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\LearningAnalytics\Module as LearningAnalyticsModule;
 
 class LearningAnalytics extends ModuleLoader
@@ -24,6 +26,11 @@ class LearningAnalytics extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, LearningAnalyticsModule::class, "/learning/analytics");
+        /** @var IConfigLoader $config */
+        $config = $kernel->getDependencyInjector()->get('config');
+
+        if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            $this->loadModule($kernel, LearningAnalyticsModule::class, "/learning/analytics");
+        }
     }
 }

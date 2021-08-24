@@ -11,6 +11,8 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Schoolbox\Assessment;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
 class Course implements ModuleConfigInterface
 {
@@ -23,13 +25,18 @@ class Course implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $courseModule = new Assessment\Course\Module($kernel->getDependencyInjector());
-        $courseModule->init('/course');
+        /** @var IConfigLoader $config */
+        $config = $kernel->getDependencyInjector()->get('config');
 
-        $importModule = new Assessment\Course\Import\Module($kernel->getDependencyInjector());
-        $importModule->init('/course/import');
+        if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            $courseModule = new Assessment\Course\Module($kernel->getDependencyInjector());
+            $courseModule->init('/course');
 
-        $atlasModule = new Assessment\Course\Import\Atlas\Module($kernel->getDependencyInjector());
-        $atlasModule->init('/course/import/atlas');
+            $importModule = new Assessment\Course\Import\Module($kernel->getDependencyInjector());
+            $importModule->init('/course/import');
+
+            $atlasModule = new Assessment\Course\Import\Atlas\Module($kernel->getDependencyInjector());
+            $atlasModule->init('/course/import/atlas');
+        }
     }
 }
