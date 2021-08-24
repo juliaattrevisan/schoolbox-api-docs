@@ -71,11 +71,16 @@ class Broker extends Base
      */
     public function connect($options = [])
     {
-        // Enable persistent connection if not in debug mode
-
-        $this->connectionOptions  = [
+        // When connecting: use the login timeout
+        $this->connectionOptions = [
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
             PDO::ATTR_PERSISTENT         => false,
+            PDO::ATTR_TIMEOUT            => self::LOGIN_TIMEOUT,
+        ];
+
+        // After connecting: use the query timeout
+        $this->databaseAttributes = [
+            PDO::ATTR_TIMEOUT => self::QUERY_TIMEOUT,
         ];
 
         return parent::connect($options);

@@ -41,15 +41,16 @@ class Broker extends Base
         // Set MSSQL specific attributes:
         // * UTF-8 Encode Query Responses
         // * fetch numeric types as numbers, instead of as strings
-        // (PHPStan doesn't yet have PDO_SQLSRV, so disable inspection)
-        /** @noinspection PhpUndefinedClassConstantInspection */
+        // * Login timeout: 2s
+        // * Query timeout: 30s
         $this->databaseAttributes = [
             PDO::SQLSRV_ATTR_ENCODING             => PDO::SQLSRV_ENCODING_UTF8,
             PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
+            'LoginTimeout'                        => self::LOGIN_TIMEOUT,
+            PDO::SQLSRV_ATTR_QUERY_TIMEOUT        => self::QUERY_TIMEOUT,
         ];
 
         // Set MSSQL specific post-connect queries
-
         $this->postConnectQueries = [
             'SET ANSI_NULL_DFLT_ON ON',
             'SET ANSI_NULLS ON',
