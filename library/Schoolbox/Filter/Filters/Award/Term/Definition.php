@@ -46,6 +46,6 @@ class Definition extends AssessmentTermFilter\Definition
      */
     protected static function getTemplatesDir(): string
     {
-        return '@filterDefinitions/Assessment/Term/Due/templates';
+        return '@filterDefinitions/Award/Term/templates';
     }
 }
