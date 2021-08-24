@@ -261,6 +261,8 @@ class Api implements IApi
             }
 
             /* Couldn't decode json, or tass server refused something, or something else died
+             * Not sure if this is ultimately possible according to guzzle docblocks but I do
+             * get reports of this error message from a variety of people; I'll keep for now
              */
             if (!$response) {
                 throw new DomainException('Could not access Tass server, or bad json payload returned.');
