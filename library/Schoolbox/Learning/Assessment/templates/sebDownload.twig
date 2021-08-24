@@ -1,13 +1,40 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
 <div class="row">
     <div class="small-12 columns">
-        <h1>Download Safe Exam Browser</h1>
+        <h1>{{ assessment.title }}</h1>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
         <section class="content">
-            <p>This assessment requires a Safe Exam Browser. Download the stuff from the place.</p>
+            <p class="content text-center">
+                This activity has been configured so that students may only attempt it using the Safe Exam Browser.
+                Before starting, you must ensure you have the correct version of Safe Exam Browser installed on
+                your computer.
+            </p>
+
+            <div class="row">
+                <div class="small-1 medium-2 columns">
+                    &nbsp;
+                </div>
+                <div class="small-10 medium-8 columns">
+                    <a href="https://safeexambrowser.org/download_en.html#Windows" class="full-width button">Download Safe Exam Browser for Windows</a>
+                    <a href="https://safeexambrowser.org/download_en.html#MacOSX" class="full-width button">Download Safe Exam Browser for MacOS</a>
+                    <a href="https://safeexambrowser.org/download_en.html#iOS" class="full-width button">Download Safe Exam Browser for iOS</a>
+                </div>
+                <div class="small-1 medium-2 columns">
+                    &nbsp;
+                </div>
+            </div>
         </section>
+
+        <ul class="flex-list buttons">
+            <li><a href="/homepage/{{ assessment.context.folder.id }}" class="button">Return to class</a></li>
+            <li><a class="button submit">Launch Safe Exam Browser</a></li>
+        </ul>
     </div>
 </div>

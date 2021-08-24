@@ -117,9 +117,16 @@ class ListController extends Web\Controller\Base
     /**
      * Offer a SEB Safe Exam Browser download screen
      */
-    public function getSebDownload(): void
+    public function getSebDownload(IAssessable $assessment): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/sebDownload.twig', []));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/sebDownload.twig', [
+            'assessmentId' => $assessment->getId(),
+            'assessment' => $assessment,
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                '',
+            ]),
+        ]));
     }
 
 

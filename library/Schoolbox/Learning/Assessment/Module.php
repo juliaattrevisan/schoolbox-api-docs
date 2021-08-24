@@ -144,7 +144,7 @@ class Module extends BaseModule
 
         // register the routes
 
-        $this->register('GET', "/assessments/seb", 'getSebDownload', $loggedIn);
+        $this->register('GET', "$assRoute/seb", 'getSebDownload', $loggedIn, $preloadAssessment);
         $this->register('GET', "$assListRoute", 'getAssessmentsByContext', $isSuper, $preloadContext);
         $this->register('POST', "$assListRoute", 'postCreateAssessment', $canWrite, $preloadContext); // a || c
         $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments', $canWrite, $preloadContext); // a || c
