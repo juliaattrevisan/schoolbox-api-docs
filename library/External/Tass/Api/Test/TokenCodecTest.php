@@ -44,7 +44,7 @@ class TokenCodecTest extends TestCase
      */
     public function test_reversibility(Token $codec, array $data): void
     {
-        $unpacked = $codec->unpackToken($codec->generateToken($data));
+        $unpacked = $codec->unpackToken($codec->generateToken($data, true));
         $this->assertSame($data, $unpacked);
     }
 
