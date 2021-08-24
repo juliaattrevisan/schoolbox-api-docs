@@ -74,7 +74,6 @@ export default {
          * Do we need to request the media device straight away? 
          * If not wait until it's requested - by deleting the pre recorded media recording
          * Otherwise we will just be displaying the existing pre recorded media
-         *
          */
         checkForPreRecordedData () {
             if (this.preRecordedData) {
@@ -84,7 +83,6 @@ export default {
 
         /**
          * Start up the videojs-record instance, which is just videojs with record functionality wrapped around it
-         *
          */
         initVideojsRecord () {
             try {
@@ -97,7 +95,6 @@ export default {
 
         /**
          * videojs is ready, so set up listeners and animate on
-         *
          */
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
@@ -106,10 +103,10 @@ export default {
 
         /**
          * track the events videojs-record offers to manage display
-         *
          */
         initVideojsRecordRecordListeners () {
             this.player.on('deviceReady', this.onDeviceReady);
+            this.player.on('enumerateReady', this.onEnumerateReady);
             this.player.on('startRecord', this.onStartRecord);
             this.player.on('finishRecord', this.onFinishRecord);
             this.player.on('error', this.onError);
@@ -118,17 +115,25 @@ export default {
 
         /**
          * onDeviceReady, dispatch to anyone listening, maybe the parent
-         *
          */
         onDeviceReady () {
             this.isDeviceReady = true;
             const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); 
             this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
+            this.player.record().enumerateDevices();
+        },
+
+        /**
+         * onEnumerateReady
+         */
+        onEnumerateReady () {
+            const allDeviceList = this.player.record().devices;
+            const videoDeviceList = allDeviceList.filter((device) => device.kind === 'videoinput');
+            // debugger;
         },
 
         /**
          * onStartRecord
-         *
          */
         onStartRecord () {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'rgba(255, 0, 0, 0.25)');
@@ -136,7 +141,6 @@ export default {
 
         /**
          * the recorded file is ready
-         *
          */
         onFinishRecord () {
             if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //if it's a webm
@@ -148,7 +152,6 @@ export default {
 
         /**
          * the seekable webm file is ready
-         *
          */
         onFinishConvert () {
             this.player.off('finishConvert', this.onFinishConvert);
@@ -157,7 +160,6 @@ export default {
 
         /**
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
-         *
          */
         recordedVideoReady (mediaData) {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
@@ -168,7 +170,6 @@ export default {
 
         /**
          * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
-         *
          */
         onError (element, error) {
             this.hasError = true;
@@ -177,7 +178,6 @@ export default {
 
         /**
          * onDeviceError - try and manage as many errors as possible
-         *
          */
         onDeviceError () {
             this.hasError = true;
@@ -192,7 +192,6 @@ export default {
 
         /**
          * ensure everything reset on possible modal re-display
-         *
          */
         destroyVideojs () {
             if (this.player) {
@@ -203,7 +202,6 @@ export default {
 
         /**
          * close the error modal, animating out
-         *
          */
         onCloseErrorModalSelected () {
             this.isOverMediaModalClosing = true;
@@ -211,7 +209,6 @@ export default {
 
         /**
          * it's closed now, so disable the errors to allow trying again
-         *
          */
         onErrorModalClosed () {
             this.hasError = false;
@@ -223,7 +220,6 @@ export default {
 
         /**
          * confirm deletion of the latest recording, setting up for another recording
-         *
          */
         onRecordedMediaDeleted () {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
@@ -258,7 +254,6 @@ export default {
 
         /**
          * revert back to original setting
-         *
          */
         onOverMediaModalClosed () {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
@@ -275,6 +270,16 @@ export default {
         
         <div class="media-container media-container-record">
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
+        </div>
+
+        <div class="device-options">
+            <fieldset class="radiolist" data-equalizer-watch>
+                <legend>Device Options</legend>
+                <ul class="option-list">
+                    <li><input type="radio" value="Red" id="pokemonRed" checked><label for="pokemonRed">Red</label></li>
+                    <li><input type="radio" value="Blue" id="pokemonBlue"><label for="pokemonBlue">Blue</label></li>
+                </ul>
+            </fieldset>
         </div>
 
         <recorded-media 
@@ -312,5 +317,14 @@ export default {
 <style lang="scss" scoped>
 
 @import '@schoolbox/videojs-record/videojs-record';
+
+.device-options {
+    position: absolute;
+    z-index: 2;
+    top: 10px;
+    left: 10px;
+    width: 300px;
+    height: 100px;
+}
 
 </style>
