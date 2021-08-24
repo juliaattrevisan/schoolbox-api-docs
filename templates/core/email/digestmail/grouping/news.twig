@@ -1,54 +1,61 @@
-{% extends "schoolmail/row.twig" %}
+<tr class="island">
+    <td width="50" height="50" valign="top" class="column-container">
+        <table>
+            <tr>
+                <td>
+                    {% set msg = row.messages | first %}
+                    {% if msg.meta.thumb %}
+                    <a href="{{ msg.href }}">
+                        <img src="{{ msg.meta.thumb }}" alt="{{ msg.meta.title }}" />
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </td>
+    <td valign="middle" class="column-container news-details-container">
+        <table width="100%">
+            <tr>
+                <td>
+                    {% set msg = row.messages | first %}
+                    {% if msg.meta.title %}
+                        {% if config.read_more | length %}
+                            <span class="title">{{ msg.meta.title }}</span>
+                        {% else %}
+                            <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
+                        {% endif %}
+                    {% else %}
+                        {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
+                        {{ msg.title | raw }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% set msg = row.messages | first %}
+            {% if msg.meta %}
+            <tr>
+                <td>
+                    <p>
+                        <em>
+                            {{ msg.meta.byline }}
+                        </em>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {% if msg.meta.blurb | length %}
+                    {# blurb already has a <p> tag #}
+                    {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
+                    {% else %}
+                    <p>{{ msg.meta.body | cutSentence(200, true) }}</p>
+                    {% endif %}
 
-{% block image %}
-    {% set msg = row.messages | first %}
-    {% if msg.meta.thumb %}
-    <a href="{{ msg.href }}">
-        <img src="{{ msg.meta.thumb }}" alt="{{ msg.meta.title }}" />
-    </a>
-    {% endif %}
-{% endblock %}
-
-{% block pretty %}
-    {% set msg = row.messages | first %}
-    {% if msg.meta.title %}
-        {% if config.read_more | length %}
-            <span class="title">{{ msg.meta.title }}</span>
-        {% else %}
-            <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
-        {% endif %}
-    {% else %}
-        {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
-        {{ msg.title | raw }}
-    {% endif %}
-{% endblock %}
-
-{% block meta %}
-    {% set msg = row.messages | first %}
-    {% if msg.meta %}
-    {{ parent() }}
-    <tr>
-        <td>
-            <p>
-                <em>
-                    {{ msg.meta.byline }}
-                </em>
-            </p>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {% if msg.meta.blurb | length %}
-            {# blurb already has a <p> tag #}
-            {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
-            {% else %}
-            <p>{{ msg.meta.body | cutSentence(200, true) }}</p>
+                    {% if msg.meta.readMore is defined and msg.meta.readMore.available %}
+                        <a href="{{ msg.href }}" class="more">{{ msg.meta.readMore.string }}</a>
+                    {% endif %}
+                </td>
+            </tr>
             {% endif %}
-
-            {% if msg.meta.readMore is defined and msg.meta.readMore.available %}
-                <a href="{{ msg.href }}" class="more">{{ msg.meta.readMore.string }}</a>
-            {% endif %}
-        </td>
-    </tr>
-    {% endif %}
-{% endblock %}
+        </table>
+    </td>
+</tr>

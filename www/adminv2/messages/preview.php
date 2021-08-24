@@ -48,7 +48,7 @@ switch ($this->arg[0]) {
         $decorator->appendInstance($bob
             ->setTitle(':author posted a Lab Report :name in :subj')
             ->setParams(array(
-                'author' => new Param('Mr Walter White'),
+                'author' => new Param('Mr Thomas'),
                 'name'   => new Param('REDUX'),
                 'subj'   => new Param('Yr 11 Chemistry B'),
             ))
@@ -70,7 +70,7 @@ switch ($this->arg[0]) {
         $decorator->appendInstance($bob
             ->setTitle(':author posted a Lab Report :name in :subj')
             ->setParams(array(
-                'author' => new Param('Mr Walter White'),
+                'author' => new Param('Mr Thomas'),
                 'name'   => new Param('REDUX'),
                 'subj'   => new Param('Yr 11 Chemistry B'),
             ))
@@ -98,7 +98,7 @@ switch ($this->arg[0]) {
             ->build());
 
         $decorator->appendInstance($bob
-            ->setTitle(':author marked your Oral Presentation :name in :subj')
+            ->setTitle(':author marked your presentation :name in :subj')
             ->setParams(array(
                 'author' => new Param('Mrs Celia Glenn'),
                 'name'   => new Param("Star-cross'd Lovers: "),
