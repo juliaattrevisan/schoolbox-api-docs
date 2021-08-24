@@ -22,8 +22,15 @@ use PDOException;
 
 abstract class Base implements IBroker
 {
-    /** Login timeout (seconds) */
-    const LOGIN_TIMEOUT = 2;
+    /**
+     * Login timeout (seconds)
+     */
+    public const LOGIN_TIMEOUT = 2;
+
+    /**
+     * Default query timeout (seconds)
+     */
+    public const QUERY_TIMEOUT = 30;
 
     /** @var array $options Connection options */
     protected $options = [];
@@ -95,7 +102,7 @@ abstract class Base implements IBroker
 
         $connectOptions = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            'LoginTimeout' => self::LOGIN_TIMEOUT
+//            'LoginTimeout'    => self::LOGIN_TIMEOUT,
         ];
 
         $connectOptions += $this->connectionOptions;
