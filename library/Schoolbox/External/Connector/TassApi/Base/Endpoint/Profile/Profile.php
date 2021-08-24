@@ -481,16 +481,21 @@ class Profile implements IStrategy
      *
      * @param string $studentCode
      * @return array
-     * @throws RuntimeException
-     * @throws DomainException
+     * @throws \JsonException
      */
     public function findEmergencyContacts(string $studentCode): array
     {
-        $emergencyContacts = $this->api[Codec\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
-            'currentstatus' => 'current',
-            'commtype' => 'ec',
-            'code' => $studentCode
-        ]);
+        try {
+            $emergencyContacts = $this->api[Codec\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
+                'currentstatus' => 'current',
+                'commtype' => 'ec',
+                'code' => $studentCode
+            ]);
+        } catch (RuntimeException $e) {
+            $this->log->warning(sprintf("Skipping emergency contacts data for student %s.", $studentCode));
+            $this->log->warning($e->getMessage());
+            return [];
+        }
 
         /* For some reason, everyone spawns in the 0th element here - not sure what else
          * appears in commrules[1] or commrules[2] etc.
