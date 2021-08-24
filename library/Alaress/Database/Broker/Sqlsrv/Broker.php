@@ -43,10 +43,13 @@ class Broker extends Base
         // * fetch numeric types as numbers, instead of as strings
         // * Login timeout: 2s
         // * Query timeout: 30s
+        $this->connectionOptions = [
+            'LoginTimeout' => self::LOGIN_TIMEOUT,
+        ];
+
         $this->databaseAttributes = [
             PDO::SQLSRV_ATTR_ENCODING             => PDO::SQLSRV_ENCODING_UTF8,
             PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
-            'LoginTimeout'                        => self::LOGIN_TIMEOUT,
             PDO::SQLSRV_ATTR_QUERY_TIMEOUT        => self::QUERY_TIMEOUT,
         ];
 
