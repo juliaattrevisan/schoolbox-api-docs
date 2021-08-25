@@ -12,15 +12,15 @@ export default {
     props: {
         isRecording: {
             type: Boolean,
-            required: true,
+            required: true
         },
         title: {
             type: String,
-            required: true,
+            required: true
         },
         currentDeviceId: {
             type: String,
-            required: true,
+            required: true
         },
         deviceList: {
             type: Array,
@@ -46,8 +46,8 @@ export default {
         /**
          * onDeviceSelected
          */
-        onDeviceSelected (event) {
-            this.$emit(recordMediaEvents.VIDEO_DEVICE_CHANGE, event.target.value);
+        onDeviceSelected (deviceId) {
+            this.$emit(recordMediaEvents.VIDEO_DEVICE_CHANGE, deviceId);
         },
 
     }
@@ -60,17 +60,14 @@ export default {
     <div>
         <transition name="slide">
             <div v-if="canDisplay" class="device-options">
-                <fieldset class="radiolist device-options-fieldset">
-                    <legend class="device-options-legend">{{ title }}</legend>
-                    <ul class="option-list device-options-list">
+                <fieldset class="fieldset">
+                    <legend class="legend">{{ title }}</legend>
+                    <ul class="option-list">
                         <li v-for="device in deviceList" :key="device.deviceId">
-                            <input type="radio" 
-                                :value="device.deviceId" 
-                                :id="device.deviceId" 
-                                :checked="device.deviceId === currentDeviceId"
-                                @click.prevent="onDeviceSelected" 
-                            >
-                            <label class="device-options-label" :for="device.deviceId">{{ device.label }}</label>
+                            <a href="#toggle-device" :class="`toggle-button ${ device.deviceId === currentDeviceId ? 'toggle-button-active' : '' }`" @click.prevent="onDeviceSelected(device.deviceId)">
+                                <span class="toggle-button-icon vjs-icon-photo-camera"></span>
+                                <span class="toggle-button-text">{{ device.label }}</span>
+                            </a>
                         </li>
                     </ul>
                 </fieldset>
@@ -86,30 +83,50 @@ export default {
     z-index: 2;
     top: 10px;
     left: 10px; 
-    max-width: 40%;
+    max-width: 50%;
     border: 2px solid white;
     padding: 0.5rem 1rem;
     color: white;
-    background: rgba(43, 51, 63, 0.7);
+    background: rgba(43, 51, 63, 0.85);
 }
 
-.device-options-legend {
-    margin-bottom: 0.8rem;
-    font-size: 0.8rem;
+.legend {
+    margin-bottom: 10px;
+    font-size: 0.8125rem;
 }
 
-.device-options-fieldset {
+.fieldset {
     margin: 0;
     padding: 0;
 }
 
-.device-options-list {
+.option-list {
     margin: 0;
     padding: 0;
 }
 
-.device-options-label {
+.toggle-button {
+    display: block;
+    margin: 0 0 5px 0;
+    padding: 3px 0;
     color: white;
+    background: none;
+    text-align: left;
+    font-size: 0.8125rem;
+    opacity: 0.6;
+}
+
+.toggle-button-active {
+    opacity: 1;
+}
+
+.toggle-button-icon {
+    position: absolute;
+}
+
+.toggle-button-text {
+    display: inline-block;
+    padding-left: 20px;
 }
 
 .slide-enter-active, .slide-leave-active {
