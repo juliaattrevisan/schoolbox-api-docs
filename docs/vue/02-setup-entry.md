@@ -26,36 +26,36 @@ The `UserList` component we're about to build requires its own javascript stuff 
 
 ### 2.1.2 Component Javascript initialiser
 
-Create `library/Schoolbox/Greenhouse/templates/initUserList.js` and put this inside, which will tell vue how to initialise our `UserList` component into its container element.
+Create `library/Schoolbox/Greenhouse/templates/userList.js` and put this inside, which will tell vue how to initialise our `UserList` component into its container element.
 
 ```js
-import Vue from "vue";
-import UserList from "./user-list";
+import Vue from 'vue';
+import UserList from './user-list';
 
 new Vue({
-    el: "#user-list-container",
+    el: '#user-list-container',
     components: {
         UserList
     }
 });
 ```
 
--   The `el` arg is the container element's id which we previously named `#user-list-container` but you can call it anything you want here.
+-   The `el` arg is the container element's id which we previously named `#user-list-container`.
 -   And the `components` is used to list the Vue components that are being referenced within `#user-list-container`
 
 ### 2.1.3 Update webpack.config.js
 
 Next, we need to add a path to this javascript file in `webpack.config.js` so the compiler knows where to look for it.
 
-At the top, there's a `module.exports` object literal definition. You'll find other schoobox vue components there. Simply add the path to the `initUserList.js` file to the `entry` node, which is an index of all the Vue entry points that currently exist.
+At the top, there's a `module.exports` object literal definition. You'll find other schoobox vue components there. Simply add the path to the `userList.js` file to the `entry` node, which is an index of all the JS entry points that currently exist.
 
 ```js
-userList: './library/Schoolbox/Greenhouse/templates/initUserList.js`
+userList: './library/Schoolbox/Greenhouse/templates/userList.js`
 ```
 
 ### 2.1.3 Vue Component basics
 
-The `UserList` component requires a basic Vue component javascript to work. This is where the meat of our component will live; it's where we add other components process data to render on screen. See https://vuejs.org/v2/guide/single-file-components.html for futher reference.
+The `UserList` component requires a basic Vue component javascript to work. This is where the meat of our component will live; it's where we add other components and process data to render on screen. See https://vuejs.org/v2/guide/single-file-components.html for futher reference.
 
 If you remember before, our initialiser was set to require from `user-list.vue`, so let's do that.
 
@@ -64,16 +64,13 @@ Add `library/Schoolbox/Greenhouse/templates/user-list.vue` and paste this massiv
 ```js
 <script>
 
-import Toast from '@schoolbox/toast';
+/**
+ * To display a list of users 
+ */
+
+import Toast from '@vue/components/toast';
 
 export default {
-
-    /**
-     * Name.
-     * The name of the component that we have here. This name will be used in the container
-     * to spawn this component.
-     */
-    name: 'user-list',
 
     /**
      * Components.
@@ -93,6 +90,14 @@ export default {
      *
      */
     mixins: [],
+
+    /**
+     * Directives
+     * Register your own custom directives
+     * https://vuejs.org/v2/guide/custom-directive.html
+     *
+     */
+    directives: {},
 
     /**
      * Props.
@@ -122,7 +127,7 @@ export default {
      * Note that v-if and v-for must never be on the same node together, as this overrides
      * the meaning of "this" in a way you don't expect.
      */
-    data() {
+    data () {
         return {
             isLoaded: false
         }
@@ -135,26 +140,6 @@ export default {
      *
      */
     computed: {
-
-    },
-
-    /**
-     * Filters
-     * Define filters that can be used to apply common text formatting.
-     * https://vuejs.org/v2/guide/filters.html
-     *
-     */
-    filters: {
-
-    },
-
-    /**
-     * Directives
-     * Register your own custom directives
-     * https://vuejs.org/v2/guide/custom-directive.html
-     *
-     */
-    directives: {
 
     },
 
@@ -177,7 +162,7 @@ export default {
      * see https://vuejs.org/v2/guide/instance.html#Lifecycle-Diagram for reference
      *
      */
-    mounted() {
+    mounted () {
 
     },
 
@@ -212,19 +197,17 @@ This is the guts of a vue component. Note that the `name` node is called `user-l
 
 ### 2.1.4 npm run build
 
-Now you need to compile it for the first time.
+Now you can compile and keep it compliing every file save. 
 
 ```
-vagrant ssh;
-cd /vagrant
-npm run build
+npm run watch
 ```
 
 If you visit the Greenhouse now, it just won't have done anything...but why? It turns out that you need to do one more thing.
 
 ### 2.1.5 Include the js npm built for you
 
-If you look in `www/static/javascript/components`, you'll find a `userList.bundle.js` which npm built for you in the previous step. It won't have existed earlier.
+If you look in `www/static/js/bundle`, you'll find a `userList.js` which npm built for you in the previous step. It won't have existed earlier.
 
 You need to include this in the `container.twig` file we built earlier.
 
@@ -233,8 +216,8 @@ You need to include this in the `container.twig` file we built earlier.
 Add this to the bottom of `container.twig`
 
 ```html
-<!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="{{ CDN_PREFIX }}/javascript/components/userList.bundle.js"></script>
+<!-- You need this; spawns after you "npm run build" or "npm run watch" for the first time -->
+<script src="{{ CDN_PREFIX }}/js/bundle/userList.js"></script>
 ```
 
 Now you can reload your Greenhouse and somewhere, it should say:
