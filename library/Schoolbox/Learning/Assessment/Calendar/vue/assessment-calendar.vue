@@ -6,14 +6,14 @@ import dayGridPlugin      from '@fullcalendar/daygrid'
 import timeGridPlugin     from '@fullcalendar/timegrid'
 import momentPlugin       from '@fullcalendar/moment'
 import adaptivePlugin     from '@fullcalendar/adaptive'
-import RevealModal        from '@schoolbox/reveal-modal'
-import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
+import RevealModal        from '@vue/components/reveal-modal'
+import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
 import axios              from 'axios'
-import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
+import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
-import CustomisedCalendarEvent    from '@schoolbox/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
 
 
 // Various URLs this calendar can make use of
@@ -964,7 +964,7 @@ export default {
 
 <style lang="scss">
 
-@import "@schoolbox/fullcalendar/styles/calendar";
+@import "@vue/components/fullcalendar/styles/calendar";
 
 // Please forgive me...
 

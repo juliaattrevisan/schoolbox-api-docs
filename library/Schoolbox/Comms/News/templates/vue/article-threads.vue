@@ -2,10 +2,10 @@
 
 import moment from 'moment';
 import axios from 'axios';
-import MediaArticle from '@schoolbox/media-article';
-import Toast from '@schoolbox/toast';
-import RevealModal from '@schoolbox/reveal-modal';
-import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
+import MediaArticle from '@vue/components/media-article';
+import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
+import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 
 export default {
 

@@ -7,7 +7,7 @@
 
 import gsap from 'gsap/all';
 import axios from 'axios';
-import Toast from '@schoolbox/toast';
+import Toast from '@vue/components/toast';
 
 export default {
 

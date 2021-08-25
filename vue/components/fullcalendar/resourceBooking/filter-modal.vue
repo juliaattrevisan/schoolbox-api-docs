@@ -1,5 +1,5 @@
 <script>
-import RevealModal from "@schoolbox/reveal-modal";
+import RevealModal from "@vue/components/reveal-modal";
 
 const FILTER_CHANGED = "filterChanged";
 

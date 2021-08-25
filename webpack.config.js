@@ -319,7 +319,7 @@ module.exports = {
                                     outputPath: '../../css/core/'
                                 }
                             },
-                            {loader: 'extract-loader'},
+                            { loader: 'extract-loader' },
                             {
                                 loader: 'css-loader',
                                 options: {
@@ -345,11 +345,11 @@ module.exports = {
     resolve: { //https://webpack.js.org/configuration/resolve/
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
-            '@schoolbox': path.resolve(__dirname, 'vue/components'),
             '@schoolboxLibrary': path.resolve(__dirname, 'library/Schoolbox'),
             '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
+            '@vue': path.resolve(__dirname, 'vue'),
             '@js': path.resolve(__dirname, 'www/static/js'),
             '@css': path.resolve(__dirname, 'www/static/css')
         },

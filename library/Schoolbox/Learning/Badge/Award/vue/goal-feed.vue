@@ -4,10 +4,10 @@ import AwardDetailModal from './award-detail-modal';
 import AchievementWithdrawModal from "./award-achievement-withdraw-modal";
 import BadgeImage from './../../vue/badge-image';
 import GoalWithdrawModal from "./award-goal-withdraw-modal";
-import foundationMixin from '@schoolbox/foundation-mixin';
+import foundationMixin from '@vue/components/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
-import toastMixin from '@schoolbox/toast-mixin';
+import toastMixin from '@vue/components/toast-mixin';
 import userProfileConstants from '../../../vue/user-profile/constants';
 import userProfileMixin from '../../../vue/user-profile/mixin';
 

@@ -6,8 +6,8 @@
  *
  */
 
-import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
-import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
+import RecordedMedia from '@vue/components/videojs-record/recorded-media';
+import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
 import { blobToDataURL } from '@js/util/fileUtils';

@@ -6,10 +6,10 @@
  */
 
 import { gsap } from 'gsap/all';
-import AudioOnlyPlayer from '@schoolbox/videojs/audio-only-player';
-import PhotoPlayer from '@schoolbox/videojs/photo-player';
-import VideoPlayer from '@schoolbox/videojs/video-player';
-import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
+import AudioOnlyPlayer from '@vue/components/videojs/audio-only-player';
+import PhotoPlayer from '@vue/components/videojs/photo-player';
+import VideoPlayer from '@vue/components/videojs/video-player';
+import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
 import { getVideoPlayerOptionsWithBlob, getVideoPlayerOptionsWithSrc, getAudioPlayerOptionsWithBlob, getAudioPlayerOptionsWithSrc } from '@js/videojs/videojsOptions';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';

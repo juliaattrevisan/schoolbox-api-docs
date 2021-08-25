@@ -1,9 +1,9 @@
 <script>
 import axios from 'axios';
 import filesize from 'filesize';
-import RevealModal from '@schoolbox/reveal-modal';
-import Toast from '@schoolbox/toast';
-import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
+import RevealModal from '@vue/components/reveal-modal';
+import Toast from '@vue/components/toast';
+import { mixinFooterUI } from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -276,6 +276,6 @@ export default {
 
 <style lang="scss">
 
-@import '@schoolbox/vueTables2/vueTables2';
+@import '@vue/components/vueTables2/vueTables2';
 
 </style>

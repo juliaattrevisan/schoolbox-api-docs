@@ -5,10 +5,10 @@
  *
  */
 
-import RecordPhoto from '@schoolbox/record/record-photo';
-import RecordCamera from '@schoolbox/record/record-camera';
-import RecordAudioOnly from '@schoolbox/record/record-audio-only';
-import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
+import RecordPhoto from '@vue/components/record/record-photo';
+import RecordCamera from '@vue/components/record/record-camera';
+import RecordAudioOnly from '@vue/components/record/record-audio-only';
+import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import axios from 'axios';
 import filesize from 'filesize';

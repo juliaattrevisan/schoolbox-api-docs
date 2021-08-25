@@ -11,8 +11,8 @@ import videojs from 'video.js';
 import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
-import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
-import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
+import RecordedMedia from '@vue/components/videojs-record/recorded-media';
+import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
 import { getRecordPhotoOptions } from '@js/videojs/videojsOptions';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
@@ -294,6 +294,6 @@ export default {
 
 <style lang="scss" scoped>
 
-@import '@schoolbox/videojs-record/videojs-record';
+@import '@vue/components/videojs-record/videojs-record';
 
 </style>

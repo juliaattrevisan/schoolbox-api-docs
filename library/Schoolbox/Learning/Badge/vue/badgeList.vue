@@ -1,9 +1,9 @@
 <script>
 
 import axios from 'axios';
-import foundationMixin from '@schoolbox/foundation-mixin';
-import Toast from "@schoolbox/toast";
-import RevealModal from "@schoolbox/reveal-modal";
+import foundationMixin from '@vue/components/foundation-mixin';
+import Toast from "@vue/components/toast";
+import RevealModal from "@vue/components/reveal-modal";
 import BadgeAward from "../Award/vue/badgeAward";
 import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";

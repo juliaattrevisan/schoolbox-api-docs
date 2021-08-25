@@ -1,16 +1,16 @@
 <script>
 
 import FullCalendar       from '@fullcalendar/vue'
-import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
+import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
 import ExportUrlModal     from './export-url-modal';
 import interactionPlugin  from "@fullcalendar/interaction";
 import listPlugin         from "@fullcalendar/list";
 import momentPlugin       from "@fullcalendar/moment";
 import adaptivePlugin     from "@fullcalendar/adaptive";
 import axios              from "axios";
-import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
+import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
-import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent	  from '@vue/components/fullcalendar/customised-calendar-event';
 import moment              from 'moment';
 
 // TODO let display formats be configurable
@@ -291,5 +291,5 @@ export default {
 </template>
 
 <style lang="scss">
-@import "@schoolbox/fullcalendar/styles/calendar";
+@import "@vue/components/fullcalendar/styles/calendar";
 </style>
