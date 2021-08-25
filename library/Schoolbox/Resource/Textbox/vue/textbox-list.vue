@@ -58,15 +58,10 @@ export default {
         }
     },
     mounted() {
-        let self = this;
         axios
-            .get(self.textboxUsageEndpoint)
-            .then(function (response) {
-                self.textboxes = response.data;
-            })
-            .finally(function () {
-                self.showSkeletonLoader = false;
-            });
+            .get(this.textboxUsageEndpoint)
+            .then(response => this.textboxes = response.data)
+            .finally(() => this.showSkeletonLoader = false);
     },
     updated() {
         this.setupValidation();
@@ -127,16 +122,15 @@ export default {
          * Post changes to the list of textboxes.
          */
         postChanges() {
-            let self     = this,
-                requests = [];
+            let requests = [];
 
             // DOM updates: disable button, add toast
-            self.saveInProgress = true;
-            self.$refs.toast.activate('Saving textboxes...');
+            this.saveInProgress = true;
+            this.$refs.toast.activate('Saving textboxes...');
 
             // Create a new set of textbox data to post
-            self.syncEditorChangesToModel();
-            self.textboxes.forEach(function (usage) {
+            this.syncEditorChangesToModel();
+            this.textboxes.forEach(usage => {
                 let textbox = usage.textbox,
                     deleted = usage.deleted ?? false;
                 if (deleted) {
@@ -154,19 +148,19 @@ export default {
                     if (updateEndpoint) {
                         requests.push(axios.put(updateEndpoint, textbox));
                     } else {
-                        requests.push(axios.post(self.createTextboxEndpoint, textbox));
+                        requests.push(axios.post(this.createTextboxEndpoint, textbox));
                     }
                 }
             });
 
             Promise.all(requests)
                 .then(() => {
-                    self.$refs.toast.timeout('Saved', true);
-                    self.window.location.href = self.returnUrl;
+                    this.$refs.toast.timeout('Saved', true);
+                    this.window.location.href = this.returnUrl;
                 })
                 .catch(() => {
-                    self.$refs.toast.timeout('Could not save all textboxes', false);
-                    self.saveInProgress = false
+                    this.$refs.toast.timeout('Could not save all textboxes', false);
+                    this.saveInProgress = false
                 });
         },
 
@@ -175,18 +169,17 @@ export default {
          * been set up.
          */
         setupValidation() {
-            let self  = this,
-                $form = jQuery(self.$refs.form);
+            let $form = jQuery(this.$refs.form);
 
-            if (self.validator) {
-                self.validator.destroy();
+            if (this.validator) {
+                this.validator.destroy();
             }
 
             // Apply the validator to the form
-            self.validator = $form.alaressValidate({
-                submitHandler(form, event) {
+            this.validator = $form.alaressValidate({
+                submitHandler: (form, event) => {
                     event.preventDefault();
-                    self.postChanges();
+                    this.postChanges();
                 }
             });
 
@@ -203,8 +196,7 @@ export default {
          * already have them.
          */
         setupEditors() {
-            let self  = this,
-                $form = jQuery(self.$refs.form);
+            let $form = jQuery(this.$refs.form);
             $form.find('textarea').each(function () {
                 if (!(this.id in window.CKEDITOR.instances)) {
                     jQuery.fn.alaressEditor({
@@ -233,10 +225,9 @@ export default {
          * CKEditor is created from aren't propagated to the model.
          */
         syncEditorChangesToModel() {
-            let self = this;
-            self.textboxes.forEach(function (usage, index) {
-                let editor = window.CKEDITOR.instances['textbox-' + String(index) + '-body'];
-                self.textboxes[index].textbox.body = editor.getData();
+            this.textboxes.forEach((usage, index) => {
+                let editor = this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'];
+                this.textboxes[index].textbox.body = editor.getData();
             });
         }
     },
@@ -250,7 +241,6 @@ export default {
             return this.textboxes.filter(v => v?.deleted !== true)
         }
     },
-    filters: {}
 }
 
 </script>
