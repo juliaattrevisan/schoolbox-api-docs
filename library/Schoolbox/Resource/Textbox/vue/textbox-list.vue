@@ -307,10 +307,12 @@ export default {
                             <div :class="{'actions-small-1': true, 'hide': Boolean(usage.textbox.id)}"
                                  :data-collapse-state="usage.textbox.id ? 'collapsed' : 'expanded'"
                                  :data-collapsable="'collapser-textbox-' + String(index)">
-                            <textarea :name="'textbox[' + String(index) + '][body]'"
-                                      :id="'textbox-' + String(index) + '-body'"
-                                      v-model="usage.textbox.body">
-                            </textarea>
+                                <div class="content">
+                                    <textarea :name="'textbox[' + String(index) + '][body]'"
+                                              :id="'textbox-' + String(index) + '-body'"
+                                              v-model="usage.textbox.body">
+                                    </textarea>
+                                </div>
                             </div>
                         </li>
                     </template>
