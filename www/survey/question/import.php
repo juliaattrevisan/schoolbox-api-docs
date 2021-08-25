@@ -11,7 +11,7 @@
 
 use Schoolbox\Permission\Access\UserAccess;
 
-SitePage::extendExecutionTime(300);
+SitePage::extendExecutionTime();
 
 if (!is_numeric($this->arg[0])) {
     error(18);

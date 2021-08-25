@@ -150,7 +150,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
     } elseif (is_array($_POST['cleanupEventId']) && count($_POST['cleanupEventId'])) {
         /* Mass cleanup of selected events
          */
-        SitePage::extendExecutionTime(300);
+        SitePage::extendExecutionTime();
 
         /* Remove all the events
          */

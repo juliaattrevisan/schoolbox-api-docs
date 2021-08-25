@@ -10,7 +10,7 @@
 
 use Schoolbox\Learning\Assessment\Redirect;
 
-SitePage::extendExecutionTime(300);
+SitePage::extendExecutionTime();
 
 if (!is_numeric($this->arg[0])) {
     error(18);

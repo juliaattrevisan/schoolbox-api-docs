@@ -30,7 +30,7 @@ if ($_FILES['importXML']['tmp_name']) {
     error(134);
 }
 
-SitePage::extendExecutionTime(300);
+SitePage::extendExecutionTime();
 
 /** @var AssessmentMapperProxy $assessmentMapperProxy */
 $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
