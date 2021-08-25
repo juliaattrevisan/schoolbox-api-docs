@@ -3,7 +3,7 @@
 import axios from 'axios';
 import RevealModal from "@vue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
-import BadgeList from '../../vue/badgeList';
+import BadgeList from '../../vue/badge-list';
 import toastMixin from '@vue/components/toast-mixin';
 
 /**
