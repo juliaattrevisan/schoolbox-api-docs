@@ -53,6 +53,24 @@ class ValidSebCheck
             return true;
         }
 
+        new \Alaress_Probe('<h2>received hashes from seb client<h2>');
+        new \Alaress_Probe('browser exam key', 'config key');
+        new \Alaress_Probe(
+            $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'],
+            $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']
+        );
+
+        new \Alaress_Probe("<hr>");
+
+        new \Alaress_Probe('<h2>computed hashes</h2>');
+        new \Alaress_Probe('browser exam key', 'config key');
+        new \Alaress_Probe(
+            hash(Payload::HASH_ALGORITHM, "{$startUrl}{$browserExamKey}"),
+            hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}"),
+        );
+
+        die();
+
         /* Otherwise check whether the two superglobal keys exist
          */
         if (isset($serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'], $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'])) {

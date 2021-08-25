@@ -25,6 +25,7 @@ use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
@@ -274,6 +275,10 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+        $sebPayload = new SebPayload(
+            $this->getRequest()->server->get('HTTP_HOST'),
+            $this->router
+        );
 
         /* Check whether SEB was required
          */
@@ -282,8 +287,8 @@ class Controller extends Assessment\Controller
             'https://' . $this->getRequest()->server->get('HTTP_HOST') . $this->getRequest()->server->get('REQUEST_URI'),
             $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),
-            'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
-            'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f'
+            'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5', // dw about this for now
+            $sebPayload->generateConfigKey($assessment)
         );
 
         if (!$sebCheckPasses) {

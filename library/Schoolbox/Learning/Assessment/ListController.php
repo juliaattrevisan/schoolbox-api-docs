@@ -127,13 +127,6 @@ class ListController extends Web\Controller\Base
      */
     public function getSebDownload(IAssessable $assessment): void
     {
-        $serverSuperglobal = $this->getRequest()->server->getArrayCopy();
-
-        new \Alaress_Probe(
-            $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'],
-            $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']
-        );
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/sebDownload.twig', [
             'assessmentId' => $assessment->getId(),
             'assessment' => $assessment,
