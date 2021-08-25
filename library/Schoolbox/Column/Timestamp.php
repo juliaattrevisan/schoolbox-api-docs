@@ -11,8 +11,6 @@
 
 namespace Schoolbox\Column;
 
-use DateTime as DateObject;
-
 class Timestamp extends Datetime implements IColumnType
 {
     protected $input_format  = 'U';
@@ -29,7 +27,7 @@ class Timestamp extends Datetime implements IColumnType
      * @param mixed             $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return int
+     * @return int|null
      */
     public function dehydrate($value, $mapper = null)
     {

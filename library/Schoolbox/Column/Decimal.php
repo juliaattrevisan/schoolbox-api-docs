@@ -17,7 +17,7 @@ class Decimal implements IColumnType
     /**
      * @param string|null $value
      * @param null|Mapper $mapper
-     * @return float|string
+     * @return float|null
      */
     public function hydrate($value, $mapper = null)
     {
@@ -25,9 +25,9 @@ class Decimal implements IColumnType
     }
 
     /**
-     * @param null|float $value
+     * @param float|null $value
      * @param null|Mapper $mapper
-     * @return null|float
+     * @return float|null
      */
     public function dehydrate($value, $mapper = null)
     {

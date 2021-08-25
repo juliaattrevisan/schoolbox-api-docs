@@ -68,7 +68,7 @@ class Datetime implements IColumnType
      * @param mixed $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return string
+     * @return string|null
      */
     public function dehydrate($value, $mapper = null)
     {

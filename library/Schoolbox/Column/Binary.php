@@ -11,15 +11,26 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\Mapper;
+
 class Binary implements IColumnType
 {
-
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return mixed
+     */
     public function hydrate($value, $mapper = null)
     {
         return $value;
     }
 
 
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return mixed
+     */
     public function dehydrate($value, $mapper = null)
     {
         return $value;
