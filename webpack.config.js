@@ -143,9 +143,10 @@ module.exports = {
         },
 
         // Libraries
-        clipboard: './www/static/js/clipboard/clipboard.main.js',
-        strtotime: './www/static/js/alaress-datetime-picker/strtotime.main.js',
-
+        clipboard: './www/static/js/clipboard/clipboard.js',
+        strtotime: './www/static/js/alaress-datetime-picker/strtotime.js',
+        
+        //Search Bar
         searchBar: './vue/components/searchBar/searchBar.js',
 
         //Calendars
@@ -209,7 +210,7 @@ module.exports = {
         sortableComponents: './templates/core/homepage/js/sortableComponents.js',
 
         //Sass
-        chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
+        chromeFoundation: './www/static/css/foundation/chromeFoundation.scss',
         editor: './www/static/css/foundation/editor.scss',
 
     },
