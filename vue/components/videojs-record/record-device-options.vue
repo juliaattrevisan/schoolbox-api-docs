@@ -97,6 +97,7 @@ export default {
 
 .fieldset {
     margin: 0;
+    border: 0;
     padding: 0;
 }
 
