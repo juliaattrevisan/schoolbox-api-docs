@@ -41,6 +41,7 @@ export default {
     data () {
         return {
             player: null, //videojs-record instance,
+            isRecording: false, //to track whether recording
             recordedData: null, //the recorded data that will be passed through to #recored-media
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
@@ -171,6 +172,7 @@ export default {
          * onStartRecord
          */
         onStartRecord () {
+            this.isRecording = true;
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'rgba(255, 0, 0, 0.25)');
         },
 
@@ -178,6 +180,7 @@ export default {
          * the recorded file is ready
          */
         onFinishRecord () {
+            this.isRecording = false;
             if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //if it's a webm
                 this.player.on('finishConvert', this.onFinishConvert);
             } else {
@@ -316,6 +319,7 @@ export default {
 
         <record-device-options 
             title="Select a Camera"
+            :is-recording="isRecording"
             :current-device-id="currentVideoDeviceId"
             :device-list="videoDeviceList"
             @on-video-device-change="onVideoDeviceChange"
