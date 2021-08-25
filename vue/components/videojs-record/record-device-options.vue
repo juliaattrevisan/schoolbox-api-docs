@@ -7,6 +7,13 @@
 
 export default {
     
+    props: {
+        deviceList: {
+            type: Array,
+            required: true
+        }
+    },
+
 }
 
 </script>
@@ -17,8 +24,9 @@ export default {
             <fieldset class="radiolist device-options-fieldset">
                 <legend class="device-options-legend">Device Options</legend>
                 <ul class="option-list device-options-list">
-                    <li><input type="radio" value="Red" id="pokemonRed" checked><label class="device-options-label" for="pokemonRed">Red</label></li>
-                    <li><input type="radio" value="Blue" id="pokemonBlue"><label class="device-options-label" for="pokemonBlue">Blue</label></li>
+                    <li v-for="device in deviceList" :key="device.id">
+                        <input type="radio" value="Red" id="pokemonRed"><label class="device-options-label" for="pokemonRed">{{ device.label }}</label>
+                    </li>
                 </ul>
             </fieldset>
         </div>

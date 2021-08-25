@@ -20,6 +20,7 @@ import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
 import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@js/record-media/recordMediaErrors';
 import { isOfMimeType } from '@js/util/fileUtils';
+import { moveArrayItem } from '@js/util/arrayUtils';
 
 
 export default {
@@ -41,7 +42,6 @@ export default {
         return {
             player: null, //videojs-record instance,
             recordedData: null, //the recorded data that will be passed through to #recored-media
-            isDeviceReady: false, //to toggle the device display
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
@@ -51,6 +51,9 @@ export default {
             isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
+            hasEnumeratedDevices: false, //has checked through the device list
+            videoDeviceList: [], //list of video devices currently available to record with
+            currentVideoDeviceId: 0
         }
     },
 
@@ -112,25 +115,53 @@ export default {
             this.player.on('finishRecord', this.onFinishRecord);
             this.player.on('error', this.onError);
             this.player.on('deviceError', this.onDeviceError);
+            this.player.on('enumerateError', this.onEnumerateError);
         },
 
         /**
          * onDeviceReady, dispatch to anyone listening, maybe the parent
          */
         onDeviceReady () {
-            this.isDeviceReady = true;
-            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); 
-            this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
-            this.player.record().enumerateDevices();
+            this.currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); //to get width, height and the current deviceId
+            this.$emit(recordMediaEvents.DEVICE_READY, this.currentDeviceSettings.width, this.currentDeviceSettings.height);
+            if (!this.hasEnumeratedDevices) {
+                this.player.record().enumerateDevices();
+            }
         },
 
         /**
          * onEnumerateReady
          */
         onEnumerateReady () {
+            this.hasEnumeratedDevices = true;
+            this.player.off('enumerateReady', this.onEnumerateReady);
+            this.getVideoDeviceList();
+        },
+
+        /**
+         * getVideoDeviceList
+         */
+        getVideoDeviceList () {
+
             const allDeviceList = this.player.record().devices;
-            const videoDeviceList = allDeviceList.filter((device) => device.kind === 'videoinput');
-            // debugger;
+            
+            this.videoDeviceList = allDeviceList.filter((device) => device.kind === 'videoinput');
+
+            if (this.currentDeviceSettings.deviceId !== this.videoDeviceList[0].deviceId) { //ensure the top device list is the currently active one, bit weird if the default active is lower down the list
+                const activeDeviceIndex = this.videoDeviceList.findIndex((videoDevice) => this.currentDeviceSettings.deviceId === videoDevice.deviceId);
+                this.videoDeviceList = this.moveArrayItem(this.videoDeviceList, activeDeviceIndex, 0);
+            }
+
+            //  try {
+            //     // change video input device
+            //     this.player.record().setVideoInput(this.videoDeviceList[0].deviceId);
+
+            //     console.log("Changed video input");
+            // } catch (error) {
+            //     console.warn(error);
+
+            // }
+
         },
 
         /**
@@ -189,6 +220,13 @@ export default {
             } else if (isPermissionDeniedError(errorCode)) {
                 this.hasPermissionDeniedError = true;
             }
+        },
+
+        /**
+         * onEnumerateError - try and manage as many errors as possible
+         */
+        onEnumerateError () {
+            console.warn('enumerate error: ' + this.player.enumerateErrorCode);
         },
 
         /**
@@ -273,7 +311,9 @@ export default {
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
 
-        <record-device-options />
+        <record-device-options 
+            :device-list="videoDeviceList"
+        />
 
         <recorded-media 
             v-if="hasPreRecordedData || hasNewRecording"
