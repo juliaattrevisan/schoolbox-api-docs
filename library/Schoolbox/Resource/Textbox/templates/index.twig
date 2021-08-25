@@ -8,9 +8,12 @@
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="button-action small-12 columns">
         <h1>Manage Text Boxes on {{ folder.title }}</h1>
+        <a href="#" class="icon-add button" title="Create Text Box" data-action="addTextbox">Create Text Box</a>
+    </div>
 
+    <div class="small-12 island">
         <div id="textbox-list">
             <textbox-list textbox-usage-endpoint="{{ routeLookupIfAuthorized('textbox.getUsageForFolder', {folderId: folder.id, folder: folder}) }}"
                           create-textbox-endpoint="{{ routeLookupIfAuthorized('textbox.createTextboxInFolder', {folderId: folder.id, folder: folder}) }}"
@@ -24,5 +27,13 @@
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/textboxList.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript">
+            $(function () {
+                $('a[data-action="addTextbox"]').click(function (event) {
+                    event.preventDefault();
+                    document.dispatchEvent(new CustomEvent('textbox-list-add'));
+                })
+            });
+        </script>
     </div>
 </div>

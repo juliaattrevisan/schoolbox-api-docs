@@ -3,6 +3,8 @@
 import axios from 'axios';
 import Toast from '@schoolbox/toast';
 
+const EVENT_ADD_TEXTBOX = 'textbox-list-add';
+
 export default {
     name: 'textbox-list',
     components: {Toast},
@@ -62,6 +64,14 @@ export default {
             .get(this.textboxUsageEndpoint)
             .then(response => this.textboxes = response.data)
             .finally(() => this.showSkeletonLoader = false);
+
+        // Add event so that a new textbox may be added from outside of this
+        // component
+        this.window.document.addEventListener(EVENT_ADD_TEXTBOX, this.addTextbox);
+    },
+    destroyed() {
+        // Remove the add textbox event
+        this.window.document.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox)
     },
     updated() {
         this.setupValidation();
@@ -302,13 +312,9 @@ export default {
                     <i class="icon-textbox"></i>
                     <p>No textboxes currently exist on this page.</p>
                 </div>
-
-                <ul class="flex-list buttons">
-                    <li><button @click.prevent="addTextbox" :disabled="saveInProgress">Add new</button></li>
-                    <li><input type="submit" ref="saveButton" value="Save" :disabled="saveInProgress" /></li>
-                </ul>
             </template>
         </section>
+        <input type="submit" ref="saveButton" value="Save all" :disabled="saveInProgress" />
         <toast ref="toast"></toast>
     </form>
 </template>
