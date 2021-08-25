@@ -41,8 +41,6 @@ export default {
                 params:           params,
                 paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
             }
-            let hhh = this.filterEndpoint;
-            console.log(this.filterEndpoint);
             axios
                 .get(this.filterEndpoint, config)
                 .then(response => {

@@ -34,8 +34,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
     public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory
     {
         switch ($filterDefinitionClass) {
-            case Filters\Badge\Category\Definition::class:
-                return new Filters\Badge\Category\Factory(
+            case Category\Definition::class:
+                return new Category\Factory(
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
