@@ -58,8 +58,8 @@ class ModelToArrayTest extends TestCase
             true,
             [
                 'id' => 1,
-                'body' => '<p>Text box 1</p>',
                 'heading' => 'Text box A',
+                'body' => '<p>Text box 1</p>',
                 'folder' => [
                     'id' => 1,
                 ],
@@ -80,8 +80,8 @@ class ModelToArrayTest extends TestCase
             false,
             [
                 'id' => 2,
-                'body' => '<p>Text box 2</p>',
                 'heading' => 'Text box B',
+                'body' => '<p>Text box 2</p>',
                 'folder' => [
                     'id' => 2,
                 ],
@@ -102,8 +102,8 @@ class ModelToArrayTest extends TestCase
             false,
             [
                 'id' => 3,
-                'body' => '<p>Text box 3</p>',
                 'heading' => 'Text box C',
+                'body' => '<p>Text box 3</p>',
                 'folder' => [
                     'id' => 3,
                 ],
@@ -124,8 +124,8 @@ class ModelToArrayTest extends TestCase
             true,
             [
                 'id' => 4,
-                'body' => '<p>Text box 4</p>',
                 'heading' => 'Text box D',
+                'body' => '<p>Text box 4</p>',
                 'folder' => [
                     'id' => 4,
                 ],
