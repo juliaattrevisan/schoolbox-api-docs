@@ -112,6 +112,7 @@ export default {
                 day: 'Day'
             },
             initialView: 'dayGridMonth',
+            scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             eventDidMount: this.$_fullCalendarHelper_eventRender,
             events: this.events,
             loading: this.$_fullCalendarHelper_onLoading,
@@ -125,6 +126,7 @@ export default {
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
             this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...

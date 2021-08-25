@@ -199,6 +199,7 @@ export default {
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
             this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
         this.registerListCustomInputFields();
