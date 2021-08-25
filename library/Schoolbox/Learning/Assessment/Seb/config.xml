@@ -5,7 +5,7 @@
     <key>originatorVersion</key>
     <string>SEB_Win_2.1.1</string>
     <key>startURL</key>
-    <string>https://www.schoolbox.com.au/23458585</string>
+    <string>{{ startUrl }}</string>
     <key>startResource</key>
     <string />
     <key>sebServerURL</key>
@@ -203,7 +203,7 @@
     <key>browserURLSalt</key>
     <true />
     <key>sendBrowserExamKey</key>
-    <false />
+    <true />
     <key>quitURL</key>
     <string />
     <key>quitURLConfirm</key>
