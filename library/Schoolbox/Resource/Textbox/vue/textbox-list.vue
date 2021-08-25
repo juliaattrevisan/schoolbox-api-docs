@@ -222,7 +222,7 @@ export default {
         setupCollapsers() {
             // Apply the collapser
             this.$nextTick(() => {
-                let $collapsers = jQuery('[data-collapser^="collapser-textbox"]');
+                let $collapsers = jQuery(this.$el).find('[data-collapser^="collapser-textbox"]');
                 $collapsers.destroyCollapsable();
                 $collapsers.collapsable();
             })
@@ -271,7 +271,8 @@ export default {
                     <template v-for="(usage, index) in textboxes">
                         <li v-if="usage.deleted !== true">
                             <div class="actions-small-1">
-                                <div class="expander" :data-collapser="'collapser-textbox-' + String(index)"></div>
+                                <div :class="{'expander': true, 'icon-up-arrow': Boolean(usage.textbox.id)}"
+                                     :data-collapser="'collapser-textbox-' + String(index)"></div>
                                 <div class="list-item">
                                     <div class="small-12 column">
                                         <label>
@@ -298,7 +299,9 @@ export default {
                                     <a class="icon-delete" href="#" @click.prevent="deleteTextbox(index)" title="Delete"></a>
                                 </nav>
                             </div>
-                            <div class="hide actions-small-1" data-collapse-state="collapsed" :data-collapsable="'collapser-textbox-' + String(index)">
+                            <div :class="{'actions-small-1': true, 'hide': Boolean(usage.textbox.id)}"
+                                 :data-collapse-state="usage.textbox.id ? 'collapsed' : 'expanded'"
+                                 :data-collapsable="'collapser-textbox-' + String(index)">
                             <textarea :name="'textbox[' + String(index) + '][body]'"
                                       :id="'textbox-' + String(index) + '-body'"
                                       v-model="usage.textbox.body">
