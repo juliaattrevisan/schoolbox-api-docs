@@ -69,8 +69,6 @@ class ValidSebCheck
             hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}"),
         );
 
-        die();
-
         /* Otherwise check whether the two superglobal keys exist
          */
         if (isset($serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'], $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'])) {
@@ -84,7 +82,7 @@ class ValidSebCheck
 
             /* Both computed hashes must match what we expected
              */
-            return $bekMatches && $configKeyMatches;
+            return $bekMatches || $configKeyMatches;
         }
 
         /* SEB was required, but you didn't pass the checks
