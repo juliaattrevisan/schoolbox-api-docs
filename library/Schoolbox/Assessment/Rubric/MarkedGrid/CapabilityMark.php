@@ -162,19 +162,6 @@ class CapabilityMark
         return round($normMark, self::PRECISION);
     }
 
-    /**
-     * Render the capability's mark in human-readable format.
-     *
-     * @return null|string
-     * @deprecated Human-readable mark is now a first-class property and not
-     *             a derived value: use `getHumanReadableValue` instead
-     *
-     */
-    public function retrieveHumanReadableMark(): ?string
-    {
-        return $this->markScheme->getHumanReadableMark($this->retrieveNormalizedMark());
-    }
-
 
     /**
      * @return CapabilityUsage
