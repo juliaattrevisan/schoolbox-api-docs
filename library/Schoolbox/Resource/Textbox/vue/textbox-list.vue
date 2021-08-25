@@ -92,6 +92,11 @@ export default {
                 folders: [],
                 dashboards: [],
             });
+
+            // Focus the new textbox's heading input immediately
+            this.$nextTick(() => {
+                jQuery(this.$el).find('input[name$="[heading]"]').last().focus();
+            })
         },
 
         /**
