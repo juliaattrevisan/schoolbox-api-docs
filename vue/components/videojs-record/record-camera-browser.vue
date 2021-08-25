@@ -18,7 +18,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getRecordCameraOptions } from '@js/videojs/videojsOptions';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
-import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@js/record-media/recordMediaErrors';
+import { isDeviceAlreadyInUseError, isPermissionDeniedError, isDeviceChangeError } from '@js/record-media/recordMediaErrors';
 import { isOfMimeType } from '@js/util/fileUtils';
 import { moveArrayItem } from '@js/util/arrayUtils';
 
@@ -49,6 +49,7 @@ export default {
             hasNotSupportedError: false, //unable to fire up the media recorder, likely because a required media API is not available
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
+            hasDeviceChangeError: false, //wasn't able to switch to the different device, will move back to the default
             isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
@@ -161,11 +162,19 @@ export default {
             try {
                 this.currentVideoDeviceId = videoDeviceId;
                 this.player.record().setVideoInput(this.currentVideoDeviceId);
-            } catch (error) {
-                console.warn(error);
-                this.currentVideoDeviceId = this.videoDeviceList[0].deviceId;
-                this.player.record().setVideoInput(this.currentVideoDeviceId);
+            } catch (error) { //if can't set the video input, move back to the default device, notifying so
+                this.hasError = true;
+                this.onDeviceChangeError();
             }
+        },
+
+        /**
+         * onDeviceChangeError, return to the default device, notifying so
+         */
+        onDeviceChangeError () {
+            this.hasDeviceChangeError = true;
+            this.currentVideoDeviceId = this.videoDeviceList[0].deviceId;
+            this.player.record().setVideoInput(this.currentVideoDeviceId);
         },
 
         /**
@@ -225,6 +234,8 @@ export default {
                 this.hasDeviceAlreadyInUseError = true;
             } else if (isPermissionDeniedError(errorCode)) {
                 this.hasPermissionDeniedError = true;
+            } else if (isDeviceChangeError(errorCode)) {
+                this.onDeviceChangeError();
             }
         },
 
@@ -260,6 +271,7 @@ export default {
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
+            this.hasDeviceChangeError = false;
             this.isRecordingOverMaxFileSize = false;
         },
 
@@ -349,6 +361,7 @@ export default {
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
             <div v-else-if="hasNotSupportedError" class="alert-box alert">Sorry, unable to record video. It's likely your browser does not support the required features. If possible please upgrade your browser.</div>
+            <div v-else-if="hasDeviceChangeError" class="alert-box alert">Sorry, the selected camera cannot be displayed. Please ensure it's functioning properly and try again.</div>
             <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
