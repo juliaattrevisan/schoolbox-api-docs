@@ -384,6 +384,9 @@ class Controller extends Base
      */
     public function getEvents(User $student): void
     {
+        // Due work calendar could take a while
+        $this->extendExecutionTime();
+
         $request             = $this->request->query->get('filters', []);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);

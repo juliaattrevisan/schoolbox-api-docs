@@ -178,6 +178,9 @@ class Controller extends WebController\Base
      */
     public function getMarkbookExport(CourseSpec\Model $courseSpec): void
     {
+        // This report may take a while
+        $this->extendExecutionTime();
+
         $queryArgs = $this->getRequest()->query->getArrayCopy();
         [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
 
@@ -198,6 +201,9 @@ class Controller extends WebController\Base
      */
     public function postMarkbook(CourseSpec\Model $courseSpec): void
     {
+        // This report may take a while
+        $this->extendExecutionTime();
+
         try {
             $request = $this->request->post['filter_selection'] ?: [];
 
