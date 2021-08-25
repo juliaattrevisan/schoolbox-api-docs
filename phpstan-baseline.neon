@@ -3406,16 +3406,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/Grid/Importer/GenericImporter.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Markbook/Controller.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Markbook/Controller.php
-
-		-
 			message: "#^PHPDoc tag @throws has invalid value \\(/Aura/Router/Exception/RouteNotFound\\)\\: Unexpected token \"/Aura/Router/Exception/RouteNotFound\", expected type at offset 215$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/Markbook/Controller.php
@@ -3736,24 +3726,9 @@ parameters:
 			path: library/Schoolbox/Column/Date.php
 
 		-
-			message: "#^Method Schoolbox\\\\Column\\\\Datetime\\:\\:dehydrate\\(\\) should return string but returns null\\.$#"
-			count: 2
-			path: library/Schoolbox/Column/Datetime.php
-
-		-
-			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Datetime.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between float\\|null and '' will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Column/Decimal.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Interval\\:\\:hydrate\\(\\) should return Alaress\\\\Date\\\\Interval but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Interval.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -3764,21 +3739,6 @@ parameters:
 			message: "#^Variable \\$id_property in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 3
 			path: library/Schoolbox/Column/Model.php
-
-		-
-			message: "#^Property DateInterval\\:\\:\\$invert \\(int\\) does not accept true\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Timespan.php
-
-		-
-			message: "#^Return type \\(int\\) of method Schoolbox\\\\Column\\\\Timestamp\\:\\:dehydrate\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Column\\\\Datetime\\:\\:dehydrate\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Column/Timestamp.php
-
-		-
-			message: "#^Variable \\$result in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Timestamp.php
 
 		-
 			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\) but returns Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\.$#"
