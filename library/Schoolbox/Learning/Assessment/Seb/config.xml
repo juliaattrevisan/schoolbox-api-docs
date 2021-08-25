@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <key>originatorVersion</key>
+    <string>SEB_Win_2.1.1</string>
     <key>startURL</key>
-    <string>https://safeexambrowser.org/start</string>
+    <string>https://www.schoolbox.com.au/23458585</string>
     <key>startResource</key>
     <string />
     <key>sebServerURL</key>
@@ -30,7 +32,6 @@
     <integer>120000</integer>
     <key>browserMessagingSocketEnabled</key>
     <false />
-
     <key>sebConfigPurpose</key>
     <integer>0</integer>
     <key>allowPreferencesWindow</key>
@@ -39,7 +40,6 @@
     <integer>0</integer>
     <key>useAsymmetricOnlyEncryption</key>
     <false />
-
     <key>browserViewMode</key>
     <integer>0</integer>
     <key>browserWindowAllowAddressBar</key>
@@ -84,14 +84,12 @@
     <integer>2</integer>
     <key>allowDeveloperConsole</key>
     <false />
-
     <key>allowSpellCheck</key>
     <false />
     <key>allowSpellCheckDictionary</key>
     <array></array>
     <key>additionalDictionaries</key>
     <array></array>
-
     <key>audioMute</key>
     <false />
     <key>audioControlEnabled</key>
@@ -100,10 +98,8 @@
     <integer>25</integer>
     <key>audioSetVolumeLevel</key>
     <false />
-
     <key>browserScreenKeyboard</key>
     <false />
-
     <key>newBrowserWindowByLinkPolicy</key>
     <integer>2</integer>
     <key>newBrowserWindowByScriptPolicy</key>
@@ -139,10 +135,10 @@
     <key>newBrowserWindowNavigation</key>
     <true />
     <key>removeBrowserProfile</key>
-    <false />
+    <true />
     <key>removeLocalStorage</key>
     <false />
-    <key>enableSebBrowser</key>
+    <key>useSebWithoutBrowser</key>
     <false />
     <key>browserWindowAllowReload</key>
     <true />
@@ -174,7 +170,6 @@
     <false />
     <key>allowFind</key>
     <true />
-
     <key>allowDownUploads</key>
     <true />
     <key>allowCustomDownUploadLocation</key>
@@ -197,7 +192,6 @@
     <false />
     <key>useTemporaryDownUploadDirectory</key>
     <false />
-
     <key>examKeySalt</key>
     <data>0zVdSEqKAnK0ZNd4QFlwVKBTgw60o6xRjpfDokUYYnk=</data>
     <key>examSessionClearCookiesOnEnd</key>
@@ -230,35 +224,28 @@
     <false />
     <key>startURLAppendQueryParameter</key>
     <false />
-
     <key>additionalResources</key>
     <array></array>
-
     <key>monitorProcesses</key>
     <true />
-
     <key>permittedProcesses</key>
     <array></array>
     <key>allowSwitchToApplications</key>
     <false />
     <key>allowFlashFullscreen</key>
     <false />
-
     <key>prohibitedProcesses</key>
     <array></array>
-
     <key>enableURLFilter</key>
     <false />
     <key>enableURLContentFilter</key>
     <false />
-
     <key>URLFilterEnable</key>
     <false />
     <key>URLFilterEnableContentFilter</key>
     <false />
     <key>URLFilterRules</key>
     <array></array>
-
     <key>blacklistURLFilter</key>
     <string />
     <key>whitelistURLFilter</key>
@@ -267,15 +254,12 @@
     <true />
     <key>urlFilterRegex</key>
     <true />
-
     <key>embeddedCertificates</key>
     <array></array>
     <key>pinEmbeddedCertificates</key>
     <false />
-
     <key>proxySettingsPolicy</key>
     <integer>0</integer>
-
     <key>proxies</key>
     <dict>
       <key>ExceptionsList</key>
@@ -353,7 +337,6 @@
       <key>RTSPPassword</key>
       <string />
     </dict>
-
     <key>sebServicePolicy</key>
     <integer>1</integer>
     <key>sebServiceIgnore</key>
@@ -364,7 +347,6 @@
     <false />
     <key>enablePrivateClipboard</key>
     <true />
-
     <key>createNewDesktop</key>
     <true />
     <key>killExplorerShell</key>
@@ -389,7 +371,6 @@
     <false />
     <key>enableWindowsUpdate</key>
     <false />
-
     <key>minMacOSVersion</key>
     <integer>4</integer>
     <key>enableAppSwitcherCheck</key>
@@ -406,7 +387,6 @@
     <true />
     <key>allowDisplayMirroring</key>
     <false />
-
     <key>allowedDisplaysMaxNumber</key>
     <integer>3</integer>
     <key>allowedDisplayBuiltin</key>
@@ -415,7 +395,6 @@
     <false />
     <key>allowedDisplaysIgnoreFailure</key>
     <true />
-
     <key>insideSebEnableSwitchUser</key>
     <false />
     <key>insideSebEnableLockThisComputer</key>
@@ -436,10 +415,8 @@
     <false />
     <key>setVmwareConfiguration</key>
     <false />
-
     <key>hookKeys</key>
     <true />
-
     <key>enableEsc</key>
     <true />
     <key>enablePrintScreen</key>
@@ -458,7 +435,6 @@
     <true />
     <key>enableAltMouseWheel</key>
     <false />
-
     <key>enableF1</key>
     <true />
     <key>enableF2</key>
