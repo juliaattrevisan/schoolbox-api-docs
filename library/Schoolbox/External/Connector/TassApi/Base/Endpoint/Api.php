@@ -146,7 +146,6 @@ class Api implements IApi
      */
     private function initClient(string $dsn, string $module, int $timeout): Client
     {
-
         /* Figure out all the credential parts: module, company code, app code, token
          */
         $dsnParts = (new Codec\DSN())->decode($dsn);
@@ -195,10 +194,42 @@ class Api implements IApi
             'method'  => $method,
             'appcode' => $this->credentials['appcode'],
             'company' => $this->credentials['companycode'],
-            'token'   => $this->tokenCodec->generateToken($params),
+            'token'   => $this->tokenCodec->generateToken($params, true),
             'v'       => $version,
         ];
 
+        try {
+            return $this->tryPayload($method, $params, $queryArgs);
+        } catch (\RuntimeException $e) {
+            /* That JSON_PRETTY_PRINT thing...it's supposed to be consistent across the board
+             *
+             * BUT IT'S NOT
+             *
+             * Some records require JSON_PRETTY_PRINT, like CARR01 at Shalom
+             * but some do not, like Eckersley at SJCGT, and will fail if PRETTY_PRINT is on
+             *
+             * Therefore you need to try both variants before dying entirely
+             */
+            $queryArgs['token'] = $this->tokenCodec->generateToken($params, false);
+
+            return $this->tryPayload($method, $params, $queryArgs);
+        }
+    }
+
+
+    /**
+     * Try accessing an enpoint with the $queryArgs provided
+     *
+     * @param string $method
+     * @param array  $params
+     * @param array  $queryArgs
+     * @return mixed|void
+     * @throws DomainException
+     * @throws RuntimeException
+     * @throws \JsonException
+     */
+    private function tryPayload(string $method, array $params, array $queryArgs)
+    {
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
         $fails = 0;
@@ -234,15 +265,9 @@ class Api implements IApi
              * Take a little nap before trying again
              * (We suspect that it might be timing related, or network traffic)
              */
-            if ($response) {
-                $fails++;
+            $fails++;
 
-                sleep(self::NAP_TIMEOUT);
-            } else {
-                /* Couldn't decode json, or tass server refused something, or something else died
-                 */
-                throw new DomainException('Could not access Tass server, or bad json payload returned.');
-            }
+            sleep(self::NAP_TIMEOUT);
 
             /* We tried multiple times and failed multiple times
              * This might as well have died
@@ -281,12 +306,6 @@ class Api implements IApi
                 ));
             }
         }
-
-        /* Couldn't decode json, or tass server refused something, or something else died
-         * Guzzle repeatedly failed too many times and kept throwing exceptions when $response
-         * was being requested, so I guess you ended up here
-         */
-        throw new DomainException('Could not access Tass server, or bad json payload returned.');
     }
 
 

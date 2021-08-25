@@ -72,13 +72,30 @@ class Token
     /**
      * Returns an encrypted token (not URL encoded) composed of all the method arguments.
      *
+     * Optionally elect to use JSON_PRETTY_PRINT which cleans up newlines etc. and formats
+     * your json data in a specific way
+     *
      * @param array $data
+     * @param bool  $prettyPrint
      * @return string
      */
-    public function generateToken(array $data): string
+    public function generateToken(array $data, bool $prettyPrint): string
     {
-        $parameters = json_encode($data, JSON_PRETTY_PRINT);
-        $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
+        /* For some records in some tass servers, JSON_PRETTY_PRINT is required.
+         * For other records, you must NOT use it.
+         *
+         * Depending on the record, if you use the wrong PRETTY_PRINT encoding,
+         * you'll get a 401 Unauthorized.
+         *
+         * Yes, it's insanity.
+         */
+        if ($prettyPrint) {
+            $parameters = json_encode($data, JSON_PRETTY_PRINT);
+        } else {
+            $parameters = json_encode($data);
+        }
+
+        $encrypted = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
 
         return base64_encode($encrypted);
     }
