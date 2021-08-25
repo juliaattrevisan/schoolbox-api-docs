@@ -150,8 +150,8 @@ class ModelToArrayTest extends TestCase
     {
         $factory    = new RouterFactory();
         $testRouter = $factory->newInstance();
-        $testRouter->add('textbox.updateTextbox', '/textbox/update/{id}');
-        $testRouter->add('textbox.deleteTextbox', '/textbox/update/{id}');
+        $testRouter->getRoutes()->add('textbox.updateTextbox', '/textbox/update/{id}');
+        $testRouter->getRoutes()->add('textbox.deleteTextbox', '/textbox/update/{id}');
 
         /** @var Authorizer|MockObject $testAuthorizer */
         $testAuthorizer = $this->createMock(Authorizer::class);
@@ -171,7 +171,7 @@ class ModelToArrayTest extends TestCase
             function (FolderModel $folder) {
                 return ['id' => $folder->getId()];
             },
-            $this->router,
+            $testRouter,
             $testAuthorizer,
             new User(),
             new MockAdapter()
