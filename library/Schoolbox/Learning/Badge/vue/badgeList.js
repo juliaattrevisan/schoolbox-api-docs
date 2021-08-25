@@ -1,5 +1,5 @@
 import Vue from "vue";
-import BadgeList from './badgeList';
+import BadgeList from './badge-list';
 
 Vue.component('badge-list', BadgeList);
 window.badgeList = new Vue({
