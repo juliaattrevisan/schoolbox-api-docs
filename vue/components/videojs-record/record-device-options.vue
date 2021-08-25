@@ -1,18 +1,39 @@
 <script>
 
+import recordMediaEvents from '@js/record-media/recordMediaEvents';
+
 /**
- * When available, a device list will be presented for the user to choose which input device
+ * When there's more than one, a device list will be presented for the user to choose which input device
  * they would like to record with
  */
 
 export default {
     
     props: {
+        title: {
+            type: String,
+            required: true,
+        },
+        currentDeviceId: {
+            type: String,
+            required: true,
+        },
         deviceList: {
             type: Array,
             required: true
         }
     },
+
+    methods: {
+
+        /**
+         * onDeviceSelected
+         */
+        onDeviceSelected (event) {
+            this.$emit(recordMediaEvents.VIDEO_DEVICE_CHANGE, event.target.value);
+        },
+
+    }
 
 }
 
@@ -22,10 +43,16 @@ export default {
     <div>
         <div class="device-options">
             <fieldset class="radiolist device-options-fieldset">
-                <legend class="device-options-legend">Device Options</legend>
+                <legend class="device-options-legend">{{ title }}</legend>
                 <ul class="option-list device-options-list">
-                    <li v-for="device in deviceList" :key="device.id">
-                        <input type="radio" value="Red" id="pokemonRed"><label class="device-options-label" for="pokemonRed">{{ device.label }}</label>
+                    <li v-for="device in deviceList" :key="device.deviceId">
+                        <input type="radio" 
+                            :value="device.deviceId" 
+                            :id="device.deviceId" 
+                            :checked="device.deviceId === currentDeviceId"
+                            @click.prevent="onDeviceSelected" 
+                        >
+                        <label class="device-options-label" :for="device.deviceId">{{ device.label }}</label>
                     </li>
                 </ul>
             </fieldset>
@@ -65,5 +92,6 @@ export default {
 .device-options-label {
     color: white;
 }
+
 
 </style>

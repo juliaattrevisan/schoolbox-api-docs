@@ -53,7 +53,7 @@ export default {
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
             hasEnumeratedDevices: false, //has checked through the device list
             videoDeviceList: [], //list of video devices currently available to record with
-            currentVideoDeviceId: 0
+            currentVideoDeviceId: '' //the active video device, can change when multiple devices available
         }
     },
 
@@ -122,15 +122,16 @@ export default {
          * onDeviceReady, dispatch to anyone listening, maybe the parent
          */
         onDeviceReady () {
-            this.currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); //to get width, height and the current deviceId
-            this.$emit(recordMediaEvents.DEVICE_READY, this.currentDeviceSettings.width, this.currentDeviceSettings.height);
+            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); //to get width, height and the current deviceId
+            this.currentVideoDeviceId = currentDeviceSettings.deviceId;
+            this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
             if (!this.hasEnumeratedDevices) {
                 this.player.record().enumerateDevices();
             }
         },
 
         /**
-         * onEnumerateReady
+         * onEnumerateReady, the list of input devices is available
          */
         onEnumerateReady () {
             this.hasEnumeratedDevices = true;
@@ -139,29 +140,31 @@ export default {
         },
 
         /**
-         * getVideoDeviceList
+         * get a list of possible video input devices so the user can toggle between them when there's more than one
          */
         getVideoDeviceList () {
-
             const allDeviceList = this.player.record().devices;
-            
             this.videoDeviceList = allDeviceList.filter((device) => device.kind === 'videoinput');
-
-            if (this.currentDeviceSettings.deviceId !== this.videoDeviceList[0].deviceId) { //ensure the top device list is the currently active one, bit weird if the default active is lower down the list
-                const activeDeviceIndex = this.videoDeviceList.findIndex((videoDevice) => this.currentDeviceSettings.deviceId === videoDevice.deviceId);
-                this.videoDeviceList = this.moveArrayItem(this.videoDeviceList, activeDeviceIndex, 0);
+            if (this.currentVideoDeviceId !== this.videoDeviceList[0].deviceId) { //ensure the top device list is the currently active one, bit weird if the default active is lower down the list
+                const activeDeviceIndex = this.videoDeviceList.findIndex((videoDevice) => this.currentVideoDeviceId === videoDevice.deviceId);
+                this.videoDeviceList = moveArrayItem(this.videoDeviceList, activeDeviceIndex, 0);
             }
+        },
 
-            //  try {
-            //     // change video input device
-            //     this.player.record().setVideoInput(this.videoDeviceList[0].deviceId);
-
-            //     console.log("Changed video input");
-            // } catch (error) {
-            //     console.warn(error);
-
-            // }
-
+        /**
+         * To toggle between different video devices
+         *
+         * @params { String }
+         */
+        onVideoDeviceChange (videoDeviceId) {
+            try {
+                this.currentVideoDeviceId = videoDeviceId;
+                this.player.record().setVideoInput(this.currentVideoDeviceId);
+            } catch (error) {
+                console.warn(error);
+                this.currentVideoDeviceId = this.videoDeviceList[0].deviceId;
+                this.player.record().setVideoInput(this.currentVideoDeviceId);
+            }
         },
 
         /**
@@ -312,7 +315,10 @@ export default {
         </div>
 
         <record-device-options 
+            title="Select a Camera"
+            :current-device-id="currentVideoDeviceId"
             :device-list="videoDeviceList"
+            @on-video-device-change="onVideoDeviceChange"
         />
 
         <recorded-media 
