@@ -52,7 +52,6 @@ export default {
             textboxes: [],
             loading: true,
             window: window,
-            jQuery: window.jQuery,
             showSkeletonLoader: true,
             validator: null,
             saveInProgress: false,
@@ -177,7 +176,7 @@ export default {
          */
         setupValidation() {
             let self  = this,
-                $form = self.jQuery(self.$refs.form);
+                $form = jQuery(self.$refs.form);
 
             if (self.validator) {
                 self.validator.destroy();
@@ -205,10 +204,10 @@ export default {
          */
         setupEditors() {
             let self  = this,
-                $form = self.jQuery(self.$refs.form);
+                $form = jQuery(self.$refs.form);
             $form.find('textarea').each(function () {
                 if (!(this.id in window.CKEDITOR.instances)) {
-                    self.jQuery.fn.alaressEditor({
+                    jQuery.fn.alaressEditor({
                         targetElements: $(this)
                     });
                 }
@@ -221,7 +220,7 @@ export default {
         setupCollapsers() {
             // Apply the collapser
             this.$nextTick(() => {
-                let $collapsers = this.jQuery('[data-collapser^="collapser-textbox"]');
+                let $collapsers = jQuery('[data-collapser^="collapser-textbox"]');
                 $collapsers.destroyCollapsable();
                 $collapsers.collapsable();
             })
