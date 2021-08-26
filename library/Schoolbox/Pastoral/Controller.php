@@ -341,9 +341,6 @@ class Controller extends Base
                         'series'      => $countSummaryByMonthSeries,
                         'categories'  => $countSummaryByMonthCategories,
                     ],
-                    // TODO: This count is causing a performance issue SA-9641
-                    // 'linkedStudents' => $this->pastoralDataSource->getLinkedStudentRecordCount($user, $student->getId()),
-                    'linkedStudents'      => [],
                     'typeSelected'        => $typeId,
                     'subtypeSelected'     => $subtypeId,
                     'resultsPerPage'      => $resultsPerPage,
