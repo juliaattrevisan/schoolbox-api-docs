@@ -104,6 +104,9 @@ class Payload
      * @param IAssessable $assessment
      * @return string
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \CFPropertyList\IOException
+     * @throws \CFPropertyList\PListException
+     * @throws \DOMException
      */
     public function generateConfigKey(IAssessable $assessment): string
     {
@@ -140,13 +143,13 @@ class Payload
 
         // Pass root dict to recursively convert dates to ISO 8601 format, encode strings to UTF-8,
         // lock data to Base 64 encoding and remove empty dictionaries.
-        $this->prepare_plist_for_json_encoding($jsonplist->getValue());
+        $this->preparePlistForJsonEncoding($jsonplist->getValue());
 
         // Serialize PList to array.
         $plistarray = $jsonplist->toArray();
 
         // Sort array alphabetically by key using case insensitive, natural sorting. See point 3 for more information.
-        $plistarray = $this->array_sort($plistarray);
+        $plistarray = $this->arraySort($plistarray);
 
         // Encode in JSON with following rules from SEB docs.
         // 1. Don't add any whitespace or line formatting to the SEB-JSON string.
@@ -154,7 +157,7 @@ class Payload
         $json = json_encode($plistarray, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         // There is no way to prevent json_encode from escaping backslashes. We replace each backslash with a unique string
-        // prior to encoding in prepare_plist_for_json_encoding(). We can then replace the substitute with a single backslash.
+        // prior to encoding in preparePlistForJsonEncoding(). We can then replace the substitute with a single backslash.
         $json = str_replace(self::BACKSLASH_SUBSTITUTE, "\\", $json);
 
         return hash(self::HASH_ALGORITHM, $json);
@@ -172,8 +175,9 @@ class Payload
      * This will mutate the PList.
      * @param \Iterator $root The root element of the PList. Must be a dictionary or array.
      */
-    private function prepare_plist_for_json_encoding($root) {
-        $this->plist_map( function($value, $key, $parent) {
+    private function preparePlistForJsonEncoding($root)
+    {
+        $this->plistMap(function ($value, $key, $parent) {
             // Convert date to ISO 8601 if date object.
             if ($value instanceof CFDate) {
                 $date = \DateTime::createFromFormat('U', $value->getValue());
@@ -210,7 +214,8 @@ class Payload
      * @param \Iterator $root The root element of the PList. Must be a dictionary or array.
      * @param bool $recursive Whether the function should traverse dicts and arrays recursively.
      */
-    private function plist_map(callable $callback, \Iterator $root, bool $recursive = true) {
+    private function plistMap(callable $callback, \Iterator $root, bool $recursive = true)
+    {
         $root->rewind();
         while ($root->valid()) {
             $value = $root->current();
@@ -218,7 +223,7 @@ class Payload
 
             // Recursively traverse all dicts and arrays if flag is true.
             if ($recursive && $value instanceof \Iterator) {
-                $this->plist_map($callback, $value);
+                $this->plistMap($callback, $value);
             }
 
             // Callback function called for every element.
@@ -237,10 +242,11 @@ class Payload
      * @param array $array Top level array to process.
      * @return array Processed array.
      */
-    private function array_sort(array $array) {
+    private function arraySort(array $array)
+    {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $array[$key] = $this->array_sort($array[$key]);
+                $array[$key] = $this->arraySort($array[$key]);
             }
         }
         // Sort assoc array. From SEB docs:
@@ -250,7 +256,7 @@ class Payload
         // and in arrays. Use non-localized (culture invariant), non-ASCII value based case insensitive ordering.
         // For example the key <key>allowWlan</key> comes before <key>allowWLAN</key>. Cocoa/Obj-C and .NET/C#
         // usually use this case insensitive ordering as default, but PHP for example doesn't.
-        if ($this->is_associative_array($array)) {
+        if ($this->isAssociativeArray($array)) {
             // Note this is a pragmatic solution as none of the native PHP *sort method appear to sort strings that
             // differ only in case (e.g. ["allowWLAN", "allowWlan"] is expected to have the lower version first).
             $keys = array_keys($array);
@@ -271,7 +277,8 @@ class Payload
      * @param array $array Array to check.
      * @return bool False if not associative.
      */
-    private function is_associative_array(array $array) {
+    private function isAssociativeArray(array $array)
+    {
         if (empty($array)) {
             return false;
         }

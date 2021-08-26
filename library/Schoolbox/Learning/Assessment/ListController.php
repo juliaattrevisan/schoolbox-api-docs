@@ -187,12 +187,10 @@ class ListController extends Web\Controller\Base
             $this->getUser(),
             $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),
-
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
              */
             'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
-
             /* Generate a config key hash from the xml that guards this assessment url
              */
             (new SebPayload(
