@@ -191,7 +191,7 @@
     <key>useTemporaryDownUploadDirectory</key>
     <false />
     <key>examKeySalt</key>
-    <data>0zVdSEqKAnK0ZNd4QFlwVKBTgw60o6xRjpfDokUYYnk=</data>
+    <data>{{ examKeySalt }}</data>
     <key>examSessionClearCookiesOnEnd</key>
     <true />
     <key>examSessionClearCookiesOnStart</key>

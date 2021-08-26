@@ -86,10 +86,16 @@ class Payload
             'assessmentId' => $assessment->getId()
         ]);
 
+        /* Decide on a salt; I presume it should be derived from something unique to each
+         * schoolbox instance, rather than a global salt; perhaps site_location or suchlike
+         */
+        $examKeySalt = 'JDEkbnN3SzJvZlgkL2dZMHVWOXRUMnE2c0diOHNrdlZkMA==';
+
         /* Manufacture a phplib style struct for strings and their replacements
          */
         $tokens = [
-            '{{ startUrl }}' => $startUrl
+            '{{ startUrl }}' => $startUrl,
+            '{{ examKeySalt }}' => $examKeySalt
         ];
 
         /* Perform the replacements
