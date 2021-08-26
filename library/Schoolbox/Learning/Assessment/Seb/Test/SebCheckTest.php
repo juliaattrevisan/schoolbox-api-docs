@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Seb\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Learning\Assessment\ValidSebCheck;
+use Schoolbox\Learning\Assessment\Seb\ValidSebCheck;
 use Schoolbox\Role;
 use Schoolbox\User;
 

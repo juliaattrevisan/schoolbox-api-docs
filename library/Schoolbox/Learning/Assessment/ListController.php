@@ -184,7 +184,7 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
-        return (new ValidSebCheck())->isSatisfiedBy(
+        return (new Seb\ValidSebCheck())->isSatisfiedBy(
             $this->getUser(),
             $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),

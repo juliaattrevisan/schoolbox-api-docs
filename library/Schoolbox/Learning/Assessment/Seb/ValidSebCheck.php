@@ -7,9 +7,8 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\Seb;
 
-use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\User;
 
 /**
