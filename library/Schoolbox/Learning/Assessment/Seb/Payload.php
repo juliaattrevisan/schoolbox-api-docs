@@ -47,6 +47,12 @@ class Payload
     /**
      * @var string
      */
+    private string $saltBasis;
+
+
+    /**
+     * @var string
+     */
     private string $host;
 
 
@@ -61,11 +67,13 @@ class Payload
 
 
     /**
-     * @param string      $host
-     * @param Router      $router
+     * @param string $saltBasis
+     * @param string $host
+     * @param Router $router
      */
-    public function __construct(string $host, Router $router)
+    public function __construct(string $saltBasis, string $host, Router $router)
     {
+        $this->saltBasis =  $saltBasis;
         $this->host = $host;
         $this->router = $router;
     }
@@ -89,7 +97,7 @@ class Payload
         /* Decide on a salt; I presume it should be derived from something unique to each
          * schoolbox instance, rather than a global salt; perhaps site_location or suchlike
          */
-        $examKeySalt = 'JDEkbnN3SzJvZlgkL2dZMHVWOXRUMnE2c0diOHNrdlZkMA==';
+        $examKeySalt = $this->generateExamKeySalt($this->saltBasis);
 
         /* Manufacture a phplib style struct for strings and their replacements
          */
@@ -101,6 +109,21 @@ class Payload
         /* Perform the replacements
          */
         return strtr(file_get_contents(self::PATH), $tokens);
+    }
+
+
+    /**
+     * Generate an instance-specific salt for the xml
+     *
+     * I'm not even sure this does anything meaningful other than being a piece
+     * of content in the xml that's sensitive to change and fiddling
+     *
+     * @param string $saltBasis
+     * @return string
+     */
+    private function generateExamKeySalt(string $saltBasis): string
+    {
+        return hash(self::HASH_ALGORITHM, $saltBasis . '$1$VMcFkEdF$.8q4GPiJ8MoA4zjOOfca11');
     }
 
 
