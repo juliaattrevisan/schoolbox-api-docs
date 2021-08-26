@@ -20,14 +20,21 @@ use Schoolbox\Learning\Assessment\IAssessable;
 /**
  * Generate an xml payload for the given IAssessable
  *
+ * The xml is manufactured via config.xml, which I lovingly handcrafted and manually
+ * verified by reverse engineering the way SEB was built.
+ *
+ * The site_location value is used as part of a salt to make repeatable hashes
+ * though I suspect this is a superficial gesture overall
+ *
  * Usage;
  *
- * new Payload(
-    * $this->getRequest()->server->get('HTTP_HOST'),
-    * $router->generate('learningAssessment.getAssessment', [
-        * 'assessmentId' => $assessment->getId()
-    * ]
- *
+    new Payload(
+        $this->getConfigLoader()->get('site_location'),
+        $this->getRequest()->server->get('HTTP_HOST'),
+        $router->generate('learningAssessment.getAssessment', [
+            'assessmentId' => $assessment->getId()
+        ]
+    );
  */
 class Payload
 {
@@ -69,6 +76,8 @@ class Payload
 
 
     /**
+     * Constructor.
+     *
      * @param string $saltBasis
      * @param string $host
      * @param Router $router
