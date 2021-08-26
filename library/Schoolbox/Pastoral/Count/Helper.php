@@ -175,8 +175,6 @@ class Helper
      *
      * @param User            $viewer
      * @param User            $student
-     * @param Collection|null $typesWhitelist
-     * @param Collection|null $subTypesWhitelist
      * @return Collection
      * @throws RouteNotFound
      */
@@ -216,7 +214,7 @@ class Helper
              * save this pastoral type & subtype into the series and
              * take a copy of the preferred color
              */
-            $uniqueSeriesID = $row['typeId'].'-'.$row['subtypeId'];
+            $uniqueSeriesID = $row['typeId'] . '-' . $row['subtypeId'];
 
             $series[$uniqueSeriesID]['name']  = $row['title'];
             $series[$uniqueSeriesID]['color'] = $row['fgColor'];
@@ -236,13 +234,13 @@ class Helper
 
     /**
      * @param Collection $studentCounts
-     * @param            $pastoralSubtypes
-     * @param            $pastoralTypes
+     * @param Collection $pastoralSubtypes
+     * @param Collection $pastoralTypes
      * @param User       $student
      * @return Collection
      * @throws RouteNotFound
      */
-    private function decorateCounts(Collection $studentCounts, $pastoralSubtypes, $pastoralTypes, User $student): Collection
+    private function decorateCounts(Collection $studentCounts, Collection $pastoralSubtypes, Collection $pastoralTypes, User $student): Collection
     {
         $output = new Collection();
 

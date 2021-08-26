@@ -1207,16 +1207,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * Get a short description of the month and year
-     *
-     * @return string
-     */
-    public function getShortMonthYear(): string
-    {
-        return $this->getUsingFormat("M y");
-    }
-
-    /**
      * Extract the day of this date.
      *
      * @param bool $leadingZero True if leading zero is fetched, false if not

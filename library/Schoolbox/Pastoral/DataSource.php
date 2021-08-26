@@ -136,7 +136,6 @@ class DataSource
      * @param int   $studentId
      * @param array $typeIds
      * @param array $subtypeIds
-     * @param bool  $partitionByMonth   further break down into monthly summaries
      * @return array
      */
     public function countRecordsByType(User $viewer, int $studentId, array $typeIds, array $subtypeIds): array
