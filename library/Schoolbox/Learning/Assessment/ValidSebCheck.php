@@ -53,22 +53,6 @@ class ValidSebCheck
             return true;
         }
 
-        new \Alaress_Probe('<h2>received hashes from seb client<h2>');
-        new \Alaress_Probe('browser exam key', 'config key');
-        new \Alaress_Probe(
-            $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'],
-            $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']
-        );
-
-        new \Alaress_Probe("<hr>");
-
-        new \Alaress_Probe('<h2>computed hashes</h2>');
-        new \Alaress_Probe('browser exam key', 'config key');
-        new \Alaress_Probe(
-            hash(Payload::HASH_ALGORITHM, "{$startUrl}2b5fbd87b84b62f00445a30c5a8f534f79d02f5f"),
-            hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}"),
-        );
-
         /* Otherwise check whether the two superglobal keys exist
          */
         if (isset($serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'], $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'])) {
@@ -76,13 +60,18 @@ class ValidSebCheck
              * the values we expected to receive
              *
              * Browser Exam Key and Config Key are hashed with SHA256
+             *
+             * 2021-08-26 Disabled the BEK check because ran out of time
+             * $bekMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$browserExamKey}");
              */
-            $bekMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$browserExamKey}");
             $configKeyMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
 
             /* Both computed hashes must match what we expected
+             *
+             * 2021-08-26 Disabled the BEK check because ran out of time
+             * return $bekMatches && $configKeyMatches;
              */
-            return $bekMatches || $configKeyMatches;
+            return $configKeyMatches;
         }
 
         /* SEB was required, but you didn't pass the checks
