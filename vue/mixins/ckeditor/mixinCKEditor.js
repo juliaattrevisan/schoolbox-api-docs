@@ -6,6 +6,8 @@
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
 let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts once
  
+import { injectScript } from '@js/util/domUtils';
+
 export default {
  
     data () {
@@ -71,8 +73,8 @@ export default {
                     
                     if (__isFirstCKEditorLoad) {
 
-                        await this.injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
-                        await this.injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
+                        await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
+                        await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
                         
                         __isFirstCKEditorLoad = false;
 
@@ -110,21 +112,6 @@ export default {
 
         },
 
-        /**
-         * Async inject a <script> tag into the DOM
-         * https://stackoverflow.com/a/39008859
-         *
-         */
-        injectScript (src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.addEventListener('load', resolve);
-                script.addEventListener('error', e => reject(e.error));
-                document.head.appendChild(script);
-            });
-        },
-        
     }
  
 }
