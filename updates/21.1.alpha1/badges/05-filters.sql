@@ -4,7 +4,7 @@ VALUES ('Schoolbox\\Learning\\Badge\\Award\\Mapper',
        ('Schoolbox\\Learning\\Badge\\Award\\Mapper',
         'Schoolbox\\Filter\\Filters\\Award\\Status\\Definition'),
        ('Schoolbox\\Learning\\Badge\\Award\\Mapper',
-        'Schoolbox\\Filter\\Filters\\Badge\\Category\\Definition');
+        'Schoolbox\\Filter\\Filters\\Award\\Category\\Definition');
 
 ALTER TABLE filter_page
     MODIFY page ENUM('pending', 'grades', 'classMarkbook', 'analytics', 'dueWorkCal', 'courseMarkbook', 'rubricMarkbook', 'assessmentCal', 'badgeList', 'awardList') NULL;
