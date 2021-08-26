@@ -21,19 +21,13 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
-use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
-use Schoolbox\Assessment\Rubric\RowSet\Capability;
-use Schoolbox\Column\Boolean;
 use Schoolbox\Column\Decimal;
 use Schoolbox\Column\Integer;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage;
 use Schoolbox\L10n\RosettaStone as Translator;
-use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -640,9 +634,6 @@ class Controller extends Base
                     $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
                     if ($capabilityDatabaseMark !== null) {
                         $capabilityMaxMark = $decimalHydrator->hydrate($capabilityMarks['maxMark']);
-
-                        $capabilityUsageModel = new CapabilityUsage(new Capability());
-                        $capabilityUsageModel->setMaxValue($capabilityMaxMark);
 
                         $normalisedCapabilityMark = ($capabilityDatabaseMark / $capabilityMaxMark) * 100;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $capabilityMarks['humanReadableMark'];
