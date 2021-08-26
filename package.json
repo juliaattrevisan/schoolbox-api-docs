@@ -47,7 +47,6 @@
     "strtotime": "^1.0.0",
     "tinycolor2": "^1.4.2",
     "ts-ebml": "^2.0.2",
-    "ucid": "^1.0.0",
     "videojs-record": "^4.4.0",
     "vmsg": "^0.4.0",
     "vue": "^2.6.12",
