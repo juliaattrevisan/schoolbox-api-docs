@@ -91,11 +91,11 @@ export default {
          */
         getConfigOptions (editorType) {
             const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
-                [EDITOR_DEFAULT_CONFIG]: {  ...$.alaressEditorConfig(), ...this.getVueSpecificConfig() },
-                [EDITOR_CONFIG_FOR_COMMENTS]: {  ...$.alaressEditorConfigForComments(), ...this.getVueSpecificConfig() },
-                [EDITOR_CONFIG_WITH_USER_TOKENS]: {  ...$.alaressEditorConfigWithUserTokens(), ...this.getVueSpecificConfig() }
+                [EDITOR_DEFAULT_CONFIG]: $.alaressEditorConfig(this.getVueSpecificConfig()),
+                [EDITOR_CONFIG_FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
+                [EDITOR_CONFIG_WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig()) 
             }
-            return configOptions[editorType] || {  ...$.alaressEditorConfig(), ...this.getVueSpecificConfig() };
+            return configOptions[editorType] || $.alaressEditorConfig(this.getVueSpecificConfig());
         },
 
         /**
