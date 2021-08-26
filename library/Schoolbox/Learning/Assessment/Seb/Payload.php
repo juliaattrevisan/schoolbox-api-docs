@@ -99,9 +99,15 @@ class Payload
      */
     public function generate(IAssessable $assessment): string
     {
-        /* Figure out the absolute url for this assessment
+        /* The domain of our schoolbox instance. We need this so students can get past the
+         * login screen since we can establish a filtered url https://domain/login*
          */
-        $startUrl = 'https://' . $this->host . $this->router->generate('learningAssessment.getAssessment', [
+        $domain = 'https://' . $this->host;
+
+        /* Figure out the absolute url for this assessment and all the subpages
+         * such as https://domain/learning/assessment/123*
+         */
+        $startUrl = $domain . $this->router->generate('learningAssessment.getAssessment', [
             'assessmentId' => $assessment->getId()
         ]);
 
@@ -113,6 +119,7 @@ class Payload
         /* Manufacture a phplib style struct for strings and their replacements
          */
         $tokens = [
+            '{{ domain }}' => $domain,
             '{{ startUrl }}' => $startUrl,
             '{{ examKeySalt }}' => $examKeySalt
         ];

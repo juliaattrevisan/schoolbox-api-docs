@@ -239,11 +239,32 @@
     <key>enableURLContentFilter</key>
     <false />
     <key>URLFilterEnable</key>
-    <false />
+    <true />
     <key>URLFilterEnableContentFilter</key>
     <false />
     <key>URLFilterRules</key>
-    <array></array>
+    <array>
+      <dict>
+        <key>active</key>
+        <true />
+        <key>regex</key>
+        <false />
+        <key>expression</key>
+        <string>{{ domain }}/login*</string>
+        <key>action</key>
+        <integer>1</integer>
+      </dict>
+      <dict>
+        <key>active</key>
+        <true />
+        <key>regex</key>
+        <false />
+        <key>expression</key>
+        <string>{{ startUrl }}/*</string>
+        <key>action</key>
+        <integer>1</integer>
+      </dict>
+    </array>
     <key>blacklistURLFilter</key>
     <string />
     <key>whitelistURLFilter</key>
