@@ -12,6 +12,7 @@ namespace Schoolbox\Application;
 use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
 use Database;
+use RuntimeException;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -123,7 +124,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 } elseif ($e instanceof \PDOException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
-                } elseif ($e instanceof \RuntimeException) {
+                } elseif ($e instanceof RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
                 } else {
@@ -220,15 +221,26 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     }
 
 
+    /**
+     * Initialise the session, in addition to running the parent class'
+     * post-install dependencies.
+     *
+     * @throws       RuntimeException              if the session doesn't start
+     * @noinspection PhpDocMissingThrowsInspection the session management object
+     *                                             will always be in DI
+     */
     protected function postInstallDependencies(): void
     {
         parent::postInstallDependencies();
 
         // initialise session
         /** @var Session $session */
+        /** @noinspection PhpUnhandledExceptionInspection */
         $session = $this->getDependencyInjector()->get('session');
         if (!$session->isStarted()) {
-            $session->start();
+            if (!$session->start()) {
+                throw new RuntimeException('Session could not be started: likely this is an issue with Redis');
+            }
         }
     }
 
