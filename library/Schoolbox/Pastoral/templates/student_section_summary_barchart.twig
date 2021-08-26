@@ -1,8 +1,9 @@
-{% if countSummaryByMonth.categories|length and countSummaryByMonth.series|length %}
+{% if countSummaryByMonth.series|length %}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/highcharts-release/highcharts.js"></script>
 
 <script type="text/javascript">
     $(function() {
+
         Highcharts.chart('graph-countSummaryByMonth-{{ student.id }}', {
             chart: {
                 type: 'bar'
@@ -11,35 +12,24 @@
                 text: ''
             },
             xAxis: {
-                categories: {{ countSummaryByMonth.categories|json_encode|raw }}
+                type: 'datetime',
+                tickInterval: 1000 * 3600 * 24 *30, // 1 month
+                dateTimeLabelFormats: {
+                    day: '%b %Y'    //ex- 01 Jan 2016
+                }
             },
             yAxis: {
                 min: 0,
+                tickInterval: 1,
                 title: {
                     text: ''
                 }
             },
-            legend: {
-                reversed: false
-            },
             plotOptions: {
                 series: {
                     stacking: 'normal',
+                    //grouping: false,
                     cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        align: 'center',
-                        inside: true,
-                        formatter: function() {
-                            let str = '';
-
-                            if (this.y > 0) {
-                                str = this.y;
-                            }
-
-                            return str;
-                        }
-                    },
                     events: {
                         click: function (event) {
                             window.location.href = event.point.series.userOptions.url;

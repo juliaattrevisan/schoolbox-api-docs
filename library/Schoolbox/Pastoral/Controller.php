@@ -320,11 +320,6 @@ class Controller extends Base
         $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
         $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student);
 
-        [
-            $countSummaryByMonthCategories,
-            $countSummaryByMonthSeries,
-        ] = $pastoralCountHelper->buildMonthlyBarChart($countSummaryByMonth);
-
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoral/student.twig',
@@ -338,8 +333,7 @@ class Controller extends Base
                     'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
                     'countSummaryByMonth' => [
                         'recordCount' => count($countSummaryByMonth),
-                        'series'      => $countSummaryByMonthSeries,
-                        'categories'  => $countSummaryByMonthCategories,
+                        'series'      => $pastoralCountHelper->buildMonthlyBarChart($countSummaryByMonth),
                     ],
                     'typeSelected'        => $typeId,
                     'subtypeSelected'     => $subtypeId,

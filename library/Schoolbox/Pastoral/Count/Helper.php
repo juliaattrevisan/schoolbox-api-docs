@@ -149,12 +149,11 @@ class Helper
          * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
          * regardless of whether they have icon and colors attached to them
          */
-        $this->initTypeWhitelists($partitionByMonth);
+        $this->initTypeWhitelists();
 
         $pastoralTypes    = $typesWhitelist ?? $this->pastoralTypesWhitelist;
         $pastoralSubtypes = $subTypesWhitelist ?? $this->pastoralSubTypesWhitelist;
 
-        $output = new Collection();
 
         $studentCounts = new Collection(
             $this->pastoralDataSource->countRecordsByType(
@@ -162,9 +161,95 @@ class Helper
                 $student->getId(),
                 $pastoralTypes->getPropertyValues('id'),
                 $pastoralSubtypes->getPropertyValues('id'),
-                $partitionByMonth
             )
         );
+
+        $output = $this->decorateCounts($studentCounts, $pastoralSubtypes, $pastoralTypes, $student);
+
+        return $output;
+    }
+
+    /**
+     * returns counts of pastoral evens types(and subtypes) for a single student but additionally partitioned by the
+     * month and year they were created in
+     *
+     * @param User            $viewer
+     * @param User            $student
+     * @param Collection|null $typesWhitelist
+     * @param Collection|null $subTypesWhitelist
+     * @return Collection
+     * @throws RouteNotFound
+     */
+    public function countStudentEventsByTypesByMonth(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
+    {
+        /**
+         * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
+         * regardless of whether they have icon and colors attached to them
+         */
+        $this->initTypeWhitelists(true);
+
+        $pastoralTypes    = $typesWhitelist ?? $this->pastoralTypesWhitelist;
+        $pastoralSubtypes = $subTypesWhitelist ?? $this->pastoralSubTypesWhitelist;
+
+        $studentCounts = new Collection(
+            $this->pastoralDataSource->countRecordsByTypeGroupByMonth(
+                $viewer,
+                $student->getId(),
+                $pastoralTypes->getPropertyValues('id'),
+                $pastoralSubtypes->getPropertyValues('id'),
+            )
+        );
+
+        return $this->decorateCounts($studentCounts, $pastoralSubtypes, $pastoralTypes, $student);
+    }
+
+    /**
+     * build the orthogonal datasets that a stacked barchart needs: categories and series
+     *
+     * @param Collection $data
+     * @return array
+     */
+    public function buildMonthlyBarChart(Collection $data): array
+    {
+        /**
+         * a unique array of type and subtypes that contain counts for a month, in a year
+         */
+        $series = [];
+
+        foreach ($data as $row) {
+            /**
+             * save this pastoral type & subtype into the series and
+             * take a copy of the preferred color
+             */
+            $uniqueSeriesID = $row['typeId'].'-'.$row['subtypeId'];
+
+            $series[$uniqueSeriesID]['name']  = $row['title'];
+            $series[$uniqueSeriesID]['color'] = $row['fgColor'];
+            $series[$uniqueSeriesID]['url']   = $row['destinationUrl'];
+
+            $summaryMonthLabel = (new Alaress_Date_Format())
+                ->setDay(1)
+                ->setMonth($row['partition_month'])
+                ->setYear($row['partition_year'])
+                ->startOfMonth()->getDateTimeObject()->valueOf();
+
+            $series[$uniqueSeriesID]['data'][] = [$summaryMonthLabel, (int)$row['count']];
+        }
+
+        return array_values($series);
+    }
+
+    /**
+     * @param Collection $studentCounts
+     * @param            $pastoralSubtypes
+     * @param            $pastoralTypes
+     * @param User       $student
+     * @return Collection
+     * @throws RouteNotFound
+     */
+    private function decorateCounts(Collection $studentCounts, $pastoralSubtypes, $pastoralTypes, User $student): Collection
+    {
+        $output = new Collection();
 
         foreach ($studentCounts as $studentCount) {
             $studentCount = new Collection($studentCount);
@@ -207,16 +292,6 @@ class Helper
                              ->setOffset('bgColor', $this->colorHelper->calculateBackground($foregroundColor)->getAsRgba());
             }
 
-            if ($partitionByMonth === true) {
-                $summaryMonthLabel = (new Alaress_Date_Format())
-                    ->setDay(1)
-                    ->setMonth($studentCount->getOffset('partition_month'))
-                    ->setYear($studentCount->getOffset('partition_year'))
-                    ->getShortMonthYear();
-
-                $studentCount->setOffset('partition_label', $summaryMonthLabel);
-            }
-
             $output->add($studentCount);
         }
 
@@ -228,91 +303,5 @@ class Helper
         });
 
         return $output;
-    }
-
-    /**
-     * returns counts of pastoral evens types(and subtypes) for a single student but additionally partitioned by the
-     * month and year they were created in
-     *
-     * @param User            $viewer
-     * @param User            $student
-     * @param Collection|null $typesWhitelist
-     * @param Collection|null $subTypesWhitelist
-     * @return Collection
-     * @throws RouteNotFound
-     */
-    public function countStudentEventsByTypesByMonth(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
-    {
-        return $this->countStudentEventsByTypes($viewer, $student, $typesWhitelist, $subTypesWhitelist, true);
-    }
-
-    /**
-     * build the orthogonal datasets that a stacked barchart needs: categories and series
-     *
-     * @param Collection $data
-     * @return array
-     */
-    public function buildMonthlyBarChart(Collection $data): array
-    {
-        $fieldName = [
-            'series'   => 'title',
-            'category' => 'partition_label',
-            'count'    => 'count',
-            'color'    => 'fgColor',
-            'url'      => 'destinationUrl',
-        ];
-
-        /**
-         * a unique array of months and the year
-         */
-        $categories = [];
-        /**
-         * a unique array of type and subtypes that contain counts for a month, in a year
-         */
-        $series = [];
-
-        foreach ($data as $row) {
-            /**
-             * extract any month & years as categories in lookup table
-             */
-            $categories[$row[$fieldName['category']]] = true;
-            /**
-             * save this pastoral type & subtype into the series and
-             * take a copy of the preferred color
-             */
-            if (!isset($series[$row[$fieldName['series']]])) {
-                $series[$row[$fieldName['series']]] = [
-                    'name'  => $row[$fieldName['series']],
-                    'color' => $row['fgColor'],
-                    'url'   => $row['destinationUrl'],
-                    'data'  => [],
-                ];
-            }
-            /**
-             * finally, make sure we capture the number of events in this type + subtype + month + year
-             */
-            $series[$row[$fieldName['series']]]['data'][$row[$fieldName['category']]] = (int)$row[$fieldName['count']];
-        }
-        /**
-         * flip the category lookup, so we have a unique list of month + years
-         */
-        $categories = array_keys($categories);
-
-        /**
-         * go back over the series and fill in any that had no counts
-         */
-        foreach ($series as &$row) {
-            if (count($row['data']) < count($categories)) {
-                foreach ($categories as $category) {
-                    $row['data'][$category] ??= 0;
-                }
-            }
-            /**
-             * strip out the lookup index
-             */
-            $row['data'] = array_values($row['data']);
-        }
-
-        return [$categories, array_values($series)];
     }
 }
