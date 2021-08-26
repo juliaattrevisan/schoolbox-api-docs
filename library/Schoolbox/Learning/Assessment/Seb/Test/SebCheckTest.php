@@ -13,7 +13,7 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\Test;
+namespace Schoolbox\Learning\Assessment\Seb\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\ValidSebCheck;
@@ -25,7 +25,6 @@ class SebCheckTest extends TestCase
     /**
      * @dataProvider providerSebCheck
      * @param User   $user
-     * @param string $startUrl
      * @param bool   $sebEnabled
      * @param array  $serverSuperglobal
      * @param string $browserExamKey
@@ -36,7 +35,6 @@ class SebCheckTest extends TestCase
      */
     public function testValidSebCheck(
         User $user,
-        string $startUrl,
         bool $sebEnabled,
         array $serverSuperglobal,
         string $browserExamKey,
@@ -45,7 +43,6 @@ class SebCheckTest extends TestCase
     ): void {
         $outcome = (new ValidSebCheck())->isSatisfiedBy(
             $user,
-            $startUrl,
             $sebEnabled,
             $serverSuperglobal,
             $browserExamKey,
@@ -82,7 +79,6 @@ class SebCheckTest extends TestCase
              */
             'Valid SEB, generic usage' => [
                 $student,
-                'https://vagrant.dev.schoolbox.cloud/test',
                 true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
@@ -98,7 +94,8 @@ class SebCheckTest extends TestCase
                     'HTTP_CACHE_CONTROL' => 'no-cache',
                     'HTTP_PRAGMA' => 'no-cache',
                     'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200'
+                    'REDIRECT_STATUS' => '200',
+                    'REQUEST_URI' => '/test'
                 ],
                 'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
                 'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f',
@@ -109,7 +106,6 @@ class SebCheckTest extends TestCase
              */
             'Valid SEB, staff always get through' => [
                 $staff,
-                'https://vagrant.dev.schoolbox.cloud/test',
                 true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
@@ -123,7 +119,8 @@ class SebCheckTest extends TestCase
                     'HTTP_CACHE_CONTROL' => 'no-cache',
                     'HTTP_PRAGMA' => 'no-cache',
                     'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200'
+                    'REDIRECT_STATUS' => '200',
+                    'REQUEST_URI' => '/test'
                 ],
                 '00258dskjrpwugugnsdy48dfyx6g7usdf5s4s7x9bnksj1iug0234u90g7258999',
                 'sogjl258972lkjdljgj289272ld2hfugh27c77b714mazxcr241fa6r949gj48g7',
@@ -134,7 +131,6 @@ class SebCheckTest extends TestCase
              */
             'Invalid SEB, keys do not match what we expected' => [
                 $student,
-                'https://vagrant.dev.schoolbox.cloud/test',
                 true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
@@ -150,7 +146,8 @@ class SebCheckTest extends TestCase
                     'HTTP_CACHE_CONTROL' => 'no-cache',
                     'HTTP_PRAGMA' => 'no-cache',
                     'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200'
+                    'REDIRECT_STATUS' => '200',
+                    'REQUEST_URI' => '/test'
                 ],
                 '00258dskjrpwugugnsdy48dfyx6g7usdf5s4s7x9bnksj1iug0234u90g7258999',
                 'sogjl258972lkjdljgj289272ld2hfugh27c77b714mazxcr241fa6r949gj48g7',
@@ -161,7 +158,6 @@ class SebCheckTest extends TestCase
              */
             'Invalid SEB, bek missing' => [
                 $student,
-                'https://vagrant.dev.schoolbox.cloud/test',
                 true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
@@ -176,7 +172,8 @@ class SebCheckTest extends TestCase
                     'HTTP_CACHE_CONTROL' => 'no-cache',
                     'HTTP_PRAGMA' => 'no-cache',
                     'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200'
+                    'REDIRECT_STATUS' => '200',
+                    'REQUEST_URI' => '/test'
                 ],
                 'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
                 'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f',
@@ -185,7 +182,6 @@ class SebCheckTest extends TestCase
 
             'Invalid SEB, config key missing' => [
                 $student,
-                'https://vagrant.dev.schoolbox.cloud/test',
                 true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
@@ -200,7 +196,8 @@ class SebCheckTest extends TestCase
                     'HTTP_CACHE_CONTROL' => 'no-cache',
                     'HTTP_PRAGMA' => 'no-cache',
                     'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200'
+                    'REDIRECT_STATUS' => '200',
+                    'REQUEST_URI' => '/test'
                 ],
                 'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
                 'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f',
@@ -209,7 +206,6 @@ class SebCheckTest extends TestCase
 
             'Invalid SEB, both keys missing' => [
                 $student,
-                'https://vagrant.dev.schoolbox.cloud/test',
                 true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
@@ -223,7 +219,8 @@ class SebCheckTest extends TestCase
                     'HTTP_CACHE_CONTROL' => 'no-cache',
                     'HTTP_PRAGMA' => 'no-cache',
                     'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200'
+                    'REDIRECT_STATUS' => '200',
+                    'REQUEST_URI' => '/test'
                 ],
                 'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
                 'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f',
@@ -234,7 +231,6 @@ class SebCheckTest extends TestCase
              */
             'Invalid SEB, start url different' => [
                 $student,
-                'https://vagrant.dev.schoolbox.cloud/test222',
                 true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
@@ -249,7 +245,8 @@ class SebCheckTest extends TestCase
                     'HTTP_CACHE_CONTROL' => 'no-cache',
                     'HTTP_PRAGMA' => 'no-cache',
                     'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200'
+                    'REDIRECT_STATUS' => '200',
+                    'REQUEST_URI' => '/test222'
                 ],
                 'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
                 'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f',
