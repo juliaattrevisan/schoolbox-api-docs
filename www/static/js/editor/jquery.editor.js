@@ -175,7 +175,7 @@
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                 {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
                 {name: 'insert', groups: ['insert']},
-                // {name: 'schoolbox', groups: ['schoolboxlink']},
+                {name: 'schoolbox', groups: ['schoolboxlink']},
             ],
             height: '4rem',
             resize_enabled: false,

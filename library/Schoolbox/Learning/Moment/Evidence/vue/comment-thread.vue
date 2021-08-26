@@ -2,22 +2,13 @@
 
 import axios  from 'axios';
 import moment from 'moment';
-<<<<<<< HEAD
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
-import mixinLoadCKEditor from '@vue/mixins/ckeditor/mixinLoadCKEditor';
-=======
-
-import MediaArticle from '@schoolbox/media-article';
-import Storage from '@schoolbox/storage';
-import Toast from '@schoolbox/toast';
-import RevealModal from '@schoolbox/reveal-modal';
-import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 import mixinCKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
->>>>>>> b8359ecd0a0... Rename mixin [SA-12493]
+import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
 
 export default {
 
@@ -134,6 +125,13 @@ export default {
     },
 
     methods: {
+
+        /**
+         * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
+         */
+        onAddCommentSelected () {
+            this.cKEditor_init(EDITOR_CONFIG_FOR_COMMENTS);
+        },
 
         /**
          * Loads the next cursor of comments.
@@ -272,7 +270,7 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="cKEditor_init">{{ cKEditor_getAddCommentButtonText }}</button>
+                    <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="onAddCommentSelected">{{ cKEditor_getAddCommentButtonText }}</button>
                     <div :style="cKEditor_getStyles">
                         <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
                         <a class="button submit"

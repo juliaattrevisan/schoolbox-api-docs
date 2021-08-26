@@ -7,6 +7,7 @@ let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page 
 let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts once
  
 import { injectScript } from '@js/util/domUtils';
+import { EDITOR_DEFAULT_CONFIG, EDITOR_CONFIG_FOR_COMMENTS, EDITOR_CONFIG_WITH_USER_TOKENS } from '@js/editor/editorConfigTypes';
 
 export default {
  
@@ -62,55 +63,60 @@ export default {
 
         /**
          * Loads ckeditor only when required rather than on page load
+         * 
+         * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
          */
-        cKEditor_init () {
+        async cKEditor_init (editorType) {
+            try {
+                this.cKEditor_isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+                if (__isFirstCKEditorLoad) {
+                    await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
+                    await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
+                    __isFirstCKEditorLoad = false;
+                }
+                $.fn.alaressEditor(this.getConfigOptions(editorType));
+            } catch (error) {
+                this.cKEditor_isCKEditorLoading = false; 
+                this.$refs.toast.timeout('Loading comment box failed', false, 5000);
+            }
+        },
 
-            this.cKEditor_isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+        /**
+         * Return the appropriate config to display consistency depending on the editorType
+         * these '$.alaress' methods are created and attached to the jQuery $ object in jquery.editor.js
+         * 
+         * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
+         * 
+         * @returns { Object }
+         */
+        getConfigOptions (editorType) {
+            const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
+                [EDITOR_DEFAULT_CONFIG]: {  ...$.alaressEditorConfig(), ...this.getVueSpecificConfig() },
+                [EDITOR_CONFIG_FOR_COMMENTS]: {  ...$.alaressEditorConfigForComments(), ...this.getVueSpecificConfig() },
+                [EDITOR_CONFIG_WITH_USER_TOKENS]: {  ...$.alaressEditorConfigWithUserTokens(), ...this.getVueSpecificConfig() }
+            }
+            return configOptions[editorType] || {  ...$.alaressEditorConfig(), ...this.getVueSpecificConfig() };
+        },
 
-            const loadScripts = async () => {
-                
-                try {
-                    
-                    if (__isFirstCKEditorLoad) {
-
-                        await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
-                        await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
-                        
-                        __isFirstCKEditorLoad = false;
-
+        /**
+         * The config that needs to be passed to CKEditor in order to for it to work in Vue land
+         * 
+         * @returns { Object }
+         */
+        getVueSpecificConfig () {
+            return {
+                targetElements: $(`#comment-${this.cKEditor_uniqueId}`),
+                on: {
+                    change: () => { // Bind the content of CKEditor into the comment model on change
+                        this.newComment = CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].getData(); 
+                    },
+                    instanceReady: () => { //can display the loaded CKEditor now
+                        this.cKEditor_isCKEditorLoading = false;
+                        this.cKEditor_isCKEditorLoaded = true;
                     }
-
-                    $.fn.alaressEditor({
-                        targetElements: $(`#comment-${this.cKEditor_uniqueId}`),
-                        startupFocus: true,
-                        height: '4rem',
-                        removePlugins: 'uploadimage,schoolboxanchor',
-                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
-                        toolbarGroups: [
-                            { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-                            { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
-                            { name: 'insert', groups: ['insert'] },
-                            { name: 'schoolbox', groups: ['schoolboxlink'] }
-                        ],
-                        on: {
-                            change: (event) => {
-                                this.newComment = CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].getData(); // Bind the content of CKEditor into the comment model on change
-                            },
-                            instanceReady: (event) => { //can display the loaded CKEditor now
-                                this.cKEditor_isCKEditorLoading = false;
-                                this.cKEditor_isCKEditorLoaded = true;
-                            }
-                        }
-                    });
-
-                } catch (error) {
-                    this.$refs.toast.timeout('Loading comment box failed', false, 5000);
                 }
             }
-
-            loadScripts();
-
-        },
+        }
 
     }
  

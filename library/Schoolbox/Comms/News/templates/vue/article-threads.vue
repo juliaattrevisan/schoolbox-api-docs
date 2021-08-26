@@ -7,6 +7,7 @@ import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 import mixinCKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
+import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
 
 export default {
 
@@ -200,6 +201,13 @@ export default {
         },
 
         /**
+         * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
+         */
+        onAddCommentSelected () {
+            this.cKEditor_init(EDITOR_CONFIG_FOR_COMMENTS);
+        },
+
+        /**
          * Post a comment
          *
          */
@@ -319,7 +327,7 @@ export default {
                 <template v-if="!isInitialLoad">
                     <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
-                            <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="cKEditor_init">{{ cKEditor_getAddCommentButtonText }}</button>
+                            <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="onAddCommentSelected">{{ cKEditor_getAddCommentButtonText }}</button>
                             <div :style="cKEditor_getStyles">
                                 <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
                                 <a class="button submit"
