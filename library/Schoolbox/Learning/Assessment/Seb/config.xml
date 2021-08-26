@@ -41,9 +41,9 @@
     <key>browserViewMode</key>
     <integer>0</integer>
     <key>browserWindowAllowAddressBar</key>
-    <true />
+    <false />
     <key>newBrowserWindowAllowAddressBar</key>
-    <true />
+    <false />
     <key>mainBrowserWindowWidth</key>
     <string>100%</string>
     <key>mainBrowserWindowHeight</key>
@@ -113,9 +113,9 @@
     <key>newBrowserWindowByLinkPositioning</key>
     <integer>2</integer>
     <key>newBrowserWindowShowURL</key>
-    <true />
+    <false />
     <key>browserWindowShowURL</key>
-    <true />
+    <false />
     <key>enablePlugIns</key>
     <true />
     <key>enableJava</key>
