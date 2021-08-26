@@ -10,7 +10,6 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
 
 class SitePage extends Page
@@ -282,25 +281,34 @@ class SitePage extends Page
     }
 
     /**
-     * Initialises a session, redirecting to the login page if there is no
-     * active session.
+     * Initialises the session for the currently logged-in user.
+     *
+     * This method raises a redirect to the login page if any of the below are
+     * true:
+     * * the session hasn't been started
+     * * the session ID is not valid
+     *
+     * Otherwise, if any of the below are true, this method checks the remember
+     * me cookie for a user, and redirects to the login page if none is found:
+     * * the session doesn't contain a logged-in user
+     * * the user's login has expired
+     * * the session's IP address doesn't match the current IP address
+     *   (only if IP tracking for sessions is enabled)
      *
      * @deprecated this is definitely not a responsibility of SitePage
      */
     public function initSession()
     {
-        if (PHP_SESSION_NONE === session_status()) {
-            session_save_path(PipeManager::getSessionSavePath($this->config->get('redis_url')));
-            session_start();
+        // No session active? Go to the login page
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            $this->goLoginPage();
         }
 
         // Validate the session ID - it has no right to be empty after it's started
         $sessionHandler = new Session();
         if (!$sessionHandler->validateSessionId(session_id())) {
-            // Have a valid ID instead (as long as a session is actually active)
-            if (session_status() === PHP_SESSION_ACTIVE) {
-                session_regenerate_id(true);
-            }
+            // Have a valid ID instead
+            session_regenerate_id(true);
             $sessionHandler->destroy();
             $this->goLoginPage();
         }
