@@ -180,7 +180,7 @@ class Helper
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentEventsByTypesByMonth(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
+    public function countStudentEventsByTypesByMonth(User $viewer, User $student): Collection
     {
         /**
          * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
@@ -188,19 +188,14 @@ class Helper
          */
         $this->initTypeWhitelists(true);
 
-        $pastoralTypes    = $typesWhitelist ?? $this->pastoralTypesWhitelist;
-        $pastoralSubtypes = $subTypesWhitelist ?? $this->pastoralSubTypesWhitelist;
-
         $studentCounts = new Collection(
             $this->pastoralDataSource->countRecordsByTypeGroupByMonth(
                 $viewer,
-                $student->getId(),
-                $pastoralTypes->getPropertyValues('id'),
-                $pastoralSubtypes->getPropertyValues('id'),
+                $student->getId()
             )
         );
 
-        return $this->decorateCounts($studentCounts, $pastoralSubtypes, $pastoralTypes, $student);
+        return $this->decorateCounts($studentCounts, $this->pastoralSubTypesWhitelist, $this->pastoralTypesWhitelist, $student);
     }
 
     /**

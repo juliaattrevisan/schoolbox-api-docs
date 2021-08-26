@@ -187,46 +187,22 @@ class DataSource
      *
      * @param User  $viewer
      * @param int   $studentId
-     * @param array $typeIds
-     * @param array $subtypeIds
-     * @param bool  $partitionByMonth   further break down into monthly summaries
      * @return array
      */
-    public function countRecordsByTypeGroupByMonth(User $viewer, int $studentId, array $typeIds, array $subtypeIds): array
+    public function countRecordsByTypeGroupByMonth(User $viewer, int $studentId): array
     {
-        if (empty($typeIds) && empty($subtypeIds)) {
-            return [];
-        }
-
-        $typeWheres           = [];
-        $typeParams           = [];
-
-        if (!empty($typeIds)) {
-            $typeBindings = Builder::getBindings($typeIds, 'typeId');
-            $typeWheres[] = "p.type_id IN ({$typeBindings->getPlaceholder()})";
-            $typeParams   = $typeBindings->getParams();
-        }
-        if (!empty($subtypeIds)) {
-            $subtypeBindings = Builder::getBindings($subtypeIds, 'subtypeId');
-            $typeWheres[]    = "p.subtype_id IN ({$subtypeBindings->getPlaceholder()})";
-            $typeParams      = array_merge($subtypeBindings->getParams(), $typeParams);
-        }
-
         $where     = $this->getPermissionClause($viewer, $studentId, null);
-        $typeWhere = implode(' OR ', $typeWheres);
 
         $sql    = "
         SELECT count(*) as count, p.type_id as typeId, p.subtype_id as subtypeId, month(p.created_at) as partition_month, year(p.created_at) as partition_year
                 FROM pastoral p
         WHERE ({$where['where']})
-        AND ({$typeWhere})
         AND created_at >= :yearAgo
         GROUP BY year(p.created_at), month(p.created_at), p.type_id, p.subtype_id
         ";
         $date   = new \Alaress_Date_Format();
         $params = array_merge(
             ['yearAgo' => $date->addYears(-1)->getDatabaseDate()],
-            $typeParams,
             $where['params']
         );
 
