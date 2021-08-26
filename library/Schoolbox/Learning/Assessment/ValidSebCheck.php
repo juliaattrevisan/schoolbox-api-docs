@@ -65,7 +65,7 @@ class ValidSebCheck
         new \Alaress_Probe('<h2>computed hashes</h2>');
         new \Alaress_Probe('browser exam key', 'config key');
         new \Alaress_Probe(
-            hash(Payload::HASH_ALGORITHM, "{$startUrl}{$browserExamKey}"),
+            hash(Payload::HASH_ALGORITHM, "{$startUrl}2b5fbd87b84b62f00445a30c5a8f534f79d02f5f"),
             hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}"),
         );
 
