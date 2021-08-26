@@ -225,7 +225,6 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * Initialise the session, in addition to running the parent class'
      * post-install dependencies.
      *
-     * @throws       RuntimeException              if the session doesn't start
      * @noinspection PhpDocMissingThrowsInspection the session management object
      *                                             will always be in DI
      */
@@ -238,9 +237,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         /** @noinspection PhpUnhandledExceptionInspection */
         $session = $this->getDependencyInjector()->get('session');
         if (!$session->isStarted()) {
-            if (!$session->start()) {
-                throw new RuntimeException('Session could not be started: likely this is an issue with Redis');
-            }
+            $session->start();
         }
     }
 
