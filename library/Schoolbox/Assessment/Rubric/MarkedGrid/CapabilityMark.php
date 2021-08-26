@@ -21,25 +21,22 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
  */
 class CapabilityMark
 {
+    /**
+     * Number of decimal places to which the normalized mark is rounded.
+     */
     private const PRECISION = 2;
 
     /**
      * The capability usage for which this mark is for.
-     *
-     * @var CapabilityUsage
      */
-    private $capabilityUsage;
+    private CapabilityUsage $capabilityUsage;
 
 
     /**
      * The scheme via which the capability is marked. This controls how the
      * overall mark for the capability is validated and rendered.
-     *
-     * TODO this belongs on the capability usage, not the capability
-     *
-     * @var IMarkScheme
      */
-    private $markScheme;
+    private IMarkScheme $markScheme;
 
 
     /**
@@ -47,7 +44,13 @@ class CapabilityMark
      *
      * @var GenericCollection|IndicatorMark[]
      */
-    private $indicatorMarks;
+    private GenericCollection $indicatorMarks;
+
+
+    /**
+     * The human-readable mark value given for this capability mark.
+     */
+    private ?string $humanReadableValue;
 
 
     /**
@@ -57,9 +60,10 @@ class CapabilityMark
      * max mark, or the mark scheme: it is instead out of the capability
      * usage's maximum value based on its indicators.
      *
-     * @var float|null
+     * For example: if the percentage mark is 50%, and the capability usage's
+     * max mark is 12, then this value should be 6.
      */
-    private $value;
+    private ?float $value;
 
 
     /**
@@ -73,6 +77,26 @@ class CapabilityMark
         $this->capabilityUsage = $capabilityUsage;
         $this->markScheme      = $markScheme;
         $this->indicatorMarks  = new GenericCollection(IndicatorMark::class);
+    }
+
+
+    /**
+     * Calculates what `$this->value` should be, given a candidate value for
+     * `$this->humanReadableValue`.
+     *
+     * @param string|null $humanReadableValue
+     * @return float|null
+     */
+    public function calculateValueFromHumanReadableValue(?string $humanReadableValue): ?float
+    {
+        if (!isset($humanReadableValue)) {
+            return null;
+        }
+        $normalisedMark = $this->markScheme->getNormalisedMark($humanReadableValue);
+        if (!isset($normalisedMark)) {
+            return null;
+        }
+        return $normalisedMark / 100 * $this->capabilityUsage->getMaxValue();
     }
 
 
@@ -118,7 +142,7 @@ class CapabilityMark
     public function getIndicatorMarkSumScaled()
     {
         $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
-        $rowMaxSum = $this->capabilityUsage->calculateMaxValueFromIndicators();
+        $rowMaxSum          = $this->capabilityUsage->calculateMaxValueFromIndicators();
         return $this->markScheme->getValueForJS($this->calculateIndicatorMarkSum(), $maxCapabilityValue, $rowMaxSum);
     }
 
@@ -134,18 +158,8 @@ class CapabilityMark
             return null;
         }
         $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
-        $normMark = $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
+        $normMark           = $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
         return round($normMark, self::PRECISION);
-    }
-
-    /**
-     * Render the capability's mark in human-readable format.
-     *
-     * @return null|string
-     */
-    public function retrieveHumanReadableMark(): ?string
-    {
-        return $this->markScheme->getHumanReadableMark($this->retrieveNormalizedMark());
     }
 
 
@@ -217,6 +231,26 @@ class CapabilityMark
     public function setIndicatorMarks(GenericCollection $indicatorMarks): self
     {
         $this->indicatorMarks = $indicatorMarks;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getHumanReadableValue(): ?string
+    {
+        return $this->humanReadableValue;
+    }
+
+
+    /**
+     * @param string|null $humanReadableValue
+     * @return $this
+     */
+    public function setHumanReadableValue(?string $humanReadableValue): self
+    {
+        $this->humanReadableValue = $humanReadableValue;
         return $this;
     }
 

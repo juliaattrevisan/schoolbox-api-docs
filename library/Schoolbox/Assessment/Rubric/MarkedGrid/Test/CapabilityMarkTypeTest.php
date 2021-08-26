@@ -37,7 +37,7 @@ class CapabilityMarkTypeTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validCapabilityMarkType
+     * @dataProvider providerValidCapabilityMarkType
      * @param MarkType                    $dueWorkMarkType
      * @param MarkType                    $capabilityMarkType
      * @param GradeLevel\Group\Model|null $capabilityGradeGroup
@@ -88,7 +88,7 @@ class CapabilityMarkTypeTest extends TestCase
      *
      * @return array
      */
-    public function provider_validCapabilityMarkType(): array
+    public function providerValidCapabilityMarkType(): array
     {
         $markTypeNone = (new MarkType())->setId(MarkType::TYPE_NONE)->setSlug(MarkType::SLUG_NONE);
         $markTypeTotal = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);
@@ -230,14 +230,15 @@ class CapabilityMarkTypeTest extends TestCase
              */
             $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($dueWork, $capabilityUsage->getMaxValue());
 
-            // Mark-per-capability?
             // Use the actual input value (which may be null) instead of the
             // calculated mark.
-            $capabilityValue = $markedGrid->getGrid()->isMarkPerCapability() ? $capabilityMark->getValue() : $capabilityMark->calculateScaledMark();
+            $capabilityValue = $markedGrid->getGrid()->isMarkPerCapability()
+                ? $capabilityMark->getValue()
+                : $capabilityMark->calculateScaledMark();
 
-            $stack[] = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
-                ->setValue($capabilityValue)
-                ->retrieveHumanReadableMark();
+            $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
+                ->setValue($capabilityValue);
+            $stack[] = $capabilityMarkScheme->getHumanReadableMark($capabilityMark->retrieveNormalizedMark());
         }
 
         return $stack;

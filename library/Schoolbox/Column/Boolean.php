@@ -13,6 +13,8 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\Mapper;
+
 class Boolean implements IColumnType
 {
     protected function isBoolean($value)
@@ -26,11 +28,21 @@ class Boolean implements IColumnType
         return $value ? true : false;
     }
 
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return bool
+     */
     public function hydrate($value, $mapper = null)
     {
         return $this->isBoolean($value);
     }
 
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return int
+     */
     public function dehydrate($value, $mapper = null)
     {
         return $this->isBoolean($value) ? 1 : 0;

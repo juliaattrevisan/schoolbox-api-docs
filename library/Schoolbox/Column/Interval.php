@@ -23,7 +23,7 @@ class Interval implements IColumnType
      * @param string            $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return IntervalObject
+     * @return IntervalObject|null
      */
     public function hydrate($value, $mapper = null)
     {
@@ -40,7 +40,7 @@ class Interval implements IColumnType
      * @param IntervalObject|DateInterval|int|string $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return null|int
+     * @return int|null
      */
     public function dehydrate($value, $mapper = null)
     {

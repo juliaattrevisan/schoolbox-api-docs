@@ -13,13 +13,20 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\Mapper;
+
 class Integer implements IColumnType
 {
+    /**
+     * Convert this value to an integer.
+     *
+     * @param mixed $value
+     * @return int|null
+     */
     protected function convert($value)
     {
         if (is_numeric($value)) {
-            //
-            // Is this a
+            // Does this have decimal places? If so convert to float then int
             if (preg_match('/\\./', $value)) {
                 return intval(floatval($value));
             }
@@ -28,11 +35,21 @@ class Integer implements IColumnType
         return null;
     }
 
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return int|null
+     */
     public function hydrate($value, $mapper = null)
     {
         return $this->convert($value);
     }
 
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return int|null
+     */
     public function dehydrate($value, $mapper = null)
     {
         return $this->convert($value);

@@ -41,14 +41,13 @@ class Datetime implements IColumnType
 
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @param \Schoolbox\Mapper $mapper
      *
      * @return Alaress_Date_Format
      */
     public function hydrate($value, $mapper = null)
     {
-
         if (!isset($value) || static::ZERO_VALUE === $value) {
             return new \Alaress_Date_NullDate();
         }
@@ -68,7 +67,7 @@ class Datetime implements IColumnType
      * @param mixed $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return string
+     * @return string|null
      */
     public function dehydrate($value, $mapper = null)
     {

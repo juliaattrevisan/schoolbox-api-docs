@@ -721,6 +721,7 @@ class DataSource
                 $capabilityUsage->getMaxValue()
             );
             $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
+                ->setHumanReadableValue($capabilityMarkModel->getHumanReadableValue())
                 ->setValue($capabilityMarkModel->getValue());
 
             // Associate indicator mark models with indicator marks
@@ -800,6 +801,7 @@ class DataSource
                 ->setSubmissionReturn($returnedWork)
                 ->setCapability($capabilityModel)
                 ->setValue($capabilityMark->getValue())
+                ->setHumanReadableValue($capabilityMark->getHumanReadableValue())
                 ->setValid(true);
 
 
@@ -1188,9 +1190,8 @@ class DataSource
 
 
         // Collate the selected descriptor values into longitudinal array
-        $longitude         = [];
-        $assessmentList    = [];
-        $markSchemeFactory = new MarkSchemeFactory();
+        $longitude      = [];
+        $assessmentList = [];
 
         while ($row = $capabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
             $longitude[$row['capability_id']]['name']                                                                  = $row['capability_name'];
@@ -1233,6 +1234,7 @@ class DataSource
                     a.due_date,
                     rim.value,
                     rcm.value AS capability_value,
+                    rcm.human_readable_value AS capability_human_readable_value,
                     rd.description,
                     rl.name AS level
                 FROM       rubric_indicator_mark  rim
@@ -1257,10 +1259,7 @@ class DataSource
                     && $row['capability_value'] !== null
                     && isset($dueWorks[$row['assessment_id']])
                 ) {
-                    $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $markSchemeFactory->spawnForCapability(
-                        $dueWorks[$row['assessment_id']],
-                        $longitude[$row['capability_id']]['max_value'][$row['assessment_id']]
-                    )->getHumanReadableMark(($row['capability_value'] / $longitude[$row['capability_id']]['max_value'][$row['assessment_id']]) * 100);
+                    $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $row['capability_human_readable_value'];
                 }
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']]['descriptor'] = $row['description'];
                 $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']]['level']      = $row['level'];

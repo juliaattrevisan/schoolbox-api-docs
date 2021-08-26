@@ -11,6 +11,8 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\Mapper;
+
 class Base implements IColumnType
 {
     /**
@@ -33,12 +35,22 @@ class Base implements IColumnType
      */
     public const LONGTEXT_MAX_LENGTH = 4294967295;
 
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return mixed
+     */
     public function hydrate($value, $mapper = null)
     {
         return $value;
     }
 
 
+    /**
+     * @param mixed $value
+     * @param Mapper $mapper
+     * @return string|null
+     */
     public function dehydrate($value, $mapper = null)
     {
         // ensure data going into the database (or rabbit, or redis) is UTF-8 friendly
