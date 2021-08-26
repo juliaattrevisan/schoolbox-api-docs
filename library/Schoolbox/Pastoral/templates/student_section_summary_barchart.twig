@@ -6,7 +6,8 @@
 
         Highcharts.chart('graph-countSummaryByMonth-{{ student.id }}', {
             chart: {
-                type: 'bar'
+                type: 'column',
+                height: 200
             },
             title: {
                 text: ''
@@ -20,7 +21,7 @@
             },
             yAxis: {
                 min: 0,
-                tickInterval: 1,
+                allowDecimals: false,
                 title: {
                     text: ''
                 }
@@ -41,7 +42,7 @@
     });
 </script>
 
-<div class="small-6 island">
+<div class="small-12 large-6 island">
     <section class="no-pad">
         <div id="graph-countSummaryByMonth-{{ student.id }}"></div>
     </section>
