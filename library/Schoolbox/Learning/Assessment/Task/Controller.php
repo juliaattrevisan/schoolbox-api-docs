@@ -154,27 +154,10 @@ class Controller extends Assessment\Controller
     public function getSummary(IAssessable $assessment, User $student): void
     {
 
-        /* Check whether SEB was required
+        /* Check if this assessment has a SEB requirement
+         * If it does, send you to the download screen
          */
-        $sebCheckPasses = (new Assessment\ValidSebCheck())->isSatisfiedBy(
-            $this->getUser(),
-            $assessment->getSebEnabled(),
-            $this->getRequest()->server->getArrayCopy(),
-
-            /* Don't worry about the Browser Exam Key for now
-             * We need to generate some platform-specific crypto for it
-             */
-            'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
-
-            /* Generate a config key hash from the xml that guards this assessment url
-             */
-            (new SebPayload(
-                $this->getRequest()->server->get('HTTP_HOST'),
-                $this->router
-            ))->generateConfigKey($assessment)
-        );
-
-        if (!$sebCheckPasses) {
+        if (!$this->isSebCheckPasses($assessment)) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload', [
                 'assessmentId' => $assessment->getId()
             ]));

@@ -168,6 +168,42 @@ class ListController extends Web\Controller\Base
 
 
     /**
+     * SEB Safe Exam Browser check
+     *
+     * Check whether $assessment is protected by seb and if so, decide if you are
+     * allowed to get in. If seb wasn't required, then it lets you through anyway.
+     *
+     * Seb is only enforced upon student roletype
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     * @throws RouteNotFound
+     */
+    public function isSebCheckPasses(IAssessable $assessment): bool
+    {
+        /* Check whether SEB was required
+         */
+        return (new \Schoolbox\Learning\Assessment\ValidSebCheck())->isSatisfiedBy(
+            $this->getUser(),
+            $assessment->getSebEnabled(),
+            $this->getRequest()->server->getArrayCopy(),
+
+            /* Don't worry about the Browser Exam Key for now
+             * We need to generate some platform-specific crypto for it
+             */
+            'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
+
+            /* Generate a config key hash from the xml that guards this assessment url
+             */
+            (new SebPayload(
+                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->router
+            ))->generateConfigKey($assessment)
+        );
+    }
+
+
+    /**
      * Retrieve a list of assessments that exist, by context
      *
      * NOTE: this is a debug route that is only available to supers, so don't go referencing this route in twigs...
