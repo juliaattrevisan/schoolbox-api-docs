@@ -121,7 +121,7 @@
                                             marker: {
                                                 radius: 6
                                             },
-                                            data: [(Number)("{{ workItem.mark }}")],
+                                            data: [{{ (workItem.mark == null or workItem.mark == '') ? null : (workItem.mark|number_format) }}],
                                             tooltip: {
                                                 headerFormat: '',
                                                 borderColor: '#000000',
