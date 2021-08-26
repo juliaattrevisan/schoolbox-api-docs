@@ -9,10 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Textbox;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
 use Component_Instance;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder;
+use Scrub;
 
 /**
  * Controller for textbox actions.
@@ -50,9 +53,9 @@ class Controller extends Base
      * @api   POST /textbox/folder/{folderId}
      * @since 20.1
      *
-     * @param FolderModel $folder
+     * @param Folder\Model $folder
      */
-    public function createTextboxInFolder(FolderModel $folder): void
+    public function createTextboxInFolder(Folder\Model $folder): void
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
@@ -67,10 +70,10 @@ class Controller extends Base
      * @api   POST /textbox/folder/{folderId}/component/{componentId}
      * @since 20.1
      *
-     * @param FolderModel        $folder
+     * @param Folder\Model        $folder
      * @param Component_Instance $component
      */
-    public function createTextboxInFolderAndComponent(FolderModel $folder, Component_Instance $component): void
+    public function createTextboxInFolderAndComponent(Folder\Model $folder, Component_Instance $component): void
     {
         $model = $this->persistTextbox($this->mapper->createModel()->setCategory($folder));
         $this->mapper->save($model);
@@ -145,40 +148,77 @@ class Controller extends Base
 
 
     /**
-     * A list of all the textboxes that exist in $folderId
-     * Also get an index of their usages
+     * Display the form for modifying textboxed in this folder.
      *
-     * @api GET /textbox/folder/{id}
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * This no longer contains the textbox's usage: that is loaded separately in
+     * `getUsageForFolder`.
+     *
+     * @api GET /textbox/folder/{folderId}
+     * @param Folder\Model $folder
      */
-    public function getIndexForFolder(\Schoolbox\Resource\Folder\Model $folder): void
+    public function getIndexForFolder(Folder\Model $folder): void
     {
         $allBreadcrumbs = [
             [$folder->getNameWithCodes(), "/homepage/{$folder->getId()}"],
             ['Text Boxes', null]
         ];
 
-        /* Textbox usage data struct
-         */
-        $usages = $this->mapper->findUsage($folder->getId());
-
         $this->response->content->set($this->buildHtmlOutput('@textbox/index.twig', [
-            'folder' => $folder,
+            'folder'         => $folder,
             'allBreadcrumbs' => $allBreadcrumbs,
-            'usages' => $usages,
         ]));
+    }
+
+
+    /**
+     * Output textbox usage for this folder, as a JSON response.
+     *
+     * @api GET /textbox/folder/{folderId}/usage
+     * @since 21.1
+     *
+     * @param Folder\Model $folder
+     */
+    public function getUsageForFolder(Folder\Model $folder): void
+    {
+        // Convert `$usages` to an array structure
+        $translateFolder  = new Folder\Translator\ModelToArray\LinkOnly();
+        $translateTextbox = new Translator\ModelToArray(
+            $translateFolder,
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            new ScrubAdapter()
+        );
+
+        $usages = [];
+        foreach ($this->mapper->findUsage($folder->getId()) as $usage) {
+            /** @var Model $textbox */
+            $textbox = $usage['textbox'];
+
+            /** @var GenericCollection|Folder\Model[] $folders */
+            $folders  = $usage['folders'] ?? new GenericCollection(Folder\Model::class);
+            $usages[] = [
+                'dashboards' => array_values($usage['dashboards'] ?? []),
+                'folders'    => $folders->map($translateFolder),
+                'textbox'    => $translateTextbox($textbox),
+            ];
+        }
+
+        $this->response->content->set(
+            $this->buildJsonOutput($usages)
+        );
     }
 
 
     /**
      * Mass rename textboxes from a set of (textboxId, name) tuples
      *
-     * @param FolderModel $folder
+     * @param Folder\Model $folder
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function postRename(\Schoolbox\Resource\Folder\Model $folder): void
+    public function postRename(Folder\Model $folder): void
     {
         $tuples = $this->getRequest()->post['textbox'] ?? [];
 
