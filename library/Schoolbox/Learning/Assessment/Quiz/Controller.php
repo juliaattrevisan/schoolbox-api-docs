@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -187,11 +188,20 @@ class Controller extends Assessment\Controller
          */
         $sebCheckPasses = (new Assessment\ValidSebCheck())->isSatisfiedBy(
             $this->getUser(),
-            'https://' . $this->getRequest()->server->get('HTTP_HOST') . $this->getRequest()->server->get('REQUEST_URI'),
             $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),
+
+            /* Don't worry about the Browser Exam Key for now
+             * We need to generate some platform-specific crypto for it
+             */
             'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
-            'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f'
+
+            /* Generate a config key hash from the xml that guards this assessment url
+             */
+            (new SebPayload(
+                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->router
+            ))->generateConfigKey($assessment)
         );
 
         if (!$sebCheckPasses) {

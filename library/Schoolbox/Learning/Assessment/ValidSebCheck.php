@@ -25,7 +25,6 @@ class ValidSebCheck
      * that SEB Safe Exam Browser expects to find.
      *
      * @param User   $user
-     * @param string $startUrl
      * @param bool   $sebEnabled
      * @param array  $serverSuperglobal
      * @param string $browserExamKey
@@ -34,7 +33,6 @@ class ValidSebCheck
      */
     public function isSatisfiedBy(
         User $user,
-        string $startUrl,
         bool $sebEnabled,
         array $serverSuperglobal,
         string $browserExamKey,
@@ -56,6 +54,12 @@ class ValidSebCheck
         /* Otherwise check whether the two superglobal keys exist
          */
         if (isset($serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'], $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'])) {
+            /* Calculate the absolute start url
+             * This is part of the configuration xml, in the startUrl node
+             * It is different per assessment and changes the config hash accordingly
+             */
+            $startUrl = 'https://' . $serverSuperglobal['HTTP_HOST'] . $serverSuperglobal['REQUEST_URI'];
+
             /* Both keys that were transmitted by the browser must match
              * the values we expected to receive
              *
