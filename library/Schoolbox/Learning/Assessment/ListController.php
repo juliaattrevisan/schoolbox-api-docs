@@ -179,11 +179,11 @@ class ListController extends Web\Controller\Base
      * @return bool
      * @throws RouteNotFound
      */
-    public function isSebCheckPasses(IAssessable $assessment): bool
+    protected function isSebCheckPasses(IAssessable $assessment): bool
     {
         /* Check whether SEB was required
          */
-        return (new \Schoolbox\Learning\Assessment\ValidSebCheck())->isSatisfiedBy(
+        return (new ValidSebCheck())->isSatisfiedBy(
             $this->getUser(),
             $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),
