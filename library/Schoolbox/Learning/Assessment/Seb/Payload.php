@@ -62,7 +62,9 @@ class Payload
     private Router $router;
 
 
-    /** A random 4 character unicode string to replace backslashes during json_encode. */
+    /**
+     * A random 4 character unicode string to replace backslashes during json_encode.
+     */
     private const BACKSLASH_SUBSTITUTE = "ؼҷҍԴ";
 
 
@@ -204,7 +206,7 @@ class Payload
      * This will mutate the PList.
      * @param \Iterator $root The root element of the PList. Must be a dictionary or array.
      */
-    private function preparePlistForJsonEncoding($root)
+    private function preparePlistForJsonEncoding(\Iterator $root): void
     {
         $this->plistMap(function ($value, $key, $parent) {
             // Convert date to ISO 8601 if date object.
@@ -243,7 +245,7 @@ class Payload
      * @param \Iterator $root The root element of the PList. Must be a dictionary or array.
      * @param bool $recursive Whether the function should traverse dicts and arrays recursively.
      */
-    private function plistMap(callable $callback, \Iterator $root, bool $recursive = true)
+    private function plistMap(callable $callback, \Iterator $root, bool $recursive = true): void
     {
         $root->rewind();
         while ($root->valid()) {
@@ -271,11 +273,11 @@ class Payload
      * @param array $array Top level array to process.
      * @return array Processed array.
      */
-    private function arraySort(array $array)
+    private function arraySort(array $array): array
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $array[$key] = $this->arraySort($array[$key]);
+                $array[$key] = $this->arraySort($value);
             }
         }
         // Sort assoc array. From SEB docs:
@@ -306,7 +308,7 @@ class Payload
      * @param array $array Array to check.
      * @return bool False if not associative.
      */
-    private function isAssociativeArray(array $array)
+    private function isAssociativeArray(array $array): bool
     {
         if (empty($array)) {
             return false;
