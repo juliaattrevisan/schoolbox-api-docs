@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
@@ -169,7 +170,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ];
         if (
             ($isClassPage || $isGroupPage)
-            && $this->getConfigLoader()->get('badges_enabled')
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED)
             && $authorizer->isPathAuthorizedForUser('learningBadgeAward.getListPage', $badgeReportParams, $this->getUser())
         ) {
             $this->setVar(
