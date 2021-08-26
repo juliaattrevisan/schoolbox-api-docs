@@ -56,11 +56,6 @@ class Controller extends Base
     private $internalDb;
 
     /**
-     * @var GradeGroup\Mapper
-     */
-    private $gradeGroupMapper;
-
-    /**
      * Data source for group lists
      *
      * @var UserAccessMapper
@@ -90,7 +85,6 @@ class Controller extends Base
      * Constructor
      *
      * @param IConnector                         $internalDb
-     * @param GradeGroup\Mapper                  $gradeGroupMapper
      * @param UserAccessMapper                   $userAccessMapper
      * @param Filter\IFactoryFactory             $filterFactoryFactory
      * @param Filter\Selection\Mapper            $filterSelectionMapper
@@ -100,7 +94,6 @@ class Controller extends Base
      */
     public function __construct(
         IConnector $internalDb,
-        GradeGroup\Mapper $gradeGroupMapper,
         UserAccessMapper $userAccessMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Selection\Mapper $filterSelectionMapper,
@@ -109,7 +102,6 @@ class Controller extends Base
         Translator $translator
     ) {
         $this->internalDb            = $internalDb;
-        $this->gradeGroupMapper      = $gradeGroupMapper;
         $this->userAccessMapper      = $userAccessMapper;
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterSelectionMapper = $filterSelectionMapper;
