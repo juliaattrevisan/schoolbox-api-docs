@@ -8,7 +8,7 @@ If you've been following along thus far, your `UserList` component should have t
         Vue components must have exactly one node directly inside the <em>template</em> node itself.
 
         <ul>
-            <li v-for="(user, index) in this.payload" :key="index">
+            <li v-for="(user, index) in payload" :key="index">
                 {{ payloadSize }} {{ user.fullname }} {{ user.role }} {{ nameLength(user.fullname) }}
             </li>
         </ul>
@@ -31,13 +31,6 @@ In `library/Schoolbox/Greenhouse/templates`, create a new file `single-user.vue`
 export default {
 
     /**
-     * Name.
-     * The name of the component that we have here. This name will be used in the container
-     * to spawn this component.
-     */
-    name: 'single-user',
-
-    /**
      * Components.
      * Any other vue components you also want to use here; they must already be imported
      * at the top of the file.
@@ -57,6 +50,14 @@ export default {
     mixins: [],
 
     /**
+     * Directives
+     * Register your own custom directives
+     * https://vuejs.org/v2/guide/custom-directive.html
+     *
+     */
+    directives: {},
+
+    /**
      * Props.
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
@@ -64,12 +65,30 @@ export default {
      *
      */
     props: {
-        fullname: String,
-        firstname: String,
-        lastname: String,
-        role: String,
-        route: String,
-        nameLength: Number
+        fullname: {
+            type: String,
+            required: true
+        }
+        firstname: {
+            type: String,
+            required: true
+        }
+        lastname: {
+            type: String,
+            required: true
+        }
+        role: {
+            type: String,
+            required: true
+        }
+        route: {
+            type: String,
+            required: true
+        }
+        nameLength: {
+            type: Number,
+            required: true
+        }
     },
 
     /**
@@ -78,7 +97,7 @@ export default {
      * Note that v-if and v-for must never be on the same node together, as this overrides
      * the meaning of "this" in a way you don't expect.
      */
-    data() {
+    data () {
         return {
             isLoaded: false
         }
@@ -91,26 +110,6 @@ export default {
      *
      */
     computed: {
-
-    },
-
-    /**
-     * Filters
-     * Define filters that can be used to apply common text formatting.
-     * https://vuejs.org/v2/guide/filters.html
-     *
-     */
-    filters: {
-
-    },
-
-    /**
-     * Directives
-     * Register your own custom directives
-     * https://vuejs.org/v2/guide/custom-directive.html
-     *
-     */
-    directives: {
 
     },
 
@@ -133,7 +132,7 @@ export default {
      * see https://vuejs.org/v2/guide/instance.html#Lifecycle-Diagram for reference
      *
      */
-    mounted() {
+    mounted () {
 
     },
 
@@ -207,12 +206,12 @@ Now we can make the subcomponent render out in a nice format. Inside `single-use
 <template>
     <div>
         <div class="card small-12">
-            <a :href="this.route" title="View Profile">
+            <a :href="route" title="View Profile">
                 <img src="/portrait.php?id=230&size=square64" alt="View Profile" />
-                <p>{{ this.firstname }} {{ this.lastname }}</p>
+                <p>{{ firstname }} {{ lastname }}</p>
             </a>
-            <p class="meta">{{ this.nameLength }}</p>
-            <p class="meta">{{ this.role }}</p>
+            <p class="meta">{{ nameLength }}</p>
+            <p class="meta">{{ role }}</p>
         </div>
     </div>
 </template>
@@ -225,3 +224,5 @@ This `single-user.vue` subcomponent can be imported into any other place and use
 > You can, of course, embellish the output with `computed()` and `methods()` as required.
 
 > There's a special vue syntax for using vars in html attributes, like that anchor tag.
+
+[Async Payload](07-async-payload.md)

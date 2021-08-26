@@ -40,3 +40,5 @@ And in the Aura module's `templates` folder, add a twig file `container.twig`.
 ```
 
 Then you can visit `https://vagrant.dev.schoolbox.cloud/greenhouse` to see it in action.
+
+[Setup Entry](02-setup-entry.md)

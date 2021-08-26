@@ -191,8 +191,6 @@ export default {
 
 ```
 
-This is the guts of a vue component. Note that the `name` node is called `user-list` which is how we'll write html to use a Vue component. For now, just read the docblocks; they describe in super simple terms what each part is meant to do.
-
 > Vue components' html template must have exactly one parent node. It'll crash out if you try to do otherwise so don't worry if you forget - npm will remind you.
 
 ### 2.1.4 npm run build
@@ -227,3 +225,5 @@ Vue components must have exactly one node directly inside the template node itse
 ```
 
 You're on the way!
+
+[Payload](03-payload.md)
