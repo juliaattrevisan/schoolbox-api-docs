@@ -165,16 +165,17 @@
      */
     $.alaressEditorConfigForComments = function (overrideConfig = {}) {
         const config = {
-            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed',
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
             toolbarGroups: [
-                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                {name: 'insert', groups: ['insert']},
-                {name: 'schoolbox', groups: ['schoolboxlink']},
+                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
+                { name: 'insert', groups: ['insert'] },
+                { name: 'schoolbox', groups: ['schoolboxlink'] },
             ],
             height: '4rem',
             resize_enabled: false,
+            toolbarCanCollapse: false,
             ...overrideConfig
         }
         return init(config);
