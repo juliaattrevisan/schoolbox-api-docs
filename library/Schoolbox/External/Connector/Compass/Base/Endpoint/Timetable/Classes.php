@@ -339,8 +339,8 @@ class Classes implements IStrategy
         // A timetable class period has only one teacher:
         // just assign the first teacher in the list as the period's teacher.
         $teachers = $class['teachers'];
-        $primaryTeacher = array_shift($teachers);
-        $teacherExternalId = $primaryTeacher['externalId'] ?? null;
+        $mainTeacher = array_shift($teachers);
+        $teacherExternalId = $mainTeacher['externalId'] ?? null;
 
 
         /* Throw warning, but assign them anyway
@@ -355,14 +355,14 @@ class Classes implements IStrategy
         }
 
         $teacherDetails = $users[$teacherExternalId] ?? null;
-        $primaryTeacher['firstname'] = $teacherDetails['firstname'] ?? 'Unknown';
-        $primaryTeacher['surname']   = $teacherDetails['lastname'] ?? 'User';
+        $mainTeacher['firstname'] = $teacherDetails['firstname'] ?? 'Unknown';
+        $mainTeacher['surname']   = $teacherDetails['lastname'] ?? 'User';
         $timetableClassPeriod->setTeacher($teacherExternalId);
 
         $this->log->info(sprintf(
             'Creating class period relation for teacher %s %s in room %s',
-            $primaryTeacher['firstname'],
-            $primaryTeacher['surname'],
+            $mainTeacher['firstname'],
+            $mainTeacher['surname'],
             $class['room']['name']
         ));
 
