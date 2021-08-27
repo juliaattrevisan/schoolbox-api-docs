@@ -2,12 +2,23 @@
 
 import axios from 'axios';
 import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
 
 const EVENT_ADD_TEXTBOX = 'textbox-list-add';
 
 export default {
     name: 'textbox-list',
-    components: {Toast},
+
+    /**
+     * Components.
+     * Any other vue components you also want to use here; they must already be imported
+     * at the top of the file.
+     */
+    components: {
+        RevealModal,
+        Toast
+    },
+
     props: {
         /**
          * Endpoint for fetching textbox usages.
@@ -57,6 +68,13 @@ export default {
             showSkeletonLoader: true,
             validator: null,
             saveInProgress: false,
+
+            /* When you click the Delete link, remember its url
+             * A singleton modal spawns and uses this as its confirmation button destination
+             * Because of the way the reveal-modal works, you don't pass it an arg
+             */
+            textboxUrlToDelete: undefined,
+            isProcessActive: false,
         }
     },
     mounted() {
@@ -99,15 +117,6 @@ export default {
             })
         },
 
-        /**
-         * Deletes a textbox from the list of textboxes.
-         *
-         * Currently this only hides the textbox from view, it does not remove
-         * it because `$index` might be reused by another textbox.
-         */
-        deleteTextbox(index) {
-            this.$set(this.textboxes[index], 'deleted', true);
-        },
 
         /**
          * Does this textbox usage record contain a usage for this component's
@@ -244,6 +253,55 @@ export default {
                 let editor = this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'];
                 this.textboxes[index].textbox.body = editor.getData();
             });
+        },
+
+        /**
+         * Open the Delete Textbox confirmDialog equivalent
+         *
+         * @param url string
+         */
+        showDeleteModal (url) {
+            this.textboxUrlToDelete = url;
+            this.$refs.deleteModal.open();
+        },
+
+        /**
+         * Asynchronously access an endpoint to delete a file from the appropriate place
+         */
+        async deleteTextbox () {
+
+            /* Set the loading flag to prevent people spamming the button
+             */
+            this.isProcessActive = true;
+
+            this.$refs.toast.activate('Deleting text box...');
+
+            try {
+
+                /* Asynchronously access the endpoint to delete the thing
+                */
+                await axios.delete(this.textboxUrlToDelete);
+
+                /* Remove the element from the allData stack
+                 */
+                this.textboxes = this.textboxes.filter((item) => item.textbox._links.delete !== this.textboxUrlToDelete);
+
+                /* Shut the modal
+                 */
+                this.$refs.deleteModal.close();
+
+                /* Toast (though I prefer our twig toast until a better replacement comes along)
+                 */
+                this.$refs.toast.timeout('Text box deleted', true);
+                this.isProcessActive = false;
+
+            } catch (error) {
+
+                /* Deal with error case
+                 */
+                this.$refs.toast.timeout('Unable to delete text box', false);
+                this.isProcessActive = false;
+            }
         }
     },
     computed: {
@@ -305,7 +363,7 @@ export default {
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-delete" href="#" @click.prevent="deleteTextbox(index)" title="Delete"></a>
+                                    <a class="icon-delete" href="#" @click.prevent="showDeleteModal(usage.textbox._links.delete)" title="Delete"></a>
                                 </nav>
                             </div>
                             <div :class="{'actions-small-1': true, 'hide': Boolean(usage.textbox.id)}"
@@ -324,11 +382,20 @@ export default {
             </section>
             <div class="empty-state" v-if="undeletedTextboxes.length === 0">
                 <i class="icon-textbox"></i>
-                <p>No textboxes currently exist on this page.</p>
+                <p>No text boxes currently exist on this page.</p>
             </div>
         </template>
 
         <input type="submit" ref="saveButton" value="Save all" :disabled="saveInProgress" />
         <toast ref="toast"></toast>
+
+        <reveal-modal ref="deleteModal">
+            <h2>Please confirm</h2>
+            <p>Are you sure you want to delete this text box?</p>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="deleteTextbox" class="button submit" id="usage-textbox-delete-button" :disabled="isProcessActive">Delete</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="usage-textbox-cancel-button" :disabled="isProcessActive">Cancel</a></li>
+            </ul>
+        </reveal-modal>
     </form>
 </template>
