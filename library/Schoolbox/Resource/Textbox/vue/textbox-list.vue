@@ -261,17 +261,21 @@ export default {
 </script>
 <template>
     <form method="post" ref="form" :action="postChangesEndpoint">
-        <section>
-            <ul class="information-list" v-if="showSkeletonLoader">
-                <li class="row" v-for="n in 3" :key="n">
-                    <div class="small-12 card skeleton">
-                        <div class="img"></div>
-                        <h3></h3>
-                        <p class="meta"></p>
-                    </div>
-                </li>
-            </ul>
-            <template v-else>
+        <template v-if="showSkeletonLoader">
+            <section>
+                <ul class="information-list">
+                    <li class="row" v-for="n in 3" :key="n">
+                        <div class="small-12 card skeleton">
+                            <div class="img"></div>
+                            <h3></h3>
+                            <p class="meta"></p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </template>
+        <template v-else>
+            <section>
                 <ul class="information-list unsortable expandable-card">
                     <template v-for="(usage, index) in textboxes">
                         <li v-if="usage.deleted !== true">
@@ -317,13 +321,13 @@ export default {
                         </li>
                     </template>
                 </ul>
+            </section>
+            <div class="empty-state" v-if="undeletedTextboxes.length === 0">
+                <i class="icon-textbox"></i>
+                <p>No textboxes currently exist on this page.</p>
+            </div>
+        </template>
 
-                <div class="empty-state" v-if="undeletedTextboxes.length === 0">
-                    <i class="icon-textbox"></i>
-                    <p>No textboxes currently exist on this page.</p>
-                </div>
-            </template>
-        </section>
         <input type="submit" ref="saveButton" value="Save all" :disabled="saveInProgress" />
         <toast ref="toast"></toast>
     </form>
