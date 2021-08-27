@@ -12,6 +12,7 @@ import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
+import RecordDeviceOptions from '@vue/components/videojs-record/record-device-options';
 import RecordedMedia from '@vue/components/videojs-record/recorded-media';
 import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
 import { getRecordCameraOptions } from '@js/videojs/videojsOptions';
