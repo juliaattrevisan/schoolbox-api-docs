@@ -2,7 +2,7 @@
 import MediaArticle   from '@vue/components/media-article';
 import Storage        from '@vue/components/storage';
 import RelativeTime   from '@schoolboxLearningMomentEvidence/relative-time';
-import CommentThread  from './commentThread';
+import CommentThread  from './comment-thread';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 
 export default {
