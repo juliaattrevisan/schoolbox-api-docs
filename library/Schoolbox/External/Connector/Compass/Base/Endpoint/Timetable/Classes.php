@@ -142,7 +142,6 @@ class Classes implements IStrategy
          */
         $this->lookup->init();
 
-        $users   = $this->lookup->getUsers();
         $periods = $this->lookup->getPeriods();
 
         // Timetable: just use the Schedule again
@@ -190,7 +189,7 @@ class Classes implements IStrategy
                 /* Assemble the pieces
                  */
                 $timetableClass = $this->createTimetableClass($class);
-                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+                $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
 
                 /* Process students (and non-main teachers)
                  */
@@ -210,11 +209,6 @@ class Classes implements IStrategy
                             $timetableClass->getCode()
                         ));
                     }
-
-//                    $involvedUserDetails = $users[$involvedUser['externalId']] ?? null;
-//                    $involvedUser['firstname'] = $involvedUserDetails['firstname'] ?? 'Unknown';
-//                    $involvedUser['surname']   = $involvedUserDetails['lastname'] ?? 'User';
-
                     $this->createTimetableClassInvolvement($involvedUser, $timetableClass);
                 }
             }
@@ -287,7 +281,6 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class Period
      *
-     * @param array           $users
      * @param array           $class
      * @param string          $ext
      * @param TimetablePeriod $period
@@ -297,7 +290,7 @@ class Classes implements IStrategy
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
+    private function createTimetableClassPeriod(array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
@@ -354,9 +347,6 @@ class Classes implements IStrategy
             ));
         }
 
-//        $teacherDetails = $users[$teacherExternalId] ?? null;
-//        $mainTeacher['firstname'] = $teacherDetails['firstname'] ?? 'Unknown';
-//        $mainTeacher['surname']   = $teacherDetails['lastname'] ?? 'User';
         $timetableClassPeriod->setTeacher($teacherExternalId);
 
         $this->log->info(sprintf(
