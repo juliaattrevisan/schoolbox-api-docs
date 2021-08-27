@@ -1,7 +1,7 @@
 <script>
 
 import axios from 'axios';
-import Toast from '@schoolbox/toast';
+import Toast from '@vue/components/toast';
 
 const EVENT_ADD_TEXTBOX = 'textbox-list-add';
 

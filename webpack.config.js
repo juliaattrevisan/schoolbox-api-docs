@@ -178,7 +178,7 @@ module.exports = {
         checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
 
         // Textboxes
-        textboxList: './library/Schoolbox/Resource/Textbox/vue/init-textbox-list.js',
+        textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
 
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
