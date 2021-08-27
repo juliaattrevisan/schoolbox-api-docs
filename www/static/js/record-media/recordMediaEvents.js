@@ -5,6 +5,7 @@
 
 export default Object.freeze({
   DEVICE_READY: 'on-device-ready', //usually to update the height ratio of the media container to match the device
+  VIDEO_DEVICE_CHANGE: 'on-video-device-change', //to toggle between different video devices
   RECORDED_MEDIA_READY: 'on-recorded-media-ready', //to notify a media can be uploaded 
   RECORDED_MEDIA_DELETED: 'on-recorded-media-deleted', //to notify a media can be uploaded 
   RESIZE: 'on-resize', //can change between media
