@@ -55,6 +55,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, "manage_page", "manage_page_block");
         $this->setBlock($templateHandle, "stats_data", "stats_data_block");
         $this->setBlock($templateHandle, "addmylinks", "addmylinks_block");
+        $this->setBlock($templateHandle, "manage_textboxes", "manage_textboxes_block");
 
         // My links button
         $url = 'http://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . '/homepage/' . $this->getContext()->getId();
@@ -80,8 +81,15 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             //has write access
             $this->parse("stats_data_block", "stats_data");
+
+            /* Allow Manage Textboxes
+             */
+            $this->parse('manage_textboxes_block', 'manage_textboxes');
         } else {
-            $this->setVar("stats_data_block", "");
+            $this->setVar([
+                'stats_data_block' => '',
+                'manage_textboxes_block' => ''
+            ]);
         }
 
         // User subscription to groups.
