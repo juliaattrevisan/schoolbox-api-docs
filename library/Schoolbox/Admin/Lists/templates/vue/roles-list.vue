@@ -10,8 +10,8 @@ import { gsap } from 'gsap/all'
 import RolesListHeader from './roles-list-header';
 import RolesListPermissions from './roles-list-permissions';
 import RolesListRow from './roles-list-row';
-import Toast from '@schoolbox/toast';
-import RevealModal from '@schoolbox/reveal-modal';
+import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
 
 export default {
 

@@ -1,10 +1,10 @@
 <script>
 
 import axios from 'axios';
-import RevealModal from "@schoolbox/reveal-modal";
+import RevealModal from "@vue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
-import BadgeList from '../../vue/badgeList';
-import toastMixin from '@schoolbox/toast-mixin';
+import BadgeList from '../../vue/badge-list';
+import toastMixin from '@vue/components/toast-mixin';
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.

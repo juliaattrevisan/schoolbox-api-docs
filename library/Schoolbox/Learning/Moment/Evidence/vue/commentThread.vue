@@ -4,11 +4,11 @@ import Vue from 'vue';
 import axios  from 'axios';
 import moment from 'moment';
 
-import MediaArticle from '@schoolbox/media-article';
-import Storage from '@schoolbox/storage';
-import Toast from '@schoolbox/toast';
-import RevealModal from '@schoolbox/reveal-modal';
-import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
+import MediaArticle from '@vue/components/media-article';
+import Storage from '@vue/components/storage';
+import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
+import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 
 export default {
     components: {

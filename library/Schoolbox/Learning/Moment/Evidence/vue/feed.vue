@@ -3,16 +3,16 @@
 import axios  from 'axios';
 import moment from 'moment';
 
-import MediaArticle from '@schoolbox/media-article';
-import Storage      from '@schoolbox/storage';
+import MediaArticle from '@vue/components/media-article';
+import Storage      from '@vue/components/storage';
 import CommentThread from './commentThread';
-import RevealModal from "@schoolbox/reveal-modal";
-import Toast from "@schoolbox/toast";
+import RevealModal from "@vue/components/reveal-modal";
+import Toast from "@vue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
-import foundationMixin from "@schoolbox/foundation-mixin";
+import foundationMixin from "@vue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
-import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
+import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 
 export default {
     components: {

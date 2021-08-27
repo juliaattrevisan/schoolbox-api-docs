@@ -20,7 +20,7 @@
      * It's not well documented, but you can trawl through closed PRs to figger out how
      * https://github.com/sagalbot/vue-select/issues/994
      */
-    import Deselect from '@schoolbox/selectize/Deselect';
+    import Deselect from '@vue/components/selectize/Deselect';
     vSelect.props.components.default = () => ({ Deselect });
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019

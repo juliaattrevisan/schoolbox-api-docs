@@ -1,8 +1,8 @@
 <script>
 
-import RevealModal from '@schoolbox/reveal-modal'
-import MetaList    from '@schoolbox/meta/list'
-import MetaItem    from '@schoolbox/meta/item'
+import RevealModal from '@vue/components/reveal-modal'
+import MetaList    from '@vue/components/meta/list'
+import MetaItem    from '@vue/components/meta/item'
 
 const EVENT_VIEW_WEEK = 'eventViewWeek';
 

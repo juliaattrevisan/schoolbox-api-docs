@@ -1,9 +1,9 @@
 <script>
 import axios from "axios";
 import BadgeImage from './../../vue/badge-image';
-import RevealModal from '@schoolbox/reveal-modal'
+import RevealModal from '@vue/components/reveal-modal'
 import qs from 'qs';
-import toastMixin from '@schoolbox/toast-mixin';
+import toastMixin from '@vue/components/toast-mixin';
 
 export default {
 

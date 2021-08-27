@@ -1,5 +1,5 @@
 import Vue from "vue";
-import AwardList from './awardList';
+import AwardList from './award-list';
 
 Vue.component('award-list', AwardList);
 window.awardList = new Vue({

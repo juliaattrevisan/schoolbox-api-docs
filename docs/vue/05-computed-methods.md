@@ -9,8 +9,8 @@ Functionally there isn't any _real_ difference to these; they both execute a jav
 In `user-list.vue`, find the `computed` node and add this method:
 
 ```js
-payloadSize: function() {
-    return this.payload.length + ' and, randomly, this text';
+payloadSize () {
+    return `${this.payload.length} and, randomly, this text`;
 }
 ```
 
@@ -18,7 +18,7 @@ Note that `payloadSize` wasn't in our original data payload; it only exists as a
 
 ```html
 <ul>
-    <li v-for="(user, index) in this.payload" :key="index">
+    <li v-for="(user, index) in payload" :key="index">
         {{ payloadSize }} {{ user.fullname }} {{ user.role }}
     </li>
 </ul>
@@ -34,18 +34,20 @@ In this case, we'll an integer to show a user's fullname length to our `UserList
 
 ```js
 methods: {
-    nameLength: function(str) {
-        return str.length + ' chars long.';
+    nameLength (str) {
+        return `${str.length} chars long.`;
     }
 }
 ```
 
 ```html
 <ul>
-    <li v-for="(user, index) in this.payload" :key="index">
+    <li v-for="(user, index) in payload" :key="index">
         {{ payloadSize }} {{ user.fullname }} {{ user.role }} {{ nameLength(user.fullname) }}
     </li>
 </ul>
 ```
 
 > `methods()` is a good place to put functions that do things which aren't really about the `props` provided, like manipulating ui elements, asynchronous requests, etc.
+
+[Subcomponents](06-subcomponents.md)

@@ -55,7 +55,7 @@ And finally in `container.twig` we don't need to pass a payload data structure a
 We need to import the `axios` library at the top of `user-list.vue`,
 
 ```js
-import axios from "axios";
+import axios from 'axios';
 ```
 
 Then in `mounted()` (the Vue equivalent of window.onload), we need to set up a few things.
@@ -112,26 +112,22 @@ In `user-list.vue`,
 -   Show an element to tell people we're loading things
 
 ```html
-<template v-if="loading">
-    <div>
-        <h2>Loading data, wait</h2>
-    </div>
-</template>
-<template v-else>
-    <ul class="information-list">
-        <li v-for="(user, index) in this.allUsers" :key="index">
-            <user
-                :fullname="user.fullname"
-                :firstname="user.firstname"
-                :lastname="user.lastname"
-                :role="user.role"
-                :route="user.route"
-                :nameLength="nameLength(user.fullname)"
-            >
-            </user>
-        </li>
-    </ul>
-</template>
+<div v-if="loading">
+    <h2>Loading data, wait</h2>
+</div>
+<ul v-else class="information-list">
+    <li v-for="(user, index) in allUsers" :key="index">
+        <user
+            :fullname="user.fullname"
+            :firstname="user.firstname"
+            :lastname="user.lastname"
+            :role="user.role"
+            :route="user.route"
+            :nameLength="nameLength(user.fullname)"
+        >
+        </user>
+    </li>
+</ul>
 ```
 
 If you compile and reload the screen, you'll briefly see a `Loading` message which will suddenly go away in place of a familiar output. You can use the Vue devtool to see the contents of your payload too.
@@ -139,3 +135,5 @@ If you compile and reload the screen, you'll briefly see a `Loading` message whi
 > Don't forget to dress up the Loading screen with skeletons or other ui fancyness.
 
 > You can also handle errors inside the `axios.request` call, just like you would with the jQuery equivalents.
+
+[Pagination](08-pagination.md)

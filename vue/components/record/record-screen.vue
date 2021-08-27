@@ -5,8 +5,8 @@
  *
  */
 
-import RecordScreenDevice from '@schoolbox/inputCapture/record-screen-device';
-import RecordScreenBrowser from '@schoolbox/videojs-record/record-screen-browser';
+import RecordScreenDevice from '@vue/components/inputCapture/record-screen-device';
+import RecordScreenBrowser from '@vue/components/videojs-record/record-screen-browser';
 import { hasDeviceCapture } from '@js/util/featureDetectionUtils';
 
 

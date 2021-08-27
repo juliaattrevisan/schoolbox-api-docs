@@ -1,8 +1,8 @@
 <script>
 
 import axios from 'axios'
-import RevealModal from "@schoolbox/reveal-modal";
-import Toast from "@schoolbox/toast";
+import RevealModal from "@vue/components/reveal-modal";
+import Toast from "@vue/components/toast";
 
 export default {
     components: {

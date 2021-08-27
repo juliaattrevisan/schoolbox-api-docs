@@ -6,8 +6,7 @@ This is already included in a special minified file `schoolbox-vue.min.js` which
 
 ```html
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script>
-<script src="{{ CDN_PREFIX }}/javascript/components/userList.bundle.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/userList.js"></script>
 ```
 
 ## 8.1 Register this component
@@ -16,8 +15,8 @@ Add a `Paginate` component to the corresponding node in `user-list.vue`.
 
 ```js
 components: {
-    'single-user': SingleUser,
-    'v-paginate': VuejsPaginate
+   SingleUser,
+   VuejsPaginate
 },
 ```
 
@@ -26,18 +25,12 @@ components: {
 Set up a local var to remember which page we're currently showing. Remember that vue is stateful in this way.
 
 ```js
-data() {
+data () {
     return {
         loading: true,
         allUsers: [],
-
-        /* Number of items to show, per page
-         */
-        numPerPage: 5,
-
-        /* The current page number
-         */
-        page: 1
+        numPerPage: 5, //Number of items to show, per page
+        page: 1 //The current page number
     }
 },
 ```
@@ -51,8 +44,7 @@ Underneath your `axios` request to obtain a payload, we can add a little thing w
  *
  * https://stackoverflow.com/questions/50647136/forward-button-not-working-after-history-pushstate
  */
-<<<<<<< HEAD
-window.onpopstate = event => {
+window.onpopstate = (event) => {
     if (!event.state) {
         // Return to defaults
         this.page = 1;
@@ -69,12 +61,11 @@ Further down, in `methods()` we need to add this:
  * Update the pushState history in the browser to simulate navigation
  * with async requests
  *
- * @param page int - The page to change to
+ * @param { Number } - The page to change to
  */
 onPaginate (page) {
-    const params = '?' + 'p=' + page;
-
-    window.history.pushState({page: page}, '', params);
+    const params = `?p=${page}`;
+    window.history.pushState({ page: page }, '', params);
 },
 ```
 
@@ -88,6 +79,8 @@ The `Paginate` component requires a couple more computed methods. Add these to t
 
 /**
  * The total number of pages available for the data set obtained
+ * 
+ * @returns { Number }
  */
 pageCount () {
     return Math.ceil(this.allUsers.length / this.numPerPage);
@@ -96,15 +89,15 @@ pageCount () {
 
 /**
  * Calculate the paginated subset of all data
+ * 
+ * @returns { Number }
  */
 users () {
     if (!this.allUsers.length) {
         return [];
     }
-
     const offset = (this.page-1) * this.numPerPage;
     const total = offset + this.numPerPage;
-
     return this.allUsers.slice(offset, total);
 }
 ```
@@ -116,7 +109,6 @@ The `users` method is a computed property that takes a _subset_ of `this.allUser
 In `user-list.vue`,
 
 ```html
-<<<<<<< HEAD
 <li v-for="(user, index) in this.users" :key="index">
     =======
 </li>
@@ -131,20 +123,13 @@ In `user-list.vue`,
 At the bottom of `user-list.vue` w can add the `Paginate` component which will do all the heavy lifting for us.
 
 ```html
-<template v-if="this.loading">
-    <div>
-        <h2>Loading data, wait</h2>
-    </div>
-</template>
-<template v-else>
+<div v-if="loading">
+    <h2>Loading data, wait</h2>
+</div>
+<div v-else>
     <ul class="information-list">
-<<<<<<< HEAD
-        <li v-for="(user, index) in this.users" :key="index">
+        <li v-for="(user, index) in users" :key="index">
             <single-user
-=======
-        <li v-for="user in this.users">
-            <user
->>>>>>> 16dbe5c93d... add in the four grunt packages and rename each to X.bundle.js [SA-11796]
                 :fullname="user.fullname"
                 :firstname="user.firstname"
                 :lastname="user.lastname"
@@ -152,17 +137,10 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
                 :route="user.route"
                 :nameLength="nameLength(user.fullname)"
             >
-<<<<<<< HEAD
             </single-user>
         </li>
     </ul>
-    <v-paginate
-=======
-            </user>
-        </li>
-    </ul>
-    <Paginate
->>>>>>> 16dbe5c93d... add in the four grunt packages and rename each to X.bundle.js [SA-11796]
+    <vuejs-paginate
         v-model="page"
         :page-count="pageCount"
         :container-class="'pagination'"
@@ -172,14 +150,11 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
         :next-link-class="'arrow'"
         :disabled-class="'unavailable'"
         :click-handler="onPaginate"
-<<<<<<< HEAD
-    ></v-paginate>
-=======
-    ></Paginate>
->>>>>>> 16dbe5c93d... add in the four grunt packages and rename each to X.bundle.js [SA-11796]
-</template>
+    ></vuejs-paginate>
+</div>
 ```
 
 Recompile and reload; you'll have an asynchronously-powered paginated data set that is fully navigable and simulates browser history, along with user-friendly indicators for loading data and a snappy perceived response because we loaded everything and now it's rendering data locally in the browser. Data is produced by a highly-cohesive decoupled class which can be both unit tested and used in a different context (e.g. phplib/twig instead of vue) without having to copypaste a lot.
 
 > Don't forget to dress it up so it looks nice by using our regular styles and so on.
+

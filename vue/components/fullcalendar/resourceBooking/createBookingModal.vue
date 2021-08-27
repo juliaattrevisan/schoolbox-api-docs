@@ -20,7 +20,7 @@
 </template>
 
 <script>
-    import RevealModal from "@schoolbox/reveal-modal";
+    import RevealModal from "@vue/components/reveal-modal";
 
     export default {
         name: "create-booking-modal",

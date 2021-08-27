@@ -47,7 +47,7 @@ This `payload` connects with the `:payload` attribute on `user-list`. Now we can
 
 ```html
 <ul>
-    <li v-for="(key, value) in this.payload" :key="key">{{ key }}</li>
+    <li v-for="(value, index) in payload" :key="index">{{ value }}</li>
 </ul>
 ```
 
@@ -80,7 +80,7 @@ stuartMahon = { 'fullname': 'Stuart Mahon', 'firstname': 'stu', 'lastname': 'mah
 > `:datetime="'some value'"` is synonymous with`var datetime = 'some value'`, which works. Keep this in mind because it applies throughout all Vue templates too.
 
 Define them in the `props` object.
-At a minimum, define the type of each property.
+At a minimum, define the type of each property and whether it's required
 
 ```js
 props: {
@@ -96,8 +96,14 @@ props: {
             }
         }
     }
-    stuartMahon: Object,
-    datetime: String
+    stuartMahon: {
+        type: Object,
+        required: true
+    }
+    datetime: {
+        type: String,
+        required: false
+    }
 },
 ```
 
@@ -105,14 +111,12 @@ Then render them out:
 
 ```html
 <p>
-    {{ this.stuartMahon.firstname }} {{ this.stuartMahon.lastname }} {{ this.datetime }}
+    {{ stuartMahon.firstname }} {{ stuartMahon.lastname }} {{ datetime }}
 </p>
 ```
 
-Don't forget that every time you change Vue code, you need to recompile everything.
-
-```
-npm run build
-```
+Don't forget that every time you change Vue code, you need to recompile everything or be running npm run watch.
 
 Again, note how the camel-case var `stuartMahon` was derived from the hyphen-separated var `stuart-mahon`.
+
+[Generate Payload](04-generate-payload.md)

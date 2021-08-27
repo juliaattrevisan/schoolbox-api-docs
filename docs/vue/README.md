@@ -26,7 +26,7 @@ Have a look through all the other rules and keep them in mind while developing. 
 -   [Prop names should always use camelCase during declaration, but kebab-case in html/twig](https://vuejs.org/v2/style-guide/#Prop-name-casing-strongly-recommended)
 -   [Directive shorthands should be used always](https://vuejs.org/v2/style-guide/#Directive-shorthands-strongly-recommended)
 -   [Single-file components should always be in order script, template, style](https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
--   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)
+-   [Component's should be structured with the following order](02-setup-entry.md#213-vue-component-basics)
 
 ## Vue pantry / testing
 

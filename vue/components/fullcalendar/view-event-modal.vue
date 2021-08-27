@@ -1,11 +1,11 @@
 <script>
 
-import RevealModal        from '@schoolbox/reveal-modal'
-import MetaList           from '@schoolbox/meta/list'
-import MetaItem           from '@schoolbox/meta/item'
+import RevealModal        from '@vue/components/reveal-modal'
+import MetaList           from '@vue/components/meta/list'
+import MetaItem           from '@vue/components/meta/item'
 import axios              from 'axios';
 import qs                 from 'qs';
-import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
+import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
  */

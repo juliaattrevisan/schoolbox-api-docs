@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import filesize from 'filesize';
-import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
+import { mixinFooterUI } from '@vue/components/vueTables2/mixinFooterUI';
 
 
 export default {
@@ -215,6 +215,6 @@ export default {
 
 <style lang="scss">
 
-@import '@schoolbox/vueTables2/vueTables2';
+@import '@vue/components/vueTables2/vueTables2';
 
 </style>

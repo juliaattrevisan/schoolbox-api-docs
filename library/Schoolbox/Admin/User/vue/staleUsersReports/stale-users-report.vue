@@ -6,13 +6,13 @@
  *
  */
 
-import Toast from '@schoolbox/toast';
-import RevealModal from '@schoolbox/reveal-modal';
+import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { ResizeObserver } from 'vue-resize';
 import 'vue-resize/dist/vue-resize.css';
-import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
+import { mixinFooterUI } from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -372,7 +372,7 @@ export default {
 
 <style lang="scss">
 
-@import '@schoolbox/vueTables2/vueTables2';
+@import '@vue/components/vueTables2/vueTables2';
 @import 'staleUsersReport';
 
 </style>
