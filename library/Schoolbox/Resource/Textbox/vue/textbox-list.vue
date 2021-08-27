@@ -386,7 +386,10 @@ export default {
             </div>
         </template>
 
-        <input type="submit" ref="saveButton" value="Save all" :disabled="saveInProgress" />
+        <template v-if="textboxes.length > 0">
+            <input type="submit" ref="saveButton" value="Save all" :disabled="saveInProgress" />
+        </template>
+
         <toast ref="toast"></toast>
 
         <reveal-modal ref="deleteModal">
