@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\Mapper;
+
 class Date extends Datetime
 {
     protected $input_format  = 'Y-m-d';
@@ -42,6 +44,11 @@ class Date extends Datetime
     }
 
 
+    /**
+     * @param string $value
+     * @param Mapper $mapper
+     * @return \Alaress_Date_Format
+     */
     public function hydrate($value, $mapper = null)
     {
         $hydrated = parent::hydrate($value, $mapper);

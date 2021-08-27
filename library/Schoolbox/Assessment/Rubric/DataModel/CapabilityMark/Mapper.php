@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
         $this->hasTable('rubric_capability_mark');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('human_readable_value', self::TYPE_STRING);
         $this->uses('value', self::TYPE_DECIMAL);
         $this->joins(
             'return_id',

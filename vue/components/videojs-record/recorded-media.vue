@@ -330,7 +330,7 @@ export default {
     background: none;
     color: white;
     border: 2px solid white;
-    background: rgba(43, 51, 63, 0.7);
+    background: rgba(43, 51, 63, 0.85);
     transition: 0.2s opacity;
     &::before {
         text-align: center;

@@ -1,100 +1,38 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 <div class="list-item">
-    <div class="small-{% if linkedStudent %}6{% else %}12{% endif %} island">
+    <div class="small-12 island">
         <h2 class="subheader">
-            {% if linkedStudent %}
-                {{ student.fullName }}
-            {% else %}
                 {{ locale.pastoral.proper }} Profile
-            {% endif %}
-
         </h2>
     </div>
 </div>
-
-{% if linkedStudent %}
-    <div class="list-item">
-        <div class="small-6 island">
-            <h2 class="subheader">{{ linkedStudent.fullName }}</h2>
-        </div>
-    </div>
-
-    <div class="row actions-small-2">
-        {% if user.role.isStaff %}
-            {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
-            {% if not linkedStudent %}
-                <nav>
-                    {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
-                    {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
-                </nav>
-                {% if linkedStudents | length %}
-                    <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
-                        <li class="separator">{{ student.firstName }}'s Linked Records</li>
-                        {% for linkedStudent in linkedStudents %}
-                            <li>
-                                <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}" class="icon-user">
-                                    {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    </div>
-
-{% else %}
-
-    <div class="row actions-small-2">
-        {% if user.role.isStaff %}
-            {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
-            <nav>
-                {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
-                {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
-            </nav>
-            {% if linkedStudents | length %}
-                <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
-                    <li class="separator">{{ student.firstName }}'s Linked Records</li>
-                    {% for linkedStudent in linkedStudents %}
-                        <li>
-                            <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}" class="icon-user">
-                                {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endif %}
-    </div>
-
-{% endif %}
+<div class="row actions-small-2">
+    {% if user.role.isStaff %}
+        {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
+        <nav>
+            {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
+        </nav>
+    {% endif %}
+</div>
 
 <div class="row">
-    <div class="small-{% if linkedStudent %}6{% else %}12{% endif %} island">
+    <div class="small-12 large-{% if countSummaryByMonth.recordCount > 0 %}6{% else %}12{% endif %} island">
         <section class="no-pad">
             <div class="profile content">
                 <div class="row no-margin">
                     <div class="small-12 medium-2 columns no-pad">
-                        {{ profile.imageSquare200(student) }}
+                        <a href="{{ profile.link(student) }}"> {{ profile.imageSquare200(student) }}</a>
                     </div>
                     <div class="small-12 medium-10 columns no-pad">
                         <dl>
                             {# Display student name #}
-
-                            {% if not linkedStudent %}
-                                <dt class="small-12 medium-3">Student Name</dt>
-                                <dd class="small-12 medium-9">
-                                    {% if student.deleted %}
-                                        {{ student.fullName }}
-                                    {% else %}
-                                        <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
-                                    {% endif %}
-                                </dd>
-                            {% endif %}
-
+                            <dt class="small-12 medium-3">Campus</dt>
+                            <dd class="small-12 medium-9">{% for campus in student.campusCollection %}{{ campus.name }} {% endfor %}</dd>
                             <dt class="small-12 medium-3">Year Level</dt>
                             <dd class="small-12 medium-9">{{ student.year.name | default('Unknown') }}</dd>
+                            <dt class="small-12 medium-3">House</dt>
+                            <dd class="small-12 medium-9">{{ student.schoolhouse.house | default('Unknown') }}</dd>
 
                             {# Display links to students parents #}
 
@@ -118,38 +56,7 @@
             </div>
         </section>
     </div>
-    {% if linkedStudent %}
-    <div class="small-6 island">
-        <section class="no-pad">
-            <div class="profile content">
-                <div class="row no-margin">
-                    <div class="small-12 medium-2 columns no-pad">
-                        {{ profile.imageSquare200(linkedStudent) }}
-                    </div>
-                    <div class="small-12 medium-10 columns no-pad">
-                        <dl>
-                            <dt class="small-12 medium-3">Year Level</dt>
-                            <dd class="small-12 medium-9">{{ linkedStudent.year.name | default('Unknown') }}</dd>
-
-                            {# Display links to students parents #}
-
-                            {% for parent in linkedStudent.parents %}
-                                <dt class="small-12 medium-3">
-                                    {% if loop.first %}
-                                        Parents
-                                    {% else %}
-                                        &nbsp;
-                                    {% endif %}
-                                </dt>
-                                <dd class="small-12 medium-9">
-                                    <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a>
-                                </dd>
-                            {% endfor %}
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
+    {% if countSummaryByMonth.recordCount > 0 %}
+        {% include '@pastoral/student_section_summary_barchart.twig' with { countSummaryByMonth: countSummaryByMonth } %}
     {% endif %}
 </div>

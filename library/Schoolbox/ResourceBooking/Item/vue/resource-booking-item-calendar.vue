@@ -81,13 +81,11 @@ export default {
                 day: {
                     dayHeaders: false,
                     allDaySlot: false,
-                    slotMinTime: '06:00:00',
                     titleFormat: this.config.dateDisplayFormats.momentJsDateLong, // will produce something like "Tuesday July 16th 2021"
                 },
                 week: {
                     dayHeaderFormat: this.formats.displayWeekDay,
                     allDaySlot: false,
-                    slotMinTime: '06:00:00',
                     titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
                 }
             },
@@ -148,6 +146,7 @@ export default {
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
             this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...

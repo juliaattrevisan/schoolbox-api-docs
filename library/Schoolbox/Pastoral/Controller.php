@@ -278,6 +278,7 @@ class Controller extends Base
      * @param User $student
      *
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function getStudent($student): void
     {
@@ -316,24 +317,28 @@ class Controller extends Base
         // populate related records
         $pageRecords = $this->pastoralDataSource->findRecords($user, $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
 
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
+        $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student);
+
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoral/student.twig',
                 'data'     => [
-                    'user'            => $user,
-                    'recordCount'     => $recordCount,
-                    'records'         => $pageRecords,
-                    'student'         => $student,
-                    'pageCurrent'     => $pageCurrent,
-                    'types'           => $this->pastoralTypeMapper->findAll(),
-                    'subtypes'        => $this->pastoralSubTypeMapper->findAll(),
-                    // TODO: This count is causing a performance issue SA-9641
-                    // 'linkedStudents' => $this->pastoralDataSource->getLinkedStudentRecordCount($user, $student->getId()),
-                    'linkedStudents'  => [],
-                    'typeSelected'    => $typeId,
-                    'subtypeSelected' => $subtypeId,
-                    'resultsPerPage'  => $resultsPerPage,
-                    'pagesToDisplay'  => $maxPage,
+                    'user'                => $user,
+                    'recordCount'         => $recordCount,
+                    'records'             => $pageRecords,
+                    'student'             => $student,
+                    'pageCurrent'         => $pageCurrent,
+                    'types'               => $this->pastoralTypeMapper->findAll(),
+                    'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
+                    'countSummaryByMonth' => [
+                        'recordCount' => count($countSummaryByMonth),
+                        'series'      => $pastoralCountHelper->buildMonthlyBarChart($countSummaryByMonth),
+                    ],
+                    'typeSelected'        => $typeId,
+                    'subtypeSelected'     => $subtypeId,
+                    'resultsPerPage'      => $resultsPerPage,
+                    'pagesToDisplay'      => $maxPage,
                 ],
                 'title'    => $student->getFullName(),
             ]

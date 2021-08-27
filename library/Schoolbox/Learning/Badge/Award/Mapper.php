@@ -263,6 +263,7 @@ class Mapper extends \Schoolbox\Mapper
             $pb->in('recipient_id', $userIds);
         }
         $pb = $pb->isNull('award_id');
+        $pb = $pb->isNull('deleted_at');
 
         // Terms .. attempt to get simplified ranges from given terms
         $terms  = \Schoolbox\Assessment\Term\Mapper::getInstance()->findByColumnList(['id' => $termIds])->sortBy('start', Collection::ORDER_ASCENDING);

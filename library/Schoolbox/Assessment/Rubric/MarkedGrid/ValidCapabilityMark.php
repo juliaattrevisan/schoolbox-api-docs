@@ -10,35 +10,54 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
-use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
+use Alaress\Specification\Base;
+use InvalidArgumentException;
+use RangeException;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
-class ValidCapabilityMark extends \Alaress\Specification\Base
+/**
+ * Spec pattern for whether a given human-readable mark is an appropriate mark
+ * for a capability.
+ */
+class ValidCapabilityMark extends Base
 {
-    private $capabilityMax;
-    private $markScheme;
+    /**
+     * The marking scheme used to validate the human-readable mark.
+     */
+    private IMarkScheme $markScheme;
 
-    public function __construct($capabilityMax, $markScheme)
+    /**
+     * Constructor
+     *
+     * @param IMarkScheme $markScheme
+     */
+    public function __construct(IMarkScheme $markScheme)
     {
-        $this->capabilityMax = $capabilityMax;
         $this->markScheme = $markScheme;
     }
 
-    // Marks are intentionally validated in their scaled form here; it's easiest to compare the exact value the user typed in
-    // with the capability max to ensure it's within the range.
-    public function isSatisfiedBy($capabilityMark): bool
+    /**
+     * Is the given human-readable capability mark valid for the capability's
+     * mark scheme?
+     *
+     * @param mixed $candidate A candidate human-readable capability mark.
+     * @return bool
+     */
+    public function isSatisfiedBy($candidate): bool
     {
-        if (null === $capabilityMark) {
+        if (null === $candidate) {
             // This is a self reflection, so null cap mark is expected
             return true;
         }
 
-        // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
-        $max = $this->markScheme instanceof TotalMarkAbstract ? $this->capabilityMax : 100;
-
-        // TODO for debugging only, remove later
-        $isNumeric = is_numeric($capabilityMark);
-        $greaterOrEqualToZero = $capabilityMark >= 0;
-        $lessThanOrEqualToMax = $capabilityMark <= $max;
-        return $isNumeric && $greaterOrEqualToZero && $lessThanOrEqualToMax;
+        try {
+            $normalisedCapabilityMark = $this->markScheme->getNormalisedMark($candidate);
+        } catch (RangeException | InvalidArgumentException $e) {
+            // This cap mark is out of range or an unparseable value.
+            // Either way:
+            return false;
+        }
+        return $normalisedCapabilityMark >= IMarkScheme::NORMALISED_MARK_MIN
+            && $normalisedCapabilityMark <= IMarkScheme::NORMALISED_MARK_MAX;
     }
 }

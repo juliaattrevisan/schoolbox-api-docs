@@ -192,7 +192,7 @@
                     // Compare letter grades by their string value (easier since we're dealing with brackets)
 
                     var grades = getLetterGrades($this);
-                    customMark = getLetterGradeFromNumeric($this.find("[data-group-mark]").val(), grades);
+                    customMark = getLetterGradeFromNumeric($this.find("[data-group-mark] :selected").attr('data-raw-grade'), grades);
                     if (displayedMark !== customMark) {
                         markIsDifferent = true;
                     }
@@ -314,7 +314,10 @@
             var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
             var $groupSummary = $rb.find(groupSummarySelector);
 
-            var customMark = $changed.val();
+            // The custom mark is on the raw-grade data attribute now
+            var customMark = markType === 'letter'
+                ? $changed.find(':selected').attr('data-raw-grade')
+                : $changed.val();
 
             if ($groupSummary.length) {
                 var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));

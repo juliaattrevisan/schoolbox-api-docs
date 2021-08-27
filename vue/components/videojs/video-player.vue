@@ -203,7 +203,7 @@ export default {
         line-height: 3.5em;
     }
     .vjs-big-play-button {
-        background: rgba(43, 51, 63, 0.7);
+        background: rgba(43, 51, 63, 0.85);
         border: 2px solid white;
         border-radius: 0;
         top: 50%;

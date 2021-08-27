@@ -36,7 +36,7 @@
          */
         function setupCollapsable() {
             var self = this;
-            $(self.config.element).click(function(event) {
+            $(self.config.element).on('click.collapsable', function(event) {
                 event.preventDefault();
 
                 var component,
@@ -58,6 +58,16 @@
             });
         }
     };
+
+    /**
+     * Destroy a previously set up collapsable.
+     */
+    $.fn.destroyCollapsable = function (options) {
+        // Mimic the element from the collapsable's init
+        options = options || {};
+        let config = $.extend({element: $(this)}, options);
+        $(config.element).off('click.collapsable');
+    }
 
     /**
      * Directly execute collapsable on demand

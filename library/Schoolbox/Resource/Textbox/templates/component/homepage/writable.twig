@@ -37,7 +37,7 @@
 
             {% set manageAllRoute = routeLookupIfAuthorized('textbox.getIndexForFolder', {folderId: textbox.category.id, folder: textbox.category}) %}
             {% if manageAllRoute %}
-            <a class='button' href="{{ manageAllRoute }}">Manage All</a>
+            <a class='button' href="{{ manageAllRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Manage All</a>
             {% endif %}
 
             <button data-action="save"

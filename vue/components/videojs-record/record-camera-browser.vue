@@ -3,7 +3,6 @@
 /**
  * To record, playback and upload a camera recording into SB 
  * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
- *
  */
 
 import 'video.js/dist/video-js.css';
@@ -18,13 +17,15 @@ import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
 import { getRecordCameraOptions } from '@js/videojs/videojsOptions';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
-import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@js/record-media/recordMediaErrors';
+import { isDeviceAlreadyInUseError, isPermissionDeniedError, isDeviceChangeError } from '@js/record-media/recordMediaErrors';
 import { isOfMimeType } from '@js/util/fileUtils';
+import { moveArrayItem } from '@js/util/arrayUtils';
 
 
 export default {
 
     components: {
+        RecordDeviceOptions,
         RecordedMedia,
         OverMediaModal
     },
@@ -39,17 +40,21 @@ export default {
     data () {
         return {
             player: null, //videojs-record instance,
+            isRecording: false, //to track whether recording
             recordedData: null, //the recorded data that will be passed through to #recored-media
-            isDeviceReady: false, //to toggle the device display
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
             hasNotSupportedError: false, //unable to fire up the media recorder, likely because a required media API is not available
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
+            hasDeviceChangeError: false, //wasn't able to switch to the different device, will move back to the default
             isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
+            hasEnumeratedDevices: false, //has checked through the device list
+            videoDeviceList: [], //list of video devices currently available to record with
+            currentVideoDeviceId: '' //the active video device, can change when multiple devices available
         }
     },
 
@@ -74,7 +79,6 @@ export default {
          * Do we need to request the media device straight away? 
          * If not wait until it's requested - by deleting the pre recorded media recording
          * Otherwise we will just be displaying the existing pre recorded media
-         *
          */
         checkForPreRecordedData () {
             if (this.preRecordedData) {
@@ -84,7 +88,6 @@ export default {
 
         /**
          * Start up the videojs-record instance, which is just videojs with record functionality wrapped around it
-         *
          */
         initVideojsRecord () {
             try {
@@ -97,7 +100,6 @@ export default {
 
         /**
          * videojs is ready, so set up listeners and animate on
-         *
          */
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
@@ -106,39 +108,87 @@ export default {
 
         /**
          * track the events videojs-record offers to manage display
-         *
          */
         initVideojsRecordRecordListeners () {
             this.player.on('deviceReady', this.onDeviceReady);
+            this.player.on('enumerateReady', this.onEnumerateReady);
             this.player.on('startRecord', this.onStartRecord);
             this.player.on('finishRecord', this.onFinishRecord);
             this.player.on('error', this.onError);
             this.player.on('deviceError', this.onDeviceError);
+            this.player.on('enumerateError', this.onEnumerateError);
         },
 
         /**
          * onDeviceReady, dispatch to anyone listening, maybe the parent
-         *
          */
         onDeviceReady () {
-            this.isDeviceReady = true;
-            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); 
+            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); //to get width, height and the current deviceId
+            this.currentVideoDeviceId = currentDeviceSettings.deviceId;
             this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
+            if (!this.hasEnumeratedDevices) {
+                this.player.record().enumerateDevices();
+            }
+        },
+
+        /**
+         * onEnumerateReady, the list of input devices is available
+         */
+        onEnumerateReady () {
+            this.hasEnumeratedDevices = true;
+            this.player.off('enumerateReady', this.onEnumerateReady);
+            this.getVideoDeviceList();
+        },
+
+        /**
+         * get a list of possible video input devices so the user can toggle between them when there's more than one
+         */
+        getVideoDeviceList () {
+            const allDeviceList = this.player.record().devices;
+            this.videoDeviceList = allDeviceList.filter((device) => device.kind === 'videoinput');
+            if (this.currentVideoDeviceId !== this.videoDeviceList[0].deviceId) { //ensure the top device list is the currently active one, bit weird if the default active is lower down the list
+                const activeDeviceIndex = this.videoDeviceList.findIndex((videoDevice) => this.currentVideoDeviceId === videoDevice.deviceId);
+                this.videoDeviceList = moveArrayItem(this.videoDeviceList, activeDeviceIndex, 0);
+            }
+        },
+
+        /**
+         * To toggle between different video devices
+         *
+         * @params { String }
+         */
+        onVideoDeviceChange (videoDeviceId) {
+            try {
+                this.currentVideoDeviceId = videoDeviceId;
+                this.player.record().setVideoInput(this.currentVideoDeviceId);
+            } catch (error) { //if can't set the video input, move back to the default device, notifying so
+                this.hasError = true;
+                this.onDeviceChangeError();
+            }
+        },
+
+        /**
+         * onDeviceChangeError, return to the default device, notifying so
+         */
+        onDeviceChangeError () {
+            this.hasDeviceChangeError = true;
+            this.currentVideoDeviceId = this.videoDeviceList[0].deviceId;
+            this.player.record().setVideoInput(this.currentVideoDeviceId);
         },
 
         /**
          * onStartRecord
-         *
          */
         onStartRecord () {
+            this.isRecording = true;
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'rgba(255, 0, 0, 0.25)');
         },
 
         /**
          * the recorded file is ready
-         *
          */
         onFinishRecord () {
+            this.isRecording = false;
             if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //if it's a webm
                 this.player.on('finishConvert', this.onFinishConvert);
             } else {
@@ -148,7 +198,6 @@ export default {
 
         /**
          * the seekable webm file is ready
-         *
          */
         onFinishConvert () {
             this.player.off('finishConvert', this.onFinishConvert);
@@ -157,7 +206,6 @@ export default {
 
         /**
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
-         *
          */
         recordedVideoReady (mediaData) {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
@@ -168,7 +216,6 @@ export default {
 
         /**
          * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
-         *
          */
         onError (element, error) {
             this.hasError = true;
@@ -177,7 +224,6 @@ export default {
 
         /**
          * onDeviceError - try and manage as many errors as possible
-         *
          */
         onDeviceError () {
             this.hasError = true;
@@ -187,12 +233,20 @@ export default {
                 this.hasDeviceAlreadyInUseError = true;
             } else if (isPermissionDeniedError(errorCode)) {
                 this.hasPermissionDeniedError = true;
+            } else if (isDeviceChangeError(errorCode)) {
+                this.onDeviceChangeError();
             }
         },
 
         /**
+         * onEnumerateError - try and manage as many errors as possible
+         */
+        onEnumerateError () {
+            console.warn('enumerate error: ' + this.player.enumerateErrorCode);
+        },
+
+        /**
          * ensure everything reset on possible modal re-display
-         *
          */
         destroyVideojs () {
             if (this.player) {
@@ -203,7 +257,6 @@ export default {
 
         /**
          * close the error modal, animating out
-         *
          */
         onCloseErrorModalSelected () {
             this.isOverMediaModalClosing = true;
@@ -211,19 +264,18 @@ export default {
 
         /**
          * it's closed now, so disable the errors to allow trying again
-         *
          */
         onErrorModalClosed () {
             this.hasError = false;
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
+            this.hasDeviceChangeError = false;
             this.isRecordingOverMaxFileSize = false;
         },
 
         /**
          * confirm deletion of the latest recording, setting up for another recording
-         *
          */
         onRecordedMediaDeleted () {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
@@ -258,7 +310,6 @@ export default {
 
         /**
          * revert back to original setting
-         *
          */
         onOverMediaModalClosed () {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
@@ -276,6 +327,14 @@ export default {
         <div class="media-container media-container-record">
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
+
+        <record-device-options 
+            title="Select a Camera"
+            :is-recording="isRecording"
+            :current-device-id="currentVideoDeviceId"
+            :device-list="videoDeviceList"
+            @on-video-device-change="onVideoDeviceChange"
+        />
 
         <recorded-media 
             v-if="hasPreRecordedData || hasNewRecording"
@@ -301,6 +360,7 @@ export default {
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
             <div v-else-if="hasNotSupportedError" class="alert-box alert">Sorry, unable to record video. It's likely your browser does not support the required features. If possible please upgrade your browser.</div>
+            <div v-else-if="hasDeviceChangeError" class="alert-box alert">Sorry, the selected camera cannot be displayed. Please ensure it's functioning properly and try again.</div>
             <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>

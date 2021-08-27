@@ -18,15 +18,14 @@ use External\Tass\Api\Exception\Unauthorised;
 use GuzzleHttp;
 use GuzzleHttp\ClientInterface;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token as TokenCodec;
-
-use function in_array;
-
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Schoolbox\GenericCollection;
 use RuntimeException;
+
+use function in_array;
 
 /**
  * Responsible for connecting to the Tass2 HTTP API and returning strongly-typed models for consumption by Schoolbox code.
@@ -514,13 +513,12 @@ class Connector
             'appcode' => $this->appCode,
             'company' => $this->companyCode,
              'v'      => 2,
-            'token'   => $this->tokenBuilder->generateToken($params),
+            'token'   => $this->tokenBuilder->generateToken($params, true),
         ];
 
         try {
             $response = $this->httpClient->get($this->apiUrl, ['query' => $queryArgs]);
-        } /** @noinspection PhpRedundantCatchClauseInspection Thrown if TODO */
-        catch (GuzzleHttp\Exception\ClientException $e) {
+        } catch (GuzzleHttp\Exception\ClientException $e) {
             // TODO check that this is only thrown on invalid credentials, as opposed to invalid method args
             // TODO this is being thrown on test API for getStudent('BELL005') with msg '401 Enable Photos is set to No' - not sure what that means?
             // TODO if that's being caused by invalid method args, it should be cast to InvalidArg, not Unauthorised

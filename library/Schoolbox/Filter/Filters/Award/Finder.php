@@ -14,7 +14,6 @@ use Schoolbox\Filter\AbstractIdFinder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Award\Mapper;
 use Schoolbox\Learning\Badge\Award\Model;
-use Schoolbox\Filter\Filters\Badge;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -64,8 +63,8 @@ class Finder extends AbstractIdFinder
         $completeFilters = $this->simplifyFilters($completeFilters);
 
         // Badge Categories
-        $categoryIds = $completeFilters[Badge\Category\Definition::class] instanceof Collection
-            ? $completeFilters[Badge\Category\Definition::class]->getAll() : [];
+        $categoryIds = $completeFilters[Category\Definition::class] instanceof Collection
+            ? $completeFilters[Category\Definition::class]->getAll() : [];
 
         // Badge Status
         $status = $completeFilters[Status\Definition::class] instanceof Collection

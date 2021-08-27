@@ -22,7 +22,7 @@ class Timespan implements IColumnType
      * @param null|int            $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return null|DateInterval
+     * @return DateInterval|null
      */
     public function hydrate($value, $mapper = null)
     {
@@ -39,7 +39,7 @@ class Timespan implements IColumnType
         $seconds  = $value % 60;
         $interval = new DateInterval("PT{$hours}H{$minutes}M{$seconds}S");
         if ($negative) {
-            $interval->invert = true;
+            $interval->invert = 1;
         }
         return $interval;
     }

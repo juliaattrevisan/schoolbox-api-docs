@@ -37,3 +37,18 @@ export const isPermissionDeniedError = (errorCode) => {
         return false;
     }
 }
+
+/** 
+ * Another Application or Browser window could already be using the camera
+ * 
+ * @param { String }
+ *
+ * @returns { Boolean }
+ */
+ export const isDeviceChangeError = (errorCode) => {
+    if (errorCode === '[object OverconstrainedError]') {
+        return true;
+    } else {
+        return false;
+    }
+}
