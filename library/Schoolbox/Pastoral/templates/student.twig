@@ -21,6 +21,6 @@
     </div>
 </div>
 
-{% include '@pastoral/student_section_summary.twig' with { student: student, linkedStudent: null } %}
+{% include '@pastoral/student_section_summary.twig' with { student: student, countSummaryByMonth: countSummaryByMonth } %}
 {% include '@pastoral/student_section_filter.twig' %}
 {% include '@pastoral/student_section_records.twig' with { linkedStudent: null }%}
