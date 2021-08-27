@@ -202,7 +202,7 @@ class Classes implements IStrategy
                 foreach ($involvedUsers as $involvedUser) {
                     /* Throw warning, but assign them anyway
                      */
-                    if (!isset($users[$involvedUser['externalId']])) {
+                    if (!($involvedUser['sudsUserExists'])) {
                         $this->log->warning(sprintf(
                             'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
                             $involvedUser['externalId'],
@@ -211,9 +211,9 @@ class Classes implements IStrategy
                         ));
                     }
 
-                    $involvedUserDetails = $users[$involvedUser['externalId']] ?? null;
-                    $involvedUser['firstname'] = $involvedUserDetails['firstname'] ?? 'Unknown';
-                    $involvedUser['surname']   = $involvedUserDetails['lastname'] ?? 'User';
+//                    $involvedUserDetails = $users[$involvedUser['externalId']] ?? null;
+//                    $involvedUser['firstname'] = $involvedUserDetails['firstname'] ?? 'Unknown';
+//                    $involvedUser['surname']   = $involvedUserDetails['lastname'] ?? 'User';
 
                     $this->createTimetableClassInvolvement($involvedUser, $timetableClass);
                 }
@@ -345,7 +345,7 @@ class Classes implements IStrategy
 
         /* Throw warning, but assign them anyway
          */
-        if (!isset($users[$teacherExternalId])) {
+        if (!($mainTeacher['sudsUserExists'])) {
             $this->log->warning(sprintf(
                 'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
                 $teacherExternalId,
@@ -354,9 +354,9 @@ class Classes implements IStrategy
             ));
         }
 
-        $teacherDetails = $users[$teacherExternalId] ?? null;
-        $mainTeacher['firstname'] = $teacherDetails['firstname'] ?? 'Unknown';
-        $mainTeacher['surname']   = $teacherDetails['lastname'] ?? 'User';
+//        $teacherDetails = $users[$teacherExternalId] ?? null;
+//        $mainTeacher['firstname'] = $teacherDetails['firstname'] ?? 'Unknown';
+//        $mainTeacher['surname']   = $teacherDetails['lastname'] ?? 'User';
         $timetableClassPeriod->setTeacher($teacherExternalId);
 
         $this->log->info(sprintf(
@@ -483,7 +483,6 @@ class Classes implements IStrategy
         foreach ($schedule['days'] as $day) {
             $dayIdentifier = $day['day'];
             foreach ($day['periods'] as $period) {
-//                $periodIdentifier = $period['code'];
                 foreach ($period['activities'] as $periodActivities) {
                     foreach ($periodActivities as $activity) {
                         $activityIdentifier = $activity['name'];
@@ -538,6 +537,16 @@ class Classes implements IStrategy
      */
     private function loadIntoExternalIdStruct(string $externalId): array
     {
-        return ['externalId' => $externalId];
+        // Look up the SUDS user for this external ID, along with:
+        // * if they even exist in SUDS
+        // * firstname
+        // * surname
+        $sudsUser = $this->lookup->getUsers()[$externalId] ?? null;
+        return [
+            'externalId'     => $externalId,
+            'sudsUserExists' => isset($sudsUser),
+            'firstname'      => $sudsUser['firstname'] ?? 'Unknown',
+            'surname'        => $sudsUser['lastname']  ?? 'User',
+        ];
     }
 }
