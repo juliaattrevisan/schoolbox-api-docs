@@ -69,11 +69,11 @@ export default {
             validator: null,
             saveInProgress: false,
 
-            /* When you click the Delete link, remember its url
+            /* When you click the Delete link, remember the index of the textbox to delete
              * A singleton modal spawns and uses this as its confirmation button destination
              * Because of the way the reveal-modal works, you don't pass it an arg
              */
-            textboxUrlToDelete: undefined,
+            textboxIndexToDelete: undefined,
             isProcessActive: false,
         }
     },
@@ -157,15 +157,10 @@ export default {
             this.textboxes.forEach(usage => {
                 let textbox = usage.textbox,
                     deleted = usage.deleted ?? false;
-                if (deleted) {
-                    // Check if this textbox has a delete link.
-                    // If it doesn't it's new, so just don't create it.
-                    let deleteEndpoint = textbox?._links?.delete;
-                    if (deleteEndpoint) {
-                        // add to the list of promises
-                        requests.push(axios.delete(deleteEndpoint));
-                    }
-                } else {
+                // If this textbox is marked as deleted, ignore it:
+                // * if it existed, it's already been deleted
+                // * if it didn't exist, it doesn't need to be deleted again
+                if (!deleted) {
                     // Check if this textbox has an update link.
                     // If it doesn't it's new, so create it: otherwise update.
                     let updateEndpoint = textbox?._links?.update;
@@ -256,19 +251,41 @@ export default {
         },
 
         /**
-         * Open the Delete Textbox confirmDialog equivalent
+         * Attempt to delete the textbox at this index from the list.
          *
-         * @param url string
+         * If the textbox exists already, it raises a confirmation modal:
+         * otherwise, it just removes it.
+         *
+         * @param {Number} index The index to remove from `this.textboxes`
          */
-        showDeleteModal (url) {
-            this.textboxUrlToDelete = url;
-            this.$refs.deleteModal.open();
+        attemptToDeleteTextbox(index) {
+            let usage = this.textboxes[index];
+            if (usage.textbox.id) {
+                // Textbox has been persisted: show the modal
+                this.textboxIndexToDelete = index;
+                this.$refs.deleteModal.open();
+            } else {
+                // Textbox has not been persisted: just mark it as deleted
+                this.markAsDeleted(index);
+            }
+        },
+
+        /**
+         * Marks a textbox as deleted.
+         *
+         * Currently this only hides the textbox from view, it does not remove
+         * it because `$index` might be reused by another textbox.
+         *
+         * @param {Number} index The index to remove from `this.textboxes`
+         */
+        markAsDeleted(index) {
+            this.$set(this.textboxes[index], 'deleted', true);
         },
 
         /**
          * Asynchronously access an endpoint to delete a file from the appropriate place
          */
-        async deleteTextbox () {
+        async sendDeleteTextboxRequest () {
 
             /* Set the loading flag to prevent people spamming the button
              */
@@ -280,11 +297,11 @@ export default {
 
                 /* Asynchronously access the endpoint to delete the thing
                 */
-                await axios.delete(this.textboxUrlToDelete);
+                await axios.delete(this.textboxes[this.textboxIndexToDelete].textbox._links.delete);
 
-                /* Remove the element from the allData stack
+                /* Mark this textbox as deleted
                  */
-                this.textboxes = this.textboxes.filter((item) => item.textbox._links.delete !== this.textboxUrlToDelete);
+                this.markAsDeleted(this.textboxIndexToDelete);
 
                 /* Shut the modal
                  */
@@ -363,7 +380,7 @@ export default {
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-delete" href="#" @click.prevent="showDeleteModal(usage.textbox._links.delete)" title="Delete"></a>
+                                    <a class="icon-delete" href="#" @click.prevent="attemptToDeleteTextbox(index)" title="Delete"></a>
                                 </nav>
                             </div>
                             <div :class="{'actions-small-1': true, 'hide': Boolean(usage.textbox.id)}"
@@ -396,7 +413,7 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this text box?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteTextbox" class="button submit" id="usage-textbox-delete-button" :disabled="isProcessActive">Delete</a></li>
+                <li><a @click.prevent="sendDeleteTextboxRequest" class="button submit" id="usage-textbox-delete-button" :disabled="isProcessActive">Delete</a></li>
                 <li><a @click.prevent="$refs.deleteModal.close" class="button" id="usage-textbox-cancel-button" :disabled="isProcessActive">Cancel</a></li>
             </ul>
         </reveal-modal>
