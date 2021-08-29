@@ -68,10 +68,10 @@ export default {
 
     computed: {
         
-        filterEndpoint() {
+        filterEndpoint () {
             return this.getBadgesRoute;
         },
-        
+
     },
 
     methods: {

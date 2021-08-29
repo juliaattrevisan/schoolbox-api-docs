@@ -1,5 +1,10 @@
 <script>
 
+/**
+ * Show a badge report for a class / group of users which can be filtered,
+ * and from where new goals / acheievements can be assigned
+ */
+
 import BadgeImage from '../../vue/badge-image';
 import AwardDetailModal from './award-detail-modal';
 import mixinFilter from '../../vue/mixinFilter';

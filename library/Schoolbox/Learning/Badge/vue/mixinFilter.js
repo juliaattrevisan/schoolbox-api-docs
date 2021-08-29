@@ -28,7 +28,6 @@ export default {
          * @param {Boolean}     showToast
          */
         filter_append (cursor, showToast) {
-            // TODO this is very generic, a candidate to be factored into its own place
             let params = {};
             if (cursor) {
                 params.cursor = cursor;
@@ -65,7 +64,7 @@ export default {
          * Helper for emitting the change event: this happens when selecting a
          * badge, or reloading the filter.
          */
-        filter_emitChange() {
+        filter_emitChange () {
             this.$emit(EVENT_CHANGE);
         },
 
