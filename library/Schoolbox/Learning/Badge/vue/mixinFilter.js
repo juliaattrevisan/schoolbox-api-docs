@@ -1,7 +1,7 @@
 import { stringify } from 'qs';
 import axios from 'axios';
 
-const EVENT_CHANGE = 'change';
+const ON_FILTER_CHANGE = 'on-filter-change';
 
 export default {
     
@@ -65,7 +65,7 @@ export default {
          * badge, or reloading the filter.
          */
         filter_emitChange () {
-            this.$emit(EVENT_CHANGE);
+            this.$emit(ON_FILTER_CHANGE);
         },
 
     },
