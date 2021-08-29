@@ -19,10 +19,10 @@
 } only %}
 <div class="row" id="award-list-container">
     <award-list
-            subject-title="{{ folder.title }}"
-            get-student-lists-endpoint="{{ routeLookup('learningBadgeAward.getListByFolderId', {folderId: folder.getId, folder: folder}) }}"
+        subject-title="{{ folder.title }}"
+        get-student-lists-endpoint="{{ routeLookup('learningBadgeAward.getListByFolderId', {folderId: folder.getId, folder: folder}) }}"
     >
     </award-list>
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/awardList.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/badgeReport.js"></script>
 <div id="toaster" class="toast" data-toast></div>
