@@ -1,7 +1,9 @@
-import Vue from "vue";
-import AwardList from './award-list';
+import Vue from 'vue';
+import BadgeReport from './badge-report';
 
-Vue.component('award-list', AwardList);
-window.awardList = new Vue({
-    el: '#award-list-container'
+window.badgeReport = new Vue({
+    el: '#badge-report-container',
+    components: {
+        BadgeReport
+    }
 });
