@@ -16,9 +16,9 @@ export default {
          *                            selections change, and that has its own
          *                            toast so don't show another.
          */
-        load (showToast) {
+        filter_load (showToast) {
             this.data = [];
-            this.append(null, showToast);
+            this.filter_append(null, showToast);
         },
 
         /**
@@ -27,7 +27,7 @@ export default {
          * @param {String|null} cursor
          * @param {Boolean}     showToast
          */
-        append (cursor, showToast) {
+        filter_append (cursor, showToast) {
             // TODO this is very generic, a candidate to be factored into its own place
             let params = {};
             if (cursor) {
@@ -65,7 +65,7 @@ export default {
          * Helper for emitting the change event: this happens when selecting a
          * badge, or reloading the filter.
          */
-        emitChange() {
+        filter_emitChange() {
             this.$emit(EVENT_CHANGE);
         },
 

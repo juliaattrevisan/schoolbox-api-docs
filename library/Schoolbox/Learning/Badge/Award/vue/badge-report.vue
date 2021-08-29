@@ -2,7 +2,7 @@
 
 import BadgeImage from '../../vue/badge-image';
 import AwardDetailModal from './award-detail-modal';
-import filterMixin from '../../vue/filter-mixin';
+import mixinFilter from '../../vue/mixinFilter';
 
 export default {
 
@@ -12,7 +12,7 @@ export default {
     },
 
     mixins: [
-        filterMixin
+        mixinFilter
     ],
     
     props: {
@@ -76,8 +76,8 @@ export default {
         onFilterChange (selectedFilters) {
             this.selectedFilters = selectedFilters;
             this.showSkeletonLoader = true;
-            this.load(false);
-            this.emitChange();
+            this.filter_load(false);
+            this.filter_emitChange();
         },
 
     }
