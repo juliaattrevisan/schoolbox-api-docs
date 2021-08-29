@@ -50,6 +50,10 @@ export default {
         },
     },
 
+    mounted () {
+        document.addEventListener('badge-report__onFilterChange', this.onFilterChange);
+    },
+
     methods: {
 
         /**
@@ -74,12 +78,14 @@ export default {
         },
 
         /**
-         * Update the list depending on the filter selection
+         * Update the list depending on the filter selection is dispatched from
+         * library/Schoolbox/Learning/Badge/Award/templates/list.twig
          * 
-         * @params { Array } 
+         * @params { Event } contains the selected filters array
          */
-        onFilterChange (selectedFilters) {
-            this.selectedFilters = selectedFilters;
+        onFilterChange (event) {
+            debugger;
+            this.selectedFilters = event.detail.selectedFilters;
             this.showSkeletonLoader = true;
             this.filter_load(false);
             this.filter_emitChange();

@@ -7,7 +7,11 @@
     <script type="text/javascript">
         $(function () {
             $('#badge-report-container').on('filterContentLoaded', function (event, selectedFilters) {
-                window.badgeReport.$children[0].onFilterChange(selectedFilters);
+                document.dispatchEvent(new CustomEvent('badge-report__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                })); 
             });
         });
     </script>
