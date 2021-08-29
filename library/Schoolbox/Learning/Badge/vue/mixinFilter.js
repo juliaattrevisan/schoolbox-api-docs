@@ -1,10 +1,12 @@
-import {stringify} from "qs";
-import axios from "axios";
+import { stringify } from 'qs';
+import axios from 'axios';
+
 const EVENT_CHANGE = 'change';
+
 export default {
-    computed: {
-    },
+    
     methods: {
+
         /**
          * Load badges.
          *
@@ -14,7 +16,7 @@ export default {
          *                            selections change, and that has its own
          *                            toast so don't show another.
          */
-        load(showToast) {
+        load (showToast) {
             this.data = [];
             this.append(null, showToast);
         },
@@ -25,7 +27,7 @@ export default {
          * @param {String|null} cursor
          * @param {Boolean}     showToast
          */
-        append(cursor, showToast) {
+        append (cursor, showToast) {
             // TODO this is very generic, a candidate to be factored into its own place
             let params = {};
             if (cursor) {
@@ -39,7 +41,7 @@ export default {
             }
             let config = {
                 params:           params,
-                paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' } ),
             }
             axios
                 .get(this.filterEndpoint, config)
@@ -58,6 +60,7 @@ export default {
                 })
                 .finally(() => this.showSkeletonLoader = false);
         },
+
         /**
          * Helper for emitting the change event: this happens when selecting a
          * badge, or reloading the filter.
@@ -65,5 +68,7 @@ export default {
         emitChange() {
             this.$emit(EVENT_CHANGE);
         },
+
     },
+
 }
