@@ -1,35 +1,19 @@
 <script>
 
 import axios from 'axios';
-import foundationMixin from '@vue/components/foundation-mixin';
-import Toast from "@vue/components/toast";
-import RevealModal from "@vue/components/reveal-modal";
-import BadgeAward from "../Award/vue/badgeAward";
-import BadgeDetail from "./badgeDetail";
-import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
-import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
+import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
+import BadgeAward from 'achievement-feed.vue';
+import BadgeDetail from './badgeDetail';
+import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdraw-modal';
+import BadgeGoalWithdrawModal from '../Award/vue/badge-goal-withdraw-modal';
 import BadgeImage from './badge-image';
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
-import mixinFilter from "./mixinFilter";
+import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
+import mixinFilter from './mixinFilter';
 
-// Foundation mixin is not required:
-// the filter panel calls `jQuery.fn.foundation` with the entire document as its
-// context.
-// Attempting to apply Foundation again causes the dropdown menus to not work.
-
-/**
- * @emits change The list of selected badges has changed
- */
 export default {
 
-    /**
-     * Mixins.
-     * Basically traits for vue; allows you to share javascript between components in the same
-     * manner as a php trait. They must already be imported at the top of the file and will
-     * be superpositioned on top of this javascript here, inside export default {}
-     */
     mixins: [
-        foundationMixin,
         mixinFilter
     ],
 
@@ -45,53 +29,31 @@ export default {
     },
 
     props: {
-        /**
-         * The route via which badges are retrieved.
-         */
-        getBadgesRoute: {
+        getBadgesRoute: { //the route via which badges are retrieved.
             type: String,
             default: '',
             required: true,
         },
-
-        /**
-         * The route which shows the badge create form.
-         */
-        getBadgeCreateFormRoute: {
+        getBadgeCreateFormRoute: { //The route which shows the badge create form.
             type: String,
             default: '',
             required: true,
         },
-
-        /**
-         * Is the menu shown for each badge?
-         */
-        showBadgeMenus: {
+        showBadgeMenus: { //Is the menu shown for each badge?
             type: Boolean,
             default: true,
         },
-
-        /**
-         * Can badges be selected?
-         */
-        allowSelection: {
+        allowSelection: { //Can badges be selected?
             type: Boolean,
             default: false,
         },
-
-        /**
-         * The Moment date format which is used to render the date when an
-         * awarding of a badge will expire.
-         *
-         * If not provided, the date will not be rendered.
-         */
-        expiryDateFormat: {
+        expiryDateFormat: { //The Moment date format which is used to render the date when an awarding of a badge will expire. If not provided, the date will not be rendered.
             type: String,
             default: null,
         },
     },
 
-    data() {
+    data () {
         return {
             currentBadge: null,
             data: [],
@@ -105,9 +67,11 @@ export default {
     },
 
     computed: {
+        
         filterEndpoint() {
             return this.getBadgesRoute;
         },
+        
     },
 
     methods: {
