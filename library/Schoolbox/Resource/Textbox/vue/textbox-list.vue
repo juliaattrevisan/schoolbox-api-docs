@@ -2,12 +2,23 @@
 
 import axios from 'axios';
 import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
 
 const EVENT_ADD_TEXTBOX = 'textbox-list-add';
 
 export default {
     name: 'textbox-list',
-    components: {Toast},
+
+    /**
+     * Components.
+     * Any other vue components you also want to use here; they must already be imported
+     * at the top of the file.
+     */
+    components: {
+        RevealModal,
+        Toast
+    },
+
     props: {
         /**
          * Endpoint for fetching textbox usages.
@@ -57,6 +68,13 @@ export default {
             showSkeletonLoader: true,
             validator: null,
             saveInProgress: false,
+
+            /* When you click the Delete link, remember the index of the textbox to delete
+             * A singleton modal spawns and uses this as its confirmation button destination
+             * Because of the way the reveal-modal works, you don't pass it an arg
+             */
+            textboxIndexToDelete: undefined,
+            isProcessActive: false,
         }
     },
     mounted() {
@@ -99,15 +117,6 @@ export default {
             })
         },
 
-        /**
-         * Deletes a textbox from the list of textboxes.
-         *
-         * Currently this only hides the textbox from view, it does not remove
-         * it because `$index` might be reused by another textbox.
-         */
-        deleteTextbox(index) {
-            this.$set(this.textboxes[index], 'deleted', true);
-        },
 
         /**
          * Does this textbox usage record contain a usage for this component's
@@ -148,15 +157,10 @@ export default {
             this.textboxes.forEach(usage => {
                 let textbox = usage.textbox,
                     deleted = usage.deleted ?? false;
-                if (deleted) {
-                    // Check if this textbox has a delete link.
-                    // If it doesn't it's new, so just don't create it.
-                    let deleteEndpoint = textbox?._links?.delete;
-                    if (deleteEndpoint) {
-                        // add to the list of promises
-                        requests.push(axios.delete(deleteEndpoint));
-                    }
-                } else {
+                // If this textbox is marked as deleted, ignore it:
+                // * if it existed, it's already been deleted
+                // * if it didn't exist, it doesn't need to be deleted again
+                if (!deleted) {
                     // Check if this textbox has an update link.
                     // If it doesn't it's new, so create it: otherwise update.
                     let updateEndpoint = textbox?._links?.update;
@@ -244,6 +248,77 @@ export default {
                 let editor = this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'];
                 this.textboxes[index].textbox.body = editor.getData();
             });
+        },
+
+        /**
+         * Attempt to delete the textbox at this index from the list.
+         *
+         * If the textbox exists already, it raises a confirmation modal:
+         * otherwise, it just removes it.
+         *
+         * @param {Number} index The index to remove from `this.textboxes`
+         */
+        attemptToDeleteTextbox(index) {
+            let usage = this.textboxes[index];
+            if (usage.textbox.id) {
+                // Textbox has been persisted: show the modal
+                this.textboxIndexToDelete = index;
+                this.$refs.deleteModal.open();
+            } else {
+                // Textbox has not been persisted: just mark it as deleted
+                this.markAsDeleted(index);
+            }
+        },
+
+        /**
+         * Marks a textbox as deleted.
+         *
+         * Currently this only hides the textbox from view, it does not remove
+         * it because `$index` might be reused by another textbox.
+         *
+         * @param {Number} index The index to remove from `this.textboxes`
+         */
+        markAsDeleted(index) {
+            this.$set(this.textboxes[index], 'deleted', true);
+        },
+
+        /**
+         * Asynchronously access an endpoint to delete a file from the appropriate place
+         */
+        async sendDeleteTextboxRequest () {
+
+            /* Set the loading flag to prevent people spamming the button
+             */
+            this.isProcessActive = true;
+
+            this.$refs.toast.activate('Deleting text box...');
+
+            try {
+
+                /* Asynchronously access the endpoint to delete the thing
+                */
+                await axios.delete(this.textboxes[this.textboxIndexToDelete].textbox._links.delete);
+
+                /* Mark this textbox as deleted
+                 */
+                this.markAsDeleted(this.textboxIndexToDelete);
+
+                /* Shut the modal
+                 */
+                this.$refs.deleteModal.close();
+
+                /* Toast (though I prefer our twig toast until a better replacement comes along)
+                 */
+                this.$refs.toast.timeout('Text box deleted', true);
+                this.isProcessActive = false;
+
+            } catch (error) {
+
+                /* Deal with error case
+                 */
+                this.$refs.toast.timeout('Unable to delete text box', false);
+                this.isProcessActive = false;
+            }
         }
     },
     computed: {
@@ -261,17 +336,21 @@ export default {
 </script>
 <template>
     <form method="post" ref="form" :action="postChangesEndpoint">
-        <section>
-            <ul class="information-list" v-if="showSkeletonLoader">
-                <li class="row" v-for="n in 3" :key="n">
-                    <div class="small-12 card skeleton">
-                        <div class="img"></div>
-                        <h3></h3>
-                        <p class="meta"></p>
-                    </div>
-                </li>
-            </ul>
-            <template v-else>
+        <template v-if="showSkeletonLoader">
+            <section>
+                <ul class="information-list">
+                    <li class="row" v-for="n in 3" :key="n">
+                        <div class="small-12 card skeleton">
+                            <div class="img"></div>
+                            <h3></h3>
+                            <p class="meta"></p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </template>
+        <template v-else>
+            <section>
                 <ul class="information-list unsortable expandable-card">
                     <template v-for="(usage, index) in textboxes">
                         <li v-if="usage.deleted !== true">
@@ -301,7 +380,7 @@ export default {
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-delete" href="#" @click.prevent="deleteTextbox(index)" title="Delete"></a>
+                                    <a class="icon-delete" href="#" @click.prevent="attemptToDeleteTextbox(index)" title="Delete"></a>
                                 </nav>
                             </div>
                             <div :class="{'actions-small-1': true, 'hide': Boolean(usage.textbox.id)}"
@@ -317,14 +396,26 @@ export default {
                         </li>
                     </template>
                 </ul>
+            </section>
+            <div class="empty-state" v-if="undeletedTextboxes.length === 0">
+                <i class="icon-textbox"></i>
+                <p>No text boxes currently exist on this page.</p>
+            </div>
+        </template>
 
-                <div class="empty-state" v-if="undeletedTextboxes.length === 0">
-                    <i class="icon-textbox"></i>
-                    <p>No textboxes currently exist on this page.</p>
-                </div>
-            </template>
-        </section>
-        <input type="submit" ref="saveButton" value="Save all" :disabled="saveInProgress" />
+        <template v-if="textboxes.length > 0">
+            <input type="submit" ref="saveButton" value="Save all" :disabled="saveInProgress" />
+        </template>
+
         <toast ref="toast"></toast>
+
+        <reveal-modal ref="deleteModal">
+            <h2>Please confirm</h2>
+            <p>Are you sure you want to delete this text box?</p>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="sendDeleteTextboxRequest" class="button submit" id="usage-textbox-delete-button" :disabled="isProcessActive">Delete</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="usage-textbox-cancel-button" :disabled="isProcessActive">Cancel</a></li>
+            </ul>
+        </reveal-modal>
     </form>
 </template>
