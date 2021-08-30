@@ -19,6 +19,19 @@ export default {
         },
     },
 
+    methods: {
+
+        /**
+         * Open the selected award detail modal
+         * 
+         * @params { Object } 
+         */
+        awardSelected (award) {
+            this.$emit('on-award-selected', award);
+        },
+
+    }
+
 }
 </script>
 
@@ -31,7 +44,7 @@ export default {
             </a>
         </div>
         <div v-for="(award, index) in student.awards" :key="index" class="left badge-card" style="width:100px; height:120px; overflow:hidden; text-align:center">
-            <a href="#open-award-modal" @click.prevent="openDetailModal(award)" :title="award.badge.name">
+            <a href="#open-award-modal" @click.prevent="awardSelected(award)" :title="award.badge.name">
                 <badge-image :badge="award.badge" :css="award.isGoal ? 'goal' : ''"></badge-image>
                 {{ award.badge.name }}
             </a>

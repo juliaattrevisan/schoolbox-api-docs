@@ -59,7 +59,7 @@ export default {
          * 
          * @returns { Object } 
          */
-        openDetailModal (award) {
+        onAwardSelected (award) {
             this.$refs.awardDetailModal.open(award);
         },
 
@@ -89,6 +89,7 @@ export default {
                         v-for="student in data" 
                         :key="student.id" 
                         :student="student"
+                        @on-award-selected="onAwardSelected"
                     />
                 </ul>
             </section>
