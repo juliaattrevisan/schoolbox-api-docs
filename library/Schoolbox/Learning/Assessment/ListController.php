@@ -124,6 +124,9 @@ class ListController extends Web\Controller\Base
 
     /**
      * Offer a SEB Safe Exam Browser download screen
+     *
+     * @api GET /learning/assessments/{assessmentId}/seb
+     * @since 21.0.7
      */
     public function getSebDownload(IAssessable $assessment): void
     {
@@ -140,6 +143,9 @@ class ListController extends Web\Controller\Base
 
     /**
      * Offer a SEB Safe Exam Browser config download for the given assessment
+     *
+     * @api GET /learning/assessments/{assessmentId}/sebConfig
+     * @since 21.0.7
      */
     public function getSebConfig(IAssessable $assessment): void
     {
@@ -179,6 +185,9 @@ class ListController extends Web\Controller\Base
      * @param IAssessable $assessment
      * @return bool
      * @throws RouteNotFound
+     * @throws \CFPropertyList\IOException
+     * @throws \CFPropertyList\PListException
+     * @throws \DOMException
      */
     protected function isSebCheckPasses(IAssessable $assessment): bool
     {
