@@ -69,7 +69,7 @@ class Sync extends Base implements ISync
                 ''              AS student_home_email,
                 S.EMAIL         AS student_default_email,
                 ''              AS student_work_email,
-                TRIM(S.CURRENT_YEAR)  AS student_year_level,
+                LTRIM(RTRIM(S.CURRENT_YEAR)) AS student_year_level,
                 S.HOUSE         AS student_house,
                 ''              AS student_boarder,
                 ''              AS student_boarding_house,
