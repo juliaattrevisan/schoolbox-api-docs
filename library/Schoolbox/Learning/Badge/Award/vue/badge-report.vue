@@ -44,7 +44,7 @@ export default {
     methods: {
 
         /**
-         * Load the list current student studentData
+         * Load the current student data
          */
         async getStudentData (event) {
             try {
@@ -52,7 +52,7 @@ export default {
                     params: {
                         filters: event.detail.selectedFilters
                     },
-                    paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' } ),
+                    paramsSerializer: (params) => stringify(params, { arrayFormat: 'brackets' } ),
                 }
                 const response = await axios.get(this.getStudentListsEndpoint, config);
                 this.studentData = response.data.data;
@@ -77,12 +77,14 @@ export default {
 
 }
 </script>
+
 <template>
 
-    <div>
+    <div class="small-12 island">
 
-        <div v-if="isDataLoaded" class="small-12 island">
-            <section class="awards">
+        <section class="content">
+            
+            <div v-if="isDataLoaded">
                 <ul class="action-list">
                     <badge-report-student 
                         v-for="student in studentData" 
@@ -91,17 +93,16 @@ export default {
                         @on-award-selected="onAwardSelected"
                     />
                 </ul>
-            </section>
-            <award-detail-modal ref="awardDetailModal"></award-detail-modal>
-        </div>
+                <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+            </div>
 
-        <div v-else-if="hasDataLoadError">
-            <h2>Unable to load the list data</h2>
-        </div>
+            <div v-else-if="hasDataLoadError" class="alert-box alert">
+                Sorry, we are currently unable to load the student data.
+            </div>
 
-        <div v-else>
-            <h2>Loading please wait</h2>
-        </div>
+            <div v-else class="loader"></div>
+
+        </section>
 
     </div>
 
