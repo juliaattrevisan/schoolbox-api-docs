@@ -122,8 +122,8 @@ class Controller extends BaseController
             return $assessmentImpl->getId();
         });
 
-        // Load participants into imported assessments
-        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported);
+//        // Load participants into imported assessments
+//        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($imported);
 
         $breadcrumbs = [
             ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
