@@ -52,6 +52,13 @@ class Payload
 
 
     /**
+     * Some arbitrary string used as the ExamKeySalt, though I don't know if
+     * that actually does anything in SEB
+     */
+    private const EXAM_KEY_SALT = '$1$VMcFkEdF$.8q4GPiJ8MoA4zjOOfca11';
+
+
+    /**
      * @var string
      */
     private string $saltBasis;
@@ -141,7 +148,7 @@ class Payload
      */
     private function generateExamKeySalt(string $saltBasis): string
     {
-        return hash(self::HASH_ALGORITHM, $saltBasis . '$1$VMcFkEdF$.8q4GPiJ8MoA4zjOOfca11');
+        return hash(self::HASH_ALGORITHM, $saltBasis . self::EXAM_KEY_SALT);
     }
 
 
