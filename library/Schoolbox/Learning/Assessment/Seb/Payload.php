@@ -10,7 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Seb;
 
 use Aura\Router\Router;
-use Schoolbox\Learning\Assessment\Seb\CFPropertyList;
+use CFPropertyList\CFData;
+use CFPropertyList\CFDate;
+use CFPropertyList\CFDictionary;
+use CFPropertyList\CFPropertyList;
+use CFPropertyList\CFString;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
@@ -125,14 +129,14 @@ class Payload
      *
      * @param string $xml
      * @return string
-     * @throws CFPropertyList\IOException
-     * @throws CFPropertyList\PListException
+     * @throws \CFPropertyList\IOException
+     * @throws \CFPropertyList\PListException
      * @throws \DOMException
      */
     private function hash(string $xml): string
     {
-        $jsonplist = new CFPropertyList\CFPropertyList();
-        $jsonplist->parse($xml, CFPropertyList\CFPropertyList::FORMAT_XML);
+        $jsonplist = new CFPropertyList();
+        $jsonplist->parse($xml, CFPropertyList::FORMAT_XML);
 
         // Pass root dict to recursively convert dates to ISO 8601 format, encode strings to UTF-8,
         // lock data to Base 64 encoding and remove empty dictionaries.
@@ -171,14 +175,14 @@ class Payload
     private function prepare_plist_for_json_encoding($root) {
         $this->plist_map( function($value, $key, $parent) {
             // Convert date to ISO 8601 if date object.
-            if ($value instanceof CFPropertyList\CFDate) {
+            if ($value instanceof CFDate) {
                 $date = \DateTime::createFromFormat('U', $value->getValue());
                 $date->setTimezone(new \DateTimeZone('UTC')); // Zulu timezone a.k.a. UTC+00.
                 $isodate = $date->format('c');
                 $value->setValue($isodate);
             }
             // Make sure strings are UTF 8 encoded.
-            if ($value instanceof CFPropertyList\CFString) {
+            if ($value instanceof CFString) {
                 // As literal backslashes will be lost during encoding, we must replace them with a unique substitute to be
                 // reverted after JSON encoding.
                 $string = str_replace("\\", self::BACKSLASH_SUBSTITUTE, $value->getValue());
@@ -186,13 +190,13 @@ class Payload
             }
             // Data should remain base 64 encoded, so convert to base encoded string for export. Otherwise
             // CFData will decode the data when serialized.
-            if ($value instanceof CFPropertyList\CFData) {
+            if ($value instanceof CFData) {
                 $data = trim($value->getCodedValue());
                 $parent->del($key);
-                $parent->add($key, new CFPropertyList\CFString($data));
+                $parent->add($key, new CFString($data));
             }
             // Empty dictionaries should be removed.
-            if ($value instanceof CFPropertyList\CFDictionary && empty($value->getValue())) {
+            if ($value instanceof CFDictionary && empty($value->getValue())) {
                 $parent->del($key);
             }
         }, $root);
