@@ -11,8 +11,8 @@ namespace Schoolbox\Realtime;
 
 use Alaress\Async\Queue\QueueInterface;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
 use Schoolbox\Mail\TwigEmailFactory;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -94,14 +94,13 @@ class Mailer
         $email = $this->emailFactory->build($template, $subject);
         $email->setContext($context)->setTo($address);
 
-        if ($this->useReplyTo && $decorator->count() === 1 && $decorator->getNotifications(1)[0]->getReplyToId()) {
+        // we can only include the reply-to header if there is but one email
+        if ($this->useReplyTo && $decorator->count() === 1) {
             try {
-                $effector = $this->userMapper->findById($decorator->getNotifications(1)[0]->getReplyToId());
+                $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getReplyToIds());
                 // do NOT format rcf2822, because swift mailer
-                if ($effector->getEmail()) {
-                    $email->setReplyTo($effector->getEmail(), $effector->getFullName());
-                }
-            } catch (Swift_RfcComplianceException | MapperException $e) {
+                $email->setReplyTo($this->getReplyTo($effectors));
+            } catch (Swift_RfcComplianceException $e) {
                 $this->log->warning('Error applying reply-to: ' . $e->getMessage());
             }
         }
@@ -132,5 +131,24 @@ class Mailer
         }
 
         return false;
+    }
+
+
+    /**
+     * @param Collection|User[] $effectors
+     * @return string[]
+     */
+    private function getReplyTo(Collection $effectors)
+    {
+        $replyTo = [];
+
+        foreach ($effectors as $effector) {
+            $replyAddr = trim($effector->getEmail());
+            if ($replyAddr) {
+                $replyTo[$replyAddr] = $effector->formatName();
+            }
+        }
+
+        return $replyTo;
     }
 }

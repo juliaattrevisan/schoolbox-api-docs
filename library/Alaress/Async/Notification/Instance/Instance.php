@@ -679,10 +679,10 @@ class Instance implements JsonSerializable
 
     /**
      * Gets reply to user id
-     * @return int|null
+     * @return array
      */
-    public function getReplyToUserId(): ?int
+    public function getReplyToUserIds(): array
     {
-        return $this->meta['replyToUserId'] ?? null;
+        return $this->meta['replyToUserIds'] ?? [];
     }
 }

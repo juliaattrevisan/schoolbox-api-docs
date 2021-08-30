@@ -322,9 +322,9 @@ class Builder implements BuilderInterface
     /**
      * Set user id, when need to explicitly set reply-to to other than effector
      */
-    public function setReplyToUserId(int $replyToUserId): self
+    public function setReplyToUserIds(array $replyToUserIds): self
     {
-        $this->meta['replyToUserId'] = $replyToUserId;
+        $this->meta['replyToUserIds'] = $replyToUserIds;
         return $this;
     }
 

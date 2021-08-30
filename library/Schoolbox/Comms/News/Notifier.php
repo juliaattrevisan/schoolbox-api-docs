@@ -644,7 +644,7 @@ class Notifier extends AbstractModuleNotifier
             ->setByline("$shortDate by $authorName")
             // timestamp and filters are optional
             ->setTimestamp($activeDate->getUnixTimeStamp())
-            ->setReplyToUserId($author->getId())
+            ->setReplyToUserIds([$author->getId()])
             // and then you build
             ->addFilter('roleType', [$roleType]);
 

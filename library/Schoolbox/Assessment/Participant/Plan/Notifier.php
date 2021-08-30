@@ -1408,16 +1408,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // set it as reply to
         if ($this->conf->get('mail_replyto_enabled') && $folder->isClass()) {
             $teachers = $this->externalClass->getTeachers($folder->getCodeString());
+            $replyToUserIds = [];
             foreach ($teachers as $teacherExternalId) {
                 try {
                     $teacher = $this->userMapper->findByExternalId($teacherExternalId);
                     if ($teacher->getEmail()) {
-                        $bob->setReplyToUserId($teacher->getId());
-                        break;
+                        $replyToUserIds[] = $teacher->getId();
                     }
                 } catch (BaseMapper\Exception $e) {
                     continue;
                 }
+            }
+            if (count($replyToUserIds) > 0) {
+                $bob->setReplyToUserIds($replyToUserIds);
             }
         }
 
