@@ -72,4 +72,7 @@ MAILTO="support@schoolbox.com.au"
 # Cleanup etherpad session storage (once a week on a Sunday)
 #10 2 * * 0 www-data php /usr/share/schoolboxdev/tools/redis/removeEtherpadSession.php -p >> /var/log/schoolboxdev/purge-old-sessions.log 2>&1
 
+# mysql optimize. Each night between 3:45 - 4:45 AM
+45 03 * * * root /usr/local/bin/jitter 3600 /usr/share/schoolboxdev/tools/schema/optimize.sh >> /var/log/schoolboxdev/mysql-optimize.log 2>&1
+
 # End of file - do not delete
