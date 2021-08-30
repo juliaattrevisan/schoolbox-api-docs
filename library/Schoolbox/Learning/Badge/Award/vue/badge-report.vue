@@ -5,9 +5,10 @@
  * and from where new goals / acheievements can be assigned
  */
 
+import axios from 'axios';
+import { stringify } from 'qs';
 import BadgeReportStudent from './badge-report-student.vue';
 import AwardDetailModal from './award-detail-modal';
-import mixinFilter from '../../vue/mixinFilter';
 
 export default {
 
@@ -15,10 +16,6 @@ export default {
         BadgeReportStudent,
         AwardDetailModal
     },
-
-    mixins: [
-        mixinFilter
-    ],
     
     props: {
         subjectTitle: {
@@ -33,26 +30,39 @@ export default {
     
     data () {
         return {
-            currentBadge: null,
-            data: [],
-            metadata: {
-                count: null,
-                cursor: null,
-            },
-            showSkeletonLoader: true,
+            studentData: [],
+            isDataLoaded: false,
+            hasDataLoadError: false,
             selectedFilters: [],
         }
     },
 
-    created () {
-        this.filter_endpoint = this.getStudentListsEndpoint; //assign endpoint for the mixinFilter
-    },
-
     mounted () {
-        document.addEventListener('badge-report__onFilterChange', this.onFilterChange);
+        document.addEventListener('badge-report__onFilterChange', this.getStudentData);
     },
 
     methods: {
+
+        /**
+         * Load the list current student studentData
+         */
+        async getStudentData (event) {
+            try {
+                const config = {
+                    params: {
+                        filters: event.detail.selectedFilters
+                    },
+                    paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' } ),
+                }
+                const response = await axios.get(this.getStudentListsEndpoint, config);
+                this.studentData = response.data.data;
+            } catch (error) {
+                console.warn(error);
+                this.hasDataLoadError = true; //show load error
+            } finally {
+                this.isDataLoaded = true; //update the display to show the list
+            }
+        },
 
         /**
          * Open the selected award detail modal
@@ -63,30 +73,19 @@ export default {
             this.$refs.awardDetailModal.open(award);
         },
 
-        /**
-         * Update the list depending on the filter selection is dispatched from
-         * library/Schoolbox/Learning/Badge/Award/templates/list.twig
-         * 
-         * @params { Event } contains the selected filters array
-         */
-        onFilterChange (event) {
-            this.selectedFilters = event.detail.selectedFilters;
-            this.showSkeletonLoader = true;
-            this.filter_load(false);
-            this.filter_emitChange();
-        },
-
     }
 
 }
 </script>
 <template>
+
     <div>
-        <div class="small-12 island">
+
+        <div v-if="isDataLoaded" class="small-12 island">
             <section class="awards">
                 <ul class="action-list">
                     <badge-report-student 
-                        v-for="student in data" 
+                        v-for="student in studentData" 
                         :key="student.id" 
                         :student="student"
                         @on-award-selected="onAwardSelected"
@@ -95,5 +94,15 @@ export default {
             </section>
             <award-detail-modal ref="awardDetailModal"></award-detail-modal>
         </div>
+
+        <div v-else-if="hasDataLoadError">
+            <h2>Unable to load the list data</h2>
+        </div>
+
+        <div v-else>
+            <h2>Loading please wait</h2>
+        </div>
+
     </div>
+
 </template>
