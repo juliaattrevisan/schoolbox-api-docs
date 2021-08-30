@@ -113,6 +113,10 @@ class Payload
 
         /* Figure out the absolute url for this assessment and all the subpages
          * such as https://domain/learning/assessment/123*
+         *
+         * FIXME If you want to lock down non-aura pages further, you'll need to change
+         *  "Router $router" to "string $route" instead, and have the aura pages generate
+         *  the $route and pass it instead of doing it internally
          */
         $startUrl = $domain . $this->router->generate('learningAssessment.getAssessment', [
             'assessmentId' => $assessment->getId()
