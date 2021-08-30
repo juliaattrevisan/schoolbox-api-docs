@@ -16,7 +16,7 @@
 {% endblock details_hohTeacher %}
 
 {% block details_studiesCode %}
-    {% if showDetails and externalUser.StudentStudiesCode is defined %}
+    {% if showDetails and externalUser.StudentStudiesCode is defined and externalUser.StudentStudiesCode %}
         <dt class="no-margin small-6 medium-3">NSN</dt>
         <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
     {% endif %}
