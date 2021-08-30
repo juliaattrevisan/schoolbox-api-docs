@@ -274,6 +274,18 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+
+        /* Check if this assessment has a SEB requirement
+         * If it does, send you to the download screen
+         */
+        if (!$this->isSebCheckPasses($assessment)) {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload', [
+                'assessmentId' => $assessment->getId()
+            ]));
+
+            return;
+        }
+
         $participant = $assessment->getParticipantIfExtant($student);
 
         // Generate rubric marked grids for every feedback being displayed

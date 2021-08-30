@@ -89,6 +89,14 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * A flag denoting whether this assessment requires the SEB Safe Exam Browser
+     *
+     * @var bool|null
+     */
+    private ?bool $sebEnabled = null;
+
+
+    /**
      * The person who created this Assessable
      *
      * @var User
@@ -865,6 +873,26 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->courseManaged = $courseManaged;
 
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getSebEnabled(): ?bool
+    {
+        return $this->sebEnabled;
+    }
+
+
+    /**
+     * @param bool|null $sebEnabled
+     * @return AbstractAssessment
+     */
+    public function setSebEnabled(?bool $sebEnabled): self
+    {
+        $this->sebEnabled = $sebEnabled;
         return $this;
     }
 

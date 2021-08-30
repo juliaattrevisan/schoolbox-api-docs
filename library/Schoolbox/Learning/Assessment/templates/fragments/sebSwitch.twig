@@ -1,0 +1,23 @@
+{##
+ # SEB Switch
+ #
+ # This is the ui for enabling the SEB Safe Exam Browser requirement
+ # on Due Work, Task, Quiz
+ #
+ # @param IAssessable $assessment
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <label for="sebEnabled">Enforce Safe Exam Browser <span class="hint has-tip tip-top" title="By ticking this box the student will be required to use a correctly configured Safe Exam Browser to view the activity" data-tooltip="">?</span></label>
+
+        <input type="hidden" name="sebEnabled" value="0" />
+
+        <div class="switch">
+            <input name="sebEnabled" id="sebEnabled" type="checkbox" {% if assessment.sebEnabled %}checked="checked"{% endif %} />
+            <label for="sebEnabled">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+</div>

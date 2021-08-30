@@ -142,8 +142,10 @@ class Module extends BaseModule
         $assListRoute  = "/{contextType:$contextTypes}/{contextId:\\d+}/assessments";
         $studentParam  = '{studentId:\d+}';
 
-
         // register the routes
+
+        $this->register('GET', "$assRoute/seb", 'getSebDownload', $loggedIn, $preloadAssessment);
+        $this->register('GET', "$assRoute/sebConfig", 'getSebConfig', $loggedIn, $preloadAssessment);
         $this->register('GET', "$assListRoute", 'getAssessmentsByContext', $isSuper, $preloadContext);
         $this->register('POST', "$assListRoute", 'postCreateAssessment', $canWrite, $preloadContext); // a || c
         $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments', $canWrite, $preloadContext); // a || c
@@ -285,9 +287,7 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
         } catch (MapperException\Deleted $e) {
             $assessment = $e->getDeletedObject();
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }

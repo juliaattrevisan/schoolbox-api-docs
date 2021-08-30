@@ -18,8 +18,10 @@ use LogicException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -87,6 +89,12 @@ class ListController extends Web\Controller\Base
 
 
     /**
+     * @var BreadcrumbFactory
+     */
+    protected BreadcrumbFactory $bakery;
+
+
+    /**
      * @param UserMapper              $userMapper
      * @param Error\Mapper            $errorMapper
      * @param MapperProxy             $assessmentMapper
@@ -111,6 +119,96 @@ class ListController extends Web\Controller\Base
         $this->transactor              = $transactor;
         $this->participantDataSource   = $participantDataSource;
         $this->unitSpecificationMapper = $unitSpecificationMapper;
+    }
+
+
+    /**
+     * Offer a SEB Safe Exam Browser download screen
+     *
+     * @api GET /learning/assessments/{assessmentId}/seb
+     * @since 21.0.7
+     */
+    public function getSebDownload(IAssessable $assessment): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/sebDownload.twig', [
+            'assessmentId' => $assessment->getId(),
+            'assessment' => $assessment,
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                '',
+            ]),
+        ]));
+    }
+
+
+    /**
+     * Offer a SEB Safe Exam Browser config download for the given assessment
+     *
+     * @api GET /learning/assessments/{assessmentId}/sebConfig
+     * @since 21.0.7
+     */
+    public function getSebConfig(IAssessable $assessment): void
+    {
+        $sebPayload = new SebPayload(
+            $this->getConfigLoader()->get('site_location'),
+            $this->getRequest()->server->get('HTTP_HOST'),
+            $this->router
+        );
+
+        $contents = $sebPayload->generate($assessment);
+
+        /* Send as a downloadable file
+         */
+        $headers  = $this->getResponse()->headers;
+
+        $headers->set('Pragma', 'no-cache');
+        $headers->set('Cache-Control', 'private, max-age=1, no-transform');
+        $headers->set('Content-Type', 'application/seb');
+        $headers->set('Content-Length', strlen($contents));
+        $headers->set('Content-Disposition', "attachment; filename=\"{$assessment->getId()}.seb\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $contents,
+        ]);
+    }
+
+
+    /**
+     * SEB Safe Exam Browser check
+     *
+     * Check whether $assessment is protected by seb and if so, decide if you are
+     * allowed to get in. If seb wasn't required, then it lets you through anyway.
+     *
+     * Seb is only enforced upon student roletype
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     * @throws RouteNotFound
+     * @throws \CFPropertyList\IOException
+     * @throws \CFPropertyList\PListException
+     * @throws \DOMException
+     */
+    protected function isSebCheckPasses(IAssessable $assessment): bool
+    {
+        /* Check whether SEB was required
+         */
+        return (new Seb\ValidSebCheck())->isSatisfiedBy(
+            $this->getUser(),
+            $assessment->getSebEnabled(),
+            $this->getRequest()->server->getArrayCopy(),
+            /* Don't worry about the Browser Exam Key for now
+             * We need to generate some platform-specific crypto for it
+             */
+            'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
+            /* Generate a config key hash from the xml that guards this assessment url
+             */
+            (new SebPayload(
+                $this->getConfigLoader()->get('site_location'),
+                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->router
+            ))->generateConfigKey($assessment)
+        );
     }
 
 
@@ -822,5 +920,14 @@ class ListController extends Web\Controller\Base
     {
         $this->access = $access;
         return $this;
+    }
+
+
+    /**
+     * @return BreadcrumbFactory
+     */
+    protected function getBakery(): BreadcrumbFactory
+    {
+        return $this->bakery;
     }
 }

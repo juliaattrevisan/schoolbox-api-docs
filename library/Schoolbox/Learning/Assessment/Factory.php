@@ -104,6 +104,12 @@ class Factory
      */
     protected $courseManaged;
 
+
+    /**
+     * @var bool
+     */
+    private bool $sebEnabled;
+
     /**
      * @var string
      */
@@ -157,6 +163,7 @@ class Factory
         $this->setCurriculumNodes($post['curriculumCodes']);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
         $this->setCourseManaged((bool)$post['courseManaged']);
+        $this->setSebEnabled((bool)$post['sebEnabled']);
         $this->setPublishAt(trim($post['publishDate']));
         $this->setOpenAt(trim($post['openDate']));
         $this->setDueAt(trim($post['dueDate']));
@@ -398,6 +405,7 @@ class Factory
                 ->setWeight($this->getWeight())
                 ->setDefaultOpenSpan($this->getDefaultOpenSpan())
                 ->setCourseManaged($this->getCourseManaged())
+                ->setSebEnabled($this->getSebEnabled())
                 ->setMarkVisibility($this->getMarkVisibility())
                 ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
                 ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
@@ -601,6 +609,26 @@ class Factory
     public function setCourseManaged(?bool $courseManaged): self
     {
         $this->courseManaged = $courseManaged;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getSebEnabled(): ?bool
+    {
+        return $this->sebEnabled;
+    }
+
+
+    /**
+     * @param bool|null $sebEnabled
+     * @return $this
+     */
+    public function setSebEnabled(?bool $sebEnabled): self
+    {
+        $this->sebEnabled = $sebEnabled;
         return $this;
     }
 

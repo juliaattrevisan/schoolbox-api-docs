@@ -661,6 +661,19 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * @return bool|null
+     */
+    public function getSebEnabled(): ?bool;
+
+
+    /**
+     * @param bool|null $sebEnabled
+     * @return AbstractAssessment
+     */
+    public function setSebEnabled(?bool $sebEnabled): self;
+
+
+    /**
      * Get the weight
      *
      * A multiplier applied to a Normalised Mark

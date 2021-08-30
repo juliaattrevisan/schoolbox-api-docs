@@ -90,7 +90,6 @@
     {% if canRelocate %}
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
-
 </fieldset>
 
 {# ----------------------------------------------------------- #}
@@ -143,6 +142,9 @@
     {% if context.baseContext is not unitSpecification %}
         {% include '@learningAssessment/fragments/dates.twig' %}
     {% endif %}
+
+    {# Enforce Safe Exam Browser #}
+    {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
 </fieldset>
 
 {# ----------------------------------------------------------- #}

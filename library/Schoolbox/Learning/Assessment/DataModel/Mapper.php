@@ -67,6 +67,7 @@ class Mapper extends BaseMapper
         $this->joins('work_type_id', WorkTypeMapper::class, 'id', self::TYPE_MODEL, null, 'workType', 'work_type');
         $this->uses('default_open_span', self::TYPE_INTEGER);
         $this->uses('course_managed', self::TYPE_BOOLEAN);
+        $this->uses('seb_enabled', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

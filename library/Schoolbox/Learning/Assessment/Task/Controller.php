@@ -26,7 +26,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Preview\Factory as PreviewFactory;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
@@ -152,6 +151,18 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+
+        /* Check if this assessment has a SEB requirement
+         * If it does, send you to the download screen
+         */
+        if (!$this->isSebCheckPasses($assessment)) {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload', [
+                'assessmentId' => $assessment->getId()
+            ]));
+
+            return;
+        }
+
         $previewFragment = [];
 
         /* If there was a specified url, it could be to some external location

@@ -131,6 +131,9 @@
             </div>
         </div>
     </div>
+
+    {# Enforce Safe Exam Browser #}
+    {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
 </fieldset>
 
 

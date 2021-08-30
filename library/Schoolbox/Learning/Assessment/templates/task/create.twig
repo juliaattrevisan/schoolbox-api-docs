@@ -100,6 +100,9 @@
                 <span class="icon-cancel"></span>
             </label>
         </div>
+
+        {# Enforce Safe Exam Browser #}
+        {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
     </div>
 </div>
 
