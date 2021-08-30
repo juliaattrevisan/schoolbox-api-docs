@@ -4,3 +4,18 @@ CREATE TABLE `turnitin_group` (
     `submission_box_id` INT NOT NULL,
     `group_id` VARCHAR(255) NOT NULL
 );
+
+-- The Turnitin processing queue and its processing result
+-- The last known error is cached here
+CREATE TABLE `turnitin_report` (
+    `id` INT NOT NULL,
+    `status` TINYINT NOT NULL,
+    `error_code` VARCHAR(255) NULL,
+    `error_message` VARCHAR(255) NULL,
+    `student_submission_file_id` INT NOT NULL,
+    `turnitin_submission_id` VARCHAR(255) NULL,
+    `overall_match_percentage` DECIMAL NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME NULL,
+PRIMARY KEY (`id`));
