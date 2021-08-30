@@ -6,6 +6,8 @@ import MediaArticle from '@vue/components/media-article';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import mixinCKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
+import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
 
 export default {
 
@@ -17,7 +19,10 @@ export default {
         RevealModal
     },
 
-    mixins: [cdnPrefixMixin],
+    mixins: [
+        cdnPrefixMixin,
+        mixinCKEditor
+    ],
 
     props: {
         articleId: Number,
@@ -43,41 +48,18 @@ export default {
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
             newComment: '',
-            isProcessActive: false,
+            isProcessing: false,
             showCommentsSection: false,
             isInitialLoad: true,
             postHeaders: {
                 'X-Requested-With' : 'XMLHttpRequest'
             },
-            isCKEditorLoading: false,
-            isCKEditorLoaded: false
         }
     },
 
     computed: {
 
-        /**
-         * The text within the comment prompt button, will change to loading when selected to notify
-         *
-         * @returns {String}
-         */
-        getAddCommentButtonText () {
-            if (this.isCKEditorLoading) return 'Loading';
-            else return 'Add a comment'
-        },
-
-        /**
-         * Ensure there's something (anything) in the comment and that the form is not already processing
-         *
-         * @returns {Boolean}
-         */
-        isPostCommentDisabled () {
-            if (this.newComment.trim() === '' || this.isProcessActive) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        
 
     },
 
@@ -105,11 +87,11 @@ export default {
          */
         getThread () {
 
-            this.isProcessActive = true;
+            this.isProcessing = true;
 
             // Short-circuit if no thread ID
             if (!this.threadId) {
-                this.isProcessActive = false;
+                this.isProcessing = false;
                 this.isInitialLoad = false;
                 this.showCommentsSection = this.isThreadCheckboxVisible;
                 return;
@@ -157,7 +139,7 @@ export default {
                     }
                     this.isInitialLoad = false;
                 }
-                this.isProcessActive = false;
+                this.isProcessing = false;
             });
         },
 
@@ -219,66 +201,10 @@ export default {
         },
 
         /**
-         * Loads ckeditor only when required rather than on page load
-         *
+         * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
-        loadCKEditor () {
-
-            //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
-            this.isCKEditorLoading = true;
-            
-            const loadScripts = async () => {
-
-                try {
-                    
-                    await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
-                    await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
-
-                    $.fn.alaressEditor({
-                        targetElements: $('#comment'),
-                        startupFocus: true,
-                        height: '8rem',
-                        removePlugins: 'uploadimage,schoolboxanchor',
-                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
-                        toolbarGroups: [
-                            {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                            {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                            {name: 'insert', groups: ['insert']},
-                            {name: 'schoolbox', groups: ['schoolboxlink']}
-                        ],
-                        on: {
-                            change: (event) => {
-                                this.newComment = CKEDITOR.instances['comment'].getData(); // Bind the content of CKEditor into the comment model on change
-                            },
-                            instanceReady: (event) => { //can display the loaded CKEditor now
-                                this.isCKEditorLoading = false;
-                                this.isCKEditorLoaded = true;
-                            }
-                        }
-                    });
-
-                } catch (error) {
-                    this.$refs.toast.timeout('Loading comments failed', false, 5000);
-	            }
-            }
-
-            loadScripts();
-
-        },
-
-        /**
-         * Async inject a <script> tag into the DOM
-         * https://stackoverflow.com/a/39008859
-         *
-         */
-        injectScript (src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.addEventListener('load', resolve);
-                script.addEventListener('error', e => reject(e.error));
-                document.head.appendChild(script);
-            });
+        onAddCommentSelected () {
+            this.cKEditor_init(EDITOR_CONFIG_FOR_COMMENTS);
         },
 
         /**
@@ -287,7 +213,7 @@ export default {
          */
         postComment () {
 
-            this.isProcessActive = true;
+            this.isProcessing = true;
             this.$refs.toast.activate('Posting comment...');
 
             axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
@@ -298,15 +224,15 @@ export default {
                 this.totalCommentsCount++;
 
                 this.newComment = '';
-                CKEDITOR.instances['comment'].setData(this.newComment); //clear out the CKEditor for another possible post
+                CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
 
                 this.$refs.toast.timeout('Comment has been added', true);
 
             }).catch((error) => {
-                this.isProcessActive = false;
+                this.isProcessing = false;
                 this.$refs.toast.timeout('Unable to post comment', false);
             }).finally(() => {
-                this.isProcessActive = false;
+                this.isProcessing = false;
             });
 
         },
@@ -330,7 +256,7 @@ export default {
          */
         deleteComment () {
 
-            this.isProcessActive = true;
+            this.isProcessing = true;
             this.$refs.toast.activate('Deleting comment...');
 
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
@@ -349,25 +275,38 @@ export default {
                 this.$refs.deleteModal.close();
 
                 this.$refs.toast.timeout('Comment deleted', true);
-                this.isProcessActive = false;
+                this.isProcessing = false;
 
             }).catch((error) => {
                 this.$refs.toast.timeout('Unable to delete comment', false);
-                this.isProcessActive = false;
+                this.isProcessing = false;
             });
 
         },
 
-    },
-
-    filters: {
-        fromNow: function (date) {
+        /**
+         * Return the date from now, 
+         *
+         * @param { Date } 
+         * 
+         * @returns { String } ie: 2 hours ago
+         */
+        fromNow (date) {
             return moment(date.database).fromNow();
         },
-        fullString: function (date) {
+
+        /**
+         * Dispaly the full date
+         *
+         * @param { Date } 
+         * 
+         * @returns { String }
+         */
+        fullString (date) {
             return moment(date.database).format(dateDisplayFormats.momentJsDatetime);
         }
-    }
+
+    },
 
 }
 </script>
@@ -388,13 +327,12 @@ export default {
                 <template v-if="!isInitialLoad">
                     <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
-                            <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
-                            <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                            <div :style="[isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                                <textarea id="comment" name="comment" rows="5"></textarea>
+                            <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="onAddCommentSelected">{{ cKEditor_getAddCommentButtonText }}</button>
+                            <div :style="cKEditor_getStyles">
+                                <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
                                 <a class="button submit"
                                     @click="postComment"
-                                    :disabled="isPostCommentDisabled">Post comment</a>
+                                    :disabled="cKEditor_isPostCommentDisabled">Post comment</a>
                             </div>
                         </template>
                         <template v-else>
@@ -430,7 +368,7 @@ export default {
                                     <a :href="'/search/user/' + comment.author.id" title="View Profile">
                                         <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'">
                                         {{ comment.author.fullName }}
-                                        <span class="pipe meta" :title="comment.createdAt | fullString ">Posted {{ comment.createdAt | fromNow }}</span>
+                                        <span class="pipe meta" :title="fullString(comment.createdAt)">Posted {{ fromNow(comment.createdAt) }}</span>
                                     </a>
                                 </div>
                             </div>
@@ -440,7 +378,7 @@ export default {
                             <media-article v-html="comment.content"></media-article>
                         </li>
                     </ul>
-                    <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessActive">Show older comments</a>
+                    <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessing">Show older comments</a>
                 </template>
             </div>
         </section>
@@ -449,8 +387,8 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this comment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteComment" class="button submit" id="article-threads-delete-button" :disabled="isProcessActive">Delete</a></li>
-                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="article-threads-cancel-button" :disabled="isProcessActive">Cancel</a></li>
+                <li><a @click.prevent="deleteComment" class="button submit" id="article-threads-delete-button" :disabled="isProcessing">Delete</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="article-threads-cancel-button" :disabled="isProcessing">Cancel</a></li>
             </ul>
         </reveal-modal>
     </div>

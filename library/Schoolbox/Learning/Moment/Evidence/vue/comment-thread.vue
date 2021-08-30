@@ -1,23 +1,29 @@
 <script>
 
-import Vue from 'vue';
 import axios  from 'axios';
 import moment from 'moment';
-
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import mixinCKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
+import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
 
 export default {
+
     components: {
         MediaArticle,
         Storage,
         Toast,
         RevealModal
     },
-    mixins: [cdnPrefixMixin],
+
+    mixins: [
+        cdnPrefixMixin,
+        mixinCKEditor
+    ],
+
     props: {
         thread: {
             type: Object,
@@ -42,46 +48,17 @@ export default {
             required: true
         }
     },
+
     data() {
         return {
             commentThread: this.thread,
-            pendingComment: '',
-            saveInProgress: false,
-            commentIndexToDelete: null,
-            editorUrl: this.cdnPrefix + '/js/ckeditor/ckeditor.js',
-            isCKEditorLoading: false,
-            isCKEditorLoaded: false,
-            isCKEditorReady: false,
-            ckeditorConfig: {
-                embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
-                removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed',
-                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-                toolbarGroups: [
-                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                    {name: 'insert', groups: ['insert']}
-                ],
-                contentsCss: [
-                    '/css/core/skin.css.php',
-                    this.cdnPrefix + '/css/core/editor.css',
-                ],
-                height: '4rem',
-                resize_enabled: false,
-                startupFocus: true,
-            }
+            newComment: '',
+            isProcessing: false,
+            commentIndexToDelete: null
         }
     },
-    computed: {
 
-         /**
-         * The text within the comment prompt button, will change to loading when selected to notify
-         *
-         * @returns {String}
-         */
-        getAddCommentButtonText () {
-            if (this.isCKEditorLoading) return 'Loading';
-            else return 'Add a comment'
-        },
+    computed: {
 
         dateDisplayFormats: () => window.dateDisplayFormats,
 
@@ -149,34 +126,11 @@ export default {
 
     methods: {
 
-
         /**
-         * Loads ckeditor only when required rather than on page load
+         * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
-        loadCKEditor () {
-            
-            //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
-            this.isCKEditorLoading = true;
-
-            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js
-            //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
-            import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
-                .then(({ default: CKEditor }) => {
-                    Vue.component('ckeditor', CKEditor.component); //register the component for use once ready
-                    this.isCKEditorLoaded = true;
-                })
-                .catch(err => {
-                    this.$refs.toast.timeout('Loading comments failed', false, 5000);
-                });
-
-        },
-
-        /**
-         * Once CKEditor is ready, we can display it and hide the prompt button
-         */
-        onCKEditorReady (event) {
-            this.isCKEditorReady = true;
-            this.isCKEditorLoading = false;
+        onAddCommentSelected () {
+            this.cKEditor_init(EDITOR_CONFIG_FOR_COMMENTS);
         },
 
         /**
@@ -184,19 +138,18 @@ export default {
          */
         loadMoreComments() {
             // What's the cursor?
-            let cursor = this.commentThread?.children?.metadata?.cursor?.next,
-                getUrl = this.commentThread?._links?.getComments?.href,
-                self   = this;
+            const cursor = this.commentThread?.children?.metadata?.cursor?.next;
+            const getUrl = this.commentThread?._links?.getComments?.href;
             if (getUrl && cursor) {
-                self.$refs.toast.activate('Loading...');
+                this.$refs.toast.activate('Loading...');
                 axios
-                    .get(getUrl, {params: {cursor: cursor}})
+                    .get(getUrl, { params: { cursor: cursor } })
                     .then((response) => {
-                        self.commentThread.children.data = self.commentThread.children.data.concat(response.data.data);
-                        self.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
+                        this.commentThread.children.data = this.commentThread.children.data.concat(response.data.data);
+                        this.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
                         this.$refs.toast.timeout('Loaded comments', true, 2000);
                     })
-                    .catch(() => self.$refs.toast.timeout('Loading comments failed', false, 5000))
+                    .catch(() => this.$refs.toast.timeout('Loading comments failed', false, 5000))
             }
         },
 
@@ -209,11 +162,10 @@ export default {
          */
         postComment() {
             // maybe there's not a thread at all. If not: create one, then post
-            let prePromise = Promise.resolve(),
-                self       = this;
+            let prePromise = Promise.resolve();
 
-            self.saveInProgress = true;
-            self.$refs.toast.activate('Saving...');
+            this.isProcessing = true;
+            this.$refs.toast.activate('Saving...');
 
             if (!this.hasThread) {
                 prePromise = axios
@@ -221,8 +173,8 @@ export default {
                     .then((response) => {
                         // Set the comment thread to the one just created,
                         // and forge an empty set of comments
-                        self.commentThread = response.data;
-                        self.commentThread.children = {
+                        this.commentThread = response.data;
+                        this.commentThread.children = {
                             data: [],
                             metadata: {
                                 count: 0,
@@ -235,17 +187,18 @@ export default {
                     })
             }
             prePromise
-                .then(() => axios.post(self.commentThread._links.createComment.href, {content: self.pendingComment}))
+                .then(() => axios.post(this.commentThread._links.createComment.href, {content: this.newComment}))
                 .then((response) => {
                     // Update the comment count, add the new comment to the
                     // thread, clear the pending comment box
-                    self.commentThread.children.metadata.count += 1;
-                    self.commentThread.children.data.unshift(response.data);
-                    self.$refs.toast.timeout('Comment posted', true, 2000);
-                    self.pendingComment = '';
+                    this.commentThread.children.metadata.count += 1;
+                    this.commentThread.children.data.unshift(response.data);
+                    this.$refs.toast.timeout('Comment posted', true, 2000);
+                    this.newComment = '';
+                    CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
                 })
-                .catch(() => self.$refs.toast.timeout('Comment post failed', false, 5000))
-                .finally(() => self.saveInProgress = false)
+                .catch(() => this.$refs.toast.timeout('Comment post failed', false, 5000))
+                .finally(() => this.isProcessing = false)
         },
 
 
@@ -267,27 +220,47 @@ export default {
          * @param {Number} index
          */
         deleteComment(index) {
-            let self       = this,
-                comment    = self.commentThread.children.data[index],
-                deleteLink = comment?._links?.delete?.href;
-            self.$refs.deleteModal.close();
+            const comment = this.commentThread.children.data[index];
+            const deleteLink = comment?._links?.delete?.href;
+            this.$refs.deleteModal.close();
             if (deleteLink) {
-                self.$refs.toast.activate('Deleting...');
+                this.$refs.toast.activate('Deleting...');
                 axios
                     .delete(deleteLink)
                     .then(() => {
-                        self.commentThread.children.data.splice(index, 1);
-                        self.commentThread.children.metadata.count -= 1;
-                        self.$refs.toast.timeout('Deleted', true, 2000);
+                        this.commentThread.children.data.splice(index, 1);
+                        this.commentThread.children.metadata.count -= 1;
+                        this.$refs.toast.timeout('Deleted', true, 2000);
                     })
-                    .catch(() => self.$refs.toast.timeout('Delete failed', false, 5000))
+                    .catch(() => this.$refs.toast.timeout('Delete failed', false, 5000))
             }
-        }
-    },
-    filters: {
-        dateFormat: (date, format) => moment(date).format(format),
-        fromNow:    (date)         => moment(date).fromNow(),
-    },
+        },
+
+        /**
+         * Format the date as specified
+         *
+         * @param { Date } 
+         * @param { String } 
+         * 
+         * @returns { String }
+         */
+        formatDate (date, format) {
+            return moment(date).format(format);
+        },        
+
+        /**
+         * Get the date as from now
+         *
+         * @param { Date } 
+         * 
+         * @returns { String } ie: 2 hours ago
+         */
+        fromNow (date) {
+            return moment(date).fromNow();
+        },  
+
+    }
+    
 }
 </script>
 
@@ -297,13 +270,12 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
-                    <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                    <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]"> 
-                        <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                    <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="onAddCommentSelected">{{ cKEditor_getAddCommentButtonText }}</button>
+                    <div :style="cKEditor_getStyles">
+                        <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
                         <a class="button submit"
-                        @click="postComment"
-                        :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
+                            @click="postComment"
+                            :disabled="cKEditor_isPostCommentDisabled">Post comment</a>
                     </div>
                 </template>
                 <template v-if="hasComments">
@@ -315,9 +287,9 @@ export default {
                                         <img :src="comment.author._links.avatar.href" alt="View Profile" />
                                         <p>{{ comment.author.fullName }}</p>
                                         <time class="pipe meta"
-                                              :datetime="comment.createdAt.json | dateFormat"
-                                              :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                        >{{ comment.createdAt.json | fromNow }}</time>
+                                              :datetime="formatDate(comment.createdAt.json)"
+                                              :title="formatDate(comment.createdAt.json, dateDisplayFormats.momentJsDatetime)"
+                                        >{{ fromNow(comment.createdAt.json) }}</time>
                                     </a>
                                 </div>
                             </div>

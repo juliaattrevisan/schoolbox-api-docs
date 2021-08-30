@@ -354,7 +354,8 @@ module.exports = {
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
             '@vue': path.resolve(__dirname, 'vue'),
             '@js': path.resolve(__dirname, 'www/static/js'),
-            '@css': path.resolve(__dirname, 'www/static/css')
+            '@css': path.resolve(__dirname, 'www/static/css'),
+            '@vue': path.resolve(__dirname, 'vue')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

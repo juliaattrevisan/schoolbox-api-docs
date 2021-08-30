@@ -154,9 +154,22 @@ export const isElementBelowOtherElement = (firstElement, secondElement) => {
  * Is the midpoint of an element below the midpoint of another element
  * 
  * @param { DOMElement }  
-* @param { Styles } for example { position: 'absolute', top: '20px' } 
- * 
+ * @param { Styles } for example { position: 'absolute', top: '20px' } 
  */
 export const setStylesOnElement = (element,styles) => {
     Object.assign(element.style, styles);
+}
+
+/**
+ * Async inject a <script> tag into the DOM
+ * https://stackoverflow.com/a/39008859
+ */
+export const injectScript = (src) => {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.addEventListener('load', resolve);
+        script.addEventListener('error', e => reject(e.error));
+        document.head.appendChild(script);
+    });
 }

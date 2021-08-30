@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import MediaArticle from '@vue/components/media-article';
 import Storage      from '@vue/components/storage';
-import CommentThread from './commentThread';
+import CommentThread from './comment-thread';
 import RevealModal from "@vue/components/reveal-modal";
 import Toast from "@vue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
