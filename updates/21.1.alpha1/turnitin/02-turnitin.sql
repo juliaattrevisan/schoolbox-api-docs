@@ -8,7 +8,7 @@ CREATE TABLE `turnitin_group` (
 -- The Turnitin processing queue and its processing result
 -- The last known error is cached here
 CREATE TABLE `turnitin_report` (
-    `id` INT NOT NULL,
+    `id` INT NOT NULL AUTO_INCREMENT,
     `status` TINYINT NOT NULL,
     `error_code` VARCHAR(255) NULL,
     `error_message` VARCHAR(255) NULL,
