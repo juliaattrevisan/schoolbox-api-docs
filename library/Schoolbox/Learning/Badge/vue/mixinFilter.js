@@ -5,8 +5,14 @@ const ON_FILTER_CHANGE = 'on-filter-change';
 
 export default {
     
-    methods: {
+    data () {
+        return {
+            filter_endpoint: '' //the endpoint of the filter action
+        }
+    },
 
+    methods: {
+  
         /**
          * Load badges.
          *
@@ -43,7 +49,7 @@ export default {
                 paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' } ),
             }
             axios
-                .get(this.filterEndpoint, config)
+                .get(this.filter_endpoint, config)
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;

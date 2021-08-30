@@ -44,10 +44,8 @@ export default {
         }
     },
 
-    computed: {
-        filterEndpoint() {
-            return this.getStudentListsEndpoint;
-        },
+    created () {
+        this.filter_endpoint = this.getStudentListsEndpoint; //assign endpoint for the mixinFilter
     },
 
     mounted () {

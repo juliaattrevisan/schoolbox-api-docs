@@ -66,12 +66,8 @@ export default {
         }
     },
 
-    computed: {
-        
-        filterEndpoint () {
-            return this.getBadgesRoute;
-        },
-
+    created () {
+        this.filter_endpoint = this.getBadgesRoute; //assign endpoint for the mixinFilter
     },
 
     methods: {
