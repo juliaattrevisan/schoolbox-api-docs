@@ -350,13 +350,14 @@ class MapperProxy
 
 
     /**
-     * Finds the specification assessment for a implementation assessment.
+     * Finds the specification assessment for an implementation assessment.
      *
-     * This method loads participants, responses and feedback.
+     * This method loads assessments only: it does not load participants,
+     * responses or feedback.
      *
      * @param int   $assessmentId
      * @param array $options
-     * @return GenericCollection|IAssessable[]
+     * @return Collection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
@@ -371,10 +372,8 @@ class MapperProxy
             // Get all assessables which have this assessment as a spec
             $options['spec_assessment_id'] = $assessmentId;
             $builder                       = $this->convertOptionsToPredicateBuilder($options, false);
-            return $this->loadParticipantsIntoAssessmentCollection(
-                $this->translateToDomainModelCollection(
-                    $this->baseMapper->findByPredicates($builder, $options)
-                )
+            return $this->translateToDomainModelCollection(
+                $this->baseMapper->findByPredicates($builder, $options)
             );
         } catch (UnderflowException $e) {
             return $this->createCollection();
