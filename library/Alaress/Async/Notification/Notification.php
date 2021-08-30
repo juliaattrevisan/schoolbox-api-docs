@@ -245,18 +245,22 @@ class Notification
         return $this->params;
     }
 
-
     /**
-     * @return int[]
+     * Returns first user id appropriate to set as reply-to
+     * @return int|null
      */
-    public function getEffectorIds(): array
+    public function getReplyToId(): ?int
     {
-        return array_filter(
-            array_map(function (Instance $instance) {
-                return isset($instance->getContext()['user'])
-                    ? $instance->getContext()['user']
-                    : null;
-            }, $this->instances)
-        );
+        foreach ($this->instances as $instance) {
+            if ($instance->getReplyToUserId()) {
+                return $instance->getReplyToUserId();
+            }
+        }
+        foreach ($this->instances as $instance) {
+            if ($instance->getContext()['user']) {
+                return $instance->getContext()['user'];
+            }
+        }
+        return null;
     }
 }

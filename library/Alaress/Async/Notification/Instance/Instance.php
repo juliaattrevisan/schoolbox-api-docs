@@ -676,4 +676,13 @@ class Instance implements JsonSerializable
     {
         return isset($this->meta['retractFirst']) && $this->meta['retractFirst'];
     }
+
+    /**
+     * Gets reply to user id
+     * @return int|null
+     */
+    public function getReplyToUserId(): ?int
+    {
+        return $this->meta['replyToUserId'] ?? null;
+    }
 }
