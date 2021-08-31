@@ -41,11 +41,24 @@
                                           'Doing so will overwrite the existing class assessment.';
 
             // Only display interaction counts if there are interactions
-            if(countResponses || countFeedbacks){
-                message += '<br><br>This will also delete ' + countResponses + ' student submissions (' +
-                    countDraftResponses + ' drafts, ' + countSubmittedResponses + ' submitted) and ' +
-                    countFeedbacks + ' teacher feedbacks (' + countDraftFeedbacks + ' drafts, ' +
-                    countPublishedFeedbacks + ' published).'
+            if (countResponses && countFeedbacks) {
+                message += '<br><br>This will also delete '
+                        + countResponses + ' student submissions ('
+                        + countDraftResponses + ' drafts, '
+                        + countSubmittedResponses + ' submitted) and '
+                        + countFeedbacks + ' teacher feedbacks ('
+                        + countDraftFeedbacks + ' drafts, '
+                        + countPublishedFeedbacks + ' published).'
+            } else if (countResponses) {
+                message += '<br><br>This will also delete '
+                        + countResponses + ' student submissions ('
+                        + countDraftResponses + ' drafts, '
+                        + countSubmittedResponses + ' submitted).'
+            } else if (countFeedbacks) {
+                message += '<br><br>This will also delete '
+                        + countFeedbacks + ' teacher feedbacks ('
+                        + countDraftFeedbacks + ' drafts, '
+                        + countPublishedFeedbacks + ' published).'
             }
 
             if ($checkbox.prop('checked')) {
