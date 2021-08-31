@@ -52,6 +52,14 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveStub(SubmissionFile $file): array
     {
+        /* Invalid file? Do nothing, exit early
+         */
+        if (!(new ValidFile())->isSatisifiedBy($file)) {
+            return [];
+        }
+
+        /* Otherwise save a stub record for later
+         */
         $now = \Alaress_Date_Format::now();
 
         return $this->save($this->createModel()
