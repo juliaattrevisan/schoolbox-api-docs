@@ -366,6 +366,9 @@ class Controller extends Base
         Folder $classFolder = null,
         WorkType\Model $submissionType = null
     ) {
+        // All variants of learning analytics reports could take a while
+        $this->extendExecutionTime();
+
         $analysis = new CohortAnalysis($dueAssessments, $classFolder, $submissionType);
 
         // Ensure we have folder codes

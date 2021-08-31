@@ -438,10 +438,6 @@ class Controller extends Base
 
                     function () use ($post) {
 
-                        // Give the script a chance to finish
-
-                        set_time_limit(60 * 15);
-
                         // Get all uploaded files
 
                         $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();

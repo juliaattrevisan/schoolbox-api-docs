@@ -8,25 +8,22 @@
 
 namespace Schoolbox\Learning\Upcoming;
 
-use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
 use DomainException;
 use External_ClassInterface;
 use InvalidArgumentException;
 use LogicException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
-use Schoolbox\Learning\Assessment\Calendar\Events\Api;
-use Schoolbox\Learning\MarkScheme\Factory;
-use Schoolbox\Mapper\DefinitionException;
-use UnexpectedValueException;
-
-use function func_get_args;
-
+use Schoolbox\Filter\Filters;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -34,16 +31,18 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Filter;
-use Schoolbox\Filter\Filters;
+use UnexpectedValueException;
+
+use function func_get_args;
 
 /**
  * Controller for the upcoming work screen.
@@ -191,7 +190,13 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $route       = $this->getRouter()->generate("learningUpcoming.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student, func_get_args());
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            $page,
+            $route,
+            $student,
+            [$student, $date]
+        );
 
         // Only get subjects from external if student's timetable isn't hidden.
         // I don't get this logic as class list != timetable, but apparently
@@ -384,6 +389,9 @@ class Controller extends Base
      */
     public function getEvents(User $student): void
     {
+        // Due work calendar could take a while
+        $this->extendExecutionTime();
+
         $request             = $this->request->query->get('filters', []);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);

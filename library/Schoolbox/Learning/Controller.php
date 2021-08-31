@@ -221,6 +221,9 @@ class Controller extends Base
      */
     public function postPendingAssessmentsForUser(User $viewee, Filter\IFactoryFactory $filterFactoryFactory): void
     {
+        // Pending assessments could take a while
+        $this->extendExecutionTime();
+
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
 

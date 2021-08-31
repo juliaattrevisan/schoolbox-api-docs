@@ -32,6 +32,9 @@ use Sentry\State\HubInterface;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
+// This may take a while
+SitePage::extendExecutionTime();
+
 /**
  * Returns the config id for the specified calendar connector.
  *

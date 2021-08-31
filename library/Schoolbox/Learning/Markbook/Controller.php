@@ -289,6 +289,9 @@ class Controller extends Base
      */
     public function getMarkbookExportForClass(FolderModel $folder): void
     {
+        // This report may take a while
+        $this->extendExecutionTime();
+
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 

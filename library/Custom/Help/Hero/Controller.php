@@ -59,7 +59,7 @@ class Controller extends Base
         Folder\Mapper $folderMapper,
         UserAccessMapper $userAccessMapper
     ) {
-        ini_set('max_execution_time', 300);
+        $this->extendExecutionTime();
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
         $this->folderMapper = $folderMapper;

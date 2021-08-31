@@ -10,22 +10,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use Alaress\Web\Controller as WebController;
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
+use Schoolbox\Assessment\Course\Task\Completion;
+use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Throwable;
 
 use function array_combine;
 use function func_get_args;
-
-use Schoolbox\Assessment\Course\Task\Completion;
-use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
-use Alaress\Web\Controller as WebController;
-use Schoolbox\Filter;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Throwable;
 
 class Controller extends WebController\Base
 {
@@ -178,6 +177,9 @@ class Controller extends WebController\Base
      */
     public function getMarkbookExport(CourseSpec\Model $courseSpec): void
     {
+        // This report may take a while
+        $this->extendExecutionTime();
+
         $queryArgs = $this->getRequest()->query->getArrayCopy();
         [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
 
@@ -198,6 +200,9 @@ class Controller extends WebController\Base
      */
     public function postMarkbook(CourseSpec\Model $courseSpec): void
     {
+        // This report may take a while
+        $this->extendExecutionTime();
+
         try {
             $request = $this->request->post['filter_selection'] ?: [];
 

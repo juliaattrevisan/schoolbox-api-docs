@@ -2,7 +2,7 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
-SitePage::extendExecutionTime(300);
+SitePage::extendExecutionTime();
 
 if (!$_SESSION['user']->isSuperuser()) {
     error(19);

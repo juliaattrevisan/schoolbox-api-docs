@@ -22,6 +22,9 @@ try {
     error($e->getCode());
 }
 
+// Calendar generation could take a while
+SitePage::extendExecutionTime();
+
 /** @var Calendar_Api_Factory $factory */
 $factory  = $this->getDi()->get('calendarApiFactory');
 $calendar = new Calendar_Layout_Full_Ajax_JSON(

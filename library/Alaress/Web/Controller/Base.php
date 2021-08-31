@@ -643,4 +643,24 @@ abstract class Base
         $output->getTemplateEngine()->addGlobal('USER', $this->getUser());
         return $output;
     }
+
+    /**
+     * Extends the allowed execution time of this script, by default by another
+     * 5 minutes.
+     *
+     * This is a copy of `\SitePage::extendExecutionTime`, with the same caveats
+     * around its use: any process which has need of this should instead have
+     * handed off to an asynchronous process, which notifies the user when it is
+     * complete.
+     *
+     * @param int $seconds
+     */
+    protected function extendExecutionTime(int $seconds = 300)
+    {
+        $currentLimit = intval(ini_get('max_execution_time'));
+        // Don't extend time limit if there is no current limit
+        if ($currentLimit !== 0) {
+            set_time_limit($seconds);
+        }
+    }
 }

@@ -68,7 +68,7 @@ class Controller extends Base
         ProfessionalDevelopment\Mapper $pdMapper,
         UserMapper $userMapper
     ) {
-        ini_set('max_execution_time', 300);
+        $this->extendExecutionTime();
         $this->errorMapper = $errorMapper;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
         $this->rubricMapper = $rubricMapper;

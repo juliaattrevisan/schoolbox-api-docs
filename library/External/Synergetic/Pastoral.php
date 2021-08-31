@@ -256,10 +256,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         bool $importAttachments,
         bool $deleteRecords
     ): void {
-        // Give the import 30 minutes to complete and bump up the memory limit just to make sure we don't bomb out
+        // Bump up the memory limit just to make sure we don't bomb out
 
         ini_set('memory_limit', '2048M');
-        set_time_limit(30 * 60);
 
         // Log start of import
 
@@ -993,9 +992,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ));
         }
 
-        // Temporarily increase the memory limit and timeout so we can get the file across to Synergetic
+        // Temporarily increase the memory limit so we can get the file across to Synergetic
         ini_set('memory_limit', '2048M');
-        set_time_limit(0);
+//        set_time_limit(0);
 
         // This whole thing is a bit of an ass, unfortunately Synergetic stores its DocMan files in
         // the actual database- which means we need to shove the file into a SQL query as a hex string

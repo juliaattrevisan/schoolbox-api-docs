@@ -158,6 +158,9 @@ class Controller extends Base
      */
     public function getMarkbookExport(Folder\Model $folder): void
     {
+        // This report may take a while
+        $this->extendExecutionTime();
+
         $queryArgs = $this->request->query->getArrayCopy();
         unset($queryArgs['page']);
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $queryArgs);
@@ -196,6 +199,9 @@ class Controller extends Base
      */
     public function postMarkbook(Folder\Model $folder): void
     {
+        // This report may take a while
+        $this->extendExecutionTime();
+
         $request       = $this->request->post['filter_selection'] ?: [];
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $request);
         $codec         = new Codec($this->filterMapper, $this->filterSelectionMapper);

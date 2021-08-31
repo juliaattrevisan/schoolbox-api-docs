@@ -392,6 +392,9 @@ class Controller extends Assessment\Controller
      */
     public function downloadSubmissions(IAssessable $assessment): void
     {
+        // Creating a ZIP archive might take a while
+        $this->extendExecutionTime();
+
         // Retrieve all participants
 
         $participants = $assessment->getAllParticipants();

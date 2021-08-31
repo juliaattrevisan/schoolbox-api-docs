@@ -30,7 +30,7 @@ if (!isset($_POST['userId']) || empty($_POST['userId'])) {
 
 /** @var SitePage $this */
 
-SitePage::extendExecutionTime(300);
+SitePage::extendExecutionTime();
 
 $userMapper = \Schoolbox\UserBulkMapper::getInstance();
 

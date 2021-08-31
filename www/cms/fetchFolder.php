@@ -21,6 +21,9 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
+// Creating a ZIP archive might take a while
+SitePage::extendExecutionTime();
+
 try {
     $folder = FolderMapper::getInstance()->findById($_GET['folder']);
 } catch (Schoolbox\Mapper\Exception $e) {

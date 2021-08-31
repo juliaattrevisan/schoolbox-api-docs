@@ -19,7 +19,7 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 
-SitePage::extendExecutionTime(300);
+SitePage::extendExecutionTime();
 
 $groupHandler = new Group();
 

@@ -182,6 +182,10 @@ class Base implements OutputInterface
             flush();
             session_write_close();
 
+            // Allow the process however long it needs to finish:
+            // 30 minutes should be more than enough.
+            set_time_limit(60 * 30);
+
             // Callbacks
 
             foreach ($callbacks as $callback) {
