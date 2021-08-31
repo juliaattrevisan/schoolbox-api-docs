@@ -199,7 +199,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateCourse']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model, Model $previous = null) {
+            $this->validateCourse($model, $previous);
+            return true;
+        });
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateUnit']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
@@ -232,8 +235,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *                                  doesn't exist
      *
      */
-    public function validateCourse(Model $folder): void
+    public function validateCourse(Model $folder, ?Model $previous = null): void
     {
+        // if parent is not changed, do not validate
+        if ($previous && ($previous->getParent()->getId() === $folder->getParent()->getId())) {
+            return;
+        }
+
         if ($folder->hasCourseSpecification()) {
             // Parent probably isn't hydrated: hydrate it
             $parent = $folder->getParent();
