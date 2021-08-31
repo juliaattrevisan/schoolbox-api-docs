@@ -72,7 +72,9 @@
                                     assessmentSpec:   assessmentSpec,
                                     assessmentImpl:   assessmentImpl,
                                     folderWritePerms: folderWritePerms,
-                                    enableReimport:   enableReimport
+                                    enableReimport:   enableReimport,
+                                    responses:        interactions[assessmentImpl.id].responses ?? [],
+                                    feedbacks:        interactions[assessmentImpl.id].feedbacks ?? [],
                                 } only %}
                             {% endfor %}
                         </ul>
@@ -87,7 +89,9 @@
                                     assessmentSpec:   assessmentSpec,
                                     assessmentImpl:   assessmentImpl,
                                     folderWritePerms: folderWritePerms,
-                                    enableReimport:   enableReimport
+                                    enableReimport:   enableReimport,
+                                    responses:        interactions[assessmentImpl.id].responses ?? [],
+                                    feedbacks:        interactions[assessmentImpl.id].feedbacks ?? [],
                                 } only %}
                             {% endfor %}
                         </ul>
