@@ -266,25 +266,46 @@ class Controller extends Base
 
                 $this->responseDataSource->save($response);
 
-                /* Save all the plagscan stubs and records too
-                 * But this is a special flow just for self-reflection
-                 * Originated from Assessment/DueWork/Controller postCreateResponse()
+                /* Similarity Check must be enabled to use plag or turnitin
+                 * This is processed in a detached function so it doesn't hang the ui
+                 * while it's executing, since accessing third party api can be slow
                  */
-                $plagscanMapper = $this->plagscanMapper;
+                $detachedFunction = static function() {};
 
                 if ($assessment->getSimilarityCheckEnabled()) {
-                    foreach ($response->getAllFiles() as $currentFile) {
-                        if (!$currentFile->getEditableInline()) {
-                            $plagscanMapper->saveNewPlagscanStub($currentFile);
-                        }
-                    }
-                }
+                    /* This is the original behaviour. Note that the Plagscan Mapper itself can
+                     * figure out if plagscan is enabled or not so we don't need to do it here
+                     *
+                     * This is only a temporary setup - eventually plagscan goes away entirely,
+                     * halving the logic established here
+                     */
+                    $isPlagscan = true;
+                    $isTurnitin = false;
 
-                $this->getResponse()->content->set([
-                    'format' => 'json',
-                    'data'   => [],
-                    'postOutput' => [
-                        function () use ($plagscanMapper, $response, $assessment) {
+                    /* Only one of these can be active at a time, but both universes can co-exist
+                     * Specifically enable turnitin if its api key was set
+                     */
+                    if ('' !== (string)$this->getConfigLoader()->get('turnitin_api_key')) {
+                        $isPlagscan = false;
+                        $isTurnitin = true;
+                    }
+
+                    if ($isPlagscan) {
+                        /* Save all the plagscan stubs and records too
+                         * But this is a special flow just for self-reflection
+                         * Originated from Assessment/DueWork/Controller postCreateResponse()
+                         */
+                        $plagscanMapper = $this->plagscanMapper;
+
+                        foreach ($response->getAllFiles() as $currentFile) {
+                            if (!$currentFile->getEditableInline()) {
+                                $plagscanMapper->saveNewPlagscanStub($currentFile);
+                            }
+                        }
+
+                        /* Set up detached function so plagscan can continue in the background
+                         */
+                        $detachedFunction = static function () use ($plagscanMapper, $response, $assessment) {
                             if ($assessment->getSimilarityCheckEnabled()) {
                                 foreach ($response->getAllFiles() as $currentFile) {
                                     $filename = $plagscanMapper->plagscanFilename($currentFile);
@@ -292,7 +313,27 @@ class Controller extends Base
                                     $plagscanMapper->saveNewPlagscan($currentFile, $filename);
                                 }
                             }
-                        },
+                        };
+                    } elseif ($isTurnitin) {
+                        foreach ($response->getAllFiles() as $currentFile) {
+                            /* TODO Turnitin api endpoint implementation
+                             */
+                        }
+
+                        /* Set up detached function so turnitin can continue in the background
+                         */
+                        $detachedFunction = static function () use ($response, $assessment) {
+                            /* TODO Turnitin api endpoint implementation
+                             */
+                        };
+                    }
+                }
+
+                $this->getResponse()->content->set([
+                    'format' => 'json',
+                    'data'   => [],
+                    'postOutput' => [
+                        $detachedFunction,
                     ],
                 ]);
             }
