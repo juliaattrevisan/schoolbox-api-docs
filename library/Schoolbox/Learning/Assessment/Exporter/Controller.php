@@ -123,7 +123,9 @@ class Controller extends BaseController
         });
 
         // Find interactions with imported assessments
-        $interactions = $this->assessmentDataSource->findInteractions($imported->getPropertyValues('id'));
+        $assessmentIds  = $imported->getPropertyValues('id');
+        $responseCounts = $this->assessmentDataSource->findResponseCountsForAssessments($assessmentIds);
+        $feedbackCounts = $this->assessmentDataSource->findFeedbackCountsForAssessments($assessmentIds);
 
         $breadcrumbs = [
             ['Learning', $this->getRouteIfAuthorized('learning.getClasses')],
@@ -144,7 +146,8 @@ class Controller extends BaseController
             'folderWritePerms' => $this->buildFolderWritePermissions($assessmentImpls),
             'enableReimport'   => (bool)$this->getConfigLoader()->get('destructive_activity_export_enabled'),
             'breadcrumbs'      => $breadcrumbs,
-            'interactions'     => $interactions,
+            'responseCounts'   => $responseCounts,
+            'feedbackCounts'   => $feedbackCounts,
         ];
 
         $template = '@learningAssessmentExporter/export.twig';

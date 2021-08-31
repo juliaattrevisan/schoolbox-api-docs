@@ -1,12 +1,12 @@
 {#
-    'assessmentSpec'   IAssessable
-    'assessmentImpl'   IAssessable
-    'folderWritePerms' bool[]        - Does current user have WRITE+ perm to the class folder
-    'enableReimport'   bool          - Should already imported class assessments be re-importable?
-    'responses'        array         - A list of responses for `assessmentImpl`.
-                                       Draft responses will have the `draft` key set to true
-    'feedbacks'        array         - A list of feedbacks for `assessmentImpl`
-                                       Draft feedbacks will have the `draft` key set to true
+    'assessmentSpec'         IAssessable
+    'assessmentImpl'         IAssessable
+    'folderWritePerms'       bool[]      - Does current user have WRITE+ perm to the class folder
+    'enableReimport'         bool        - Should already imported class assessments be re-importable?
+    'submittedResponseCount' int
+    'draftResponseCount'     int
+    'publishedFeedbackCount' int
+    'draftFeedbackCount'     int
 #}
 {% set unitImpl     = assessmentImpl.baseContext %}
 {% set isInstructor = folderWritePerms[unitImpl.course.folder.id] %}
@@ -76,10 +76,10 @@
                    {% if not canImport %}disabled{% endif %}
                    {% if enableReimport and isImported %}
                        data-warn-destructive-export
-                       data-count-responses="{{ responses | length }}"
-                       data-count-submitted-responses="{{ responses | filter(v => not v.draft) | length }}"
-                       data-count-feedbacks="{{ feedbacks | length }}"
-                       data-count-published-feedbacks="{{ feedbacks | filter(v => not v.draft) | length }}"
+                       data-count-responses="{{ submittedResponseCount + draftResponseCount }}"
+                       data-count-submitted-responses="{{ submittedResponseCount }}"
+                       data-count-feedbacks="{{ publishedFeedbackCount + draftFeedbackCount }}"
+                       data-count-published-feedbacks="{{ publishedFeedbackCount }}"
                    {% endif %}
                    data-unit-id="{{ unitImpl.id }}"/>
             <label for="import-{{ unitImpl.id }}" class="checkbox-label"></label>

@@ -325,23 +325,28 @@ class MapperProxy
 
 
     /**
-     * Optimised method for finding all interactions (responses + feedback) for
-     * a set of assessment IDs.
+     * Optimised method for finding the number of responses for a set of
+     * assessment IDs.
      *
-     * @param array $assessmentIds
-     * @return array
+     * @param array<int> $assessmentIds
+     * @return array<int, array{submitted: int, draft: int}>
      */
-    public function findInteractions(array $assessmentIds): array
+    public function findResponseCountsForAssessments(array $assessmentIds): array
     {
         if (empty($assessmentIds)) {
             return [];
         }
 
-        $interactions = [];
+        $responses = [];
+        foreach ($assessmentIds as $assessmentId) {
+            $responses[$assessmentId] = [
+                'submitted' => 0,
+                'draft'     => 0,
+            ];
+        }
 
-        // Find all responses
         $pb = $this->baseMapper->getPredicateBuilder()
-            ->in('v.assessment_id', $assessmentIds);
+                   ->in('v.assessment_id', $assessmentIds);
         $responseQuery = $this->baseMapper->getDatabase()->prepare("
             SELECT *
             FROM v_assessment_response v
@@ -350,11 +355,45 @@ class MapperProxy
         $responseQuery->setFetchMode(\PDO::FETCH_ASSOC);
         $responseQuery->execute($pb->getParams());
         foreach ($responseQuery as $row) {
-            $row['draft'] = !isset($row['submitted_at']);
-            $interactions[$row['assessment_id']]['responses'][] = $row;
+            $assessmentId = (int)$row['assessment_id'];
+            $responses[$assessmentId] ??= [
+                'submitted' => 0,
+                'draft'     => 0,
+            ];
+            if (!isset($row['submitted_at'])) {
+                $responses[$assessmentId]['submitted']++;
+            } else {
+                $responses[$assessmentId]['draft']++;
+            }
         }
 
-        // Find all feedback
+        return $responses;
+    }
+
+
+    /**
+     * Optimised method for finding the number of feedbacks for a set of
+     * assessment IDs.
+     *
+     * @param array<int> $assessmentIds
+     * @return array<int, array{published: int, draft: int}>
+     */
+    public function findFeedbackCountsForAssessments(array $assessmentIds): array
+    {
+        if (empty($assessmentIds)) {
+            return [];
+        }
+
+        $feedbacks = [];
+        foreach ($assessmentIds as $assessmentId) {
+            $feedbacks[$assessmentId] = [
+                'published' => 0,
+                'draft'     => 0,
+            ];
+        }
+
+        $pb = $this->baseMapper->getPredicateBuilder()
+                   ->in('v.assessment_id', $assessmentIds);
         $feedbackQuery = $this->baseMapper->getDatabase()->prepare("
             SELECT *
             FROM v_assessment_feedback v
@@ -363,11 +402,19 @@ class MapperProxy
         $feedbackQuery->setFetchMode(\PDO::FETCH_ASSOC);
         $feedbackQuery->execute($pb->getParams());
         foreach ($feedbackQuery as $row) {
-            $row['draft'] = !isset($row['published_at']);
-            $interactions[$row['assessment_id']]['feedbacks'][] = $row;
+            $assessmentId = (int)$row['assessment_id'];
+            $feedbacks[$assessmentId] ??= [
+                'published' => 0,
+                'draft'     => 0,
+            ];
+            if (!isset($row['published_at'])) {
+                $feedbacks[$assessmentId]['published']++;
+            } else {
+                $feedbacks[$assessmentId]['draft']++;
+            }
         }
 
-        return $interactions;
+        return $feedbacks;
     }
 
 
