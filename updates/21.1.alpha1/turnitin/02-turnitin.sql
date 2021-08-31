@@ -16,7 +16,7 @@ CREATE TABLE `turnitin_report` (
     `error_message` VARCHAR(255) NULL,
     `student_submission_file_id` INT UNSIGNED NOT NULL,
     `turnitin_submission_id` VARCHAR(255) NULL,
-    `overall_match_percentage` DECIMAL NULL,
+    `overall_match_percentage` DECIMAL(10, 2) NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME NULL,
