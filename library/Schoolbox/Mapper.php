@@ -722,7 +722,7 @@ abstract class Mapper implements IMapper, Serializable
                     // this catch is merely to accommodate that case, it should
                     // not be relied upon in development
                     self::$prop = new MockPropagator();
-                } catch (\ErrorException|AMQPIOException|AMQPRuntimeException $e) {
+                } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
                     // Could not connect to the propagator's AMQP instance
                     // (i.e. RabbitMQ).
                     // Continue as if it didn't exist, but log a warning
