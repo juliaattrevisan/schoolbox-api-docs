@@ -325,6 +325,53 @@ class MapperProxy
 
 
     /**
+     * Optimised method for finding all interactions (responses + feedback) for
+     * a set of assessment IDs.
+     *
+     * @param array $assessmentIds
+     * @return array
+     */
+    public function findInteractions(array $assessmentIds): array
+    {
+        if (empty($assessmentIds)) {
+            return [];
+        }
+
+        $interactions = [];
+
+        // Find all responses
+        $pb = $this->baseMapper->getPredicateBuilder()
+            ->in('v.assessment_id', $assessmentIds);
+        $responseQuery = $this->baseMapper->getDatabase()->prepare("
+            SELECT *
+            FROM v_assessment_response v
+            WHERE ({$pb->getWhereIntersect()})
+        ");
+        $responseQuery->setFetchMode(\PDO::FETCH_ASSOC);
+        $responseQuery->execute($pb->getParams());
+        foreach ($responseQuery as $row) {
+            $row['draft'] = !isset($row['submitted_at']);
+            $interactions[$row['assessment_id']]['responses'][] = $row;
+        }
+
+        // Find all feedback
+        $feedbackQuery = $this->baseMapper->getDatabase()->prepare("
+            SELECT *
+            FROM v_assessment_feedback v
+            WHERE ({$pb->getWhereIntersect()})
+        ");
+        $feedbackQuery->setFetchMode(\PDO::FETCH_ASSOC);
+        $feedbackQuery->execute($pb->getParams());
+        foreach ($feedbackQuery as $row) {
+            $row['draft'] = !isset($row['published_at']);
+            $interactions[$row['assessment_id']]['feedbacks'][] = $row;
+        }
+
+        return $interactions;
+    }
+
+
+    /**
      * Finds the specification assessment for a implementation assessment.
      *
      * This method does not load participants, because assessments in a unit spec
