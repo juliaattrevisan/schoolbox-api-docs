@@ -1,0 +1,248 @@
+<?php
+
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+
+/**
+ * Represents data from the turnitin_report db table
+ */
+class Model implements ISoftDeletable
+{
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+
+
+    /**
+     * Consts that elucidate the current state of a turnitin process
+     *
+     * Note that when you try to get more granular status reports about the
+     * turnitin callback workflow you'll end up having to expand the available
+     * strings here as turnitin can die in multiple places with the same
+     * kind of error string
+     *
+     * These statuses update at the start of their respective duties
+     */
+
+    /* We saved a student's submission in schoolbox and set up the turnitin record
+     * in the instance, but we haven't told turnitin about this document yet.
+     */
+    public const STATUS_SETUP_PENDING = 'pending';
+
+    /* We started communicating with turnitin; this status usually denotes when an
+     * automated script has come along and started doing its thing
+     */
+    public const STATUS_PROCESSING = 'processing';
+
+    /* We started seting up a turnitin Group ("submission box") or found an existing
+     * one to use, which is th same thing really
+     */
+    public const STATUS_SETUP_GROUP = 'group';
+
+    /* We started setting up a turnitin Submission which is a container for student's
+     * file contents which is sent separately
+     */
+    public const STATUS_SETUP_SUBMISSION = 'submission';
+
+    /* We started sending the student's file contents to turnitin
+     */
+    public const STATUS_SETUP_UPLOADING = 'uploading';
+
+    /* We started turnitin's analysis process to generate their similarity report
+     * This should start when their webhook executes after our successful upload
+     */
+    public const STATUS_ANALYSIS = 'analysis';
+
+    /* We successfully completed turnitin analysis, yanking their overall percentage
+     * and caching that locally
+     */
+    public const STATUS_COMPLETE = 'complete';
+
+    /* Something went wrong; check the error_code and error_message for more details
+     */
+    public const STATUS_ERROR = 'error';
+
+
+     /**
+     * A string that represents the current state of a Similarity Report
+     * Denotes whether it has successfully finished or not
+     *
+     * @var string
+     */
+    private string $status;
+
+
+    /**
+     * If an error occurred, this is the Turnitin string that they gave to us
+     * when it died. It comes with a prefix so you can see where it died in
+     * our overall workflow since there are numerous api endpoints where
+     * Turnitin might die
+     *
+     * @var string
+     */
+    private string $errorCode;
+
+
+    /**
+     * A verbose description of what went wrong
+     *
+     * @var string
+     */
+    private string $errorMessage;
+
+
+    /**
+     * The individual submission file for which we are generating a Similarity Report
+     * @var int
+     */
+    private int $studentSubmissionFileId;
+
+
+    /**
+     * A 36-char string that Turnitin uses internally to identify one of their submissions
+     * It's like a guid: e.g. b5cf0e76-c1c7-11e8-a355-529269fb1459
+     *
+     * @var string
+     */
+    private string $turnitinSubmissionId;
+
+
+    /**
+     * When Turnitin finishes generating its Similarity Report we can remember the answer
+     * so we can display it liberally throughout the app without querying Turnitin
+     *
+     * @var float
+     */
+    private float $overallMatchPercentage;
+
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+
+    /**
+     * @param string $status
+     * @return Model
+     */
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getErrorCode(): string
+    {
+        return $this->errorCode;
+    }
+
+
+    /**
+     * @param string $errorCode
+     * @return Model
+     */
+    public function setErrorCode(string $errorCode): self
+    {
+        $this->errorCode = $errorCode;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getErrorMessage(): string
+    {
+        return $this->errorMessage;
+    }
+
+
+    /**
+     * @param string $errorMessage
+     * @return Model
+     */
+    public function setErrorMessage(string $errorMessage): self
+    {
+        $this->errorMessage = $errorMessage;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getStudentSubmissionFileId(): int
+    {
+        return $this->studentSubmissionFileId;
+    }
+
+
+    /**
+     * @param int $studentSubmissionFileId
+     * @return Model
+     */
+    public function setStudentSubmissionFileId(int $studentSubmissionFileId): self
+    {
+        $this->studentSubmissionFileId = $studentSubmissionFileId;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getTurnitinSubmissionId(): string
+    {
+        return $this->turnitinSubmissionId;
+    }
+
+
+    /**
+     * @param string $turnitinSubmissionId
+     * @return Model
+     */
+    public function setTurnitinSubmissionId(string $turnitinSubmissionId): self
+    {
+        $this->turnitinSubmissionId = $turnitinSubmissionId;
+        return $this;
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getOverallMatchPercentage(): float
+    {
+        return $this->overallMatchPercentage;
+    }
+
+
+    /**
+     * @param float $overallMatchPercentage
+     * @return Model
+     */
+    public function setOverallMatchPercentage(float $overallMatchPercentage): self
+    {
+        $this->overallMatchPercentage = $overallMatchPercentage;
+        return $this;
+    }
+}
