@@ -286,7 +286,7 @@ class Controller extends Base
                     /* Only one of these can be active at a time, but both universes can co-exist
                      * Specifically enable turnitin if its api key was set
                      */
-                    if ('' !== (string)$this->getConfigLoader()->get('turnitin_api_key')) {
+                    if ('' !== trim((string)$this->getConfigLoader()->get('turnitin_api_key'))) {
                         $isPlagscan = false;
                         $isTurnitin = true;
                     }
