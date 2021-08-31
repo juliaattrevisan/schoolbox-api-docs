@@ -1043,7 +1043,7 @@ class Controller extends Assessment\Controller
 
                 /* Set up detached function so plagscan can continue in the background
                  */
-                $detachedFunction = static function () use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
+                $detachedFunction = static function () use ($plagscanMapper, $response) {
                     foreach ($response->getAllFiles() as $currentFile) {
                         $filename = $plagscanMapper->plagscanFilename($currentFile);
 
@@ -1063,10 +1063,10 @@ class Controller extends Assessment\Controller
 
                 /* Set up detached function so turnitin can continue in the background
                  */
-                $detachedFunction = static function () use ($isFinal, $selfAssessable, $response, $assessment) {
-                    /* TODO Turnitin api endpoint implementation
-                     */
-                };
+//                $detachedFunction = static function () use ($isFinal, $selfAssessable, $response, $assessment) {
+//                    /* TODO Turnitin api endpoint implementation
+//                     */
+//                };
             }
         }
 

@@ -6022,7 +6022,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getSimilarityCheckEnabled\\(\\)\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
 
 		-
