@@ -348,7 +348,10 @@ class MapperProxy
         $pb = $this->baseMapper->getPredicateBuilder()
                    ->in('v.assessment_id', $assessmentIds);
         $responseQuery = $this->baseMapper->getDatabase()->prepare("
-            SELECT *
+            SELECT DISTINCT
+                v.assessment_id,
+                v.response_id,
+                v.submitted_at
             FROM v_assessment_response v
             WHERE ({$pb->getWhereIntersect()})
         ");
@@ -395,7 +398,10 @@ class MapperProxy
         $pb = $this->baseMapper->getPredicateBuilder()
                    ->in('v.assessment_id', $assessmentIds);
         $feedbackQuery = $this->baseMapper->getDatabase()->prepare("
-            SELECT *
+            SELECT DISTINCT
+                v.assessment_id,
+                v.feedback_id,
+                v.published_at
             FROM v_assessment_feedback v
             WHERE ({$pb->getWhereIntersect()})
         ");
