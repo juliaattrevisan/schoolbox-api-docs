@@ -8794,13 +8794,3 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
-
-		-
-			message: "#^Elseif condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Elseif condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php

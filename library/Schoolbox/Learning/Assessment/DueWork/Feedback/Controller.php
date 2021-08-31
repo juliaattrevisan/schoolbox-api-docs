@@ -274,24 +274,34 @@ class Controller extends Base
                 };
 
                 if ($assessment->getSimilarityCheckEnabled()) {
-                    /* This is the original behaviour. Note that the Plagscan Mapper itself can
-                     * figure out if plagscan is enabled or not so we don't need to do it here
-                     *
-                     * This is only a temporary setup - eventually plagscan goes away entirely,
-                     * halving the logic established here
-                     */
-                    $isPlagscan = true;
-                    $isTurnitin = false;
-
                     /* Only one of these can be active at a time, but both universes can co-exist
                      * Specifically enable turnitin if its api key was set
                      */
                     if ('' !== trim((string)$this->getConfigLoader()->get('turnitin_api_key'))) {
-                        $isPlagscan = false;
-                        $isTurnitin = true;
-                    }
+                        /* Set up a turnitin stub record
+                         * This allows it to be picked up and processed by an async script later
+                         * if it doesn't start processing via the $detachedFunction
+                         */
+                        $turnitinMapper = DueWork\Response\File\Turnitin\Mapper::getInstance();
 
-                    if ($isPlagscan) {
+                        foreach ($response->getAllFiles() as $currentFile) {
+                            $turnitinMapper->saveStub($currentFile);
+                        }
+
+                        /* Set up detached function so turnitin can continue in the background
+                         */
+//                        $detachedFunction = static function () use ($response, $assessment) {
+//                            /* TODO Turnitin api endpoint implementation
+//                             */
+//                        };
+                    } else {
+                        /* This is the original behaviour. Note that the Plagscan Mapper itself can
+                         * figure out if plagscan is enabled or not so we don't need to do it here
+                         *
+                         * This is only a temporary setup - eventually plagscan goes away entirely,
+                         * halving the logic established here
+                         */
+
                         /* Save all the plagscan stubs and records too
                          * But this is a special flow just for self-reflection
                          * Originated from Assessment/DueWork/Controller postCreateResponse()
@@ -313,23 +323,6 @@ class Controller extends Base
                                 $plagscanMapper->saveNewPlagscan($currentFile, $filename);
                             }
                         };
-                    } elseif ($isTurnitin) {
-                        /* Set up a turnitin stub record
-                         * This allows it to be picked up and processed by an async script later
-                         * if it doesn't start processing via the $detachedFunction
-                         */
-                        $turnitinMapper = DueWork\Response\File\Turnitin\Mapper::getInstance();
-
-                        foreach ($response->getAllFiles() as $currentFile) {
-                            $turnitinMapper->saveStub($currentFile);
-                        }
-
-                        /* Set up detached function so turnitin can continue in the background
-                         */
-//                        $detachedFunction = static function () use ($response, $assessment) {
-//                            /* TODO Turnitin api endpoint implementation
-//                             */
-//                        };
                     }
                 }
 
