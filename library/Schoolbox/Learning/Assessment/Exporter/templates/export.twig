@@ -69,10 +69,14 @@
                         <ul class="information-list card-selectable">
                             {% for assessmentImpl in unImported %}
                                 {% include '@learningAssessmentExporter/assessment_row.twig' with {
-                                    assessmentSpec:   assessmentSpec,
-                                    assessmentImpl:   assessmentImpl,
-                                    folderWritePerms: folderWritePerms,
-                                    enableReimport:   enableReimport
+                                    assessmentSpec:         assessmentSpec,
+                                    assessmentImpl:         assessmentImpl,
+                                    folderWritePerms:       folderWritePerms,
+                                    enableReimport:         enableReimport,
+                                    submittedResponseCount: responseCounts[assessmentImpl.id].submitted ?? 0,
+                                    draftResponseCount:     responseCounts[assessmentImpl.id].draft ?? 0,
+                                    publishedFeedbackCount: feedbackCounts[assessmentImpl.id].published ?? 0,
+                                    draftFeedbackCount:     feedbackCounts[assessmentImpl.id].draft ?? 0,
                                 } only %}
                             {% endfor %}
                         </ul>
@@ -84,10 +88,14 @@
                         <ul class="information-list card-selectable">
                             {% for assessmentImpl in imported %}
                                 {% include '@learningAssessmentExporter/assessment_row.twig' with {
-                                    assessmentSpec:   assessmentSpec,
-                                    assessmentImpl:   assessmentImpl,
-                                    folderWritePerms: folderWritePerms,
-                                    enableReimport:   enableReimport
+                                    assessmentSpec:         assessmentSpec,
+                                    assessmentImpl:         assessmentImpl,
+                                    folderWritePerms:       folderWritePerms,
+                                    enableReimport:         enableReimport,
+                                    submittedResponseCount: responseCounts[assessmentImpl.id].submitted ?? 0,
+                                    draftResponseCount:     responseCounts[assessmentImpl.id].draft ?? 0,
+                                    publishedFeedbackCount: feedbackCounts[assessmentImpl.id].published ?? 0,
+                                    draftFeedbackCount:     feedbackCounts[assessmentImpl.id].draft ?? 0,
                                 } only %}
                             {% endfor %}
                         </ul>

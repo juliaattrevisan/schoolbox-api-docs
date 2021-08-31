@@ -1,8 +1,12 @@
 {#
-    'assessmentSpec'   IAssessable
-    'assessmentImpl'   IAssessable
-    'folderWritePerms' bool[]        - Does current user have WRITE+ perm to the class folder
-    'enableReimport'   bool          - Should already imported class assessments be re-importable?
+    'assessmentSpec'         IAssessable
+    'assessmentImpl'         IAssessable
+    'folderWritePerms'       bool[]      - Does current user have WRITE+ perm to the class folder
+    'enableReimport'         bool        - Should already imported class assessments be re-importable?
+    'submittedResponseCount' int
+    'draftResponseCount'     int
+    'publishedFeedbackCount' int
+    'draftFeedbackCount'     int
 #}
 {% set unitImpl     = assessmentImpl.baseContext %}
 {% set isInstructor = folderWritePerms[unitImpl.course.folder.id] %}
@@ -37,11 +41,24 @@
                                           'Doing so will overwrite the existing class assessment.';
 
             // Only display interaction counts if there are interactions
-            if(countResponses || countFeedbacks){
-                message += '<br><br>This will also delete ' + countResponses + ' student submissions (' +
-                    countDraftResponses + ' drafts, ' + countSubmittedResponses + ' submitted) and ' +
-                    countFeedbacks + ' teacher feedbacks (' + countDraftFeedbacks + ' drafts, ' +
-                    countPublishedFeedbacks + ' published).'
+            if (countResponses && countFeedbacks) {
+                message += '<br><br>This will also delete '
+                        + countResponses + ' student submissions ('
+                        + countDraftResponses + ' drafts, '
+                        + countSubmittedResponses + ' submitted) and '
+                        + countFeedbacks + ' teacher feedbacks ('
+                        + countDraftFeedbacks + ' drafts, '
+                        + countPublishedFeedbacks + ' published).'
+            } else if (countResponses) {
+                message += '<br><br>This will also delete '
+                        + countResponses + ' student submissions ('
+                        + countDraftResponses + ' drafts, '
+                        + countSubmittedResponses + ' submitted).'
+            } else if (countFeedbacks) {
+                message += '<br><br>This will also delete '
+                        + countFeedbacks + ' teacher feedbacks ('
+                        + countDraftFeedbacks + ' drafts, '
+                        + countPublishedFeedbacks + ' published).'
             }
 
             if ($checkbox.prop('checked')) {
@@ -72,10 +89,10 @@
                    {% if not canImport %}disabled{% endif %}
                    {% if enableReimport and isImported %}
                        data-warn-destructive-export
-                       data-count-responses="{{ assessmentImpl.countResponses(true) }}"
-                       data-count-submitted-responses="{{ assessmentImpl.countResponses(false) }}"
-                       data-count-feedbacks="{{ assessmentImpl.countFeedbacks(true) }}"
-                       data-count-published-feedbacks="{{ assessmentImpl.countFeedbacks(false) }}"
+                       data-count-responses="{{ submittedResponseCount + draftResponseCount }}"
+                       data-count-submitted-responses="{{ submittedResponseCount }}"
+                       data-count-feedbacks="{{ publishedFeedbackCount + draftFeedbackCount }}"
+                       data-count-published-feedbacks="{{ publishedFeedbackCount }}"
                    {% endif %}
                    data-unit-id="{{ unitImpl.id }}"/>
             <label for="import-{{ unitImpl.id }}" class="checkbox-label"></label>

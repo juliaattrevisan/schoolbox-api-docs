@@ -5486,11 +5486,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\MapperProxy\\:\\:findAllImplementationsBySpecificationId\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\MapperProxy\\:\\:getSubObjectPrimaryKeyValue\\(\\) should return int but returns null\\.$#"
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php

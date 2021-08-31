@@ -325,6 +325,106 @@ class MapperProxy
 
 
     /**
+     * Optimised method for finding the number of responses for a set of
+     * assessment IDs.
+     *
+     * @param array<int> $assessmentIds
+     * @return array<int, array{submitted: int, draft: int}>
+     */
+    public function findResponseCountsForAssessments(array $assessmentIds): array
+    {
+        if (empty($assessmentIds)) {
+            return [];
+        }
+
+        $responses = [];
+        foreach ($assessmentIds as $assessmentId) {
+            $responses[$assessmentId] = [
+                'submitted' => 0,
+                'draft'     => 0,
+            ];
+        }
+
+        $pb = $this->baseMapper->getPredicateBuilder()
+                   ->in('v.assessment_id', $assessmentIds);
+        $responseQuery = $this->baseMapper->getDatabase()->prepare("
+            SELECT DISTINCT
+                v.assessment_id,
+                v.response_id,
+                v.submitted_at
+            FROM v_assessment_response v
+            WHERE ({$pb->getWhereIntersect()})
+        ");
+        $responseQuery->setFetchMode(\PDO::FETCH_ASSOC);
+        $responseQuery->execute($pb->getParams());
+        foreach ($responseQuery as $row) {
+            $assessmentId = (int)$row['assessment_id'];
+            $responses[$assessmentId] ??= [
+                'submitted' => 0,
+                'draft'     => 0,
+            ];
+            if ($row['submitted_at']) {
+                $responses[$assessmentId]['submitted']++;
+            } else {
+                $responses[$assessmentId]['draft']++;
+            }
+        }
+
+        return $responses;
+    }
+
+
+    /**
+     * Optimised method for finding the number of feedbacks for a set of
+     * assessment IDs.
+     *
+     * @param array<int> $assessmentIds
+     * @return array<int, array{published: int, draft: int}>
+     */
+    public function findFeedbackCountsForAssessments(array $assessmentIds): array
+    {
+        if (empty($assessmentIds)) {
+            return [];
+        }
+
+        $feedbacks = [];
+        foreach ($assessmentIds as $assessmentId) {
+            $feedbacks[$assessmentId] = [
+                'published' => 0,
+                'draft'     => 0,
+            ];
+        }
+
+        $pb = $this->baseMapper->getPredicateBuilder()
+                   ->in('v.assessment_id', $assessmentIds);
+        $feedbackQuery = $this->baseMapper->getDatabase()->prepare("
+            SELECT DISTINCT
+                v.assessment_id,
+                v.feedback_id,
+                v.published_at
+            FROM v_assessment_feedback v
+            WHERE ({$pb->getWhereIntersect()})
+        ");
+        $feedbackQuery->setFetchMode(\PDO::FETCH_ASSOC);
+        $feedbackQuery->execute($pb->getParams());
+        foreach ($feedbackQuery as $row) {
+            $assessmentId = (int)$row['assessment_id'];
+            $feedbacks[$assessmentId] ??= [
+                'published' => 0,
+                'draft'     => 0,
+            ];
+            if ($row['published_at']) {
+                $feedbacks[$assessmentId]['published']++;
+            } else {
+                $feedbacks[$assessmentId]['draft']++;
+            }
+        }
+
+        return $feedbacks;
+    }
+
+
+    /**
      * Finds the specification assessment for a implementation assessment.
      *
      * This method does not load participants, because assessments in a unit spec
@@ -350,13 +450,14 @@ class MapperProxy
 
 
     /**
-     * Finds the specification assessment for a implementation assessment.
+     * Finds the specification assessment for an implementation assessment.
      *
-     * This method loads participants, responses and feedback.
+     * This method loads assessments only: it does not load participants,
+     * responses or feedback.
      *
      * @param int   $assessmentId
      * @param array $options
-     * @return GenericCollection|IAssessable[]
+     * @return Collection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
@@ -371,10 +472,8 @@ class MapperProxy
             // Get all assessables which have this assessment as a spec
             $options['spec_assessment_id'] = $assessmentId;
             $builder                       = $this->convertOptionsToPredicateBuilder($options, false);
-            return $this->loadParticipantsIntoAssessmentCollection(
-                $this->translateToDomainModelCollection(
-                    $this->baseMapper->findByPredicates($builder, $options)
-                )
+            return $this->translateToDomainModelCollection(
+                $this->baseMapper->findByPredicates($builder, $options)
             );
         } catch (UnderflowException $e) {
             return $this->createCollection();
