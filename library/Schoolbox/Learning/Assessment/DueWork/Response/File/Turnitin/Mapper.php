@@ -26,7 +26,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('status', self::TYPE_INTEGER);
+        $this->uses('status', self::TYPE_STRING);
         $this->uses('error_code', self::TYPE_STRING);
         $this->uses('error_message', self::TYPE_STRING);
         $this->uses('student_submission_file_id', self::TYPE_INTEGER);

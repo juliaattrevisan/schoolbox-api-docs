@@ -25,12 +25,62 @@ class Model implements ISoftDeletable
 
 
     /**
-     * An int that represents the current state of a Similarity Report
+     * Consts that elucidate the current state of a turnitin process
+     *
+     * Note that when you try to get more granular status reports about the
+     * turnitin callback workflow you'll end up having to expand the available
+     * strings here as turnitin can die in multiple places with the same
+     * kind of error string
+     *
+     * These statuses update at the start of their respective duties
+     */
+
+    /* We saved a student's submission in schoolbox and set up the turnitin record
+     * in the instance, but we haven't told turnitin about this document yet.
+     */
+    public const STATUS_SETUP_PENDING = 'pending';
+
+    /* We started communicating with turnitin; this status usually denotes when an
+     * automated script has come along and started doing its thing
+     */
+    public const STATUS_PROCESSING = 'processing';
+
+    /* We started seting up a turnitin Group ("submission box") or found an existing
+     * one to use, which is th same thing really
+     */
+    public const STATUS_SETUP_GROUP = 'group';
+
+    /* We started setting up a turnitin Submission which is a container for student's
+     * file contents which is sent separately
+     */
+    public const STATUS_SETUP_SUBMISSION = 'submission';
+
+    /* We started sending the student's file contents to turnitin
+     */
+    public const STATUS_SETUP_UPLOADING = 'uploading';
+
+    /* We started turnitin's analysis process to generate their similarity report
+     * This should start when their webhook executes after our successful upload
+     */
+    public const STATUS_ANALYSIS = 'analysis';
+
+    /* We successfully completed turnitin analysis, yanking their overall percentage
+     * and caching that locally
+     */
+    public const STATUS_COMPLETE = 'complete';
+
+    /* Something went wrong; check the error_code and error_message for more details
+     */
+    public const STATUS_ERROR = 'error';
+
+
+     /**
+     * A string that represents the current state of a Similarity Report
      * Denotes whether it has successfully finished or not
      *
-     * @var int
+     * @var string
      */
-    private int $status;
+    private string $status;
 
 
     /**
@@ -78,19 +128,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return string
      */
-    public function getStatus(): int
+    public function getStatus(): string
     {
         return $this->status;
     }
 
 
     /**
-     * @param int $status
+     * @param string $status
      * @return Model
      */
-    public function setStatus(int $status): self
+    public function setStatus(string $status): self
     {
         $this->status = $status;
         return $this;
