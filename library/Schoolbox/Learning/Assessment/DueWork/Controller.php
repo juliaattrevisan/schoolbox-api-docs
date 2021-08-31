@@ -1044,12 +1044,10 @@ class Controller extends Assessment\Controller
                 /* Set up detached function so plagscan can continue in the background
                  */
                 $detachedFunction = static function () use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
-                    if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-                        foreach ($response->getAllFiles() as $currentFile) {
-                            $filename = $plagscanMapper->plagscanFilename($currentFile);
+                    foreach ($response->getAllFiles() as $currentFile) {
+                        $filename = $plagscanMapper->plagscanFilename($currentFile);
 
-                            $plagscanMapper->saveNewPlagscan($currentFile, $filename);
-                        }
+                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
                     }
                 };
             } elseif ($isTurnitin) {

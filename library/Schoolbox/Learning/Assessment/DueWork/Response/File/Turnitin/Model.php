@@ -157,7 +157,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string| $errorCode
+     * @param string $errorCode
      * @return Model
      */
     public function setErrorCode(string $errorCode): self
