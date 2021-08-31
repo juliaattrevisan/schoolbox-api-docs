@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
@@ -60,14 +62,14 @@ class ValidFile
      * Turnitin has a max file size of 100mb for most files
      * https://help.turnitin.com/feedback-studio/canvas/lti/instructor/submitting-papers/file-types-and-size.htm#
      */
-    private const MAX_TURNITIN_FILESIZE_OTHER = 100*1024*1024;
+    private const MAX_TURNITIN_FILESIZE_OTHER = 100 * 1024 * 1024;
 
 
     /**
      * But text files must be smaller than 2mb
      * https://help.turnitin.com/feedback-studio/canvas/lti/instructor/submitting-papers/file-types-and-size.htm#
      */
-    private const MAX_TURNITIN_TEXT_FILESIZE_TEXT = 2*1024*1024;
+    private const MAX_TURNITIN_TEXT_FILESIZE_TEXT = 2 * 1024 * 1024;
 
 
     /**

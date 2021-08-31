@@ -48,50 +48,42 @@ class ValidFileTest extends TestCase
         $validTextFile = (new SubmissionFile())
             ->setStorage((new Storage())
                 ->setExtension('txt')
-                ->setSize(1.5*1024*1024)
-            );
+                ->setSize(1.5 * 1024 * 1024));
 
         $validOtherFile = (new SubmissionFile())
             ->setStorage((new Storage())
                 ->setExtension('docx')
-                ->setSize(50*1024*1024)
-            );
+                ->setSize(50 * 1024 * 1024));
 
         $invalidTextFile = (new SubmissionFile())
             ->setStorage((new Storage())
                 ->setExtension('txt')
-                ->setSize(15*1024*1024)
-            );
+                ->setSize(15 * 1024 * 1024));
 
         $invalidOtherFile = (new SubmissionFile())
             ->setStorage((new Storage())
                 ->setExtension('docx')
-                ->setSize(500*1024*1024)
-            );
+                ->setSize(500 * 1024 * 1024));
 
         $unknownExtension = (new SubmissionFile())
             ->setStorage((new Storage())
                 ->setExtension('exe')
-                ->setSize(1024)
-            );
+                ->setSize(1024));
 
         $missingExtension = (new SubmissionFile())
                         ->setStorage((new Storage())
                 ->setExtension('')
-                ->setSize(1024)
-            );
+                ->setSize(1024));
 
         $unknownExtensionExceedsSize = (new SubmissionFile())
             ->setStorage((new Storage())
                 ->setExtension('exe')
-                ->setSize(900*1024*1024)
-            );
+                ->setSize(900 * 1024 * 1024));
 
         $missingExtensionExceedsSize = (new SubmissionFile())
             ->setStorage((new Storage())
                 ->setExtension('')
-                ->setSize(900*1024*1024)
-            );
+                ->setSize(900 * 1024 * 1024));
 
         return [
             'Valid 1: allowed extension, allowed size' => [

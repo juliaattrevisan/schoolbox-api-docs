@@ -1005,7 +1005,8 @@ class Controller extends Assessment\Controller
          * This is processed in a detached function so it doesn't hang the ui
          * while it's executing, since accessing third party api can be slow
          */
-        $detachedFunction = static function() {};
+        $detachedFunction = static function () {
+        };
 
         if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             /* This is the original behaviour. Note that the Plagscan Mapper itself can
