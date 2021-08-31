@@ -948,7 +948,7 @@ class Controller extends Base
                 'title'         => [
                     'caption'   => 'Name',
                     'width'     => 12,
-                    'maxLength' => 60,
+                    'maxLength' => 20,
                     'mandatory' => true,
                 ],
             ]
