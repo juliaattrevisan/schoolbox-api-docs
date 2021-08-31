@@ -48,6 +48,14 @@ class Notifier extends ResourceNotifier
             return $envelope;
         }
 
+        // Body or heading not updated: nothing to notify about
+        if (
+            $action === self::TRIGGER_UPDATED
+            && !(isset($diff['body']) || isset($diff['heading']))
+        ) {
+            return $envelope;
+        }
+
         $bob = new Builder();
 
         $heading = $this->getResourceName($resource);
