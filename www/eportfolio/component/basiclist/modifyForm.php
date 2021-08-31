@@ -1,8 +1,6 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,9 +13,9 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$action = $_REQUEST['action'];
-$ownerId = $_REQUEST['userId'];
-$pageId = $_REQUEST['pageId'];
+$action              = $_REQUEST['action'];
+$ownerId             = $_REQUEST['userId'];
+$pageId              = $_REQUEST['pageId'];
 $componentInstanceId = $_REQUEST['componentInstanceId'];
 
 /* All three vars need to exist before you can continue:
@@ -29,7 +27,14 @@ foreach ([$_SESSION['user'], $ownerId, $pageId] as $val) {
     }
 }
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
+try {
+    $page = \Eportfolio\PageMapper::getInstance()->findById((int)$pageId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
     /* Add a list item
@@ -43,21 +48,17 @@ if ($authenticator->canModify()) {
         $listItem->setSequence(1);
 
         \Component\Eportfolio\BasicListMapper::getInstance()->save($listItem);
-    }
-    /* Update a list item
-     */
-    elseif ($action == 'updateItem') {
+    } elseif ($action == 'updateItem') {
+        /* Update a list item */
         $listItemId = $_POST['listItemId'];
-        $content = $_POST['content'];
+        $content    = $_POST['content'];
 
         $listItem = \Component\Eportfolio\BasicListMapper::getInstance()->findById($listItemId);
         $listItem->setContent($content);
 
         \Component\Eportfolio\BasicListMapper::getInstance()->save($listItem);
-    }
-    /* Delete a list item
-     */
-    elseif ($action == 'removeItem') {
+    } elseif ($action == 'removeItem') {
+        /* Delete a list item */
         $listItemId = $_GET['listItemId'];
 
         $listItem = Component\Eportfolio\BasicListMapper::getInstance()->findById($listItemId);

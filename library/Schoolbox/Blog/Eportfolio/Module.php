@@ -129,7 +129,7 @@ class Module extends BaseModule
             if ($params['page'] instanceof EportfolioPageModel) {
                 $auth = new Eportfolio_Authenticator(
                     $user,
-                    $params['page']->getOwner()->getId(),
+                    $params['page']->getOwner(),
                     $params['page']->getPageId()
                 );
                 if (!method_exists($auth, $method)) {

@@ -135,7 +135,7 @@ class Controller extends Base
                 }
             }
         } catch (RangeException $e) {
-            $this->sendError('Invalid mark provided');
+            $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
             return;
         } catch (MapperException $e) {
             $this->sendError('Invalid mark provided');

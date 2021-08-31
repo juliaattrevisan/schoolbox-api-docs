@@ -1,8 +1,6 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,9 +13,9 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$action = $_POST['action'];
-$ownerId = $_POST['userId'];
-$pageId = $_POST['pageId'];
+$action              = $_POST['action'];
+$ownerId             = $_POST['userId'];
+$pageId              = $_POST['pageId'];
 $componentInstanceId = $_POST['componentInstanceId'];
 
 /* All three vars need to exist before you can continue:
@@ -29,7 +27,14 @@ foreach ([$_SESSION['user'], $ownerId, $pageId] as $val) {
     }
 }
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
+try {
+    $page = \Eportfolio\PageMapper::getInstance()->findById((int)$pageId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
     $content = $_POST['content'];
@@ -40,21 +45,14 @@ if ($authenticator->canModify()) {
      */
     if ($textboxCollection->count()) {
         $textboxItem = $textboxCollection->first();
-        $textboxItem->setContent($content);
-        $textboxItem->setSequence(1);
-
-        \Component\Eportfolio\TextboxMapper::getInstance()->save($textboxItem);
-    }
-    /* Create new one
-     */
-    else {
+    } else {
+        /* Create new one */
         $textboxItem = new \Component\Eportfolio\Textbox();
         $textboxItem->setComponentInstanceId($componentInstanceId);
-        $textboxItem->setContent($content);
-        $textboxItem->setSequence(1);
-
-        \Component\Eportfolio\TextboxMapper::getInstance()->save($textboxItem);
     }
+    $textboxItem->setContent($content);
+    $textboxItem->setSequence(1);
+    \Component\Eportfolio\TextboxMapper::getInstance()->save($textboxItem);
 
-    SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
+    SitePage::localRedir("/eportfolio/{$page->getOwner()->getId()}/{$page->getPageId()}");
 }

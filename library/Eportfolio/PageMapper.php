@@ -10,6 +10,7 @@
 
 namespace Eportfolio;
 
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\UserMapper;
 use Schoolbox\GenericCollection;
@@ -63,6 +64,47 @@ class PageMapper extends Schoolbox\Mapper
             'other_key' => 'page_id',
             ]
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('owner', 'o')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM        {$this->getTable()}
+            INNER JOIN  {$this->getJoinSql('owner', '', 'o')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $userMapper = $this->getJoinMapper('owner');
+        $modelList  = $this->createCollection();
+        foreach ($statement as $row) {
+            $model = $this->hydrate($row);
+            if ($model instanceof Page) {
+                /** @var Schoolbox\User $owner */
+                $owner = $userMapper->hydrate($row, 'o');
+                $model->setOwner($owner);
+                $modelList->add($model);
+            }
+        }
+        return $modelList;
     }
 
     /**

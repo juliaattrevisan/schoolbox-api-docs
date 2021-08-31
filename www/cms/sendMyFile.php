@@ -42,7 +42,7 @@ if (is_numeric($_GET['id'])) {
 
     if ($allFiles->count()) {
         foreach ($allFiles as $currentFile) {
-            $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $file->getOwner()->getId(), $currentFile->getPageId());
+            $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $file->getOwner(), $currentFile->getPageId());
 
             /* If you can view one of the pages that this file is shared on,
              * break out of here

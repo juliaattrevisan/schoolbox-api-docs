@@ -12,7 +12,6 @@ namespace Schoolbox\User\Search;
 
 use Alaress_Date_Format;
 use Config;
-use Eportfolio_Authenticator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Schoolbox\User;
@@ -228,9 +227,14 @@ class Renderer extends Handler
 
                 /* ePortfolio link
                  */
-                $authenticator = new Eportfolio_Authenticator($currentUser, $user['id'], 'profile');
-
-                if ($authenticator->canView()) {
+                if (
+                    Config::get(ConfigMapper::NAME_EPORTFOLIO_ENABLED)
+                    && $user['eportfolio_enabled']
+                    && ($currentUserIsSuperuser
+                        || ($currentUserIsStaff && $currentUser->getRole()->getAccessEportfolio())
+                        || $currentUserIsResult
+                        || $currentUserIsParentOfResult)
+                ) {
                     $this->getPage()->parse('eportfolio_block', 'eportfolio');
                     $hasActions = true;
                 }

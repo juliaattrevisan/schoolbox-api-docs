@@ -194,7 +194,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         if ($allShowcasedItems->count() && $assessments->count()) {
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
-                /** @var IAssessable $assessment */
+                /** @var IAssessable|null $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
                 // if box's assessment is deleted, it's not included in $assessments
                 if (!$assessment) {
@@ -204,9 +204,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 if (!$participant) {
                     continue;
                 }
-                /** @var Response $latestSubmission */
+                /** @var Response|null $latestSubmission */
                 $latestSubmission = $participant->findMostRecentSubmittedResponse();
-                /** @var Feedback $latestReturn */
+                /** @var Feedback|null $latestReturn */
                 $latestReturn = $participant->findMostRecentInstructorGivenPublishedFeedback();
 
                 $workType = $assessment->getWorkType();
@@ -362,7 +362,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function canUserViewPage($pageId)
     {
-        $auth = new Eportfolio_Authenticator($this->getCurrentUser(), $this->getUserId(), $pageId);
+        $auth = new Eportfolio_Authenticator($this->getCurrentUser(), $this->getUser(), $pageId);
         return $auth->canView();
     }
 

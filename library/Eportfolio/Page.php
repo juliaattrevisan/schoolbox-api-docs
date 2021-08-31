@@ -18,6 +18,10 @@ use Schoolbox\User;
 class Page implements ISoftDeletable
 {
 
+    public const PROFILE  = 'profile';
+    public const SHOWCASE = 'showcase';
+    public const CREATE   = 'create';
+
     /**
      * The id of the page currently being viewed
      *

@@ -1,8 +1,6 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,9 +13,9 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$action = $_REQUEST['action'];
-$ownerId = $_REQUEST['userId'];
-$pageId = $_REQUEST['pageId'];
+$action              = $_REQUEST['action'];
+$ownerId             = $_REQUEST['userId'];
+$pageId              = $_REQUEST['pageId'];
 $componentInstanceId = $_REQUEST['componentInstanceId'];
 
 /* All three vars need to exist before you can continue:
@@ -29,13 +27,20 @@ foreach ([$_SESSION['user'], $ownerId, $pageId] as $val) {
     }
 }
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
+try {
+    $page = \Eportfolio\PageMapper::getInstance()->findById((int)$pageId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
     /* Add a list item
      */
     if ($action == 'addItem' && $_POST['title']) {
-        $title = $_POST['title'];
+        $title   = $_POST['title'];
         $content = $_POST['content'];
 
         $listItem = new \Component\Eportfolio\AdvancedList();
@@ -46,11 +51,11 @@ if ($authenticator->canModify()) {
 
         $uploadedFilename = $_FILES['imagehash']['name'];
         $uploadedLocation = $_FILES['imagehash']['tmp_name'];
-        $uploadedUid = $_SESSION['id'];
+        $uploadedUid      = $_SESSION['id'];
 
         if (is_readable($uploadedLocation)) {
             $allowedFiles = new \Schoolbox\File\MimetypeMapper();
-            $mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
+            $mime         = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
 
             if (is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(), 'image/')) {
                 try {
@@ -63,13 +68,11 @@ if ($authenticator->canModify()) {
         }
 
         \Component\Eportfolio\AdvancedListMapper::getInstance()->save($listItem);
-    }
-    /* Update a list item
-     */
-    elseif ($action == 'updateItem' && $_POST['title']) {
+    } elseif ($action == 'updateItem' && $_POST['title']) {
+        /* Update a list item */
         $listItemId = $_POST['listItemId'];
-        $title = $_POST['title'];
-        $content = $_POST['content'];
+        $title      = $_POST['title'];
+        $content    = $_POST['content'];
 
         $listItem = \Component\Eportfolio\AdvancedListMapper::getInstance()->findById($listItemId);
         $listItem->setTitle($title);
@@ -77,11 +80,11 @@ if ($authenticator->canModify()) {
 
         $uploadedFilename = $_FILES['imagehash']['name'];
         $uploadedLocation = $_FILES['imagehash']['tmp_name'];
-        $uploadedUid = $_SESSION['id'];
+        $uploadedUid      = $_SESSION['id'];
 
         if (is_readable($uploadedLocation)) {
             $allowedFiles = new \Schoolbox\File\MimetypeMapper();
-            $mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
+            $mime         = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
 
             if (is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(), 'image/')) {
                 $imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($uploadedFilename, $uploadedLocation, $uploadedUid);
@@ -90,10 +93,8 @@ if ($authenticator->canModify()) {
         }
 
         \Component\Eportfolio\AdvancedListMapper::getInstance()->save($listItem);
-    }
-    /* Delete a list item
-     */
-    elseif ($action == 'removeItem') {
+    } elseif ($action == 'removeItem') {
+        /* Delete a list item */
         $listItemId = $_GET['listItemId'];
 
         $listItem = Component\Eportfolio\AdvancedListMapper::getInstance()->findById($listItemId);

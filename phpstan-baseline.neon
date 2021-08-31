@@ -1881,11 +1881,6 @@ parameters:
 			path: library/Eportfolio.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Eportfolio/Authenticator.php
-
-		-
 			message: "#^Method Eportfolio\\\\Page\\:\\:getPermissions\\(\\) should return iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\Collection but returns array\\<Eportfolio\\\\Permission\\>\\|\\(iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\GenericCollection\\)\\.$#"
 			count: 1
 			path: library/Eportfolio/Page.php
@@ -1904,21 +1899,6 @@ parameters:
 			message: "#^Variable \\$tabList in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Profile.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Profile.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Profile.php
 
 		-
 			message: "#^If condition is always true\\.$#"
