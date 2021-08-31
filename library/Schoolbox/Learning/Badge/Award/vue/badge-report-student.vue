@@ -4,8 +4,11 @@
  * An individual student within the badge-report
  */
 
+import { gsap } from 'gsap/all';
 import BadgeImage from '../../vue/badge-image';
 import HorizontalScroller from '@js/scroll/horizontalScroller';
+
+const BADGE_ANIMATE_DURATION = 0.3;
 
 export default {
     
@@ -20,13 +23,33 @@ export default {
         },
     },
 
-    mounted () {
+    watch: {
 
-        const scroller = new HorizontalScroller(this.$el.querySelector('[data-scroller]')); 
+        student: {
+            deep: true,
+            handler (newStudentData, oldStudentData) {
+                if (newStudentData?.awards?.length !== oldStudentData?.awards?.length) {
+                    setTimeout(() => { 
+                        this.horizontalScroller.refresh();
+                    }, BADGE_ANIMATE_DURATION * 1000);
+                }
+            }
+        }
 
     },
 
+    mounted () {
+        this.initHorizontalScroller();
+    },
+
     methods: {
+
+        /**
+         * To horizontally scroll the badge list
+         */
+        initHorizontalScroller () {
+            this.horizontalScroller = new HorizontalScroller(this.$el.querySelector('[data-scroller]')); 
+        },
 
         /**
          * Open the selected award detail modal
@@ -35,6 +58,74 @@ export default {
          */
         awardSelected (award) {
             this.$emit('on-award-selected', award);
+        },
+
+        /**
+         * 
+         * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
+         * what happens before shown
+         *
+         * @param {DOMElement} element - the element that's animating
+         *
+         */
+        onBeforeEnter (element) {
+            // element.style.position = 'absolute';
+            gsap.set(element, { opacity: 0, y: 10 } );
+        },
+
+        /**
+         * how it element animates on
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onEnter (element, done) {
+            gsap.to(element, { opacity: 1, y: 0, ease: 'power2.out', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
+        },
+
+        /**
+         * how it element animates on
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onAfterEnter (element, done) {
+            // element.style.position = 'static';
+        },
+
+        /**
+         * how the element animates off
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onBeforeLeave (element, done) {
+            element.style.position = 'absolute';
+        },
+
+        /**
+         * how the element animates off
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onLeave (element, done) {
+            gsap.to(element, { opacity: 0, y: 10, ease: 'power2.in', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
+        },
+
+        /**
+         * how the element animates off
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onAfterLeave (element) {
+            element.style.position = 'static';
         },
 
     }
@@ -56,15 +147,25 @@ export default {
         <div class="small-12 medium-9 column">
             <div class="scroller-container" data-scroller>
                 <div class="scroller-button-container">
-                    <button class="previous-button" data-scroller-previous-button>&lt;</button>
+                    <button class="scroller-button" data-scroller-previous-button>&lt;</button>
                 </div>
                 <div class="scroller-flex-container">
                     <div class="scroller-outer-container" data-scroller-outer-container>
+                        <!-- name="fade-in-award" -->
+                        <!-- :css="false"
+                            @enter="onEnter"
+                            @leave="onLeave" -->
                         <transition-group
-                            name="fade-in-award"
                             tag="ul"
                             class="scroller-inner-container"
                             data-scroller-inner-container
+                            :css="false"
+                            @before-enter="onBeforeEnter"
+                            @enter="onEnter"
+                            @after-enter="onAfterEnter"
+                            @before-leave="onBeforeLeave" 
+                            @leave="onLeave" 
+                            @after-leave="onAfterLeave" 
                         >      
                             <li v-for="award in student.awards" :key="award.id" class="award" data-scroller-item>
                                 <a href="#open-award-modal" @click.prevent="awardSelected(award)" :title="award.badge.name">
@@ -73,11 +174,11 @@ export default {
                                 </a>
                             </li>
                         </transition-group>
-                        <div class="scroller-status" data-scroller-scroll-status></div>
+                        <div class="scroller-bar" data-scroller-scroll-bar></div>
                     </div>
                 </div>
                 <div class="scroller-button-container">
-                    <button class="next-button" data-scroller-next-button>&gt;</button>
+                    <button class="scroller-button" data-scroller-next-button>&gt;</button>
                 </div>
             </div>
         </div>
@@ -98,25 +199,23 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-around;
+    height: 140px;
 }
 
 .scroller-button-container {
     flex: 0 0 50px;
     height: 100%;
-    // background: green;
-    button {
-        height: 100%;
-        margin: 0px auto;
-    }
+}
+
+.scroller-button {
+    width: 100%;
+    height: 100%;
+    margin: 0px auto;
+    background: none;
 }
 
 .scroller-flex-container {
-    // position: relative;
-    // display: inline-block;
-    // box-sizing: border-box;
-    // width: 1000px;
     flex: 1 1 auto;
-    // height: 140px;
     overflow: hidden;
     white-space: nowrap;
 }
@@ -155,29 +254,21 @@ export default {
     }
 }
 
-.scroller-status {
+.scroller-bar {
     position: absolute;
     left: 5px;
-    bottom: 5px;
+    bottom: 0px;
     width: 120px; //will be updated relative to scroll amount by horizontalScoller.js
     height: 4px;
     background: $content-ui-foreground;
 }
 
-// button {
-//     display: inline-block;
-//     padding: 10px;
+// .fade-in-award-enter, .fade-in-award-leave-to {
+//     opacity: 0;
+//     transform: translateY(10px);
 // }
-
-.fade-in-award-enter, .fade-in-award-leave-to {
-    opacity: 0;
-    transform: translateY(10px);
-}
-.fade-in-award-leave-active {
-    position: absolute;
-}
-
-
-
+// .fade-in-award-leave-active {
+//     position: absolute;
+// }
 
 </style>

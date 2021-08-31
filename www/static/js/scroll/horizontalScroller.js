@@ -1,9 +1,16 @@
 
+/**
+ * A horizontal scroll container that uses GSAP's Draggable 
+ * Handy for when there's more to display that what horizontal space will allow
+ */
+
+
 import { gsap, Draggable, InertiaPlugin, CSSPlugin } from 'gsap/all';
 
 gsap.registerPlugin(Draggable, InertiaPlugin, CSSPlugin);
 
 const SCROLL_PADDING = 10;
+const MIN_SCROLL_BAR_WIDTH = 100;
 
 export default class HorizontalScroller {
 
@@ -18,14 +25,14 @@ export default class HorizontalScroller {
         
         this.outerContainer = this.scrollerContainer.querySelector('[data-scroller-outer-container]');
         this.innerContainer = this.scrollerContainer.querySelector('[data-scroller-inner-container]');
-        this.innerContainer.style.width = `${this.innerContainer.scrollWidth}px`; //ensure can grab the whole container to drag
         
         this.initDraggable();
         this.initPreviousButton();
         this.initNextButton();
-        this.initScrollStatus();
+        this.initScrollBar();
 
-        this.updated();
+        this.refresh();
+        window.addEventListener('resize', () => this.refresh());
 
     }
 
@@ -33,42 +40,47 @@ export default class HorizontalScroller {
      * Set everything up
      */
     initDraggable () {
-
-        this.minX = -(this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
-        this.maxX = 0;
-
         this.draggable = Draggable.create(this.innerContainer, {
             type: 'x',
-            bounds: { minX: this.minX, maxX: this.maxX },
             edgeResistance: 0.75,
             inertia: true,
-            onDragStart: () => this.showScrollStatus(),
-            onDrag: () => this.updateScrollStatus(),
-            onThrowUpdate: () => this.updateScrollStatus(),
-            onThrowComplete: () => this.hideScrollStatus()
+            onDragStart: () => this.showScrollBar(),
+            onDrag: () => this.updateScrollBar(),
+            onThrowUpdate: () => this.updateScrollBar(),
+            onThrowComplete: () => this.hideScrollBar()
         })[0];
+    }
 
+    /**
+     * Ensure can't scroll beyond the bounds of the container
+     */
+    refreshDraggableBounds () { 
+        this.innerContainer.style.width = 'auto'; //reset for accurate re-display and bound detection
+        this.innerContainer.style.width = `${this.innerContainer.scrollWidth}px`; //ensure can grab the whole container to drag
+        this.minX = -(this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
+        this.maxX = 0;
+        this.draggable.applyBounds( { minX: this.minX, maxX: this.maxX } );
     }
 
     /**
      * Slider has been activated, so show the scroll status
      */
-    showScrollStatus () { 
-        gsap.to(this.scrollStatus, { alpha: 1, duration: 0.3 } );
+    showScrollBar () { 
+        gsap.to(this.scrollBar, { alpha: 1, duration: 0.3 } );
     }
 
     /**
      * Keep the scroll status accurate with the current slide position
      */
-    updateScrollStatus () {
-        gsap.set(this.scrollStatus, { x: -(gsap.getProperty(this.innerContainer, 'x') * this.scrollStatusXFactor) } );
+    updateScrollBar () {
+        gsap.set(this.scrollBar, { x: -(gsap.getProperty(this.innerContainer, 'x') * this.scrollBarXFactor) } );
     } 
     
     /**
      * Fade out the scroll status, when no longer moving
      */
-    hideScrollStatus () {
-        gsap.to(this.scrollStatus, { alpha: 0, duration: 0.3 } );
+    hideScrollBar () {
+        gsap.to(this.scrollBar, { alpha: 0, duration: 0.3 } );
     } 
 
     /**
@@ -80,9 +92,9 @@ export default class HorizontalScroller {
         gsap.to(this.innerContainer, { 
             x: xTarget, 
             duration: 0.5, 
-            onStart: () => this.showScrollStatus(),
-            onUpdate: () => this.updateScrollStatus(),
-            onComplete: () => this.hideScrollStatus()
+            onStart: () => this.showScrollBar(),
+            onUpdate: () => this.updateScrollBar(),
+            onComplete: () => this.hideScrollBar()
         } );
     }
 
@@ -92,11 +104,9 @@ export default class HorizontalScroller {
     initPreviousButton () {
         this.previousButton = this.scrollerContainer.querySelector('[data-scroller-previous-button]');
         this.previousButton.addEventListener('click', () => {
-            let xTarget = gsap.getProperty(this.innerContainer, 'x') + this.outerContainer.clientWidth;
-            if (xTarget > this.maxX) {
-                xTarget = this.maxX;
-            }
-            this.moveInnerContainer(xTarget);
+            const xTarget = gsap.getProperty(this.innerContainer, 'x') + this.outerContainer.clientWidth;
+            const constrainedXTarget = (xTarget > this.maxX) ? this.maxX : xTarget; //ensure doesn't move beyond the container bounds
+            this.moveInnerContainer(constrainedXTarget);
         });
     }
 
@@ -106,41 +116,57 @@ export default class HorizontalScroller {
     initNextButton () {
         this.nextButton = this.scrollerContainer.querySelector('[data-scroller-next-button]');
         this.nextButton.addEventListener('click', () => {
-            let xTarget = gsap.getProperty(this.innerContainer, 'x') - this.outerContainer.clientWidth;
-            if (xTarget < this.minX) {
-                xTarget = this.minX;
-            }
-            this.moveInnerContainer(xTarget);
+            const xTarget = gsap.getProperty(this.innerContainer, 'x') - this.outerContainer.clientWidth;
+            const constrainedXTarget = (xTarget < this.minX) ? this.minX : xTarget; //ensure doesn't move beyond the container bounds
+            this.moveInnerContainer(constrainedXTarget);
         });
     }
 
     /**
      * The visual indication of scroll progress, moves as you scroll
      */
-    initScrollStatus () {
-        let scrollStatusWidth = (this.outerContainer.clientWidth - SCROLL_PADDING) * (this.outerContainer.clientWidth / this.innerContainer.scrollWidth);
-        if (scrollStatusWidth < 100) { //don't go to small
-            scrollStatusWidth = 100;
-        }
-        this.scrollStatus = this.scrollerContainer.querySelector('[data-scroller-scroll-status]');
-        this.scrollStatus.style.width = `${scrollStatusWidth}px`; //provide an accurate indication of length of scroll 
-        gsap.set(this.scrollStatus, { alpha: 0 } ); //only show when sliding active
-        this.scrollStatusXFactor = (this.outerContainer.clientWidth - this.scrollStatus.clientWidth - SCROLL_PADDING) / (this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
+    initScrollBar () {
+        this.scrollBar = this.scrollerContainer.querySelector('[data-scroller-scroll-bar]');
+        gsap.set(this.scrollBar, { alpha: 0 } ); //only show when sliding active
+        this.refreshScrollBarWidth();
+    }
+
+    /**
+     * Ensure the size of the scroll bar accurately reflects the amount of scroll required
+     */
+    refreshScrollBarWidth () {
+        const scrollBarWidth = (this.outerContainer.clientWidth - SCROLL_PADDING) * (this.outerContainer.clientWidth / this.innerContainer.scrollWidth);
+        const constrainedScrollBarWidth = (scrollBarWidth < MIN_SCROLL_BAR_WIDTH) ? MIN_SCROLL_BAR_WIDTH : scrollBarWidth;  //don't go to small
+        this.scrollBar.style.width = `${constrainedScrollBarWidth}px`; //provide an accurate indication of length of scroll 
+        this.scrollBarXFactor = (this.outerContainer.clientWidth - this.scrollBar.clientWidth - SCROLL_PADDING) / (this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
     }
 
     /**
      * Only need to provide sliding functionality when we actually need to slide!
      */
-    updated () {
-        if (this.innerContainer.scrollWidth === this.outerContainer.clientWidth) { //no need to enable when can see the entire container content
-            this.draggable.disable();
-            this.nextButton.style.display = 'none';
-            this.previousButton.style.display = 'none';
-        } else {
-            this.draggable.enable();
-            this.nextButton.style.display = 'block';
-            this.previousButton.style.display = 'block';
-        }
+    refresh () {
+        gsap.to(this.innerContainer, { x: 0, duration: 0.5 } ); //move back to the start
+        this.refreshDraggableBounds();
+        this.minX < 0 ? this.enable() : this.disable(); //only provide scrolling when needed
     }
 
+    /**
+     * enable all the functionality of scroller
+     */
+     enable () {
+        this.nextButton.style.display = 'block';
+        this.previousButton.style.display = 'block';
+        this.draggable.enable();
+        this.refreshScrollBarWidth();
+    }
+
+    /**
+     * disable all the functionality of scroller
+     */
+    disable () {
+        this.nextButton.style.display = 'none';
+        this.previousButton.style.display = 'none';
+        this.draggable.disable();
+    }
+    
 }
