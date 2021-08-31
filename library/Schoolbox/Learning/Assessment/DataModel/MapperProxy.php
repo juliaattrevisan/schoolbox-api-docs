@@ -363,7 +363,7 @@ class MapperProxy
                 'submitted' => 0,
                 'draft'     => 0,
             ];
-            if (!isset($row['submitted_at'])) {
+            if ($row['submitted_at']) {
                 $responses[$assessmentId]['submitted']++;
             } else {
                 $responses[$assessmentId]['draft']++;
@@ -413,7 +413,7 @@ class MapperProxy
                 'published' => 0,
                 'draft'     => 0,
             ];
-            if (!isset($row['published_at'])) {
+            if ($row['published_at']) {
                 $feedbacks[$assessmentId]['published']++;
             } else {
                 $feedbacks[$assessmentId]['draft']++;
