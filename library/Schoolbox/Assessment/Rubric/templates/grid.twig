@@ -113,12 +113,14 @@
         {% if showSummaryForThisCapability %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                    {{ capabilityMark.humanReadableValue }}
+                    {{ capabilityMark and capabilityMark.humanReadableValue }}
 
                     {# Self-Assessment #}
                     {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading %}
                         {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
-                        ({{ selfAssessmentCapabilityMark.humanReadableValue }} given in {{ locale.selfAssessment }})
+                        {% if selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.retrieveHumanReadableMark %}
+                            ({{ selfAssessmentCapabilityMark.humanReadableValue }} given in {{ locale.selfAssessment }})
+                        {% endif %}
                     {% endif %}
                 </th>
             </tr>
