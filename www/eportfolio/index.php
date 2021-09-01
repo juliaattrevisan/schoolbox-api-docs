@@ -36,7 +36,10 @@ if (is_numeric($this->arg[1])) {
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page ? $page->getOwner() : $owner, $page ? $page->getPageId() : null);
 if ($authenticator->canCreate() || $authenticator->canModify()) {
     $access = UserAccess::ACCESS_FULL;
-} elseif ($authenticator->canView() && ($pageName !== \Eportfolio\Page::CREATE)) {
+} elseif ($authenticator->canView() && $pageName === \Eportfolio\Page::CREATE) {
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+    exit;
+} elseif ($authenticator->canView()) {
     $access = UserAccess::ACCESS_READ;
 } else {
     $this->pageNotFound();
