@@ -17,7 +17,8 @@ use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
  *
  * @method Campus hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Campus[] findAll($options = [])
- * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection|Campus[] findByColumn($columnName, $columnValue, $options = [])
+ * @method Campus findOneByColumn($columnName, $columnValue, $options = [])
  */
 class CampusMapper extends Mapper
 {

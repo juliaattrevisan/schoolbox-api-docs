@@ -124,9 +124,8 @@ class External_Liss_Server
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
      *
-     * @return object|TimetableCycle
+     * @return TimetableCycle|xmlrpcresp
      * @throws MapperException
-     * @throws MapperException\Deleted
      * @throws PDOException
      * @throws UnexpectedValueException
      */
@@ -139,33 +138,55 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $cycleMapper = new TimetableCycleMapper();
+        /* TODO: Undo these hardcoded values at some point
+         *  Find the first available campus for now until we can detect campuses specifically
+         */
+        /** @var Campus $campus */
+        $campus = CampusMapper::getInstance()->findAll()->first();
 
+        /* You need:
+         *      a) at least one campus to exist with a name, for logging purposes
+         *      b) that campus needs a meaningful ext_timetable_code to identify it
+         */
+        if (!$campus) {
+            $this->log()->warning('You need at least one campus with an ext_timetable_code to continue.');
+            exit;
+        }
+
+        /* Try to find a Timetable Cycle from the first campus' ext_timetable_code
+         */
+        $cycleMapper = TimetableCycleMapper::getInstance();
+
+        /* If one exists, load it and reuse it
+         * Otherwise create a new one
+         */
         try {
-            /* TODO: Assume a particular cycle
-             */
-            $cycle = $cycleMapper->findById(1);
-
-            $this->log()->info("publishBellTimes: Defaulting to using first existing timetable cycle");
+            $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $campus->getExtTimetableCode());
         } catch (MapperException $e) {
-            $this->log()->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
+            $this->log()->warning(sprintf(
+                "publishBellTimes: Did not find a cycle for campus %s (%s); creating a new one for it instead",
+                $campus->getName(),
+                $campus->getExtTimetableCode()
+            ));
 
             $now = new Alaress_Date_Format();
 
-            /* TODO: Undo these hardcoded values at some point
+            /* Assume some basic ideas about this new cycle because we haven't
+             * seen anything warranting changing them yet
+             *      a) It starts on Day 1
+             *      b) It has a 10-day cycle length
+             *      c) Each day has 13 slots in it
+             *      d) Goes for the full calendar year
              */
-            /** @var Campus $campus */
-            $campus = CampusMapper::getInstance()->findById(1);
-
             $cycle = $cycleMapper->createModel()
                 ->setTitle('Main Timetable')
                 ->setCycleIdentifier($campus->getExtTimetableCode())
                 ->setStart($now->startOfYear())
                 ->setFinish($now->endOfYear())
-                ->setStartDay(1)
 
                 /* TODO: Undo these hardcoded values at some point
                  */
+                ->setStartDay(1)
                 ->setCycleLength(10)
                 ->setDayLength(13);
 
