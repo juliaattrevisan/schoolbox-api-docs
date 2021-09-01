@@ -116,17 +116,26 @@ export default {
             axios.request(request)
                 .then(response => {
 
-                    /* Send bat signal to the parent component
+                    /* Everything went normally as intended
                      */
-                    this.$emit('withdraw-complete');
+                    if (null === response.data) {
+                        /* Send bat signal to the parent component
+                         */
+                        this.$emit('withdraw-complete');
 
-                    /* Close this modal
-                     */
-                    self.close();
+                        /* Close this modal
+                         */
+                        self.close();
 
-                    /* Pop toast
-                     */
-                    self.toastSuccess('Withdraw complete');
+                        /* Pop toast
+                         */
+                        self.toastSuccess('Withdraw complete');
+                    } else if (response.data.status !== undefined && 400 === response.data.status) {
+
+                        /* Goal prevents achievement from being withdrawn
+                         */
+                        self.toastError('Unable to withdraw achievement; a goal might exist and should be withdrawn first.');
+                    }
                 })
                 .catch(error => {
                     if (error.response) {

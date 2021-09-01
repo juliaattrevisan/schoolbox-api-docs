@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use Exception;
 use PDOException;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -582,7 +583,15 @@ class Controller extends Base
             return;
         }
 
-        $this->mapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
+        try {
+            $this->mapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
+        } catch (\RuntimeException $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+        }
     }
 
 
