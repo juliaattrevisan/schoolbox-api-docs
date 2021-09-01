@@ -84,8 +84,8 @@ switch ($_GET['transform_type']) {
 
     case Image\Transformation\MyImage::getSlug():
     default:
-        $width     = intval($_GET['width']) ?: 100;
-        $height    = intval($_GET['height']) ?: 100;
+        $width     = (int)$_GET['width'] ?: 100;
+        $height    = (int)$_GET['height'] ?: 100;
         $myImage   = new Image\Transformation\MyImage();
         $transform = $myImage->retrieve($width, $height);
         $cache_key = $myImage->getCacheKey($width, $height);
