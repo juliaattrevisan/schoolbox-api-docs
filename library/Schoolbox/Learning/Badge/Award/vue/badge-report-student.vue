@@ -134,27 +134,23 @@ export default {
 </script>
 
 <template>
-    <li class="action-small-1 awards student">
+    <li class="awards student">
         <div class="small-12 medium-1 column">
             <p>Checkbox</p>
         </div>
-        <div class="small-12 medium-2 column">
+        <div class="small-12 medium-1 column">
             <a :href="`/search/user/${student.id}`">
                 <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="student.fullName">
-                {{ student.fullName }}
+                <h4>{{ student.fullName }}</h4>
             </a>
         </div>
-        <div class="small-12 medium-9 column">
+        <div class="small-12 medium-10 column">
             <div class="scroller-container" data-scroller>
                 <div class="scroller-button-container">
                     <button class="scroller-button" data-scroller-previous-button>&lt;</button>
                 </div>
                 <div class="scroller-flex-container">
                     <div class="scroller-outer-container" data-scroller-outer-container>
-                        <!-- name="fade-in-award" -->
-                        <!-- :css="false"
-                            @enter="onEnter"
-                            @leave="onLeave" -->
                         <transition-group
                             tag="ul"
                             class="scroller-inner-container"
@@ -189,17 +185,40 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
+$rowHeight: 140px;
+
 .student {
-    height: 140px;
+    height: $rowHeight;
     overflow: hidden;
     margin-bottom: 1rem;
 }
 
+.column {
+    padding-bottom: 0;
+}
+
+// .student {
+//     height: $rowHeight;
+//     margin-bottom: 1rem;
+// }
+
+// .column-checkbox {
+//     flex: 0 0 50px;
+// }
+
+// .column-name {
+//     flex: 0 0 50px;
+// }
+
+// .column-badges {
+//     flex: 1 1 auto;
+// }
+
 .scroller-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-around;
-    height: 140px;
+    height: $rowHeight;
 }
 
 .scroller-button-container {
@@ -212,10 +231,12 @@ export default {
     height: 100%;
     margin: 0px auto;
     background: none;
+    font-weight: bold;
 }
 
 .scroller-flex-container {
     flex: 1 1 auto;
+    height: 100%;
     overflow: hidden;
     white-space: nowrap;
 }
@@ -236,7 +257,7 @@ export default {
 
 .award::v-deep {
     display: inline-block;
-    width: 140px;
+    width: $rowHeight;
     margin: 0px 0.5rem;
     vertical-align: top;
     text-align: center;
@@ -262,13 +283,5 @@ export default {
     height: 4px;
     background: $content-ui-foreground;
 }
-
-// .fade-in-award-enter, .fade-in-award-leave-to {
-//     opacity: 0;
-//     transform: translateY(10px);
-// }
-// .fade-in-award-leave-active {
-//     position: absolute;
-// }
 
 </style>
