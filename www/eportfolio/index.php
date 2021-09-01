@@ -36,10 +36,10 @@ if (is_numeric($this->arg[1])) {
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page ? $page->getOwner() : $owner, $page ? $page->getPageId() : null);
 if ($authenticator->canCreate() || $authenticator->canModify()) {
     $access = UserAccess::ACCESS_FULL;
-} elseif ($authenticator->canView()) {
+} elseif ($authenticator->canView() && ($pageName !== \Eportfolio\Page::CREATE)) {
     $access = UserAccess::ACCESS_READ;
 } else {
-    error(19);
+    $this->pageNotFound();
     exit;
 }
 $eportfolioPage = (new Eportfolio_Page_Factory())->produce($this, $ownerId, $pageName, $access);
