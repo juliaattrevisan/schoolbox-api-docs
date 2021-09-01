@@ -37,7 +37,7 @@ export default class HorizontalScroller {
     }
 
     /**
-     * Set everything up
+     * init the draggable instance, which is the core functionality 
      */
     initDraggable () {
         this.draggable = Draggable.create(this.innerContainer, {
@@ -52,7 +52,7 @@ export default class HorizontalScroller {
     }
 
     /**
-     * Ensure can't scroll beyond the bounds of the container
+     * Ensure can't scroll beyond the bounds of what's in the container
      */
     refreshDraggableBounds () { 
         this.innerContainer.style.width = 'auto'; //reset for accurate re-display and bound detection
@@ -63,21 +63,21 @@ export default class HorizontalScroller {
     }
 
     /**
-     * Slider has been activated, so show the scroll status
+     * scroller has been activated, so show the scroll bar to track scroll progress
      */
     showScrollBar () { 
         gsap.to(this.scrollBar, { alpha: 1, duration: 0.3 } );
     }
 
     /**
-     * Keep the scroll status accurate with the current slide position
+     * Keep the scroll bar accurate with the current scroll position
      */
     updateScrollBar () {
         gsap.set(this.scrollBar, { x: -(gsap.getProperty(this.innerContainer, 'x') * this.scrollBarXFactor) } );
     } 
     
     /**
-     * Fade out the scroll status, when no longer moving
+     * Fade out the scroll bar, when no longer moving
      */
     hideScrollBar () {
         gsap.to(this.scrollBar, { alpha: 0, duration: 0.3 } );
@@ -142,7 +142,7 @@ export default class HorizontalScroller {
     }
 
     /**
-     * Only need to provide sliding functionality when we actually need to slide!
+     * Only need to provide scrolling functionality when we actually need to scroll!
      */
     refresh () {
         gsap.to(this.innerContainer, { x: 0, duration: 0.5 } ); //move back to the start
@@ -151,7 +151,7 @@ export default class HorizontalScroller {
     }
 
     /**
-     * enable all the functionality of scroller
+     * enable the functionality of scroller, the contents of the container goes beyond the bounds set
      */
      enable () {
         this.nextButton.style.display = 'block';
@@ -161,7 +161,7 @@ export default class HorizontalScroller {
     }
 
     /**
-     * disable all the functionality of scroller
+     * disable all the functionality of scroller, not enough in the container to be needed
      */
     disable () {
         this.nextButton.style.display = 'none';
