@@ -43,21 +43,21 @@ class DefinitionCompiler
 
 
     /**
-     * @var false|string
+     * @var string
      */
-    private $from;
+    private string $from;
 
 
     /**
-     * @var false|string
+     * @var string
      */
-    private $to;
+    private string $to;
 
 
     /**
      * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
