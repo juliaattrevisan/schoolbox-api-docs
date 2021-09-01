@@ -16,6 +16,7 @@ use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
 use LogicException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -195,7 +196,7 @@ class ListController extends Web\Controller\Base
          */
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
             $this->getUser(),
-            $assessment->getSebEnabled(),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_LMS_SEB_ENABLED) && $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
