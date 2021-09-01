@@ -294,7 +294,7 @@ class ScheduleIterator implements Iterator
 
         $setId = trim((string)$node[0]->xpath('@Id')[0]->Id);
 
-        /* Select all the SetList nodes where any of its Set subnodes contains the value $setId exactly
+        /* Select all the SetList nodes where any of its SetId subnodes contains the value $setId exactly
          */
         $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
 
