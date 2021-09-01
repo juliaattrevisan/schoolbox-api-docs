@@ -73,8 +73,15 @@ class Freedom implements IQueryHelper
             WHERE (I.MEMBER# = :externalId)
             AND (A.RELATION_STAT = :relationStatus)
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
-            AND (A.STUDENT_PREF = :contactLevel);
-        ";
+            AND (A.STUDENT_PREF = :contactLevel)
+            AND (
+                S.DATE_DEPART IS NULL
+                OR
+                DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
+                OR
+                DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
+                )
+            ";
 
         $params = [
             'externalId'     => (int)$externalUserId,
