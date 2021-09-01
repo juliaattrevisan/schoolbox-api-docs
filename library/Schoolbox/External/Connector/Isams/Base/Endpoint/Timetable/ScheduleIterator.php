@@ -294,7 +294,9 @@ class ScheduleIterator implements Iterator
 
         $setId = trim((string)$node[0]->xpath('@Id')[0]->Id);
 
-        $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[contains(SetId, '{$setId}')]");
+        /* Select all the SetList nodes where any of its subnodes contains the value $setId
+         */
+        $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
 
         foreach ($setListNodes as $current) {
             $studentId = trim((string)$current->xpath('@PupilId')[0]);
@@ -315,6 +317,7 @@ class ScheduleIterator implements Iterator
                 'username' => trim((string)$student->SchoolCode),
             ];
         }
+
 
         return $students;
     }
