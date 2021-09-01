@@ -56,6 +56,8 @@ class Factory
                     SchoolboxException::class
                 ),
                 'error_types' => self::ERROR_REPORTING,
+                'send_default_pii' => true,
+                'attach_stacktrace' => true,
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
                 // fall back to site_location if site_school_code not set
