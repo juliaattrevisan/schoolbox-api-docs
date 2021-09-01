@@ -15,7 +15,7 @@ import AdminListRow from './row/admin-list-row';
 import AdminListAddRow from './admin-list-add-row';
 import AdminListDeleteRow from './admin-list-delete-row';
 import mixinSaveRows from './mixins/mixinAdminListSaveRows';
-import Toast from '@schoolbox/toast';
+import Toast from '@vue/components/toast';
 import { UPDATE_LOADED_DATA } from './store/adminListMutationTypes';
 
 
