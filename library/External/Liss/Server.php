@@ -84,6 +84,13 @@ class External_Liss_Server
 
 
     /**
+     * When TtStructure values are mysteriously empty, use this string
+     * as the cycle's identifier and also its name
+     */
+    private const DEFAULT_CYCLE_IDENTIFIER = 'Main Timetable';
+
+
+    /**
      * @var IConfigLoader
      */
     private $config;
@@ -143,12 +150,22 @@ class External_Liss_Server
          */
         $cycleMapper = TimetableCycleMapper::getInstance();
 
+        /* If the $identifier is somehow an empty string, then it might not have
+         * been set properly in the remote data source - just assume the usual
+         * traditional default identifier in this case, and use that
+         */
+        $cycleIdentifier = $identifier;
+
+        if ('' === $cycleIdentifier) {
+            $cycleIdentifier = self::DEFAULT_CYCLE_IDENTIFIER;
+        }
+
         try {
-            $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $identifier);
+            $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $cycleIdentifier);
         } catch (MapperException $e) {
             $this->log()->warning(sprintf(
                 "publishBellTimes: Did not find a cycle for TtStructure identifier %s; creating a new one for it instead",
-                $identifier
+                $cycleIdentifier
             ));
 
             $now = new Alaress_Date_Format();
@@ -161,8 +178,8 @@ class External_Liss_Server
              *      d) Goes for the full calendar year
              */
             $cycle = $cycleMapper->createModel()
-                ->setTitle($identifier)
-                ->setCycleIdentifier($identifier)
+                ->setTitle($cycleIdentifier)
+                ->setCycleIdentifier($cycleIdentifier)
                 ->setStart($now->startOfYear())
                 ->setFinish($now->endOfYear())
 
