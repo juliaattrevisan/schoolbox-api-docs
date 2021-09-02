@@ -207,7 +207,7 @@ class Preloader
 
             /* Go digging in another endpoint for names and identifier
              */
-            if ('' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
+            if (isset($timetableLesson['attributes']['teacherIds'][0]) && '' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
                 $endpoint = "enrolments/person/{$timetableLesson['attributes']['teacherIds'][0]}?limit=200";
 
                 try {
