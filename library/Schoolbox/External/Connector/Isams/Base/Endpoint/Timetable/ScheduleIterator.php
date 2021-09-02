@@ -56,10 +56,19 @@ class ScheduleIterator implements Iterator
      *
      * @param Batchxml         $batchxml
      * @param SimpleXMLElement $timetable
+     * @throws RuntimeException
      */
     public function __construct(Batchxml $batchxml, SimpleXMLElement $timetable)
     {
         $this->batchxml = $batchxml;
+
+        /* Published timetables might, or might not, have Schedules nodes
+         * because classes haven't been assigned to a timetable yet
+         */
+        if (!isset($timetable->xpath('Schedules')[0])) {
+            throw new \RuntimeException('No schedules found in this timetable; nothing to process.');
+        }
+
         $this->schedules = $timetable->xpath('Schedules')[0]->Schedule;
         $this->dayCalibrator = new DayCalibrator($batchxml);
     }
