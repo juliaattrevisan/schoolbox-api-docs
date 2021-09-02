@@ -27,6 +27,7 @@ use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -130,6 +131,11 @@ class Module extends BaseModule
             )
         );
 
+        $canUseSeb = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_LMS_SEB_ENABLED, $this->getConfig())
+        );
+
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) {
             return $name . 's';
@@ -144,8 +150,8 @@ class Module extends BaseModule
 
         // register the routes
 
-        $this->register('GET', "$assRoute/seb", 'getSebDownload', $loggedIn, $preloadAssessment);
-        $this->register('GET', "$assRoute/sebConfig", 'getSebConfig', $loggedIn, $preloadAssessment);
+        $this->register('GET', "$assRoute/seb", 'getSebDownload', $canUseSeb, $preloadAssessment);
+        $this->register('GET', "$assRoute/sebConfig", 'getSebConfig', $canUseSeb, $preloadAssessment);
         $this->register('GET', "$assListRoute", 'getAssessmentsByContext', $isSuper, $preloadContext);
         $this->register('POST', "$assListRoute", 'postCreateAssessment', $canWrite, $preloadContext); // a || c
         $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments', $canWrite, $preloadContext); // a || c

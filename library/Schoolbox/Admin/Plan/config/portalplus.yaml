@@ -80,6 +80,7 @@ config:
   grade_capability_display: { hide: true }
   lms_cohort_comparison: {hide: true }
   lms_duetime_default: {hide: true }
+  lms_seb_enable: {value: false, hide: true}
 
   #Comms
   comms_comments_enabled: { hide: false }
