@@ -13,7 +13,6 @@ use SplObjectStorage;
 
 class Rule
 {
-
     /** @var bool */
     protected $negate;
 
@@ -22,7 +21,6 @@ class Rule
 
     /** @var Callable */
     protected $effect;
-
 
     /**
      * @param Callable $effect
@@ -34,7 +32,6 @@ class Rule
         $this->negate     = $negate;
         $this->effect     = $effect;
     }
-
 
     /**
      * Determine if this rule's conditions match a user.
@@ -52,6 +49,16 @@ class Rule
         if ($this->conditions->count()) {
             // iterate conditions and ensure all match
             foreach ($this->conditions as $condition) {
+                /**
+                 * there may be historical conditions that have no field defined, so silently skip over them and
+                 * provide users with the opportunity to come back and correct their config
+                 */
+                if (method_exists($condition, 'getField')) {
+                    if (empty($condition->getField())) {
+                        continue;
+                    }
+                }
+
                 // failfast
                 if (!call_user_func_array([ $condition, 'test' ], func_get_args())) {
                     $fire = false;
@@ -69,7 +76,6 @@ class Rule
         return null;
     }
 
-
     /**
      * @param Condition $condition
      * @return self
@@ -80,7 +86,6 @@ class Rule
         return $this;
     }
 
-
     /**
      * How specific is this rule? Used for precedence.
      *
@@ -90,7 +95,6 @@ class Rule
     {
         return $this->conditions->count();
     }
-
 
     /**
      * @return Condition[]
