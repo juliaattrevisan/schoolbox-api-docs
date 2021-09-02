@@ -161,7 +161,6 @@
                     text: 'Saving...'
                 });
 
-
                 saveRules($rule)
                     .done(function( data, textStatus, jqXHR ) {
                         $rule.find(config.validInputTypes).attr('disabled', false);
@@ -308,7 +307,6 @@
                 });
             });
         }
-
 
         /**
          * Delete a Rule

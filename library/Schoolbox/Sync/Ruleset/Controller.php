@@ -576,7 +576,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
 
-
     /**
      * Update a Rule's sequencing
      *
@@ -638,6 +637,13 @@ class Controller extends Base
 
                 // ensure this is in the right order
                 ksort($conditionArgs);
+
+                /**
+                 * if the user has not nominated a field, we're not even going to attempt saving/handling it
+                 */
+                if (empty($conditionArgs[0])) {
+                    continue;
+                }
 
                 // this is pretty hacky and not overly extensible...
                 if ($conditionType == 1 && count($conditionArgs) == 3) {
