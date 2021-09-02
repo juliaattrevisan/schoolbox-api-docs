@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface IAssessable
+interface IResponse
+interface IFeedback
+
+hide empty members
+
+class LtiAssessment {
+    - string assessmentUrl
+}
+note right of LtiAssessment::assessmentUrl
+    populated from result of POST line item request
+end note
+
+class LtiFeedback {
+    - string normalisedMark
+    - string humanReadableMark
+}
+note right of LtiFeedback::normalised
+    populated from result of GET results request
+end note
+note right of LtiFeedback::humanReadableMark
+    populated from result of GET results request
+end note
+
+IAssessable --|> LtiAssessment
+IFeedback --|> LtiFeedback
+
+note bottom of IResponse
+    LTI results don't contain a completion state,
+    thus there's no point to storing a response.
+end note
+
+@enduml
