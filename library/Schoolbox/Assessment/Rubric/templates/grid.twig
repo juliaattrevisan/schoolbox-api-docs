@@ -39,8 +39,11 @@
 
         {# Only show capability summary if there's something to actually show #}
         {% set capabilityMark               = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set showSummaryForThisCapability = showSummaryCapability
-            and ((selfAssessmentFeedback.isSelfGrading ?? false) or (capabilityMark.humanReadableValue ?? null is not null)) %}
+        {% set selfAssessmentCapabilityMark = (selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading)
+            ? selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
+        {% set showSummaryForThisCapability =
+            (selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue)
+            or (showSummaryCapability and capabilityMark and capabilityMark.humanReadableValue) %}
         {% set rowspan                      = groupUsage.indicatorUsages|length + (showSummaryForThisCapability ? 1 : 0) %}
 
         {% for critIndex, critUsage in groupUsage.indicatorUsages %}
@@ -113,11 +116,10 @@
         {% if showSummaryForThisCapability %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                    {{ capabilityMark.humanReadableValue }}
+                    {{ capabilityMark.humanReadableValue ?? '' }}
 
                     {# Self-Assessment #}
-                    {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading %}
-                        {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
+                    {% if selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue %}
                         ({{ selfAssessmentCapabilityMark.humanReadableValue }} given in {{ locale.selfAssessment }})
                     {% endif %}
                 </th>
