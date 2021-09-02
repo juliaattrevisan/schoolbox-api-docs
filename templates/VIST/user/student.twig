@@ -4,18 +4,6 @@
 {% endblock details_studentId %}
 
 {% block details_formTeacher %}
-    {% if showClasses %}
-        {% if formTeacher %}
-            <dt class="small-4 medium-3 columns">Primary Learning Designer:</dt>
-            <dd class="small-8 medium-9 columns">
-                {% if formTeacher.id %}
-                <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                    {% else %}
-                        {{ formTeacher.formatName }}
-                    {% endif %}
-                    </dd>
-                {% endif %}
-        {% endif %}
 {% endblock details_formTeacher %}
 
 {% block details_yearLevel %}
