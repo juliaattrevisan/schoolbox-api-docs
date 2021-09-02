@@ -144,7 +144,7 @@
     {% endif %}
 
     {# Enforce Safe Exam Browser #}
-    {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
+    {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment, courseManagedReadonly: courseManaged.isReadonly} only %}
 </fieldset>
 
 {# ----------------------------------------------------------- #}
