@@ -119,7 +119,7 @@
                     {{ capabilityMark.humanReadableValue ?? '' }}
 
                     {# Self-Assessment #}
-                    {% if selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.retrieveHumanReadableMark %}
+                    {% if selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue %}
                         ({{ selfAssessmentCapabilityMark.humanReadableValue }} given in {{ locale.selfAssessment }})
                     {% endif %}
                 </th>
