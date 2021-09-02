@@ -5,6 +5,7 @@
  # on Due Work, Task, Quiz
  #
  # @param IAssessable $assessment
+ # @param bool $courseManagedReadonly
  #}
 {% if config.lms_seb_enable %}
 <div class="row">
@@ -14,7 +15,7 @@
         <input type="hidden" name="sebEnabled" value="0" />
 
         <div class="switch">
-            <input name="sebEnabled" id="sebEnabled" type="checkbox" {% if assessment.sebEnabled %}checked="checked"{% endif %} />
+            <input name="sebEnabled" id="sebEnabled" type="checkbox" {% if assessment.sebEnabled %}checked="checked"{% endif %} {% if courseManagedReadonly ?? false %}disabled{% endif %} />
             <label for="sebEnabled">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
