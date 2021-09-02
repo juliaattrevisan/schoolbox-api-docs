@@ -10,27 +10,34 @@ hide empty members
 class LtiAssessment {
     - string assessmentUrl
 }
-note right of LtiAssessment::assessmentUrl
-    populated from result of POST line item request
+note bottom of LtiAssessment
+    LTI assessment is populated from
+    result of POST line item request.
 end note
+
+class LtiResponse {}
 
 class LtiFeedback {
     - string normalisedMark
     - string humanReadableMark
 }
-note right of LtiFeedback::normalised
-    populated from result of GET results request
-end note
-note right of LtiFeedback::humanReadableMark
-    populated from result of GET results request
+note bottom of LtiFeedback
+    Normalised and HR mark are populated
+    from result of GET results request.
 end note
 
 IAssessable --|> LtiAssessment
+IResponse --|> LtiResponse
 IFeedback --|> LtiFeedback
 
-note bottom of IResponse
-    LTI results don't contain a completion state,
-    thus there's no point to storing a response.
+note bottom of LtiResponse
+    LTI results don't contain a completion
+    state, thus there's no data beyond the
+    fields IResponse already prescribes.
+
+    This is still required so that there's a
+    record that the student has responded to
+    the assessment.
 end note
 
 @enduml
