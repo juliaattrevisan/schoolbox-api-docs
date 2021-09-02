@@ -10,8 +10,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use External\Liss\Helper\PublishDailyData as PublishDailyDataHelper;
-use Schoolbox\Campus;
-use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
@@ -86,6 +84,13 @@ class External_Liss_Server
 
 
     /**
+     * When TtStructure values are mysteriously empty, use this string
+     * as the cycle's identifier and also its name
+     */
+    private const DEFAULT_CYCLE_IDENTIFIER = 'Main Timetable';
+
+
+    /**
      * @var IConfigLoader
      */
     private $config;
@@ -106,8 +111,8 @@ class External_Liss_Server
     /**
      * External_Liss_Server constructor.
      *
-     * @param IConfigLoader $config
-     * @param IConnector    $externalDb
+     * @param IConfigLoader   $config
+     * @param IConnector|null $externalDb
      */
     public function __construct(IConfigLoader $config, IConnector $externalDb = null)
     {
@@ -124,13 +129,13 @@ class External_Liss_Server
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
      *
-     * @return object|TimetableCycle
+     * @param string $identifier
+     * @return TimetableCycle|xmlrpcresp
      * @throws MapperException
-     * @throws MapperException\Deleted
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function getCycle()
+    public function getCycle(string $identifier)
     {
         /* Requires schoolbox connector
          */
@@ -139,33 +144,48 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $cycleMapper = new TimetableCycleMapper();
+        /* Try to find a Timetable Cycle matching $identifier
+         * If one exists, load it and reuse it
+         * Otherwise create a new one
+         */
+        $cycleMapper = TimetableCycleMapper::getInstance();
+
+        /* If the $identifier is somehow an empty string, then it might not have
+         * been set properly in the remote data source - just assume the usual
+         * traditional default identifier in this case, and use that
+         */
+        $cycleIdentifier = $identifier;
+
+        if ('' === $cycleIdentifier) {
+            $cycleIdentifier = self::DEFAULT_CYCLE_IDENTIFIER;
+        }
 
         try {
-            /* TODO: Assume a particular cycle
-             */
-            $cycle = $cycleMapper->findById(1);
-
-            $this->log()->info("publishBellTimes: Defaulting to using first existing timetable cycle");
+            $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $cycleIdentifier);
         } catch (MapperException $e) {
-            $this->log()->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
+            $this->log()->warning(sprintf(
+                "publishBellTimes: Did not find a cycle for TtStructure identifier %s; creating a new one for it instead",
+                $cycleIdentifier
+            ));
 
             $now = new Alaress_Date_Format();
 
-            /* TODO: Undo these hardcoded values at some point
+            /* Assume some basic ideas about this new cycle because we haven't
+             * seen anything warranting changing them yet
+             *      a) It starts on Day 1
+             *      b) It has a 10-day cycle length
+             *      c) Each day has 13 slots in it
+             *      d) Goes for the full calendar year
              */
-            /** @var Campus $campus */
-            $campus = CampusMapper::getInstance()->findById(1);
-
             $cycle = $cycleMapper->createModel()
-                ->setTitle('Main Timetable')
-                ->setCycleIdentifier($campus->getExtTimetableCode())
+                ->setTitle($cycleIdentifier)
+                ->setCycleIdentifier($cycleIdentifier)
                 ->setStart($now->startOfYear())
                 ->setFinish($now->endOfYear())
-                ->setStartDay(1)
 
                 /* TODO: Undo these hardcoded values at some point
                  */
+                ->setStartDay(1)
                 ->setCycleLength(10)
                 ->setDayLength(13);
 
@@ -600,7 +620,6 @@ class External_Liss_Server
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishBellTimes: processing request');
-            $cycle = External_Liss_Server::getCycle();
 
             $allData = $message->params[2]->me['array'];
 
@@ -612,6 +631,12 @@ class External_Liss_Server
 
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
+
+                /* Use $currentData['TtStructure']'s value as the cycle identifier
+                 * and load that if it exists, creating a new one if it doesn't
+                 */
+                $cycleIdentifier = (string)$struct['TtStructure']->me['string'];
+                $cycle = External_Liss_Server::getCycle($cycleIdentifier);
 
                 $dayNumber = (string)$struct['DayNumber']->me['i4'];
 
