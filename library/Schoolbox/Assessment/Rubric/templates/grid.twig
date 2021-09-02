@@ -39,7 +39,7 @@
 
         {# Only show capability summary if there's something to actually show #}
         {% set capabilityMark               = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
-        {% set selfAssessmentCapabilityMark = (selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading)
+        {% set selfAssessmentCapabilityMark = (selfAssessmentFeedback is defined and selfAssessmentFeedback.isSelfGrading)
             ? selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
         {% set showSummaryForThisCapability =
             (selfAssessmentCapabilityMark and selfAssessmentCapabilityMark.humanReadableValue)
