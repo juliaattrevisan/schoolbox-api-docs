@@ -133,14 +133,22 @@ class Payload
          */
         $examKeySalt = $this->generateExamKeySalt($this->saltBasis);
 
-        $whiteList = $this->generateWhiteList(["{$domain}/login","{$startUrl}/", "{$domain}/assess/"]);
+        /* List of allowed urls
+         */
+        $whitelistUrls = ["{$domain}/login", "{$startUrl}/", "{$domain}/assess/"];
+        if ($this->config->get('saml_enabled')) {
+            $urlSso          = parse_url(trim($this->config->get('saml_sso_url')));
+            $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/";
+            $urlIdp          = parse_url(trim($this->config->get('saml_idp_metadata_url')));
+            $whitelistUrls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/";
+        }
 
         /* Manufacture a phplib style struct for strings and their replacements
          */
         $tokens = [
             '{{ startUrl }}'    => $startUrl,
             '{{ examKeySalt }}' => $examKeySalt,
-            '{{ whiteList }}'   => $whiteList,
+            '{{ whiteList }}'   => $this->generateWhiteList($whitelistUrls),
         ];
 
         /* Perform the replacements
@@ -359,12 +367,6 @@ class Payload
      */
     private function generateWhiteList(array $urls): string
     {
-        if ($this->config->get('saml_enabled')) {
-            $urlSso = parse_url(trim($this->config->get('saml_sso_url')));
-            $urls[] = "{$urlSso['scheme']}://{$urlSso['host']}/";
-            $urlIdp = parse_url(trim($this->config->get('saml_idp_metadata_url')));
-            $urls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/";
-        }
         $urls = array_unique(array_filter($urls));
         $whiteList = '';
         foreach ($urls as $url) {
