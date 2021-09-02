@@ -331,9 +331,9 @@ export default {
 
         <record-device-options 
             title="Select a Camera"
-            :is-recording="isRecording"
             :current-device-id="currentVideoDeviceId"
             :device-list="videoDeviceList"
+            :is-recording="isRecording"
             @on-video-device-change="onVideoDeviceChange"
         />
 
