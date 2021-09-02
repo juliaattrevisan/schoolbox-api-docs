@@ -4261,11 +4261,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
 
 		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Isams\\\\Base\\\\Endpoint\\\\Timetable\\\\ScheduleIterator\\:\\:\\$schedules \\(array\\<SimpleXMLElement\\>\\) does not accept SimpleXMLElement\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/ScheduleIterator.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Isams\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Isams/Base/Sync.php
