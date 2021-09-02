@@ -205,7 +205,9 @@ class Controller extends Alaress\Web\Controller\Base
     {
         if ($this->getUser()->getRole()->isParent() && \Config::get('external_tass_sso_parent_code') === "TASS ID") {
             // remove any non-numeric characters so it's the proper TASS id
-            return preg_replace('/\D/', '', $this->getUser()->getExternalId());
+            $parentCode = preg_replace('/\D/', '', $this->getUser()->getExternalId());
+            $parentLength = \Config::get('external_tass_parent_id_length');
+            return substr($parentCode, 0, $parentLength);
         }
         if ($this->getUser()->getRole()->isStaff() && \Config::get('external_tass_sso_staff_code') === "TASS ID") {
             return $this->getUser()->getExternalId();
