@@ -18,7 +18,7 @@ group Attempt LTI assessment
     SB -> LTI: redirect student to LTI assessment
     LTI -> LTI: student attempts LTI assessment
     LTI -> SB: student gets sent back to SB
-    SB -> SB: mark student as having responded to assessment
+    SB -> SB: create response to assessment
     SB -> SB: trigger mark synchronisation for assessment (student attempt only)
 end
 
@@ -33,7 +33,8 @@ end
 group Mark synchronisation
     SB -> LTI: request marks for LTI assessment
     LTI -> SB: return marks
-    SB -> SB: determine which marks are new, and update them
+    SB -> SB: determine which marks are new
+    SB -> SB: create feedback for assessment for new marks
 end
 
 @enduml
