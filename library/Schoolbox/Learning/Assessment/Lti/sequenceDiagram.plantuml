@@ -7,8 +7,16 @@ participant "LTI Platform\n(Schoolbox)" as SB
 participant "LTI Tool\n(Google Classroom, MS Teams Classes)" as LTI
 
 group Create LTI assessment
-    TC -> SB: create SB assessment for association with LTI
+    TC -> SB: visit create assessment page
+    SB -> SB: create assessment
     SB -> LTI: send request to create LTI assessment
+    note right
+    The LTI Platform must pass a resource link
+    to the LTI Tool.
+
+    This will probably take the form of a
+    "Resource link launch request message".
+    end note
     LTI -> SB: return link to new LTI assessment
     SB -> SB: associate new LTI assessment with SB assessment
 end
@@ -19,7 +27,6 @@ group Attempt LTI assessment
     LTI -> LTI: student attempts LTI assessment
     LTI -> SB: student gets sent back to SB
     SB -> SB: create response to assessment
-    SB -> SB: trigger mark synchronisation for assessment (student attempt only)
 end
 
 group Mark LTI assessment
@@ -27,14 +34,15 @@ group Mark LTI assessment
     SB -> LTI: redirect teacher to LTI assessment
     LTI -> LTI: teacher marks LTI assessment attempts
     LTI -> SB: teacher gets sent back to SB
-    SB -> SB: trigger mark synchronisation for assessment
 end
 
-group Mark synchronisation
-    SB -> LTI: request marks for LTI assessment
-    LTI -> SB: return marks
-    SB -> SB: determine which marks are new
-    SB -> SB: create feedback for assessment for new marks
+group Mark update
+    LTI -> SB: update mark
+    note left
+    The LTI Platform must implement the
+    Score Publish Service.
+    end note
+    SB -> SB: write mark
 end
 
 @enduml
