@@ -172,7 +172,19 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            $classes = new ScheduleIterator($this->batchxml, $currentTimetable);
+            try {
+                $classes = new ScheduleIterator($this->batchxml, $currentTimetable);
+            } catch (\RuntimeException $e) {
+                /* This occurs when a PublishedTimetable exists, but there aren't any Schedules
+                 * inside it, perhaps because there are no Sets. Nothing to process.
+                 */
+                $this->log->warning(sprintf(
+                    'No Schedules/Schedule nodes found for timetable %s; skipping',
+                    $ext
+                ));
+
+                continue;
+            }
 
             foreach ($classes as $class) {
                 /* Look up the period instance by (name, day)
