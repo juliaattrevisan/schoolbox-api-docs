@@ -274,6 +274,7 @@
         <key>action</key>
         <integer>1</integer>
       </dict>
+      {{ samlDicts }}
     </array>
     <key>blacklistURLFilter</key>
     <string />
