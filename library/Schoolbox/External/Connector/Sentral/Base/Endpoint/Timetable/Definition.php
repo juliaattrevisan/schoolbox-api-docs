@@ -252,6 +252,19 @@ class Definition implements IStrategy
             /* Each $period is an array of [name, order, startTime, endTime, isActive]
              */
             for ($j = 0; $j < $dayLength; $j++) {
+                /* Not all days have the same number of periods
+                 * The longest day we have seen might be 12 periods long
+                 *
+                 * But:
+                 * Day 1 might have 10 periods
+                 * Day 3 might have 6 periods
+                 *
+                 * Skip undefined periods
+                 */
+                if (!isset($periods[$j])) {
+                    continue;
+                }
+
                 $period = $periods[$j];
 
                 /* Assumption: assign arbitrary name since each $period has a different
