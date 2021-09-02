@@ -10,8 +10,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use External\Liss\Helper\PublishDailyData as PublishDailyDataHelper;
-use Schoolbox\Campus;
-use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
@@ -106,8 +104,8 @@ class External_Liss_Server
     /**
      * External_Liss_Server constructor.
      *
-     * @param IConfigLoader $config
-     * @param IConnector    $externalDb
+     * @param IConfigLoader   $config
+     * @param IConnector|null $externalDb
      */
     public function __construct(IConfigLoader $config, IConnector $externalDb = null)
     {
@@ -124,12 +122,13 @@ class External_Liss_Server
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
      *
+     * @param string $identifier
      * @return TimetableCycle|xmlrpcresp
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function getCycle()
+    public function getCycle(string $identifier)
     {
         /* Requires schoolbox connector
          */
@@ -138,35 +137,18 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        /* TODO: Undo these hardcoded values at some point
-         *  Find the first available campus for now until we can detect campuses specifically
-         */
-        /** @var Campus $campus */
-        $campus = CampusMapper::getInstance()->findAll()->first();
-
-        /* You need:
-         *      a) at least one campus to exist with a name, for logging purposes
-         *      b) that campus needs a meaningful ext_timetable_code to identify it
-         */
-        if (!$campus) {
-            $this->log()->warning('You need at least one campus with an ext_timetable_code to continue.');
-            exit;
-        }
-
-        /* Try to find a Timetable Cycle from the first campus' ext_timetable_code
+        /* Try to find a Timetable Cycle matching $identifier
+         * If one exists, load it and reuse it
+         * Otherwise create a new one
          */
         $cycleMapper = TimetableCycleMapper::getInstance();
 
-        /* If one exists, load it and reuse it
-         * Otherwise create a new one
-         */
         try {
-            $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $campus->getExtTimetableCode());
+            $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $identifier);
         } catch (MapperException $e) {
             $this->log()->warning(sprintf(
-                "publishBellTimes: Did not find a cycle for campus %s (%s); creating a new one for it instead",
-                $campus->getName(),
-                $campus->getExtTimetableCode()
+                "publishBellTimes: Did not find a cycle for TtStructure identifier %s; creating a new one for it instead",
+                $identifier
             ));
 
             $now = new Alaress_Date_Format();
@@ -179,8 +161,8 @@ class External_Liss_Server
              *      d) Goes for the full calendar year
              */
             $cycle = $cycleMapper->createModel()
-                ->setTitle('Main Timetable')
-                ->setCycleIdentifier($campus->getExtTimetableCode())
+                ->setTitle($identifier)
+                ->setCycleIdentifier($identifier)
                 ->setStart($now->startOfYear())
                 ->setFinish($now->endOfYear())
 
@@ -621,7 +603,6 @@ class External_Liss_Server
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishBellTimes: processing request');
-            $cycle = External_Liss_Server::getCycle();
 
             $allData = $message->params[2]->me['array'];
 
@@ -633,6 +614,12 @@ class External_Liss_Server
 
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
+
+                /* Use $currentData['TtStructure']'s value as the cycle identifier
+                 * and load that if it exists, creating a new one if it doesn't
+                 */
+                $cycleIdentifier = (string)$struct['TtStructure']->me['string'];
+                $cycle = External_Liss_Server::getCycle($cycleIdentifier);
 
                 $dayNumber = (string)$struct['DayNumber']->me['i4'];
 
