@@ -133,15 +133,14 @@ class Payload
          */
         $examKeySalt = $this->generateExamKeySalt($this->saltBasis);
 
-        $samlDicts = $this->generateSamlDicts();
+        $whiteList = $this->generateWhiteList(["{$domain}/login","{$startUrl}/", "{$domain}/assess/"]);
 
         /* Manufacture a phplib style struct for strings and their replacements
          */
         $tokens = [
-            '{{ domain }}' => $domain,
-            '{{ startUrl }}' => $startUrl,
+            '{{ startUrl }}'    => $startUrl,
             '{{ examKeySalt }}' => $examKeySalt,
-            '{{ samlDicts }}' => $samlDicts,
+            '{{ whiteList }}'   => $whiteList,
         ];
 
         /* Perform the replacements
@@ -354,32 +353,33 @@ class Payload
     }
 
     /**
+     * Generates list of filter rules
+     * @param array $urls
      * @return string
      */
-    private function generateSamlDicts(): string
+    private function generateWhiteList(array $urls): string
     {
-        if (!$this->config->get('saml_enabled')) {
-            return '';
+        if ($this->config->get('saml_enabled')) {
+            $urlSso = parse_url(trim($this->config->get('saml_sso_url')));
+            $urls[] = "{$urlSso['scheme']}://{$urlSso['host']}/";
+            $urlIdp = parse_url(trim($this->config->get('saml_idp_metadata_url')));
+            $urls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/";
         }
-        $hosts = [];
-        $urlSso = parse_url(trim($this->config->get('saml_sso_url')));
-        $hosts[] = "{$urlSso['scheme']}://{$urlSso['host']}";
-        $urlIdp = parse_url(trim($this->config->get('saml_idp_metadata_url')));
-        $hosts[] = "{$urlIdp['scheme']}://{$urlIdp['host']}";
-        $hosts = array_unique(array_filter($hosts));
-        $dicts = '';
-        foreach ($hosts as $host) {
-            $dicts .= "      <dict>
+        $urls = array_unique(array_filter($urls));
+        $whiteList = '';
+        foreach ($urls as $url) {
+            $whiteList .= "
+      <dict>
         <key>active</key>
         <true />
         <key>regex</key>
         <false />
         <key>expression</key>
-        <string>$host/*</string>
+        <string>{$url}*</string>
         <key>action</key>
         <integer>1</integer>
       </dict>";
         }
-        return $dicts;
+        return $whiteList;
     }
 }
