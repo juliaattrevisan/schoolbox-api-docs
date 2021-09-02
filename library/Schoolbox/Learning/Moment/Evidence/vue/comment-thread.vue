@@ -7,7 +7,7 @@ import Storage from '@vue/components/storage';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
-import mixinCKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
+import cKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
 import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
 
 export default {
@@ -21,7 +21,7 @@ export default {
 
     mixins: [
         cdnPrefixMixin,
-        mixinCKEditor
+        cKEditor
     ],
 
     props: {
