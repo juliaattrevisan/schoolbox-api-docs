@@ -145,6 +145,7 @@ module.exports = {
         // Libraries
         clipboard: './www/static/js/clipboard/clipboard.js',
         strtotime: './www/static/js/alaress-datetime-picker/strtotime.js',
+        highcharts: './www/static/js/vendors/highcharts/highcharts.js',
         
         //Search Bar
         searchBar: './vue/components/searchBar/searchBar.js',
@@ -260,6 +261,13 @@ module.exports = {
                 loader: 'expose-loader',
                 options: {
                     exposes: {globalName: 'IntroJs', moduleLocalName: 'introJs', override: true}
+                },
+            },
+            {
+                test: require.resolve('highcharts'),
+                loader: 'expose-loader',
+                options: {
+                    exposes: {globalName: 'Highcharts', override: true}
                 },
             },
             {
