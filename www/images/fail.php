@@ -10,18 +10,23 @@
 
 use Alaress\Image\Cache;
 use Alaress\Image;
+use Schoolbox\Application\BasicRequest;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel = new BasicRequest\Kernel();
+
+$browserCacheTimeoutConfigName = $_GET['transform_type'] === 'portrait'
+    ? ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT
+    : ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT;
 
 // Use the type of transform to determine the timeout
-$kernel->outputCacheControlMaxAgeHeaderFromConfig(
-    $_GET['transform_type'] === 'portrait'
-        ? ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT
-        : ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT
-);
+$kernel->outputCacheControlMaxAgeHeaderFromConfig($browserCacheTimeoutConfigName);
 
 //
 // Get the code, then the image path from the code.
@@ -37,16 +42,17 @@ switch ($_GET['code']) {
     default:
         break;
 }
-$path = null;
 switch ($code) {
     case 403:
         $path = '/images/placeholders/permission-denied.png';
+        $hash = '27e7f8e7e63a8b2562128842fc3302f7758647be';
         break;
 
     case 404:
     case 500:
     default:
         $path = '/images/placeholders/corrupt-image.png';
+        $hash = '93c3e6fc5c928ef24b65ee41a03c5756d8e1c09d';
         break;
 }
 
@@ -54,11 +60,10 @@ switch ($code) {
 //
 // Build the transformation.
 // If there's no valid transformation, then transform to a given size.
-$transform = null;
-$cache_key = null;
 switch ($_GET['transform_type']) {
     case Image\Transformation\Portrait::getSlug():
         $path       = '/images/placeholders/portrait.png';
+        $hash       = '4ffb9e38f95e5fbafe0277c6a424e2b47b38d997';
         $transforms = new Image\Transformation\Portrait();
         $size       = $_GET['transform'] ?? '';
         try {
@@ -84,11 +89,11 @@ switch ($_GET['transform_type']) {
 
     case Image\Transformation\MyImage::getSlug():
     default:
-        $width     = (int)$_GET['width'] ?: 100;
-        $height    = (int)$_GET['height'] ?: 100;
-        $myImage   = new Image\Transformation\MyImage();
-        $transform = $myImage->retrieve($width, $height);
-        $cache_key = $myImage->getCacheKey($width, $height);
+        $width      = (int)$_GET['width'] ?: 100;
+        $height     = (int)$_GET['height'] ?: 100;
+        $transforms = new Image\Transformation\MyImage();
+        $transform  = $transforms->retrieve($width, $height);
+        $cache_key  = $transforms->getCacheKey($width, $height);
         break;
 }
 
@@ -96,11 +101,31 @@ switch ($_GET['transform_type']) {
 if ($code === 503) {
     http_response_code($code);
 }
+/** @var IConfigLoader $config */
+$config = $kernel->get('config');
 // Try to transform the fail image in /resources
 // If even THAT fails, just redirect to the static version.
 // (The redirect should never happen anymore, as an invalid transform falls back
 //  to a valid one now.)
 try {
+    if (
+        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3 &&
+        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
+    ) {
+        $preSignedUrlService    = new PreSignedUrlService($config);
+        $storage                = (new Storage\Model())->setHash($hash);
+        $preSignedUrlDataObject = $preSignedUrlService->generate(
+            $storage,
+            Alaress_Date_Format::now()->addSeconds($config->get($browserCacheTimeoutConfigName)),
+            $transforms->getTranscodePath(Storage\Manager::getPathFromHash($hash), $cache_key),
+            'private',
+            PreSignedUrlService::DISPOSITION_INLINE,
+            'image/png',
+            basename($path)
+        );
+        $preSignedUrlService->download($preSignedUrlDataObject);
+    }
+
     $imageProcessor = new Image\Processor(
         Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
         $cache_key,
