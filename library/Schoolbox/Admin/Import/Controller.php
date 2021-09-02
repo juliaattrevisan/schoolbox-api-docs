@@ -157,7 +157,7 @@ class Controller extends ConfigController
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
-            'report' => $report ?: [[
+            'report' => \is_array($report) ? $report : [[
                 'message' => $message,
                 'reason' => '',
                 'status' => ISpecification::STATUS_ERROR
