@@ -15,6 +15,7 @@ use CFPropertyList\CFDate;
 use CFPropertyList\CFDictionary;
 use CFPropertyList\CFPropertyList;
 use CFPropertyList\CFString;
+use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
@@ -75,6 +76,10 @@ class Payload
      */
     private Router $router;
 
+    /**
+     * @var Loader
+     */
+    private Loader $config;
 
     /**
      * A random 4 character unicode string to replace backslashes during json_encode.
@@ -85,15 +90,16 @@ class Payload
     /**
      * Constructor.
      *
-     * @param string $saltBasis
+     * @param Loader $config
      * @param string $host
      * @param Router $router
      */
-    public function __construct(string $saltBasis, string $host, Router $router)
+    public function __construct(Loader $config, string $host, Router $router)
     {
-        $this->saltBasis =  $saltBasis;
+        $this->saltBasis = (string)$config->get('site_location');
         $this->host = $host;
         $this->router = $router;
+        $this->config = $config;
     }
 
 
@@ -127,12 +133,22 @@ class Payload
          */
         $examKeySalt = $this->generateExamKeySalt($this->saltBasis);
 
+        /* List of allowed urls
+         */
+        $whitelistUrls = ["{$domain}/login", "{$startUrl}/", "{$domain}/assess/"];
+        if ($this->config->get('saml_enabled')) {
+            $urlSso          = parse_url(trim($this->config->get('saml_sso_url')));
+            $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/";
+            $urlIdp          = parse_url(trim($this->config->get('saml_idp_metadata_url')));
+            $whitelistUrls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/";
+        }
+
         /* Manufacture a phplib style struct for strings and their replacements
          */
         $tokens = [
-            '{{ domain }}' => $domain,
-            '{{ startUrl }}' => $startUrl,
-            '{{ examKeySalt }}' => $examKeySalt
+            '{{ startUrl }}'    => $startUrl,
+            '{{ examKeySalt }}' => $examKeySalt,
+            '{{ whiteList }}'   => $this->generateWhiteList($whitelistUrls),
         ];
 
         /* Perform the replacements
@@ -342,5 +358,30 @@ class Payload
         }
         // Check that all keys are not sequential integers starting from 0 (Which is what PHP arrays have behind the scenes.)
         return array_keys($array) !== range(0, count($array) - 1);
+    }
+
+    /**
+     * Generates list of filter rules
+     * @param array $urls
+     * @return string
+     */
+    private function generateWhiteList(array $urls): string
+    {
+        $urls = array_unique(array_filter($urls));
+        $whiteList = '';
+        foreach ($urls as $url) {
+            $whiteList .= "
+      <dict>
+        <key>active</key>
+        <true />
+        <key>regex</key>
+        <false />
+        <key>expression</key>
+        <string>{$url}*</string>
+        <key>action</key>
+        <integer>1</integer>
+      </dict>";
+        }
+        return $whiteList;
     }
 }

@@ -244,36 +244,7 @@
     <false />
     <key>URLFilterRules</key>
     <array>
-      <dict>
-        <key>active</key>
-        <true />
-        <key>regex</key>
-        <false />
-        <key>expression</key>
-        <string>{{ domain }}/login*</string>
-        <key>action</key>
-        <integer>1</integer>
-      </dict>
-      <dict>
-        <key>active</key>
-        <true />
-        <key>regex</key>
-        <false />
-        <key>expression</key>
-        <string>{{ startUrl }}/*</string>
-        <key>action</key>
-        <integer>1</integer>
-      </dict>
-      <dict>
-        <key>active</key>
-        <true />
-        <key>regex</key>
-        <false />
-        <key>expression</key>
-        <string>{{ domain }}/assess/*</string>
-        <key>action</key>
-        <integer>1</integer>
-      </dict>
+      {{ whiteList }}
     </array>
     <key>blacklistURLFilter</key>
     <string />

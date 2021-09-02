@@ -151,7 +151,7 @@ class ListController extends Web\Controller\Base
     public function getSebConfig(IAssessable $assessment): void
     {
         $sebPayload = new SebPayload(
-            $this->getConfigLoader()->get('site_location'),
+            $this->getConfigLoader(),
             $this->getRequest()->server->get('HTTP_HOST'),
             $this->router
         );
@@ -205,7 +205,7 @@ class ListController extends Web\Controller\Base
             /* Generate a config key hash from the xml that guards this assessment url
              */
             (new SebPayload(
-                $this->getConfigLoader()->get('site_location'),
+                $this->getConfigLoader(),
                 $this->getRequest()->server->get('HTTP_HOST'),
                 $this->router
             ))->generateConfigKey($assessment)
