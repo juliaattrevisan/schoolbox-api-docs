@@ -243,7 +243,7 @@ class Preloader
 
             $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
                 'day'      => $timetableLesson['attributes']['dayName'],
-                'name'     => "Period {$timetableLesson['attributes']['periodName']}",
+                'name'     => $timetableLesson['attributes']['periodName'],
                 'start'    => $timetableLesson['attributes']['startTime'],
                 'finish'   => $timetableLesson['attributes']['endTime'],
                 'sequence' => $timetableLesson['attributes']['periodOrder'],
