@@ -172,6 +172,9 @@ export default {
 
         /**
          * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
+         * 
+         * @params { DOMElement }
+         * @params { Object }
          */
         onError (element, error) {
             this.hasError = true;
