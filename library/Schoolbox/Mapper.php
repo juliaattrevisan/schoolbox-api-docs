@@ -722,7 +722,7 @@ abstract class Mapper implements IMapper, Serializable
                     // this catch is merely to accommodate that case, it should
                     // not be relied upon in development
                     self::$prop = new MockPropagator();
-                } catch (\ErrorException|AMQPIOException|AMQPRuntimeException $e) {
+                } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
                     // Could not connect to the propagator's AMQP instance
                     // (i.e. RabbitMQ).
                     // Continue as if it didn't exist, but log a warning
@@ -2864,26 +2864,11 @@ abstract class Mapper implements IMapper, Serializable
         $updString   = $this->getUpdateString();
         $affectedIds = [];
         $pdoMethods  = [];
-        //
-        // Trigger all on collection before attempting to run?
-        // Must for now, because otherwise transactions would be nested.
-        foreach ($collection as $model) {
-            if (!($this->triggerCallbacks(self::CALLBACK_PRESAVE, $model))) {
-                return false;
-            }
-        }
-
-        foreach ($collection as $model) {
-            $this->assertValidEnums($model);
-        }
-
 
         $idProperty       = $this->getIdentifierProperty();
         $idColumn         = $this->getIdentifierColumn();
         $insertQuery      = "INSERT INTO `{$tbl}` ({$colString}) VALUES ({$plcString})";
-        $replaceQuery     = "{$insertQuery} ON DUPLICATE KEY UPDATE {$updString}";
         $insertStatement  = null;
-        $replaceStatement = $this->database->prepare($replaceQuery);
         $existingObjects  = [];
 
         if (isset($idColumn)) {
@@ -2901,8 +2886,8 @@ abstract class Mapper implements IMapper, Serializable
             if (count($collectionIds)) {
                 foreach (
                     $this->findByColumn($idColumn, $collectionIds, [
-                    'deleted' => true,
-                    'cache'   => false,
+                        'deleted' => true,
+                        'cache'   => false,
                     ]) as $obj
                 ) {
                     // index by ID
@@ -2910,6 +2895,32 @@ abstract class Mapper implements IMapper, Serializable
                 }
             }
         }
+
+        //
+        // Trigger all on collection before attempting to run?
+        // Must for now, because otherwise transactions would be nested.
+        foreach ($collection as $model) {
+            $previous = null;
+            if ($idProperty) {
+                // this mapper defines a primary key, so providing a diff is possible (if this is an UPDATE)
+                $id = $this->getModelProperty($model, $idProperty);
+                if ($id) {
+                    $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
+                    if (!$this->triggerCallbacks(self::CALLBACK_PRESAVE, $model, $previous)) {
+                        return false;
+                    }
+                }
+            } elseif (!$this->triggerCallbacks(self::CALLBACK_PRESAVE, $model)) {
+                return false;
+            }
+        }
+
+        foreach ($collection as $model) {
+            $this->assertValidEnums($model);
+        }
+
+        $replaceQuery     = "{$insertQuery} ON DUPLICATE KEY UPDATE {$updString}";
+        $replaceStatement = $this->database->prepare($replaceQuery);
 
         $this->database->beginTransaction();
 
