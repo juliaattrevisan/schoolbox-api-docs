@@ -1,0 +1,36 @@
+@startuml
+actor Teacher as TC
+actor Student as ST
+participant Schoolbox as SB
+participant "LTI Tool" as LTI
+
+group Create LTI assessment
+    TC -> SB: create SB assessment for association with LTI
+    SB -> LTI: send request to create LTI assessment
+    LTI -> SB: return link to new LTI assessment
+    SB -> SB: associate new LTI assessment with SB assessment
+end
+
+group Attempt LTI assessment
+    ST -> SB: visit assessment summary page
+    SB -> LTI: redirect student to LTI assessment
+    LTI -> LTI: student attempts LTI assessment
+    LTI -> SB: student gets sent back to SB
+    SB -> SB: student gets marked as having attempted assessment
+end
+
+group Mark LTI assessment
+    TC -> SB: visit assessment status page
+    SB -> LTI: redirect teacher to LTI assessment
+    LTI -> LTI: teacher marks LTI assessments
+    LTI -> SB: teacher gets sent back to SB
+    SB -> SB: trigger mark synchronisation
+end
+
+group Sync marks from LTI to Schoolbox
+    SB -> LTI: request marks for LTI assessment
+    LTI -> SB: return marks
+    SB -> SB: update all marks
+end
+
+@enduml
