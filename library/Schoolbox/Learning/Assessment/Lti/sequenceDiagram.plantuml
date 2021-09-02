@@ -1,4 +1,6 @@
 @startuml
+'https://plantuml.com/sequence-diagram
+
 actor Teacher as TC
 actor Student as ST
 participant Schoolbox as SB
@@ -16,21 +18,21 @@ group Attempt LTI assessment
     SB -> LTI: redirect student to LTI assessment
     LTI -> LTI: student attempts LTI assessment
     LTI -> SB: student gets sent back to SB
-    SB -> SB: student gets marked as having attempted assessment
+    SB -> SB: trigger mark synchronisation for assessment (student attempt only)
 end
 
 group Mark LTI assessment
     TC -> SB: visit assessment status page
     SB -> LTI: redirect teacher to LTI assessment
-    LTI -> LTI: teacher marks LTI assessments
+    LTI -> LTI: teacher marks LTI assessment attempts
     LTI -> SB: teacher gets sent back to SB
-    SB -> SB: trigger mark synchronisation
+    SB -> SB: trigger mark synchronisation for assessment
 end
 
-group Sync marks from LTI to Schoolbox
+group Mark synchronisation
     SB -> LTI: request marks for LTI assessment
     LTI -> SB: return marks
-    SB -> SB: update all marks
+    SB -> SB: determine which marks are new, and update them
 end
 
 @enduml
