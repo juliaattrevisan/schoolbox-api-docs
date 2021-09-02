@@ -43,21 +43,21 @@ class DefinitionCompiler
 
 
     /**
-     * @var false|string
+     * @var string
      */
-    private $from;
+    private string $from;
 
 
     /**
-     * @var false|string
+     * @var string
      */
-    private $to;
+    private string $to;
 
 
     /**
      * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
@@ -105,6 +105,18 @@ class DefinitionCompiler
             $payload = $this->api->retrieveDocument($nextUrl);
 
             foreach ($payload['data'] as $timetableCalendarDate) {
+                /* If, for some reason, the relationships node doesn't exist,
+                 * then it probably means there are no Days for this date
+                 * and we should just skip it
+                 *
+                 * I think that's what it means.
+                 * Or their api could be broken.
+                 * Or both (maybe they meant to return empty array in extant node)
+                 */
+                if (!isset($timetableCalendarDate['relationships'])) {
+                    continue;
+                }
+
                 $dayId = $timetableCalendarDate['relationships']['day']['data']['id'];
 
                 /* For each day, find all the associated periods, then stack them up
