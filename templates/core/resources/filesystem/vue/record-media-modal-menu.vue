@@ -193,6 +193,13 @@ export default {
                 <aside>Say something with an audio only recording.</aside>
             </div>
         </button>
+        <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.PHOTO)">
+            <div>
+                <div class='icon-video'></div>
+                <span>Photo</span>
+                <aside>Use a computer camera to take a photo.</aside>
+            </div>
+        </button>
         <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
             <div>
                 <div class='icon-video'></div>
