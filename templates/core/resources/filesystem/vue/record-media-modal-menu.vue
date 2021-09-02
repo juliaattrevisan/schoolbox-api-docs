@@ -195,7 +195,7 @@ export default {
         </button>
         <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.PHOTO)">
             <div>
-                <div class='icon-video'></div>
+                <div class='icon-photo'></div>
                 <span>Photo</span>
                 <aside>Use a computer camera to take a photo.</aside>
             </div>
@@ -211,7 +211,7 @@ export default {
             <div>
                 <div class='icon-screen-capture'></div>
                 <span>Screen</span>
-                <aside>Choose a computer screen to create a screen recording.</aside>
+                <aside>Create a computer screen recording.</aside>
             </div>
         </button>
     </div>
@@ -266,6 +266,13 @@ $font-family-icon: 'schoolbox';
     @extend .icon;
     &:before {
         content: '\e641';
+    }
+}
+
+.icon-photo {
+    @extend .icon;
+    &:before {
+        content: '\e65c';
     }
 }
 
