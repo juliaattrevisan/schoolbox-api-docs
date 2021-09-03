@@ -215,7 +215,7 @@ class Preloader
             /* Go digging in another endpoint for names and identifier
              */
             if (isset($timetableLesson['attributes']['teacherIds'][0]) && '' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
-                $endpoint = "enrolments/person/{$timetableLesson['attributes']['teacherIds'][0]}?limit=200";
+                $endpoint = "enrolments/staff/{$timetableLesson['attributes']['teacherIds'][0]}/person";
 
                 /* Load it from the cache, if we have it;
                  * Otherwise just hit that api
