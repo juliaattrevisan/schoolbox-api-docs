@@ -267,19 +267,7 @@ class Definition implements IStrategy
 
                 $period = $periods[$j];
 
-                /* Assumption: assign arbitrary name since each $period has a different
-                 * name on each day, e.g. "Mon0", "MonHome room" (yes I know), "MonRecess",
-                 * "Tue0", "TueHome room" (yes I know), etc. This seems dumb but I can ditch
-                 * the first three chars for now
-                 */
-                $periodName = substr($period['name'], 3);
-
-                /* Append a "Period" prefix if numeric, so they're not just called "1"
-                 */
-                if (is_numeric($periodName)) {
-                    $periodName = "Period {$periodName}";
-                }
-
+                $periodName = $period['name'];
                 $sequence = $period['order'];
                 $start = $period['startTime'];
                 $finish = $period['endTime'];

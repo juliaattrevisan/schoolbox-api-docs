@@ -154,6 +154,39 @@ class DefinitionCompiler
                 $dayId = $timetablePeriodInDay['relationships']['day']['data']['id'];
                 $attributes = $timetablePeriodInDay['attributes'];
 
+                /* Note that timetablePeriodInDay attributes have the period name
+                 * prefixed by the day index for no apparent reason (their docs
+                 * also cleverly describe period name as "null" to hide this)
+                 *
+                 * http://development.sentral.com.au/#operation/getTimetablePeriodInDays
+                 *
+                 * Bandaid over it, for now, I suppose
+                 *
+                Array
+                (
+                    [type] => timetablePeriodInDay
+                    [id] => 17
+                    [attributes] => Array
+                        (
+                            [name] => 3Period 2
+                            [order] => 4
+                            [startTime] => 10:50:00
+                            [endTime] => 11:45:00
+                            [isActive] => 1
+                        )
+
+                    [relationships] => Array
+                        (
+                            [day] => Array
+                                (
+                                    [data] => Array
+                                        (
+                                            [id] => 3
+                                            [type] => timetableDay
+                                        )
+                 */
+                $attributes['name'] = ltrim($attributes['name'], $dayId);
+
                 $struct[$dayId][] = $attributes;
             }
 
