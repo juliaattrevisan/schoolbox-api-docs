@@ -15,11 +15,12 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
@@ -27,6 +28,25 @@ use Schoolbox\User;
 
 class Notifier extends ResourceNotifier
 {
+    /**
+     * If this is an update, and neither the body nor heading were updated:
+     * don't bundle anything.
+     *
+     * @param TriggerBundle $bundle
+     * @return void
+     */
+    public function bundleTriggers($bundle)
+    {
+        // Body or heading not updated: nothing to notify about
+        if ($bundle->getMethod() === Mapper::METHOD_UPDATE) {
+            $diff = $bundle->getEvent()->getDiff();
+            if (!(isset($diff['body']) || isset($diff['heading']))) {
+                return;
+            }
+        }
+
+        parent::bundleTriggers($bundle);
+    }
 
 
     /**
@@ -44,15 +64,7 @@ class Notifier extends ResourceNotifier
 
         try {
             $category = $this->folderMapper->findById($resource->getCategory()->getId());
-        } catch (Exception $e) {
-            return $envelope;
-        }
-
-        // Body or heading not updated: nothing to notify about
-        if (
-            $action === self::TRIGGER_UPDATED
-            && !(isset($diff['body']) || isset($diff['heading']))
-        ) {
+        } catch (Mapper\Exception $e) {
             return $envelope;
         }
 
