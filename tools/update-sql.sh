@@ -12,6 +12,7 @@ readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200
 readonly L_WARN=300
 readonly L_ERROR=400
+readonly UNSUPPORTED_FROM_MAJOR='20.1' # Require force if upgrading a schema at this version or below
 
 # Global vars
 declare package                  # 'schoolbox'|'schoolboxdev'
@@ -104,25 +105,16 @@ check_sql_versions(){
   fi
 
   # Ensure we are not upgrading from a major version where we know there are issues. Allow force override
-  local supported_from_majors=('20.1' '20.2' '21.0' '21.1')
   local sql_major
   sql_major=$(echo "$sql_ver" | grep -Eo '[0-9]+\.[0-9]+')
-  local found=0
-  for supported_from_major in "${supported_from_majors[@]}"; do
-    if [[ $supported_from_major == "$sql_major" ]]; then
-      found=1
-      break
-    fi
-  done
-  if [[ $found == 0 ]]; then
+
+  if [[ $sql_major > $UNSUPPORTED_FROM_MAJOR ]]; then
+    log "Upgrades supported from major version: '$sql_major'"
+  else
     if [[ $SB_FORCE_UPGRADE == 1 ]]; then
       warn "Forcing upgrade from unsafe major version '$sql_major'"
     else
-      error "Refusing upgrade from unsafe major version '$sql_major'. Supported:"
-      for supported in "${supported_from_majors[@]}"; do
-        error " * $supported"
-      done
-
+      error "Refusing upgrade from unsafe major version '$sql_major' as it is <= '$UNSUPPORTED_FROM_MAJOR'"
       error "Set environment var SB_FORCE_UPGRADE to 1 to force unsafe upgrade"
       # Check if this is being invoked by vagrant provision (vagrant-shell > refresh.sh > update-sql.sh)
       if grep -qE '^vagrant-shell' /proc/"$(ps -o ppid= $PPID | xargs )"/comm ; then
@@ -130,8 +122,6 @@ check_sql_versions(){
       fi
       exit 1
     fi
-  else
-    log "Upgrades supported from major version: '$sql_major'"
   fi
 
   if [ "$sql_ver" == "$new_ver" ]; then
