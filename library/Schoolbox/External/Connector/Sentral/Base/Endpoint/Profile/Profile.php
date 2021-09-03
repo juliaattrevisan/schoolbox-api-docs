@@ -182,16 +182,38 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     private function importStudents(): void
     {
+        /* Constrain to academic periods relevant to today's date
+         */
+        $today = date('Y-m-d');
+        $academicPeriodIds = $this->findAcademicPeriodIds($today);
+
+        if (!\count($academicPeriodIds)) {
+            $this->log->warning(sprintf(
+                'No academic periods found for %s; exiting',
+                $today
+            ));
+
+            exit();
+        }
+
+        /* Collapse this var's contents; we won't use it again
+         */
+        $academicPeriodIds = implode(',', $academicPeriodIds);
 
         /* Sentral gives you paginated data, at most, 200 per page
          *
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=200';
+        $nextUrl = "enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=200";
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
@@ -273,53 +295,53 @@ class Profile implements IStrategy
                     $this->baseProfileMapper->save($studentBaseProfile);
                 }
 
-                /*  Maintain the methods' return signature for easiest resolution
-                 *  though you are free to customise it as you see fit
-                 */
-
-                /* Fish out a House
-                 */
-                $academicHouse = $this->findHouse($studentBaseProfile, $student);
-
-                /* Fish out alert comments
-                 */
-                $alertComments = $this->findComments();
-
-                /* Fish out legal alerts
-                 */
-                $alertLegal = $this->findLegal();
-
-                /* Fish out medical alerts
-                 */
-                $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $student));
-
-                /* Fish out campus name
-                 */
-                $campusName = $this->findCampusName();
-
-                /* Emergency Contacts
-                 */
-                $emergencyContacts = $this->findEmergencyContacts($student);
-
-                /* Find out a staff member via their user code
-                 */
-                $formTeacher = $this->findFormTeacher();
-
-                /* Fish out a staff member via their user code
-                 */
-                $housemaster = $this->findHousemaster();
-
-                /* Fish out special needs
-                 */
-                $specialNeeds = $this->findSpecialNeeds($externalId);
-
-                /* Fish out a staff member via their user code
-                 */
-                $tutor = $this->findTutor();
-
-                /* Find out a staff member via their user code
-                 */
-                $yearLevelCoordinator = $this->findYearLevelCoordinator();
+//                /*  Maintain the methods' return signature for easiest resolution
+//                 *  though you are free to customise it as you see fit
+//                 */
+//
+//                /* Fish out a House
+//                 */
+//                $academicHouse = $this->findHouse($studentBaseProfile, $student);
+//
+//                /* Fish out alert comments
+//                 */
+//                $alertComments = $this->findComments();
+//
+//                /* Fish out legal alerts
+//                 */
+//                $alertLegal = $this->findLegal();
+//
+//                /* Fish out medical alerts
+//                 */
+//                $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $student));
+//
+//                /* Fish out campus name
+//                 */
+//                $campusName = $this->findCampusName();
+//
+//                /* Emergency Contacts
+//                 */
+//                $emergencyContacts = $this->findEmergencyContacts($student);
+//
+//                /* Find out a staff member via their user code
+//                 */
+//                $formTeacher = $this->findFormTeacher();
+//
+//                /* Fish out a staff member via their user code
+//                 */
+//                $housemaster = $this->findHousemaster();
+//
+//                /* Fish out special needs
+//                 */
+//                $specialNeeds = $this->findSpecialNeeds($externalId);
+//
+//                /* Fish out a staff member via their user code
+//                 */
+//                $tutor = $this->findTutor();
+//
+//                /* Find out a staff member via their user code
+//                 */
+//                $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
                 /* Dates
                  */
@@ -329,38 +351,38 @@ class Profile implements IStrategy
                 /* Smoosh it all together
                  */
                 $studentProfile
-                    ->setUsername($username)
-                    ->setAlertComment($alertComments)
-                    ->setAlertLegal($alertLegal)
-                    ->setAlertMessage($messages)
-                    ->setCampusName($campusName)
-                    ->setEmail($email)
-                    ->setEnrolmentDate($enrolment)
-                    ->setFormName($form)
-                    ->setFormTeacherId($formTeacher['id'])
-                    ->setFormTeacherName($formTeacher['name'])
-                    ->setGender($gender)
-                    ->setHeadOfHouseId($housemaster['id'])
-                    ->setHeadOfHouseName($housemaster['name'])
-                    ->setHouseName($academicHouse)
-                    ->setLeavingDate($leaving)
-                    ->setMobile($mobile)
-                    ->setStudiesCode($studiesCode)
-                    ->setTutorGroup($tutorGroup)
-                    ->setTutorTeacherId($tutor['id'])
-                    ->setTutorTeacherName($tutor['name'])
-                    ->setYearLevel($yearLevel)
-                    ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
-                    ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+                    ->setUsername($username ?? '')
+                    ->setAlertComment($alertComments ?? '')
+                    ->setAlertLegal($alertLegal ?? '')
+                    ->setAlertMessage($messages ?? '')
+                    ->setCampusName($campusName ?? '')
+                    ->setEmail($email ?? '')
+                    ->setEnrolmentDate($enrolment ?? null)
+                    ->setFormName($form ?? '')
+                    ->setFormTeacherId($formTeacher['id'] ?? '')
+                    ->setFormTeacherName($formTeacher['name'] ?? '')
+                    ->setGender($gender ?? '')
+                    ->setHeadOfHouseId($housemaster['id'] ?? '')
+                    ->setHeadOfHouseName($housemaster['name'] ?? '')
+                    ->setHouseName($academicHouse ?? '')
+                    ->setLeavingDate($leaving ?? null)
+                    ->setMobile($mobile ?? '')
+                    ->setStudiesCode($studiesCode ?? '')
+                    ->setTutorGroup($tutorGroup ?? '')
+                    ->setTutorTeacherId($tutor['id'] ?? '')
+                    ->setTutorTeacherName($tutor['name'] ?? '')
+                    ->setYearLevel($yearLevel ?? '')
+                    ->setYearLevelCoordinatorId($yearLevelCoordinator['id'] ?? '')
+                    ->setYearLevelCoordinatorName($yearLevelCoordinator['name'] ?? '')
 
                     /**
                      * Flags
                      */
-                    ->setBoardingStatus($boardingStatus)
-                    ->setEsl($esl)
-                    ->setIb($ib)
-                    ->setIndividualLearningPlans($ilp)
-                    ->setSpecialNeeds($specialNeeds);
+                    ->setBoardingStatus($boardingStatus ?? false)
+                    ->setEsl($esl ?? false)
+                    ->setIb($ib ?? false)
+                    ->setIndividualLearningPlans($ilp ?? false)
+                    ->setSpecialNeeds($specialNeeds ?? false);
 
                 /* Date of birth requires special treatment as ADF doesn't deal with nulls well
                  */
@@ -368,40 +390,40 @@ class Profile implements IStrategy
                     $studentProfile
                         ->setDateOfBirth($this->findDate($dob));
                 }
-
-                /**
-                 * Emergency Contacts
-                 * ...because we didn't normalise it, I'm hardcoding these
-                 */
-                if (\count($emergencyContacts)) {
-                    if (isset($emergencyContacts[0])) {
-                        $studentProfile
-                            ->setEmergencyContactName1($emergencyContacts[0]['name'])
-                            ->setEmergencyContactPhone1($emergencyContacts[0]['phone'])
-                            ->setEmergencyContactPhoneAlt1($emergencyContacts[0]['phoneAlt']);
-                    }
-
-                    if (isset($emergencyContacts[1])) {
-                        $studentProfile
-                            ->setEmergencyContactName2($emergencyContacts[1]['name'])
-                            ->setEmergencyContactPhone2($emergencyContacts[1]['phone'])
-                            ->setEmergencyContactPhoneAlt2($emergencyContacts[1]['phoneAlt']);
-                    }
-
-                    if (isset($emergencyContacts[2])) {
-                        $studentProfile
-                            ->setEmergencyContactName3($emergencyContacts[2]['name'])
-                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone'])
-                            ->setEmergencyContactPhoneAlt3($emergencyContacts[2]['phoneAlt']);
-                    }
-
-                    $this->log->debug(sprintf(
-                        'Found %s emergency contacts for %s (user %s)',
-                        \count($emergencyContacts),
-                        trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
-                        $studentBaseProfile->getExternalId()
-                    ));
-                }
+//
+//                /**
+//                 * Emergency Contacts
+//                 * ...because we didn't normalise it, I'm hardcoding these
+//                 */
+//                if (\count($emergencyContacts)) {
+//                    if (isset($emergencyContacts[0])) {
+//                        $studentProfile
+//                            ->setEmergencyContactName1($emergencyContacts[0]['name'])
+//                            ->setEmergencyContactPhone1($emergencyContacts[0]['phone'])
+//                            ->setEmergencyContactPhoneAlt1($emergencyContacts[0]['phoneAlt']);
+//                    }
+//
+//                    if (isset($emergencyContacts[1])) {
+//                        $studentProfile
+//                            ->setEmergencyContactName2($emergencyContacts[1]['name'])
+//                            ->setEmergencyContactPhone2($emergencyContacts[1]['phone'])
+//                            ->setEmergencyContactPhoneAlt2($emergencyContacts[1]['phoneAlt']);
+//                    }
+//
+//                    if (isset($emergencyContacts[2])) {
+//                        $studentProfile
+//                            ->setEmergencyContactName3($emergencyContacts[2]['name'])
+//                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone'])
+//                            ->setEmergencyContactPhoneAlt3($emergencyContacts[2]['phoneAlt']);
+//                    }
+//
+//                    $this->log->debug(sprintf(
+//                        'Found %s emergency contacts for %s (user %s)',
+//                        \count($emergencyContacts),
+//                        trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+//                        $studentBaseProfile->getExternalId()
+//                    ));
+//                }
 
                 /* Log it
                  */
@@ -420,7 +442,7 @@ class Profile implements IStrategy
                  * This set is mixed with emergency contacts and other non-data, so
                  * sift through it all manually for the gems you need
                  */
-                $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
+//                $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
 
                 /* Remember that we saw a particular student id
                  * (-not- their externalId, the primary key in sentral for this student)
@@ -445,6 +467,41 @@ class Profile implements IStrategy
              */
             $nextUrl = $payload['links']['next'] ?? null;
         }
+    }
+
+
+    /**
+     * Find the Academic Period instances relevant to $date
+     *
+     * Used to filter enrolments/students endpoint which would otherwise give
+     * you all the students who ever passed through its halls
+     *
+     * Note: the field "isActive" doesn't actually tell you whether a student is
+     * actually active in the school, it's more to do with sentral data, not the
+     * student themselves, and therefore "isMisleading"
+     *
+     * @param string $date
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    private function findAcademicPeriodIds(string $date): array {
+        $ids = [];
+
+        $nextUrl = "enrolments/academic-period?date={$date}&limit=200";
+
+        for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
+            $payload = $this->api->retrieveDocument($nextUrl);
+
+            foreach ($payload['data'] as $row) {
+                $ids[] = $row['id'];
+            }
+
+            /* Prepare for next page if it exists
+             */
+            $nextUrl = $payload['links']['next'] ?? null;
+        }
+
+        return $ids;
     }
 
 
