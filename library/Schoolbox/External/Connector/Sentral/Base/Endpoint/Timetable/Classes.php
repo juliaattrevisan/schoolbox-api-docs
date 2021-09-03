@@ -179,8 +179,8 @@ class Classes implements IStrategy
                 [D4] => 4
             )
              */
-            $dayLookup = array_map(static function($elem) {
-                return $elem+1;
+            $dayLookup = array_map(static function ($elem) {
+                return $elem + 1;
             }, array_flip(array_keys($timetable)));
 
             /* Find all the classes and their details as best we can

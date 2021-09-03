@@ -484,7 +484,8 @@ class Profile implements IStrategy
      * @return array
      * @throws \InvalidArgumentException
      */
-    private function findAcademicPeriodIds(string $date): array {
+    private function findAcademicPeriodIds(string $date): array
+    {
         $ids = [];
 
         $nextUrl = "enrolments/academic-period?date={$date}&limit=200";
