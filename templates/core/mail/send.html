@@ -11,7 +11,8 @@ $(function() {
     // Disable iFrame embed on mail content
     $.fn.alaressEditor({
         targetElements: $('#body'),
-        removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe'
+        removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe',
+        urlOrigin: "{URLORIGIN}"
     });
 
     var options = {
