@@ -15,8 +15,10 @@ case "$1" in
         # backup instances
         if [ -f /etc/schoolbox/primary_node ]; then
             instance_list=$(/usr/local/bin/schoolbox-read-instances --ini /etc/schoolbox/instances.ini --option instance-list)
+            echo "Backing up instances" | tee -a tee -a /var/log/schoolbox/upgrade.log
             for instance_id in $instance_list
             do
+                echo "Backing up instance $instance_id" | tee -a tee -a /var/log/schoolbox/upgrade.log
                 INSTANCE_ID=$instance_id /usr/local/bin/schoolbox-database-backup --package schoolbox | \
                 tee -a /var/log/schoolbox/"$instance_id"/upgrade.log &
                 pids="${pids} $!"
@@ -25,10 +27,11 @@ case "$1" in
             for pid in $pids
             do
                 if ! wait "$pid"; then
-                    echo "failed to backup an instance" | tee -a tee -a /var/log/schoolbox/upgrade.log
+                    echo "Error: Failed to backup an instance" | tee -a tee -a /var/log/schoolbox/upgrade.log
                     exit 1;
                 fi
             done
+            echo "Finished backing up instances" | tee -a tee -a /var/log/schoolbox/upgrade.log
         fi
         # Temporary fix for moving symlinked conf file as part of 20.2 upgrade
         if [ -L /usr/share/schoolbox/www/conf ]; then
