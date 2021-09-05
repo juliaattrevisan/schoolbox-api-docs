@@ -93,48 +93,6 @@ check_sql_versions(){
   fi
 }
 
-# Dump the instance's database
-backup_database(){
-  sql_ver=$1
-
-  if [[ "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1" ]]; then
-    # DB schema is < 20.1.alpha1
-    backup_dir_name='file_dir'
-  else
-    # DB schema is >= 20.1.alpha1
-    backup_dir_name='backup_dir'
-  fi
-  backup_dir=$(mysql -u "$sql_user" -p"$sql_pass" -h "$sql_host" "$sql_db" -e "SELECT value FROM config WHERE name='$backup_dir_name' \G;" | grep 'value' | cut -d' ' -f2);
-  backup_dir=$(readlink --canonicalize-missing "$backup_dir"/../)
-  if [ "$backup_dir" == "" ]; then
-    error "Unable to detect backup dir"
-    exit 1;
-  fi
-
-  backup_file="$backup_dir/$sql_ver-$(date +%Y-%m-%d_%H-%M-%S).sql.gz"
-
-  # Skip backup if backup exists for same version and within last hour.
-  # Need to check for min size because gzip of empty file produces non-empty file.
-  existing_backup=$(find "$backup_dir" -mindepth 1 -maxdepth 1 -name "$sql_ver-$(date +%Y-%m-%d_%H-)*.sql.gz" | head -n 1);
-  if [[ -f $existing_backup ]] && [[ $(wc -c "$existing_backup" | awk '{ print $1 }') -gt 10000 ]]; then
-    log "Backup already completed at '$existing_backup'";
-    backup_file=$existing_backup;
-  else
-    log "Backing up database before changes";
-    mkdir -p "$backup_dir";
-    if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" | gzip > "$backup_file"; then
-      error "Unable to backup database '$sql_db'"
-      exit 1
-    fi
-    # For some reason the above test is not failing when the dump fails. Need to check we actually got data.
-    if [[ $(wc -c "$backup_file" | awk '{ print $1 }') -lt 1000 ]]; then
-      error "Unable to backup database '$sql_db'. Dump file seems too small."
-      exit 1
-    fi
-    log "Database backed up to '$backup_file'"
-  fi
-}
-
 # Execute a single SQL/PHP update script
 execute_upgrade_script(){
   script=$1
@@ -265,7 +223,6 @@ main(){
 
   check_start_end_dirs "$start" "$end"
   check_system_dependencies
-  backup_database "$sql_ver"
   execute_upgrade_scripts "$version_list" "$start" "$end"
   update_puppet_facts
 }
