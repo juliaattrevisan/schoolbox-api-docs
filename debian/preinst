@@ -12,6 +12,24 @@ case "$1" in
     install)
     ;;
     upgrade)
+        # backup instances
+        if [ -f /etc/schoolbox/primary_node ]; then
+            instance_list=$(/usr/local/bin/schoolbox-read-instances --ini /etc/schoolbox/instances.ini --option instance-list)
+            for instance_id in $instance_list
+            do
+                INSTANCE_ID=$instance_id /usr/local/bin/schoolbox-database-backup --package schoolbox | \
+                tee -a /var/log/schoolbox/"$instance_id"/upgrade.log &
+                pids="${pids} $!"
+            done
+
+            for pid in $pids
+            do
+                if ! wait "$pid"; then
+                    echo "failed to backup an instance" | tee -a tee -a /var/log/schoolbox/upgrade.log
+                    exit 1;
+                fi
+            done
+        fi
         # Temporary fix for moving symlinked conf file as part of 20.2 upgrade
         if [ -L /usr/share/schoolbox/www/conf ]; then
             echo "Converting conf link to dir..." | tee -a /var/log/schoolbox/upgrade.log;
