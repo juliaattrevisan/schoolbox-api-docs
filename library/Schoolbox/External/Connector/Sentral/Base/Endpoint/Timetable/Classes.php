@@ -35,17 +35,6 @@ use UnexpectedValueException;
 class Classes implements IStrategy
 {
 
-    /* A short lookup for converting sentral dayName to an int because sentral
-     */
-    private const DAY_LOOKUP = [
-        'Mon' => '1',
-        'Tue' => '2',
-        'Wed' => '3',
-        'Thu' => '4',
-        'Fri' => '5'
-    ];
-
-
     /**
      * @var LoggerInterface
      */
@@ -165,6 +154,35 @@ class Classes implements IStrategy
                 continue;
             }
 
+            /* Each $timetable comes as an associative array
+             * The Day Identifier is the key, and its Periods are the value
+             * The Day Identifier seems school-configurable somewhere, but idk where
+             * Historically it used to be "Mon Tue Wed..."
+             * But in schools it has been seen as "D1 D2 D3..."
+             *
+             * Therefore to have it correlate to a numerical day index for schoolbox
+             * we take those array keys and associate them in order
+             *
+            $timetable = [
+                'D1' => ['periods ...'],
+                'D2' => ['periods ...'],
+                'D3' => ['periods ...'],
+                'D4' => ['periods ...'],
+            ];
+
+            Day Lookup:
+            Array
+            (
+                [D1] => 1
+                [D2] => 2
+                [D3] => 3
+                [D4] => 4
+            )
+             */
+            $dayLookup = array_map(static function ($elem) {
+                return $elem + 1;
+            }, array_flip(array_keys($timetable)));
+
             /* Find all the classes and their details as best we can
              *
              * Some parts will rely on data to have already been imported into local schema,
@@ -175,7 +193,7 @@ class Classes implements IStrategy
                 foreach ($dayPeriods as $periodSequence => $period) {
                     $class = [
                         'period' => [
-                            'day' => self::DAY_LOOKUP[$day],
+                            'day' => (string)$dayLookup[$day],
                             'name' => $period['name'],
                             'sequence' => $period['sequence'],
                             'start' => $period['start'],

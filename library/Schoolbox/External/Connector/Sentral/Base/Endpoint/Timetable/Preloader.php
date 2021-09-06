@@ -197,6 +197,13 @@ class Preloader
          */
         $timetable = [];
 
+        /* A temporary cache for teacher id endpoints
+         * because sentral is so damn slow
+         *
+         * Trade space for time
+         */
+        $teacherCache = [];
+
         foreach ($payload['data'] as $timetableLesson) {
             $teacher = [
                 'externalId' => '',
@@ -207,31 +214,50 @@ class Preloader
 
             /* Go digging in another endpoint for names and identifier
              */
-            if ('' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
-                $endpoint = "enrolments/person/{$timetableLesson['attributes']['teacherIds'][0]}?limit=200";
+            if (isset($timetableLesson['attributes']['teacherIds'][0]) && '' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
+                $endpoint = "enrolments/staff/{$timetableLesson['attributes']['teacherIds'][0]}/person";
 
-                try {
-                    $teacherPayload = $this->api->retrieveDocument($endpoint);
+                /* Load it from the cache, if we have it;
+                 * Otherwise just hit that api
+                 */
+                if (isset($teacherCache[$endpoint])) {
+                    $teacher = $teacherCache[$endpoint];
 
-                    $teacher = [
-                        'externalId' => $teacherPayload['data']['attributes']['externalId'],
-                        'firstname' => $teacherPayload['data']['attributes']['firstName'],
-                        'surname' => $teacherPayload['data']['attributes']['lastName'],
-                        'id' => $timetableLesson['attributes']['teacherIds'][0],
-                    ];
-                } catch (\InvalidArgumentException $e) {
-                    $this->log->warning(sprintf(
-                        'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
-                        $timetableLesson['attributes']['teacherIds'][0],
-                        $timetableLesson['attributes']['teacherName']
+                    $this->log->debug(sprintf(
+                        'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
+                        $teacher['firstname'],
+                        $teacher['surname'],
+                        $teacher['externalId'],
+                        $teacher['id']
                     ));
+                } else {
+                    try {
+                        $teacherPayload = $this->api->retrieveDocument($endpoint);
 
-                    $teacher = [
-                        'externalId' => '',
-                        'firstname' => '',
-                        'surname' => '',
-                        'id' => $timetableLesson['attributes']['teacherIds'][0],
-                    ];
+                        $teacher = [
+                            'externalId' => $teacherPayload['data']['attributes']['externalId'],
+                            'firstname' => $teacherPayload['data']['attributes']['firstName'],
+                            'surname' => $teacherPayload['data']['attributes']['lastName'],
+                            'id' => $timetableLesson['attributes']['teacherIds'][0],
+                        ];
+                    } catch (\InvalidArgumentException $e) {
+                        $this->log->warning(sprintf(
+                            'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
+                            $timetableLesson['attributes']['teacherIds'][0],
+                            $timetableLesson['attributes']['teacherName']
+                        ));
+
+                        $teacher = [
+                            'externalId' => '',
+                            'firstname' => '',
+                            'surname' => '',
+                            'id' => $timetableLesson['attributes']['teacherIds'][0],
+                        ];
+                    }
+
+                    /* Remember this for later
+                     */
+                    $teacherCache[$endpoint] = $teacher;
                 }
             } else {
                 $this->log->warning(sprintf(
@@ -243,7 +269,7 @@ class Preloader
 
             $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
                 'day'      => $timetableLesson['attributes']['dayName'],
-                'name'     => "Period {$timetableLesson['attributes']['periodName']}",
+                'name'     => $timetableLesson['attributes']['periodName'],
                 'start'    => $timetableLesson['attributes']['startTime'],
                 'finish'   => $timetableLesson['attributes']['endTime'],
                 'sequence' => $timetableLesson['attributes']['periodOrder'],

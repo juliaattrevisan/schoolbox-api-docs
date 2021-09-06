@@ -252,21 +252,22 @@ class Definition implements IStrategy
             /* Each $period is an array of [name, order, startTime, endTime, isActive]
              */
             for ($j = 0; $j < $dayLength; $j++) {
-                $period = $periods[$j];
-
-                /* Assumption: assign arbitrary name since each $period has a different
-                 * name on each day, e.g. "Mon0", "MonHome room" (yes I know), "MonRecess",
-                 * "Tue0", "TueHome room" (yes I know), etc. This seems dumb but I can ditch
-                 * the first three chars for now
+                /* Not all days have the same number of periods
+                 * The longest day we have seen might be 12 periods long
+                 *
+                 * But:
+                 * Day 1 might have 10 periods
+                 * Day 3 might have 6 periods
+                 *
+                 * Skip undefined periods
                  */
-                $periodName = substr($period['name'], 3);
-
-                /* Append a "Period" prefix if numeric, so they're not just called "1"
-                 */
-                if (is_numeric($periodName)) {
-                    $periodName = "Period {$periodName}";
+                if (!isset($periods[$j])) {
+                    continue;
                 }
 
+                $period = $periods[$j];
+
+                $periodName = $period['name'];
                 $sequence = $period['order'];
                 $start = $period['startTime'];
                 $finish = $period['endTime'];

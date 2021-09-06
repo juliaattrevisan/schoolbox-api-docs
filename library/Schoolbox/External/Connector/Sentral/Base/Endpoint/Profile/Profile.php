@@ -182,16 +182,38 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     private function importStudents(): void
     {
+        /* Constrain to academic periods relevant to today's date
+         */
+        $today = date('Y-m-d');
+        $academicPeriodIds = $this->findAcademicPeriodIds($today);
+
+        if (!\count($academicPeriodIds)) {
+            $this->log->warning(sprintf(
+                'No academic periods found for %s; exiting',
+                $today
+            ));
+
+            exit();
+        }
+
+        /* Collapse this var's contents; we won't use it again
+         */
+        $academicPeriodIds = implode(',', $academicPeriodIds);
 
         /* Sentral gives you paginated data, at most, 200 per page
          *
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=200';
+        $nextUrl = "enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=200";
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
@@ -445,6 +467,42 @@ class Profile implements IStrategy
              */
             $nextUrl = $payload['links']['next'] ?? null;
         }
+    }
+
+
+    /**
+     * Find the Academic Period instances relevant to $date
+     *
+     * Used to filter enrolments/students endpoint which would otherwise give
+     * you all the students who ever passed through its halls
+     *
+     * Note: the field "isActive" doesn't actually tell you whether a student is
+     * actually active in the school, it's more to do with sentral data, not the
+     * student themselves, and therefore "isMisleading"
+     *
+     * @param string $date
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    private function findAcademicPeriodIds(string $date): array
+    {
+        $ids = [];
+
+        $nextUrl = "enrolments/academic-period?date={$date}&limit=200";
+
+        for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
+            $payload = $this->api->retrieveDocument($nextUrl);
+
+            foreach ($payload['data'] as $row) {
+                $ids[] = $row['id'];
+            }
+
+            /* Prepare for next page if it exists
+             */
+            $nextUrl = $payload['links']['next'] ?? null;
+        }
+
+        return $ids;
     }
 
 
