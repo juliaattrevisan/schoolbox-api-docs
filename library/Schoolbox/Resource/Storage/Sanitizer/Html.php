@@ -47,7 +47,7 @@ class Html implements ISanitizer
     /**
      * @inheritdoc
      */
-    public function sanitize(string $mimetype, string $contents): ?string
+    public function sanitize(string $mimetype, string $contents, ?string $path = null): ?string
     {
         return $this->accepts($mimetype)
             ? $this->scrubAdapter->purify($contents)
