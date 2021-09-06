@@ -805,7 +805,8 @@ class ListController extends Web\Controller\Base
      */
     public function getRelocatedContext(IAssessable $assessment, ?string $locationId): ?AssessmentContext
     {
-        if ($assessment && $locationId
+        if (
+            $locationId
             && $assessment->isSpecification()
             && ($assessment->getContext()->getLocationId() !== $locationId)
         ) {
