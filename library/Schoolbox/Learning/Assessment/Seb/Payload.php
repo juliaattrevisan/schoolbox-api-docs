@@ -128,6 +128,8 @@ class Payload
             'assessmentId' => $assessment->getId()
         ]);
 
+        $exitUrl = $domain . '/homepage/' . $assessment->getContext()->getFolder()->getId();
+
         /* Decide on a salt; I presume it should be derived from something unique to each
          * schoolbox instance, rather than a global salt; perhaps site_location or suchlike
          */
@@ -151,6 +153,7 @@ class Payload
          */
         $tokens = [
             '{{ startUrl }}'    => $startUrl,
+            '{{ exitUrl }}'     => $exitUrl,
             '{{ examKeySalt }}' => $examKeySalt,
             '{{ whiteList }}'   => $this->generateWhiteList($whitelistUrls),
         ];
