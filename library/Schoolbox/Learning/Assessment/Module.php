@@ -139,7 +139,6 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STUDENT),
             new Rule\IsConfigOn(ConfigMapper::NAME_LMS_SEB_ENABLED, $this->getConfig()),
             new IsSafeExamBrowserRequired(),
-            new CanViewAssessable(new Visibility($this->getAccess())),
         );
 
         // pluralise for REST
