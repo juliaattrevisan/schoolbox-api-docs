@@ -37,7 +37,7 @@ help_msg() {
   echo "       --name [X]  Required. Name of the dataset to persist, eg 'sales', 'initial', 'custom-dataset-x'"
   echo "  -h | --help      Optional. Display this help message";
   echo "  -i | --initial   Optional. Prepare data for using as an initial dataset (more cleaning)";
-  echo "  -u | --upload    Optional. Upload the data for others to use on completion";
+  echo "  -u | --upload    Optional. Upload the data for others to use on completion. Sync storage files to S3";
   echo "  -v | --verbose   Optional. Verbose mode for easier debugging";
 }
 
@@ -225,6 +225,9 @@ upload_tarball(){
   else
     error "Error: an error occurred uploading to S3";
   fi
+
+  log "Uploading storage files to S3"
+  INSTANCE_ID=vagrantx /usr/share/schoolbox/tools/s3-migration.php --quiet --perform
 }
 
 main(){
