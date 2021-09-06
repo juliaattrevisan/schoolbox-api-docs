@@ -17,6 +17,8 @@ use Schoolbox;
  * Cycles contain periods.
  *
  * @package Schoolbox\External
+ * @method TimetableCycle createModel($idValue = null)
+ * @method TimetableCycle findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class TimetableCycleMapper extends Schoolbox\Mapper
 {

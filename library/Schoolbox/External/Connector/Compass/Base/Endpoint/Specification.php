@@ -88,7 +88,31 @@ class Specification
             /**
              * Timetable nodes
              */
-
+            [
+                'endpoint' => 'reference/v1/GetAcademicGroups',
+                'params' => [],
+            ],
+            [
+                'endpoint' => 'schedule/v1/GetStructures',
+                'params' => [],
+            ],
+            [
+                'endpoint' => 'schedule/v1/GetSchedule',
+                'params' => [],
+            ],
+            [
+                'endpoint' => 'schedule/v1/GetStandardClassDetails',
+                'params' => [
+                    'activityCode'      => '',
+                    'academicGroupCode' => '',
+                ],
+                // The 500 HTTP error code is expected and acceptable when
+                // passing a blank activity code:
+                // this is what Compass responds with when the endpoint is
+                // available but the code doesn't exist on the Compass instance.
+                // Any other error code isn't acceptable.
+                'acceptableErrorCodes' => [500],
+            ],
         ];
 
         $endpoints = [];
@@ -100,8 +124,14 @@ class Specification
             try {
                 $result = (bool)$this->api->retrieveDocument($path['endpoint'], $path['params']);
             } catch (\RuntimeException | \DomainException | \JsonException $e) {
-                $errorMessage = $e->getMessage();
-                $result = false;
+                $acceptableErrorCodes = $path['acceptableErrorCodes'] ?? [];
+                if (in_array($e->getCode(), $acceptableErrorCodes, true)) {
+                    $result = true;
+                    $message .= sprintf(' (returned acceptable HTTP response code %d)', $e->getCode());
+                } else {
+                    $result = false;
+                    $errorMessage = $e->getMessage();
+                }
             }
 
             if ($result) {

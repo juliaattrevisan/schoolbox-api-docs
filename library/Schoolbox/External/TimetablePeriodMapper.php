@@ -19,6 +19,7 @@ use Schoolbox\Collection;
  * This is only used by the Schoolbox connector.
  *
  * @method Collection|TimetablePeriod[] findAll()
+ * @method TimetablePeriod createModel($idValue = null)
  * @package Schoolbox\External
  */
 class TimetablePeriodMapper extends Schoolbox\Mapper
