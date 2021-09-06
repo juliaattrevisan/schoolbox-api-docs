@@ -203,7 +203,7 @@
     <key>sendBrowserExamKey</key>
     <true />
     <key>quitURL</key>
-    <string>{{exitUrl}</string>
+    <string>{{ exitUrl }}</string>
     <key>quitURLConfirm</key>
     <true />
     <key>restartExamText</key>
