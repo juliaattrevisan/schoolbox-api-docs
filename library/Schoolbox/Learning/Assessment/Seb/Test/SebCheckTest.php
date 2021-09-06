@@ -43,7 +43,6 @@ class SebCheckTest extends TestCase
     ): void {
         $outcome = (new ValidSebCheck())->isSatisfiedBy(
             $user,
-            $sebEnabled,
             $serverSuperglobal,
             $browserExamKey,
             $configKey
