@@ -194,7 +194,7 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
-        if($this->getConfigLoader()->get(ConfigMapper::NAME_LMS_SEB_ENABLED) && $assessment->getSebEnabled()) {
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_LMS_SEB_ENABLED) && $assessment->getSebEnabled()) {
             return (new Seb\ValidSebCheck())->isSatisfiedBy(
                 $this->getUser(),
                 $this->getRequest()->server->getArrayCopy(),
@@ -213,7 +213,6 @@ class ListController extends Web\Controller\Base
         } else {
             return false;
         }
-
     }
 
 
@@ -811,8 +810,7 @@ class ListController extends Web\Controller\Base
      */
     public function getRelocatedContext(IAssessable $assessment, ?string $locationId): ?AssessmentContext
     {
-        if (
-            $assessment && $locationId
+        if ($assessment && $locationId
             && $assessment->isSpecification()
             && ($assessment->getContext()->getLocationId() !== $locationId)
         ) {
