@@ -222,42 +222,78 @@ class Bulk_Folder
         // Folder Image
         $folderImageHash = $folderImageColumnIndex >= 0 ? trim($row[$folderImageColumnIndex]) : '';
         if (!empty($folderImageHash)) {
-            $hash = false;
-            //check what format $folderImageHash is (hash,urlID,urlHASH)
-            if (stripos($folderImageHash, '?')) {
-                $idHash = false;
-                parse_str(explode('?', $folderImageHash)[1], $idHash);
-            } else {
-                $idHash = array('default' => $folderImageHash);
-            }
-            if (isset($idHash['id'])) {
+            // Get csv column's string
+            // this could be anything atm
+
+            $file = null;
+            //check if csvfield is hash only.
+            if (ctype_alnum($folderImageHash)) {
+                // check the csv field for an alphanumeric hash
+                // check that field only has alphanums only [a-zA-Z0-9]
+                // options to check this was use regex, or run ctype_alnum, i feel this will have less overhead than writing a regex.
+                // If I replace any nonalphanums with an empty string, and the result is the same as how I started,
+                // I replaced nothing, which means every character was valid
                 try {
-                    $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($idHash['id']);
-                    if ($file->getMimetype()->isImage()) {
-                        $newFolder->setCoverImage($file);
-                    } else {
-                        $warnings[] = "Provided hash is not an image: {$folderImageHash}.";
-                    }
+                    $file = $this->storageMapper->findByHash($folderImageHash);
                 } catch (MapperException $e) {
                     $warnings[] = "Unable to find image {$folderImageHash}.";
                 }
-            } elseif (isset($idHash['hash'])) {
-                $hash = $idHash['hash'];
             } else {
-                $hash = $folderImageHash;
+                // check the csv field for url
+                // * is relative e.g. /send.php?id...
+                // * is relative e.g. /image.php?hash...
+                // * is relative e.g. /fetch.php?hash...
+                // * is absolute e.g. myschoolboxinstance.com.au/send.php?id...
+                // * is relative e.g. myschoolboxinstance.com.au/image.php?hash...
+                // * is relative e.g. myschoolboxinstance.com.au/fetch.php?hash...
+
+                // the url has contain /send.php?{id}, /image.php?{hash}, /fetch.php?{hash}
+                // use a regex to find out whether it's a) valid file b) id/hash or parse the url
+
+                $uri = parse_url($folderImageHash);
+                parse_str($uri['query'], $query);
+                // let's say we detected the id/hash
+                // exit early: set the $warning[] string and continue onwards
+                switch ($uri['path']) {
+                    case "/cms/image.php": //id
+                    case "/send.php": //id
+                    // if it was send, we need a FileMapper instance
+                    // $file = load by id
+                    // do basic error checking and exit early if possible
+                        try {
+                            $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($query['id']);
+                        } catch (MapperException $e) {
+                            $warnings[] = "Unable to find image {$folderImageHash}.";
+                        }
+                        break;
+                    case "/storage/image.php": //hash
+                    case "/storage/fetch.php": //hash
+                    // if it was image or fetch, we need a StorageMapper instance
+                    // $file = load by hash
+                    // do basic error checking and exit early if possible
+                        try {
+                            $file = $this->storageMapper->findByHash($query['hash']);
+                        } catch (MapperException $e) {
+                            $warnings[] = "Unable to find image {$folderImageHash}.";
+                        }
+                        break;
+                    default:
+                        $warnings[] = "Unable to find image {$folderImageHash}.";
+                        break;
+                }
+
             }
-            if ($hash) {
-                try {
-                    $file = $this->storageMapper->findByHash($hash);
-                    if ($file->getMimetype()->isImage()) {
-                        $newFolder->setCoverImage($file);
-                    } else {
-                        $warnings[] = "Provided hash is not an image: {$folderImageHash}.";
-                    }
-                } catch (MapperException $e) {
-                    $warnings[] = "Unable to find image {$folderImageHash}.";
+
+            // if we got here, there were no errors
+
+            if (null !== $file) {
+            // check that $file is an image
+
+                if ($file->getMimetype()->isImage()) {
+                    $newFolder->setCoverImage($file);
                 }
             }
+
         } //end if empty $folderImageHash
 
         // Folder Codes
