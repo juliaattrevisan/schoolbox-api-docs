@@ -62,7 +62,7 @@ class Controller extends Base
      * @return bool|string
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    function getBasePath()
+    public function getBasePath()
     {
         // cache
         return $this->basePath ?: $this->basePath = $this->getRouteIfAuthorized('upsRuleset.intro');
@@ -764,27 +764,25 @@ class Controller extends Base
                     unset($pairs[null]);
 
                     $arg[] = $pairs;
-                }
-                /* Force cast of boolean arg so it doesn't save in some
-                 * other data format.
-                 *
-                 * Sequential Dependency:
-                 * This has to take place after isMap() check because the
-                 * Mapped Key/Value Pairs can utilise a boolean field
-                 */
-                else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
+                } else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
+                    /* Force cast of boolean arg so it doesn't save in some
+                     * other data format.
+                     *
+                     * Sequential Dependency:
+                     * This has to take place after isMap() check because the
+                     * Mapped Key/Value Pairs can utilise a boolean field
+                     */
+
                     $arg = [(bool)$effectArgs[0]];
-                }
-                /*
-                 * Explode the collection type on comma
-                 */
-                elseif ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                } elseif ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                    /*
+                     * Explode the collection type on comma
+                     */
                     $xpl = explode(',', $effectArgs[0]);
                     $arg = [count($xpl) == 1 ? $xpl[0] : $xpl];
-                }
-                /* Otherwise just save it as given
-                 */
-                else {
+                } else {
+                    /* Otherwise just save it as given
+                     */
                     $arg = $effectArgs;
                 }
 
