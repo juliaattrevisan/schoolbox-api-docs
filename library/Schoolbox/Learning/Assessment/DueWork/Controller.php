@@ -279,11 +279,14 @@ class Controller extends Assessment\Controller
         /* Check if this assessment has a SEB requirement
          * If it does, send you to the download screen
          */
-        if (!$this->isSebCheckPasses($assessment)) {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload', [
-                'assessmentId' => $assessment->getId()
-            ]));
+        $sebDownload = $this->getRouteIfAuthorized(
+            'learningAssessment.getSebDownload',
+            ['assessment' => $assessment,
+            'assessmentId' => $assessment->getId()]
+        );
 
+        if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
+            $this->getResponse()->redirect->to($sebDownload);
             return;
         }
 

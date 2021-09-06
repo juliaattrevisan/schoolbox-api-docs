@@ -137,17 +137,21 @@ class Payload
 
         /* List of allowed urls
          */
-        $whitelistUrls = ["{$domain}/login", "{$startUrl}", "{$domain}/assess/", "{$domain}/storage/fetch.php", "{$domain}/storage/image.php", "{$domain}/cms/sendVideo.php" ];
+        $whitelistUrls = [
+            "{$domain}/login",
+            $startUrl,
+            "{$domain}/assess/",
+            "{$domain}/storage/fetch.php",
+            "{$domain}/storage/image.php",
+            "{$domain}/cms/sendVideo.php"
+        ];
+
         if ($this->config->get('saml_enabled')) {
             $urlSso          = parse_url(trim($this->config->get('saml_sso_url')));
             $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/";
             $urlIdp          = parse_url(trim($this->config->get('saml_idp_metadata_url')));
             $whitelistUrls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/";
         }
-
-        /* Allow common 3rd party sites for embedding content */
-        $whitelistUrls[] = "https://docs.google.com/document/";
-
 
         /* Manufacture a phplib style struct for strings and their replacements
          */

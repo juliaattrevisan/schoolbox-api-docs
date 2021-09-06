@@ -194,25 +194,20 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_LMS_SEB_ENABLED) && $assessment->getSebEnabled()) {
-            return (new Seb\ValidSebCheck())->isSatisfiedBy(
-                $this->getUser(),
-                $this->getRequest()->server->getArrayCopy(),
-                /* Don't worry about the Browser Exam Key for now
-                 * We need to generate some platform-specific crypto for it
-                 */
-                'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
-                /* Generate a config key hash from the xml that guards this assessment url
-                 */
-                (new SebPayload(
-                    $this->getConfigLoader(),
-                    $this->getRequest()->server->get('HTTP_HOST'),
-                    $this->router
-                ))->generateConfigKey($assessment)
-            );
-        } else {
-            return false;
-        }
+        return (new Seb\ValidSebCheck())->isSatisfiedBy(
+            $this->getRequest()->server->getArrayCopy(),
+            /* Don't worry about the Browser Exam Key for now
+             * We need to generate some platform-specific crypto for it
+             */
+            'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
+            /* Generate a config key hash from the xml that guards this assessment url
+             */
+            (new SebPayload(
+                $this->getConfigLoader(),
+                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->router
+            ))->generateConfigKey($assessment)
+        );
     }
 
 

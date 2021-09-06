@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Seb;
 
-use Schoolbox\User;
-
 /**
  * Check if you can view this assessment with a normal browser
  * or if you need to view it with SEB Safe Exam Browser
@@ -23,24 +21,16 @@ class ValidSebCheck
      * it checks whether the $_SERVER superglobal contains the two headers
      * that SEB Safe Exam Browser expects to find.
      *
-     * @param User   $user
      * @param array  $serverSuperglobal
      * @param string $browserExamKey
      * @param string $configKey
      * @return bool
      */
     public function isSatisfiedBy(
-        User $user,
         array $serverSuperglobal,
         string $browserExamKey,
         string $configKey
     ): bool {
-
-        /* Only students are required to use the SEB
-         */
-        if ($user->getRole()->isStaff()) {
-            return true;
-        }
 
         /* Otherwise check whether the two superglobal keys exist
          */

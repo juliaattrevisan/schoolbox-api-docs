@@ -32,7 +32,7 @@
 
         <ul class="flex-list buttons">
             <li><a href="/homepage/{{ assessment.context.folder.id }}" class="button">Return to class</a></li>
-            <li><a href="{{ routeLookupIfAuthorized('learningAssessment.getSebConfig', {assessmentId: assessmentId}) }}"
+            <li><a href="{{ routeLookupIfAuthorized('learningAssessment.getSebConfig', {assessment: assessment, assessmentId: assessmentId}) }}"
                    class="button submit">Launch Safe Exam Browser</a></li>
         </ul>
     </div>

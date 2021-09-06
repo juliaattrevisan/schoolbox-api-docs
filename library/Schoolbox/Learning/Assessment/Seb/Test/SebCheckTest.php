@@ -24,8 +24,6 @@ class SebCheckTest extends TestCase
 {
     /**
      * @dataProvider providerSebCheck
-     * @param User   $user
-     * @param bool   $sebEnabled
      * @param array  $serverSuperglobal
      * @param string $browserExamKey
      * @param string $configKey
@@ -34,15 +32,12 @@ class SebCheckTest extends TestCase
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     public function testValidSebCheck(
-        User $user,
-        bool $sebEnabled,
         array $serverSuperglobal,
         string $browserExamKey,
         string $configKey,
         bool $expected
     ): void {
         $outcome = (new ValidSebCheck())->isSatisfiedBy(
-            $user,
             $serverSuperglobal,
             $browserExamKey,
             $configKey
@@ -60,25 +55,12 @@ class SebCheckTest extends TestCase
      */
     public function providerSebCheck(): array
     {
-        $staff = (new User())
-            ->setId(150)
-            ->setRole((new Role())->setType(Role::STAFF))
-            ->setFirstname('Generic')
-            ->setLastname('Staff');
-
-        $student = (new User())
-            ->setId(999)
-            ->setRole((new Role())->setType(Role::STUDENT))
-            ->setFirstname('Generic')
-            ->setLastname('Student');
 
         return [
 
             /* Both keys provided, both match
              */
             'Valid SEB, generic usage' => [
-                $student,
-                true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
                     'HTTP_SEC_FETCH_MODE' => 'navigate',
@@ -101,36 +83,9 @@ class SebCheckTest extends TestCase
                 true
             ],
 
-            /* Staff always get in, regardless of seb requirements
-             */
-            'Valid SEB, staff always get through' => [
-                $staff,
-                true,
-                [
-                    'HTTP_SEC_FETCH_USER' => '?1',
-                    'HTTP_SEC_FETCH_MODE' => 'navigate',
-                    'HTTP_SEC_FETCH_SITE' => 'same-origin',
-                    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                    'HTTP_USER_AGENT' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
-                    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
-                    'HTTP_SEC_CH_UA_MOBILE' => '?0',
-                    'HTTP_SEC_CH_UA' => '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
-                    'HTTP_CACHE_CONTROL' => 'no-cache',
-                    'HTTP_PRAGMA' => 'no-cache',
-                    'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200',
-                    'REQUEST_URI' => '/test'
-                ],
-                '00258dskjrpwugugnsdy48dfyx6g7usdf5s4s7x9bnksj1iug0234u90g7258999',
-                'sogjl258972lkjdljgj289272ld2hfugh27c77b714mazxcr241fa6r949gj48g7',
-                true
-            ],
-
             /* Keys provided don't match what we expected
              */
             'Invalid SEB, keys do not match what we expected' => [
-                $student,
-                true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
                     'HTTP_SEC_FETCH_MODE' => 'navigate',
@@ -156,8 +111,6 @@ class SebCheckTest extends TestCase
             /* Both Keys weren't provided
              */
             'Invalid SEB, bek missing' => [
-                $student,
-                true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
                     'HTTP_SEC_FETCH_MODE' => 'navigate',
@@ -180,8 +133,6 @@ class SebCheckTest extends TestCase
             ],
 
             'Invalid SEB, config key missing' => [
-                $student,
-                true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
                     'HTTP_SEC_FETCH_MODE' => 'navigate',
@@ -204,8 +155,6 @@ class SebCheckTest extends TestCase
             ],
 
             'Invalid SEB, both keys missing' => [
-                $student,
-                true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
                     'HTTP_SEC_FETCH_MODE' => 'navigate',
@@ -229,8 +178,6 @@ class SebCheckTest extends TestCase
             /* Wrong start url
              */
             'Invalid SEB, start url different' => [
-                $student,
-                true,
                 [
                     'HTTP_SEC_FETCH_USER' => '?1',
                     'HTTP_SEC_FETCH_MODE' => 'navigate',
