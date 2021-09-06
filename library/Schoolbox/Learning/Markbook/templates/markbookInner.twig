@@ -103,14 +103,14 @@
 
         <tbody>
             {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Weight', key: 'weight', input: true} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject', input: true} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Mean', key: 'mean'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Min', key: 'min'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Max', key: 'max'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight', input: writable[assessment.id] ?? false} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject', input: writable[assessment.id] ?? false} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Mean', key: 'mean'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
             <tr class="sub-row">
                 <td>Visibility</td>
                 <td>&nbsp;</td>
