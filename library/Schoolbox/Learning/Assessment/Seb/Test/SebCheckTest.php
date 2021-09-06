@@ -17,8 +17,6 @@ namespace Schoolbox\Learning\Assessment\Seb\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment\Seb\ValidSebCheck;
-use Schoolbox\Role;
-use Schoolbox\User;
 
 class SebCheckTest extends TestCase
 {
