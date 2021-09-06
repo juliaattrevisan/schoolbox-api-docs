@@ -104,7 +104,8 @@ do
   # Undo unwanted 'schoolbox' => 'schoolboxdev' string replacements
   if [ "$i" == "schoolboxdev" ]; then
     sed -i "s/schoolboxdev-rebuild-daemons/schoolbox-rebuild-daemons/g" debian/postinst;
-    sed -i "s/schoolboxdev-database-backup/schoolbox-database-backup/g" debian/postinst;
+    sed -i "s/schoolboxdev-database-backup/schoolbox-database-backup/g" debian/preinst;
+    sed -i "s/schoolboxdev-read-instances/schoolbox-read-instances/g" debian/preinst;
   fi
 
 	if [ "$i" == "schoolboxcloud" ];
