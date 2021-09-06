@@ -217,8 +217,8 @@ module.exports = {
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
         viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
 
-        //Sortable components for homepages
-        sortableComponents: './templates/core/homepage/js/sortableComponents.js',
+        //Most functionality for a home page
+        updateHomepage: './templates/core/homepage/js/updateHomepage.js',
 
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
