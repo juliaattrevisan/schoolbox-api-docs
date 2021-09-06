@@ -24,7 +24,6 @@ class ValidSebCheck
      * that SEB Safe Exam Browser expects to find.
      *
      * @param User   $user
-     * @param bool   $sebEnabled
      * @param array  $serverSuperglobal
      * @param string $browserExamKey
      * @param string $configKey
@@ -32,7 +31,6 @@ class ValidSebCheck
      */
     public function isSatisfiedBy(
         User $user,
-        bool $sebEnabled,
         array $serverSuperglobal,
         string $browserExamKey,
         string $configKey
@@ -41,12 +39,6 @@ class ValidSebCheck
         /* Only students are required to use the SEB
          */
         if ($user->getRole()->isStaff()) {
-            return true;
-        }
-
-        /* SEB was not required; let people through as normal
-         */
-        if (!$sebEnabled) {
             return true;
         }
 
