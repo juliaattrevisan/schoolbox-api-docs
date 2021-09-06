@@ -222,17 +222,43 @@ class Bulk_Folder
         // Folder Image
         $folderImageHash = $folderImageColumnIndex >= 0 ? trim($row[$folderImageColumnIndex]) : '';
         if (!empty($folderImageHash)) {
-            try {
-                $file = $this->storageMapper->findByHash($folderImageHash);
-                if ($file->getMimetype()->isImage()) {
-                    $newFolder->setCoverImage($file);
-                } else {
-                    $warnings[] = "Provided hash is not an image: {$folderImageHash}.";
-                }
-            } catch (MapperException $e) {
-                $warnings[] = "Unable to find image {$folderImageHash}.";
+            $hash = false;
+            //check what format $folderImageHash is (hash,urlID,urlHASH)
+            if (stripos($folderImageHash, '?')) {
+                $idHash = false;
+                parse_str(explode('?', $folderImageHash)[1], $idHash);
+            } else {
+                $idHash = array('default' => $folderImageHash);
             }
-        }
+            if (isset($idHash['id'])) {
+                try {
+                    $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($idHash['id']);
+                    if ($file->getMimetype()->isImage()) {
+                        $newFolder->setCoverImage($file);
+                    } else {
+                        $warnings[] = "Provided hash is not an image: {$folderImageHash}.";
+                    }
+                } catch (MapperException $e) {
+                    $warnings[] = "Unable to find image {$folderImageHash}.";
+                }
+            } elseif (isset($idHash['hash'])) {
+                $hash = $idHash['hash'];
+            } else {
+                $hash = $folderImageHash;
+            }
+            if ($hash) {
+                try {
+                    $file = $this->storageMapper->findByHash($hash);
+                    if ($file->getMimetype()->isImage()) {
+                        $newFolder->setCoverImage($file);
+                    } else {
+                        $warnings[] = "Provided hash is not an image: {$folderImageHash}.";
+                    }
+                } catch (MapperException $e) {
+                    $warnings[] = "Unable to find image {$folderImageHash}.";
+                }
+            }
+        } //end if empty $folderImageHash
 
         // Folder Codes
         $result = $this->processFolderCodes($rowIdx, $row, $newFolder, $folderCodeColumnIndexes);
