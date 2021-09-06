@@ -24,6 +24,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -286,6 +287,12 @@ class Controller extends Assessment\Controller
             return;
         }
 
+        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+
         $participant = $assessment->getParticipantIfExtant($student);
 
         // Generate rubric marked grids for every feedback being displayed
@@ -316,7 +323,7 @@ class Controller extends Assessment\Controller
             'assessment'  => $assessment,
             'student'     => $student,
             'participant' => $participant,
-
+            'returnUrl'   => $returnUrl,
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
             'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
             'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,

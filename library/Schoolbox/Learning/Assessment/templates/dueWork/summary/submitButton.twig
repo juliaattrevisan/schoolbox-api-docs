@@ -5,6 +5,7 @@ Data:
     selfAcknowledgeRoute  string
     assessment            DueWork\Model
     student               User
+    returnUrl             string
 #}
 <div class="row">
     <div class="small-12 columns">
@@ -44,6 +45,8 @@ Data:
                     </button>
                 {% endif %}
             {% endif %}
+        {% else %}
+           <a href="{{ returnUrl }}" class="submit button full-width">Return</a>
         {% endif %}
         <div class="toast" data-toast></div>
     </div>
