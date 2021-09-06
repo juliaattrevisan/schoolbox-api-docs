@@ -270,8 +270,7 @@ class Controller extends Base
                  * This is processed in a detached function so it doesn't hang the ui
                  * while it's executing, since accessing third party api can be slow
                  */
-                $detachedFunction = static function () {
-                };
+                $detachedFunction = null;
 
                 if ($assessment->getSimilarityCheckEnabled()) {
                     /* Only one of these can be active at a time, but both universes can co-exist
@@ -326,13 +325,18 @@ class Controller extends Base
                     }
                 }
 
-                $this->getResponse()->content->set([
+                $output = [
                     'format' => 'json',
                     'data'   => [],
-                    'postOutput' => [
-                        $detachedFunction,
-                    ],
-                ]);
+                ];
+
+                if (null !== $detachedFunction) {
+                    $output['postOutput'] = [
+                        $detachedFunction
+                    ];
+                }
+
+                $this->getResponse()->content->set($output);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');

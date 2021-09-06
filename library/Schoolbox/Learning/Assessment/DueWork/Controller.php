@@ -1005,8 +1005,7 @@ class Controller extends Assessment\Controller
          * This is processed in a detached function so it doesn't hang the ui
          * while it's executing, since accessing third party api can be slow
          */
-        $detachedFunction = static function () {
-        };
+        $detachedFunction = null;
 
         if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             /* Only one of these can be active at a time, but both universes can co-exist
@@ -1063,17 +1062,20 @@ class Controller extends Assessment\Controller
             }
         }
 
+        $output = [
+            'format' => 'noContent',
+        ];
+
+        if (null !== $detachedFunction) {
+            $output['postOutput'] = [
+                $detachedFunction
+            ];
+        }
+
         /* Asynchronously shove it into plagscan so we don't make the user wait ages
          * for it to read 1 byte at a time >_<
          */
-        $this->getResponse()->content->set(
-            [
-                'format'     => 'noContent',
-                'postOutput' => [
-                    $detachedFunction
-                ],
-            ]
-        );
+        $this->getResponse()->content->set($output);
 
         /* Saving drafts from the wizzywig
          */
