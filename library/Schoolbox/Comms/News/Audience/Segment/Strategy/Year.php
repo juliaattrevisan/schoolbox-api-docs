@@ -66,7 +66,7 @@ class Year extends SimpleStrategy
              * because the column values for years are typically stored as a number, we want to make it easy for users
              * to search for either: "9" or "year 9" and get the same results
              */
-            $keywordFilter = "AND (lu_year_level.name LIKE :{$searchPlaceholder} or concat('{$entityType} ', lu_year_level.name) LIKE :{$searchPlaceholder})";
+            $keywordFilter = "AND (lu_year_level.name LIKE :{$searchPlaceholder} or concat('Year ', lu_year_level.name) LIKE :{$searchPlaceholder})";
         }
 
         return "
