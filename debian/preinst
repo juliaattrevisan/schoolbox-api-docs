@@ -12,7 +12,7 @@ case "$1" in
     install)
     ;;
     upgrade)
-        # backup instances
+        # Backup instances
         if [ -f /etc/schoolbox/primary_node ]; then
             instance_list=$(/usr/local/bin/schoolbox-read-instances --ini /etc/schoolbox/instances.ini --option instance-list)
             echo "Backing up instances" | tee -a tee -a /var/log/schoolbox/upgrade.log
@@ -21,13 +21,15 @@ case "$1" in
                 echo "Backing up instance $instance_id" | tee -a tee -a /var/log/schoolbox/upgrade.log
                 INSTANCE_ID=$instance_id /usr/local/bin/schoolbox-database-backup --package schoolbox | \
                 tee -a /var/log/schoolbox/"$instance_id"/upgrade.log &
-                pids="${pids} $!"
+                pids="${pids} $!-$instance_id"
             done
 
-            for pid in $pids
+            for group in $pids
             do
+                pid=$(echo group | cut -d '-' -f1)
+                instance_id=$(echo group | cut -d '-' -f2)
                 if ! wait "$pid"; then
-                    echo "Error: Failed to backup an instance" | tee -a tee -a /var/log/schoolbox/upgrade.log
+                    echo "Error: Failed to backup instance $instance_id" | tee -a tee -a /var/log/schoolbox/upgrade.log
                     exit 1;
                 fi
             done
