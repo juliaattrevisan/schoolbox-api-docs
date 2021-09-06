@@ -1,25 +1,27 @@
 /** 
- * To be able to drag/sort existing homepage components around 
+ * Handles the majority of functionality on a Home page, including adding, sorting, and updating
  *
  */
 
 import { gsap, Draggable, Flip } from 'gsap/all';
-import axios from 'axios';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
          isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
+import { submitNewComponentOrder } from './submitNewComponentOrder';
+         
 
 gsap.registerPlugin(Draggable, Flip);
 
-const SORTABLES_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers
-const SORTABLES_SELECTOR = '[data-component]'; //any component that will be sorted
-const SORTABLES_TRIGGER_SELECTOR = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
+const COMPONENET_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers
+export const COMPONENT_SELECTOR = '[data-component], [data-component-palette]'; //any component that will be dragged/added/sorted
+const COMPONENT_TRIGGER_SELECTOR = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
+const SORTABLE_SELECTOR = '[data-component]'; //existing components that can be sorted
 const ANIMATE_SPEED = 0.3; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
 let __placeHolderComponentsList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
-let __activeElement; //the element that's currently being dragged/sorted around
-let __placeHolderElement; //the element that subs in for the __activeElement being sorted
+let __activeComponent; //the component that's currently being dragged/sorted around
+let __placeHolderComponent; //the element that subs in for the __activeComponent being sorted
 let __hasSortChange = false; //to know whether to update the DB with sort change
 let __isScrollingTimeout = false; //to prevent sorting when moving a sortable up/down the window
 let __isScrolling = false;
@@ -38,18 +40,17 @@ let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position cha
  * Fire up Draggable instances, looping through each sortable to assign a Draggable instance 
  */
 const initDraggables = () => {
-    document.querySelectorAll(SORTABLES_SELECTOR).forEach((sortableItem) => {
+    document.querySelectorAll(COMPONENT_SELECTOR).forEach((sortableItem) => {
         __draggablesList = [...__draggablesList, getDraggable(sortableItem)];
     });
-    __draggablesList.forEach((draggable) => draggable.disable()); //disabled at start until the #component-lock-switch is toggled
 }
 
 /**
  * To enable Dragging functionality to the chosen item
  * Refer to https://greensock.com/docs/v3/Plugins/Draggable for further info
  */
- const getDraggable = (sortableItem) => {
-    const sortableItemTrigger = sortableItem.querySelector(SORTABLES_TRIGGER_SELECTOR);
+const getDraggable = (sortableItem) => {
+    const sortableItemTrigger = isExistingComponent(sortableItem) ? sortableItem.querySelector(COMPONENT_TRIGGER_SELECTOR) : sortableItem;//existing components use a handle, the ones in the palette do not
     sortableItemTrigger.addEventListener('click', (event) => event.preventDefault());
     sortableItemTrigger.addEventListener('dblclick', (event) => event.preventDefault());
     return Draggable.create(sortableItem, {
@@ -63,10 +64,28 @@ const initDraggables = () => {
 }
 
 /**
+ * Is a new component, one that's currently within the palette
+ * 
+ * @param { DOMElement } 
+ */
+const isNewComponent = (component) => {
+    return component.hasAttribute('data-component-palette');
+}
+
+/**
+ * Is already on the page
+ * 
+ * @param { DOMElement } 
+ */
+ const isExistingComponent = (component) => {
+    return component.hasAttribute('id');
+}
+
+/**
  * To respond to any events that require action
  */
  const initListeners = () => {
-    initComponentLockSwitchListener();
+    // initComponentLockSwitchListener(); - may add in again when actually adding the palette functionality
     initOnComponentAddedListener();
     initOnComponentRemovedListener();
 }
@@ -74,22 +93,18 @@ const initDraggables = () => {
 /**
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
-const initComponentLockSwitchListener = () => {
-    const componentLockSwitch = document.getElementById('component-lock-switch').querySelector('input');
-    componentLockSwitch.addEventListener('change', (event) => updateDraggablesStatus(event.target.checked));
-}
+// const initComponentLockSwitchListener = () => {
+//     const componentLockSwitch = document.getElementById('component-lock-switch').querySelector('input');
+//     componentLockSwitch.addEventListener('change', (event) => updateDraggablesStatus(event.target.checked));
+// }
 
 /**
  * Run through each Draggable instance and enable/disable
  * 
  * @param { Boolean }  
  */
- const updateDraggablesStatus = (enable) => {
-    if (enable) {
-        __draggablesList.forEach((draggable) => draggable.enable()); 
-    } else {
-        __draggablesList.forEach((draggable) => draggable.disable());
-    }
+ const updateDraggablesStatus = (isEnabled) => {
+    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 /**
@@ -122,7 +137,7 @@ const initComponentLockSwitchListener = () => {
  * if there's no children need to show that items can be dragged into this container
  */
  const initPlaceHolderComponents = () => {
-    document.querySelectorAll(SORTABLES_CONTAINERS_SELECTOR).forEach(() => {
+    document.querySelectorAll(COMPONENET_CONTAINERS_SELECTOR).forEach(() => {
         const placeHolderComponent = document.createElement('div');
         placeHolderComponent.classList.add('masonry-placeholder');
         placeHolderComponent.style.display = 'block';
@@ -144,32 +159,42 @@ const initComponentLockSwitchListener = () => {
 /**
  * Sub in a placeholder to use in place of the element being dragged, 
  * which gets pulled out so it can go into any other parent container 
- * that contains the SORTABLES_SELECTOR
+ * that contains the COMPONENT_SELECTOR
  */
 const onDragStart = (event) => {
-    __activeElement = event.target.closest(SORTABLES_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
-    __placeHolderElement = getPlaceholderElement();
+    __activeComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
+    __placeHolderComponent = getPlaceholderElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
     updateDocumentForDrag();
     disableAllOtherDraggables();
-    extractActiveElement();
+    extractActiveComponent();
     updateSortableElements(); //ensure we have the most up to date positions
-    collapseActiveElementContent();
+    if (isExistingComponent(__activeComponent)) {
+        collapseExistingComponentContent();
+    } else {
+        __isChangingSize = false;
+        addPlaceHolderComponents();
+        hideExistingMasonryPlaceHolders();
+    }
 }
 
 /**
- * Create a clone of the __activeElement being dragged to use as a placeholder 
- * and to keep it in position as the __activeElement will be pulled out of context
+ * Create a clone of the __activeComponent being dragged to use as a placeholder 
+ * and to keep it in position as the __activeComponent will be pulled out of context
  * 
  * @returns { DOMElement }  
  */
- const getPlaceholderElement = () => {
-    const cloneElement = __activeElement.cloneNode(true);
-    cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference, so remove all component controls that can be expanded
-    cloneElement.querySelector('[data-component-panel="settings"]').remove(); 
-    cloneElement.querySelector('[data-component-panel="delete"]').remove();
-    cloneElement.style.opacity = 0.5; //displayed as reference where the __activeElement is currently placed 
-    insertElementBefore(__activeElement, cloneElement);
+const getPlaceholderElement = () => {
+    const cloneElement = __activeComponent.cloneNode(true);
+    if (isExistingComponent(__activeComponent)) { //only existing components have to worry about removing these elements
+        cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference, so remove all component controls that can be expanded
+        cloneElement.querySelector('[data-component-panel="settings"]').remove(); 
+        cloneElement.querySelector('[data-component-panel="delete"]').remove();
+    } else {
+        cloneElement.setAttribute('data-component', ''); //so it can be considered when sorting
+    }
+    cloneElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed 
+    insertElementBefore(__activeComponent, cloneElement);
     return cloneElement;
 }
 
@@ -178,17 +203,17 @@ const onDragStart = (event) => {
  * 
  * @returns { left, top } 
  */
- const updateDragPoint = () => {
+const updateDragPoint = () => {
     return { 
-        left: __activeElement.getBoundingClientRect().left,
-        top: __activeElement.getBoundingClientRect().top + window.scrollY
+        left: __activeComponent.getBoundingClientRect().left,
+        top: __activeComponent.getBoundingClientRect().top + window.scrollY
     }
 }
 
 /**
  * Prep the document to handle dragging
  */
- const updateDocumentForDrag = () => {
+const updateDocumentForDrag = () => {
     document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
     document.documentElement.style.scrollBehavior = 'auto'; //disable smooth scroll as it can jar while moving elements around 
     document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'none') //prevent any mouse interactions interferring while dragging
@@ -198,7 +223,7 @@ const onDragStart = (event) => {
 /**
  * Don't do sorting while moving up or down the window due to dragging at the window edges 
  */
- const onScroll = () => {
+const onScroll = () => {
     __isScrolling = true;
     window.clearTimeout(__isScrollingTimeout); // Clear our timeout throughout the scroll
     __isScrollingTimeout = setTimeout(() => { // Set a timeout to run after scrolling ends
@@ -209,43 +234,45 @@ const onDragStart = (event) => {
 /**
  * Disable all others until current drag is finished to avoid rapid fire / double click issues
  */
- const disableAllOtherDraggables = () => {
+const disableAllOtherDraggables = () => {
     __draggablesList.forEach((draggable) => { 
-        if (draggable.target.id !== __activeElement.id) { //to avoid disabling the current
+        if (draggable.target.id !== __activeComponent.id) { //to avoid disabling the current
             draggable.disable();
         }
     }); 
 }
 
 /**
- * With the __placeHolderElement in place, the __activeElement is pulled out
+ * With the __placeHolderComponent in place, the __activeComponent is pulled out
  * so it doesn't impact our ability to sort through the items and can go into any container
  */
- const extractActiveElement = () => {
-    document.body.appendChild(__activeElement);
-    __activeElement.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
-    setStylesOnElement(__activeElement, { //Update position and styles to match now that the __activeElement has been moved out of context
+const extractActiveComponent = () => {
+    document.body.appendChild(__activeComponent);
+    __activeComponent.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
+    setStylesOnElement(__activeComponent, { //Update position and styles to match now that the __activeComponent has been moved out of context
         position: 'absolute',
-        top: `${__placeHolderElement.getBoundingClientRect().top + window.scrollY}px`,
-        left: `${__placeHolderElement.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
-        width: `${__placeHolderElement.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
+        top: `${__placeHolderComponent.getBoundingClientRect().top + window.scrollY}px`,
+        left: `${__placeHolderComponent.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
+        width: `${__placeHolderComponent.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
-    updateActiveElementComputedStyles(__activeElement);
+    if (isExistingComponent(__activeComponent)) {
+        updateExistingComponentComputedStyles(__activeComponent);
+    }
 }
 
 /**
  * Ensure custom set colour vars are respected and set when moving between parent containers
  */
- const updateActiveElementComputedStyles = () => {
+const updateExistingComponentComputedStyles = () => {
 
-    const containerPosition = __placeHolderElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
+    const containerPosition = __placeHolderComponent.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
 
-    const headBg = getComputedStyle(__placeHolderElement).getPropertyValue(`--${containerPosition}-head-bg`); //use __placeHolderElement as it still exists in the correct context
-    __activeElement.querySelectorAll('.component-titlebar').forEach((item) => item.style.backgroundColor = headBg );
+    const headBg = getComputedStyle(__placeHolderComponent).getPropertyValue(`--${containerPosition}-head-bg`); //use __placeHolderComponent as it still exists in the correct context
+    __activeComponent.querySelectorAll('.component-titlebar').forEach((item) => item.style.backgroundColor = headBg );
 
-    const headFont = getComputedStyle(__placeHolderElement).getPropertyValue(`--${containerPosition}-head-font`);
-    __activeElement.querySelectorAll('.component-titlebar h2').forEach((item) => item.style.color = headFont );
-    __activeElement.querySelectorAll('.component-titlebar a').forEach((item) => item.style.color = headFont );
+    const headFont = getComputedStyle(__placeHolderComponent).getPropertyValue(`--${containerPosition}-head-font`);
+    __activeComponent.querySelectorAll('.component-titlebar h2').forEach((item) => item.style.color = headFont );
+    __activeComponent.querySelectorAll('.component-titlebar a').forEach((item) => item.style.color = headFont );
 
 }
 
@@ -253,29 +280,29 @@ const onDragStart = (event) => {
  * Shrink down the element to the top bar, which is used to sort to 
  * avoid trying to sort tall height elements
  */
- const collapseActiveElementContent = () => {
+const collapseExistingComponentContent = () => {
     
     __isChangingSize = true;
     
-    const activeElementSettingsPanel = __activeElement.querySelector('[data-component-panel="settings"]');
-    gsap.to(activeElementSettingsPanel, { 
-        onStart: () => activeElementSettingsPanel.style.overflow = 'hidden',
+    const existingComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]');
+    gsap.to(existingComponentSettingsPanel, { 
+        onStart: () => existingComponentSettingsPanel.style.overflow = 'hidden',
         height: 0, 
         padding: 0,
         duration: ANIMATE_SPEED,
     } );
 
-    const activeElementDeletePanel = __activeElement.querySelector('[data-component-panel="delete"]');
-    gsap.to(activeElementDeletePanel, { 
-        onStart: () => activeElementDeletePanel.style.overflow = 'hidden',
+    const existingComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]');
+    gsap.to(existingComponentDeletePanel, { 
+        onStart: () => existingComponentDeletePanel.style.overflow = 'hidden',
         height: 0, 
         padding: 0,
         duration: ANIMATE_SPEED,
     } );
     
-    const activeElementContent = __activeElement.querySelector('[data-collapsable]');
-    gsap.to(activeElementContent, { 
-        onStart: () => activeElementContent.style.overflow = 'hidden',
+    const existingComponentContent = __activeComponent.querySelector('[data-collapsable]');
+    gsap.to(existingComponentContent, { 
+        onStart: () => existingComponentContent.style.overflow = 'hidden',
         height: 0, 
         duration: ANIMATE_SPEED,
         onComplete: () => {
@@ -291,8 +318,8 @@ const onDragStart = (event) => {
  * need to run through and check each parent container for children
  * if there's no children except the .masonry-placeholder need to show that items can be dragged into this container
  */
- const addPlaceHolderComponents = () => {
-    document.querySelectorAll(SORTABLES_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
+const addPlaceHolderComponents = () => {
+    document.querySelectorAll(COMPONENET_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
         if (canAddPlaceHolderComponent(parentContainer)) { //something going on in here.. with FLIP
             const placeHolderComponent = __placeHolderComponentsList[index];
             parentContainer.append(placeHolderComponent);
@@ -308,7 +335,7 @@ const onDragStart = (event) => {
  * 
  * @returns { Boolean }
  */
- const canAddPlaceHolderComponent = (parentContainer) => {
+const canAddPlaceHolderComponent = (parentContainer) => {
     return (parentContainer.children.length === 1) || //only the existing .masonry-placeholder is in the container
            (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
 }
@@ -333,8 +360,8 @@ const hideExistingMasonryPlaceHolders = () => {
 /**
  * To be able to sort elements and snap back to correct position
  */
- const updateSortableElements = () => {
-    document.querySelectorAll(SORTABLES_SELECTOR).forEach((sortableItem) => {
+const updateSortableElements = () => {
+    document.querySelectorAll(COMPONENT_SELECTOR).forEach((sortableItem) => {
         sortableItem.dataset.originalLeft = sortableItem.getBoundingClientRect().left;
         sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
         sortableItem.dataset.leftDifference = 0;
@@ -355,12 +382,12 @@ const hideExistingMasonryPlaceHolders = () => {
  */
 const onDrag = () => {
     if (canCheckForChange()) { 
-        const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLES_SELECTOR)); //grab all sortable elements 
-        const closestElement = getClosestElement(__activeElement, sortablesToCheckList); //the element nearest to the dragged element
-        if (closestElement && closestElement.id !== __activeElement.id) { //no need to FLIP if the closest element is still the __activeElement
-            if (isElementAboveOtherElement(__activeElement, closestElement)) { //otherwise determine movement direction, up or down into the container
+        const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
+        const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
+        if (closestElement && closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
+            if (isElementAboveOtherElement(__activeComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
                 flipState(closestElement, true);
-            } else if (isElementBelowOtherElement(__activeElement, closestElement)) {
+            } else if (isElementBelowOtherElement(__activeComponent, closestElement)) {
                 flipState(closestElement, false);
             }
         }
@@ -368,14 +395,14 @@ const onDrag = () => {
 }
 
 /**
- *  Don't be checking while have hardly dragged, while the window is scrolling or while the __activeElement is still shrinking in collapseActiveElementContent()
+ *  Don't be checking while have hardly dragged, while the window is scrolling or while the __activeComponent is still shrinking in collapseExistingComponentContent()
  * 
- * @retruns { Boolean } 
+ * @returns { Boolean } 
  */
 const canCheckForChange = () => {
     const currentDragPoint = { 
-        left: __activeElement.getBoundingClientRect().left,
-        top: __activeElement.getBoundingClientRect().top + window.scrollY
+        left: __activeComponent.getBoundingClientRect().left,
+        top: __activeComponent.getBoundingClientRect().top + window.scrollY
     }
     const distance = Math.sqrt(Math.pow(__startDragPoint.left - currentDragPoint.left, 2) + Math.pow(__startDragPoint.top - currentDragPoint.top, 2));
     return distance > MIN_MOVEMENT && !__isScrolling && !__isChangingSize;
@@ -398,19 +425,24 @@ const flipState = (closestElement, isShiftingDown) => {
         __isFlipping = true;
         __startDragPoint = updateDragPoint();
 
-        const state = Flip.getState(document.querySelectorAll(SORTABLES_SELECTOR));
+        const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
         
         if (isShiftingDown) {
-            insertElementAfter(closestElement, __placeHolderElement);
+            insertElementAfter(closestElement, __placeHolderComponent);
         } else {
-            insertElementBefore(closestElement, __placeHolderElement);
+            insertElementBefore(closestElement, __placeHolderComponent);
+        }
+
+        if (isNewComponent(__activeComponent)) {
+            __placeHolderComponent.style.marginBottom = '2rem'; //existing components all have a margin
+            __activeComponent.style.marginBottom = '2rem'; //existing components all have a margin
         }
 
         removePlaceHolderComponents(); //remove prior to recording the new co-ordinates so can snap back on release to correct location
         
-        __activeElement.dataset.leftDifference = __placeHolderElement.getBoundingClientRect().left - parseInt(__placeHolderElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
-        __activeElement.dataset.topDifference = (__placeHolderElement.getBoundingClientRect().top + window.scrollY) - parseInt(__placeHolderElement.dataset.originalTop);
-        gsap.to(__activeElement, { width: __placeHolderElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+        __activeComponent.dataset.leftDifference = __placeHolderComponent.getBoundingClientRect().left - parseInt(__placeHolderComponent.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+        __activeComponent.dataset.topDifference = (__placeHolderComponent.getBoundingClientRect().top + window.scrollY) - parseInt(__placeHolderComponent.dataset.originalTop);
+        gsap.to(__activeComponent, { width: __placeHolderComponent.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
         addPlaceHolderComponents(); //now check if need to add them back in
 
@@ -445,25 +477,18 @@ const removePlaceHolderComponents = () => {
 /**
  * Just snap back to where it now belongs
  */
- const onDragEnd = () => {
+const onDragEnd = () => {
     removePlaceHolderComponents();
     showExistingMasonryPlaceHolders();
     updateDraggablesStatus(false); //prevent quick reclicks on elements
-    gsap.to(__activeElement, {
-        x: 0 + parseInt(__activeElement.dataset.leftDifference), //to accommodate for potential position changes that have occured
-        y: 0 + parseInt(__activeElement.dataset.topDifference),
-        width: __placeHolderElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
-        duration: ANIMATE_SPEED,
-        overwrite: true,
-        onComplete: () => onSnapBackActiveElementComplete()
-    });
+    snapBackActiveComponent();
 }
 
 /**
  * When the add components tab is open, there would be a double up of place holders in parent containers
  * so need to hide them while dragging, and they are shown again when drag is released
  */
- const showExistingMasonryPlaceHolders = () => {
+const showExistingMasonryPlaceHolders = () => {
     const addComponentTabs = document.getElementById('tabs-1');
     if (addComponentTabs.classList.contains('active')) { 
         document.querySelectorAll('.masonry-placeholder').forEach((placeHolder) => {
@@ -476,54 +501,72 @@ const removePlaceHolderComponents = () => {
 }
 
 /**
+ * Move the component back to its original spot or its new 
+ */
+const snapBackActiveComponent = () => {
+    gsap.to(__activeComponent, {
+        x: 0 + parseInt(__activeComponent.dataset.leftDifference), //to accommodate for potential position changes that have occured
+        y: 0 + parseInt(__activeComponent.dataset.topDifference),
+        width: __placeHolderComponent.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
+        duration: ANIMATE_SPEED,
+        overwrite: true,
+        onComplete: () => onSnapBackActiveComponentComplete()
+    });
+}
+
+/**
  * Tidy up once the element has snapped back 
  * setting up for another drag, returning various variables back to there pre dragging state etc
  * 
  * @param { DOMElement }  
  */
- const onSnapBackActiveElementComplete = () => {
+const onSnapBackActiveComponentComplete = () => {
 
-    gsap.set(__activeElement, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
-    __activeElement.style.position = 'static'; //was absolute, now sitting as it should
-    __activeElement.setAttribute('data-component', ''); //so it can be dragged again
-    updateActiveElementComputedStyles(); //ensure the defined colours are respected
+    gsap.set(__activeComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
+    __activeComponent.style.position = 'static'; //was absolute, now sitting as it should
+    __activeComponent.setAttribute('data-component', ''); //so it can be dragged again
+    updateExistingComponentComputedStyles(); //ensure the defined colours are respected
 
-    insertElementAfter(__placeHolderElement, __activeElement); //the element was taken out, so put it back where it now belongs
-    __placeHolderElement.remove(); //and now the placeholder can be pulled out
+    insertElementAfter(__placeHolderComponent, __activeComponent); //the element was taken out, so put it back where it now belongs
+    __placeHolderComponent.remove(); //and now the placeholder can be pulled out
 
-    expandActiveElement();
+    if (isExistingComponent(__activeComponent)) {
+        expandExistingComponent();
+    } else {
+        onActiveComponentExpanded();
+    }
 
 }
 
 /**
- * Expand out the activeElement again now that's its' back in place
+ * Expand out the existingComponent again now that's its' back in place
  * The panels will animate regardless of whether they are opened or closed
  */
- const expandActiveElement = () => {
+const expandExistingComponent = () => {
 
-    const activeElementSettingsPanel = __activeElement.querySelector('[data-component-panel="settings"]');
-    gsap.to(activeElementSettingsPanel, { 
+    const existingComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]');
+    gsap.to(existingComponentSettingsPanel, { 
         height: 'auto', 
         padding: '1rem',
         duration: ANIMATE_SPEED,
-        onComplete: () => activeElementSettingsPanel.style.overflow = 'visible'
+        onComplete: () => existingComponentSettingsPanel.style.overflow = 'visible'
     } );
 
-    const activeElementDeletePanel = __activeElement.querySelector('[data-component-panel="delete"]');
-    gsap.to(activeElementDeletePanel, { 
+    const existingComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]');
+    gsap.to(existingComponentDeletePanel, { 
         height: 'auto', 
         padding: '1rem',
         duration: ANIMATE_SPEED,
-        onComplete: () => activeElementDeletePanel.style.overflow = 'visible'
+        onComplete: () => existingComponentDeletePanel.style.overflow = 'visible'
     } );
 
-    const activeElementContent = __activeElement.querySelector('[data-collapsable]');
-    gsap.to(activeElementContent, { 
+    const existingComponentContent = __activeComponent.querySelector('[data-collapsable]');
+    gsap.to(existingComponentContent, { 
         height: 'auto', 
         duration: ANIMATE_SPEED, 
         onComplete: () => {
-            activeElementContent.style.overflow = 'visible';
-            onActiveElementExpanded();
+            existingComponentContent.style.overflow = 'visible';
+            onActiveComponentExpanded();
         }
     } ); 
 
@@ -532,7 +575,7 @@ const removePlaceHolderComponents = () => {
 /**
  * To set up for another possible drag of elements
  */
- const onActiveElementExpanded = () => {
+const onActiveComponentExpanded = async () => {
 
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
@@ -541,99 +584,15 @@ const removePlaceHolderComponents = () => {
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
     
     updateSortableElements();
-    submitNewComponentOrder();
 
-}
-
-
-/*****************************************************************
- * 
- * SUBMIT SORT CHANGE
- * 
- ****************************************************************/
-
-/**
- * Submit the new component order to the DB
- */
-const submitNewComponentOrder = async () => {
-    try {
-        if (__hasSortChange) {
-            const response = await axios.post('/homepage/configForm.php', getNewComponentOrderFormData());
-            if (response.data.hasComponentBeenDeleted) {
-                updateDeletedComponent();
-            }
-            __hasSortChange = false;
-        } 
-    } catch (error) {
-        console.warn(error);
-    } finally {
-        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    if (__hasSortChange) {
+        await submitNewComponentOrder(__activeComponent);
+        __hasSortChange = false;
     }
-}
-
-/**
- * To pass through the required FormData to save the new position in the DB
- * 
- * @returns { FormData }  
- */
-const getNewComponentOrderFormData = () => {
-    const formData = new FormData();
-    formData.append('column1', getContainerComponentIDs(document.querySelector('[data-position="left"]'))); //left side panel
-    formData.append('column2', getContainerComponentIDs(document.querySelector('[data-position="right"]'))); //right side panel
-    formData.append('column3', getContainerComponentIDs(document.querySelector('[data-position="top"]'))); //top panel... I know right?!
-    formData.append('movedComponentId', getComponentID(__activeElement));
-    formData.append('type', 'components');
-    formData.append('cid', document.getElementById('categoryID').value);
-    return formData;
-}
-
-/**
- * To retrieve all component ids within a container
- * 
- * @param { DOMElement } 
- * 
- * @returns { String } 
- */
-const getContainerComponentIDs = (componentContainer) => {
-    let containerComponentIDList = []; //add all ids into an array
-    componentContainer.querySelectorAll(SORTABLES_SELECTOR).forEach((sortable) => {
-        if (sortable.id) { //the <div class="masonry-placeholder" /> exists in each parent container
-            containerComponentIDList.push(getComponentID(sortable));
-        }
-    });
-    return containerComponentIDList.join(','); //return just a string from the array
-}
-
-/**
- * To retrieve the component id
- * 
- * @param { DOMElement } 
- * 
- * @returns { String } 
- */
-const getComponentID = (componentElement) => {
-    return componentElement.id.replace('component', ''); //strip the 'component' at the start to just get the id number
-}
-
-/**
- * The component has been deleted elsewhere, so notify the user
- * and suggest a page refresh for the latest data
- */
-const updateDeletedComponent = () => {
-
-    __activeElement.querySelector(SORTABLES_TRIGGER_SELECTOR).remove(); //remove the drag trigger 
-    __activeElement.querySelector('[data-component-titlebar-container] > nav').remove(); //as well as the edit controls to prevent any further interactions on this component
-
-    const errorElement = document.createElement('div');
-    errorElement.classList.add('alert', 'alert-box');
-    errorElement.innerHTML = `<b>Warning:</b> This component has been deleted from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
-
-    const insideComponentElement = __activeElement.querySelector('[data-collapsable] > div > section');
-    insideComponentElement.replaceChildren(errorElement);
-
-    gsap.from(errorElement, { opacity: 0, duration: 0.5 } );
+    updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
 
 }
+
 
 /**
  * Fire everything up
