@@ -119,17 +119,23 @@
                         {% if assessment is not task %}
                             {% set selected = assessment.markvisibility %}
                             {% set allOptions = {
-                                0: '&#xe63e; Staff Only',
-                                1: '&#xe667; Staff and Students',
-                                2: '&#xe666; Staff, Students and their Parents'
+                                0: { icon: '&#xe63e;', description: 'Staff Only' },
+                                1: { icon: '&#xe667;', description: 'Staff and Students' },
+                                2: { icon: '&#xe666;', description: 'Staff, Students and their Parents' }
                             } %}
-                            <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
-                                {% for currentOption, label in allOptions %}
-                                    <option value="{{ currentOption }}"
-                                            {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
-                                            {% if currentOption == selected %}selected="selected"{% endif %}> {{ label|raw }} </option>
-                                {% endfor %}
-                            </select>
+
+                            {% if writable[assessment.id] %}
+                                <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
+                                    {% for currentOption, label in allOptions %}
+                                        <option value="{{ currentOption }}"
+                                                {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
+                                                {% if currentOption == selected %}selected="selected"{% endif %}> {{ (label['icon'] ~ ' ' ~ label['description'])|raw }} </option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <span style="font-family: schoolbox" title="{{ allOptions[selected].description }}">{{ allOptions[selected].icon | raw }}</span>
+                            {% endif %}
+
                         {% endif %}
                     </td>
                 {% endfor %}
