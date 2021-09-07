@@ -590,6 +590,7 @@ class Controller extends Base
                 ->setStatus(400)
                 ->asArray();
 
+            $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
         }
     }

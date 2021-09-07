@@ -115,31 +115,29 @@ export default {
 
             axios.request(request)
                 .then(response => {
-
-                    /* Everything went normally as intended
+                    /* Send bat signal to the parent component
                      */
-                    if (null === response.data) {
-                        /* Send bat signal to the parent component
-                         */
-                        this.$emit('withdraw-complete');
+                    this.$emit('withdraw-complete');
 
-                        /* Close this modal
-                         */
-                        self.close();
+                    /* Close this modal
+                     */
+                    self.close();
 
-                        /* Pop toast
-                         */
-                        self.toastSuccess('Withdraw complete');
-                    } else if (response.data.status !== undefined && 400 === response.data.status) {
-
-                        /* Goal prevents achievement from being withdrawn
-                         */
-                        self.toastError('Unable to withdraw achievement; a goal might exist and should be withdrawn first.');
-                    }
+                    /* Pop toast
+                     */
+                    self.toastSuccess('Withdraw complete');
                 })
                 .catch(error => {
                     if (error.response) {
-                        self.toastError('Unable to withdraw achievement; please try again.');
+                        if (400 === error.response.status) {
+                            /* Goal prevents achievement from being withdrawn
+                             */
+                            self.toastError('Unable to withdraw achievement; a goal might exist and should be withdrawn first.');
+                        } else {
+                            /* Generic error
+                             */
+                            self.toastError('Unable to withdraw achievement; please try again.');
+                        }
                     }
                 });
         }
