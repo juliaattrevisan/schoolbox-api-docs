@@ -128,6 +128,8 @@ class Payload
             'assessmentId' => $assessment->getId()
         ]);
 
+        $exitUrl = $domain . '/homepage/' . $assessment->getContext()->getFolder()->getId();
+
         /* Decide on a salt; I presume it should be derived from something unique to each
          * schoolbox instance, rather than a global salt; perhaps site_location or suchlike
          */
@@ -135,7 +137,15 @@ class Payload
 
         /* List of allowed urls
          */
-        $whitelistUrls = ["{$domain}/login", "{$startUrl}/", "{$domain}/assess/"];
+        $whitelistUrls = [
+            "{$domain}/login",
+            $startUrl,
+            "{$domain}/assess/",
+            "{$domain}/storage/fetch.php",
+            "{$domain}/storage/image.php",
+            "{$domain}/cms/sendVideo.php"
+        ];
+
         if ($this->config->get('saml_enabled')) {
             $urlSso          = parse_url(trim($this->config->get('saml_sso_url')));
             $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/";
@@ -147,6 +157,7 @@ class Payload
          */
         $tokens = [
             '{{ startUrl }}'    => $startUrl,
+            '{{ exitUrl }}'     => $exitUrl,
             '{{ examKeySalt }}' => $examKeySalt,
             '{{ whiteList }}'   => $this->generateWhiteList($whitelistUrls),
         ];

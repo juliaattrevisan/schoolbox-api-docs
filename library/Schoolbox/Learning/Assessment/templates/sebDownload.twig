@@ -11,30 +11,29 @@
 <div class="row">
     <div class="small-12 island">
         <section class="content">
-            <p class="content text-center">
+            <p class="text-center">
                 This activity has been configured so that students may only attempt it using the Safe Exam Browser.
                 Before starting, you must ensure you have the correct version of Safe Exam Browser installed on
                 your computer.
             </p>
-
-            <div class="row">
-                <div class="small-1 medium-2 columns">
-                    &nbsp;
-                </div>
-                <div class="small-10 medium-8 columns">
-                    <a href="https://safeexambrowser.org/download_en.html#Windows" class="full-width button">Download Safe Exam Browser for Windows</a>
-                    <a href="https://safeexambrowser.org/download_en.html#MacOSX" class="full-width button">Download Safe Exam Browser for MacOS</a>
-                    <a href="https://safeexambrowser.org/download_en.html#iOS" class="full-width button">Download Safe Exam Browser for iOS</a>
-                </div>
-                <div class="small-1 medium-2 columns">
-                    &nbsp;
-                </div>
-            </div>
+            <p class=" text-center">
+                <a href="https://github.com/SafeExamBrowser/seb-win-refactoring/releases/download/3.3.0/SEB_3.3.0.354_SetupBundle.exe"
+                   class="icon-download button">Download Safe Exam Browser for Windows</a>
+            </p>
+            <p class=" text-center">
+                <a href="https://github.com/SafeExamBrowser/seb-mac/releases/download/2.3.2/SafeExamBrowser-2.3.2.dmg"
+                   class="icon-download button">Download Safe Exam Browser for MacOS</a>
+            </p>
+            <p class=" text-center">
+                <a href="https://itunes.apple.com/app/safeexambrowser/id1155002964?mt=8"
+                   class="icon-download button">Download Safe Exam Browser for iOS</a>
+            </p>
         </section>
 
         <ul class="flex-list buttons">
             <li><a href="/homepage/{{ assessment.context.folder.id }}" class="button">Return to class</a></li>
-            <li><a href="{{ routeLookupIfAuthorized('learningAssessment.getSebConfig', {assessmentId: assessmentId}) }}" class="button submit">Launch Safe Exam Browser</a></li>
+            <li><a href="{{ routeLookupIfAuthorized('learningAssessment.getSebConfig', {assessment: assessment, assessmentId: assessmentId}) }}"
+                   class="button submit">Launch Safe Exam Browser</a></li>
         </ul>
     </div>
 </div>

@@ -52,7 +52,7 @@
         <li class="actions-small-1">
             <div class="list-item">
                 <div class="card attachment small-12">
-                    <a data-plugin="preview" href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="{{ currentFile.filename }}">
+                    <a data-plugin="preview" href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                         {% if currentFile.mimetype.image %}
                             <img src="/storage/image.php?hash={{ currentFile.hash }}&size=square64" alt="Download" />
                         {% else %}

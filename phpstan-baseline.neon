@@ -6211,11 +6211,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/ListController.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\ListController\\:\\:getDelegateController\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\Controller but returns Alaress\\\\Web\\\\Controller\\\\Base\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ListController.php

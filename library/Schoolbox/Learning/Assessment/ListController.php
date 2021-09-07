@@ -195,8 +195,6 @@ class ListController extends Web\Controller\Base
         /* Check whether SEB was required
          */
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
-            $this->getUser(),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_LMS_SEB_ENABLED) && $assessment->getSebEnabled(),
             $this->getRequest()->server->getArrayCopy(),
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
@@ -808,7 +806,7 @@ class ListController extends Web\Controller\Base
     public function getRelocatedContext(IAssessable $assessment, ?string $locationId): ?AssessmentContext
     {
         if (
-            $assessment && $locationId
+            $locationId
             && $assessment->isSpecification()
             && ($assessment->getContext()->getLocationId() !== $locationId)
         ) {

@@ -24,6 +24,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -278,12 +279,21 @@ class Controller extends Assessment\Controller
         /* Check if this assessment has a SEB requirement
          * If it does, send you to the download screen
          */
-        if (!$this->isSebCheckPasses($assessment)) {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getSebDownload', [
-                'assessmentId' => $assessment->getId()
-            ]));
+        $sebDownload = $this->getRouteIfAuthorized(
+            'learningAssessment.getSebDownload',
+            ['assessment' => $assessment,
+            'assessmentId' => $assessment->getId()]
+        );
 
+        if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
+            $this->getResponse()->redirect->to($sebDownload);
             return;
+        }
+
+        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
 
         $participant = $assessment->getParticipantIfExtant($student);
@@ -316,7 +326,7 @@ class Controller extends Assessment\Controller
             'assessment'  => $assessment,
             'student'     => $student,
             'participant' => $participant,
-
+            'returnUrl'   => $returnUrl,
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
             'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
             'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,

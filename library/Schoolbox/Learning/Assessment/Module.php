@@ -47,6 +47,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsSafeExamBrowserRequired;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -61,6 +62,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -131,9 +133,11 @@ class Module extends BaseModule
             )
         );
 
-        $canUseSeb = new Rule\All(
+        $mustUseSeb = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsConfigOn(ConfigMapper::NAME_LMS_SEB_ENABLED, $this->getConfig())
+            new Rule\HasRole(Role::STUDENT),
+            new Rule\IsConfigOn(ConfigMapper::NAME_LMS_SEB_ENABLED, $this->getConfig()),
+            new IsSafeExamBrowserRequired(),
         );
 
         // pluralise for REST
@@ -150,8 +154,8 @@ class Module extends BaseModule
 
         // register the routes
 
-        $this->register('GET', "$assRoute/seb", 'getSebDownload', $canUseSeb, $preloadAssessment);
-        $this->register('GET', "$assRoute/sebConfig", 'getSebConfig', $canUseSeb, $preloadAssessment);
+        $this->register('GET', "$assRoute/seb", 'getSebDownload', $mustUseSeb, $preloadAssessment);
+        $this->register('GET', "$assRoute/sebConfig", 'getSebConfig', $mustUseSeb, $preloadAssessment);
         $this->register('GET', "$assListRoute", 'getAssessmentsByContext', $isSuper, $preloadContext);
         $this->register('POST', "$assListRoute", 'postCreateAssessment', $canWrite, $preloadContext); // a || c
         $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments', $canWrite, $preloadContext); // a || c
