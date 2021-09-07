@@ -360,7 +360,7 @@ class Subnav
                     ],
                     '/adminv2/setting/Document%20Management' => [
                         'name'        => 'Document Management',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0,
+                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0 && $this->configLoader->get('external_type') === 'synergetic',
                         'children'    => [],
                         'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
