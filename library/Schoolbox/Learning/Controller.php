@@ -420,6 +420,7 @@ class Controller extends Base
             $this->getAuthorizer(),
             $this->getRouter(),
             $this->getConfigLoader()->get('pastoral_enabled'),
+            $this->getConfigLoader()->get('lms_enabled'),
             $this->getConfigLoader()->get('mail_enable'),
             $this->getSession()->get('mailhandle'),
             $this->rosettaStone
