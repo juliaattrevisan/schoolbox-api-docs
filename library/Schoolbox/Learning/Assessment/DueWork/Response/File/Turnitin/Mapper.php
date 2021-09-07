@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+
+
 /**
  * Transacts Turnitin models into the turnitin_report db table
  *
@@ -35,5 +38,27 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+
+    /**
+     * Save a stub record in the db so an async script can come along and process it
+     * if it doesn't already commence via the controller's detached function
+     *
+     * @param SubmissionFile $file
+     * @return array
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function saveStub(SubmissionFile $file): array
+    {
+        $now = \Alaress_Date_Format::now();
+
+        return $this->save($this->createModel()
+            ->setStatus(Model::STATUS_SETUP_PENDING)
+            ->setStudentSubmissionFileId($file->getId())
+            ->setCreatedAt($now)
+            ->setUpdatedAt($now));
     }
 }

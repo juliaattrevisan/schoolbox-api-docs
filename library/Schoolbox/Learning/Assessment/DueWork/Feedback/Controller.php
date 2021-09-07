@@ -315,9 +315,14 @@ class Controller extends Base
                             }
                         };
                     } elseif ($isTurnitin) {
+                        /* Set up a turnitin stub record
+                         * This allows it to be picked up and processed by an async script later
+                         * if it doesn't start processing via the $detachedFunction
+                         */
+                        $turnitinMapper = DueWork\Response\File\Turnitin\Mapper::getInstance();
+
                         foreach ($response->getAllFiles() as $currentFile) {
-                            /* TODO Turnitin api endpoint implementation
-                             */
+                            $turnitinMapper->saveStub($currentFile);
                         }
 
                         /* Set up detached function so turnitin can continue in the background

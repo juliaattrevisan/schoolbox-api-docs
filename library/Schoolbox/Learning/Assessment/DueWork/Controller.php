@@ -24,6 +24,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -1051,9 +1052,14 @@ class Controller extends Assessment\Controller
                     }
                 };
             } elseif ($isTurnitin) {
+                /* Set up a turnitin stub record
+                 * This allows it to be picked up and processed by an async script later
+                 * if it doesn't start processing via the $detachedFunction
+                 */
+                $turnitinMapper = Turnitin\Mapper::getInstance();
+
                 foreach ($response->getAllFiles() as $currentFile) {
-                    /* TODO Turnitin api endpoint implementation
-                     */
+                    $turnitinMapper->saveStub($currentFile);
                 }
 
                 /* Set up detached function so turnitin can continue in the background
