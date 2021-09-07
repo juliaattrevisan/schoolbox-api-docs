@@ -197,7 +197,7 @@ class StudentLists
         }
 
         // ePortfolio
-        if ($user->getEportfolioEnable()) {
+        if ($user->getEportfolioEnable() && $this->viewer->getRole()->getAccessEportfolio()) {
             $studentSisRecord['routes']['ePortfolio'] = [
                 'label' => 'ePortfolio',
                 'href'  => '/eportfolio/' . $user->getId() . '/profile',
