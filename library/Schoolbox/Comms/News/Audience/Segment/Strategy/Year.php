@@ -40,7 +40,6 @@ class Year extends SimpleStrategy
 //        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
-
     /**
      * @inheritdoc
      */
@@ -49,6 +48,7 @@ class Year extends SimpleStrategy
         if (parent::canAudienceToEntityType($user)) {
             return true;
         }
+
         return $this->getStaffCanPost() && $user->getRole()->isStaff();
     }
 
@@ -57,10 +57,18 @@ class Year extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "AND lu_year_level.name LIKE :{$searchPlaceholder}";
-
         // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         $entityType = self::getEntityType();
+
+        $keywordFilter = '';
+        if ($searchPlaceholder !== null) {
+            /**
+             * because the column values for years are typically stored as a number, we want to make it easy for users
+             * to search for either: "9" or "year 9" and get the same results
+             */
+            $keywordFilter = "AND (lu_year_level.name LIKE :{$searchPlaceholder} or concat('Year ', lu_year_level.name) LIKE :{$searchPlaceholder})";
+        }
+
         return "
             SELECT DISTINCT
               lu_year_level.name AS id,
@@ -74,7 +82,6 @@ class Year extends SimpleStrategy
             ORDER BY lu_year_level.sequence
         ";
     }
-
 
     /**
      * @inheritdoc
