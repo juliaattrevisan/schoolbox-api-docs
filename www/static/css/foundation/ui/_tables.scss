@@ -263,6 +263,11 @@ $rotate-span-width: 11rem;
   max-width: 3rem;
 }
 
+//prevent grades from wrapping over two lines
+#marksheet-styles .student-mean-grades {
+    white-space: nowrap;
+}
+
 // dataTables
 .island {
   table.dataTable.no-footer {
