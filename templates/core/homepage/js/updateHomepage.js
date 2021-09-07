@@ -6,7 +6,9 @@
 import { gsap, Draggable, Flip } from 'gsap/all';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
          isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
-import { submitNewComponentOrder } from './submitNewComponentOrder';
+import { getNewComponent } from './getNewComponent';
+import { saveComponentOrder } from './saveComponentOrder';
+import { slideDown, slideUp } from '@js/util/animateUtils';
          
 
 gsap.registerPlugin(Draggable, Flip);
@@ -19,7 +21,7 @@ const ANIMATE_SPEED = 0.3; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
-let __placeHolderComponentsList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
+let __placeHolderComponentsList = []; //to contain the place holder instances
 let __activeComponent; //the component that's currently being dragged/sorted around
 let __placeHolderComponent; //the element that subs in for the __activeComponent being sorted
 let __hasSortChange = false; //to know whether to update the DB with sort change
@@ -478,9 +480,9 @@ const removePlaceHolderComponents = () => {
  * Just snap back to where it now belongs
  */
 const onDragEnd = () => {
+    updateDraggablesStatus(false); //prevent quick reclicks on elements
     removePlaceHolderComponents();
     showExistingMasonryPlaceHolders();
-    updateDraggablesStatus(false); //prevent quick reclicks on elements
     snapBackActiveComponent();
 }
 
@@ -585,10 +587,14 @@ const onActiveComponentExpanded = async () => {
     
     updateSortableElements();
 
-    if (__hasSortChange) {
-        await submitNewComponentOrder(__activeComponent);
+    if (__hasSortChange && isNewComponent(__activeComponent)) {
+        await getNewComponent(__activeComponent);
+        __hasSortChange = false;
+    } else if (__hasSortChange && isNewComponent(__activeComponent)) {
+        await saveComponentOrder(__activeComponent);
         __hasSortChange = false;
     }
+
     updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
 
 }
@@ -601,6 +607,27 @@ export const init = () => {
     initDraggables();
     initListeners();
     initPlaceHolderComponents();
+
+
+    document.querySelectorAll('[data-target="delete"]').forEach((deleteButton) => {
+        deleteButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            const deletePanel = deleteButton.parentElement.parentElement.parentElement.parentElement.querySelector('[data-component-panel="delete"]');
+            if (deleteButton.getAttribute('data-state') === 'closed') {
+                deleteButton.setAttribute('data-state', 'opened');
+                slideDown(deletePanel, 0.5);
+                
+            } else {
+                deleteButton.setAttribute('data-state', 'closed');
+                slideUp(deletePanel, 0.5);
+                
+            }
+        })
+    });
+
+
+
 }
 
 document.addEventListener('DOMContentLoaded', init);
+

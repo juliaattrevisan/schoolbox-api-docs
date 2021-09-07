@@ -1,5 +1,5 @@
 /** 
- * Handles the majority of functionality on a Home page, including adding, sorting, and updating
+ * Save the new sorting order, as a component has been moved to a new spot
  *
  */
 
@@ -11,7 +11,7 @@ import { COMPONENT_SELECTOR } from './updateHomepage';
 /**
  * Submit the new component order to the DB
  */
-export const submitNewComponentOrder = async (activeComponent) => {
+export const saveComponentOrder = async (activeComponent) => {
     try {
         const response = await axios.post('/homepage/configForm.php', getNewComponentOrderFormData(activeComponent));
         if (response.data.hasComponentBeenDeleted) {
