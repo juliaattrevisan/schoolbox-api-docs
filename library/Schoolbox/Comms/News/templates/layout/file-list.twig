@@ -12,7 +12,6 @@
  #}
 {% if article.attachedFiles|length %}
 <div id="article-attachments">
-    <hr />
 
     {# Images are processed first into their own little lightbox gallery
      # Can probably split these attachedFiles further, but nobody's really sure
@@ -29,7 +28,6 @@
                 });
             });
         </script>
-
         <ul class="img-gallery" data-image-gallery="{{ identifier }}">
             {% for file in article.getImages %}
                 <li>
@@ -47,28 +45,28 @@
     {% if article.getFiles|length %}
         <script>
             $(function() {
-                $('[data-plugin="preview-{{ identifier }}"]').preview();
+                $('[data-plugin="preview"]').preview();
             });
         </script>
         <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
-            {% for file in article.getFiles %}
+            {% for currentFile in article.getFiles %}
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="card small-12">
-                            <a href="/storage/fetch.php?hash={{ file.hash }}&name={{ file.basename|url_encode }}" data-plugin="preview-{{ identifier }}" title="{{ file.filename }}">
-                                {% if file.mimetype.image %}
-                                    <img src="/storage/image.php?hash={{ file.hash }}&size=square64" alt="Download" />
+                        <div class="card attachment small-12">
+                            <a data-plugin="preview" href="/storage/fetch.php?hash={{ currentFile.hash }}&name={{ currentFile.basename|url_encode }}" title="{{ currentFile.filename }}">
+                                {% if currentFile.mimetype.image %}
+                                    <img src="/storage/image.php?hash={{ currentFile.hash }}&size=square64" alt="Download" />
                                 {% else %}
-                                    <img src="/ajax/mime/{{ file.mime }}" alt="Download" />
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
                                 {% endif %}
 
-                                <p>{{ file.filename }}</p>
-                                <p class="meta">{{ file.size|bytes }}</p>
+                                <p>{{ currentFile.filename }}</p>
+                                <p class="meta">{{ currentFile.size|bytes }}</p>
                             </a>
                         </div>
                     </div>
                     <nav>
-                        <a href="/storage/fetch.php?hash={{ file.hash }}&save=1&name={{ file.basename|url_encode }}" class="icon-download" title="Download"></a>
+                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1&name={{ currentFile.basename|url_encode }}" title="Download" class="icon-download"></a>
                     </nav>
                 </li>
             {% endfor %}

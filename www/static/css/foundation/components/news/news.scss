@@ -234,24 +234,21 @@
 
 /* News File List
  */
+.news-post {
+    #article-attachments {
+        /* Do a bit of acrobatics to make this padding sane
+         */
+        .img-gallery > li {
+            margin-top: 1rem;
+            margin-bottom: 0;
+        }
+    }
+}
+
 .article-files {
-  li {
-    border: 1px solid $body-bg;
-    &:only-child {
-      width: 100%;
-    }
-    .card {
-      padding: .5rem 0 .5rem .25rem;
-      p {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      img {
-        margin: 0 .5rem 0 0;
-      }
-    }
-  }
+    border-top: 1px solid $body-bg;
+    border-left: 1px solid $body-bg;
+    margin-top: 1rem;
 }
 
 /* News Homepage component specific
