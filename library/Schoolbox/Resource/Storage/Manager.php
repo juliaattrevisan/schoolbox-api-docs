@@ -266,16 +266,11 @@ class Manager
             return false;
         }
         try {
-            /** @var \League\Flysystem\Filesystem $fileSystemObj */
-            $fileSystemObj = $this->mountManager->getFilesystem($fileSystem);
-            /** @var \League\Flysystem\Adapter\Local $adapter */
-            $adapter = $fileSystemObj->getAdapter();
-            $fullPath = $adapter->getPathPrefix() . $path;
-            $unsafeContent = $fileSystemObj->read($path);
+            $unsafeContent = $this->mountManager->getFilesystem($fileSystem)->read($path);
         } catch (FileNotFoundException $e) {
             return false;
         }
-        $sanitizedContent = $this->sanitizer->sanitize($storage->getMime(), $unsafeContent, $fullPath);
+        $sanitizedContent = $this->sanitizer->sanitize($storage->getMime(), $unsafeContent);
         if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
             return false;
         }

@@ -37,7 +37,7 @@ $app = new class extends CliTool\App {
         $exifFiles     = $storageMapper->findByColumn('ext', ['jpg', 'tif']);
         /** @var Storage $exifFile */
         foreach ($exifFiles as $exifFile) {
-            $result = $mountManager->sanitize($exifFile, $mountManager::FS_STORAGE, $exifFile->getPath(), !$this->perform());
+            $result = $mountManager->sanitize($exifFile, $mountManager::FS_STORAGE, !$this->perform());
             if ($result) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $exifFile->getHash());
             } else {
