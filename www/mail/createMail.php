@@ -155,6 +155,11 @@ if (Config::get('mail_enable') == 1) {
     $zone->renderIntoSitePage($page, 'ATTACH_ZONE');
 
     $page->setVar($output);
+
+    $uri = (new \Schoolbox\Url\Factory($page->getDi()->get('config')->getInstance()))->buildFullyQualified();
+    $urlOrigin = array( 'URLORIGIN' => $uri );
+    $page->setVar($urlOrigin);
+
     $page->outputPage();
 } else {
     error(7);
