@@ -135,7 +135,9 @@ export default {
 
             if (this.hasEvents) { //won't be available if there's no events to display
                 this.$nextTick().then(() => { //pull out the built in date display
-                    this.$el.querySelector('[data-date]').style.display = 'none';
+                    if (this.$el.querySelector('[data-date]').getAttribute('data-date') === moment(new Date()).format('YYYY-MM-DD')) {
+                        this.$el.querySelector('[data-date]').style.display = 'none';
+                    }
                 });
             }
 
