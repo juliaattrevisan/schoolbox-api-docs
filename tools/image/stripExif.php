@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -20,6 +21,12 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
+        $policyEnabled = $this->getConfig()->get('remove_image_location_data');
+        if (!$policyEnabled) {
+            $this->getLogger()->warning('Remove Image Location Data is disabled.');
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         if ($this->perform()) {
             $this->getLogger()->info('Running in perform mode (-p): changes will be written to filesystem');
         } else {

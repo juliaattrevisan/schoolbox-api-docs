@@ -31,5 +31,5 @@ interface ISanitizer
      * @return string|null     Sanitized content, or null if this sanitizer does
      *                         not accept files of type `$mimetype`
      */
-    public function sanitize(string $mimetype, string $contents, ?string $path = null): ?string;
+    public function sanitize(string $mimetype, string $contents): ?string;
 }

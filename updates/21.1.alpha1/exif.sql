@@ -1,9 +1,9 @@
 INSERT INTO config(name, value, title, description, field_id, options, type_id, editable, hidden, required, module, sequence)
 VALUES (
-           'remove_image_exif',
+           'remove_image_location_data',
            0,
-           'Remove exif data from image',
-           'If set to ON, exif data will be removed from image on upload',
+           'Remove Image Location Data',
+           'If set to ON, image location data will be removed from images on upload',
            (SELECT id FROM lu_config_field WHERE field = 'boolean'),
            '',
            (SELECT id FROM lu_config_type WHERE `type` = 'Policy'),
