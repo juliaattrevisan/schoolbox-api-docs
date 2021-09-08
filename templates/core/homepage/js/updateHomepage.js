@@ -8,8 +8,9 @@ import { insertElementBefore, insertElementAfter, getClosestElement, isElementAb
          isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from './saveComponentOrder';
-import { initComponentPanels } from './initComponentPanels';
+import { initUpdateComponentSettings } from './updateComponentSettings';
 import { initDeleteComponent } from './deleteComponent';
+import { initCollapseComponent } from './collapseComponent';
          
 
 gsap.registerPlugin(Draggable, Flip);
@@ -609,10 +610,9 @@ export const init = () => {
     initListeners();
     initPlaceHolderComponents();
 
-    document.querySelectorAll('[data-component]').forEach((component) => {
-        initComponentPanels(component);
-        initDeleteComponent(component);
-    });
+    initUpdateComponentSettings();
+    initDeleteComponent();
+    initCollapseComponent();
 
 }
 

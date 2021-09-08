@@ -9,15 +9,15 @@ import { slideDown, slideUp } from '@js/util/animateUtils';
 
 /**
  * 
- * 
- * @param { DOMElement } 
  */
-export const initDeleteComponent = (component) => {
-    const deletePanel = component.querySelector('[data-component-panel="delete"]');
-    const deleteButton = component.querySelector('[data-target="delete"]');
-    initDeleteComponentButton(deletePanel, deleteButton);
-    initCancelDeleteComponentButton(component, deletePanel, deleteButton);
-    initConfirmDeleteComponent(component);
+export const initDeleteComponent = () => {
+    document.querySelectorAll('[data-component]').forEach((component) => {
+        const deletePanel = component.querySelector('[data-component-panel="delete"]');
+        const deleteButton = component.querySelector('[data-target="delete"]');
+        initDeleteComponentButton(deletePanel, deleteButton);
+        initCancelDeleteComponentButton(component, deletePanel, deleteButton);
+        initConfirmDeleteComponent(component);
+    });
 }
 
 /**
