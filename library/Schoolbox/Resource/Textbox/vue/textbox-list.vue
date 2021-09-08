@@ -245,8 +245,8 @@ export default {
          */
         syncEditorChangesToModel() {
             this.textboxes.forEach((usage, index) => {
-                let editor = this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'];
-                this.textboxes[index].textbox.body = editor.getData();
+                let editor = this.retrieveEditorForIndex(index);
+                this.textboxes[index].textbox.body = editor ? editor.getData() : '';
             });
         },
 
@@ -280,7 +280,25 @@ export default {
          */
         markAsDeleted(index) {
             this.$set(this.textboxes[index], 'deleted', true);
+
+            // Destroy the editor too
+            let editor = this.retrieveEditorForIndex(index);
+            if (editor) {
+                editor.destroy();
+            }
         },
+
+
+        /**
+         * Retrieves the CKEditor instance for this index.
+         *
+         * @param {Number} index The index to find the CKEditor for
+         * @returns {CKEDITOR.editor|null} The editor, or null if not found
+         */
+        retrieveEditorForIndex(index) {
+            return this.window?.CKEDITOR?.instances['textbox-' + String(index) + '-body'];
+        },
+
 
         /**
          * Asynchronously access an endpoint to delete a file from the appropriate place
