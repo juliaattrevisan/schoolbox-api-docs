@@ -5,6 +5,7 @@ import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 
 const EVENT_ADD_TEXTBOX = 'textbox-list-add';
+const EVENT_BEFORE_UNLOAD = 'beforeunload';
 
 export default {
     name: 'textbox-list',
@@ -86,12 +87,12 @@ export default {
         // Add event so that a new textbox may be added from outside of this
         // component
         this.window.addEventListener(EVENT_ADD_TEXTBOX, this.addTextbox);
-        this.window.addEventListener('beforeunload', this.onBeforeUnload);
+        this.window.addEventListener(EVENT_BEFORE_UNLOAD, this.onBeforeUnload);
     },
     destroyed() {
         // Remove the add textbox event
         this.window.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox)
-        this.window.removeEventListener('beforeunload', this.onBeforeUnload);
+        this.window.removeEventListener(EVENT_BEFORE_UNLOAD, this.onBeforeUnload);
     },
     updated() {
         this.setupValidation();
@@ -177,7 +178,7 @@ export default {
             Promise.all(requests)
                 .then(() => {
                     this.$refs.toast.timeout('Saved', true);
-                    this.window.removeEventListener('beforeunload', this.onBeforeUnload);
+                    this.window.removeEventListener(EVENT_BEFORE_UNLOAD, this.onBeforeUnload);
                     this.window.location.href = this.returnUrl;
                 })
                 .catch(() => {
@@ -313,7 +314,8 @@ export default {
         onBeforeUnload(event) {
             if (Object.values(window.CKEDITOR.instances).some(editor => editor.checkDirty())) {
                 event.preventDefault();
-                return 'Are you sure you wish to leave the page?'
+                event.returnValue = true;
+                return 'Are you sure you wish to leave the page?';
             }
         },
 
