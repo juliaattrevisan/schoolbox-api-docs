@@ -85,11 +85,13 @@ export default {
 
         // Add event so that a new textbox may be added from outside of this
         // component
-        this.window.document.addEventListener(EVENT_ADD_TEXTBOX, this.addTextbox);
+        this.window.addEventListener(EVENT_ADD_TEXTBOX, this.addTextbox);
+        this.window.addEventListener('beforeunload', this.onBeforeUnload);
     },
     destroyed() {
         // Remove the add textbox event
-        this.window.document.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox)
+        this.window.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox)
+        this.window.removeEventListener('beforeunload', this.onBeforeUnload);
     },
     updated() {
         this.setupValidation();
@@ -175,6 +177,7 @@ export default {
             Promise.all(requests)
                 .then(() => {
                     this.$refs.toast.timeout('Saved', true);
+                    this.window.removeEventListener('beforeunload', this.onBeforeUnload);
                     this.window.location.href = this.returnUrl;
                 })
                 .catch(() => {
@@ -296,7 +299,22 @@ export default {
          * @returns {CKEDITOR.editor|null} The editor, or null if not found
          */
         retrieveEditorForIndex(index) {
-            return this.window?.CKEDITOR?.instances['textbox-' + String(index) + '-body'];
+            return this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'] ?? null;
+        },
+
+
+        /**
+         * Before-unload function: if the user's changed a text box, show an
+         * alert box.
+         *
+         * @param {Event} event the browser event which triggered this
+         * @returns {string}
+         */
+        onBeforeUnload(event) {
+            if (Object.values(window.CKEDITOR.instances).some(editor => editor.checkDirty())) {
+                event.preventDefault();
+                return 'Are you sure you wish to leave the page?'
+            }
         },
 
 
