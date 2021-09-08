@@ -236,11 +236,31 @@ export default {
         </div><!-- v-if="isDataLoaded" -->
 
         <div v-else-if="hasDataLoadError">
-            <h2>Unable to load the list data</h2>
+            <div class="small-12 island">
+                <section class="content">
+                    <div data-alert class="alert-box alert">
+                        Sorry, we are currently unable to load this List data. Please contact Schoolbox Support it the problem persists. 
+                    </div>
+                </section>
+            </div>
         </div>
 
         <div v-else>
-            <h2>Loading please wait</h2>
+            <table class="skeleton">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
     </div>
