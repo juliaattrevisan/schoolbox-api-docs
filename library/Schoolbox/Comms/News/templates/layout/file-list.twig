@@ -45,7 +45,7 @@
     {% if article.getFiles|length %}
         <script>
             $(function() {
-                $('[data-plugin="preview"]').preview();
+                $('[data-plugin="preview-{{ identifier }}"]').preview();
             });
         </script>
         <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
@@ -53,7 +53,7 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card attachment small-12">
-                            <a data-plugin="preview" href="/storage/fetch.php?hash={{ currentFile.hash }}&name={{ currentFile.basename|url_encode }}" title="{{ currentFile.filename }}">
+                            <a data-plugin="preview-{{ identifier }}" href="/storage/fetch.php?hash={{ currentFile.hash }}&name={{ currentFile.basename|url_encode }}" title="{{ currentFile.filename }}">
                                 {% if currentFile.mimetype.image %}
                                     <img src="/storage/image.php?hash={{ currentFile.hash }}&size=square64" alt="Download" />
                                 {% else %}
