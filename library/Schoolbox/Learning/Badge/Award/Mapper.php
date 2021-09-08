@@ -436,6 +436,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param Badge\Model $badge
      * @param string      $status
      * @throws \PDOException
+     * @throws \RuntimeException
      */
     public function deleteMostRecentlyAwarded(array $userIds, Badge\Model $badge, string $status): void
     {
@@ -469,6 +470,17 @@ class Mapper extends \Schoolbox\Mapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         $awardIdsToDelete = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
+        /* If there aren't any records to delete, just leave; nothing to do
+         *
+         * It's not really supposed to happen, but it isn't catastrophic
+         * It occurs when you manipulate the timeline from the Goals or Achievements tabs
+         */
+        if (!\count($awardIdsToDelete)) {
+            /* A Goal might prevent you from withdrawing an Achievement, for example
+             */
+            throw new \RuntimeException('No badges to withdraw');
+        }
 
         /* Deleting awards using mapper, so that awarded notification will be retracted.
          */
@@ -511,7 +523,6 @@ class Mapper extends \Schoolbox\Mapper
                 'awarded_at' => 'desc'
             ]
         ]);
-
 
         /* Index histories by user id by initialising a new GenericCollection for each user
          *

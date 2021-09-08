@@ -115,7 +115,6 @@ export default {
 
             axios.request(request)
                 .then(response => {
-
                     /* Send bat signal to the parent component
                      */
                     this.$emit('withdraw-complete');
@@ -130,7 +129,15 @@ export default {
                 })
                 .catch(error => {
                     if (error.response) {
-                        self.toastError('Unable to withdraw achievement; please try again.');
+                        if (400 === error.response.status) {
+                            /* Goal prevents achievement from being withdrawn
+                             */
+                            self.toastError('Unable to withdraw achievement; a goal might exist and should be withdrawn first.');
+                        } else {
+                            /* Generic error
+                             */
+                            self.toastError('Unable to withdraw achievement; please try again.');
+                        }
                     }
                 });
         }
