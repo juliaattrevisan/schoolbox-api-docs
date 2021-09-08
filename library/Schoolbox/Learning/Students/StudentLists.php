@@ -180,26 +180,29 @@ class StudentLists
         $studentSisRecord['routes']                 = [];
         $studentSisRecord['classCodes']             = [];
 
-        // Upcoming assessments
-        $canViewUpcomingAssessments = $this->authorizer->isPathAuthorizedForUser('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()], $this->viewer);
-        if ($canViewUpcomingAssessments && $this->lmsIsEnabled) {
-            $studentSisRecord['routes']['dueWork'] = [
-                'label' => $this->rosettaStone->translate('dueWork', false, true),
-                'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
-                'class' => 'icon-due-work',
-                'title' => '',
-            ];
-        }
+        //Won't even try to check for upcoming assessments or grades, if LMS is disabled
+        if ($this->lmsIsEnabled) {
+            // Upcoming assessments
+            $canViewUpcomingAssessments = $this->authorizer->isPathAuthorizedForUser('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()], $this->viewer);
+            if ($canViewUpcomingAssessments) {
+                $studentSisRecord['routes']['dueWork'] = [
+                    'label' => $this->rosettaStone->translate('dueWork', false, true),
+                    'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
+                    'class' => 'icon-due-work',
+                    'title' => '',
+                ];
+            }
 
-        // Grades
-        $canViewGrades = $this->authorizer->isPathAuthorizedForUser('learningGrades.getGrades', ['userId' => $user->getId()], $this->viewer);
-        if ($canViewGrades && $this->lmsIsEnabled) {
-            $studentSisRecord['routes']['grades'] = [
-                'label' => $this->rosettaStone->translate('grades', true, true),
-                'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
-                'class' => 'icon-approve',
-                'title' => '',
-            ];
+            // Grades
+            $canViewGrades = $this->authorizer->isPathAuthorizedForUser('learningGrades.getGrades', ['userId' => $user->getId()], $this->viewer);
+            if ($canViewGrades) {
+                $studentSisRecord['routes']['grades'] = [
+                    'label' => $this->rosettaStone->translate('grades', true, true),
+                    'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
+                    'class' => 'icon-approve',
+                    'title' => '',
+                ];
+            }
         }
 
         // ePortfolio
