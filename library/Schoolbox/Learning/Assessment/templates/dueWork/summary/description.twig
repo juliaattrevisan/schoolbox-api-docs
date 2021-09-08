@@ -6,9 +6,6 @@ Data:
     assessment  IAssessable
     participant ?Participant - optional. If supplied override real assessment values
 #}
-
-
-
 <section>
     {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
     {% if description|length %}
@@ -26,17 +23,27 @@ Data:
         </article>
     {% endif %}
 
-    {# Attached files
-     #}
+    {# Attached files #}
     {% if assessment.attachedFiles|length %}
-        <ul class="information-list">
+        <script>
+            $(function() {
+                $('[data-plugin="preview"]').preview();
+            });
+        </script>
+        <ul class="grid small-block-grid-1 medium-block-grid-2">
             {% for currentFile in assessment.attachedFiles %}
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card attachment small-12">
                             <a data-plugin="preview" href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
-                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                {% if currentFile.mimetype.image %}
+                                    <img src="/storage/image.php?hash={{ currentFile.hash }}&size=square64" alt="Download" />
+                                {% else %}
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                {% endif %}
+
                                 <p>{{ currentFile.filename }}</p>
+                                <p class="meta">{{ currentFile.size|bytes }}</p>
                             </a>
                         </div>
                     </div>

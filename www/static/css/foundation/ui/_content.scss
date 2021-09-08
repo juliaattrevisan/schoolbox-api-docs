@@ -1125,6 +1125,9 @@ $selector-width: 2.25rem;
 
 // Block Grid
 .grid {
+    border-top: 1px solid $body-bg;
+    border-left: 1px solid $body-bg;
+
     > li {
         padding: 0 !important; // SORRY! foundation's selector is just too specific :'(
         border-right: 1px solid $body-bg;
