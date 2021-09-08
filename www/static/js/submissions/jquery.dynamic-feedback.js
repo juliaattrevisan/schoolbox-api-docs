@@ -178,16 +178,16 @@
             commentBox = document.querySelector('#' + commentBoxId);
             return '' === document.querySelector('#' + commentBoxId).value;
         }
-        
+
         /**
          * Set up actions to occur when Publishing Feedback
          */
         function setupPublishAction() {
 
             $(config.assessmentList).on('mousedown click', '[data-draft="publish"]', function (e) {
-                
+
                 e.preventDefault();
-                
+
                 var $participant = findParticipantElement($(this)),
                     participantId = $participant.data('participant'),
                     commentBoxId = "comment-" + participantId;
@@ -205,12 +205,12 @@
 
         /**
          * Publish the feedback
-         * 
+         *
          * @param selectedButton - with either be [data-draft="publish"] through 'this' or target directly when within the confirm empty comment modal
-         * 
+         *
          */
         function publishFeedback (selectedButton) {
-            
+
             var $participant = findParticipantElement($(selectedButton)),
                 $form = $participant.find('[data-feedback-form]'),
                 $actionBar = $participant.find('[data-action-bar]'),
@@ -218,7 +218,7 @@
                 $btnPublish = $actionBar.find('[data-draft=publish]'),
                 participantId = $participant.data('participant'),
                 commentBoxId = "comment-" + participantId;
-            
+
             // We can safely clear this timeout now that we're publishing
             window.clearTimeout(commentBoxTimeouts[commentBoxId]);
 
@@ -399,7 +399,7 @@
             };
 
             $actionBar.find('[data-draft]').attr('disabled', 'disabled');
-            $btnDrafted.text('Saving...');
+            $btnDrafted.text('Saving...').removeClass('alert');
 
             $(config.formSaveLabel).toastActivate({
                 text: 'Autosaving...'
@@ -430,7 +430,7 @@
                 })
                 .fail(function (xhr) {
                     $actionBar.show();
-                    $btnDrafted.show().text('Saving failed');
+                    $btnDrafted.show().text('Saving failed').addClass('alert');
                     $btnPublish.show();
                     toast.call($participant, xhr.responseText, false, false);
                 })
