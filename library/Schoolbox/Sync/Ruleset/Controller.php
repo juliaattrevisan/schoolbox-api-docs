@@ -62,7 +62,7 @@ class Controller extends Base
      * @return bool|string
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    function getBasePath()
+    public function getBasePath()
     {
         // cache
         return $this->basePath ?: $this->basePath = $this->getRouteIfAuthorized('upsRuleset.intro');
@@ -576,7 +576,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
 
-
     /**
      * Update a Rule's sequencing
      *
@@ -638,6 +637,13 @@ class Controller extends Base
 
                 // ensure this is in the right order
                 ksort($conditionArgs);
+
+                /**
+                 * if the user has not nominated a field, we're not even going to attempt saving/handling it
+                 */
+                if (empty($conditionArgs[0])) {
+                    continue;
+                }
 
                 // this is pretty hacky and not overly extensible...
                 if ($conditionType == 1 && count($conditionArgs) == 3) {
@@ -758,27 +764,25 @@ class Controller extends Base
                     unset($pairs[null]);
 
                     $arg[] = $pairs;
-                }
-                /* Force cast of boolean arg so it doesn't save in some
-                 * other data format.
-                 *
-                 * Sequential Dependency:
-                 * This has to take place after isMap() check because the
-                 * Mapped Key/Value Pairs can utilise a boolean field
-                 */
-                else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
+                } else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
+                    /* Force cast of boolean arg so it doesn't save in some
+                     * other data format.
+                     *
+                     * Sequential Dependency:
+                     * This has to take place after isMap() check because the
+                     * Mapped Key/Value Pairs can utilise a boolean field
+                     */
+
                     $arg = [(bool)$effectArgs[0]];
-                }
-                /*
-                 * Explode the collection type on comma
-                 */
-                elseif ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                } elseif ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                    /*
+                     * Explode the collection type on comma
+                     */
                     $xpl = explode(',', $effectArgs[0]);
                     $arg = [count($xpl) == 1 ? $xpl[0] : $xpl];
-                }
-                /* Otherwise just save it as given
-                 */
-                else {
+                } else {
+                    /* Otherwise just save it as given
+                     */
                     $arg = $effectArgs;
                 }
 
