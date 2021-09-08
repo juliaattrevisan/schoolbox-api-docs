@@ -8,7 +8,8 @@ import { insertElementBefore, insertElementAfter, getClosestElement, isElementAb
          isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from './saveComponentOrder';
-import { slideDown, slideUp } from '@js/util/animateUtils';
+import { initComponentPanels } from './initComponentPanels';
+import { initDeleteComponent } from './deleteComponent';
          
 
 gsap.registerPlugin(Draggable, Flip);
@@ -608,26 +609,24 @@ export const init = () => {
     initListeners();
     initPlaceHolderComponents();
 
-
-    document.querySelectorAll('[data-target="delete"]').forEach((deleteButton) => {
-        deleteButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            const deletePanel = deleteButton.parentElement.parentElement.parentElement.parentElement.querySelector('[data-component-panel="delete"]');
-            if (deleteButton.getAttribute('data-state') === 'closed') {
-                deleteButton.setAttribute('data-state', 'opened');
-                slideDown(deletePanel, 0.5);
-                
-            } else {
-                deleteButton.setAttribute('data-state', 'closed');
-                slideUp(deletePanel, 0.5);
-                
-            }
-        })
+    document.querySelectorAll('[data-component]').forEach((component) => {
+        initComponentPanels(component);
+        initDeleteComponent(component);
     });
-
-
 
 }
 
 document.addEventListener('DOMContentLoaded', init);
 
+
+
+/**
+ * To retrieve the component id
+ * 
+ * @param { DOMElement } 
+ * 
+ * @returns { String } 
+ */
+const getComponentID = (component) => {
+    return component.id.replace('component', ''); //strip the 'component' at the start to just get the id number
+}

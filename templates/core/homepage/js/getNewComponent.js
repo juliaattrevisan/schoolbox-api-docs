@@ -11,7 +11,7 @@ import axios from 'axios';
  */
 export const getNewComponent = async (activeComponent) => {
     try {
-        const response = await axios.post('/homepage/configForm.php', getNewComponentOrderFormData(activeComponent));
+        const response = await axios.post('/homepage/configForm.php', getNewComponentFormData(activeComponent));
         const newComponent = response.data;
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = newComponent;
@@ -32,7 +32,7 @@ export const getNewComponent = async (activeComponent) => {
  * 
  * @returns { FormData }  
  */
-const getNewComponentOrderFormData = (activeComponent) => {
+const getNewComponentFormData = (activeComponent) => {
     const formData = new FormData();
     formData.append('add', '51');
     formData.append('cid', document.getElementById('categoryID').value);
