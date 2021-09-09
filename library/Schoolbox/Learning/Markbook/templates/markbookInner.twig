@@ -81,12 +81,12 @@
                     Class Average
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
-                <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg">
+                <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
                         {{ weightedMean | default('–') }}
                 </th>
                 {% for assessment in markbook.assessments %}
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
-                    <th data-assessment="{{ assessment.id }}">
+                    <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
                         <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                             {{ stats.mean | default('–') }}
                         </span>
@@ -103,14 +103,14 @@
 
         <tbody>
             {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight', input: true} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject', input: true} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Mean', key: 'mean'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
-            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Weight', key: 'weight', input: true} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject', input: true} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Mean', key: 'mean'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Min', key: 'min'} %}
+            {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Max', key: 'max'} %}
             <tr class="sub-row">
                 <td>Visibility</td>
                 <td>&nbsp;</td>
@@ -119,17 +119,23 @@
                         {% if assessment is not task %}
                             {% set selected = assessment.markvisibility %}
                             {% set allOptions = {
-                                0: '&#xe63e; Staff Only',
-                                1: '&#xe667; Staff and Students',
-                                2: '&#xe666; Staff, Students and their Parents'
+                                0: { css: 'icon-locked', icon: '&#xe63e;', description: 'Staff Only' },
+                                1: { css: 'icon-staff-students', icon: '&#xe667;', description: 'Staff and Students' },
+                                2: { css: 'icon-staff', icon: '&#xe666;', description: 'Staff, Students and their Parents' }
                             } %}
-                            <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
-                                {% for currentOption, label in allOptions %}
-                                    <option value="{{ currentOption }}"
+
+                            {% if writable[assessment.id] %}
+                                <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
+                                    {% for currentOption, label in allOptions %}
+                                        <option value="{{ currentOption }}"
                                             {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
-                                            {% if currentOption == selected %}selected="selected"{% endif %}> {{ label|raw }} </option>
-                                {% endfor %}
-                            </select>
+                                            {% if currentOption == selected %}selected="selected"{% endif %}> {{ (label['icon'] ~ ' ' ~ label['description'])|raw }} </option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <span class="{{ allOptions[selected].css }}" title="{{ allOptions[selected].description }}"></span>
+                            {% endif %}
+
                         {% endif %}
                     </td>
                 {% endfor %}
@@ -157,7 +163,7 @@
                 {% set draftsOffClass      = studentMean is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
                 {% set draftsOnClass       = draftWeightedMean is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
 
-                <td class="{{ draftsOffClass }} student-mean-grades"
+                <td class="{{ draftsOffClass }} student-grade-cell"
                     {% if draftWeightedMean %}data-student-average{% endif %}
                     data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                     {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
@@ -176,7 +182,7 @@
 
                 {% for assessment in markbook.assessments %}
                     {% set participant = assessment.getParticipantIfExtant(student) %}
-                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
+                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %} student-grade-cell" data-assessment="{{ assessment.id }}">
                         {% if participant and not participant.isExcluded %}
                             {% if assessment is task %}
                                 {# An icon that shows if the student has attempted the task or not #}
