@@ -6,9 +6,10 @@
 
 import { gsap } from 'gsap/all';
 import BadgeImage from '../../vue/badge-image';
+import { getIndex } from '@js/util/domUtils';
 import HorizontalScroller from '@js/scroll/horizontalScroller';
 
-const BADGE_ANIMATE_DURATION = 0.3;
+const BADGE_ANIMATE_DURATION = 0.5;
 
 export default {
     
@@ -61,49 +62,34 @@ export default {
         },
 
         /**
-         * 
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
          *
          * @param {DOMElement} element - the element that's animating
-         *
          */
         onBeforeEnter (element) {
-            // element.style.position = 'absolute';
             gsap.set(element, { opacity: 0, y: 10 } );
         },
 
         /**
-         * how it element animates on
+         * how the element animates on
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
-         *
          */
         onEnter (element, done) {
-            gsap.to(element, { opacity: 1, y: 0, ease: 'power2.out', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
-        },
-
-        /**
-         * how it element animates on
-         *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
-         *
-         */
-        onAfterEnter (element, done) {
-            // element.style.position = 'static';
+            gsap.to(element, { opacity: 1, y: 0, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
         },
 
         /**
          * how the element animates off
          *
          * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
-         *
          */
-        onBeforeLeave (element, done) {
+        onBeforeLeave (element) {
+            const leftTarget = (element.getBoundingClientRect().width + 16) * getIndex(element);
             element.style.position = 'absolute';
+            element.style.left = `${leftTarget}px`;
         },
 
         /**
@@ -111,10 +97,9 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
-         *
          */
         onLeave (element, done) {
-            gsap.to(element, { opacity: 0, y: 10, ease: 'power2.in', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
+            gsap.to(element, { opacity: 0, y: 10, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
         },
 
         /**
@@ -122,7 +107,6 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
-         *
          */
         onAfterLeave (element) {
             element.style.position = 'static';
@@ -158,12 +142,11 @@ export default {
                             :css="false"
                             @before-enter="onBeforeEnter"
                             @enter="onEnter"
-                            @after-enter="onAfterEnter"
                             @before-leave="onBeforeLeave" 
                             @leave="onLeave" 
                             @after-leave="onAfterLeave" 
                         >      
-                            <li v-for="award in student.awards" :key="award.id" class="award" data-scroller-item>
+                            <li v-for="award in student.awards" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
                                 <a href="#open-award-modal" @click.prevent="awardSelected(award)" :title="award.badge.name">
                                     <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
                                     <span>{{ award.badge.name }}</span>
@@ -232,6 +215,8 @@ $rowHeight: 140px;
     margin: 0px auto;
     background: none;
     font-weight: bold;
+    font-size: 1.5rem;
+    color: #4f4f4f;
 }
 
 .scroller-flex-container {

@@ -5,9 +5,9 @@
  */
 
 
-import { gsap, Draggable, InertiaPlugin, CSSPlugin } from 'gsap/all';
+import { gsap, Draggable, InertiaPlugin } from 'gsap/all';
 
-gsap.registerPlugin(Draggable, InertiaPlugin, CSSPlugin);
+gsap.registerPlugin(Draggable, InertiaPlugin);
 
 const SCROLL_PADDING = 10;
 const MIN_SCROLL_BAR_WIDTH = 100;
