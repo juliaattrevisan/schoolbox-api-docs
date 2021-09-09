@@ -53,4 +53,12 @@ class Completion extends AbstractMarkScheme
         }
         return self::NORMALISED_MARK_MAX;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function formatMark(?string $humanReadableMark): ?string
+    {
+        return null;
+    }
 }

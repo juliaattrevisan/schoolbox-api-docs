@@ -42,4 +42,12 @@ class None extends AbstractMarkScheme
     {
         return null;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function formatMark(?string $humanReadableMark): ?string
+    {
+        return null;
+    }
 }

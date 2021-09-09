@@ -67,6 +67,14 @@ class Percentage extends AbstractMarkScheme
     }
 
     /**
+     * @inheritdoc
+     */
+    public function formatMark(?string $humanReadableMark): ?string
+    {
+        return "$humanReadableMark %";
+    }
+
+    /**
      * @inheritDoc
      */
     public function getValueForJS($mark, ?float $maxValue, ?float $rowMaxSum)

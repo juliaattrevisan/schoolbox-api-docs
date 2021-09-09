@@ -129,6 +129,14 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
         return $floatVal;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function formatMark(?string $humanReadableMark): ?string
+    {
+        $denominator = round($this->deriveDenominator() / $this->getGranularityDenominator()) * $this->getGranularityDenominator();
+        return "$humanReadableMark / $denominator";
+    }
 
     /* Getters / Setters
      */

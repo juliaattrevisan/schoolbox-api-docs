@@ -89,6 +89,14 @@ class LetterGrade extends AbstractMarkScheme
         throw new InvalidArgumentException("No GradeLevel found. GradeGroup: $gradeGroup, GradeLevel: '.$humanReadableMark");
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function formatMark(?string $humanReadableMark): ?string
+    {
+        return $humanReadableMark;
+    }
+
     /* Getters / Setters
      */
 
