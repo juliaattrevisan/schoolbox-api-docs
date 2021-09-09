@@ -5,6 +5,7 @@ import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 
 const EVENT_ADD_TEXTBOX = 'textbox-list-add';
+const EVENT_BEFORE_UNLOAD = 'beforeunload';
 
 export default {
     name: 'textbox-list',
@@ -85,11 +86,13 @@ export default {
 
         // Add event so that a new textbox may be added from outside of this
         // component
-        this.window.document.addEventListener(EVENT_ADD_TEXTBOX, this.addTextbox);
+        this.window.addEventListener(EVENT_ADD_TEXTBOX, this.addTextbox);
+        this.window.addEventListener(EVENT_BEFORE_UNLOAD, this.onBeforeUnload);
     },
     destroyed() {
         // Remove the add textbox event
-        this.window.document.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox)
+        this.window.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox)
+        this.window.removeEventListener(EVENT_BEFORE_UNLOAD, this.onBeforeUnload);
     },
     updated() {
         this.setupValidation();
@@ -102,13 +105,24 @@ export default {
          */
         addTextbox() {
             this.textboxes.push({
+                // The textbox's field values
                 textbox: {
+                    // It is not yet saved, so it has no ID
                     id: null,
                     heading: '',
                     body: '',
                 },
+
+                // Folders and dashboards the textbox is actually in use on:
+                // as this is a new textbox, it's not in use yet
                 folders: [],
                 dashboards: [],
+
+                // This textbox isn't deleted, because it's not yet saved
+                deleted: false,
+
+                // This textbox is dirty, because it's not yet saved
+                dirty: true,
             });
 
             // Focus the new textbox's heading input immediately
@@ -154,7 +168,7 @@ export default {
 
             // Create a new set of textbox data to post
             this.syncEditorChangesToModel();
-            this.textboxes.forEach(usage => {
+            this.textboxes.forEach((usage, index) => {
                 let textbox = usage.textbox,
                     deleted = usage.deleted ?? false;
                 // If this textbox is marked as deleted, ignore it:
@@ -165,9 +179,17 @@ export default {
                     // If it doesn't it's new, so create it: otherwise update.
                     let updateEndpoint = textbox?._links?.update;
                     if (updateEndpoint) {
-                        requests.push(axios.put(updateEndpoint, textbox));
+                        requests.push(
+                            axios
+                                .put(updateEndpoint, textbox)
+                                .then(() => this.markAsClean(index))
+                        );
                     } else {
-                        requests.push(axios.post(this.createTextboxEndpoint, textbox));
+                        requests.push(
+                            axios
+                                .post(this.createTextboxEndpoint, textbox)
+                                .then(() => this.markAsClean(index))
+                        );
                     }
                 }
             });
@@ -215,11 +237,19 @@ export default {
          * already have them.
          */
         setupEditors() {
-            let $form = jQuery(this.$refs.form);
+            let $form = jQuery(this.$refs.form),
+                self  = this;
             $form.find('textarea').each(function () {
                 if (!(this.id in window.CKEDITOR.instances)) {
                     jQuery.fn.alaressEditor({
-                        targetElements: $(this)
+                        targetElements: $(this),
+                        change: () => {
+                            // When this editor's content changes, mark it as dirty
+                            let index = self.retrieveIndexForEditorId(this.id);
+                            if (index !== null) {
+                                self.markAsDirty(index);
+                            }
+                        }
                     });
                 }
             });
@@ -245,8 +275,8 @@ export default {
          */
         syncEditorChangesToModel() {
             this.textboxes.forEach((usage, index) => {
-                let editor = this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'];
-                this.textboxes[index].textbox.body = editor.getData();
+                let editor = this.retrieveEditorForIndex(index);
+                this.textboxes[index].textbox.body = editor ? editor.getData() : '';
             });
         },
 
@@ -271,6 +301,27 @@ export default {
         },
 
         /**
+         * Marks a textbox as dirty (either its heading or body has changed).
+         *
+         * If any textbox is dirty, then a warning will be raised when
+         * navigating away from the page.
+         *
+         * @param {Number} index The index to mark as dirty in `this.textboxes`
+         */
+        markAsDirty(index) {
+            this.$set(this.textboxes[index], 'dirty', true);
+        },
+
+        /**
+         * Marks a textbox as clean (its heading and body have been persisted).
+         *
+         * @param {Number} index The index to mark as clean in `this.textboxes`
+         */
+        markAsClean(index) {
+            this.$set(this.textboxes[index], 'dirty', false);
+        },
+
+        /**
          * Marks a textbox as deleted.
          *
          * Currently this only hides the textbox from view, it does not remove
@@ -280,6 +331,53 @@ export default {
          */
         markAsDeleted(index) {
             this.$set(this.textboxes[index], 'deleted', true);
+
+            // This textbox's state has been persisted, thus it is not dirty
+            this.markAsClean(index);
+
+            // Destroy the editor too
+            let editor = this.retrieveEditorForIndex(index);
+            if (editor) {
+                editor.destroy();
+            }
+        },
+
+        /**
+         * Retrieves the CKEditor instance for this index.
+         *
+         * @param {Number} index The index to find the CKEditor for
+         * @returns {CKEDITOR.editor|null} The editor, or null if not found
+         */
+        retrieveEditorForIndex(index) {
+            return this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'] ?? null;
+        },
+
+        /**
+         * Retrieves the index from this CKEditor instance ID.
+         *
+         * @param {String} editorId The CKEditor instance's ID
+         * @returns {Number|null} The index, or null if not found
+         */
+        retrieveIndexForEditorId(editorId) {
+            let match = editorId.match(/^textbox-(\d+)-body$/);
+            if (match) {
+                return Number(match[1]);
+            }
+            return null;
+        },
+
+        /**
+         * Before-unload function: if any textbox is dirty, show an alert box.
+         *
+         * @param {Event} event the browser event which triggered this
+         * @returns {string}
+         */
+        onBeforeUnload(event) {
+            if (this.textboxes.some(textbox => textbox.dirty ?? false)) {
+                event.preventDefault();
+                event.returnValue = true;
+                return 'Are you sure you wish to leave the page?';
+            }
         },
 
         /**
@@ -361,7 +459,10 @@ export default {
                                     <div class="small-12 column">
                                         <label>
                                             <span class="hide-for-medium-up">Textbox</span>
-                                            <input :name="'textbox[' + String(index) + '][heading]'" type="text" v-model="usage.textbox.heading">
+                                            <input :name="'textbox[' + String(index) + '][heading]'"
+                                                   type="text"
+                                                   v-model="usage.textbox.heading"
+                                                   @change="markAsDirty(index)" />
                                         </label>
 
                                         <p class="meta" v-if="usage.folders.length > 0">
