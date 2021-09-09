@@ -48,6 +48,8 @@ class Controller extends Base
     /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
+    private Filter\Mapper $filterMapper;
+
     private Filter\Page\Mapper $filterPageMapper;
 
     private Filter\Selection\Mapper $filterSelectionMapper;
@@ -67,6 +69,7 @@ class Controller extends Base
         Access $access,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Filter\IFactoryFactory $filterFactoryFactory,
+        Filter\Mapper $filterMapper,
         Filter\Page\Mapper $filterPageMapper,
         Filter\Selection\Mapper $filterSelectionMapper
     ) {
@@ -75,6 +78,7 @@ class Controller extends Base
         $this->access                = $access;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterFactoryFactory  = $filterFactoryFactory;
+        $this->filterMapper          = $filterMapper;
         $this->filterPageMapper      = $filterPageMapper;
         $this->filterSelectionMapper = $filterSelectionMapper;
     }
@@ -113,14 +117,18 @@ class Controller extends Base
         );
 
         // check whether any default filters are selected for terms
+        $termFilter = $this->filterMapper->findOneByColumnList(
+            [
+                'entity' => AssessmentMapper::class,
+                'class'  => Filter\Filters\Assessment\Term\Due\Definition::class,
+            ]
+        );
         $filterPages   = $this->filterPageMapper->findForPageAndEntity($page, AssessmentMapper::class);
         $defaultExists = false;
         foreach ($filterPages as $filterPage) {
             if ($filterPage->getFilter()->getClass() !== Filter\Filters\Assessment\Term\Due\Definition::class) {
                 continue;
             }
-            $termFilter = $filterPage->getFilter();
-
             foreach ($filterPage->getOptions() as $option) {
                 /** @var Filter\Page\Option\Defaults\Model|null $default */
                 $default = $option->getDefaults()->offsetGet($this->getUser()->getRole()->getType());
@@ -136,7 +144,6 @@ class Controller extends Base
         // if there's no effective filters and this is not an archived class, filter by current term
         if (
             !$folder->wasClass()
-            && isset($termFilter)
             && $savedFilter->count() === 0
             && !$defaultExists
             && !isset($queryArgs[$termFilter->getId()])
