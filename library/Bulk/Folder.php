@@ -18,6 +18,7 @@ use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\YearLevel;
 
@@ -69,6 +70,9 @@ class Bulk_Folder
     /** @var StorageMapper */
     private $storageMapper;
 
+    /** @var FileMapper */
+    private $fileMapper;
+
     /**
      * Constructor
      *
@@ -94,6 +98,7 @@ class Bulk_Folder
         $this->homepageConfigMapper = HomepageConfigMapper::getInstance();
         $this->yearLevelMapper      = YearLevel\Mapper::getInstance();
         $this->storageMapper        = StorageMapper::getInstance();
+        $this->fileMapper           = FileMapper::getInstance();
     }
 
 
@@ -227,16 +232,16 @@ class Bulk_Folder
 
             $file = null;
             try {
-                if (preg_match_all('#/(send|image)\.php\?id=(\d+)#', $folderImageHash, $matches) || preg_match('/^[0-9]+$/', $folderImageHash, $matches)) {
+                if (preg_match_all('#/(send|image)\.php\?*id=(\d+)#', $folderImageHash, $matches) || preg_match('/^[0-9]+$/', $folderImageHash, $matches)) {
                     // if it was send or cms/image, or a straight numeric this could be an id, we need a filemapper instance
                     // $file load by ID
                     // do basic error checking and exit early
-                    $file = \Schoolbox\Resource\File\Mapper::getInstance()->findById(end($matches));
-                } elseif (preg_match_all('#(image|fetch)\.php\?hash=([a-zA-Z0-9]+)#', $folderImageHash, $matches) || preg_match('/^[0-9a-zA-Z]+$/', $folderImageHash, $matches)) {
+                    $file = $this->fileMapper->findById(end($matches));
+                } elseif (preg_match_all('#(image|fetch)\.php\?*hash=([a-zA-Z0-9]+)#', $folderImageHash, $matches) || preg_match('/^[0-9a-zA-Z]+$/', $folderImageHash, $matches)) {
                     // if it was storage/(image/fetch), or a straight alphanumeric (this could be a hash), we need a StorageMapper instance
                     // $file = load by hash
                     // do basic error checking and exit early
-                    $file = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash(end($matches));
+                    $file = $this->storageMapper->findByHash(end($matches));
                 } else {
                     // exit early: set the $warning[] string and continue creating the folder
                     // (the format was not correct, and we couldn't get the file identifier)
@@ -256,7 +261,7 @@ class Bulk_Folder
                 if ($file->getMimetype()->isImage()) {
                     $newFolder->setCoverImage($file);
                 } else {
-                    $warnings[] = "File {$folderImageHash} is not an Image";
+                    $warnings[] = "File {$folderImageHash} is not an image";
                 }
             }
 
