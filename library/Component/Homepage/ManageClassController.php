@@ -118,9 +118,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             && ($isGroupPage || $isClassPage || $wasClassPage)
             && $this->getConfigLoader()->get('class_markbook_enable')
         ) {
-            $classMarkbookLink = $this->buildMarkbookLink($wasClassPage, $currentTerm);
+            $classMarkbookLink = $this->buildMarkbookLink();
             if ($classMarkbookLink) {
-                $this->setVar('MARKBOOK_LINK', $this->buildMarkbookLink($wasClassPage, $currentTerm));
+                $this->setVar('MARKBOOK_LINK', $classMarkbookLink);
                 $this->parse('markbook_link_block', 'markbook_link');
                 $hasClassActions = true;
             }
@@ -284,29 +284,18 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * Build a link to the markbook, if this controller's user has permission to
      * view it.
      *
-     * @param bool       $wasClassPage If the homepage was a class, don't filter
-     *                                 markbook by term, else filter to just the
-     *                                 current term.
-     * @param Term\Model $currentTerm
      * @return string|null
      * @throws RuntimeException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function buildMarkbookLink(bool $wasClassPage, Term\Model $currentTerm): ?string
+    private function buildMarkbookLink(): ?string
     {
         $classArg = [
             'folder'   => $this->getContext(),
             'folderId' => $this->getContext()->getId(),
         ];
-        if ($wasClassPage) {
-            $route = 'learningMarkbook.getMarkbookForClass';
-        } else {
-            $route                = 'learningMarkbook.getMarkbookForClassAndTerm';
-            $classArg['term']     = $currentTerm;
-            $classArg['termCode'] = $currentTerm->getCode();
-        }
-
+        $route = 'learningMarkbook.getMarkbookForClass';
         if (!$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())) {
             return null;
         }

@@ -97,6 +97,8 @@ class Module extends BaseModule
                 'access'                => $this->getMapperFactory()->getLazy(Access::class),
                 'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
                 'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
+                'filterPageMapper'      => $this->getMapperFactory()->getLazy(\Schoolbox\Filter\Page\Mapper::class),
+                'filterSelectionMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Filter\Selection\Mapper::class),
             ])
         );
     }
