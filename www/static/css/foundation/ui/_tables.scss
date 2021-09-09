@@ -264,7 +264,7 @@ $rotate-span-width: 11rem;
 }
 
 //prevent grades from wrapping over two lines
-#marksheet-styles .student-mean-grades {
+.marksheet .student-mean-grades {
     white-space: nowrap;
 }
 

@@ -81,12 +81,12 @@
                     Class Average
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
-                <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg">
+                <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-mean-grades">
                         {{ weightedMean | default('–') }}
                 </th>
                 {% for assessment in markbook.assessments %}
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
-                    <th data-assessment="{{ assessment.id }}">
+                    <th data-assessment="{{ assessment.id }}" class="student-mean-grades">
                         <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                             {{ stats.mean | default('–') }}
                         </span>
@@ -119,21 +119,21 @@
                         {% if assessment is not task %}
                             {% set selected = assessment.markvisibility %}
                             {% set allOptions = {
-                                0: { icon: '&#xe63e;', description: 'Staff Only' },
-                                1: { icon: '&#xe667;', description: 'Staff and Students' },
-                                2: { icon: '&#xe666;', description: 'Staff, Students and their Parents' }
+                                0: { css: 'icon-locked', icon: '&#xe63e;', description: 'Staff Only' },
+                                1: { css: 'icon-staff-students', icon: '&#xe667;', description: 'Staff and Students' },
+                                2: { css: 'icon-staff', icon: '&#xe666;', description: 'Staff, Students and their Parents' }
                             } %}
 
                             {% if writable[assessment.id] %}
                                 <select name="visibility" data-assessment="{{ assessment.id }}" data-visibility>
                                     {% for currentOption, label in allOptions %}
                                         <option value="{{ currentOption }}"
-                                                {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
-                                                {% if currentOption == selected %}selected="selected"{% endif %}> {{ (label['icon'] ~ ' ' ~ label['description'])|raw }} </option>
+                                            {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
+                                            {% if currentOption == selected %}selected="selected"{% endif %}> {{ (label['icon'] ~ ' ' ~ label['description'])|raw }} </option>
                                     {% endfor %}
                                 </select>
                             {% else %}
-                                <span style="font-family: schoolbox" title="{{ allOptions[selected].description }}">{{ allOptions[selected].icon | raw }}</span>
+                                <span class="{{ allOptions[selected].css }}" title="{{ allOptions[selected].description }}"></span>
                             {% endif %}
 
                         {% endif %}
