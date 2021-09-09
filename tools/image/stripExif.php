@@ -14,19 +14,14 @@ use Schoolbox\Resource\Storage\Model as Storage;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * This tool is to strip exif data
+ * This tool is to strip location data from exif to protect peoples privacy
+ * Use the -p option to commit the changes to disk
  */
 $app = new class extends CliTool\App {
     /* @var array */
 
     public function run(): void
     {
-        $policyEnabled = $this->getConfig()->get('remove_image_location_data');
-        if (!$policyEnabled) {
-            $this->getLogger()->warning('Remove Image Location Data is disabled.');
-            exit(CliKernelAbstract::EXIT_STATUS_OK);
-        }
-
         if ($this->perform()) {
             $this->getLogger()->info('Running in perform mode (-p): changes will be written to filesystem');
         } else {
@@ -34,10 +29,10 @@ $app = new class extends CliTool\App {
         }
         $storageMapper = new StorageMapper();
         $mountManager  = $storageMapper->getManager();
-        $exifFiles     = $storageMapper->findByColumn('ext', ['jpg', 'tif']);
+        $exifFiles     = $storageMapper->findByColumn('ext', ['jpg','jpeg','jpe','tif','tiff']);
         /** @var Storage $exifFile */
         foreach ($exifFiles as $exifFile) {
-            $result = $mountManager->sanitize($exifFile, $mountManager::FS_STORAGE, !$this->perform());
+            $result = $mountManager->sanitize($exifFile, $mountManager::FS_STORAGE, $exifFile->getPath(), !$this->perform());
             if ($result) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $exifFile->getHash());
             } else {
