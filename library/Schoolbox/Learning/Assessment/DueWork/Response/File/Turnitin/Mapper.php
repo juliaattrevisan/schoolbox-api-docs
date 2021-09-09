@@ -54,7 +54,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* Invalid file? Do nothing, exit early
          */
-        if (!(new ValidFile())->isSatisifiedBy($file)) {
+        if (!(new ValidFile())->isSatisfiedBy($file)) {
             return [];
         }
 

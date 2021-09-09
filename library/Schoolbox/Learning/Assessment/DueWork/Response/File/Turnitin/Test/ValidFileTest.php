@@ -34,7 +34,7 @@ class ValidFileTest extends TestCase
      */
     public function testValidExample(SubmissionFile $file, bool $expected): void
     {
-        $this->assertEquals($expected, (new ValidFile())->isSatisifiedBy($file));
+        $this->assertEquals($expected, (new ValidFile())->isSatisfiedBy($file));
     }
 
 

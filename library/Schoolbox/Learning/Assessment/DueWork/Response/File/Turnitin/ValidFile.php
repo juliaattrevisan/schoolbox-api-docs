@@ -78,7 +78,7 @@ class ValidFile
      * @param SubmissionFile $file
      * @return bool
      */
-    public function isSatisifiedBy(SubmissionFile $file): bool
+    public function isSatisfiedBy(SubmissionFile $file): bool
     {
         /* Must be one of the allowed filetypes; reject immediately if not allowed
          */
