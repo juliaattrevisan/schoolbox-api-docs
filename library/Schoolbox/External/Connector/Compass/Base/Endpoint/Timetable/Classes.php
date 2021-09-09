@@ -501,7 +501,7 @@ class Classes implements IStrategy
                                     'name' => $activityIdentifier
                                 ],
                                 'room' => [
-                                    'name' => ''
+                                    'name' => $activity['room'],
                                 ],
                                 'teachers' => array_map(
                                     [$this, 'loadIntoExternalIdStruct'],
