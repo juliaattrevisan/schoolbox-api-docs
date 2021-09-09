@@ -81,12 +81,12 @@
                     Class Average
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
-                <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-mean-grades">
+                <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
                         {{ weightedMean | default('–') }}
                 </th>
                 {% for assessment in markbook.assessments %}
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
-                    <th data-assessment="{{ assessment.id }}" class="student-mean-grades">
+                    <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
                         <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
                             {{ stats.mean | default('–') }}
                         </span>
@@ -163,7 +163,7 @@
                 {% set draftsOffClass      = studentMean is null ? 'gradient-off-bg' : urgency.marks(meanNormalised) ~ '-bg' %}
                 {% set draftsOnClass       = draftWeightedMean is null ? 'gradient-off-bg' : urgency.marks(meanDraftNormalised) ~ '-bg' %}
 
-                <td class="{{ draftsOffClass }} student-mean-grades"
+                <td class="{{ draftsOffClass }} student-grade-cell"
                     {% if draftWeightedMean %}data-student-average{% endif %}
                     data-off-class="{{ draftsOffClass }}" data-on-class="{{ draftsOnClass }}">
                     {% set gradesRoute = routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) %}
@@ -182,7 +182,7 @@
 
                 {% for assessment in markbook.assessments %}
                     {% set participant = assessment.getParticipantIfExtant(student) %}
-                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
+                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %} student-grade-cell" data-assessment="{{ assessment.id }}">
                         {% if participant and not participant.isExcluded %}
                             {% if assessment is task %}
                                 {# An icon that shows if the student has attempted the task or not #}
