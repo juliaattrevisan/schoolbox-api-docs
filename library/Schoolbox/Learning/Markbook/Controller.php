@@ -328,6 +328,9 @@ class Controller extends Base
     /**
      * Stream a filtered markbook for a folder in CSV format
      *
+     * @api   GET /learning/markbook/class/:folderId/export?{filterQueryArgs}
+     * @since 20.1
+     *
      * @param FolderModel $folder
      *
      * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
@@ -335,10 +338,7 @@ class Controller extends Base
      * @throws \InvalidArgumentException             If any filter keys not recognised
      * @throws \ReflectionException                  If a specified filter class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws MapperException           If an alias is incorrect
-     *@since 20.1
-     *
-     * @api   GET /learning/markbook/class/:folderId/export?{filterQueryArgs}
+     * @throws MapperException                       If an alias is incorrect
      */
     public function getMarkbookExportForClass(FolderModel $folder): void
     {
