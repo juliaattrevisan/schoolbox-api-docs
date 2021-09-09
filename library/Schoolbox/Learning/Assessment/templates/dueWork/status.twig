@@ -253,7 +253,7 @@
                 {% endif %}
                 {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
                 {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
-                <span class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}">{{ draftSaveHtml }}</span>
+                <button class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}">{{ draftSaveHtml }}</button>
                 {% if not readonly %}
                     <a  class="button"
                         data-draft="publish"

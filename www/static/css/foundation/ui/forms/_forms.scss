@@ -1000,3 +1000,13 @@ input.invalid-data:focus {
         }
     }
 }
+
+/**
+ * when you have an action bar that includes state tracking, this is
+ * the correct way to indicate a failure.
+ */
+#assessment-status .component-action .saving-error {
+    background-color: $alert-color;
+    color: #fff;
+    opacity: 1;
+}
