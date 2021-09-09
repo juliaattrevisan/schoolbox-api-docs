@@ -89,17 +89,17 @@ class Model implements ISoftDeletable
      * our overall workflow since there are numerous api endpoints where
      * Turnitin might die
      *
-     * @var string
+     * @var string|null
      */
-    private string $errorCode;
+    private ?string $errorCode = null;
 
 
     /**
      * A verbose description of what went wrong
      *
-     * @var string
+     * @var string|null
      */
-    private string $errorMessage;
+    private ?string $errorMessage = null;
 
 
     /**
@@ -113,18 +113,18 @@ class Model implements ISoftDeletable
      * A 36-char string that Turnitin uses internally to identify one of their submissions
      * It's like a guid: e.g. b5cf0e76-c1c7-11e8-a355-529269fb1459
      *
-     * @var string
+     * @var string|null
      */
-    private string $turnitinSubmissionId;
+    private ?string $turnitinSubmissionId = null;
 
 
     /**
      * When Turnitin finishes generating its Similarity Report we can remember the answer
      * so we can display it liberally throughout the app without querying Turnitin
      *
-     * @var float
+     * @var float|null
      */
-    private float $overallMatchPercentage;
+    private ?float $overallMatchPercentage = null;
 
 
     /**
@@ -148,9 +148,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getErrorCode(): string
+    public function getErrorCode(): ?string
     {
         return $this->errorCode;
     }
@@ -168,9 +168,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getErrorMessage(): string
+    public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
     }
@@ -208,9 +208,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTurnitinSubmissionId(): string
+    public function getTurnitinSubmissionId(): ?string
     {
         return $this->turnitinSubmissionId;
     }
@@ -228,9 +228,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getOverallMatchPercentage(): float
+    public function getOverallMatchPercentage(): ?float
     {
         return $this->overallMatchPercentage;
     }

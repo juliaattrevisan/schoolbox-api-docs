@@ -24,6 +24,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -996,46 +997,85 @@ class Controller extends Assessment\Controller
             $this->enqueueKamiUploads($response->getAllFiles());
         }
 
-        /* Save stubble record and send each file in the Submission to Plagscan
-         * if the Submission was saved successfully
-         *
-         * Only plagscan when actually submitting final
-         * Only plagscan non-online-submission files (for some reason, plag won't do html files)
-         */
-        $plagscanMapper = PlagscanMapper::getInstance();
-
-        /* Plagscans should only spawn upon saving a Submitted IResponse instance
+        /* Similarity Report endpoints should only spawn upon saving a Submitted IResponse instance
          * This screen is shared between self-reflection and non-self-reflection steps
-         * Self-reflection's plagscan stubs saving .......happens elsewhere
-         * Similarity Check must be enabled
+         * Self-reflection's Similarity Check stubs saving .......happens elsewhere
+         *
+         * Similarity Check must be enabled to use plag or turnitin
+         * This is processed in a detached function so it doesn't hang the ui
+         * while it's executing, since accessing third party api can be slow
          */
+        $detachedFunction = null;
+
         if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-            foreach ($response->getAllFiles() as $currentFile) {
-                if (!$currentFile->getEditableInline()) {
-                    $plagscanMapper->saveNewPlagscanStub($currentFile);
+            /* Only one of these can be active at a time, but both universes can co-exist
+             * Specifically enable turnitin if its api key was set
+             */
+            if ('' !== trim((string)$this->getConfigLoader()->get('turnitin_api_key'))) {
+                /* Set up a turnitin stub record
+                 * This allows it to be picked up and processed by an async script later
+                 * if it doesn't start processing via the $detachedFunction
+                 */
+                $turnitinMapper = Turnitin\Mapper::getInstance();
+
+                foreach ($response->getAllFiles() as $currentFile) {
+                    $turnitinMapper->saveStub($currentFile);
                 }
+
+                /* Set up detached function so turnitin can continue in the background
+                 */
+//                $detachedFunction = static function () use ($isFinal, $selfAssessable, $response, $assessment) {
+//                    /* TODO Turnitin api endpoint implementation
+//                     */
+//                };
+            } else {
+                /* This is the original behaviour. Note that the Plagscan Mapper itself can
+                 * figure out if plagscan is enabled or not so we don't need to do it here
+                 *
+                 * This is only a temporary setup - eventually plagscan goes away entirely,
+                 * halving the logic established here
+                 */
+
+                /* Save stubble record and send each file in the Submission to Plagscan
+                 * if the Submission was saved successfully
+                 *
+                 * Only plagscan when actually submitting final
+                 * Only plagscan non-online-submission files (for some reason, plag won't do html files)
+                 */
+                $plagscanMapper = PlagscanMapper::getInstance();
+
+                foreach ($response->getAllFiles() as $currentFile) {
+                    if (!$currentFile->getEditableInline()) {
+                        $plagscanMapper->saveNewPlagscanStub($currentFile);
+                    }
+                }
+
+                /* Set up detached function so plagscan can continue in the background
+                 */
+                $detachedFunction = static function () use ($plagscanMapper, $response) {
+                    foreach ($response->getAllFiles() as $currentFile) {
+                        $filename = $plagscanMapper->plagscanFilename($currentFile);
+
+                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                    }
+                };
             }
+        }
+
+        $output = [
+            'format' => 'noContent',
+        ];
+
+        if (null !== $detachedFunction) {
+            $output['postOutput'] = [
+                $detachedFunction
+            ];
         }
 
         /* Asynchronously shove it into plagscan so we don't make the user wait ages
          * for it to read 1 byte at a time >_<
          */
-        $this->getResponse()->content->set(
-            [
-                'format'     => 'noContent',
-                'postOutput' => [
-                    function () use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
-                        if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-                            foreach ($response->getAllFiles() as $currentFile) {
-                                $filename = $plagscanMapper->plagscanFilename($currentFile);
-
-                                $plagscanMapper->saveNewPlagscan($currentFile, $filename);
-                            }
-                        }
-                    },
-                ],
-            ]
-        );
+        $this->getResponse()->content->set($output);
 
         /* Saving drafts from the wizzywig
          */

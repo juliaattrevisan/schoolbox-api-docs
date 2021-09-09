@@ -266,35 +266,77 @@ class Controller extends Base
 
                 $this->responseDataSource->save($response);
 
-                /* Save all the plagscan stubs and records too
-                 * But this is a special flow just for self-reflection
-                 * Originated from Assessment/DueWork/Controller postCreateResponse()
+                /* Similarity Check must be enabled to use plag or turnitin
+                 * This is processed in a detached function so it doesn't hang the ui
+                 * while it's executing, since accessing third party api can be slow
                  */
-                $plagscanMapper = $this->plagscanMapper;
+                $detachedFunction = null;
 
                 if ($assessment->getSimilarityCheckEnabled()) {
-                    foreach ($response->getAllFiles() as $currentFile) {
-                        if (!$currentFile->getEditableInline()) {
-                            $plagscanMapper->saveNewPlagscanStub($currentFile);
+                    /* Only one of these can be active at a time, but both universes can co-exist
+                     * Specifically enable turnitin if its api key was set
+                     */
+                    if ('' !== trim((string)$this->getConfigLoader()->get('turnitin_api_key'))) {
+                        /* Set up a turnitin stub record
+                         * This allows it to be picked up and processed by an async script later
+                         * if it doesn't start processing via the $detachedFunction
+                         */
+                        $turnitinMapper = DueWork\Response\File\Turnitin\Mapper::getInstance();
+
+                        foreach ($response->getAllFiles() as $currentFile) {
+                            $turnitinMapper->saveStub($currentFile);
                         }
+
+                        /* Set up detached function so turnitin can continue in the background
+                         */
+//                        $detachedFunction = static function () use ($response, $assessment) {
+//                            /* TODO Turnitin api endpoint implementation
+//                             */
+//                        };
+                    } else {
+                        /* This is the original behaviour. Note that the Plagscan Mapper itself can
+                         * figure out if plagscan is enabled or not so we don't need to do it here
+                         *
+                         * This is only a temporary setup - eventually plagscan goes away entirely,
+                         * halving the logic established here
+                         */
+
+                        /* Save all the plagscan stubs and records too
+                         * But this is a special flow just for self-reflection
+                         * Originated from Assessment/DueWork/Controller postCreateResponse()
+                         */
+                        $plagscanMapper = $this->plagscanMapper;
+
+                        foreach ($response->getAllFiles() as $currentFile) {
+                            if (!$currentFile->getEditableInline()) {
+                                $plagscanMapper->saveNewPlagscanStub($currentFile);
+                            }
+                        }
+
+                        /* Set up detached function so plagscan can continue in the background
+                         */
+                        $detachedFunction = static function () use ($plagscanMapper, $response) {
+                            foreach ($response->getAllFiles() as $currentFile) {
+                                $filename = $plagscanMapper->plagscanFilename($currentFile);
+
+                                $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                            }
+                        };
                     }
                 }
 
-                $this->getResponse()->content->set([
+                $output = [
                     'format' => 'json',
                     'data'   => [],
-                    'postOutput' => [
-                        function () use ($plagscanMapper, $response, $assessment) {
-                            if ($assessment->getSimilarityCheckEnabled()) {
-                                foreach ($response->getAllFiles() as $currentFile) {
-                                    $filename = $plagscanMapper->plagscanFilename($currentFile);
+                ];
 
-                                    $plagscanMapper->saveNewPlagscan($currentFile, $filename);
-                                }
-                            }
-                        },
-                    ],
-                ]);
+                if (null !== $detachedFunction) {
+                    $output['postOutput'] = [
+                        $detachedFunction
+                    ];
+                }
+
+                $this->getResponse()->content->set($output);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
