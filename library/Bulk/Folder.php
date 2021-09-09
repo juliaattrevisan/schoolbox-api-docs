@@ -232,12 +232,12 @@ class Bulk_Folder
 
             $file = null;
             try {
-                if (preg_match_all('#/(send|image)\.php\?*id=(\d+)#', $folderImageHash, $matches) || preg_match('/^[0-9]+$/', $folderImageHash, $matches)) {
+                if (preg_match_all('#(send|image)\.php\?.*id=(\d+)#', $folderImageHash, $matches) || preg_match('/^[0-9]+$/', $folderImageHash, $matches)) {
                     // if it was send or cms/image, or a straight numeric this could be an id, we need a filemapper instance
                     // $file load by ID
                     // do basic error checking and exit early
                     $file = $this->fileMapper->findById(end($matches));
-                } elseif (preg_match_all('#(image|fetch)\.php\?*hash=([a-zA-Z0-9]+)#', $folderImageHash, $matches) || preg_match('/^[0-9a-zA-Z]+$/', $folderImageHash, $matches)) {
+                } elseif (preg_match_all('#(image|fetch)\.php\?.*hash=([a-zA-Z0-9]+)#', $folderImageHash, $matches) || preg_match('/^[0-9a-zA-Z]+$/', $folderImageHash, $matches)) {
                     // if it was storage/(image/fetch), or a straight alphanumeric (this could be a hash), we need a StorageMapper instance
                     // $file = load by hash
                     // do basic error checking and exit early
