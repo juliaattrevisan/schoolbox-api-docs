@@ -399,7 +399,7 @@
             };
 
             $actionBar.find('[data-draft]').attr('disabled', 'disabled');
-            $btnDrafted.text('Saving...').removeClass('alert');
+            $btnDrafted.text('Saving...').removeClass('saving-error');
 
             $(config.formSaveLabel).toastActivate({
                 text: 'Autosaving...'
@@ -430,7 +430,7 @@
                 })
                 .fail(function (xhr) {
                     $actionBar.show();
-                    $btnDrafted.show().text('Saving failed').addClass('alert');
+                    $btnDrafted.show().text('Saving failed').addClass('saving-error');
                     $btnPublish.show();
                     toast.call($participant, xhr.responseText, false, false);
                 })
