@@ -5,6 +5,6 @@ INNER JOIN rubric_capability_usage rcu ON rcm.rubric_capability_id = rcu.rubric_
 INNER JOIN submission_box          sb  ON sr.box_id = sb.id
 INNER JOIN submission_mark_type    smt ON sb.rubric_capability_mark_type_id = smt.mark_type_id
 
-SET rcm.human_readable_value = rcm.value
+SET rcm.human_readable_value = ROUND(rcm.value, 2)
 
 WHERE smt.slug = 'raw';
