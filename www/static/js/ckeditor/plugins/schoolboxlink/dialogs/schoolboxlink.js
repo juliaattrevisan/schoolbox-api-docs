@@ -39,7 +39,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
     function inject(editorInstance, selection, fields) {
         var element = editorInstance.document.createElement('a'),
             urlPath = false,
-            urlOrigin = editorInstance.config.urlOrigin ? editorInstance.config.urlOrigin : '' ;
+            urlOrigin = editorInstance.config.baseHref ? editorInstance.config.baseHref : '' ;
         try {
             urlPath = new URL(fields.url.getValue()).toString();
         }

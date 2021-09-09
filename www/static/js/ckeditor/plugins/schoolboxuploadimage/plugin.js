@@ -89,15 +89,26 @@
                     let $img = this.parts.img.$,
                         width = upload.responseData.width || $img.naturalWidth,
                         height = upload.responseData.height || $img.naturalHeight,
-                        isEmpty = (this.editor.getData() === '');
+                        isEmpty = (this.editor.getData() === ''),
+                        urlPath = false,
+                        urlOrigin = this.editor.config.baseHref ? this.editor.config.baseHref : '' ;
+                    try {
+                        urlPath = new URL(upload.url).toString();
+                    } catch (e) {
+                        if (e.message === "Failed to construct 'URL': Invalid URL") {
+                            urlPath = urlOrigin + upload.url;
+                        } else {
+                            throw e;
+                        }
+                    }
 
                     // Set width and height to prevent blinking.
                     // Also set data vars to ensure that Schoolbox knows how to render this file later.
-                    this.replaceWith( '<img src="' + upload.url + '" ' +
+                    this.replaceWith( '<img src="' + urlPath + '" ' +
                         'data-schoolboxresource-type="image" ' +
                         'data-schoolboxresource-filesystem="' + upload.responseData.filesystem + '" ' +
-                        'data-schoolboxresource-thumbnail="' + upload.url + '" ' +
-                        'data-schoolboxresource-source="' + upload.url + '" ' +
+                        'data-schoolboxresource-thumbnail="' + urlPath + '" ' +
+                        'data-schoolboxresource-source="' + urlPath + '" ' +
                         'data-schoolboxresource-width="' + width + '" ' +
                         'data-schoolboxresource-height="' + height + '" ' +
                         'width="' + width + '" ' +
