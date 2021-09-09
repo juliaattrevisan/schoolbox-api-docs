@@ -166,6 +166,10 @@ class Schedule
                         'code'   => $activityCode,
                         'start'  => $start->getDatabase(),
                         'finish' => $finish->getDatabase(),
+                        // Default location is the best I can do for room:
+                        // SUDS doesn't track individual class occurrences, just
+                        // a period number (which is part of a repeating cycle)
+                        'room'   => $activity['defaultLocation'] ?? null,
                     ];
                 }
             }
