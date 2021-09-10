@@ -352,6 +352,7 @@
                 event.preventDefault();
                 existing.addClass('saving');
                 formInputs.prop('disabled', true);
+                debugger;
                 $.ajax(
                     {
                         url:  masonry.options.component.url,

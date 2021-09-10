@@ -25,7 +25,6 @@ export const initDeleteComponent = () => {
  * 
  * @param { DOMElement } 
  * @param { DOMElement } 
- * @param { DOMElement } 
  */
 const initDeleteComponentButton = (deletePanel, deleteButton) => {
     deleteButton.addEventListener('click', (event) => {
