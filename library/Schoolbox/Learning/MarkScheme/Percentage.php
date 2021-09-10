@@ -69,9 +69,19 @@ class Percentage extends AbstractMarkScheme
     /**
      * @inheritdoc
      */
-    public function formatMark(?string $humanReadableMark): ?string
+    public function formatMark(?string $formMark): ?string
     {
-        return "$humanReadableMark %";
+        if (!isset($formMark)) {
+            return null;
+        }
+        $matches = [];
+        $pattern = '/^\s*(-?[0-9.]+)/';
+        if (!preg_match($pattern, $formMark, $matches)) {
+            throw new InvalidArgumentException("Unable to parse percentage value: $formMark");
+        }
+
+        $floatVal = round(floatval($matches[1]), 2);
+        return sprintf("%s %%", $floatVal);
     }
 
     /**

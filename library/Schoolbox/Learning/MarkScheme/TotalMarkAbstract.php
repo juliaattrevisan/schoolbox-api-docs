@@ -132,10 +132,26 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     /**
      * @inheritdoc
      */
-    public function formatMark(?string $humanReadableMark): ?string
+    public function formatMark(?string $formMark): ?string
     {
-        $denominator = round($this->deriveDenominator() / $this->getGranularityDenominator()) * $this->getGranularityDenominator();
-        return "$humanReadableMark / $denominator";
+        if (!isset($formMark)) {
+            return null;
+        }
+        $matches = [];
+        $pattern = '/^\s*(-?[0-9.]+)/';
+        if (!preg_match($pattern, $formMark, $matches)) {
+            throw new InvalidArgumentException("Unable to parse numerator: $formMark");
+        }
+
+        $denominator = round($this->deriveDenominator(), 2);
+
+        // Prevent divide by 0 Errors
+        if (0 === (int)$denominator) {
+            return null;
+        }
+
+        $floatVal = round(floatval($matches[1] / $denominator * self::NORMALISED_MARK_MAX), 2);
+        return sprintf("%s / %s", $floatVal, $denominator);
     }
 
     /* Getters / Setters

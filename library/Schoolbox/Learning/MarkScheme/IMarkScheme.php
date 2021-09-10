@@ -67,12 +67,13 @@ interface IMarkScheme
     public function getNormalisedMark($humanReadableMark, IResponse $response = null);
 
     /**
-     * Formats a human-readable mark for storage.
+     * Formats a value submitted from the form into a human-readable mark for
+     * storage.
      *
-     * @param string|null $humanReadableMark
+     * @param string|null $formMark
      * @return string|null
      */
-    public function formatMark(?string $humanReadableMark): ?string;
+    public function formatMark(?string $formMark): ?string;
 
     /**
      * Get the Mark Type's human-readable title

@@ -46,7 +46,7 @@ class None extends AbstractMarkScheme
     /**
      * @inheritdoc
      */
-    public function formatMark(?string $humanReadableMark): ?string
+    public function formatMark(?string $formMark): ?string
     {
         return null;
     }

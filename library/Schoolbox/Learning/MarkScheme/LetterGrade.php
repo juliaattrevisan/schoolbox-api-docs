@@ -92,9 +92,9 @@ class LetterGrade extends AbstractMarkScheme
     /**
      * @inheritdoc
      */
-    public function formatMark(?string $humanReadableMark): ?string
+    public function formatMark(?string $formMark): ?string
     {
-        return $humanReadableMark;
+        return $formMark;
     }
 
     /* Getters / Setters

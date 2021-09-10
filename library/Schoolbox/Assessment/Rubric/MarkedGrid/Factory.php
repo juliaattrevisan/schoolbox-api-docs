@@ -72,6 +72,11 @@ class Factory
                     // Set the capability mark's values:
                     // human-readable: whatever was passed in the form
                     // standard value: calculated based on the human-readable value
+                    // Consider how the feedback class does this in
+                    // \Schoolbox\Learning\Assessment\DueWork\Feedback\Factory::produce:
+                    // it takes the form value, then normalizes it, then sets the
+                    // HR mark based on that.
+//                    $normalisedMark = $capabilityMark->getMarkScheme()->getNormalisedMark($capabilityCustomMarkInput);
                     $capabilityMark
                         ->setHumanReadableValue($capabilityMark->getMarkScheme()->formatMark($capabilityCustomMarkInput))
                         ->setValue($capabilityMark->calculateValueFromHumanReadableValue($capabilityCustomMarkInput));
