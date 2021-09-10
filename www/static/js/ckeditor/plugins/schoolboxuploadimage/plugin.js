@@ -90,17 +90,7 @@
                         width = upload.responseData.width || $img.naturalWidth,
                         height = upload.responseData.height || $img.naturalHeight,
                         isEmpty = (this.editor.getData() === ''),
-                        urlPath = false,
-                        urlOrigin = this.editor.config.baseHref ? this.editor.config.baseHref : '' ;
-                    try {
-                        urlPath = new URL(upload.url).toString();
-                    } catch (e) {
-                        if (e.message === "Failed to construct 'URL': Invalid URL") {
-                            urlPath = urlOrigin + upload.url;
-                        } else {
-                            throw e;
-                        }
-                    }
+                        urlPath = (this.editor.config.baseHref ? this.editor.config.baseHref : '') + upload.url;
 
                     // Set width and height to prevent blinking.
                     // Also set data vars to ensure that Schoolbox knows how to render this file later.

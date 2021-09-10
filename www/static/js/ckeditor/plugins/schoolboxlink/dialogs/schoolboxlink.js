@@ -44,11 +44,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             urlPath = new URL(fields.url.getValue()).toString();
         }
         catch (e) {
-            if (e.message === "Failed to construct 'URL': Invalid URL") {
-                urlPath = urlOrigin + fields.url.getValue();
-            } else {
-                throw e;
-            }
+            urlPath = urlOrigin + fields.url.getValue();
         }
         element.setAttribute('href', urlPath);
 
