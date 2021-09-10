@@ -150,7 +150,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
             return null;
         }
 
-        $floatVal = round(floatval($matches[1] / $denominator * self::NORMALISED_MARK_MAX), 2);
+        $floatVal = round(floatval($matches[1]), 2);
         return sprintf("%s / %s", $floatVal, $denominator);
     }
 
