@@ -12,7 +12,6 @@ namespace Schoolbox\Calendar;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
-use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress_Date_Format;
 use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
@@ -92,13 +91,15 @@ class EventNotifier extends AbstractModuleNotifier
         /** @var Event $event */
         $event = $bundle->getEvent()->getObject();
         $diff  = $bundle->getEvent()->getDiff();
-        /** @var Event $previous */
+        /** @var Event|null $previous */
         $previous = $this->buildPrevious($event, $diff);
 
         $method = $bundle->getMethod();
 
         $previousVisible = $previous && $previous->isPublished() && $previous->getEndDateTime()->isFuture();
         $eventVisible    = $event->isPublished() && $event->getEndDateTime()->isFuture();
+
+        $eventStartTime = $event->getStartDateTime()->getUnixTimeStamp();
 
         /**
          * Created or published
@@ -108,7 +109,7 @@ class EventNotifier extends AbstractModuleNotifier
             && ($method === Mapper::METHOD_CREATE || ($method === Mapper::METHOD_UPDATE && !$previousVisible))
         ) {
             // advise 10 minutes before start
-            $bundle->attach(self::TRIGGER_UPCOMING, $event->getStartDateTime()->addSeconds(-60 * self::UPCOMING_WINDOW)->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_UPCOMING, $eventStartTime - 60 * self::UPCOMING_WINDOW);
             if ($event->getAttendance()) {
                 $bundle->attach(self::TRIGGER_INVITED, self::IMMEDIATELY);
             }
@@ -156,7 +157,7 @@ class EventNotifier extends AbstractModuleNotifier
             // attach a custom trigger for handling the event recurrence
             $upcoming = [$this, 'getNextSeriesTime'];
         } else {
-            $upcoming = $event->getStartDateTime()->addSeconds(-60 * self::UPCOMING_WINDOW)->getUnixTimeStamp();
+            $upcoming = $eventStartTime - 60 * self::UPCOMING_WINDOW;
         }
         $bundle->attach(self::TRIGGER_UPCOMING, $upcoming);
         $bundle->attach(self::TRIGGER_INVITED, self::IMMEDIATELY);
