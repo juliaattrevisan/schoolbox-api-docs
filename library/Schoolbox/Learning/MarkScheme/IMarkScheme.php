@@ -67,13 +67,15 @@ interface IMarkScheme
     public function getNormalisedMark($humanReadableMark, IResponse $response = null);
 
     /**
-     * Formats a value submitted from the form into a human-readable mark for
-     * storage.
+     * Converts a value submitted from the form into a standardised
+     * human-readable mark.
      *
-     * @param string|null $formMark
-     * @return string|null
+     * For example, form inputs of "59" and "59 %" may both be stored as "59 %".
+     *
+     * @param string|null $formMark The mark submitted from the form.
+     * @return string|null A human-readable mark for storage.
      */
-    public function formatMark(?string $formMark): ?string;
+    public function convertFromFormInputToHumanReadableMark(?string $formInputMark): ?string;
 
     /**
      * Get the Mark Type's human-readable title

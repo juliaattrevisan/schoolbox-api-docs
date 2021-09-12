@@ -78,7 +78,7 @@ class Factory
                     // HR mark based on that.
 //                    $normalisedMark = $capabilityMark->getMarkScheme()->getNormalisedMark($capabilityCustomMarkInput);
                     $capabilityMark
-                        ->setHumanReadableValue($capabilityMark->getMarkScheme()->formatMark($capabilityCustomMarkInput))
+                        ->setHumanReadableValue($capabilityMark->getMarkScheme()->convertFromFormInputToHumanReadableMark($capabilityCustomMarkInput))
                         ->setValue($capabilityMark->calculateValueFromHumanReadableValue($capabilityCustomMarkInput));
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
