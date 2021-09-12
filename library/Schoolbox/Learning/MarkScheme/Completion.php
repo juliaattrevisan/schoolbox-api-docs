@@ -55,9 +55,25 @@ class Completion extends AbstractMarkScheme
     }
 
     /**
-     * @inheritdoc
+     * This mark type has no way to convert a form input to a mark, so always
+     * return null.
+     *
+     * @param string|null $formInput
+     * @return string|null
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInputMark): ?string
+    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string
+    {
+        return null;
+    }
+
+    /**
+     * This mark type has no way to convert a mark to a form input, so always
+     * return null.
+     *
+     * @param string|null $humanReadableMark
+     * @return string|null
+     */
+    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
         return null;
     }

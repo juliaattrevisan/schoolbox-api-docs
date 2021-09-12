@@ -67,21 +67,41 @@ class Percentage extends AbstractMarkScheme
     }
 
     /**
-     * @inheritdoc
+     * For percent marks, the form input is the percent value only:
+     * append a % symbol to the end of it.
+     *
+     * @param string|null $formInput
+     * @return string|null
+     * @throws InvalidArgumentException if there's no numeric component to
+     *                                  `$formInput`
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInputMark): ?string
+    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string
     {
-        if (!isset($formInputMark)) {
+        if (!isset($formInput)) {
             return null;
         }
         $matches = [];
         $pattern = '/^\s*(-?[0-9.]+)/';
-        if (!preg_match($pattern, $formInputMark, $matches)) {
-            throw new InvalidArgumentException("Unable to parse percentage value: $formInputMark");
+        if (!preg_match($pattern, $formInput, $matches)) {
+            throw new InvalidArgumentException("Unable to parse percentage value: $formInput");
         }
 
         $floatVal = round(floatval($matches[1]), 2);
         return sprintf("%s %%", $floatVal);
+    }
+
+    /**
+     * Strip the % symbol from the end of the human-readable mark to get its
+     * form input value.
+     *
+     * @param string|null $humanReadableMark
+     * @return string|null
+     */
+    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
+    {
+        return isset($humanReadableMark)
+            ? (string)round($humanReadableMark, 2)
+            : null;
     }
 
     /**

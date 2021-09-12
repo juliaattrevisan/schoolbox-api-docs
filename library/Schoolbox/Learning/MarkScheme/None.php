@@ -44,9 +44,23 @@ class None extends AbstractMarkScheme
     }
 
     /**
-     * @inheritdoc
+     * This mark type has no human-readable mark, so always return null.
+     *
+     * @param string|null $formInput
+     * @return string|null
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInputMark): ?string
+    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string
+    {
+        return null;
+    }
+
+    /**
+     * This mark type has no form input, so always return null.
+     *
+     * @param string|null $humanReadableMark
+     * @return string|null
+     */
+    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
         return null;
     }
