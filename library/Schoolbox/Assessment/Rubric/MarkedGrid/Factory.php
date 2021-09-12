@@ -76,10 +76,9 @@ class Factory
                     // \Schoolbox\Learning\Assessment\DueWork\Feedback\Factory::produce:
                     // it takes the form value, then normalizes it, then sets the
                     // HR mark based on that.
-//                    $normalisedMark = $capabilityMark->getMarkScheme()->getNormalisedMark($capabilityCustomMarkInput);
                     $capabilityMark
-                        ->setHumanReadableValue($capabilityMark->getMarkScheme()->convertFromFormInputToHumanReadableMark($capabilityCustomMarkInput))
-                        ->setValue($capabilityMark->calculateValueFromHumanReadableValue($capabilityCustomMarkInput));
+                        ->setHumanReadableValue($capabilityMark->convertFormInputToHumanReadableValue($capabilityCustomMarkInput))
+                        ->setValue($capabilityMark->convertFormInputToValue($capabilityCustomMarkInput));
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
                 }

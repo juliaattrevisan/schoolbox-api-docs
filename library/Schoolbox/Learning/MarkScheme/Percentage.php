@@ -75,7 +75,7 @@ class Percentage extends AbstractMarkScheme
      * @throws InvalidArgumentException if there's no numeric component to
      *                                  `$formInput`
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string
     {
         if (!isset($formInput)) {
             return null;
@@ -97,7 +97,7 @@ class Percentage extends AbstractMarkScheme
      * @param string|null $humanReadableMark
      * @return string|null
      */
-    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
         return isset($humanReadableMark)
             ? (string)round($humanReadableMark, 2)

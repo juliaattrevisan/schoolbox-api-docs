@@ -61,7 +61,7 @@ class Completion extends AbstractMarkScheme
      * @param string|null $formInput
      * @return string|null
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string
     {
         return null;
     }
@@ -73,7 +73,7 @@ class Completion extends AbstractMarkScheme
      * @param string|null $humanReadableMark
      * @return string|null
      */
-    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
         return null;
     }

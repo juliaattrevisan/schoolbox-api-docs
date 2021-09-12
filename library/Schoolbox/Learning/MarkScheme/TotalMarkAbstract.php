@@ -138,7 +138,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @throws InvalidArgumentException if there's no numeric component to
      *                                  `$formInput`
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string
     {
         if (!isset($formInput)) {
             return null;
@@ -167,7 +167,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param string|null $humanReadableMark
      * @return string|null
      */
-    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
         if (isset($humanReadableMark)) {
             $parts = explode('/', $humanReadableMark);

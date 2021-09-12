@@ -77,7 +77,7 @@ interface IMarkScheme
      * @return string|null A human-readable mark for storage.
      * @throws InvalidArgumentException if the form input can't be converted
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string;
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string;
 
     /**
      * Converts a human-readable mark into a form input value.
@@ -88,7 +88,7 @@ interface IMarkScheme
      * @param string|null $humanReadableMark
      * @return string|null A mark to display in a form input.
      */
-    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string;
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string;
 
     /**
      * Get the Mark Type's human-readable title

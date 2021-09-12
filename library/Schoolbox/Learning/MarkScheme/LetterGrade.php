@@ -97,7 +97,7 @@ class LetterGrade extends AbstractMarkScheme
      * @throws InvalidArgumentException if `$formInput` isn't a valid level in
      *                                  the grade group
      */
-    public function convertFromFormInputToHumanReadableMark(?string $formInput): ?string
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string
     {
         foreach ($this->gradeGroup->getGradeLevels() as $gradeLevel) {
             if ($gradeLevel->getCaption() === $formInput) {
@@ -119,7 +119,7 @@ class LetterGrade extends AbstractMarkScheme
      * @param string|null $humanReadableMark
      * @return string|null
      */
-    public function convertFromHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
         return $humanReadableMark;
     }

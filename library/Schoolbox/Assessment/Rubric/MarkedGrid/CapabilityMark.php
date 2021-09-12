@@ -81,22 +81,45 @@ class CapabilityMark
 
 
     /**
-     * Calculates what `$this->value` should be, given a candidate value for
-     * `$this->humanReadableValue`.
+     * Calculates what `$this->value` should be, given a form input.
      *
-     * @param string|null $humanReadableValue
+     * @param string|null $formInput
      * @return float|null
      */
-    public function calculateValueFromHumanReadableValue(?string $humanReadableValue): ?float
+    public function convertFormInputToValue(?string $formInput): ?float
     {
-        if (!isset($humanReadableValue)) {
+        if (!isset($formInput)) {
             return null;
         }
-        $normalisedMark = $this->markScheme->getNormalisedMark($humanReadableValue);
+        $normalisedMark = $this->markScheme->getNormalisedMark($formInput);
         if (!isset($normalisedMark)) {
             return null;
         }
         return $normalisedMark / 100 * $this->capabilityUsage->getMaxValue();
+    }
+
+
+    /**
+     * Calculates what `$this->humanReadableValue` should be, given a form
+     * input.
+     *
+     * @param string|null $formInput
+     * @return string|null
+     */
+    public function convertFormInputToHumanReadableValue(?string $formInput): ?string
+    {
+        return $this->markScheme->convertFormInputToHumanReadableMark($formInput);
+    }
+
+
+    /**
+     * Retrieves a form input value from this mark's human-readable value.
+     *
+     * @return string|null
+     */
+    public function retrieveHumanReadableValueAsFormInput()
+    {
+        return $this->markScheme->convertHumanReadableMarkToFormInput($this->humanReadableValue);
     }
 
 
