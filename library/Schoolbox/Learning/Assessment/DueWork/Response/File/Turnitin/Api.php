@@ -185,7 +185,12 @@ class Api
          * Can develop this futher as per suds tass, to remember payloads etc.
          * for diagnostics
          */
-        throw new \DomainException('Turnitin retrieve() failed');
+        throw new \DomainException(sprintf(
+            "Turnitin retrieve(%s) failed: %s %s",
+            $endpoint,
+            $result->getStatusCode(),
+            $result->getReasonPhrase()
+        ));
     }
 
 

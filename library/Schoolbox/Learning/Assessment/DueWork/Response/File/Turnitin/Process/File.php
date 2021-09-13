@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -35,6 +36,12 @@ class File
 
 
     /**
+     * @var SubmissionBoxMapper
+     */
+    private SubmissionBoxMapper $boxMapper;
+
+
+    /**
      * @var SingleFile\Mapper
      */
     private SingleFile\Mapper $ssfMapper;
@@ -43,17 +50,20 @@ class File
     /**
      * Constructor.
      *
-     * @param Turnitin\Api      $api
-     * @param UserMapper        $userMapper
-     * @param SingleFile\Mapper $ssfMapper
+     * @param Turnitin\Api        $api
+     * @param UserMapper          $userMapper
+     * @param SubmissionBoxMapper $boxMapper
+     * @param SingleFile\Mapper   $ssfMapper
      */
     public function __construct(
         Turnitin\Api $api,
         UserMapper $userMapper,
+        SubmissionBoxMapper $boxMapper,
         SingleFile\Mapper $ssfMapper
     ) {
         $this->api = $api;
         $this->userMapper = $userMapper;
+        $this->boxMapper = $boxMapper;
         $this->ssfMapper = $ssfMapper;
     }
 
@@ -71,12 +81,23 @@ class File
     public function process(Turnitin\Model $model): void
     {
 
+        /* Check the file exists
+         * Without it, we don't do much at all
+         */
+        try {
+            $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop; file not found
+            return;
+        }
+
         /* Create a Turnitin Group
          */
+        $this->createGroup($ssf);
 
         /* Create a Turnitin Submission
          */
-        $this->createSubmission($model);
+//        $this->createSubmission($ssf);
 
         /* Upload a Student Submission File's contents to the Turnitin Submission
          */
@@ -84,6 +105,26 @@ class File
         /* If anything went wrong, set the ERROR state in the db
          * for this model; we'll think of a Replay script later
          */
+    }
+
+
+    /**
+     * Create a Turnitin Group, which is synonymous with our Submission Boxes
+     *
+     * @param SingleFile\Model $ssf
+     * @throws \DebugBar\DebugBarException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function createGroup(SingleFile\Model $ssf)
+    {
+        $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
+
+        $payload = [
+            'name' => $box->getName(),
+            'type' => 'ASSIGNMENT'
+        ];
+
+        $this->api->retrieve('PUT', "/api/v1/groups/{$box->getId()}", $payload);
     }
 
 
@@ -101,17 +142,11 @@ class File
      *  - There are five subfields, so "the other four" would be submitter, group, group_context, original_submitted_time
      *  - That means "owners" struct, and its fields, is a required subfield in metadata
      *
-     * @param Turnitin\Model $model
+     * @param SingleFile\Model $ssf
      * @throws \DebugBar\DebugBarException
      */
-    private function createSubmission(Turnitin\Model $model): void
+    private function createSubmission(SingleFile\Model $ssf): void
     {
-        try {
-            $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop; file not found
-            return;
-        }
 
         /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
          *  a pretty sweeping assumption that we needed them everywhere else...
@@ -134,7 +169,7 @@ class File
              * I think it should be the submission file since you have multiple
              * student submission files per assessment
              */
-            'title' => $ssf->getFilename(),
+            'title' => "[{$ssf->getId()}] {$ssf->getFilename()}",
             'metadata' => [
                 'owners' => [
                     'id' => $owner->getId(),
