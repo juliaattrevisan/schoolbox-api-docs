@@ -10,10 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\Grid\Test\Generator as GridGenerator;
 use Schoolbox\Assessment\Rubric\MarkedGrid as RubricMarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\Test\Generator as RowSetGenerator;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\MarkScheme;
 
 /**
  * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark
@@ -361,5 +365,154 @@ class CapabilityMark extends TestCase
         ?RubricMarkedGrid\IndicatorMark $expected
     ): void {
         $this->assertSame($expected, $capabilityMark->retrieveIndicatorMark($indicatorUsage));
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToValue`
+     *
+     * @return iterable
+     */
+    public function getTestConvertFormInputToValueData(): iterable
+    {
+        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+
+        // None
+        $none = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\None());
+        yield 'Capability mark type: none, null form input' => [$none, null, null];
+        yield 'Capability mark type: none, string form input' => [$none, 'red', null];
+        yield 'Capability mark type: none, numeric form input' => [$none, '123', null];
+
+        // Percent
+        $percent = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\Percentage());
+        yield 'Capability mark type: percent, null form input' => [$percent, null, null];
+        yield 'Capability mark type: percent, string form input' => [$percent, 'red', null];
+        yield 'Capability mark type: percent, numeric form input' => [$percent, '50', 2];
+        yield 'Capability mark type: percent, percent form input, space' => [$percent, '50 %', 2];
+        yield 'Capability mark type: percent, percent form input, no space' => [$percent, '50%', 2];
+
+        // Total mark
+        $total = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\TotalMarkFractional(12));
+        yield 'Capability mark type: total, null form input' => [$total, null, null];
+        yield 'Capability mark type: total, string form input' => [$total, 'red', null];
+        yield 'Capability mark type: total, numeric form input' => [$total, '6', 2];
+        yield 'Capability mark type: total, fraction form input, space' => [$total, '6 / 12', 2];
+        yield 'Capability mark type: total, fraction form input, no space' => [$total, '6/12', 2];
+
+        // Letter grade
+        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
+        yield 'Capability mark type: letter, null form input' => [$letter, null, null];
+        yield 'Capability mark type: letter, invalid form input' => [$letter, 'red', null];
+        yield 'Capability mark type: letter, valid form input' => [$letter, 'A', 3.5];
+    }
+
+
+    /**
+     * @dataProvider getTestConvertFormInputToValueData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToValue
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param string|null                     $formInput
+     * @param float|null                      $expected
+     */
+    public function testConvertFormInputToValue(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        ?string $formInput,
+        ?float $expected
+    ): void {
+        $this->assertSame($expected, $capabilityMark->convertFormInputToValue($formInput));
+    }
+
+
+    /**
+     * Build a test capability usage for the form input conversion methods.
+     *
+     * Note that its maximum value is 4.
+     *
+     * @return CapabilityUsage
+     */
+    private function buildTestFormInputConversionCapabilityUsage(): CapabilityUsage
+    {
+        $gridGenerator = new GridGenerator();
+        $grid          = $gridGenerator->generateGrid(
+            RowSetGenerator::TEST_CAPABILITIES,
+            GridGenerator::TEST_LEVELS,
+            [
+                1 => [
+                    'indicators' => [
+                        11 => [
+                            'descriptors' => [
+                                111 => [
+                                    'levelId'     => 1,
+                                    'description' => 'Poor',
+                                    'value'       => 0,
+                                ],
+                                112 => [
+                                    'levelId'     => 2,
+                                    'description' => 'Okay',
+                                    'value'       => 2,
+                                ],
+                            ],
+                        ],
+                        12 => [
+                            'descriptors' => [
+                                121 => [
+                                    'levelId'     => 1,
+                                    'description' => 'Poor',
+                                    'value'       => 0,
+                                ],
+                                122 => [
+                                    'levelId'     => 2,
+                                    'description' => 'Okay',
+                                    'value'       => 2,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        return $grid->getCapabilityUsages()[1];
+    }
+
+
+    /**
+     * Build a test letter grade mark scheme:
+     * * D: 0-25, raw grade 12.5
+     * * C: 25-50, raw grade 37.5
+     * * B: 50-75, raw grade 62.5
+     * * A: 75-100, raw grade 87.5
+     *
+     * @return MarkScheme\LetterGrade
+     */
+    private function buildTestLetterGradeMarkScheme(): MarkScheme\LetterGrade
+    {
+        return new MarkScheme\LetterGrade(
+            (new GradeLevel\Group\Model())
+                ->setGradeLevels(
+                    new GenericCollection(
+                        GradeLevel\Model::class,
+                        [
+                            (new GradeLevel\Model())
+                                ->setCaption('D')
+                                ->setLowerBound(0)
+                                ->setRawGrade(12.5),
+                            (new GradeLevel\Model())
+                                ->setCaption('C')
+                                ->setLowerBound(25)
+                                ->setRawGrade(37.5),
+                            (new GradeLevel\Model())
+                                ->setCaption('B')
+                                ->setLowerBound(50)
+                                ->setRawGrade(67.5),
+                            (new GradeLevel\Model())
+                                ->setCaption('A')
+                                ->setLowerBound(75)
+                                ->setRawGrade(87.5)
+                        ]
+                    )
+                )
+        );
     }
 }
