@@ -136,22 +136,50 @@ class Api
      * @param string $method
      * @param string $endpoint
      * @param array  $params
-     * @return Response
+     * @return array
      * @throws Exception\BadEndpoint
      * @throws Exception\Credentials
-     * @throws \DebugBar\DebugBarException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, array $params): Response
+    public function retrieve(string $method, string $endpoint, array $params): array
     {
         $endpoint = "{$this->host}{$endpoint}";
 
+        /* Generate a standard header set
+         */
+        $headers = $this->generateDefaultHeaders();
+
         /* Send it to the endpoint and see what comes back
          */
-        $result = $this->client->request($method, $endpoint, [
-            RequestOptions::QUERY => $params
-        ]);
+        switch ($method) {
+
+            /* TODO Uploading a binary specifically
+             *  Uses a special content-type header value
+             */
+            case 'UPLOAD':
+                $headers['Content-Type'] = 'binary/octet-stream';
+
+                $result = $this->client->request($method, $endpoint, [
+                    'headers' => $headers,
+                    RequestOptions::FORM_PARAMS => json_encode($params, JSON_THROW_ON_ERROR)
+                ]);
+
+                break;
+
+            /* Default case: assume standard headers
+             */
+            default:
+                $result = $this->client->request($method, $endpoint, [
+                    'headers' => $headers,
+                    RequestOptions::JSON => $params
+                ]);
+
+                break;
+        }
+
 
         /* Check errors; if anything went wrong throw special types of exceptions
          * according to what happened. I found that in suds, we kind of started to
@@ -176,17 +204,18 @@ class Api
          * what happens next and how those errors might be logged/presented to users
          */
         if (200 === $result->getStatusCode()) {
-            return $result;
+            return json_decode($result->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         }
 
         /* Arbitrary default case for now
          * Something occurred that we haven't accounted for just now
          *
-         * Can develop this futher as per suds tass, to remember payloads etc.
+         * Can develop this further as per suds tass, to remember payloads etc.
          * for diagnostics
          */
         throw new \DomainException(sprintf(
-            "Turnitin retrieve(%s) failed: %s %s",
+            "Turnitin failed to retrieve(): %s %s - %s %s",
+            $method,
             $endpoint,
             $result->getStatusCode(),
             $result->getReasonPhrase()
@@ -205,20 +234,32 @@ class Api
      */
     private function initClient(): Client
     {
-        $headers = [
-            'X-Turnitin-Integration-Name' => self::INTEGRATION_FAMILY,
-            'X-Turnitin-Integration-Version' => self::VERSION,
-            'Authorization' => "Bearer {$this->apiKey}",
-        ];
-
-        /* Return a new guzzle setup
-         */
         return new Client([
             'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-            'headers' => $headers,
             'base_uri' => $this->host,
             'timeout' => self::DEFAULT_TIMEOUT,
             'http_errors' => false,
         ]);
+    }
+
+
+    /**
+     * Default headers required for all api requests
+     *
+     * All requests require application/json as Content Type
+     * except for the one where you upload binary data
+     * (that uses binary/octet-stream)
+     *
+     * @return string[]
+     */
+    private function generateDefaultHeaders(): array
+    {
+        return [
+            'X-Turnitin-Integration-Name' => self::INTEGRATION_FAMILY,
+            'X-Turnitin-Integration-Version' => self::VERSION,
+            'Authorization' => "Bearer {$this->apiKey}",
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
     }
 }

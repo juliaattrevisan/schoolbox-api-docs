@@ -24,6 +24,12 @@ class File
 {
 
     /**
+     * Group type in Turnitin
+     */
+    private const GROUP_TYPE = 'ASSIGNMENT';
+
+
+    /**
      * @var Turnitin\Api
      */
     private Turnitin\Api $api;
@@ -93,11 +99,11 @@ class File
 
         /* Create a Turnitin Group
          */
-        $this->createGroup($ssf);
+        $group = $this->createGroup($ssf);
 
         /* Create a Turnitin Submission
          */
-//        $this->createSubmission($ssf);
+//        $this->createSubmission($ssf, $group);
 
         /* Upload a Student Submission File's contents to the Turnitin Submission
          */
@@ -111,20 +117,30 @@ class File
     /**
      * Create a Turnitin Group, which is synonymous with our Submission Boxes
      *
+     * Apparently you just shove in an identifier, turnitin understands that...
+     * ...which seems a little odd, but ok. It puts the onus on us (haha) to
+     * manage these. Since our Box Ids are guaranteed to be unique, in it goes
+     *
      * @param SingleFile\Model $ssf
-     * @throws \DebugBar\DebugBarException
+     * @return array
+     * @throws Turnitin\Exception\BadEndpoint
+     * @throws Turnitin\Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \RuntimeException
      */
-    private function createGroup(SingleFile\Model $ssf)
+    private function createGroup(SingleFile\Model $ssf): array
     {
         $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
 
         $payload = [
             'name' => $box->getName(),
-            'type' => 'ASSIGNMENT'
+            'type' => self::GROUP_TYPE
         ];
 
-        $this->api->retrieve('PUT', "/api/v1/groups/{$box->getId()}", $payload);
+        return $this->api->retrieve('PUT', "/api/v1/groups/{$box->getId()}", $payload);
     }
 
 
