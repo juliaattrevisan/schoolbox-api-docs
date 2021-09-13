@@ -96,7 +96,7 @@ class Payload
      */
     public function __construct(Loader $config, string $host, Router $router)
     {
-        $this->saltBasis = (string)$config->get('site_location');
+        $this->saltBasis = (string)$config->get('site_school_code');
         $this->host = $host;
         $this->router = $router;
         $this->config = $config;
