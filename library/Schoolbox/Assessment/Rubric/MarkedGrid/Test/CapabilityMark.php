@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
@@ -386,7 +388,6 @@ class CapabilityMark extends TestCase
         // Percent
         $percent = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\Percentage());
         yield 'Capability mark type: percent, null form input' => [$percent, null, null];
-        yield 'Capability mark type: percent, string form input' => [$percent, 'red', null];
         yield 'Capability mark type: percent, numeric form input' => [$percent, '50', 2];
         yield 'Capability mark type: percent, percent form input, space' => [$percent, '50 %', 2];
         yield 'Capability mark type: percent, percent form input, no space' => [$percent, '50%', 2];
@@ -394,7 +395,6 @@ class CapabilityMark extends TestCase
         // Total mark
         $total = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\TotalMarkFractional(12));
         yield 'Capability mark type: total, null form input' => [$total, null, null];
-        yield 'Capability mark type: total, string form input' => [$total, 'red', null];
         yield 'Capability mark type: total, numeric form input' => [$total, '6', 2];
         yield 'Capability mark type: total, fraction form input, space' => [$total, '6 / 12', 2];
         yield 'Capability mark type: total, fraction form input, no space' => [$total, '6/12', 2];
@@ -402,7 +402,6 @@ class CapabilityMark extends TestCase
         // Letter grade
         $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
         yield 'Capability mark type: letter, null form input' => [$letter, null, null];
-        yield 'Capability mark type: letter, invalid form input' => [$letter, 'red', null];
         yield 'Capability mark type: letter, valid form input' => [$letter, 'A', 3.5];
     }
 
@@ -421,6 +420,84 @@ class CapabilityMark extends TestCase
         ?float $expected
     ): void {
         $this->assertSame($expected, $capabilityMark->convertFormInputToValue($formInput));
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToValueInvalid`
+     *
+     * @return iterable
+     */
+    public function getTestConvertFormInputToValueDataInvalid(): iterable
+    {
+        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+
+        // Percent
+        $percent = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\Percentage());
+        yield 'Capability mark type: percent, string' => [$percent, 'red'];
+
+        // Total mark
+        $total = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\TotalMarkFractional(12));
+        yield 'Capability mark type: total, string' => [$total, 'red'];
+
+        // Letter grade
+        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
+        yield 'Capability mark type: letter, string' => [$letter, 'red'];
+    }
+
+
+    /**
+     * @dataProvider getTestConvertFormInputToValueDataInvalid
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToValue
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param string|null                     $formInput
+     */
+    public function testConvertFormInputToValueInvalid(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        ?string $formInput
+    ): void {
+        $this->expectException(InvalidArgumentException::class);
+        $capabilityMark->convertFormInputToValue($formInput);
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToValueOutOfRange`
+     *
+     * @return iterable
+     */
+    public function getTestConvertFormInputToValueDataOutOfRange(): iterable
+    {
+        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+
+        // Percent
+        $percent = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\Percentage());
+        yield 'Capability mark type: percent, < 0' => [$percent, '-1'];
+        yield 'Capability mark type: percent, > 100' => [$percent, '101'];
+
+        // Total mark
+        $total = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\TotalMarkFractional(12));
+        yield 'Capability mark type: total, number < 0' => [$total, '-1'];
+        yield 'Capability mark type: total, number > total' => [$total, '13'];
+        yield 'Capability mark type: total, fraction < 0' => [$total, '-1 / 12'];
+        yield 'Capability mark type: total, fraction > total' => [$total, '13 / 12'];
+    }
+
+
+    /**
+     * @dataProvider getTestConvertFormInputToValueDataOutOfRange
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToValue
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param string|null                     $formInput
+     */
+    public function testConvertFormInputToValueOutOfRange(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        ?string $formInput
+    ): void {
+        $this->expectException(RangeException::class);
+        $capabilityMark->convertFormInputToValue($formInput);
     }
 
 
@@ -490,6 +567,7 @@ class CapabilityMark extends TestCase
     {
         return new MarkScheme\LetterGrade(
             (new GradeLevel\Group\Model())
+                ->setName('Test')
                 ->setGradeLevels(
                     new GenericCollection(
                         GradeLevel\Model::class,

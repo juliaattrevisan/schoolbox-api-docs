@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use RangeException;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
@@ -95,6 +96,26 @@ class CapabilityMark
         if (!isset($normalisedMark)) {
             return null;
         }
+
+        if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN) {
+            throw new RangeException(
+                sprintf(
+                    'Form input value "%s" normalises to a value < %f',
+                    $formInput,
+                    IMarkScheme::NORMALISED_MARK_MIN
+                )
+            );
+        }
+        if ($normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
+            throw new RangeException(
+                sprintf(
+                    'Form input value "%s" normalises to a value > %f',
+                    $formInput,
+                    IMarkScheme::NORMALISED_MARK_MAX
+                )
+            );
+        }
+
         return $normalisedMark / 100 * $this->capabilityUsage->getMaxValue();
     }
 
