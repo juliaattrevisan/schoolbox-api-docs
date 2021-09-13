@@ -349,8 +349,7 @@ function check_ldap(){
   local ldap_pri_user;
 
   if [ -f /etc/schoolbox/conf.php ]; then
-    check=$(which ldapsearch >/dev/null 2>&1);
-    if [ $? -eq 0 ]; then
+    if which ldapsearch >/dev/null 2>&1; then
       temp_conf_file='/etc/schoolbox/conf.php';
       timeout='5'; # seconds
       sql_user=$(grep "\"SQL_user" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
