@@ -160,16 +160,27 @@ class Api
              *  Uses a special content-type header value
              */
             case 'UPLOAD':
-                $headers['Content-Type'] = 'binary/octet-stream';
+                /* Add some extra fields and values, specific to purpose
+                 */
+                $filename = urlencode($params['filename']);
+                
+                $headers = array_merge($headers, [
+                    'Content-Type' => 'binary/octet-stream',
+                    'Content-Disposition' => "inline; filename=\"{$filename}\""
+                ]);
 
-                $result = $this->client->request($method, $endpoint, [
+                /* This is actually a PUT request under the hood
+                 * A special payload struct to facilitate this unique endpoint
+                 */
+                $result = $this->client->request('PUT', $endpoint, [
                     'headers' => $headers,
-                    RequestOptions::FORM_PARAMS => json_encode($params, JSON_THROW_ON_ERROR)
+                    RequestOptions::BODY => $params['contents']
                 ]);
 
                 break;
 
             /* Default case: assume standard headers
+             * These seem sufficient for GET PUT POST types
              */
             default:
                 $result = $this->client->request($method, $endpoint, [
@@ -203,7 +214,7 @@ class Api
          * but we should check for other errors in the caller function to decide
          * what happens next and how those errors might be logged/presented to users
          */
-        if (\in_array($result->getStatusCode(), [200, 201], true)) {
+        if (\in_array($result->getStatusCode(), [200, 201, 202], true)) {
             return json_decode($result->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         }
 

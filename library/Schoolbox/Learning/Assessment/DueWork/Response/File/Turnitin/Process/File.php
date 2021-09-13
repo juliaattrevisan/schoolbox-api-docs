@@ -113,11 +113,12 @@ class File
 
         /* Upload a Student Submission File's contents to the Turnitin Submission
          */
-
+        $upload = $this->uploadFile($ssf, $submission);
 
         /* If anything went wrong, set the ERROR state in the db
          * for this model; we'll think of a Replay script later
          */
+        new \Alaress_Probe($upload);
     }
 
 
@@ -228,5 +229,29 @@ class File
         ];
 
         return $this->api->retrieve('POST', "/api/v1/submissions", $payload);
+    }
+
+
+    /**
+     * Upload a file's contents to turnitin into the given turnitin submission identifier
+     *
+     * @param SingleFile\Model $ssf
+     * @param array            $submission
+     * @return array
+     * @throws Turnitin\Exception\BadEndpoint
+     * @throws Turnitin\Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    private function uploadFile(SingleFile\Model $ssf, array $submission)
+    {
+        $payload = [
+            'filename' => $ssf->getBasename(),
+            'contents' => $ssf->read()
+        ];
+
+        return $this->api->retrieve('UPLOAD', "/api/v1/submissions/{$submission['id']}/original", $payload);
     }
 }
