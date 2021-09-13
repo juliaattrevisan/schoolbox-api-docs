@@ -206,7 +206,7 @@ class File
          * Example result:
          * {"owner":"47","title":"[106] Online Submission","status":"CREATED","id":"d756ffe5-1a61-4bf9-b7f7-1fc7950d70a3","created_time":"2021-09-13T06:17:48.685Z"}
          */
-        return $this->api->retrieve('POST', "/api/v1/submissions", [
+        $payload = [
             'owner' => $owner->getId(),
             /* Is this the name of the submission file or the assessment?
              * I think it should be the submission file since you have multiple
@@ -225,6 +225,8 @@ class File
                 ],
                 'group' => $group
             ]
-        ]);
+        ];
+
+        return $this->api->retrieve('POST', "/api/v1/submissions", $payload);
     }
 }

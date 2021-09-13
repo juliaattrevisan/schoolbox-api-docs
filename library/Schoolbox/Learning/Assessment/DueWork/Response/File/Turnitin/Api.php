@@ -203,10 +203,10 @@ class Api
          * but we should check for other errors in the caller function to decide
          * what happens next and how those errors might be logged/presented to users
          */
-        if (200 === $result->getStatusCode()) {
+        if (\in_array($result->getStatusCode(), [200, 201], true)) {
             return json_decode($result->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         }
-new \Alaress_Probe($result->getBody()->getContents());
+
         /* Arbitrary default case for now
          * Something occurred that we haven't accounted for just now
          *
