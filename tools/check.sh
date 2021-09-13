@@ -58,27 +58,27 @@ function parse_args() {
       verbose="1"
       shift # past argument
       ;;
-      $ARG_SYSTEM)
+      "$ARG_SYSTEM")
       check_system="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_DNS)
+      "$ARG_DNS")
       check_dns="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_HTTP)
+      "$ARG_HTTP")
       check_http="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_LDAP)
+      "$ARG_LDAP")
       check_ldap="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_SB)
+      "$ARG_SB")
       check_sb="1"
       check_specific='1'
       shift # past argument
