@@ -77,7 +77,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteTurnitin(Model $file): void
     {
-        /** @var Turnitin\Mapper $plagScanMapper */
+        /** @var Turnitin\Mapper $turnitinMapper */
         $turnitinMapper = $this->getJoinMapper('turnitin');
         $turnitins = $turnitinMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $turnitinMapper->delete($turnitins);
