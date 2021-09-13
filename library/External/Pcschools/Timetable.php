@@ -390,7 +390,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
-            if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00") {
+            if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00.000") {
                 // TODO: Remove hardcoded day one once Schoolbox supports different day/times
                 $period = '01.' . $dayClass['PERIOD'];
 
