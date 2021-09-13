@@ -1,18 +1,16 @@
 #!/bin/bash
 # Checks an on-prem server is suitable for an on-prem install
-# When called with no params, w
+# If called with flags, just execute the specified tests. Otherwise execute all tests.
+# Can be also invoked post-install for diagnosis, will include LDAP tests in this case.
 #
 # Usage:
 #   ./check.sh [-v] [--verbose] [system] [dns] [http] [ldap] [ntp] [schoolbox]
 #
 # @copyright   Copyright 2020, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
-# @todo This script's purpose is unclear. One use case is checking on on-prem server is suitable for an install
-# @todo But it also has code that actually checks schoolbox after an install. Consider splitting into distinct scripts.
 
 # Global constants
 readonly COLOUR_RED='\e[91m'
-readonly COLOUR_GREEN='\e[92m'
 readonly COLOUR_END='\e[0m'
 
 readonly ARG_SYSTEM='system'
@@ -217,7 +215,7 @@ function check_dns(){
 # HTTP Check
 function check_http(){
   prefix='[HTTP]';
-  local timeout;
+  local timeout=15; # in seconds
   local http_list;
   local http_list_ignore_ssl_check;
   local start_time;
@@ -227,7 +225,6 @@ function check_http(){
   local time;
   local time_ms;
 
-  timeout='15'; # in seconds
   if ! which curl >/dev/null 2>&1; then
     error "$prefix" 'Error: Unable to locate curl';
   else
@@ -278,8 +275,7 @@ function check_http(){
 function check_sb(){
   prefix='[SCHOOLBOX]';
   local temp_conf_file;
-  local timeout;
-  local timeout;
+  local timeout=5; # seconds
   local start_time;
   local check;
   local check_check;
@@ -291,7 +287,6 @@ function check_sb(){
 
   if [ -f /etc/schoolbox/conf.php ]; then
     temp_conf_file='/etc/schoolbox/conf.php';
-    timeout='5'; # seconds
     http_list='https://localhost/saml/browsertest.php http://localhost/saml/browsertest.php'
     for http_check in $http_list; do
       start_time=$(date +%s%N);
