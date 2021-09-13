@@ -2901,16 +2901,16 @@ abstract class Mapper implements IMapper, Serializable
         // Must for now, because otherwise transactions would be nested.
         foreach ($collection as $model) {
             $previous = null;
+            $id       = null;
             if ($idProperty) {
                 // this mapper defines a primary key, so providing a diff is possible (if this is an UPDATE)
                 $id = $this->getModelProperty($model, $idProperty);
                 if ($id) {
                     $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
-                    if (!$this->triggerCallbacks(self::CALLBACK_PRESAVE, $model, $previous)) {
-                        return false;
-                    }
                 }
-            } elseif (!$this->triggerCallbacks(self::CALLBACK_PRESAVE, $model)) {
+            }
+
+            if (!$this->triggerCallbacks(self::CALLBACK_PRESAVE, $model, $previous)) {
                 return false;
             }
         }
