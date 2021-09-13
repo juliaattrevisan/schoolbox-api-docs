@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\MarkScheme\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use RangeException;
@@ -20,7 +21,7 @@ class PercentageTest extends TestCase
      * @param float  $normalised
      * @param string $expected
      * @throws RangeException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function test_getHumanReadable_Valid($normalised, $expected)
     {
@@ -36,7 +37,7 @@ class PercentageTest extends TestCase
      * @param string $humanReadable
      * @param float  $expected
      * @throws RangeException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function test_getNormalised_Valid($humanReadable, $expected)
     {
@@ -77,6 +78,20 @@ class PercentageTest extends TestCase
     ): void {
         $markScheme = new Percentage();
         $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
+     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     */
+    public function testConvertFormInputToHumanReadableMarkInvalid(?string $formInput): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $markScheme = new Percentage();
+        $markScheme->convertFormInputToHumanReadableMark($formInput);
     }
 
 
@@ -169,6 +184,18 @@ class PercentageTest extends TestCase
         yield 'numeric form input' => ['50', '50 %'];
         yield 'percent form input, space' => ['50 %', '50 %'];
         yield 'percent form input, no space' => ['50%', '50 %'];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMarkInvalid`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    {
+        yield 'invalid valid form input 1' => ['Invalid'];
+        yield 'invalid valid form input 2' => [''];
     }
 
 

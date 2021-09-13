@@ -323,6 +323,23 @@ class TotalMarkFractionalTest extends TestCase
     }
 
 
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
+     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertFormInputToHumanReadableMark
+     *
+     * @param TotalMarkFractional $markScheme
+     * @param string|null         $formInput
+     */
+    public function testConvertFormInputToHumanReadableMarkInvalid(
+        TotalMarkFractional $markScheme,
+        ?string $formInput
+    ): void {
+        $this->expectException(InvalidArgumentException::class);
+        $markScheme->convertFormInputToHumanReadableMark($formInput);
+    }
+
+
     /**
      * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
      * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertHumanReadableMarkToFormInput
@@ -470,6 +487,21 @@ class TotalMarkFractionalTest extends TestCase
         yield 'numeric form input' => [$total, '6', '6 / 12'];
         yield 'fraction form input, space' => [$total, '6 / 12', '6 / 12'];
         yield 'fraction form input, no space' => [$total, '6/12', '6 / 12'];
+        yield 'fraction form input, < 0' => [$total, '-1', '-1 / 12'];
+        yield 'fraction form input, > 100' => [$total, '13', '13 / 12'];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMarkInvalid`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    {
+        $total = new TotalMarkFractional(12);
+        yield 'invalid valid form input 1' => [$total, 'Invalid'];
+        yield 'invalid valid form input 2' => [$total, ''];
     }
 
 
@@ -485,6 +517,8 @@ class TotalMarkFractionalTest extends TestCase
         yield 'numeric form input' => [$total, '6', '6'];
         yield 'fraction form input, space' => [$total, '6 / 12', '6'];
         yield 'fraction form input, no space' => [$total, '6/12', '6'];
+        yield 'fraction form input, < 0' => [$total, '-1/12', '-1'];
+        yield 'fraction form input, > 100' => [$total, '13/12', '13'];
     }
 
 

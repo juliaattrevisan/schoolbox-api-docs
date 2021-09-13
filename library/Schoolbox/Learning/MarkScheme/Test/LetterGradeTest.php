@@ -78,6 +78,20 @@ class LetterGradeTest extends TestCase
 
 
     /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
+     * @covers \Schoolbox\Learning\MarkScheme\LetterGrade::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     */
+    public function testConvertFormInputToHumanReadableMarkInvalid(?string $formInput): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $markScheme = new LetterGrade($this->getDummyLetterGradeGroup());
+        $markScheme->convertFormInputToHumanReadableMark($formInput);
+    }
+
+
+    /**
      * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
      * @covers \Schoolbox\Learning\MarkScheme\LetterGrade::convertHumanReadableMarkToFormInput
      *
@@ -161,6 +175,18 @@ class LetterGradeTest extends TestCase
         yield 'valid form input 3' => ['Good', 'Good'];
         yield 'valid form input 4' => ['Very Good', 'Very Good'];
         yield 'valid form input 5' => ['Excellent', 'Excellent'];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMarkInvalid`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    {
+        yield 'invalid valid form input 1' => ['Invalid'];
+        yield 'invalid valid form input 2' => [''];
     }
 
 
