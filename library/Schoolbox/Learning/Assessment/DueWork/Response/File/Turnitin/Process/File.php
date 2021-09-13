@@ -11,7 +11,6 @@ use Aws\Exception\CredentialsException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -70,6 +69,7 @@ class File
      * Constructor.
      *
      * @param Turnitin\Api        $api
+     * @param Turnitin\Mapper     $turnitinMapper
      * @param UserMapper          $userMapper
      * @param SubmissionBoxMapper $boxMapper
      * @param SingleFile\Mapper   $ssfMapper
