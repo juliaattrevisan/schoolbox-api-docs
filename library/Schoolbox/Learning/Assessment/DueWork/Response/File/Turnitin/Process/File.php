@@ -127,11 +127,18 @@ class File
             try {
                 $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->turnitinMapper->save($model
-                    ->setStatus(Turnitin\Model::STATUS_ERROR)
+                /* These are schoolbox errors, not turnitin errors
+                 */
+                $model
                     ->setErrorCode('Student Submission File Not Found')
-                    ->setErrorMessage('Student Submission File not found; maybe its record was deleted')
-                );
+                    ->setErrorMessage('Student Submission File not found; maybe its record was deleted');
+
+                $this->changeState($model, sprintf(
+                    'Report %s: Student Submission File %s not found; setting to status %s',
+                    $model->getId(),
+                    $model->getStudentSubmissionFileId(),
+                    Turnitin\Model::STATUS_ERROR
+                ), Turnitin\Model::STATUS_ERROR);
 
                 return;
             }
@@ -214,7 +221,7 @@ class File
         /* Log the state change
          */
         $this->changeState($model, sprintf(
-            'Setting up turnitin Group for report %s (submission file %s %s) to status %s',
+            'Report %s: setting up turnitin Group for submission file %s %s to status %s',
             $model->getId(),
             $ssf->getId(),
             $ssf->getBasename(),
@@ -280,7 +287,7 @@ class File
         /* Log the state change
          */
         $this->changeState($model, sprintf(
-            'Setting up turnitin Submission for report %s (submission file %s %s) to status %s',
+            'Report %s: setting up turnitin Submission for submission file %s %s to status %s',
             $model->getId(),
             $ssf->getId(),
             $ssf->getBasename(),
@@ -371,7 +378,7 @@ class File
         /* Log the state change
          */
         $this->changeState($model, sprintf(
-            'Setting up turnitin Submission File Contents for report %s (submission file %s %s) to status %s',
+            'Report %s: setting up turnitin Submission File Contents for submission file %s %s to status %s',
             $model->getId(),
             $ssf->getId(),
             $ssf->getBasename(),
