@@ -62,13 +62,24 @@ Find every Pending turnitin report in turnitin_report and set up the turnitin Gr
 and upload the file's contents. Used periodically to kick everything up to turnit in for another
 async process to do its work.
 
+Transmission of turnitin files goes through these stages, with their status strings:
+
+1. Saved in schoolbox db with status Pending ("pending")
+2. Set up Turnitin Group, analogous to our submission boxes ("group")
+3. Set up Turnitin Submission, analagous to our student submission files ("submission")
+3a. Accept EULA on behalf of student; no status for this step, it's kind of implicit
+4. Upload file contents into Turnitin Submission ("uploading")
+5. Turnitin report record set to Loaded ("loaded")
+
+When you get to stage 5, another async process takes over to manufacture the report itself.
+(For those ancient support kings, this file is analogous to plag "submit.php")
+
 Usage: transmit.php
+
 
 HELP;
             exit;
         }
-
-        $this->getLogger()->info('Script commencing.');
 
         /* We need this api
          */
@@ -81,12 +92,18 @@ HELP;
             Turnitin\Mapper::getInstance(),
             UserMapper::getInstance(),
             Component\SubmissionBoxMapper::getInstance(),
-            SingleFile\Mapper::getInstance()
+            SingleFile\Mapper::getInstance(),
+            $this->getLogger()
         ));
 
         /* Find all the Pending records
          */
         $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+
+        $this->getLogger()->info(sprintf(
+                'Commencing upload sequence for %s pending Turnitin reports.',
+            $models->count()
+        ));
 
         /* Shank them all up
          */

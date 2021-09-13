@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
 
 use Aws\Exception\CredentialsException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
@@ -66,26 +67,35 @@ class File
 
 
     /**
+     * @var LoggerInterface|null
+     */
+    private ?LoggerInterface $log;
+
+
+    /**
      * Constructor.
      *
-     * @param Turnitin\Api        $api
-     * @param Turnitin\Mapper     $turnitinMapper
-     * @param UserMapper          $userMapper
-     * @param SubmissionBoxMapper $boxMapper
-     * @param SingleFile\Mapper   $ssfMapper
+     * @param Turnitin\Api         $api
+     * @param Turnitin\Mapper      $turnitinMapper
+     * @param UserMapper           $userMapper
+     * @param SubmissionBoxMapper  $boxMapper
+     * @param SingleFile\Mapper    $ssfMapper
+     * @param LoggerInterface|null $log
      */
     public function __construct(
         Turnitin\Api $api,
         Turnitin\Mapper $turnitinMapper,
         UserMapper $userMapper,
         SubmissionBoxMapper $boxMapper,
-        SingleFile\Mapper $ssfMapper
+        SingleFile\Mapper $ssfMapper,
+        ?LoggerInterface $log = null
     ) {
         $this->api = $api;
         $this->turnitinMapper = $turnitinMapper;
         $this->userMapper = $userMapper;
         $this->boxMapper = $boxMapper;
         $this->ssfMapper = $ssfMapper;
+        $this->log = $log;
     }
 
 
@@ -97,7 +107,14 @@ class File
      * When that's done a secondary process generates the Report info
      *
      * @param Turnitin\Model $model
-     * @throws \DebugBar\DebugBarException
+     * @throws Turnitin\Exception\Credentials
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
     public function process(Turnitin\Model $model): void
     {
@@ -111,24 +128,18 @@ class File
             return;
         }
 
-        /* Create a Turnitin Group
-         */
         try {
-            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_GROUP));
-
-            $group = $this->createGroup($ssf);
+            /* Create a Turnitin Group
+             */
+            $group = $this->createGroup($model, $ssf);
 
             /* Create a Turnitin Submission
              */
-            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_SUBMISSION));
-
-            $submission = $this->createSubmission($ssf, $group);
+            $submission = $this->createSubmission($model, $ssf, $group);
 
             /* Upload a Student Submission File's contents to the Turnitin Submission
              */
-            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_UPLOADING));
-
-            $upload = $this->uploadFile($ssf, $submission);
+            $upload = $this->uploadFile($model, $ssf, $submission);
 
             /* I guess we did it
              */
@@ -143,12 +154,35 @@ class File
 
 
     /**
+     * Log to Logger if one was provided (used in cli tools)
+     *
+     * @param Turnitin\Model $model
+     * @param string         $message
+     * @param string         $status
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function changeState(Turnitin\Model $model, string $message, string $status): void
+    {
+        if (null !== $this->log) {
+            $this->log->debug($message);
+        }
+
+        /* Actually change the state
+         */
+        $this->turnitinMapper->save($model->setStatus($status));
+    }
+
+
+    /**
      * Create a Turnitin Group, which is synonymous with our Submission Boxes
      *
      * Apparently you just shove in an identifier, turnitin understands that...
      * ...which seems a little odd, but ok. It puts the onus on us (haha) to
      * manage these. Since our Box Ids are guaranteed to be unique, in it goes
      *
+     * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @return array
      * @throws Turnitin\Exception\BadEndpoint
@@ -156,11 +190,23 @@ class File
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws \PDOException
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    private function createGroup(SingleFile\Model $ssf): array
+    private function createGroup(Turnitin\Model $model, SingleFile\Model $ssf): array
     {
+        /* Log the state change
+         */
+        $this->changeState($model, sprintf(
+            'Setting up turnitin Group for report %s (submission file %s %s) to status %s',
+            $model->getId(),
+            $ssf->getId(),
+            $ssf->getBasename(),
+            Turnitin\Model::STATUS_SETUP_GROUP
+        ), Turnitin\Model::STATUS_SETUP_GROUP);
+
         $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
 
         $payload = [
@@ -186,26 +232,38 @@ class File
      *  - There are five subfields, so "the other four" would be submitter, group, group_context, original_submitted_time
      *  - That means "owners" struct, and its fields, is a required subfield in metadata
      *
+     * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $group
      * @return array
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
-     * @throws \DebugBar\DebugBarException
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
+     * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
-    private function createSubmission(SingleFile\Model $ssf, array $group): array
+    private function createSubmission(Turnitin\Model $model, SingleFile\Model $ssf, array $group): array
     {
 
         /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
          *  a pretty sweeping assumption that we needed them everywhere else...
          */
         $owner = $this->userMapper->findById($ssf->getOwner()->getId());
+
+        /* Log the state change
+         */
+        $this->changeState($model, sprintf(
+            'Setting up turnitin Submission for report %s (submission file %s %s) to status %s',
+            $model->getId(),
+            $ssf->getId(),
+            $ssf->getBasename(),
+            Turnitin\Model::STATUS_SETUP_SUBMISSION
+        ), Turnitin\Model::STATUS_SETUP_SUBMISSION);
 
         /* Status 451 is used to do some EULA business
          * {"status":451,"message":"47 has not accepted a EULA"}
@@ -255,6 +313,7 @@ class File
     /**
      * Upload a file's contents to turnitin into the given turnitin submission identifier
      *
+     * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $submission
      * @return array
@@ -263,10 +322,23 @@ class File
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
+     * @throws \PDOException
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    private function uploadFile(SingleFile\Model $ssf, array $submission)
+    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): array
     {
+        /* Log the state change
+         */
+        $this->changeState($model, sprintf(
+            'Setting up turnitin Submission File Contents for report %s (submission file %s %s) to status %s',
+            $model->getId(),
+            $ssf->getId(),
+            $ssf->getBasename(),
+            Turnitin\Model::STATUS_SETUP_UPLOADING
+        ), Turnitin\Model::STATUS_SETUP_UPLOADING);
+
         $payload = [
             'filename' => $ssf->getBasename(),
             'contents' => $ssf->read()
