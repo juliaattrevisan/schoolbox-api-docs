@@ -206,7 +206,7 @@ class Api
         if (200 === $result->getStatusCode()) {
             return json_decode($result->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         }
-
+new \Alaress_Probe($result->getBody()->getContents());
         /* Arbitrary default case for now
          * Something occurred that we haven't accounted for just now
          *

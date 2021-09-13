@@ -30,6 +30,12 @@ class File
 
 
     /**
+     * EULA language for our people to accept
+     */
+    private const EULA_LANGUAGE = 'en-US';
+
+
+    /**
      * @var Turnitin\Api
      */
     private Turnitin\Api $api;
@@ -103,10 +109,11 @@ class File
 
         /* Create a Turnitin Submission
          */
-//        $this->createSubmission($ssf, $group);
+        $submission = $this->createSubmission($ssf, $group);
 
         /* Upload a Student Submission File's contents to the Turnitin Submission
          */
+
 
         /* If anything went wrong, set the ERROR state in the db
          * for this model; we'll think of a Replay script later
@@ -159,45 +166,65 @@ class File
      *  - That means "owners" struct, and its fields, is a required subfield in metadata
      *
      * @param SingleFile\Model $ssf
+     * @param array            $group
+     * @return array
+     * @throws Turnitin\Exception\BadEndpoint
+     * @throws Turnitin\Exception\Credentials
      * @throws \DebugBar\DebugBarException
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    private function createSubmission(SingleFile\Model $ssf): void
+    private function createSubmission(SingleFile\Model $ssf, array $group): array
     {
 
         /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
          *  a pretty sweeping assumption that we needed them everywhere else...
          */
-        try {
-            $owner = $this->userMapper->findById($ssf->getOwner()->getId());
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop; owner not found
-            return;
-        }
+        $owner = $this->userMapper->findById($ssf->getOwner()->getId());
 
-        /* Method is POST
+        /* Status 451 is used to do some EULA business
+         * {"status":451,"message":"47 has not accepted a EULA"}
+         *
+         * TODO Accept it on their behalf, because that dialog would get old real fast
+         *  Anyway, that datetime format is specific, don't mess with it
+         */
+        $eulaResult = $this->api->retrieve('POST', '/api/v1/eula/v1beta/accept', [
+            'user_id' => $owner->getId(),
+            'accepted_timestamp' => gmdate("Y-m-d\TH:i:s\Z"),
+            'language' => self::EULA_LANGUAGE
+        ]);
+
+        /* TODO maybe some error checking, but I haven't seen it die yet
          */
 
         /* Set up the payload
+         *
+         * Example result:
+         * {"owner":"47","title":"[106] Online Submission","status":"CREATED","id":"d756ffe5-1a61-4bf9-b7f7-1fc7950d70a3","created_time":"2021-09-13T06:17:48.685Z"}
          */
-        $payload = [
+        return $this->api->retrieve('POST', "/api/v1/submissions", [
             'owner' => $owner->getId(),
             /* Is this the name of the submission file or the assessment?
              * I think it should be the submission file since you have multiple
              * student submission files per assessment
              */
             'title' => "[{$ssf->getId()}] {$ssf->getFilename()}",
+            'owner_default_permission_set' => 'LEARNER',
             'metadata' => [
                 'owners' => [
-                    'id' => $owner->getId(),
-                    'given_name' => $owner->getFirstname(),
-                    'family_name' => $owner->getLastname(),
-                    'email' => $owner->getEmail()
-                ]
+                    [
+                        'id' => $owner->getId(),
+                        'given_name' => $owner->getFirstname(),
+                        'family_name' => $owner->getLastname(),
+                        'email' => $owner->getEmail()
+                    ]
+                ],
+                'group' => $group
             ]
-        ];
-
-        /* Send it
-         */
-        new \Alaress_Probe($payload);
+        ]);
     }
 }
