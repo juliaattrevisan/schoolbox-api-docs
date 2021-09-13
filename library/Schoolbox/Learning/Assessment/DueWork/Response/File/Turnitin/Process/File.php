@@ -118,37 +118,51 @@ class File
      */
     public function process(Turnitin\Model $model): void
     {
-        /* Check the file exists
-         * Without it, we don't do much at all
-         */
         try {
-            $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop; file not found
-            return;
-        }
 
-        try {
+            /* The student submission file exists (i.e. not deleted)
+             * This is a mandatory ingredient for all future steps
+             * If we die here, we all die
+             */
+            try {
+                $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->turnitinMapper->save($model
+                    ->setStatus(Turnitin\Model::STATUS_ERROR)
+                    ->setErrorCode('Student Submission File Not Found')
+                    ->setErrorMessage('Student Submission File not found; maybe its record was deleted')
+                );
+
+                return;
+            }
+
+            /* Commence Purification.
+             */
+
             /* Create a Turnitin Group
              */
             $group = $this->createGroup($model, $ssf);
 
             /* Create a Turnitin Submission
              */
-            $submission = $this->createSubmission($model, $ssf, $group);
+            if (null !== $group) {
+                $submission = $this->createSubmission($model, $ssf, $group);
 
-            /* Upload a Student Submission File's contents to the Turnitin Submission
-             */
-            $upload = $this->uploadFile($model, $ssf, $submission);
+                /* Upload a Student Submission File's contents to the Turnitin Submission
+                 */
+                if (null !== $submission) {
+                    $upload = $this->uploadFile($model, $ssf, $submission);
 
-            /* I guess we did it
-             */
-            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_LOADED));
+                    /* I guess we did it
+                     */
+                    $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_LOADED));
+                }
+            }
         } catch (Turnitin\Exception\BadEndpoint | CredentialsException | \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode($e->getCode())
-                ->setErrorMessage($e->getMessage()
-            ));
+                ->setErrorMessage($e->getMessage())
+            );
         }
     }
 
@@ -184,7 +198,7 @@ class File
      *
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
-     * @return array
+     * @return array|null
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -195,7 +209,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createGroup(Turnitin\Model $model, SingleFile\Model $ssf): array
+    private function createGroup(Turnitin\Model $model, SingleFile\Model $ssf): ?array
     {
         /* Log the state change
          */
@@ -207,8 +221,22 @@ class File
             Turnitin\Model::STATUS_SETUP_GROUP
         ), Turnitin\Model::STATUS_SETUP_GROUP);
 
-        $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
+        /* The box has to exist (i.e. not deleted)
+         */
+        try {
+            $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->turnitinMapper->save($model
+                ->setStatus(Turnitin\Model::STATUS_ERROR)
+                ->setErrorCode('Submission Box Not Found')
+                ->setErrorMessage('Submission Box not found; maybe its record was deleted')
+            );
 
+            return null;
+        }
+
+        /* Got through that? Keep going
+         */
         $payload = [
             'name' => $box->getName(),
             'type' => self::GROUP_TYPE
@@ -235,7 +263,7 @@ class File
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $group
-     * @return array
+     * @return array|null
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -244,16 +272,10 @@ class File
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
-    private function createSubmission(Turnitin\Model $model, SingleFile\Model $ssf, array $group): array
+    private function createSubmission(Turnitin\Model $model, SingleFile\Model $ssf, array $group): ?array
     {
-
-        /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
-         *  a pretty sweeping assumption that we needed them everywhere else...
-         */
-        $owner = $this->userMapper->findById($ssf->getOwner()->getId());
 
         /* Log the state change
          */
@@ -264,6 +286,23 @@ class File
             $ssf->getBasename(),
             Turnitin\Model::STATUS_SETUP_SUBMISSION
         ), Turnitin\Model::STATUS_SETUP_SUBMISSION);
+
+        /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
+         *  a pretty sweeping assumption that we needed them everywhere else...
+         *
+         * The student submission file owner has to exist (i.e. not deleted)
+         */
+        try {
+            $owner = $this->userMapper->findById($ssf->getOwner()->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->turnitinMapper->save($model
+                ->setStatus(Turnitin\Model::STATUS_ERROR)
+                ->setErrorCode('Student Submission File Owner Not Found')
+                ->setErrorMessage('Student Submission File owner not found; maybe their record was deleted')
+            );
+
+            return null;
+        }
 
         /* Status 451 is used to do some EULA business
          * {"status":451,"message":"47 has not accepted a EULA"}
