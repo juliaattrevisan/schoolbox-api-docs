@@ -157,10 +157,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $errorCode
+     * @param string|null $errorCode
      * @return Model
      */
-    public function setErrorCode(string $errorCode): self
+    public function setErrorCode(?string $errorCode): self
     {
         $this->errorCode = $errorCode;
         return $this;
@@ -177,10 +177,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $errorMessage
+     * @param string|null $errorMessage
      * @return Model
      */
-    public function setErrorMessage(string $errorMessage): self
+    public function setErrorMessage(?string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
         return $this;
@@ -217,10 +217,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $turnitinSubmissionId
+     * @param string|null $turnitinSubmissionId
      * @return Model
      */
-    public function setTurnitinSubmissionId(string $turnitinSubmissionId): self
+    public function setTurnitinSubmissionId(?string $turnitinSubmissionId): self
     {
         $this->turnitinSubmissionId = $turnitinSubmissionId;
         return $this;
@@ -237,10 +237,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param float $overallMatchPercentage
+     * @param float|null $overallMatchPercentage
      * @return Model
      */
-    public function setOverallMatchPercentage(float $overallMatchPercentage): self
+    public function setOverallMatchPercentage(?float $overallMatchPercentage): self
     {
         $this->overallMatchPercentage = $overallMatchPercentage;
         return $this;

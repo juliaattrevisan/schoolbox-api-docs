@@ -54,6 +54,15 @@ class Model implements IFile, ISoftDeletable
     /** @var Kami\Model */
     private $kami;
 
+
+    /**
+     * A Turnitin Report model, optionally null
+     *
+     * @var DueWork\Response\File\Turnitin\Model|null
+     */
+    private ?DueWork\Response\File\Turnitin\Model $turnitin = null;
+
+
     public function __clone()
     {
         // Robustly protect against scalar nulls
@@ -115,6 +124,27 @@ class Model implements IFile, ISoftDeletable
         $this->plagscan = $plagscan;
         return $this;
     }
+
+
+    /**
+     * @return DueWork\Response\File\Turnitin\Model|null
+     */
+    public function getTurnItIn(): ?DueWork\Response\File\Turnitin\Model
+    {
+        return $this->turnitin;
+    }
+
+
+    /**
+     * @param DueWork\Response\File\Turnitin\Model|null $turnitin
+     * @return $this
+     */
+    public function setTurnItIn(?DueWork\Response\File\Turnitin\Model $turnitin): self
+    {
+        $this->turnitin = $turnitin;
+        return $this;
+    }
+
 
     /**
      * @return Submission|DueWork\Response\Model

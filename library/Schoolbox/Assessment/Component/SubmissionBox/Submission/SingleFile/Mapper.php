@@ -17,6 +17,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
@@ -43,9 +44,11 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseSingle('student_submission_file_id', Plagscan\Mapper::class, 'plagscan', 'plagscan');
+        $this->joinsReverseSingle('student_submission_file_id', Turnitin\Mapper::class, 'turnitin', 'turnitin');
         $this->joinsReverseSingle('student_submission_file_id', Kami\Mapper::class, 'kami', 'kami');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteTurnitin' ]);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteKami' ]);
     }
 
@@ -62,6 +65,21 @@ class Mapper extends BaseMapper
         $plagScanMapper = $this->getJoinMapper('plagscan');
         $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $plagScanMapper->delete($plagScans);
+    }
+
+
+    /**
+     * Soft deletes any Turnitin for the specified File
+     *
+     * @param Model $file
+     * @throws BaseMapper\DefinitionException
+     */
+    public function softDeleteTurnitin(Model $file): void
+    {
+        /** @var Turnitin\Mapper $plagScanMapper */
+        $turnitinMapper = $this->getJoinMapper('turnitin');
+        $turnitins = $turnitinMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $turnitinMapper->delete($turnitins);
     }
 
 
@@ -96,12 +114,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('storage', 'f')},
                 {$this->getJoinColumnString('storage.allowedFileExtension', 'm')},
                 {$this->getJoinMapper('plagscan')->getColumnString('ps')},
-                {$this->getJoinMapper('kami')->getColumnString('k')}
+                {$this->getJoinMapper('kami')->getColumnString('k')},
+                {$this->getJoinMapper('turnitin')->getColumnString('tii')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('submission', '', 's', true)}
             LEFT JOIN {$this->getJoinSql('storage', '', 'f')}
             LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm')}
             LEFT JOIN {$this->getJoinSql('plagscan', '', 'ps')}
+            LEFT JOIN {$this->getJoinSql('turnitin', '', 'tii')}
             LEFT JOIN {$this->getJoinSql('kami', '', 'k')}
         ";
     }
@@ -148,10 +168,14 @@ class Mapper extends BaseMapper
             /** @var Plagscan\Model $plagscan */
             $plagscan = $this->hydrateJoin($row, 'plagscan', 'ps');
 
+            /** @var Turnitin\Model $turnitin */
+            $turnitin = $this->hydrateJoin($row, 'turnitin', 'tii');
+
             $submissionFile = $this->hydrate($row);
             $submissionFile
                 ->setStorage($storage)
                 ->setPlagscan($plagscan)
+                ->setTurnItIn($turnitin)
                 ->setKami($kamiMapper->hydrate($row, 'k'))
                 ->setSubmission($submissionMapper->hydrate($row, 's'));
 

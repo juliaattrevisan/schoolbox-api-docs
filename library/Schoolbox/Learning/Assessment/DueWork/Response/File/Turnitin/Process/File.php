@@ -28,15 +28,23 @@ class File
 
 
     /**
+     * @var SingleFile\Mapper
+     */
+    private SingleFile\Mapper $ssfMapper;
+
+
+    /**
      * Constructor.
      *
-     * @param Turnitin\Api $api
+     * @param Turnitin\Api      $api
+     * @param SingleFile\Mapper $ssfMapper
      */
     public function __construct(
         Turnitin\Api $api,
-
+        SingleFile\Mapper $ssfMapper
     ) {
         $this->api = $api;
+        $this->ssfMapper = $ssfMapper;
     }
 
 
