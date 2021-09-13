@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 
-class External_Isams_Cis_User extends External_Isams_User
+class External_Isams_Cispl_User extends External_Isams_User
 {
     /**
      * @inheritdoc
@@ -25,7 +25,7 @@ class External_Isams_Cis_User extends External_Isams_User
         $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
 
         $query = "
-            SELECT      
+            SELECT
                         V_Parent.ParentID             AS StudentContactID,
                         ''                            AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
@@ -48,10 +48,10 @@ class External_Isams_Cis_User extends External_Isams_User
                         ''                            AS StudentContactSpousePreferred,
                         ''                            AS StudentContactSpouseSurname,
                         ''                            AS StudentContactSpouseMobilePhone,
-                        ''                            AS StudentContactSpouseOccupPhone, 
+                        ''                            AS StudentContactSpouseOccupPhone,
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
-            JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
+            JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID
             WHERE       V_Student.StudentID IN ({$predicate['placeholders']})
         ";
 

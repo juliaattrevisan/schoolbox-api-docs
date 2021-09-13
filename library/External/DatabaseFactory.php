@@ -371,8 +371,8 @@ class External_DatabaseFactory
                 }
                 return new External_Tass_User();
             case IConnector::EXTERNAL_TYPE_ISAMS:
-                return $siteSchoolCode === 'CIS'
-                    ? new External_Isams_Cis_User()
+                return $siteSchoolCode === 'CISPL'
+                    ? new External_Isams_Cispl_User()
                     : new External_Isams_User();
             case IConnector::EXTERNAL_TYPE_DENBIGH:
                 return new External_Denbigh_User();
