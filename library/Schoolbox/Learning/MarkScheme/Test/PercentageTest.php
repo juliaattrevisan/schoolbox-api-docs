@@ -17,13 +17,13 @@ class PercentageTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_normalisedToHumanReadable
+     * @dataProvider providerNormalisedToHumanReadable
      * @param float  $normalised
      * @param string $expected
      * @throws RangeException
      * @throws InvalidArgumentException
      */
-    public function test_getHumanReadable_Valid($normalised, $expected)
+    public function testGetHumanReadableValid($normalised, $expected)
     {
         $markScheme = new Percentage();
         $actual = $markScheme->getHumanReadableMark($normalised);
@@ -33,13 +33,13 @@ class PercentageTest extends TestCase
 
 
     /**
-     * @dataProvider provider_humanReadableToNormalised
+     * @dataProvider providerHumanReadableToNormalised
      * @param string $humanReadable
      * @param float  $expected
      * @throws RangeException
      * @throws InvalidArgumentException
      */
-    public function test_getNormalised_Valid($humanReadable, $expected)
+    public function testGetNormalisedValid($humanReadable, $expected)
     {
         $markScheme = new Percentage();
         $actual = $markScheme->getNormalisedMark($humanReadable);
@@ -47,7 +47,7 @@ class PercentageTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
-    public function test_getNormalised_TooLow()
+    public function testGetNormalisedTooLow()
     {
         $this->expectException(RangeException::class);
         $humanReadable = '-0.0001 %';
@@ -56,7 +56,7 @@ class PercentageTest extends TestCase
     }
 
 
-    public function test_getNormalised_TooHigh()
+    public function testGetNormalisedTooHigh()
     {
         $this->expectException(RangeException::class);
         $humanReadable = '100.0000001 %';
@@ -116,7 +116,7 @@ class PercentageTest extends TestCase
     /**
      * @return array
      */
-    public function provider_humanReadableToNormalised(): array
+    public function providerHumanReadableToNormalised(): array
     {
         return [
             ['  0 %',      0.0],
@@ -148,7 +148,7 @@ class PercentageTest extends TestCase
     /**
      * @return array
      */
-    public function provider_normalisedToHumanReadable(): array
+    public function providerNormalisedToHumanReadable(): array
     {
         return [
             [-0.0001,     '0 %'],

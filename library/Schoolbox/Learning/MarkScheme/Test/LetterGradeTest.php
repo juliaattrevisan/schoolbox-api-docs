@@ -18,7 +18,7 @@ use InvalidArgumentException;
 class LetterGradeTest extends TestCase
 {
 
-    public function test_Unknown_Caption()
+    public function testUnknownCaption()
     {
         $this->expectException(InvalidArgumentException::class);
         $humanReadable = 'Some Unknown Captions';
@@ -29,13 +29,13 @@ class LetterGradeTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalisedToHumanReadable
+     * @dataProvider providerNormalisedToHumanReadable
      * @param float  $normalised
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws \RangeException
      */
-    public function test_getHumanReadable($normalised, $expected)
+    public function testGetHumanReadable($normalised, $expected)
     {
         $gradeGroup = $this->getDummyLetterGradeGroup();
         $markScheme = new LetterGrade($gradeGroup);
@@ -46,12 +46,12 @@ class LetterGradeTest extends TestCase
 
 
     /**
-     * @dataProvider provider_humanReadableToNormalised
+     * @dataProvider providerHumanReadableToNormalised
      * @param string $humanReadable
      * @param float  $expected
      * @throws InvalidArgumentException
      */
-    public function test_getNormalised($humanReadable, $expected)
+    public function testGetNormalised($humanReadable, $expected)
     {
         $gradeGroup = $this->getDummyLetterGradeGroup();
         $markScheme = new LetterGrade($gradeGroup);
@@ -112,7 +112,7 @@ class LetterGradeTest extends TestCase
     /**
      * @return array
      */
-    public function provider_normalisedToHumanReadable(): array
+    public function providerNormalisedToHumanReadable(): array
     {
         return [
             [-5,     'Needs Attention'],
@@ -134,7 +134,7 @@ class LetterGradeTest extends TestCase
     /**
      * @return array
      */
-    public function provider_humanReadableToNormalised(): array
+    public function providerHumanReadableToNormalised(): array
     {
         return [
             ['Needs Attention', 20.0],

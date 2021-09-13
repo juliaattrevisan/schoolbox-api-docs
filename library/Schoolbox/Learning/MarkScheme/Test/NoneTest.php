@@ -16,7 +16,7 @@ class NoneTest extends TestCase
     /**
      * Humanreadable is null
      */
-    public function test_getHumanReadable_Null()
+    public function testGetHumanReadableNull()
     {
         $normalised = null;
         $expected = null;
@@ -30,10 +30,10 @@ class NoneTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalised
+     * @dataProvider providerNormalised
      * @param float $normalised
      */
-    public function test_getHumanReadable_Valid($normalised)
+    public function testGetHumanReadableValid($normalised)
     {
         $expected = null;
         $markScheme = new None();
@@ -47,7 +47,7 @@ class NoneTest extends TestCase
     /**
      * Normalised mark is null
      */
-    public function test_GetNormalised_Null()
+    public function testGetNormalisedNull()
     {
         $humanReadable = null;
         $expected = null;
@@ -61,7 +61,7 @@ class NoneTest extends TestCase
     /**
      * Normalised mark is empty
      */
-    public function test_GetNormalised_Empty()
+    public function testGetNormalisedEmpty()
     {
         $humanReadable = '';
         $expected = null;
@@ -72,10 +72,10 @@ class NoneTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_humanReadable
+     * @dataProvider providerHumanReadable
      * @param string $humanReadable
      */
-    public function test_GetNormalised_Valid($humanReadable)
+    public function testGetNormalisedValid($humanReadable)
     {
         $expected = null;
         $markScheme = new None();
@@ -121,7 +121,7 @@ class NoneTest extends TestCase
     /**
      * @return array
      */
-    public function provider_normalised(): array
+    public function providerNormalised(): array
     {
         return [
             [0],
@@ -137,7 +137,7 @@ class NoneTest extends TestCase
     /**
      * @return array
      */
-    public function provider_humanReadable(): array
+    public function providerHumanReadable(): array
     {
         return [
             [null],
