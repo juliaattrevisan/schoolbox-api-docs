@@ -13,8 +13,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\BadEndpointException;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\CredentialsException;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\Credentials;
 
 /**
  * Establish connectivity to Turnitin
@@ -117,7 +117,7 @@ class Api
              * but how do you make this endpoint fail?
              */
             return true;
-        } catch (BadEndpointException|CredentialsException|GuzzleException $e) {
+        } catch (BadEndpoint|Credentials|GuzzleException $e) {
             // noop: all errors return false
         }
 
@@ -137,8 +137,8 @@ class Api
      * @param string $endpoint
      * @param array  $params
      * @return Response
-     * @throws Exception\BadEndpointException
-     * @throws Exception\CredentialsException
+     * @throws Exception\BadEndpoint
+     * @throws Exception\Credentials
      * @throws \DebugBar\DebugBarException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \DomainException
@@ -162,13 +162,13 @@ class Api
         /* Can't authenticate
          */
         if (403 === $result->getStatusCode()) {
-            throw new Exception\CredentialsException();
+            throw new Exception\Credentials();
         }
 
         /* Bad endpoint
          */
         if (404 === $result->getStatusCode()) {
-            throw new Exception\BadEndpointException();
+            throw new Exception\BadEndpoint();
         }
 
         /* I guess we succeeded, which should be the case most of the time,
