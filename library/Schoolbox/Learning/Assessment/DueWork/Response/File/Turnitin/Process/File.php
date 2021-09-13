@@ -118,56 +118,56 @@ class File
      */
     public function process(Turnitin\Model $model): void
     {
+        /* These are schoolbox errors, not turnitin errors
+         * Try to exit early
+         */
+
+        /* The student submission file exists (i.e. not deleted)
+         * This is a mandatory ingredient for all future steps
+         * If we die here, we all die
+         */
         try {
+            $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $model
+                ->setErrorCode('Student Submission File Not Found')
+                ->setErrorMessage('Student Submission File not found; maybe its record was deleted');
 
-            /* The student submission file exists (i.e. not deleted)
-             * This is a mandatory ingredient for all future steps
-             * If we die here, we all die
-             */
-            try {
-                $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                /* These are schoolbox errors, not turnitin errors
-                 */
-                $model
-                    ->setErrorCode('Student Submission File Not Found')
-                    ->setErrorMessage('Student Submission File not found; maybe its record was deleted');
+            $this->changeState($model, sprintf(
+                'Report %s: Student Submission File %s not found; setting to status %s',
+                $model->getId(),
+                $model->getStudentSubmissionFileId(),
+                Turnitin\Model::STATUS_ERROR
+            ), Turnitin\Model::STATUS_ERROR);
 
-                $this->changeState($model, sprintf(
-                    'Report %s: Student Submission File %s not found; setting to status %s',
-                    $model->getId(),
-                    $model->getStudentSubmissionFileId(),
-                    Turnitin\Model::STATUS_ERROR
-                ), Turnitin\Model::STATUS_ERROR);
+            return;
+        }
 
-                return;
-            }
+        /* It also has to be a valid file for upload
+         *
+         * Note: The controller usage of this should have denied invalid mimes
+         * but who knows how a record might actually get populated beyond our
+         * own intended controller usage (ie. 3rd party imports/syncs)
+         */
+        if (!(new Turnitin\ValidFile())->isSatisfiedBy($ssf)) {
+            $model
+                ->setErrorCode('Invalid Filetype')
+                ->setErrorMessage('Student Submission File has an invalid mime type');
 
-            /* It also has to be a valid file for upload
-             *
-             * Note: The controller usage of this should have denied invalid mimes
-             * but who knows how a record might actually get populated beyond our
-             * own intended controller usage (ie. 3rd party imports/syncs)
-             */
-            if (!(new Turnitin\ValidFile())->isSatisfiedBy($ssf)) {
-                $model
-                    ->setErrorCode('Invalid Filetype')
-                    ->setErrorMessage('Student Submission File has an invalid mime type');
+            $this->changeState($model, sprintf(
+                'Report %s: Student Submission File %s %s has an invalid mime type; setting to status %s',
+                $model->getId(),
+                $ssf->getId(),
+                $ssf->getBasename(),
+                Turnitin\Model::STATUS_ERROR
+            ), Turnitin\Model::STATUS_ERROR);
 
-                $this->changeState($model, sprintf(
-                    'Report %s: Student Submission File %s %s has an invalid mime type; setting to status %s',
-                    $model->getId(),
-                    $ssf->getId(),
-                    $ssf->getBasename(),
-                    Turnitin\Model::STATUS_ERROR
-                ), Turnitin\Model::STATUS_ERROR);
+            return;
+        }
 
-                return;
-            }
-
-            /* Commence Purification.
-             */
-
+        /* Commencing Purification.
+         */
+        try {
             /* Create a Turnitin Group
              */
             $group = $this->createGroup($model, $ssf);
