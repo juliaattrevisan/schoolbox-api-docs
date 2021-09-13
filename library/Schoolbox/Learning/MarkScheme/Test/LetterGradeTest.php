@@ -60,6 +60,39 @@ class LetterGradeTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkData
+     * @covers \Schoolbox\Learning\MarkScheme\LetterGrade::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     * @param string|null $expected
+     */
+    public function testConvertFormInputToHumanReadableMark(
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $markScheme = new LetterGrade($this->getDummyLetterGradeGroup());
+        $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+    /**
+     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
+     * @covers \Schoolbox\Learning\MarkScheme\LetterGrade::convertHumanReadableMarkToFormInput
+     *
+     * @param string|null $humanReadableMark
+     * @param string|null $expected
+     */
+    public function testConvertHumanReadableMarkToFormInput(
+        ?string $humanReadableMark,
+        ?string $expected
+    ): void {
+        $markScheme = new LetterGrade($this->getDummyLetterGradeGroup());
+        $this->assertSame($expected, $markScheme->convertHumanReadableMarkToFormInput($humanReadableMark));
+    }
+
+
     // ==================== Data Providers ====================
 
     /**
@@ -97,6 +130,39 @@ class LetterGradeTest extends TestCase
             ['Excellent',       95.0],
         ];
     }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMark`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'valid form input 1' => ['Needs Attention', 'Needs Attention'];
+        yield 'valid form input 2' => ['Acceptable', 'Acceptable'];
+        yield 'valid form input 3' => ['Good', 'Good'];
+        yield 'valid form input 4' => ['Very Good', 'Very Good'];
+        yield 'valid form input 5' => ['Excellent', 'Excellent'];
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableValueAsFormInput`
+     *
+     * @return iterable
+     */
+    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'valid form input 1' => ['Needs Attention', 'Needs Attention'];
+        yield 'valid form input 2' => ['Acceptable', 'Acceptable'];
+        yield 'valid form input 3' => ['Good', 'Good'];
+        yield 'valid form input 4' => ['Very Good', 'Very Good'];
+        yield 'valid form input 5' => ['Excellent', 'Excellent'];
+    }
+
 
     /**
      * @return GradeGroup

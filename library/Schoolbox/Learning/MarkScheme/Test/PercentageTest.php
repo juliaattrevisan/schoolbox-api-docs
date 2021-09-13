@@ -63,6 +63,39 @@ class PercentageTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable);
     }
 
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkData
+     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     * @param string|null $expected
+     */
+    public function testConvertFormInputToHumanReadableMark(
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $markScheme = new Percentage();
+        $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+    /**
+     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
+     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertHumanReadableMarkToFormInput
+     *
+     * @param string|null $humanReadableMark
+     * @param string|null $expected
+     */
+    public function testConvertHumanReadableMarkToFormInput(
+        ?string $humanReadableMark,
+        ?string $expected
+    ): void {
+        $markScheme = new Percentage();
+        $this->assertSame($expected, $markScheme->convertHumanReadableMarkToFormInput($humanReadableMark));
+    }
+
+
     // ==================== Data Providers ====================
 
     /**
@@ -122,5 +155,33 @@ class PercentageTest extends TestCase
             [100.0,       '100 %'],
             [100.0000001, '100 %'],
         ];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMark`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'numeric form input' => ['50', '50 %'];
+        yield 'percent form input, space' => ['50 %', '50 %'];
+        yield 'percent form input, no space' => ['50%', '50 %'];
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableValueAsFormInput`
+     *
+     * @return iterable
+     */
+    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'numeric form input' => ['50', '50'];
+        yield 'percent form input, space' => ['50 %', '50'];
+        yield 'percent form input, no space' => ['50%', '50'];
     }
 }

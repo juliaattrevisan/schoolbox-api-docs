@@ -305,6 +305,41 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkData
+     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertFormInputToHumanReadableMark
+     *
+     * @param TotalMarkFractional $markScheme
+     * @param string|null         $formInput
+     * @param string|null         $expected
+     */
+    public function testConvertFormInputToHumanReadableMark(
+        TotalMarkFractional $markScheme,
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+    /**
+     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
+     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertHumanReadableMarkToFormInput
+     *
+     * @param TotalMarkFractional $markScheme
+     * @param string|null         $humanReadableMark
+     * @param string|null         $expected
+     */
+    public function testConvertHumanReadableMarkToFormInput(
+        TotalMarkFractional $markScheme,
+        ?string $humanReadableMark,
+        ?string $expected
+    ): void {
+        $this->assertSame($expected, $markScheme->convertHumanReadableMarkToFormInput($humanReadableMark));
+    }
+
+
     // ==================== Data Providers ====================
 
     /**
@@ -421,6 +456,37 @@ class TotalMarkFractionalTest extends TestCase
             [133.3333, $totalMark,   '3 / 3'],
         ];
     }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMark`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    {
+        $total = new TotalMarkFractional(12);
+        yield 'null form input' => [$total, null, null];
+        yield 'numeric form input' => [$total, '6', '6 / 12'];
+        yield 'fraction form input, space' => [$total, '6 / 12', '6 / 12'];
+        yield 'fraction form input, no space' => [$total, '6/12', '6 / 12'];
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableValueAsFormInput`
+     *
+     * @return iterable
+     */
+    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    {
+        $total = new TotalMarkFractional(12);
+        yield 'null form input' => [$total, null, null];
+        yield 'numeric form input' => [$total, '6', '6'];
+        yield 'fraction form input, space' => [$total, '6 / 12', '6'];
+        yield 'fraction form input, no space' => [$total, '6/12', '6'];
+    }
+
 
     /**
      * Generate a Quiz with attached Attempts, Feedbacks, Questions + Responses

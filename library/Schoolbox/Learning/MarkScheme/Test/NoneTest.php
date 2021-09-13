@@ -84,6 +84,36 @@ class NoneTest extends TestCase
     }
 
 
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkData
+     * @covers \Schoolbox\Learning\MarkScheme\None::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     * @param string|null $expected
+     */
+    public function testConvertFormInputToHumanReadableMark(
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $markScheme = new None();
+        $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+    /**
+     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
+     * @covers \Schoolbox\Learning\MarkScheme\None::convertHumanReadableMarkToFormInput
+     *
+     * @param string|null $humanReadableMark
+     * @param string|null $expected
+     */
+    public function testConvertHumanReadableMarkToFormInput(
+        ?string $humanReadableMark,
+        ?string $expected
+    ): void {
+        $markScheme = new None();
+        $this->assertSame($expected, $markScheme->convertHumanReadableMarkToFormInput($humanReadableMark));
+    }
 
 
     // ==================== Data Providers ====================
@@ -115,5 +145,31 @@ class NoneTest extends TestCase
             ['a big dinosaur'],
             [20.5],
         ];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMark`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'string form input' => ['red', null];
+        yield 'numeric form input' => ['123', null];
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableValueAsFormInput`
+     *
+     * @return iterable
+     */
+    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'string form input' => ['red', null];
+        yield 'numeric form input' => ['123', null];
     }
 }
