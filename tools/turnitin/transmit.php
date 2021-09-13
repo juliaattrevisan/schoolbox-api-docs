@@ -72,7 +72,7 @@ Transmission of turnitin files goes through these stages, with their status stri
 5. Turnitin report record set to Loaded ("loaded")
 
 When you get to stage 5, another async process takes over to manufacture the report itself.
-(For those ancient support kings, this file is analogous to plag "submit.php")
+(For those ancient support kings, Turnitin transmit.php is analogous to plag "submit.php")
 
 Usage: transmit.php
 

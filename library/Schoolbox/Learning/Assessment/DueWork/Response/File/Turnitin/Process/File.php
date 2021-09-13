@@ -183,7 +183,14 @@ class File
                     $upload = $this->uploadFile($model, $ssf, $submission);
 
                     /* I guess we did it
+                     * Log the state change
                      */
+                    $this->changeState($model, sprintf(
+                        'Report %s: setting up turnitin upload complete; setting status %s',
+                        $model->getId(),
+                        Turnitin\Model::STATUS_SETUP_LOADED
+                    ), Turnitin\Model::STATUS_SETUP_LOADED);
+
                     $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_LOADED));
                 }
             }
