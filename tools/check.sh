@@ -3,7 +3,7 @@
 # When called with no params, w
 #
 # Usage:
-#   ./check.sh [-v] [--verbose] [system] [dns] [http] [ldap] [schoolbox]
+#   ./check.sh [-v] [--verbose] [system] [dns] [http] [ldap] [ntp] [schoolbox]
 #
 # @copyright   Copyright 2020, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
@@ -19,6 +19,7 @@ readonly ARG_SYSTEM='system'
 readonly ARG_DNS='dns'
 readonly ARG_HTTP='http'
 readonly ARG_LDAP='ldap'
+readonly ARG_NTP='ntp'
 readonly ARG_SB='schoolbox'
 
 # Global vars. Initialised to default values.
@@ -28,6 +29,7 @@ check_system='0';
 check_dns='0';
 check_http='0';
 check_ldap='0';
+check_ntp='0';
 check_sb='0';
 
 ipv6_check_pretty='true'
@@ -77,6 +79,11 @@ function parse_args() {
       check_ldap="1"
       check_specific='1'
       shift # past argument
+      ;;
+      "$ARG_NTP")
+      check_ntp="1"
+      check_specific='1'
+      shift
       ;;
       "$ARG_SB")
       check_sb="1"
@@ -404,6 +411,17 @@ function check_ldap(){
   fi
 }
 
+# NTP server check
+function check_ntp(){
+  prefix='[NTP]';
+  local output
+  if output=$(nc -z -v -u pool.ntp.org 123 2>&1); then
+    echo "$prefix $output";
+  else
+    error "$prefix" "Unable to connect to NTP server 'pool.ntp.org' port 123. Check firewall outbound rules."
+  fi
+}
+
 
 # Schoolbox Health Check
 function check_sb_health(){
@@ -437,6 +455,9 @@ function main(){
   fi
   if [ "$check_sb" == "1" ] || [ "$check_ldap" == "1" ] || [ "$check_specific" == "0" ]; then
     check_ldap
+  fi
+  if [ "$check_ntp" == "1" ] || [ "$check_specific" == "0" ]; then
+    check_ntp
   fi
   if [ "$check_sb" == "1" ] || [ "$check_specific" == "0" ]; then
     check_sb_health
