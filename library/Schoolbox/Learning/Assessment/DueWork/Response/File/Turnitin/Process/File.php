@@ -143,6 +143,28 @@ class File
                 return;
             }
 
+            /* It also has to be a valid file for upload
+             *
+             * Note: The controller usage of this should have denied invalid mimes
+             * but who knows how a record might actually get populated beyond our
+             * own intended controller usage (ie. 3rd party imports/syncs)
+             */
+            if (!(new Turnitin\ValidFile())->isSatisfiedBy($ssf)) {
+                $model
+                    ->setErrorCode('Invalid Filetype')
+                    ->setErrorMessage('Student Submission File has an invalid mime type');
+
+                $this->changeState($model, sprintf(
+                    'Report %s: Student Submission File %s %s has an invalid mime type; setting to status %s',
+                    $model->getId(),
+                    $ssf->getId(),
+                    $ssf->getBasename(),
+                    Turnitin\Model::STATUS_ERROR
+                ), Turnitin\Model::STATUS_ERROR);
+
+                return;
+            }
+
             /* Commence Purification.
              */
 
