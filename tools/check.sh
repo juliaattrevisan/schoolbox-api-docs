@@ -127,7 +127,7 @@ function check_system(){
   local disk_space;
   local disk_total_space;
 
-  os=$(cat /etc/lsb-release | grep CODENAME | cut -d'=' -f2);
+  os=$(grep "CODENAME" /etc/lsb-release | cut -d'=' -f2);
   echo "$prefix OS: $os";
   if [ "$os" != "bionic" ]; then
     error "$prefix" "Error: Schoolbox requires Ubuntu 18.04 LTS (bionic) - current: $os";
@@ -137,7 +137,7 @@ function check_system(){
   if [ "$arch" != "x86_64" ]; then
     error "$prefix" "Error: Schoolbox requires 64bit linux - current: $arch";
   fi
-  cpus=$(cat /proc/cpuinfo | grep processor | wc -l);
+  cpus=$(grep -c 'processor' /proc/cpuinfo);
   echo "$prefix CPU Cores: $cpus";
   if [ "$cpus" -lt 4 ]; then
     error "$prefix" "Error: Schoolbox requires a minimum of 4 cpu cores - current: $cpus";
@@ -147,14 +147,14 @@ function check_system(){
   if [ "$mem" -lt 7480 ]; then
     error "$prefix" "Error: Schoolbox requires a minimum of 8 GB of ram - current: $mem MB";
   fi
-  disks=$(lsblk | grep disk | wc -l);
+  disks=$(lsblk | grep -c 'disk');
   echo "$prefix HDDs: $disks";
   disk_space=$(lsblk -b | grep disk | awk '{print $4}' | cut -d'G' -f1);
   disk_total_space=0;
   for disk in $disk_space; do
-    disk_total_space=$(expr $disk_total_space + $disk);
+    disk_total_space=$((disk_total_space + disk));
   done
-  disk_total_space=$(expr "$disk_total_space" / 1024 / 1024 / 1024);
+  disk_total_space=$((disk_total_space / 1024 / 1024 / 1024));
   echo "$prefix HDD Total Space: $disk_total_space GB";
   if [ "$disk_total_space" -lt 190 ]; then
     error "$prefix" "Error: Schoolbox requires a minimum of 200GB of HDD space across system and data disks - current: $disk_total_space GB";
@@ -187,7 +187,7 @@ function check_dns(){
       for resolve_check in $resolve_list; do
         start_time=$(date +%s%N);
         check=$(host "$resolve_check" "$dns_server" -W 10);
-        check_check=$(echo $?);
+        check_check=$?;
         end_time=$(date +%s%N);
         time=$((end_time - start_time));
         time_ms=$((time / 1000000));
@@ -221,8 +221,7 @@ function check_http(){
   local time_ms;
 
   timeout='15'; # in seconds
-  which curl >/dev/null 2>&1;
-  if [ $? -ne 0 ]; then
+  if ! which curl >/dev/null 2>&1; then
     error "$prefix" 'Error: Unable to locate curl';
   else
     http_list='http://google.com.au https://google.com.au http://repo.schoolbox.com.au/testfile.txt https://repo.schoolbox.com.au/testfile.txt https://api.notablepdf.com/';
@@ -233,7 +232,7 @@ function check_http(){
     for http_check in $http_list; do
       start_time=$(date +%s%N);
       check=$(curl -vvv -I --connect-timeout $timeout "$http_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$((end_time - start_time));
       time_ms=$((time / 1000000));
@@ -250,7 +249,7 @@ function check_http(){
     for http_check in $http_list_ignore_ssl_check; do
       start_time=$(date +%s%N);
       check=$(curl -vvv -Ik --connect-timeout $timeout "$http_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$((end_time - start_time));
       time_ms=$((time / 1000000));
@@ -290,7 +289,7 @@ function check_sb(){
     for http_check in $http_list; do
       start_time=$(date +%s%N);
       check=$(curl -vvv -Ik --connect-timeout "$timeout" "$http_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$(("$end_time" - "$start_time"));
       time_ms=$((time / 1000000));
@@ -305,8 +304,7 @@ function check_sb(){
       fi
     done
   fi
-  which openssl >/dev/null 2>&1;
-  if [ $? -ne 0 ]; then
+  if ! which openssl >/dev/null 2>&1; then
     error "$prefix" 'Error: Unable to locate openssl';
   else
     prefix="[TLS]";
@@ -314,7 +312,7 @@ function check_sb(){
     for tls_check in $tls_list; do
       start_time=$(date +%s%N);
       check=$(timeout "$timeout"s openssl s_client -connect "$tls_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$(("$end_time" - "$start_time"));
       time_ms=$((time / 1000000));
@@ -363,10 +361,10 @@ function check_ldap(){
         ldap_pri_host=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_host'" 2>/dev/null);
         ldap_sec_host=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_host_alt'" 2>/dev/null);
         ldap_ter_host=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_host_ter'" 2>/dev/null);
-        if [ "$(echo "$ldap_pri_host" | egrep 'ldap(s|)://' | wc -l)" -eq 0 ]; then
+        if [ "$(echo "$ldap_pri_host" | grep -Ec 'ldap(s|)://')" -eq 0 ]; then
           ldap_pri_host="ldap://$ldap_pri_host";
         fi
-        if [ "$(echo "$ldap_sec_host" | egrep 'ldap(s|)://' | wc -l)" -eq 0 ]; then
+        if [ "$(echo "$ldap_sec_host" | grep -Ec 'ldap(s|)://')" -eq 0 ]; then
           ldap_sec_host="ldap://$ldap_sec_host";
         fi
         if [ "$ldap_enable" == "0" ]; then
