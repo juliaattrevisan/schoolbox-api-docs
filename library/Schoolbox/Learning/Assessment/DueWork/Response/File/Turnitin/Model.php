@@ -40,12 +40,7 @@ class Model implements ISoftDeletable
      */
     public const STATUS_SETUP_PENDING = 'pending';
 
-    /* We started communicating with turnitin; this status usually denotes when an
-     * automated script has come along and started doing its thing
-     */
-    public const STATUS_PROCESSING = 'processing';
-
-    /* We started seting up a turnitin Group ("submission box") or found an existing
+    /* We started setting up a turnitin Group ("submission box") or found an existing
      * one to use, which is th same thing really
      */
     public const STATUS_SETUP_GROUP = 'group';
@@ -59,10 +54,14 @@ class Model implements ISoftDeletable
      */
     public const STATUS_SETUP_UPLOADING = 'uploading';
 
+    /* We finished uploading the file, now awaiting the next phase to begin
+     */
+    public const STATUS_SETUP_LOADED = 'loaded';
+
     /* We started turnitin's analysis process to generate their similarity report
      * This should start when their webhook executes after our successful upload
      */
-    public const STATUS_ANALYSIS = 'analysis';
+    public const STATUS_ANALYSING = 'analysing';
 
     /* We successfully completed turnitin analysis, yanking their overall percentage
      * and caching that locally

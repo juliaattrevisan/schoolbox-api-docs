@@ -11,7 +11,7 @@ CREATE TABLE `turnitin_group` (
 -- The last known error is cached here
 CREATE TABLE `turnitin_report` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `status` ENUM('pending', 'uploading', 'processing', 'complete', 'error') NOT NULL,
+    `status` ENUM('pending', 'group', 'submission', 'uploading', 'loaded', 'analysing', 'complete', 'error') NOT NULL,
     `error_code` VARCHAR(255) NULL,
     `error_message` VARCHAR(255) NULL,
     `student_submission_file_id` INT UNSIGNED NOT NULL,
