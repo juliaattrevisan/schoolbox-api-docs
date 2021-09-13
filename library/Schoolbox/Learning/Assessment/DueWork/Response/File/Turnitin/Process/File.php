@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
 
+use Aws\Exception\CredentialsException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
@@ -42,6 +43,12 @@ class File
 
 
     /**
+     * @var Turnitin\Mapper
+     */
+    private Turnitin\Mapper $turnitinMapper;
+
+
+    /**
      * @var UserMapper
      */
     private UserMapper $userMapper;
@@ -69,11 +76,13 @@ class File
      */
     public function __construct(
         Turnitin\Api $api,
+        Turnitin\Mapper $turnitinMapper,
         UserMapper $userMapper,
         SubmissionBoxMapper $boxMapper,
         SingleFile\Mapper $ssfMapper
     ) {
         $this->api = $api;
+        $this->turnitinMapper = $turnitinMapper;
         $this->userMapper = $userMapper;
         $this->boxMapper = $boxMapper;
         $this->ssfMapper = $ssfMapper;
@@ -92,7 +101,6 @@ class File
      */
     public function process(Turnitin\Model $model): void
     {
-
         /* Check the file exists
          * Without it, we don't do much at all
          */
@@ -105,20 +113,32 @@ class File
 
         /* Create a Turnitin Group
          */
-        $group = $this->createGroup($ssf);
+        try {
+            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_GROUP));
 
-        /* Create a Turnitin Submission
-         */
-        $submission = $this->createSubmission($ssf, $group);
+            $group = $this->createGroup($ssf);
 
-        /* Upload a Student Submission File's contents to the Turnitin Submission
-         */
-        $upload = $this->uploadFile($ssf, $submission);
+            /* Create a Turnitin Submission
+             */
+            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_SUBMISSION));
 
-        /* If anything went wrong, set the ERROR state in the db
-         * for this model; we'll think of a Replay script later
-         */
-        new \Alaress_Probe($upload);
+            $submission = $this->createSubmission($ssf, $group);
+
+            /* Upload a Student Submission File's contents to the Turnitin Submission
+             */
+            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_UPLOADING));
+
+            $upload = $this->uploadFile($ssf, $submission);
+
+            /* I guess we did it
+             */
+            $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_LOADED));
+        } catch (Turnitin\Exception\BadEndpoint | CredentialsException | \DomainException $e) {
+            $this->turnitinMapper->save($model
+                ->setErrorCode($e->getCode())
+                ->setErrorMessage($e->getMessage()
+            ));
+        }
     }
 
 

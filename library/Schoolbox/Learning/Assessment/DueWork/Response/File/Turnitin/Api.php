@@ -201,13 +201,19 @@ class Api
         /* Can't authenticate
          */
         if (403 === $result->getStatusCode()) {
-            throw new Exception\Credentials();
+            throw new Exception\Credentials(sprintf(
+                'Turnitin: bad access credentials for %s; check your payload',
+                $endpoint
+            ), 403);
         }
 
         /* Bad endpoint
          */
         if (404 === $result->getStatusCode()) {
-            throw new Exception\BadEndpoint();
+            throw new Exception\BadEndpoint(sprintf(
+                'Turnitin: endpoint %s not found',
+                $endpoint
+            ), 404);
         }
 
         /* I guess we succeeded, which should be the case most of the time,
@@ -230,7 +236,7 @@ class Api
             $endpoint,
             $result->getStatusCode(),
             $result->getReasonPhrase()
-        ));
+        ), $result->getStatusCode());
     }
 
 
