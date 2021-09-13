@@ -24,6 +24,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
  * A mapper for a single file within a student's submission to a due work.
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {

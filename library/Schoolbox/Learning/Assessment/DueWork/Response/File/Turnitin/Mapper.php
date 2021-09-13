@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as 
  * Transacts Turnitin models into the turnitin_report db table
  *
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  */
 class Mapper extends \Schoolbox\Mapper
 {

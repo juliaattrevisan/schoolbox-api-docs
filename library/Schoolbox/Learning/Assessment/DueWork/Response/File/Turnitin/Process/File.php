@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * The first half of a Turnitin request
@@ -28,6 +29,12 @@ class File
 
 
     /**
+     * @var UserMapper
+     */
+    private UserMapper $userMapper;
+
+
+    /**
      * @var SingleFile\Mapper
      */
     private SingleFile\Mapper $ssfMapper;
@@ -37,13 +44,16 @@ class File
      * Constructor.
      *
      * @param Turnitin\Api      $api
+     * @param UserMapper        $userMapper
      * @param SingleFile\Mapper $ssfMapper
      */
     public function __construct(
         Turnitin\Api $api,
+        UserMapper $userMapper,
         SingleFile\Mapper $ssfMapper
     ) {
         $this->api = $api;
+        $this->userMapper = $userMapper;
         $this->ssfMapper = $ssfMapper;
     }
 
@@ -56,14 +66,17 @@ class File
      * When that's done a secondary process generates the Report info
      *
      * @param Turnitin\Model $model
+     * @throws \DebugBar\DebugBarException
      */
     public function process(Turnitin\Model $model): void
     {
-        /* Create a Turnitin Submission
-         */
 
         /* Create a Turnitin Group
          */
+
+        /* Create a Turnitin Submission
+         */
+        $this->createSubmission($model);
 
         /* Upload a Student Submission File's contents to the Turnitin Submission
          */
@@ -88,13 +101,27 @@ class File
      *  - There are five subfields, so "the other four" would be submitter, group, group_context, original_submitted_time
      *  - That means "owners" struct, and its fields, is a required subfield in metadata
      *
-     * @param \Schoolbox\User  $owner
-     * @param SingleFile\Model $file
+     * @param Turnitin\Model $model
+     * @throws \DebugBar\DebugBarException
      */
-    private function createSubmission(
-        User $owner,
-        SingleFile\Model $file
-    ) {
+    private function createSubmission(Turnitin\Model $model): void
+    {
+        try {
+            $ssf = $this->ssfMapper->findById($model->getStudentSubmissionFileId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop; file not found
+            return;
+        }
+
+        /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
+         *  a pretty sweeping assumption that we needed them everywhere else...
+         */
+        try {
+            $owner = $this->userMapper->findById($ssf->getOwner()->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop; owner not found
+            return;
+        }
 
         /* Method is POST
          */
@@ -107,7 +134,7 @@ class File
              * I think it should be the submission file since you have multiple
              * student submission files per assessment
              */
-            'title' => $file->getFilename(),
+            'title' => $ssf->getFilename(),
             'metadata' => [
                 'owners' => [
                     'id' => $owner->getId(),
@@ -120,5 +147,6 @@ class File
 
         /* Send it
          */
+        new \Alaress_Probe($payload);
     }
 }
