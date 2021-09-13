@@ -354,8 +354,7 @@ function check_ldap(){
       sql_passwd=$(grep "\"SQL_passwd" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
       sql_host=$(grep "\"SQL_host" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
       sql_schema=$(grep "\"SQL_db" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
-      config=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_enable'" 2>/dev/null);
-      if [ $? -eq 0 ]; then
+      if mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_enable'" 2>/dev/null; then
         ldap_pass=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_pass'" 2>/dev/null);
         ldap_enable=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_enable'" 2>/dev/null);
         ldap_pri_host=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_host'" 2>/dev/null);
@@ -372,30 +371,29 @@ function check_ldap(){
         else
           if [ "${#ldap_pri_host}" -gt 10 ]; then
             ldap_pri_user=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user'" 2>/dev/null);
-            ldappribase=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base'" 2>/dev/null);
-            ldappricheck=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_pri_host" -D "$ldap_pri_user" -y /dev/fd/0 -b "$ldappribase" "(userObject=*)" dn 2>&1);
-            if [ $? -eq 0 ]; then
+            ldap_pri_base=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base'" 2>/dev/null);
+            if ldap_pri_check=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_pri_host" -D "$ldap_pri_user" -y /dev/fd/0 -b "$ldap_pri_base" "(userObject=*)" dn 2>&1); then
               echo "$prefix" "[LDAP] [PRIMARY] OK - $ldap_pri_host";
             else
-              error "$prefix" "[LDAP] [PRIMARY] Error with $ldap_pri_host:\n$ldappricheck";
+              error "$prefix" "[LDAP] [PRIMARY] Error with $ldap_pri_host:\n$ldap_pri_check";
             fi
           fi
           if [ "${#ldap_sec_host}" -gt 10 ]; then
-            ldapsecuser=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_alt'" 2>/dev/null);
-            ldapsecbase=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null);
-            if ldapseccheck=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_sec_host" -D "$ldapsecuser" -y /dev/fd/0 -b "$ldapsecbase" "(userObject=*)" dn 2>&1); then
+            ldap_sec_user=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_alt'" 2>/dev/null);
+            ldap_sec_base=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null);
+            if ldap_sec_check=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_sec_host" -D "$ldap_sec_user" -y /dev/fd/0 -b "$ldap_sec_base" "(userObject=*)" dn 2>&1); then
               echo "$prefix [LDAP] [SECONDARY] OK - $ldap_sec_host";
             else
-              error "$prefix" "[LDAP] [SECONDARY] Error with $ldap_sec_host:\n$ldapseccheck";
+              error "$prefix" "[LDAP] [SECONDARY] Error with $ldap_sec_host:\n$ldap_sec_check";
             fi
           fi
           if [ "${#ldap_ter_host}" -gt 10 ]; then
-            ldapteruser=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_ter'" 2>/dev/null);
-            ldapterbase=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_ter'" 2>/dev/null);
-            if ldaptercheck=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_ter_host" -D "$ldapteruser" -y /dev/fd/0 -b "$ldapterbase" "(userObject=*)" dn 2>&1); then
+            ldap_ter_user=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_ter'" 2>/dev/null);
+            ldap_ter_base=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_ter'" 2>/dev/null);
+            if ldap_ter_check=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_ter_host" -D "$ldap_ter_user" -y /dev/fd/0 -b "$ldap_ter_base" "(userObject=*)" dn 2>&1); then
               echo "$prefix [LDAP] [TERTIARY] OK - $ldap_ter_host";
             else
-              error "$prefix" "[LDAP] [TERTIARY] Error with $ldap_ter_host:\n$ldaptercheck";
+              error "$prefix" "[LDAP] [TERTIARY] Error with $ldap_ter_host:\n$ldap_ter_check";
             fi
           fi
         fi
