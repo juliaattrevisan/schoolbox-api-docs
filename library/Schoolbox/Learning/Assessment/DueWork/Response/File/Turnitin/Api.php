@@ -117,7 +117,7 @@ class Api
              * but how do you make this endpoint fail?
              */
             return true;
-        } catch (BadEndpoint|Credentials|GuzzleException $e) {
+        } catch (BadEndpoint | Credentials | GuzzleException $e) {
             // noop: all errors return false
         }
 
@@ -155,7 +155,6 @@ class Api
         /* Send it to the endpoint and see what comes back
          */
         switch ($method) {
-
             /* TODO Uploading a binary specifically
              *  Uses a special content-type header value
              */
@@ -163,7 +162,7 @@ class Api
                 /* Add some extra fields and values, specific to purpose
                  */
                 $filename = urlencode($params['filename']);
-                
+
                 $headers = array_merge($headers, [
                     'Content-Type' => 'binary/octet-stream',
                     'Content-Disposition' => "inline; filename=\"{$filename}\""
@@ -190,7 +189,6 @@ class Api
 
                 break;
         }
-
 
         /* Check errors; if anything went wrong throw special types of exceptions
          * according to what happened. I found that in suds, we kind of started to

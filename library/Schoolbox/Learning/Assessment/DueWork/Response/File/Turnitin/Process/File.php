@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
@@ -133,12 +135,16 @@ class File
                 ->setErrorCode('Student Submission File Not Found')
                 ->setErrorMessage('Student Submission File not found; maybe its record was deleted');
 
-            $this->changeState($model, sprintf(
-                'Report %s: Student Submission File %s not found; setting to status %s',
-                $model->getId(),
-                $model->getStudentSubmissionFileId(),
+            $this->changeState(
+                $model,
+                sprintf(
+                    'Report %s: Student Submission File %s not found; setting to status %s',
+                    $model->getId(),
+                    $model->getStudentSubmissionFileId(),
+                    Turnitin\Model::STATUS_ERROR
+                ),
                 Turnitin\Model::STATUS_ERROR
-            ), Turnitin\Model::STATUS_ERROR);
+            );
 
             return;
         }
@@ -154,13 +160,17 @@ class File
                 ->setErrorCode('Invalid Filetype')
                 ->setErrorMessage('Student Submission File has an invalid mime type');
 
-            $this->changeState($model, sprintf(
-                'Report %s: Student Submission File %s %s has an invalid mime type; setting to status %s',
-                $model->getId(),
-                $ssf->getId(),
-                $ssf->getBasename(),
+            $this->changeState(
+                $model,
+                sprintf(
+                    'Report %s: Student Submission File %s %s has an invalid mime type; setting to status %s',
+                    $model->getId(),
+                    $ssf->getId(),
+                    $ssf->getBasename(),
+                    Turnitin\Model::STATUS_ERROR
+                ),
                 Turnitin\Model::STATUS_ERROR
-            ), Turnitin\Model::STATUS_ERROR);
+            );
 
             return;
         }
@@ -185,11 +195,15 @@ class File
                     /* I guess we did it
                      * Log the state change
                      */
-                    $this->changeState($model, sprintf(
-                        'Report %s: setting up turnitin upload complete; setting status %s',
-                        $model->getId(),
+                    $this->changeState(
+                        $model,
+                        sprintf(
+                            'Report %s: setting up turnitin upload complete; setting status %s',
+                            $model->getId(),
+                            Turnitin\Model::STATUS_SETUP_LOADED
+                        ),
                         Turnitin\Model::STATUS_SETUP_LOADED
-                    ), Turnitin\Model::STATUS_SETUP_LOADED);
+                    );
 
                     $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_LOADED));
                 }
@@ -197,8 +211,7 @@ class File
         } catch (Turnitin\Exception\BadEndpoint | CredentialsException | \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode($e->getCode())
-                ->setErrorMessage($e->getMessage())
-            );
+                ->setErrorMessage($e->getMessage()));
         }
     }
 
@@ -249,13 +262,17 @@ class File
     {
         /* Log the state change
          */
-        $this->changeState($model, sprintf(
-            'Report %s: setting up turnitin Group for submission file %s %s to status %s',
-            $model->getId(),
-            $ssf->getId(),
-            $ssf->getBasename(),
+        $this->changeState(
+            $model,
+            sprintf(
+                'Report %s: setting up turnitin Group for submission file %s %s to status %s',
+                $model->getId(),
+                $ssf->getId(),
+                $ssf->getBasename(),
+                Turnitin\Model::STATUS_SETUP_GROUP
+            ),
             Turnitin\Model::STATUS_SETUP_GROUP
-        ), Turnitin\Model::STATUS_SETUP_GROUP);
+        );
 
         /* The box has to exist (i.e. not deleted)
          */
@@ -265,8 +282,7 @@ class File
             $this->turnitinMapper->save($model
                 ->setStatus(Turnitin\Model::STATUS_ERROR)
                 ->setErrorCode('Submission Box Not Found')
-                ->setErrorMessage('Submission Box not found; maybe its record was deleted')
-            );
+                ->setErrorMessage('Submission Box not found; maybe its record was deleted'));
 
             return null;
         }
@@ -315,13 +331,17 @@ class File
 
         /* Log the state change
          */
-        $this->changeState($model, sprintf(
-            'Report %s: setting up turnitin Submission for submission file %s %s to status %s',
-            $model->getId(),
-            $ssf->getId(),
-            $ssf->getBasename(),
+        $this->changeState(
+            $model,
+            sprintf(
+                'Report %s: setting up turnitin Submission for submission file %s %s to status %s',
+                $model->getId(),
+                $ssf->getId(),
+                $ssf->getBasename(),
+                Turnitin\Model::STATUS_SETUP_SUBMISSION
+            ),
             Turnitin\Model::STATUS_SETUP_SUBMISSION
-        ), Turnitin\Model::STATUS_SETUP_SUBMISSION);
+        );
 
         /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
          *  a pretty sweeping assumption that we needed them everywhere else...
@@ -334,8 +354,7 @@ class File
             $this->turnitinMapper->save($model
                 ->setStatus(Turnitin\Model::STATUS_ERROR)
                 ->setErrorCode('Student Submission File Owner Not Found')
-                ->setErrorMessage('Student Submission File owner not found; maybe their record was deleted')
-            );
+                ->setErrorMessage('Student Submission File owner not found; maybe their record was deleted'));
 
             return null;
         }
@@ -406,13 +425,17 @@ class File
     {
         /* Log the state change
          */
-        $this->changeState($model, sprintf(
-            'Report %s: setting up turnitin Submission File Contents for submission file %s %s to status %s',
-            $model->getId(),
-            $ssf->getId(),
-            $ssf->getBasename(),
+        $this->changeState(
+            $model,
+            sprintf(
+                'Report %s: setting up turnitin Submission File Contents for submission file %s %s to status %s',
+                $model->getId(),
+                $ssf->getId(),
+                $ssf->getBasename(),
+                Turnitin\Model::STATUS_SETUP_UPLOADING
+            ),
             Turnitin\Model::STATUS_SETUP_UPLOADING
-        ), Turnitin\Model::STATUS_SETUP_UPLOADING);
+        );
 
         $payload = [
             'filename' => $ssf->getBasename(),

@@ -101,7 +101,7 @@ HELP;
         $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
 
         $this->getLogger()->info(sprintf(
-                'Commencing upload sequence for %s pending Turnitin reports.',
+            'Commencing upload sequence for %s pending Turnitin reports.',
             $models->count()
         ));
 
