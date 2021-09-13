@@ -61,11 +61,11 @@ class Base extends AchievementReportBase
         $mypData  = [];
         $headings = [];
         foreach ($rows as $row) {
-            $subject      = $row['SubjectName'];
-            $classCode    = $row['ClassCode'];
-            $topicHeading = $row['TopicHeading'];
-            $shortHeading = $row['ShortHeading'];
-            $shortCode    = $row['HdgAbbrev1'];
+            $subject      = trim($row['SubjectName']);
+            $classCode    = trim($row['ClassCode']);
+            $topicHeading = trim($row['TopicHeading']);
+            $shortHeading = trim($row['ShortHeading']);
+            $shortCode    = trim($row['HdgAbbrev1']);
 
             // HEADINGS
             if (!key_exists($classCode, $headings)) {
@@ -93,12 +93,15 @@ class Base extends AchievementReportBase
             if (!key_exists($topicHeading, $mypData[$classCode]['topics'])) {
                 $mypData[$classCode]['topics'][$topicHeading] = [];
             }
-            $mypData[$classCode]['topics'][$topicHeading][$shortCode] = (int)$row['ResultNumeric'];
+            $mypData[$classCode]['topics'][$topicHeading][$shortCode] =
+                (int)$row['ResultNumeric'] === 0 ? '-' : (int)$row['ResultNumeric'];
         }
 
         foreach ($headings as $classCode => $subjectHeadings) {
             natsort($subjectHeadings['shortHeadings']);
             $headings[$classCode]['shortHeadings'] = $subjectHeadings['shortHeadings'];
+            natsort($subjectHeadings['topicHeadings']);
+            $headings[$classCode]['topicHeadings'] = $subjectHeadings['topicHeadings'];
         }
 
         return [

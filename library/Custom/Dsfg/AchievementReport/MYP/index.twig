@@ -9,16 +9,10 @@
     elements: navigation
 } %}
 {% for classCode, subjectData in subjects %}
+    {% set colspan = (headings[classCode].shortHeadings | length) + 1 %}
     <div class="row">
         <div class="small-12 island">
             <strong>{{ headings[classCode].subjectName }}</strong>
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12 island">
-            <section class="content">
-                <p>{{ subjectData.overview }}</p>
-            </section>
         </div>
     </div>
     <div class="row">
@@ -27,7 +21,7 @@
                 <table>
                     <thead>
                     <tr>
-                        <th></th>
+                        <th>Course topics</th>
                         {% for shortHeading in headings[classCode].shortHeadings %}
                             <th class="centered">{{ shortHeading }}</th>
                         {% endfor %}
@@ -42,16 +36,34 @@
                             {% endfor %}
                         </tr>
                     {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <table>
+                    <thead>
+                    <tr>
+                        <td colspan="{{ colspan }}">
+                            Mid Year
+                            <p>{{ subjectData.overview }}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        {% for shortHeading in headings[classCode].shortHeadings %}
+                            <th class="centered">{{ shortHeading }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
                     <tr>
                         <th>Interim Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
                             <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <th>Final Achievement Level</th>
-                        {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
                         {% endfor %}
                     </tr>
                     </tbody>
@@ -61,8 +73,31 @@
     </div>
     <div class="row">
         <div class="small-12 island">
-            <section class="content">
-                <p>{{ subjectData.comment }}</p>
+            <section>
+                <table>
+                    <thead>
+                    <tr>
+                        <td colspan="{{ colspan }}">
+                            End of Year
+                            <p>{{ subjectData.comment }}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        {% for shortHeading in headings[classCode].shortHeadings %}
+                            <th class="centered">{{ shortHeading }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th>Final Achievement Level</th>
+                        {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                            <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
             </section>
         </div>
     </div>
