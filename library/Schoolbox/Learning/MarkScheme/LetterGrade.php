@@ -99,6 +99,9 @@ class LetterGrade extends AbstractMarkScheme
      */
     public function convertFormInputToHumanReadableMark(?string $formInput): ?string
     {
+        if (!isset($formInput)) {
+            return null;
+        }
         foreach ($this->gradeGroup->getGradeLevels() as $gradeLevel) {
             if ($gradeLevel->getCaption() === $formInput) {
                 return $formInput;

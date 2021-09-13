@@ -502,6 +502,57 @@ class CapabilityMark extends TestCase
 
 
     /**
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableValueData(): iterable
+    {
+        $testCapabilityUsage = $this->buildTestFormInputConversionCapabilityUsage();
+
+        // None
+        $none = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\None());
+        yield 'Capability mark type: none, null form input' => [$none, null, null];
+        yield 'Capability mark type: none, string form input' => [$none, 'red', null];
+        yield 'Capability mark type: none, numeric form input' => [$none, '123', null];
+
+        // Percent
+        $percent = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\Percentage());
+        yield 'Capability mark type: percent, null form input' => [$percent, null, null];
+        yield 'Capability mark type: percent, numeric form input' => [$percent, '50', '50 %'];
+        yield 'Capability mark type: percent, percent form input, space' => [$percent, '50 %', '50 %'];
+        yield 'Capability mark type: percent, percent form input, no space' => [$percent, '50%', '50 %'];
+
+        // Total mark
+        $total = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, new MarkScheme\TotalMarkFractional(12));
+        yield 'Capability mark type: total, null form input' => [$total, null, null];
+        yield 'Capability mark type: total, numeric form input' => [$total, '6', '6 / 12'];
+        yield 'Capability mark type: total, fraction form input, space' => [$total, '6 / 12', '6 / 12'];
+        yield 'Capability mark type: total, fraction form input, no space' => [$total, '6/12', '6 / 12'];
+
+        // Letter grade
+        $letter = new RubricMarkedGrid\CapabilityMark($testCapabilityUsage, $this->buildTestLetterGradeMarkScheme());
+        yield 'Capability mark type: letter, null form input' => [$letter, null, null];
+        yield 'Capability mark type: letter, valid form input' => [$letter, 'A', 'A'];
+    }
+
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableValueData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::convertFormInputToHumanReadableValue
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param string|null                     $formInput
+     * @param string|null                     $expected
+     */
+    public function testConvertFormInputToHumanReadableValue(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $this->assertSame($expected, $capabilityMark->convertFormInputToHumanReadableValue($formInput));
+    }
+
+
+    /**
      * Build a test capability usage for the form input conversion methods.
      *
      * Note that its maximum value is 4.
