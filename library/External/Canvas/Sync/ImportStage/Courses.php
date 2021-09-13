@@ -149,7 +149,7 @@ class Courses
         $accountsData = [];
         while ($row = $statement->fetch()) {
             $accountCanvasId = (int)$row['account.canvas_id'];
-            $courseCode      = $row['course.code'];
+            $courseCode      = (string)$row['course.code'];
             $courseCanvasId  = (int)$row['course.canvas_id'];
 
             // First time we've seen this account?

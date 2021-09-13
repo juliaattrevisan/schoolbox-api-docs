@@ -192,6 +192,9 @@ class CourseAssignments extends CourseAssessmentAbstract
             $unitSpecFolder = $this->folderMapper->findOneByPredicates($pb);
 
             foreach ($courseData['assignments'] as $assignmentCanvasId => $assignmentData) {
+                if ($assignmentData['points_possible'] > 999) {
+                    $this->log->warning("Max mark for $assignmentCanvasId is truncated from {$assignmentData['points_possible']} to 999");
+                }
                 $this->countAssignmentsSynchronised++;
                 $submissionBox                  = $this->syncWithSubmissionBox(
                     $unitSpecFolder,
@@ -199,7 +202,7 @@ class CourseAssignments extends CourseAssessmentAbstract
                     $courseData['teacherSchoolboxId'] ?? $schoolboxAdminUserId,
                     $assignmentData['title'],
                     $assignmentData['description'] ? $this->htmlPurifier->purify($assignmentData['description']) : '',
-                    $assignmentData['points_possible'],
+                    $assignmentData['points_possible'] > 999 ? 999 : $assignmentData['points_possible'],
                     $assignmentData['grading_type'],
                     $assignmentData['submission_types'],
                     $assignmentData['created_at'],
