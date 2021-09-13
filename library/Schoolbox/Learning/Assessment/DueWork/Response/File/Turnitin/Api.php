@@ -16,7 +16,6 @@ use GuzzleHttp\RequestOptions;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\BadEndpointException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\CredentialsException;
 
-
 /**
  * Establish connectivity to Turnitin
  */
