@@ -204,7 +204,7 @@ class File
                     }
                 }
             }
-        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials| \DomainException $e) {
+        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($e->getMessage()));
@@ -418,7 +418,7 @@ class File
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $submission
-     * @return array|null
+     * @return array
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -429,7 +429,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): ?array
+    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): array
     {
         /* Log the state change
          */
@@ -462,7 +462,7 @@ class File
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $submission
-     * @return array|null
+     * @return void
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -473,7 +473,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function generateReport(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): ?array
+    private function generateReport(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): void
     {
         /* Log the state change
          */
@@ -538,7 +538,5 @@ class File
                 throw $e;
             }
         }
-
-        return null;
     }
 }
