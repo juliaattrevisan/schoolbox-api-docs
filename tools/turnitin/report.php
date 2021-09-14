@@ -90,7 +90,7 @@ HELP;
 
         /* Find all the Pending records
          */
-        $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_ANALYSING);
+        $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_LOADED);
 
         $this->getLogger()->info(sprintf(
             'Asking Turnitin for %s reports.',

@@ -211,11 +211,23 @@ class Api
         }
 
         /* Bad endpoint
+         * but turnitin sometimes hides error messages inside $result anyway
          */
         if (404 === $result->getStatusCode()) {
+            $info = json_decode($result->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+
+            /* An error message might be found in either info[error] or info[message]
+             * depending on whether you accessed a bad endpoint or the endpoint itself
+             * is valid but is missing data, respectively
+             *
+             * e.g. an endpoint that is missing a report will throw 404 at you, despite
+             * that endpoint being valid
+             */
             throw new Exception\BadEndpoint(sprintf(
-                'Turnitin: endpoint %s not found',
-                $endpoint
+                'Turnitin: endpoint %s returned %s - %s',
+                $endpoint,
+                $result->getStatusCode(),
+                '' === $info['message'] ? $info['error'] : $info['message']
             ), 404);
         }
 

@@ -72,13 +72,79 @@ class Report
      */
     public function process(Turnitin\Model $model): void
     {
-        try {
-            $report = $this->getSimilarityReport($model);
-        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
-            $this->turnitinMapper->save($model
-            ->setErrorCode((string)$e->getCode())
-            ->setErrorMessage($e->getMessage()));
-        }
+        $similarity = $this->generateReport($model);
+
+//
+//        if (null !== $similarity) {
+//            $report = $this->getSimilarityReport($model);
+//        }
+//
+//        try {
+////            $report = $this->getSimilarityReport($model);
+//        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
+//            $this->turnitinMapper->save($model
+//            ->setErrorCode((string)$e->getCode())
+//            ->setErrorMessage($e->getMessage()));
+//        }
+    }
+
+    /**
+     * Request turnitin to start manufacturing a Similarity Report for $model
+     * This is the last step in this phase, since turnitin normally uses a webhook
+     * to tell us when it's done with this manufacturing.
+     *
+     * @param Turnitin\Model   $model
+     * @return array|null
+     * @throws Turnitin\Exception\BadEndpoint
+     * @throws Turnitin\Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
+     */
+    private function generateReport(Turnitin\Model $model): ?array
+    {
+        /* Log the state change
+         */
+        $this->logDebug(sprintf(
+            'Report %s: requesting Similarity Report for Turnitin submission %s',
+            $model->getId(),
+            $model->getTurnitinSubmissionId()
+        ));
+
+        /* These use the default search repositories for now
+         * TODO We can refine these search repos later
+         */
+        $payload = [
+            'generation_settings' => [
+                'search_repositories' => [
+                    'INTERNET',
+                    'SUBMITTED_WORK',
+                    'PUBLICATION',
+                    'CROSSREF',
+                    'CROSSREF_POSTED_CONTENT'
+                ],
+            ]
+        ];
+
+        $result = $this->api->retrieve('PUT', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", $payload);
+
+        /* http 202 equates to this, which means you have to wait:
+            Array
+            (
+                [message] => Successfully scheduled similarity report generation
+            )
+        */
+        $this->logDebug(sprintf(
+            'Report %s: Turnitin submission id %s - %s',
+            $model->getId(),
+            $model->getTurnitinSubmissionId(),
+            $result['message']
+        ));
+
+        return $result;
     }
 
 
@@ -96,12 +162,12 @@ class Report
      */
     private function getSimilarityReport(Turnitin\Model $model): array
     {
-        $this->logState(sprintf(
+        $this->logDebug(sprintf(
             'Report %s: requesting similarity report from turnitin...',
             $model->getId()
         ));
 
-        return $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
+        return $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}", []);
     }
 
 
@@ -110,10 +176,23 @@ class Report
      *
      * @param string $message
      */
-    private function logState(string $message): void
+    private function logDebug(string $message): void
     {
         if (null !== $this->log) {
             $this->log->debug($message);
+        }
+    }
+
+
+    /**
+     * Specifically log a warning to the cli
+     *
+     * @param string $message
+     */
+    private function logWarning(string $message): void
+    {
+        if (null !== $this->log) {
+            $this->log->warning($message);
         }
     }
 }
