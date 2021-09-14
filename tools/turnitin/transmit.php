@@ -76,7 +76,7 @@ When you get to stage 5, another async process takes over to retrieve the report
 
 ----
 
-(For those ancient support kings, Turnitin transmit.php is analogous to plag "submit.php")
+(For those ancient support kings, Turnitin "transmit.php" is analogous to plag "submit.php")
 
 Usage: transmit.php
 
