@@ -204,7 +204,7 @@ class File
                     /* Request similarity report
                      */
                     if (null !== $upload) {
-                        $this->generateReport($model, $ssf, $submission);
+                        $similarity = $this->generateReport($model, $ssf, $submission);
 
                         /* There are no further steps we need to conduct here
                          *
@@ -215,6 +215,8 @@ class File
                 }
             }
         } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
+            $this->logWarning($e->getMessage());
+
             $this->turnitinMapper->save($model
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($e->getMessage()));
@@ -235,7 +237,7 @@ class File
      */
     private function changeState(Turnitin\Model $model, string $message, string $status): void
     {
-        $this->logState($message);
+        $this->logDebug($message);
 
         /* Actually change the state
          */
@@ -248,10 +250,23 @@ class File
      *
      * @param string $message
      */
-    private function logState(string $message): void
+    private function logDebug(string $message): void
     {
         if (null !== $this->log) {
             $this->log->debug($message);
+        }
+    }
+
+
+    /**
+     * Specifically log a warning to the cli
+     * 
+     * @param string $message
+     */
+    private function logWarning(string $message): void
+    {
+        if (null !== $this->log) {
+            $this->log->warning($message);
         }
     }
 
@@ -472,7 +487,7 @@ class File
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $submission
-     * @return void
+     * @return array|null
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -483,7 +498,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function generateReport(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): void
+    private function generateReport(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): ?array
     {
         /* Log the state change
          */
@@ -514,39 +529,6 @@ class File
             ]
         ];
 
-        try {
-            $similarity = $this->api->retrieve('PUT', "/api/v1/submissions/{$submission['id']}/similarity", $payload);
-
-            /* Succeeded in asking turnitin to do some work
-             * This Ends Now
-             */
-            if (null !== $similarity) {
-                $this->changeState(
-                    $model,
-                    sprintf(
-                        'Report %s: requested similarity report for submission file %s %s. Wait for turnitin to finish',
-                        $model->getId(),
-                        $ssf->getId(),
-                        $ssf->getBasename()
-                    ),
-                    Turnitin\Model::STATUS_SETUP_GROUP
-                );
-            }
-        } catch (\DomainException $e) {
-            /* You can request a Similarity Report while one is already being built
-             * This results in 409 Conflict but it isn't really an error for us
-             * We just need to wait
-             */
-            if (409 === $e->getCode()) {
-                $this->logState(sprintf(
-                    'Report %s: Similarity Report was requested but one is already being made. Just wait.',
-                    $model->getId()
-                ));
-            } else {
-                /* Alley-oop
-                 */
-                throw $e;
-            }
-        }
+        return $this->api->retrieve('PUT', "/api/v1/submissions/{$submission['id']}/similarity", $payload);
     }
 }
