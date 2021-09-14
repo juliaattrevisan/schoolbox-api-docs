@@ -31,7 +31,7 @@ export async function slideDown (element, duration = 0.3) {
     
     const targetHeight = element.offsetHeight + paddingTop + paddingBottom;
     element.style.height = 0;
-
+    
     return gsap.to(element, { 
         height: targetHeight, 
         paddingTop: paddingTop, 

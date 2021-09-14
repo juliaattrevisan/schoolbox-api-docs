@@ -352,7 +352,6 @@
                 event.preventDefault();
                 existing.addClass('saving');
                 formInputs.prop('disabled', true);
-                debugger;
                 $.ajax(
                     {
                         url:  masonry.options.component.url,
@@ -625,19 +624,19 @@
         // If this component already exists: don't drop it invisibly onto the page.
         // That will cause issues with JS that depends on that component's ID.
         // (such as dropzones)
-        var css = { opacity: 0 };
-        if (response.attr('id') != replacement.attr('id')) {
-            // nek level cheating for pretty animationz -_-
-            response.css({
-                visibility: 'hidden',
-                position: 'fixed',
-                width: replacement.width()
-            });
-            // drop it invisibly onto the page so that it has a height
-            $('body').append(response);
-            // grab its computed height
-            css.height = response.height;
-        }
+        // var css = { opacity: 0 };
+        // if (response.attr('id') != replacement.attr('id')) {
+        //     // nek level cheating for pretty animationz -_-
+        //     response.css({
+        //         visibility: 'hidden',
+        //         position: 'fixed',
+        //         width: replacement.width()
+        //     });
+        //     // drop it invisibly onto the page so that it has a height
+        //     $('body').append(response);
+        //     // grab its computed height
+        //     css.height = response.height;
+        // }
 
         var insertReplacement = function () {
 
@@ -658,7 +657,21 @@
             /* replacement.empty() causes a getAttribute exception but that seems
              * overkill anyway given you're replacing entire dom via replaceWith()
              */
-            replacement.replaceWith(response);
+            // replacement.replaceWith(response);
+            
+            // replacement[0].parentNode.replaceChild(response[0], replacement[0]); //replace with the new component
+            // document.body.appendChild(response[0]);
+            // replacement[0].innerHTML = '';
+            // replacement[0].appendChild(response[0]);
+            // replacement[0].replaceWith(response[0]);
+
+            // replacement[0].innerHTML = '';
+            // while (response[0].firstElementChild) {
+            //     replacement[0].appendChild(response[0].firstElementChild);
+            // }
+
+            // replacement[0].insertAdjacentHTML('afterend', response[0].outerHTML); 
+            // replacement[0].remove();
 
             if (saveSorting) {
                 masonry.saveSorting();
@@ -678,11 +691,13 @@
 
         };
 
-        if (animate) {
-            replacement.animate(css, 550, insertReplacement);
-        } else {
-            insertReplacement();
-        }
+        // if (animate) {
+        //     replacement.animate(css, 550, insertReplacement);
+        // } else {
+        //     insertReplacement();
+        // }
+
+        insertReplacement();
     };
 
 

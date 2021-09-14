@@ -4,7 +4,7 @@
  * passed element relative to the original collection
  * replacement for $(el).index
  *
- * @param { DOMElement } the DOM element to find the index of
+ * @param { Element } the DOM element to find the index of
  * 
  * @return { Number } position of the DOM element
  */
@@ -24,7 +24,7 @@ export function getIndex (element) {
  * empty the element of children
  * replacement for $(el).empty
  *
- * @param { DOMElement } the DOM element to empty
+ * @param { Element } the DOM element to empty
  * 
  */
 export function empty (element) {
@@ -36,8 +36,8 @@ export function empty (element) {
 /**
  * switch elements, changing stacking order
  *
- * @param { DOMElement } the first DOM element
- * @param { DOMElement } the second DOM element
+ * @param { Element } the first DOM element
+ * @param { Element } the second DOM element
  * 
  */
 export function swapElements (firstElement, secondElement) {
@@ -47,8 +47,8 @@ export function swapElements (firstElement, secondElement) {
 /**
  * Insert the target node before the reference
  * 
- * @param { DOMElement } element to use as basis
- * @param { DOMElement } element that will be added
+ * @param { Element } element to use as basis
+ * @param { Element } element that will be added
  */
 export function insertElementBefore (referenceElement, targetElement) {
     referenceElement.parentNode.insertBefore(targetElement, referenceElement);
@@ -57,8 +57,8 @@ export function insertElementBefore (referenceElement, targetElement) {
 /**
  * Insert the target node after the reference
  * 
- * @param { DOMElement } element to use as basis 
- * @param { DOMElement } element that will be added
+ * @param { Element } element to use as basis 
+ * @param { Element } element that will be added
  */
 export function insertElementAfter (referenceElement, targetElement) {
     referenceElement.parentNode.insertBefore(targetElement, referenceElement.nextSibling);
@@ -67,7 +67,7 @@ export function insertElementAfter (referenceElement, targetElement) {
 /**
  * put at the very top of the stack
  *
- * @param { DOMElement } the DOM element
+ * @param { Element } the DOM element
  * 
  */
  export function insertBeforeFirstChild (element) {
@@ -81,7 +81,7 @@ export function insertElementAfter (referenceElement, targetElement) {
  * @param { Element }  
  * @param { NodeList }  
  * 
- * @returns { DOMElement }   
+ * @returns { Element }   
  */
 export function getClosestElement (targetElement, elements) {
     const targetPoint = getElementsLeftAndMidHeightPoint(targetElement);
@@ -101,7 +101,7 @@ export function getClosestElement (targetElement, elements) {
 /**
  * To get an elements left and mid height point relative to the document
  * 
- * @param { DOMElement }  
+ * @param { Element }  
  * 
  * @returns { x, y }   
  */
@@ -115,7 +115,7 @@ export function getClosestElement (targetElement, elements) {
 /**
  * To get an elements mid point relative to the document
  * 
- * @param { DOMElement }  
+ * @param { Element }  
  * 
  * @returns { x, y }   
  */
@@ -129,8 +129,8 @@ export function getElementsMidPoint (element) {
 /**
  * Is the midpoint of an element above the midpoint of another element
  * 
- * @param { DOMElement }  
- * @param { DOMElement }  
+ * @param { Element }  
+ * @param { Element }  
  * 
  * @returns { Boolean }  
  */
@@ -141,8 +141,8 @@ export function isElementAboveOtherElement (firstElement, secondElement) {
 /**
  * Is the midpoint of an element below the midpoint of another element
  * 
- * @param { DOMElement }  
- * @param { DOMElement }  
+ * @param { Element }  
+ * @param { Element }  
  * 
  * @returns { Boolean }  
  */
@@ -153,7 +153,7 @@ export function isElementBelowOtherElement (firstElement, secondElement) {
 /**
  * Is the midpoint of an element below the midpoint of another element
  * 
- * @param { DOMElement }  
+ * @param { Element }  
  * @param { Styles } for example { position: 'absolute', top: '20px' } 
  */
 export function setStylesOnElement (element,styles) {

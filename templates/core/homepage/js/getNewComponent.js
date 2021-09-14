@@ -28,7 +28,7 @@ export const getNewComponent = async (activeComponent) => {
 /**
  * To pass through the required FormData to save the new position in the DB
  * 
- * @params { DOMElement } the component that's been moved
+ * @params { Element } the component that's been moved
  * 
  * @returns { FormData }  
  */
