@@ -69,7 +69,8 @@ Transmission of turnitin files goes through these stages, with their status stri
 3. Set up Turnitin Submission, analagous to our student submission files ("submission")
 3a. Accept EULA on behalf of student; no status for this step, it's kind of implicit
 4. Upload file contents into Turnitin Submission ("uploading")
-5. Request Similarity Report to be generated ("analysing")
+5. Contents finished sending to Turnitin for further processing ("loaded")
+
 
 When you get to stage 5, another async process takes over to retrieve the report itself.
 

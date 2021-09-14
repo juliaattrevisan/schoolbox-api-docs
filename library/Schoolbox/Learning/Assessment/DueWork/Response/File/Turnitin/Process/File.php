@@ -201,17 +201,27 @@ class File
                      */
                     $upload = $this->uploadFile($model, $ssf, $submission);
 
-                    /* Request similarity report
+                    /* Once we uploaded, we wait for turnitin
                      */
                     if (null !== $upload) {
-                        $similarity = $this->generateReport($model, $ssf, $submission);
-
-                        /* There are no further steps we need to conduct here
-                         *
-                         * Normally turnitin uses a webhook to tell us when it's finished
-                         * but we can't trust that will always work
-                         */
+                        $this->changeState(
+                            $model,
+                            sprintf(
+                                'Report %s: Submission File Contents for submission file %s %s sent to Turnitin for processing; setting to status %s',
+                                $model->getId(),
+                                $ssf->getId(),
+                                $ssf->getBasename(),
+                                Turnitin\Model::STATUS_SETUP_LOADED
+                            ),
+                            Turnitin\Model::STATUS_SETUP_LOADED
+                        );
                     }
+
+                    /* There are no further steps we need to conduct here
+                     *
+                     * Normally turnitin uses a webhook to tell us when it's finished
+                     * but we can't trust that will always work
+                     */
                 }
             }
         } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
@@ -476,59 +486,5 @@ class File
         ];
 
         return $this->api->retrieve('UPLOAD', "/api/v1/submissions/{$submission['id']}/original", $payload);
-    }
-
-
-    /**
-     * Request turnitin to start manufacturing a Similarity Report for $model
-     * This is the last step in this phase, since turnitin normally uses a webhook
-     * to tell us when it's done with this manufacturing.
-     *
-     * @param Turnitin\Model   $model
-     * @param SingleFile\Model $ssf
-     * @param array            $submission
-     * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    private function generateReport(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): ?array
-    {
-        /* Log the state change
-         */
-        $this->changeState(
-            $model,
-            sprintf(
-                'Report %s: requesting Similarity Report for submission file %s %s; setting to status %s',
-                $model->getId(),
-                $ssf->getId(),
-                $ssf->getBasename(),
-                Turnitin\Model::STATUS_ANALYSING
-            ),
-            Turnitin\Model::STATUS_ANALYSING
-        );
-
-        /* These use the default search repositories for now
-         * TODO We can refine these search repos later
-         */
-        $payload = [
-            'generation_settings' => [
-                'search_repositories' => [
-                    'INTERNET',
-                    'SUBMITTED_WORK',
-                    'PUBLICATION',
-                    'CROSSREF',
-                    'CROSSREF_POSTED_CONTENT'
-                ],
-            ]
-        ];
-
-        return $this->api->retrieve('PUT', "/api/v1/submissions/{$submission['id']}/similarity", $payload);
     }
 }
