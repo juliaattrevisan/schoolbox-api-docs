@@ -207,13 +207,13 @@ button.submit {
 // button action that displays inline with a heading
 .button-action {
   display: flex;
+  align-items: flex-start;
 
   h1 {
     flex: 1 1 auto;
   }
   .button {
     flex: 0 auto;
-    max-height: 2.5rem;
   }
 }
 
