@@ -132,21 +132,4 @@ class Component extends Filter\BaseComponent
         }
         return false;
     }
-
-    /**
-     * Convert "current" to current term for url override
-     * @inheritDoc
-     */
-    protected function buildUserSelections(GenericCollection $roleSelections)
-    {
-        $userSelections = parent::buildUserSelections($roleSelections);
-
-        foreach (($this->getUrlOverrides() ?? []) as $key => $override) {
-            if ($key === Definition::KEY_CURRENT && $override instanceof Filter\Selection\Model) {
-                $currentTermId                  = $this->getDefinition()->getCurrentTerm()->getId();
-                $userSelections[$currentTermId] = $this->createSelection($currentTermId, $override->getSelected());
-            }
-        }
-        return $userSelections;
-    }
 }

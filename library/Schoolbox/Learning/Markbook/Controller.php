@@ -16,14 +16,11 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
-use Schoolbox\Filter\Filters\Assessment\Term\Definition;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\Factory;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
@@ -48,11 +45,6 @@ class Controller extends Base
     /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
-    private Filter\Mapper $filterMapper;
-
-    private Filter\Page\Mapper $filterPageMapper;
-
-    private Filter\Selection\Mapper $filterSelectionMapper;
 
     /**
      * @param AssessmentMapperProxy              $assessmentMapperProxy
@@ -60,27 +52,19 @@ class Controller extends Base
      * @param Access                             $access
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\IFactoryFactory             $filterFactoryFactory
-     * @param Filter\Page\Mapper                 $filterPageMapper
-     * @param Filter\Selection\Mapper            $filterSelectionMapper
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
         Term\Mapper $termMapper,
         Access $access,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Mapper $filterMapper,
-        Filter\Page\Mapper $filterPageMapper,
-        Filter\Selection\Mapper $filterSelectionMapper
+        Filter\IFactoryFactory $filterFactoryFactory
     ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->termMapper            = $termMapper;
         $this->access                = $access;
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->filterMapper          = $filterMapper;
-        $this->filterPageMapper      = $filterPageMapper;
-        $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
 
@@ -90,12 +74,11 @@ class Controller extends Base
      * This renders the filter panel, but not its contents: those are rendered
      * by `postMarkbookForClass`.
      *
-     * @param FolderModel $folder
-     * @throws RouteNotFound If unable to generate the redirect route*
-     * @throws MapperException
+     * @api   GET /learning/markbook/class/:folderId?{filterQueryArgs}
      * @since 20.1
      *
-     * @api   GET /learning/markbook/class/:folderId?{filterQueryArgs}
+     * @param FolderModel $folder
+     * @throws RouteNotFound If unable to generate the redirect route
      */
     public function getMarkbookForClass(FolderModel $folder): void
     {
@@ -111,58 +94,15 @@ class Controller extends Base
         );
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
-        // check whether there already is a saved filter for this user
-        $savedFilter = $this->filterSelectionMapper->findByColumnList(
-            ['user_id' => $this->getUser()->getId(), 'page' => $page]
-        );
-
-        // check whether any default filters are selected for terms
-        $termFilter = $this->filterMapper->findOneByColumnList(
-            [
-                'entity' => AssessmentMapper::class,
-                'class'  => Filter\Filters\Assessment\Term\Due\Definition::class,
-            ]
-        );
-        $filterPages   = $this->filterPageMapper->findForPageAndEntity($page, AssessmentMapper::class);
-        $defaultExists = false;
-        foreach ($filterPages as $filterPage) {
-            if ($filterPage->getFilter()->getClass() !== Filter\Filters\Assessment\Term\Due\Definition::class) {
-                continue;
-            }
-            foreach ($filterPage->getOptions() as $option) {
-                /** @var Filter\Page\Option\Defaults\Model|null $default */
-                $default = $option->getDefaults()->offsetGet($this->getUser()->getRole()->getType());
-                if ($default && $option->getAvailable() && $default->isSelected()) {
-                    $defaultExists = true;
-                    break 2;
-                }
-            }
-            // not interested in the other filters
-            break;
-        }
-
-        // if there's no effective filters and this is not an archived class, filter by current term
-        if (
-            !$folder->wasClass()
-            && $savedFilter->count() === 0
-            && !$defaultExists
-            && !isset($queryArgs[$termFilter->getId()])
-        ) {
-            $queryArgs[$termFilter->getId()][Definition::KEY_CURRENT] = 1;
-        }
-
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
         $pageTitle = 'Class Markbook';
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningMarkbook/markbookOuter.twig',
-                [
-                    'folder'      => $folder,
-                    'filterPanel' => $filterPanel,
-                ]
-            )->setTab('submission')->setTitle($pageTitle)
+            $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
+                'folder'      => $folder,
+                'filterPanel' => $filterPanel,
+            ])->setTab('submission')->setTitle($pageTitle)
         );
     }
 
@@ -307,7 +247,7 @@ class Controller extends Base
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined what entity it is filtering
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws MapperException If an alias is incorrect
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
     private function convertRequestToFilters(array $request, bool $saveToDB): array
     {
@@ -345,7 +285,7 @@ class Controller extends Base
      * @throws \InvalidArgumentException             If any filter keys not recognised
      * @throws \ReflectionException                  If a specified filter class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws MapperException                       If an alias is incorrect
+     * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
     public function getMarkbookExportForClass(FolderModel $folder): void
     {
