@@ -181,6 +181,9 @@ class File
              */
             $group = $this->createGroup($model, $ssf);
 
+            /* TODO: Remember the group_id in turnitin_group (later)
+             */
+
             /* Create a Turnitin Submission
              */
             if (null !== $group) {
@@ -189,12 +192,19 @@ class File
                 /* Upload a Student Submission File's contents to the Turnitin Submission
                  */
                 if (null !== $submission) {
+                    /* Remember the turnitin_submission_id
+                     */
+                    $model->setTurnitinSubmissionId($submission['id']);
+                    $this->turnitinMapper->save($model);
+
+                    /* Continue with file upload itself
+                     */
                     $upload = $this->uploadFile($model, $ssf, $submission);
 
                     /* Request similarity report
                      */
                     if (null !== $upload) {
-                        $similarity = $this->generateReport($model, $ssf, $submission);
+                        $this->generateReport($model, $ssf, $submission);
 
                         /* There are no further steps we need to conduct here
                          *
