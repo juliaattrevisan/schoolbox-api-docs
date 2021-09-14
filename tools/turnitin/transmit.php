@@ -59,7 +59,7 @@ $app = new class extends CliTool\App
             echo <<<HELP
 
 Find every Pending turnitin report in turnitin_report and set up the turnitin Group, Submission
-and upload the file's contents. Used periodically to kick everything up to turnit in for another
+and upload the file's contents. Used periodically to kick everything up to turnitin for another
 async process to do its work.
 
 Transmission of turnitin files goes through these stages, with their status strings:
