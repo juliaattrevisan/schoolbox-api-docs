@@ -42,7 +42,6 @@ class Integration extends REST
         parent::_before($test);
 
         if ($this->_getConfig('xdebug') ?? false) {
-            $this->connectionModule->_before($test);
             $this->client->getCookieJar()->set(new Cookie('XDEBUG_SESSION', 'PHPSTORM'));
         }
     }
