@@ -378,6 +378,7 @@ class Mapper extends BaseMapper implements Receiver
         // By default files uploaded this way are public
 
         $storage->setPublic($public);
+        $this->getManager()->sanitize($storage);
 
         $this->save($storage);
 

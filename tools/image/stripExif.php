@@ -22,6 +22,11 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
+        if (!$this->getConfig()->get('remove_image_location_data')) {
+            $this->getLogger()->info('Remove Image Location Data is disabled in config; exiting');
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         if ($this->perform()) {
             $this->getLogger()->info('Running in perform mode (-p): changes will be written to filesystem');
         } else {
@@ -29,14 +34,15 @@ $app = new class extends CliTool\App {
         }
         $storageMapper = new StorageMapper();
         $mountManager  = $storageMapper->getManager();
-        $exifFiles     = $storageMapper->findByColumn('ext', ['jpg','jpeg','jpe','tif','tiff']);
+        $exifFiles     = $storageMapper->findByColumn('allowedFileTypes.mime', ['image/jpeg', 'image/tiff']);
+
         /** @var Storage $exifFile */
         foreach ($exifFiles as $exifFile) {
-            $result = $mountManager->sanitize($exifFile, $mountManager::FS_STORAGE, $exifFile->getPath(), !$this->perform());
+            $result = $mountManager->sanitize($exifFile, !$this->perform());
             if ($result) {
-                $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $exifFile->getHash());
+                $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . "{$exifFile->getFilename()} ({$exifFile->getHash()})");
             } else {
-                $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $exifFile->getHash());
+                $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . "{$exifFile->getFilename()} ({$exifFile->getHash()})");
             }
         }
     }
