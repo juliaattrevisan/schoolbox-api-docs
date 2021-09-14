@@ -194,17 +194,13 @@ class File
                     /* I guess we did it
                      * Log the state change
                      */
-                    $this->changeState(
-                        $model,
-                        sprintf(
-                            'Report %s: setting up turnitin upload complete; setting status %s',
-                            $model->getId(),
-                            Turnitin\Model::STATUS_SETUP_LOADED
-                        ),
-                        Turnitin\Model::STATUS_SETUP_LOADED
-                    );
+                    if (null !== $upload) {
 
-                    $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_LOADED));
+
+                        /* Request similarity report
+                         */
+                        $this->generateReport($model);
+                    }
                 }
             }
         } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials| \DomainException $e) {
@@ -409,7 +405,7 @@ class File
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $submission
-     * @return array
+     * @return array|null
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -420,7 +416,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): array
+    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): ?array
     {
         /* Log the state change
          */
@@ -442,5 +438,18 @@ class File
         ];
 
         return $this->api->retrieve('UPLOAD', "/api/v1/submissions/{$submission['id']}/original", $payload);
+    }
+
+
+    /**
+     * Request turnitin to start manufacturing a Similarity Report for $model
+     * This is the last step in this phase, since turnitin normally uses a webhook
+     * to tell us when it's done with this manufacturing.
+     *
+     * @param Turnitin\Model $model
+     */
+    private function generateReport(Turnitin\Model $model)
+    {
+
     }
 }

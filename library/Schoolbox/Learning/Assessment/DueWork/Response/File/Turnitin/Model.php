@@ -54,11 +54,12 @@ class Model implements ISoftDeletable
      */
     public const STATUS_SETUP_UPLOADING = 'uploading';
 
-    /* We finished uploading the file, now awaiting the next phase to begin
+    /* , now awaiting the next phase to begin
      */
     public const STATUS_SETUP_LOADED = 'loaded';
 
-    /* We started turnitin's analysis process to generate their similarity report
+    /* We finished uploading the file
+     * We started turnitin's analysis process to generate their similarity report
      * This should start when their webhook executes after our successful upload
      */
     public const STATUS_ANALYSING = 'analysing';
