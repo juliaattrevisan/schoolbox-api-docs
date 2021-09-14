@@ -1,10 +1,18 @@
-import {stringify} from "qs";
-import axios from "axios";
-const EVENT_CHANGE = 'change';
+import { stringify } from 'qs';
+import axios from 'axios';
+
+const ON_FILTER_CHANGE = 'on-filter-change';
+
 export default {
-    computed: {
+    
+    data () {
+        return {
+            filter_endpoint: '' //the endpoint of the filter action
+        }
     },
+
     methods: {
+  
         /**
          * Load badges.
          *
@@ -14,9 +22,9 @@ export default {
          *                            selections change, and that has its own
          *                            toast so don't show another.
          */
-        load(showToast) {
+        filter_load (showToast) {
             this.data = [];
-            this.append(null, showToast);
+            this.filter_append(null, showToast);
         },
 
         /**
@@ -25,8 +33,7 @@ export default {
          * @param {String|null} cursor
          * @param {Boolean}     showToast
          */
-        append(cursor, showToast) {
-            // TODO this is very generic, a candidate to be factored into its own place
+        filter_append (cursor, showToast) {
             let params = {};
             if (cursor) {
                 params.cursor = cursor;
@@ -39,10 +46,10 @@ export default {
             }
             let config = {
                 params:           params,
-                paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' } ),
             }
             axios
-                .get(this.filterEndpoint, config)
+                .get(this.filter_endpoint, config)
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
@@ -58,12 +65,15 @@ export default {
                 })
                 .finally(() => this.showSkeletonLoader = false);
         },
+
         /**
          * Helper for emitting the change event: this happens when selecting a
          * badge, or reloading the filter.
          */
-        emitChange() {
-            this.$emit(EVENT_CHANGE);
+        filter_emitChange () {
+            this.$emit(ON_FILTER_CHANGE);
         },
+
     },
+
 }

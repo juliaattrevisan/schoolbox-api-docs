@@ -1,51 +1,20 @@
 <script>
 
 import axios from 'axios';
-import foundationMixin from '@vue/components/foundation-mixin';
-import Toast from "@vue/components/toast";
-import RevealModal from "@vue/components/reveal-modal";
+import Toast from '@vue/components/toast';
+import RevealModal from '@vue/components/reveal-modal';
 import BadgeAward from "../Award/vue/badgeAward";
-import BadgeDetail from "./badgeDetail";
-import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
-import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
+import BadgeDetail from './badgeDetail';
+import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdraw-modal';
+import BadgeGoalWithdrawModal from '../Award/vue/badge-goal-withdraw-modal';
 import BadgeImage from './badge-image';
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
-import filterMixin from "./filter-mixin";
+import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
+import mixinFilter from './mixinFilter';
 
-const EVENT_CHANGE = 'change';
-
-// Foundation mixin is not required:
-// the filter panel calls `jQuery.fn.foundation` with the entire document as its
-// context.
-// Attempting to apply Foundation again causes the dropdown menus to not work.
-
-/**
- * @emits change The list of selected badges has changed
- */
 export default {
-    /**
-     * Constant values which this component may expose. Generally, this includes
-     * information which a component including this component might want to know
-     * about:
-     * * sensible default values for this component
-     * * event names
-     *
-     * (This is not part of Vue, and isn't a convention yet: putting it out
-     *  there as an idea for discussion.)
-     */
-    constants: {
-        EVENT_CHANGE,
-    },
 
-    /**
-     * Mixins.
-     * Basically traits for vue; allows you to share javascript between components in the same
-     * manner as a php trait. They must already be imported at the top of the file and will
-     * be superpositioned on top of this javascript here, inside export default {}
-     */
     mixins: [
-        foundationMixin,
-        filterMixin
+        mixinFilter
     ],
 
     components: {
@@ -58,53 +27,33 @@ export default {
         RevealModal,
         Toast
     },
+
     props: {
-        /**
-         * The route via which badges are retrieved.
-         */
-        getBadgesRoute: {
+        getBadgesRoute: { //the route via which badges are retrieved.
             type: String,
             default: '',
             required: true,
         },
-
-        /**
-         * The route which shows the badge create form.
-         */
-        getBadgeCreateFormRoute: {
+        getBadgeCreateFormRoute: { //The route which shows the badge create form.
             type: String,
             default: '',
             required: true,
         },
-
-        /**
-         * Is the menu shown for each badge?
-         */
-        showBadgeMenus: {
+        showBadgeMenus: { //Is the menu shown for each badge?
             type: Boolean,
             default: true,
         },
-
-        /**
-         * Can badges be selected?
-         */
-        allowSelection: {
+        allowSelection: { //Can badges be selected?
             type: Boolean,
             default: false,
         },
-
-        /**
-         * The Moment date format which is used to render the date when an
-         * awarding of a badge will expire.
-         *
-         * If not provided, the date will not be rendered.
-         */
-        expiryDateFormat: {
+        expiryDateFormat: { //The Moment date format which is used to render the date when an awarding of a badge will expire. If not provided, the date will not be rendered.
             type: String,
             default: null,
         },
     },
-    data() {
+
+    data () {
         return {
             currentBadge: null,
             data: [],
@@ -116,12 +65,13 @@ export default {
             selectedFilters: null,
         }
     },
-    computed: {
-        filterEndpoint() {
-            return this.getBadgesRoute;
-        },
+
+    created () {
+        this.filter_endpoint = this.getBadgesRoute; //assign endpoint for the mixinFilter
     },
+
     methods: {
+
         /**
          * Opens a modal window for viewing this badge's full details.
          *
@@ -172,7 +122,7 @@ export default {
          *
          * @param {Object} badge
          */
-        openSetAsGoalModal(badge) {
+        openSetAsGoalModal (badge) {
             this.currentBadge = badge;
             this.$refs.setAsGoalModal.open();
         },
@@ -182,7 +132,7 @@ export default {
          *
          * @param {Object} badge
          */
-        closeSetAsGoalModal(badge) {
+        closeSetAsGoalModal (badge) {
             this.$refs.setAsGoalModal.close();
         },
 
@@ -193,11 +143,11 @@ export default {
          *
          * @param {object} selectedFilters The filters that were selected
          */
-        onFilterChange(selectedFilters) {
+        onFilterChange (selectedFilters) {
             this.selectedFilters    = selectedFilters;
             this.showSkeletonLoader = true;
-            this.load(false);
-            this.emitChange();
+            this.filter_load(false);
+            this.filter_emitChange();
         },
 
         /**
@@ -205,7 +155,7 @@ export default {
          *
          * @return {Array}
          */
-        selectedBadges() {
+        selectedBadges () {
             return this.data.filter(v => v.selected === true);
         },
 
@@ -214,7 +164,7 @@ export default {
          *
          * @param {Object} badge
          */
-        openDeleteModal(badge) {
+        openDeleteModal (badge) {
           this.currentBadge = badge;
           this.$refs.deleteModal.open();
         },
@@ -222,14 +172,14 @@ export default {
         /**
          * Closes a modal window for deleting this badge.
          */
-        closeDeleteModal() {
+        closeDeleteModal () {
           this.$refs.deleteModal.close();
         },
 
         /**
          * Perform delete
          */
-        deleteBadge() {
+        deleteBadge () {
             this.$refs.toast.activate('Deleting badge...');
             let newData = this.data.filter((v) => v.id !== this.currentBadge.id);
             axios.delete(this.currentBadge._links.delete)
@@ -253,7 +203,7 @@ export default {
          *
          * @return {Boolean}
          */
-        isSelectedFiltersEmpty() {
+        isSelectedFiltersEmpty () {
             let nonEmptyFilters = Object.values(this.selectedFilters).filter(function (v1) {
                 if (v1 instanceof Object) {
                     // Each value in this object will be either a string 0 or 1:
@@ -265,18 +215,19 @@ export default {
             return nonEmptyFilters.length > 0;
         },
 
-
         /**
          * Generate a URL which references this page with all filters cleared.
          *
          * @return {String}
          */
-        generateResetFilterUrl() {
+        generateResetFilterUrl () {
             let emptyQueryString = {};
             Object.keys(this.selectedFilters).forEach(k => emptyQueryString[k] = '');
             return "?" + new URLSearchParams(emptyQueryString).toString();
         },
-    },
+
+    }
+
 }
 </script>
 
@@ -284,7 +235,7 @@ export default {
     <div>
         <div v-if="showSkeletonLoader" class="row">
             <div class="small-12 columns">
-                <div v-for="n in 3" class="card badge skeleton">
+                <div v-for="n in 3" class="card badge skeleton" :key="n">
                     <div class="img"></div>
                     <h3></h3>
                     <p class="meta"></p>
@@ -333,7 +284,7 @@ export default {
                                         <input type="checkbox"
                                                :id="'selectBadge-' + String(badge.id)"
                                                v-model="badge.selected"
-                                               @change="emitChange"
+                                               @change="filter_emitChange"
                                         >
                                         <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
                                             {{ badge.name }}
@@ -363,7 +314,7 @@ export default {
                     </div>
 
                     <!-- Load more button, if there are more to load -->
-                    <a @click.prevent="append(metadata.cursor.next, true)"
+                    <a @click.prevent="filter_append(metadata.cursor.next, true)"
                        class="button load-more expand"
                        title="Load more"
                        v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
@@ -376,17 +327,18 @@ export default {
         </reveal-modal>
 
         <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
-            <badge-award v-if="currentBadge"
-                         :key="'awardAchievement-' + String(currentBadge.id)"
-                         :badge="currentBadge"
-                         :endpoint="currentBadge._links.awardAsAchievement"
-                         :expiry="currentBadge.achievementExpiry"
-                         @cancel="closeAwardAsAchievementModal"
-                         @done="closeAwardAsAchievementModal"
-                         placeholder="Search for users to award achievement to"
-                         toast-activate-message="Awarding achievement..."
-                         toast-success-message="Awarded achievement"
-                         toast-failure-message="Awarding achievement failed"
+            <badge-award 
+                v-if="currentBadge"
+                :key="'awardAchievement-' + String(currentBadge.id)"
+                :badge="currentBadge"
+                :endpoint="currentBadge._links.awardAsAchievement"
+                :expiry="currentBadge.achievementExpiry"
+                @cancel="closeAwardAsAchievementModal"
+                @done="closeAwardAsAchievementModal"
+                placeholder="Search for users to award achievement to"
+                toast-activate-message="Awarding achievement..."
+                toast-success-message="Awarded achievement"
+                toast-failure-message="Awarding achievement failed"
             >
                 <template v-slot:header="slotProps">
                     <h2>Award &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as an Achievement</h2>
@@ -403,17 +355,18 @@ export default {
         </reveal-modal>
 
         <reveal-modal size="medium" ref="setAsGoalModal" :closeOnBackgroundClick="false">
-            <badge-award v-if="currentBadge"
-                         :key="'setGoal-' + String(currentBadge.id)"
-                         :badge="currentBadge"
-                         :endpoint="currentBadge._links.setAsGoal"
-                         :expiry="currentBadge.goalExpiry"
-                         @cancel="closeSetAsGoalModal"
-                         @done="closeSetAsGoalModal"
-                         placeholder="Search for users to set a goal for"
-                         toast-activate-message="Setting goal..."
-                         toast-success-message="Goal set"
-                         toast-failure-message="Setting goal failed"
+            <badge-award 
+                v-if="currentBadge"
+                :key="'setGoal-' + String(currentBadge.id)"
+                :badge="currentBadge"
+                :endpoint="currentBadge._links.setAsGoal"
+                :expiry="currentBadge.goalExpiry"
+                @cancel="closeSetAsGoalModal"
+                @done="closeSetAsGoalModal"
+                placeholder="Search for users to set a goal for"
+                toast-activate-message="Setting goal..."
+                toast-success-message="Goal set"
+                toast-failure-message="Setting goal failed"
             >
                 <template v-slot:header="slotProps">
                     <h2>Set &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as a goal</h2>

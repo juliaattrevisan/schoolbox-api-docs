@@ -175,7 +175,7 @@ module.exports = {
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js',
-        awardList: './library/Schoolbox/Learning/Badge/Award/vue/awardList.js',
+        badgeReport: './library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js',
         evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js',
         checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
 

@@ -203,7 +203,7 @@ export default {
     data() {
         return {
             selectedBadges: [],
-            badgeListChangeEvent: BadgeList.constants.EVENT_CHANGE,
+            badgeListChangeEvent: 'EVENT_CHANGE',
         }
     },
     computed: {
@@ -298,12 +298,13 @@ export default {
 
 <template>
     <div>
-        <badge-list ref="badgeList"
-                    :get-badges-route="getBadgesRoute"
-                    :get-badge-create-form-route="getBadgeCreateFormRoute"
-                    :allow-selection="true"
-                    :show-badge-menus="false"
-                    @[badgeListChangeEvent]="updateSelectedBadges"
+        <badge-list 
+            ref="badgeList"
+            :get-badges-route="getBadgesRoute"
+            :get-badge-create-form-route="getBadgeCreateFormRoute"
+            :allow-selection="true"
+            :show-badge-menus="false"
+            @on-filter-change="updateSelectedBadges"
         ></badge-list>
 
         <ul class="flex-list buttons">
@@ -320,7 +321,7 @@ export default {
             <h2>{{ confirmModalHeader }}</h2>
             <p class="meta">{{ confirmModalBadgeListMeta }}</p>
             <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
-                <li v-for="badge in selectedBadges">
+                <li v-for="(badge, index) in selectedBadges" :key="index">
                     <div class="compact card small-12 badge-card">
                         <div>
                             <badge-image :badge="badge"></badge-image>
@@ -334,7 +335,7 @@ export default {
                 <hr />
                 <p class="meta">{{ confirmModalUserListMeta }}</p>
                 <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
-                    <li v-for="user in users">
+                    <li v-for="(user, index) in users" :key="index">
                         <div class="card small-12 compact">
                             <div>
                                 <img :src="user._links.avatar" :alt="user.fullName">
