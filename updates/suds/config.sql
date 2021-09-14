@@ -14,7 +14,7 @@ INSERT INTO config(
     required
 ) VALUES (
     'schooldata_import_timeout',
-    '',
+    '10800',
     'Import Timeout',
     'School Data Import Timeout',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
