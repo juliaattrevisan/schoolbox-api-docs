@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
 
-use Aws\Exception\CredentialsException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -208,7 +207,7 @@ class File
                     $this->turnitinMapper->save($model->setStatus(Turnitin\Model::STATUS_SETUP_LOADED));
                 }
             }
-        } catch (Turnitin\Exception\BadEndpoint | CredentialsException | \DomainException $e) {
+        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials| \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode($e->getCode())
                 ->setErrorMessage($e->getMessage()));
