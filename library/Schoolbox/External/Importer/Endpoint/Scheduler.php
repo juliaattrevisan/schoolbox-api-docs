@@ -20,21 +20,28 @@ use RuntimeException;
  */
 class Scheduler
 {
-
     /**
      * The options you can choose
      */
-    public const SB = 'sb';
-    public const HOURLY = 'hourly';
+    public const SB          = 'sb';
+    public const HOURLY      = 'hourly';
     public const TWICE_DAILY = 'twiceDaily';
-    public const DAILY = 'daily';
+    public const DAILY       = 'daily';
 
+    /**
+     * max execution time before we consider the import process timed out.
+     */
+    public const DEFAULT_TIMEOUT = 10800;
+
+    /**
+     * lock identifier used to prevent more than one import process from running at a time
+     */
+    public const LOCK_NAME = 'schooldata_import';
 
     /**
      * @var IDatabase
      */
     private $db;
-
 
     /**
      * One of [hourly, twiceDaily, daily]
@@ -50,12 +57,10 @@ class Scheduler
      */
     private array $customHours;
 
-
     /**
      * @var IFactory
      */
     private $factory;
-
 
     /**
      * Optional path to a file containing cached nodes that can be read instead of
@@ -65,18 +70,15 @@ class Scheduler
      */
     private $file;
 
-
     /**'
      * @var string
      */
     private $type;
 
-
     /**
      * @var LoggerInterface
      */
     private $logger;
-
 
     /**
      * Scheduler constructor.

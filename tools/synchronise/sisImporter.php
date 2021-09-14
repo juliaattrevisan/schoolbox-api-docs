@@ -30,12 +30,10 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *   sis_timetable_cycle
  *   sis_timetable_period
  */
-$app = new class extends CliTool\App
-{
+$app = new class extends CliTool\App {
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
-
 
     /**
      * --file
@@ -43,7 +41,6 @@ $app = new class extends CliTool\App
      * Load xml contents from a file path specified by this arg
      */
     private const OPT_LONG_FILE = 'file:';
-
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -53,7 +50,6 @@ $app = new class extends CliTool\App
             self::OPT_LONG_FILE
         ];
     }
-
 
     /**
      * Execute each strat in the composite
@@ -87,12 +83,13 @@ HELP;
          * to Hourly to facilitate this behaviour; check ValidScheduleExecution
          * for the logic)
          */
-        $host = $this->getConfig()->get('schooldata_import_endpoint_host');
-        $key = $this->getConfig()->get('schooldata_import_endpoint_key');
-        $frequency = Endpoint\Scheduler::HOURLY;
+        $host        = $this->getConfig()->get('schooldata_import_endpoint_host');
+        $key         = $this->getConfig()->get('schooldata_import_endpoint_key');
+        $frequency   = Endpoint\Scheduler::HOURLY;
         $customHours = [];
-        $type = $this->getConfig()->get('schooldata_import_data_source');
-        $file = $this->getOpt(self::OPT_LONG_FILE);
+        $type        = $this->getConfig()->get('schooldata_import_data_source');
+        $file        = $this->getOpt(self::OPT_LONG_FILE);
+        $timeout     = (int)$this->getConfig()->get('schooldata_import_timeout') ?? Endpoint\Scheduler::DEFAULT_TIMEOUT;
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
@@ -105,6 +102,18 @@ You haven't specified a SUDS Data Source in Admin.
 NULLTYPE;
             exit;
         }
+
+        /**
+         * request a lock with timeout before executing anything
+         */
+        $lock = $this->acquireLock(Endpoint\Scheduler::LOCK_NAME, $timeout);
+        if (!$lock->isAcquired()) {
+            exit(1);
+        }
+        /**
+         * lock secured, now lets constrain the execution time
+         */
+        $this->setMaxExecutionTime($timeout);
 
         /* Accept perform param from opts
          */

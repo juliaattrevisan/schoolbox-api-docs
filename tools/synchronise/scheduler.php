@@ -38,7 +38,6 @@ $app = new class extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
-
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -46,7 +45,6 @@ $app = new class extends CliTool\App
             self::OPT_LONG_HELP,
         ];
     }
-
 
     /**
      * Execute each strat in the composite
@@ -80,12 +78,13 @@ HELP;
          * Though maybe it should be able to do that...? It would allow people
          * to ftp stuff to a folder instead of providing an api endpoint
          */
-        $host = $this->getConfig()->get('schooldata_import_endpoint_host');
-        $key = $this->getConfig()->get('schooldata_import_endpoint_key');
-        $frequency = $this->getConfig()->get('schooldata_import_frequency') ?: Endpoint\Scheduler::HOURLY;
-        $type = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
+        $host        = $this->getConfig()->get('schooldata_import_endpoint_host');
+        $key         = $this->getConfig()->get('schooldata_import_endpoint_key');
+        $frequency   = $this->getConfig()->get('schooldata_import_frequency') ?: Endpoint\Scheduler::HOURLY;
+        $type        = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
         $customHours = explode(Renderer::VALUE_DELIMITER, $this->getConfig()->get('schooldata_import_managed_hours') ?? '');
-        $file = null;
+        $file        = null;
+        $timeout     = (int)$this->getConfig()->get('schooldata_import_timeout') ?? Endpoint\Scheduler::DEFAULT_TIMEOUT;
 
         /* This always perform updates
          */
@@ -94,6 +93,18 @@ HELP;
         /* Used to shank a database instance
          */
         $randomMapper = UserMapper::getInstance();
+
+        /**
+         * request a lock with timeout before executing anything
+         */
+        $lock = $this->acquireLock(Endpoint\Scheduler::LOCK_NAME, $timeout);
+        if (!$lock->isAcquired()) {
+            exit(1);
+        }
+        /**
+         * lock secured, now lets constrain the execution time
+         */
+        $this->setMaxExecutionTime($timeout);
 
         /* Execute scheduler: sis stuff
          */
