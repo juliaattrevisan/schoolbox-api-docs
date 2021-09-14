@@ -22,6 +22,12 @@ class Report
 {
 
     /**
+     * Status string from turnitin once it's finished a report for us
+     */
+    private const REPORT_COMPLETE = 'COMPLETE';
+
+
+    /**
      * @var Turnitin\Api
      */
     private Turnitin\Api $api;
@@ -72,20 +78,20 @@ class Report
      */
     public function process(Turnitin\Model $model): void
     {
-        $similarity = $this->generateReport($model);
+        try {
+            $similarity = $this->generateReport($model);
 
-//
-//        if (null !== $similarity) {
-//            $report = $this->getSimilarityReport($model);
-//        }
-//
-//        try {
-////            $report = $this->getSimilarityReport($model);
-//        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
-//            $this->turnitinMapper->save($model
-//            ->setErrorCode((string)$e->getCode())
-//            ->setErrorMessage($e->getMessage()));
-//        }
+            /* generateReport() might return null when the report is still processing
+             * nothing to do; just leave quietly
+             */
+            if (null !== $similarity) {
+                $report = $this->getSimilarityReport($model);
+            }
+        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
+            $this->turnitinMapper->save($model
+            ->setErrorCode((string)$e->getCode())
+            ->setErrorMessage($e->getMessage()));
+        }
     }
 
     /**
@@ -152,7 +158,7 @@ class Report
      * Get a turnitin report
      *
      * @param Turnitin\Model $model
-     * @return array
+     * @return array|null
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -160,14 +166,31 @@ class Report
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    private function getSimilarityReport(Turnitin\Model $model): array
+    private function getSimilarityReport(Turnitin\Model $model): ?array
     {
         $this->logDebug(sprintf(
             'Report %s: requesting similarity report from turnitin...',
             $model->getId()
         ));
 
-        return $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}", []);
+        $result = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
+
+        $this->logDebug(sprintf(
+            'Report %s: current turnitin internal status is %s',
+            $model->getId(),
+            $result['status']
+        ));
+
+        var_dump($result);
+
+        /* $result['status'] is either PROCESSING or COMPLETE
+         * Oddly, I'm seeing a report _start_ in COMPLETE which was confusing and misleading...
+         */
+        if (self::REPORT_COMPLETE === $result['status']) {
+            return $result;
+        }
+
+        return null;
     }
 
 
