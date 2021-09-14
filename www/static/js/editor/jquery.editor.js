@@ -174,7 +174,7 @@
                 { name: 'schoolbox', groups: ['schoolboxlink'] },
             ],
             height: '4rem',
-            resize_enabled: false,
+            resize_enabled: true,
             toolbarCanCollapse: false,
             ...overrideConfig
         }
