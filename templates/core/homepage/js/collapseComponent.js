@@ -8,6 +8,7 @@ import { slideDown, slideUp } from '@js/util/animateUtils';
 
 const COLLAPSABLE_SELECTOR = '[data-collapsable="true"]';
 const COLLAPSE_BUTTON_SELECTOR = '[data-collapser="true"]';
+const ANIMATE_SPEED = 0.4; //the speed of animations
 
 
 /**
@@ -42,10 +43,10 @@ export const isComponentUncollapsed = (component) => {
  */
 export const uncollapseComponent = async (component) => {
     const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
-    gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: 0.5 } );
+    gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
     const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
     collapsePanel.setAttribute('data-collapse-state', 'uncollapsed');
-    await slideDown(collapsePanel, 0.5);
+    await slideDown(collapsePanel, ANIMATE_SPEED);
 }
 
 /**
@@ -55,10 +56,10 @@ export const uncollapseComponent = async (component) => {
  */
 export const collapseComponent = async (component) => {
     const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
-    gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: 0.5 } );
+    gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
     const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
     collapsePanel.setAttribute('data-collapse-state', 'collapsed');
-    await slideUp(collapsePanel, 0.5);
+    await slideUp(collapsePanel, ANIMATE_SPEED);
 }
 
 /**

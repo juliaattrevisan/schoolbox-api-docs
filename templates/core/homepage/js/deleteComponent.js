@@ -8,6 +8,8 @@ import axios from 'axios';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
 
+const ANIMATE_SPEED = 0.4;
+
 
 /**
  * Toggle the delete palette and manage the confirm/deny actions
@@ -33,12 +35,12 @@ const initDeleteComponentButton = (deletePanel, deleteButton) => {
         event.preventDefault();
         if (deleteButton.getAttribute('data-state') === 'closed') {
             deleteButton.setAttribute('data-state', 'opened');
-            gsap.to(deleteButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: 0.5 } );
-            slideDown(deletePanel, 0.5);
+            gsap.to(deleteButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+            slideDown(deletePanel, ANIMATE_SPEED);
         } else {
             deleteButton.setAttribute('data-state', 'closed');
-            gsap.to(deleteButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: 0.5 } );
-            slideUp(deletePanel, 0.5);
+            gsap.to(deleteButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+            slideUp(deletePanel, ANIMATE_SPEED);
         }
     });
 }
@@ -56,7 +58,7 @@ const initCancelDeleteComponentButton = (component, deletePanel, deleteButton) =
         event.preventDefault();
         if (deleteButton.getAttribute('data-state') === 'opened') {
             deleteButton.setAttribute('data-state', 'closed');
-            slideUp(deletePanel, 0.5);
+            slideUp(deletePanel, ANIMATE_SPEED);
         } 
     });
 }
@@ -128,6 +130,6 @@ export const updateDeletedComponent = (component) => {
     const insideComponentElement = component.querySelector('[data-collapsable] > div > section');
     insideComponentElement.replaceChildren(errorElement);
 
-    gsap.from(errorElement, { opacity: 0, duration: 0.5 } );
+    gsap.from(errorElement, { opacity: 0, duration: ANIMATE_SPEED } );
 
 }

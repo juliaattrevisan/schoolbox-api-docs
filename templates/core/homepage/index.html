@@ -43,21 +43,8 @@
 </script>
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}/{USER_TOKEN}" />
 
-<script type="text/javascript" src="{CDN_PREFIX}/js/form/jquery.ajax-form.js"></script>
 <script type="text/javascript">
     $(function() {
-
-        // Adds page to my links
-        $('#postToMyLinks').click( function (event) {
-            event.preventDefault();
-            $(this).ajaxForm({
-                url: "/cms/myLinksForm.php",
-                data: { url: {HOMEPAGE_URL_JS}, description: {HEADING_JS}},
-                type: 'post'
-            }).on('done.ajaxForm', function() {
-                location.reload();
-            });
-        });
 
         // Lock all components on page load
         // This is done with JS, otherwise components that are added after page load will be locked,
@@ -541,6 +528,8 @@
     -->
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />
+<input type="hidden" id="homepageURL" value="{HOMEPAGE_URL}" />
+<input type="hidden" id="heading" value="{HEADING}" />
 
 <div id="resource-browser" class="hide"></div>
 

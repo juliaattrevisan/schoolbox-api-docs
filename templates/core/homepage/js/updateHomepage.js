@@ -4,6 +4,7 @@
  */
 
 
+import { initPostToMyLinks } from './postToMyLinks';
 import { initAddAndSortComponents } from './addAndSortComponents';
 import { initUpdateComponentSettings } from './updateComponentSettings';
 import { initDeleteComponent } from './deleteComponent';
@@ -20,6 +21,7 @@ export const ON_COMPONENT_REMOVED = 'ON_COMPONENT_REMOVED';
  * Fire everything up
  */
 export const init = () => {
+    initPostToMyLinks();
     initAddAndSortComponents();
     initUpdateComponentSettings();
     initDeleteComponent();

@@ -7,8 +7,6 @@ import { ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
 
 gsap.registerPlugin(Draggable, Flip);
 
-
-
 const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers
 const COMPONENT_SELECTOR = '[data-component], [data-component-palette]'; //any component that will be dragged/added/sorted
 const COMPONENT_TRIGGER_SELECTOR = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger

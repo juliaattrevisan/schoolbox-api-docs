@@ -6,12 +6,16 @@
 import { gsap } from 'gsap/all';
 import axios from 'axios';
 import { slideDown, slideUp } from '@js/util/animateUtils';
+import { timeout } from '@js/util/jsUtils';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from './updateHomepage';
 import { updateDeletedComponent } from './deleteComponent';
 import { isComponentUncollapsed, collapseComponent, uncollapseComponent, isCollapseComponentSelected } from './collapseComponent';
 
+const ANIMATE_SPEED = 0.4;
 const SETTINGS_BUTTON_SELECTOR = '[data-target="settings"]';
 const SETTINGS_PANEL_SELECTOR = '[data-component-panel="settings"]';
+const STATE_ATTRIBUTE = 'data-state'; //can be 'opened' or 'closed'
+const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed'
 
 
 
@@ -34,7 +38,7 @@ const initToggleSettingsButton = (component) => {
     const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
     settingsButton.addEventListener('click', (event) => {
         event.preventDefault();
-        gsap.to(settingsButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: 0.5 } );
+        gsap.to(settingsButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
         isSettingsOpen(component) ? closeSettings(component) : openSettings(component);
     });
 }
@@ -48,7 +52,7 @@ const initToggleSettingsButton = (component) => {
  */
 const isSettingsOpen = (component) => {
     const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    return settingsButton.getAttribute('data-state') === 'opened';
+    return settingsButton.getAttribute(STATE_ATTRIBUTE) === 'opened';
 }
 
 /**
@@ -59,8 +63,22 @@ const isSettingsOpen = (component) => {
 const openSettings = (component) => {
     const settingsPanel = component.querySelector(SETTINGS_PANEL_SELECTOR);
     const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    settingsButton.setAttribute('data-state', 'opened');
-    slideDown(settingsPanel, 0.5);
+    settingsButton.setAttribute(STATE_ATTRIBUTE, 'opened');
+    settingsButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
+    slideDown(settingsPanel, ANIMATE_SPEED);
+}
+
+/**
+ * To be able to compare the form query string on form submit, as don't want to submit if nothing has changed
+ * 
+ * @param { Element } 
+ * 
+ * @returns { String }  
+ */
+const getQueryString = (component) => {
+    const settingsPanelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
+    const formData = Object.fromEntries(new FormData(settingsPanelForm));
+    return Object.keys(formData).map(key => key + '=' + encodeURIComponent(formData[key])).join('&'); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
 }
 
 /**
@@ -68,11 +86,11 @@ const openSettings = (component) => {
  * 
  * @param { Element } 
  */
- const closeSettings = (component) => {
+const closeSettings = async (component) => {
     const settingsPanel = component.querySelector(SETTINGS_PANEL_SELECTOR);
     const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    settingsButton.setAttribute('data-state', 'closed');
-    slideUp(settingsPanel, 0.5);
+    settingsButton.setAttribute(STATE_ATTRIBUTE, 'closed');
+    await slideUp(settingsPanel, ANIMATE_SPEED);
 }
 
 /**
@@ -80,11 +98,12 @@ const openSettings = (component) => {
  * 
  * @param { Element } 
  */
- const initSettingsForm = (component) => {
+const initSettingsForm = (component) => {
     const settingsPanelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
+    const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
     settingsPanelForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        saveComponentSettings(component, settingsPanelForm);
+        settingsButton.getAttribute(QUERY_STRING_ATTRIBUTE) === getQueryString(component) ? closeSettings(component) : saveComponentSettings(component, settingsPanelForm);
     });
 }
 
@@ -98,15 +117,18 @@ const saveComponentSettings = async (component, form) => {
     const submitFormButton = form.querySelector('input[type="submit"]');
     try {
         submitFormButton.disabled = true;
+        submitFormButton.value = 'Updating...';
         const response = await axios.get(UPDATE_URL, getSaveComponentSettingsParams(form));
-        closeSettings(component)
-        updateComponent(component, response.data);
+        await updateComponent(component, response.data);
     } catch (error) {
         console.warn(error);
         updateDeletedComponent(component); //currently the assumed error, that the component no longer exists
-        slideUp(component.querySelector(SETTINGS_PANEL_SELECTOR), 0.5);
-    } finally {
+        slideUp(component.querySelector(SETTINGS_PANEL_SELECTOR), ANIMATE_SPEED);
+    } finally { //now the update is complete notify with the button and close the settings, enabling once the settings are closed 
+        submitFormButton.value = 'Updated';
+        await closeSettings(component);
         submitFormButton.disabled = false;
+        submitFormButton.value = 'Update';
     }
 }
 
@@ -133,28 +155,21 @@ const getSaveComponentSettingsParams = (form) => {
 const updateComponent = async (component, responseData) => {
     
     const updatedComponent = getUpdatedComponent(component, responseData);
-    const updatedComponentPanelFragment = document.createRange().createContextualFragment(updatedComponent.innerHTML);
-    document.body.appendChild(updatedComponentPanelFragment);
-    
-    updateComponentTitle(component, updatedComponent);
 
-    const oldCollapsePanel = component.querySelector('[data-collapsable="true"]');
-    // const newCollapsePanel = updatedComponent.querySelector('[data-collapsable="true"]');
-    // const newCollapsePanel = document.createRange().createContextualFragment(updatedComponent.querySelector('[data-collapsable="true"]').outerHTML);
+    const componentCollapsable = component.querySelector('[data-collapsable="true"]');
+    const updatedComponentCollapsable = updatedComponent.querySelector('[data-collapsable="true"]');
+    const updatedComponentCollapsableFragment = document.createRange().createContextualFragment(updatedComponentCollapsable.innerHTML); //createContextualFragment ensures any </script> tags within the element are run
 
     if (isComponentUncollapsed(component)) { //and is currently uncollapsed
         await collapseComponent(component); //hide the old component
     }
     
-    // oldCollapsePanel.innerHTML = '';
-    oldCollapsePanel.parentNode.replaceChild(updatedComponentPanelFragment, oldCollapsePanel); //replace with the new component
+    componentCollapsable.innerHTML = ''; //empty the contents so any Vue instances can unmount
+    componentCollapsable.appendChild(updatedComponentCollapsableFragment); //add in the updated collapsable 
+   
+    await timeout(100); //adding a delay just ensures that component scripts have had a chance to initiate so we can accurately animate the height in uncollapseComponent()
 
-    // newCollapsePanel.style.display = 'none';
-
-    // await waitFor(200);
-
-    // oldCollapsePanel.parentNode.replaceChild(document.createRange().createContextualFragment(newCollapsePanel.outerHTML), oldCollapsePanel); //replace with the new component
-    // setInnerHTML(oldCollapsePanel, newCollapsePanel.innerHTML);
+    updateComponentTitle(component, updatedComponent);
 
     if (!isCollapseComponentSelected(updatedComponent)) {
         await uncollapseComponent(component); //hide the old component
@@ -162,9 +177,6 @@ const updateComponent = async (component, responseData) => {
     }
 
 }
-
-const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
-
 
 /**
  * To get the updated component once returned
@@ -178,8 +190,6 @@ const getUpdatedComponent = (component, documentString) => {
     const parser = new DOMParser();
     const document = parser.parseFromString(documentString, 'text/html');
     return document.documentElement.querySelector(`#${component.id}`);
-    // const updatedComponent = document.documentElement.querySelector(`#${component.id}`);
-    // return document.createRange().createContextualFragment(updatedComponent.innerHTML); //createContextualFragment ensures any </script> tags within the component are run
 }
 
 /**
@@ -194,6 +204,6 @@ const updateComponentTitle = (oldComponent, updatedComponent) => {
     if (componentTitle.innerText !== updatedComponentTitle.innerText) {
         gsap.set(componentTitle, { opacity: 0 } );
         componentTitle.innerText = updatedComponentTitle.innerText;
-        gsap.to(componentTitle, { opacity: 1, duration: 0.5 } );
+        gsap.to(componentTitle, { opacity: 1, duration: ANIMATE_SPEED } );
     }
 }
