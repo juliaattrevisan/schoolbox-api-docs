@@ -114,17 +114,20 @@ class Module extends Thread\Module
         return new Auth\Rule\LazyCallback(function () {
             /** @var UserMapper $userMapper */
             $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-            return new Auth\Rule\Any(
-                new Auth\Rule\IsSuperuser(),
-                new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-                new Auth\Rule\IsUserOrParentOfUser(
-                    $this->getExternalUser(),
-                    $userMapper,
-                    static function (array $params) {
-                        $evidence = $params['context'];
-                        return $evidence->getRecipient()->getId();
-                    },
-                ),
+            return new Auth\Rule\All(
+                new Auth\Rule\IsLoggedIn(),
+                new Auth\Rule\Any(
+                    new Auth\Rule\IsSuperuser(),
+                    new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
+                    new Auth\Rule\IsUserOrParentOfUser(
+                        $this->getExternalUser(),
+                        $userMapper,
+                        static function (array $params) {
+                            $evidence = $params['context'];
+                            return $evidence->getRecipient()->getId();
+                        },
+                    )
+                )
             );
         });
     }

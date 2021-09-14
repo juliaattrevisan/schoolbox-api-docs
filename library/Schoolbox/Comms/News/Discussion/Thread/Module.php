@@ -112,6 +112,7 @@ class Module extends Thread\Module
     {
         return new Auth\Rule\All(
             new Auth\Rule\IsConfigOn(ConfigMapper::COMMS_COMMENTS_ENABLED, $this->getConfig()),
+            new Auth\Rule\IsLoggedIn(),
             new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
                 new Auth\Rule\LazyCallback(function () {
@@ -136,6 +137,7 @@ class Module extends Thread\Module
     {
         return new Auth\Rule\All(
             new Auth\Rule\IsConfigOn(ConfigMapper::COMMS_COMMENTS_ENABLED, $this->getConfig()),
+            new Auth\Rule\IsLoggedIn(),
             new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
                 new Auth\Rule\LazyCallback(function () {
@@ -176,6 +178,7 @@ class Module extends Thread\Module
     {
         return new Auth\Rule\All(
             new Auth\Rule\IsConfigOn(ConfigMapper::COMMS_COMMENTS_ENABLED, $this->getConfig()),
+            new Auth\Rule\IsLoggedIn(),
             new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
                 new Auth\Rule\LazyCallback(function () {
