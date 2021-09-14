@@ -270,7 +270,7 @@ class File
 
     /**
      * Specifically log a warning to the cli
-     * 
+     *
      * @param string $message
      */
     private function logWarning(string $message): void
@@ -453,7 +453,7 @@ class File
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @param array            $submission
-     * @return array
+     * @return array|null
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
      * @throws \DomainException
@@ -464,7 +464,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): array
+    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): ?array
     {
         /* Log the state change
          */

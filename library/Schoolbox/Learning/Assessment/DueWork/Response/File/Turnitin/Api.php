@@ -136,7 +136,7 @@ class Api
      * @param string $method
      * @param string $endpoint
      * @param array  $params
-     * @return array
+     * @return array|null
      * @throws Exception\BadEndpoint
      * @throws Exception\Credentials
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -144,7 +144,7 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, array $params): array
+    public function retrieve(string $method, string $endpoint, array $params): ?array
     {
         $endpoint = "{$this->host}{$endpoint}";
 
