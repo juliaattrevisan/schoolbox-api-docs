@@ -120,6 +120,7 @@ class Course
     public function getCanvasCoursesToImport(string $courseAlias = 'c', string $sectionAlias = 'cs'): Builder
     {
         $pb = (new Builder($this->canvasDb->getQuoter(), ''))
+            ->greaterThan('term.date_end', date('Y-m-d'))
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
         return (new Builder($this->canvasDb->getQuoter(), ''))
             ->all($pb);

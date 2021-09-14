@@ -260,6 +260,7 @@ class Assignment
             case 'online_quiz':
             case 'online_text_entry':
             case 'online_file_upload':
+            case 'student_annotation':
                 return true;
             case 'discussion_topic':
             case 'external_tool':
@@ -293,6 +294,7 @@ class Assignment
             case 'online_quiz':
             case 'online_text_entry':
             case 'online_file_upload':
+            case 'student_annotation':
                 return true;
         }
         throw new InvalidArgumentException("Unrecognised submissionType: '$submissionType'");
