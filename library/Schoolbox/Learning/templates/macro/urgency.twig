@@ -28,7 +28,7 @@
 
 
 {##
- # Decide Urgency of a Plagscan percentage
+ # Decide Urgency of a Similarity Check percentage
  #
  # $value represents how much of the document was plagiarised
  # so a high percentage means a lot was copied from somewhere
@@ -37,7 +37,7 @@
  # thresholds are 60, 20 and 0 (represented in red, orange,
  # and green respectively)
  #}
-{% macro plagscan(value) %}
+{% macro similarity(value) %}
 {% apply spaceless %}
     {% set numericValue = value|replace({'%': ''}) %}
     {% if numericValue > 60 %}

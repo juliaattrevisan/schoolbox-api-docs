@@ -20,11 +20,11 @@
         %}
         {% if reportRoute %}
             <a href="{{ reportRoute }}">
-                <span class="{{ urgency.plagscan(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
+                <span class="{{ urgency.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
                 <span title="Similarity check completed.">similar content</span>
             </a>
         {% else %}
-            <span class="{{ urgency.plagscan(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
+            <span class="{{ urgency.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
             <span title="Similarity check completed.">similar content</span>
         {%  endif %}
     {% elseif currentFile.turnitin.isProcessing %}

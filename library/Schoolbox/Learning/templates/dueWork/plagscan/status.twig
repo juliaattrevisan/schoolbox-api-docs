@@ -17,11 +17,11 @@
             ) %}
             {% if plagscanReport %}
                 <a href="{{ plagscanReport }}">
-                    <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                    <span class="{{ urgency.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
                     <span title="Similarity check completed.">similar content</span>
                 </a>
             {% else %}
-                <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                <span class="{{ urgency.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
                 <span title="Similarity check completed.">similar content</span>
             {%  endif %}
         {% elseif currentFile.plagscan.isProcessing %}
