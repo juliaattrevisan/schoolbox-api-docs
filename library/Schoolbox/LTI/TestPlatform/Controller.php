@@ -12,13 +12,7 @@ namespace Schoolbox\LTI\TestPlatform;
 use Alaress\Web\Controller\Base;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
-use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
-use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
-use OAT\Library\Lti1p3Core\User\UserIdentity;
 use Schoolbox\Url\Factory;
-use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -65,33 +59,17 @@ class Controller extends Base
 
     /**
      * Authenticate an OIDC request
+     *
+     * @api GET /lti-test-platform/oidc/authentication
+     * @since 21.1.0
      */
     public function getOidcAuthenticationRequest(): void
     {
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
-        $userAuthenticator = new class ($this->getUser()) implements UserAuthenticatorInterface
-        {
-            private User $currentUser;
-
-            public function __construct(User $currentUser)
-            {
-                $this->currentUser = $currentUser;
-            }
-
-            public function authenticate(RegistrationInterface $registration, string $loginHint): UserAuthenticationResultInterface
-            {
-                // Authenticate user somehow
-                return new UserAuthenticationResult(
-                    true,
-                    new UserIdentity(
-                        $this->currentUser->getId(),
-                        $this->currentUser->getFullName(),
-                        $this->currentUser->getEmail()
-                    )
-                );
-            }
-        };
+        $userAuthenticator = new UserAuthenticator(
+            $this->getUser()->getId() ? $this->getUser() : null
+        );
 
 //        RegistrationRepositoryInterface::class
 //
