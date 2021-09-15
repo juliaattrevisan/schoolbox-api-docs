@@ -41,6 +41,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     {
         header(sprintf('Cache-Control: max-age=%d, private', $maxAge));
         header_remove('Pragma');
+        header_remove('expires');
     }
 
 
