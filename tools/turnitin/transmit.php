@@ -63,7 +63,13 @@ $app = new class extends CliTool\App
     /**
      * Lock name
      */
-    private const TRANSMIT_LOCK_NAME = 'turnitin_transmit';
+    private const TURNITIN_LOCK_NAME = 'turnitin_transmit';
+
+
+    /**
+     * Lock ttl
+     */
+    private const LOCK_TTL = 10*60;
 
 
     /**
@@ -121,7 +127,7 @@ HELP;
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::TRANSMIT_LOCK_NAME, 10*60);
+        $lock        = $lockFactory->createLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
 
         try {
             $acquired = $lock->acquire();
