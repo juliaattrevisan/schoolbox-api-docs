@@ -181,7 +181,8 @@ class Report
                 /* This can occur if your Online Submission html is too short, for example
                  * Save the error state
                  */
-                $model->setErrorCode($uploadResult['error_code']);
+                $model->setErrorCode($uploadResult['error_code'])
+                ->setStatus(Turnitin\Model::STATUS_ERROR);
 
                 $this->turnitinMapper->save($model);
             }
