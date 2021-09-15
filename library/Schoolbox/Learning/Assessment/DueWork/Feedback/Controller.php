@@ -14,10 +14,13 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -287,12 +290,41 @@ class Controller extends Base
                             $turnitinMapper->saveStub($currentFile);
                         }
 
+                        /* We need this api
+                         */
+                        $api = new Turnitin\Api(
+                            $this->getConfigLoader()->get('site_version'),
+                            $this->getConfigLoader()->get('turnitin_api_host'),
+                            $this->getConfigLoader()->get('turnitin_api_key')
+                        );
+
                         /* Set up detached function so turnitin can continue in the background
                          */
-//                        $detachedFunction = static function () use ($response, $assessment) {
-//                            /* TODO Turnitin api endpoint implementation
-//                             */
-//                        };
+                        $detachedFunction = static function () use ($api,  $response) {
+
+                            /* Set up a record processor
+                             */
+                            $processor = (new Turnitin\Process\File(
+                                $api,
+                                Turnitin\Mapper::getInstance(),
+                                UserMapper::getInstance(),
+                                SubmissionBoxMapper::getInstance(),
+                                SingleFile\Mapper::getInstance()
+                            ));
+
+                            /* Shank them all up
+                             */
+                            foreach ($response->getAllFiles() as $file) {
+                                try {
+                                    $model = Turnitin\Mapper::getInstance()->findOneByColumn('student_submission_file_id', $file->getId());
+                                    $processor->process($model);
+                                } catch (\Schoolbox\Mapper\Exception $e) {
+                                    /* TODO I guess we log this somewhere; file not found in detached process
+                                     *  seems like an obscure scenario
+                                     */
+                                }
+                            }
+                        };
                     } else {
                         /* This is the original behaviour. Note that the Plagscan Mapper itself can
                          * figure out if plagscan is enabled or not so we don't need to do it here
