@@ -107,11 +107,15 @@ Transmission of turnitin files goes through these stages, with their status stri
 
 When you get to stage 5, another async process takes over to retrieve the report itself.
 
+You can optionally specify a report id to just affect that report alone, in case you need
+to fix a single report but not any others. The report id is the primary key of turnitin_report
+and its report status must be "pending" for it to be found.
+
+Usage: transmit.php [--instance=INSTANCE_ID] [--report=1234]
+
 ----
 
 (For those ancient support kings, Turnitin "transmit.php" is analogous to plag "submit.php")
-
-Usage: transmit.php --instance=INSTANCE_ID
 
 
 HELP;
