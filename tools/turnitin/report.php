@@ -110,6 +110,24 @@ HELP;
 
         if ($acquired) {
 
+            /* Find all the Pending records
+             */
+            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_LOADED);
+
+            /* Leave immediately when nothing to do
+             */
+            if (!$models->count()) {
+                $this->getLogger()->info('There are no loaded Turnitin reports; nothing to do');
+                exit();
+            }
+
+            /* Otherwise keep going
+             */
+            $this->getLogger()->info(sprintf(
+                'Asking Turnitin for %s Turnitin reports',
+                $models->count()
+            ));
+
             /* We need this api
              */
             $api = new Turnitin\Api(
@@ -124,15 +142,6 @@ HELP;
                 $api,
                 Turnitin\Mapper::getInstance(),
                 $this->getLogger()
-            ));
-
-            /* Find all the Pending records
-             */
-            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_LOADED);
-
-            $this->getLogger()->info(sprintf(
-                'Asking Turnitin for %s reports.',
-                $models->count()
             ));
 
             /* Shank them all down

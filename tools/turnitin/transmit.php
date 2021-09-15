@@ -121,6 +121,25 @@ HELP;
         }
 
         if ($acquired) {
+
+            /* Find all the Pending records
+             */
+            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+
+            /* Leave immediately when nothing to do
+             */
+            if (!$models->count()) {
+                $this->getLogger()->info('There are no pending Turnitin reports; nothing to do');
+                exit();
+            }
+
+            /* Otherwise keep going
+             */
+            $this->getLogger()->info(sprintf(
+                'Commencing upload sequence for %s pending Turnitin reports',
+                $models->count()
+            ));
+
             /* We need this api
              */
             $api = new Turnitin\Api(
@@ -138,15 +157,6 @@ HELP;
                 Component\SubmissionBoxMapper::getInstance(),
                 SingleFile\Mapper::getInstance(),
                 $this->getLogger()
-            ));
-
-            /* Find all the Pending records
-             */
-            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
-
-            $this->getLogger()->info(sprintf(
-                'Commencing upload sequence for %s pending Turnitin reports.',
-                $models->count()
             ));
 
             /* Shank them all up
