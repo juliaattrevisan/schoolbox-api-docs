@@ -53,6 +53,14 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --report
+     *
+     * Choose a particular turnitin_report to affect
+     */
+    private const OPT_LONG_REPORT_ID = 'report:';
+
+
+    /**
      * Lock name
      */
     private const TRANSMIT_LOCK_NAME = 'turnitin_transmit';
@@ -65,7 +73,8 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_INSTANCE
+            self::OPT_LONG_INSTANCE,
+            self::OPT_LONG_REPORT_ID
         ];
     }
 
@@ -121,10 +130,16 @@ HELP;
         }
 
         if ($acquired) {
-
-            /* Find all the Pending records
+            /* Find all the records to process in a synonymous data struct
              */
-            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+            if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
+                $models = Turnitin\Mapper::getInstance()->findByColumnList([
+                    'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
+                    'status' => Turnitin\Model::STATUS_SETUP_PENDING
+                ]);
+            } else {
+                $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+            }
 
             /* Leave immediately when nothing to do
              */
