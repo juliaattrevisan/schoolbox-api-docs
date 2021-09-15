@@ -87,7 +87,11 @@ HELP;
 
         /* We need this api
          */
-        $api = new Turnitin\Api($this->getConfig()->get('turnitin_api_host'), $this->getConfig()->get('turnitin_api_key'));
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
 
         /* Set up a record processor
          */

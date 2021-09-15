@@ -43,16 +43,20 @@ class Api
     private const INTEGRATION_FAMILY = 'Schoolbox';
 
 
-    /**
-     * Turnitin version (TCA integration version)
-     */
-    private const VERSION = '3.2.4';
-
 
     /**
      * Request timeout
      */
     private const DEFAULT_TIMEOUT = 300;
+
+
+    /**
+     * The current schoolbox instance version
+     * Turnitin does something with this, idk what, though
+     *
+     * @var string
+     */
+    private string $version;
 
 
     /**
@@ -88,10 +92,11 @@ class Api
      * @param string $apiKey
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $version, string $host, string $apiKey)
     {
         $this->host = $host;
         $this->apiKey = $apiKey;
+        $this->version = $version;
 
         /* Set up guzzle client
          */
@@ -271,7 +276,7 @@ class Api
     {
         return [
             'X-Turnitin-Integration-Name' => self::INTEGRATION_FAMILY,
-            'X-Turnitin-Integration-Version' => self::VERSION,
+            'X-Turnitin-Integration-Version' => $this->version,
             'Authorization' => "Bearer {$this->apiKey}",
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
