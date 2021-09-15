@@ -293,46 +293,6 @@ class Report
 
 
     /**
-     * Get a turnitin report
-     *
-     * @param Turnitin\Model $model
-     * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
-     * @throws \RuntimeException
-     */
-    private function getSimilarityReport(Turnitin\Model $model): ?array
-    {
-        $this->logDebug(sprintf(
-            'Report %s: requesting similarity report from turnitin...',
-            $model->getId()
-        ));
-
-        $result = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
-
-        $this->logDebug(sprintf(
-            'Report %s: current turnitin internal status is %s',
-            $model->getId(),
-            $result['status']
-        ));
-
-        var_dump($result);
-
-        /* $result['status'] is either PROCESSING or COMPLETE
-         * Oddly, I'm seeing a report _start_ in COMPLETE which was confusing and misleading...
-         */
-        if (self::REPORT_COMPLETE === $result['status']) {
-            return $result;
-        }
-
-        return null;
-    }
-
-
-    /**
      * Log to Logger if one was provided (used in cli tools)
      *
      * @param string $message
