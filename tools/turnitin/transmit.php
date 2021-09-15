@@ -21,7 +21,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
 
-
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
