@@ -101,7 +101,7 @@ class Module extends BaseModule
                 $this->buildRuleHasWriteAccess(),
                 new Rule\All(
                     new Rule\IsUser('participant'),
-                    new Rule\IsConfigOn('plagscan_allow_students_report_access', $this->getConfigLoader())
+                    new Rule\IsConfigOn('similarity_check_allow_students_report_access', $this->getConfigLoader())
                 )
             ),
             new CanViewAssessable(new Visibility(Access::getInstance()))
