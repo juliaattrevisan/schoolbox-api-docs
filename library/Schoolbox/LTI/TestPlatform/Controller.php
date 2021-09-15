@@ -103,16 +103,17 @@ class Controller extends Base
         // Configure a platform
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-platform
         $platform = new Platform(
-            'schoolbox',
-            'schoolbox',
-            (new Factory($this->getConfigLoader()))->buildFullyQualified()->toString(),
+            'schoolboxVagrantPlatform',
+            'Schoolbox [vagrant]',
+            (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https')->toString(),
+            'schoolboxVagrantPlatform',
         );
 
         // Configure a tool
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-tool
         $tool = new Tool(
-            'tool',
-            'tool',
+            'devkitTool',
+            'LTI 1.3 DevKit (as tool)',
             'http://devkit-lti1p3.localhost/tool',
             'http://devkit-lti1p3.localhost/lti1p3/oidc/initiation',
             'http://devkit-lti1p3.localhost/tool/launch',
@@ -124,10 +125,10 @@ class Controller extends Base
         // Need to set this up in the devkit
         $registration = new Registration(
             'schoolboxVagrant',
-            'client_id',
+            'schoolboxVagrantRegistration',
             $platform,
             $tool,
-            ['deploymentId1', 'deploymentId2'],
+            ['deploymentId3'],
             $platformKeyChain,
             $toolKeyChain,
         );
