@@ -9,11 +9,18 @@
 
 declare(strict_types=1);
 
+use Alaress\Lock\InstanceLockFactory;
+use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\UserMapper;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\RedisStore;
+
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -40,12 +47,25 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --instance
+     */
+    private const OPT_LONG_INSTANCE = 'instance:';
+
+
+    /**
+     * Lock name
+     */
+    private const TRANSMIT_LOCK_NAME = 'turnitin_transmit';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_INSTANCE
         ];
     }
 
@@ -71,55 +91,79 @@ Transmission of turnitin files goes through these stages, with their status stri
 4. Upload file contents into Turnitin Submission ("uploading")
 5. Contents finished sending to Turnitin for further processing ("loaded")
 
-
 When you get to stage 5, another async process takes over to retrieve the report itself.
 
 ----
 
 (For those ancient support kings, Turnitin "transmit.php" is analogous to plag "submit.php")
 
-Usage: transmit.php
+Usage: transmit.php --instance=INSTANCE_ID
 
 
 HELP;
             exit;
         }
 
-        /* We need this api
+        /* Check that this isn't currently running
          */
-        $api = new Turnitin\Api(
-            $this->getConfig()->get('site_version'),
-            $this->getConfig()->get('turnitin_api_host'),
-            $this->getConfig()->get('turnitin_api_key')
-        );
 
-        /* Set up a record processor
-         */
-        $processor = (new Turnitin\Process\File(
-            $api,
-            Turnitin\Mapper::getInstance(),
-            UserMapper::getInstance(),
-            Component\SubmissionBoxMapper::getInstance(),
-            SingleFile\Mapper::getInstance(),
-            $this->getLogger()
-        ));
+        /** @var ClientInterface $redis */
+        $redis      = $this->getDi()->get('redis');
+        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
-        /* Find all the Pending records
-         */
-        $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
+        $lock        = $lockFactory->createLock(self::TRANSMIT_LOCK_NAME, 10*60);
 
-        $this->getLogger()->info(sprintf(
-            'Commencing upload sequence for %s pending Turnitin reports.',
-            $models->count()
-        ));
-
-        /* Shank them all up
-         */
-        foreach ($models as $model) {
-            $processor->process($model);
+        try {
+            $acquired = $lock->acquire();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            $acquired = false;
         }
 
-        $this->getLogger()->info('Done.');
+        if ($acquired) {
+            /* We need this api
+             */
+            $api = new Turnitin\Api(
+                $this->getConfig()->get('site_version'),
+                $this->getConfig()->get('turnitin_api_host'),
+                $this->getConfig()->get('turnitin_api_key')
+            );
+
+            /* Set up a record processor
+             */
+            $processor = (new Turnitin\Process\File(
+                $api,
+                Turnitin\Mapper::getInstance(),
+                UserMapper::getInstance(),
+                Component\SubmissionBoxMapper::getInstance(),
+                SingleFile\Mapper::getInstance(),
+                $this->getLogger()
+            ));
+
+            /* Find all the Pending records
+             */
+            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+
+            $this->getLogger()->info(sprintf(
+                'Commencing upload sequence for %s pending Turnitin reports.',
+                $models->count()
+            ));
+
+            /* Shank them all up
+             */
+            foreach ($models as $model) {
+                $processor->process($model);
+            }
+
+            $this->getLogger()->info('Done.');
+
+            /* Releasing control
+             */
+            $lock->release();
+        } else {
+            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
+            exit;
+        }
     }
 
 

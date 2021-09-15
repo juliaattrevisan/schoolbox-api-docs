@@ -9,8 +9,14 @@
 
 declare(strict_types=1);
 
+use Alaress\Lock\InstanceLockFactory;
+use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\RedisStore;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -37,12 +43,24 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --instance
+     */
+    private const OPT_LONG_INSTANCE = 'instance:';
+
+
+    /**
+     * Lock name
+     */
+    private const TRANSMIT_LOCK_NAME = 'turnitin_report';
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_INSTANCE
         ];
     }
 
@@ -67,45 +85,71 @@ process, in case their webhooks fail or if you just want to do it by hand.
 
 (For those ancient support kings, Turnitin "report.php" is analogous to plag "scan.php")
 
-Usage: report.php
+Usage: report.php --instance=INSTANCE_ID
 
 
 HELP;
             exit;
         }
 
-        /* We need this api
+        /* Check that this isn't currently running
          */
-        $api = new Turnitin\Api(
-            $this->getConfig()->get('site_version'),
-            $this->getConfig()->get('turnitin_api_host'),
-            $this->getConfig()->get('turnitin_api_key')
-        );
 
-        /* Set up a record processor
-         */
-        $processor = (new Turnitin\Process\Report(
-            $api,
-            Turnitin\Mapper::getInstance(),
-            $this->getLogger()
-        ));
+        /** @var ClientInterface $redis */
+        $redis      = $this->getDi()->get('redis');
+        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
-        /* Find all the Pending records
-         */
-        $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_LOADED);
+        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
+        $lock        = $lockFactory->createLock(self::TRANSMIT_LOCK_NAME, 10*60);
 
-        $this->getLogger()->info(sprintf(
-            'Asking Turnitin for %s reports.',
-            $models->count()
-        ));
-
-        /* Shank them all down
-         */
-        foreach ($models as $model) {
-            $processor->process($model);
+        try {
+            $acquired = $lock->acquire();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            $acquired = false;
         }
 
-        $this->getLogger()->info('Done.');
+        if ($acquired) {
+
+            /* We need this api
+             */
+            $api = new Turnitin\Api(
+                $this->getConfig()->get('site_version'),
+                $this->getConfig()->get('turnitin_api_host'),
+                $this->getConfig()->get('turnitin_api_key')
+            );
+
+            /* Set up a record processor
+             */
+            $processor = (new Turnitin\Process\Report(
+                $api,
+                Turnitin\Mapper::getInstance(),
+                $this->getLogger()
+            ));
+
+            /* Find all the Pending records
+             */
+            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_LOADED);
+
+            $this->getLogger()->info(sprintf(
+                'Asking Turnitin for %s reports.',
+                $models->count()
+            ));
+
+            /* Shank them all down
+             */
+            foreach ($models as $model) {
+                $processor->process($model);
+            }
+
+            $this->getLogger()->info('Done.');
+
+            /* Releasing control
+             */
+            $lock->release();
+        } else {
+            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
+            exit;
+        }
     }
 
 
