@@ -65,7 +65,7 @@ $app = new class extends CliTool\App
     /**
      * Lock ttl
      */
-    private const LOCK_TTL = 10*60;
+    private const LOCK_TTL = 10 * 60;
 
 
     /**

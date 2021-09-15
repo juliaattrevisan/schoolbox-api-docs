@@ -68,7 +68,7 @@ $app = new class extends CliTool\App
     /**
      * Lock ttl
      */
-    private const LOCK_TTL = 10*60;
+    private const LOCK_TTL = 10 * 60;
 
 
     /**
@@ -100,7 +100,7 @@ Transmission of turnitin files goes through these stages, with their status stri
 
 1. Saved in schoolbox db with status Pending ("pending")
 2. Set up Turnitin Group, analogous to our submission boxes ("group")
-3. Set up Turnitin Submission, analagous to our student submission files ("submission")
+3. Set up Turnitin Submission, analogous to our student submission files ("submission")
 3a. Accept EULA on behalf of student; no status for this step, it's kind of implicit
 4. Upload file contents into Turnitin Submission ("uploading")
 5. Contents finished sending to Turnitin for further processing ("loaded")
