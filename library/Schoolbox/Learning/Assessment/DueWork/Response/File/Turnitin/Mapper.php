@@ -108,7 +108,7 @@ class Mapper extends \Schoolbox\Mapper
         /* If both of these are set, then Turnitin was configured presumably correctly
          * and should take precedence over plag
          */
-        if ($this->isConfigured()){
+        if ($this->isConfigured()) {
             /* Staffs and super can always see similarity results
              */
             if ($user->isSuperuser() || $user->getRole()->isStaff()) {
