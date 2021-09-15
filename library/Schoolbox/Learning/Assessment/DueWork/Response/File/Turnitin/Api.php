@@ -224,7 +224,8 @@ class Api
              * that endpoint being valid
              */
             throw new Exception\BadEndpoint(sprintf(
-                'Turnitin: endpoint %s returned %s - %s',
+                'Turnitin: endpoint %s %s returned %s - %s',
+                $method,
                 $endpoint,
                 $result->getStatusCode(),
                 '' === $info['message'] ? $info['error'] : $info['message']
