@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\User;
+
 
 /**
  * Transacts Turnitin models into the turnitin_report db table
@@ -68,5 +70,41 @@ class Mapper extends \Schoolbox\Mapper
             ->setStudentSubmissionFileId($file->getId())
             ->setCreatedAt($now)
             ->setUpdatedAt($now));
+    }
+
+
+    /**
+     * If the turnitin host and key was set in config, then\ turnitin is enabled for the $user specified
+     *
+     * Assuming this is the case, the following policies are obeyed:
+     * - Students and parents can see similarity results allowed via config
+     * - Staff and Superusers can always see similarity results
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isEnabled(User $user): bool
+    {
+        /* If both of these are set, then Turnitin was configured presumably correctly
+         * and should take precedence over plag
+         */
+        $host = trim((string)$this->getConfigLoader()->get('turnitin_api_host'));
+        $key = trim((string)$this->getConfigLoader()->get('turnitin_api_key'));
+
+        if ('' !== $host && '' !== $key) {
+            /* Staffs and super can always see similarity results
+             */
+            if ($user->isSuperuser() || $user->getRole()->isStaff()) {
+                return true;
+            }
+
+            /* If the $user is a student or a parent, check a config var too
+             */
+            if ($this->getConfigLoader()->get('similarity_check_student_visible') && ($user->getRole()->isStudent() || $user->getRole()->isParent())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -334,9 +334,10 @@ class Controller extends Assessment\Controller
             'selfReflect'            => $participant ? (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
             'selfAssess'             => $participant ? (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
 
-            /* Plagscan status
+            /* Similarity Check status
              */
-            'plagscanEnabled'        => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanApiEnabled'     => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled'     => Turnitin\Mapper::getInstance()->isEnabled($this->getUser()),
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */

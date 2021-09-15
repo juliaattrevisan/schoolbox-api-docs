@@ -6,23 +6,24 @@
 This lets you create Associated Feedback along with grade, comment and assorted feedback files etc.
 
 Usage:
-    assessment        DueWork\Model                  The DueWork being assessed
-    breadcrumbs       Collection|string[][]          An array of label + URL pairs
-    response          null|DueWork\Submission
-    feedback          null|DueWork\Feedback
-    attachzone        array
-    selectedFileHash  string
-    markSchemeName    string
-    carousel          StudentCarousel
-    blindMode         bool
-    responseList      Collection|DueWork\Submission
-    file              null|File\Model
-    subfragment       null|string[]
-    errors            string[]
-    participant       Participant
-    plagscanEnabled   bool
-    interactionLocked bool                             Is the assessment due in an archived term?
-    reviewRoute       string                           The mechansim by which feedback is being given
+    assessment          DueWork\Model                  The DueWork being assessed
+    breadcrumbs         Collection|string[][]          An array of label + URL pairs
+    response            null|DueWork\Submission
+    feedback            null|DueWork\Feedback
+    attachzone          array
+    selectedFileHash    string
+    markSchemeName      string
+    carousel            StudentCarousel
+    blindMode           bool
+    responseList        Collection|DueWork\Submission
+    file                null|File\Model
+    subfragment         null|string[]
+    errors              string[]
+    participant         Participant
+    plagscanApiEnabled  bool
+    turnitinApiEnabled  bool
+    interactionLocked   bool                             Is the assessment due in an archived term?
+    reviewRoute         string                           The mechansim by which feedback is being given
  #}
 
 {# Required in both self-assess/reflect and regular staff inline grading
@@ -98,7 +99,8 @@ Usage:
             data:            subfragment.data is defined ? subfragment.data : null,
             participant:     participant,
             file:            file,
-            plagscanEnabled: plagscanEnabled,
+            plagscanApiEnabled: plagscanApiEnabled,
+            turnitinApiEnabled: turnitinApiEnabled
         } %}
     {% endif %}
 {% endblock %}
@@ -111,7 +113,8 @@ Usage:
         response: response,
         latestFeedback: feedback,
         kamiEnabled: true,
-        plagscanEnabled: plagscanEnabled,
+        plagscanApiEnabled: plagscanApiEnabled,
+        turnitinApiEnabled: turnitinApiEnabled,
         selectedFileHash: selectedFileHash,
         blindMode: blindMode ?? false
     } only %}

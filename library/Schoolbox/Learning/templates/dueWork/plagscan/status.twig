@@ -1,11 +1,10 @@
 {##
  # currentFile      an instance of duework/submission/file with plagscan instance joined
- # plagscanEnabled  whether plagscan is enabled
  #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-{% if plagscanEnabled and currentFile.plagscan %}
+{% if currentFile.plagscan %}
     <p class="meta">
         {% if currentFile.plagscan.isComplete %}
             {% set plagscanReport = routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {

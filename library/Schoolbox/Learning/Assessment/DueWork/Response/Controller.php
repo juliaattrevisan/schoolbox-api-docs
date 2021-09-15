@@ -24,6 +24,8 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper as TurnitinMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Model as Turnitin;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -166,9 +168,11 @@ class Controller extends Base
              */
             'errors' => [],
 
-            /* Plagscan status
+            /* Similarity Check status
              */
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => TurnitinMapper::getInstance()->isEnabled($this->getUser()),
+
             'interactionLocked' => $isInteractionLocked,
             'reviewRoute'       => $reviewRoute,
             'studentView'       => true,
@@ -355,9 +359,10 @@ class Controller extends Base
             'errors' => StateMapper::getInstance()->listDisplayValues(),
             'participant' => $participant,
 
-            /* Plagscan status
+            /* Similarity Check status
              */
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => \Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper::getInstance()->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'studentView' => false,
             'selfAssess' => false,

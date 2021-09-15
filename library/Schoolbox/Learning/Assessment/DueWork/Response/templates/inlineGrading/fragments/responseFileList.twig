@@ -47,8 +47,8 @@
 
                                 {# Similarity Check #}
                                 {% include '@learning/dueWork/similarity/status.twig' with {
-                                    turnitinEnabled: turnitinEnabled,
-                                    plagscanEnabled: plagscanEnabled,
+                                    turnitinApiEnabled: turnitinApiEnabled,
+                                    plagscanApiEnabled: plagscanApiEnabled,
                                     currentFile: currentFile
                                 } %}
                             </div>
@@ -56,6 +56,8 @@
                         <nav>
                             {# Similarity Check #}
                             {% include '@learning/dueWork/similarity/link.twig' with {
+                                turnitinApiEnabled: turnitinApiEnabled,
+                                plagscanApiEnabled: plagscanApiEnabled,
                                 assessment: assessment,
                                 response: response,
                                 currentFile: currentFile,
