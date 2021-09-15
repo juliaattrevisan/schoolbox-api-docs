@@ -1,0 +1,35 @@
+{##
+ # Similarity Check Status Factory
+ #
+ # Decide which of the apis (if any) to use for the Similarity Check rendering
+ # and reporting links
+ #
+ # @param bool $validSimilarityCheckPermission  A set of user/config policies that determine availability of Similarity Reports
+ #                                              Formerly known as "plagscanEnabled"
+ # @param bool $turnitinApiEnabled              A bool declaring whether Turnitin was configured adequately
+ # @param bool $plagscanApiEnabled              A bool declaring whether PLagscan was configured adequately
+ # @param SingleFile\Model $currentFile         A student submission file instance (Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile)
+ #}
+
+{# If the similarity report policy vars allow you to see further,
+ # try and figure out which tool to use: turnitin, plag, or neither
+ #}
+{% if validSimiliarityCheckPermission %}
+    {% if turnitinApiEnabled %}
+        {# If the turnitin api was configured then assume we're using that
+         # instead of plag (mutually exclusive)
+        #}
+        {% include '@learning/dueWork/turnitin/status.twig' with {
+            currentFile: currentFile
+        } %}
+    {% elseif plagscanApiEnabled %}
+        {# If the plagscan api was configured then assume we're using that
+         # instead of turnitin (mutually exclusive)
+         #}
+        {% include '@learning/dueWork/plagscan/status.twig' with {
+            currentFile: currentFile
+        } %}
+    {% endif %}
+{% endif %}
+
+{# You might not be using either similiarity checkers; do nothing #}

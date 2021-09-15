@@ -44,11 +44,24 @@
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" class="mime" />
                                     <p>{{ currentFile.filename }}</p>
                                 </a>
-                                {% include '@learning/dueWork/plagscan/status.twig' %}
+
+                                {# Similarity Check #}
+                                {% include '@learning/dueWork/similarity/status.twig' with {
+                                    turnitinEnabled: turnitinEnabled,
+                                    plagscanEnabled: plagscanEnabled,
+                                    currentFile: currentFile
+                                } %}
                             </div>
                         </div>
                         <nav>
-                            {% include '@learning/dueWork/plagscan/link.twig' with {assessment: assessment, response: response, plagscan: currentFile.plagscan, participant: participant} only %}
+                            {# Similarity Check #}
+                            {% include '@learning/dueWork/similarity/link.twig' with {
+                                assessment: assessment,
+                                response: response,
+                                currentFile: currentFile,
+                                participant: participant
+                            } only %}
+
                             <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
                         </nav>
                         {% set latestFeedback    = latestFeedback ?? participant.findMostRecentInstructorGivenFeedback %}
