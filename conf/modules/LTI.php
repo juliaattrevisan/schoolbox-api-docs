@@ -13,6 +13,7 @@ use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\LTI\Component\Homepage\Module as LTIComponent;
 use Schoolbox\LTI\Consumer\Module as LTIConsumer;
+use Schoolbox\LTI\TestPlatform\Module as LtiTestPlatform;
 
 class LTI extends ModuleLoader
 {
@@ -26,5 +27,6 @@ class LTI extends ModuleLoader
     {
         $this->loadModule($kernel, LTIComponent::class, "/lti");
         $this->loadModule($kernel, LTIConsumer::class, "/lti-consumer");
+        $this->loadModule($kernel, LtiTestPlatform::class, "/lti-test-platform");
     }
 }
