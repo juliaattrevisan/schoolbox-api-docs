@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\Credentials;
@@ -32,16 +31,9 @@ class Api
 
 
     /**
-     * I think each school will have their own?
-     */
-    private const TEST_HOST = 'schoolbox.tii-sandbox.com';
-
-
-    /**
      * X-Turnitin-Integration-Name
      */
     private const INTEGRATION_FAMILY = 'Schoolbox';
-
 
 
     /**
@@ -88,6 +80,7 @@ class Api
     /**
      * Constructor.
      *
+     * @param string $version
      * @param string $host
      * @param string $apiKey
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
