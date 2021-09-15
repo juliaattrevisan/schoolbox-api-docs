@@ -1,6 +1,4 @@
-<script>
-    $(function() {
-        $('#loadReport').trigger('click');
-    });
-</script>
-<a href="{{ url }}" id="loadReport">do something amazing</a>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<iframe src="{{ url }}" class="fullscreen"></iframe>

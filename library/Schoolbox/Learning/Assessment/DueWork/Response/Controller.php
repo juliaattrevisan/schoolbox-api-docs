@@ -599,7 +599,18 @@ class Controller extends Base
         ]);
 
         if (null !== $viewerUrl) {
-            $this->response->redirect->to($viewerUrl['viewer_url']);
+            $data = [
+                'url' => $viewerUrl['viewer_url'],
+                'turnitin' => $turnitin,
+                'assessment' => $assessment,
+                'response' => $response,
+                'participant' => $participant,
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                    ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
+                    ->add(['Similarity Check', '']),
+            ];
+
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
         }
 
         /* TODO You might error out here when json_decode returns null
