@@ -52,7 +52,7 @@ class UserAuthenticator implements UserAuthenticatorInterface
             return new UserAuthenticationResult(
                 true,
                 new UserIdentity(
-                    $this->currentUser->getId(),
+                    (string)$this->currentUser->getId(),
                     $this->currentUser->getFullName(),
                     $this->currentUser->getEmail()
                 )
