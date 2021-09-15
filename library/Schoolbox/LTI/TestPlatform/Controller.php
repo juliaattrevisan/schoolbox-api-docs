@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\TestPlatform;
 
 use Alaress\Web\Controller\Base;
+use Http\Factory\Guzzle\ServerRequestFactory;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use Schoolbox\Url\Factory;
 
 class Controller extends Base
@@ -26,9 +28,7 @@ class Controller extends Base
     {
         // Build the registration repository
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/interfaces/#registration-repository-interface
-        $registrationRepository = new RegistrationRepository(
-            (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https')->toString(),
-        );
+        $registrationRepository = $this->buildRegistrationRepository();
 
         // Get a registration out of it
         $registration = $registrationRepository->find(RegistrationRepository::REGISTRATION_IDENTIFIER);
@@ -67,13 +67,46 @@ class Controller extends Base
     {
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
-        $userAuthenticator = new UserAuthenticator(
-            $this->getUser()->getId() ? $this->getUser() : null
+        $oidcAuthenticator = new OidcAuthenticator(
+            $this->buildRegistrationRepository(),
+            $this->buildUserAuthenticator()
         );
 
-//        RegistrationRepositoryInterface::class
-//
-//        $registrationRepository = new
-//        $authenticator = new OidcAuthenticator()
+        // This library uses PSR-7 `\Psr\Http\Message\ServerRequestInterface`,
+        // which Aura doesn't work with:
+        // have to build one ourselves.
+        $serverRequestFactory = new ServerRequestFactory();
+        $serverRequest        = $serverRequestFactory->createServerRequest(
+            '',
+            $this->request->url->get(),
+            $this->request->server->getArrayCopy(),
+        );
+        $message = $oidcAuthenticator->authenticate(
+            $serverRequest
+        );
+
+        var_dump($message);
+    }
+
+    /**
+     * Build the test registration repository for this platform.
+     *
+     * @return RegistrationRepository
+     */
+    private function buildRegistrationRepository(): RegistrationRepository
+    {
+        return new RegistrationRepository(
+            (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https')->toString(),
+        );
+    }
+
+    /**
+     * Build the test user authenticator for this platform.
+     *
+     * @return UserAuthenticator
+     */
+    private function buildUserAuthenticator(): UserAuthenticator
+    {
+        return new UserAuthenticator($this->getUser()->getId() ? $this->getUser() : null);
     }
 }
