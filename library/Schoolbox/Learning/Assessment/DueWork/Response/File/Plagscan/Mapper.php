@@ -186,7 +186,7 @@ class Mapper extends \Schoolbox\Mapper
 
             /* If the $user is a student or a parent, check a config var too
              */
-            if ($this->getConfigLoader()->get('plagscan_student_visible') && ($user->getRole()->isStudent() || $user->getRole()->isParent())) {
+            if ($this->getConfigLoader()->get('similarity_check_student_visible') && ($user->getRole()->isStudent() || $user->getRole()->isParent())) {
                 return true;
             }
         }

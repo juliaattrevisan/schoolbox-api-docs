@@ -67,7 +67,7 @@ config:
   restrict_student_submissions: {hide: false}
   submission_visibility_max: {hide: false}
   submission_access: {hide: false}
-  plagscan_student_visible: {hide: true}
+  similarity_check_student_visible: {hide: true}
   plagscan_allow_students_report_access: {hide: true}
   restrict_parent_grades: {hide: false}
   default_grade_group: {hide: false}
