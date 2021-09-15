@@ -15,7 +15,8 @@
             importEventsUrl: "/calendar/import",
             canCreateEvent: false,
             momentJsDateLong:  '{{ config.date_long | momentJsFormat }}',
-            isDashboard: true
+            isDashboard: true,
+            title: '{{ locale.calendar.proper }}'
         };
     </script>
 {% endautoescape %}

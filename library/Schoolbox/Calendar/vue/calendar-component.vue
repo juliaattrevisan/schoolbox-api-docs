@@ -116,7 +116,7 @@ export default {
 
             const headingElement = document.createElement('h2');
             headingElement.classList.add('subheader');
-            headingElement.innerText = moment(new Date()).format(this.config.momentJsDateLong);
+            headingElement.innerText = this.config.title;
 
             /**
              * For example:
@@ -132,13 +132,6 @@ export default {
             const containerElement = this.$el.parentElement.parentElement.parentElement;
             const sectionElement = this.$el.parentElement.parentElement;
             containerElement.insertBefore(headingElement, sectionElement);
-
-            if (this.hasEvents) { //won't be available if there's no events to display
-                this.$nextTick().then(() => { //pull out the built in date display
-                    this.$el.querySelector('[data-date]').style.display = 'none';
-                });
-            }
-
         },
 
         /**
