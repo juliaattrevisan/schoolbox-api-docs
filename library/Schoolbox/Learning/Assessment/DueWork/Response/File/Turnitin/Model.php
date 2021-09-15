@@ -129,7 +129,7 @@ class Model implements ISoftDeletable
 
     /**
      * Turnitin report finished processing
-     * 
+     *
      * @return bool
      */
     public function isComplete(): bool

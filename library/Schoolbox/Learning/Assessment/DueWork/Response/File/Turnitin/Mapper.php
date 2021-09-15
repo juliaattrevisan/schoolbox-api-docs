@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\User;
 
-
 /**
  * Transacts Turnitin models into the turnitin_report db table
  *
