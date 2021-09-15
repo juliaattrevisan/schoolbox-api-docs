@@ -36,7 +36,8 @@ switch ($_GET['code']) {
     case 404:
     case 500:
     case 503:
-        $code = $_GET['code'];
+    case 504:
+        $code = (int)$_GET['code'];
         break;
 
     default:
@@ -98,7 +99,7 @@ switch ($_GET['transform_type']) {
 }
 
 // If transient (503), otherwise likely a 200, regardless if a 4/5xx, to enable caching of broken images
-if ($code === 503) {
+if (in_array($code, [503, 504], true)) {
     http_response_code($code);
 }
 /** @var IConfigLoader $config */
