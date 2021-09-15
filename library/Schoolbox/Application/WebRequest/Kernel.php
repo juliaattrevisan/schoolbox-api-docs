@@ -662,7 +662,7 @@ class Kernel extends WebKernelAbstract
         $sessionHandler->create($user->getUsername());
 
         // Restore or destroy the session when all is done
-        register_shutdown_function(
+        $this->getShutdownHandler()->registerFunction(
             function () use ($sessionHandler, $currentSessionData) {
                 if (isset($currentSessionData)) {
                     $_SESSION = $currentSessionData;

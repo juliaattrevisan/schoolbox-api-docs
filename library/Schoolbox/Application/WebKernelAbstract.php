@@ -12,8 +12,8 @@ namespace Schoolbox\Application;
 use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
 use Database;
+use InvalidArgumentException;
 use RuntimeException;
-use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
@@ -212,10 +212,11 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
     /**
      * @inheritdoc
+     * @throws InvalidArgumentException
      */
     protected function registerShutdownHandling(): void
     {
-        register_shutdown_function(
+        $this->getShutdownHandler()->registerFunction(
             new ResourceLimitExceededHandler(function () {
                 $this->shutdownSafely(error_get_last(), debug_backtrace());
             })
