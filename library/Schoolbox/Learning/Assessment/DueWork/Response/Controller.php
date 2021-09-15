@@ -566,7 +566,7 @@ class Controller extends Base
 
 
     /**
-     * Dump out a plagscan report
+     * Dump out a turnitin report
      *
      * @param IAssessable $assessment
      * @param IResponse   $response
