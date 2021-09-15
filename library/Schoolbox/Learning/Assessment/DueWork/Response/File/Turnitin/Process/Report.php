@@ -151,14 +151,14 @@ class Report
                     /* When the report hasn't been scheduled for generation, this endpoint returns 404
                      * imho that really should be InvalidArgument because the endpoint exists, but the
                      * remote server hasn't finished populating its contents yet
-                     *
-                     * Anyway, nothing to do here
                      */
                     $this->logDebug(sprintf(
                         'Report %s: report has not been scheduled for creation yet; doing so now',
                         $model->getId()
                     ));
 
+                    /* Schedule a report for generation (don't know if we need $similarity yet)
+                     */
                     $similarity = $this->generateReport($model);
 
                     return null;
@@ -191,7 +191,7 @@ class Report
                  * Save the error state
                  */
                 $model->setErrorCode($uploadResult['error_code'])
-                ->setStatus(Turnitin\Model::STATUS_ERROR);
+                    ->setStatus(Turnitin\Model::STATUS_ERROR);
 
                 $this->turnitinMapper->save($model);
             }
