@@ -196,13 +196,14 @@ class Report
                 $this->turnitinMapper->save($model);
             }
 
-//
-//            $this->logDebug(sprintf(
-//                'Report %s: report is not ready yet, but its upload status is %s',
-//                $uploadResult['status'],
-//                $model->getId()
-//            ));
-
+            /* When the upload is still PROCESSING, or otherwise being tended to,
+             * I guess we just say this
+             */
+            $this->logDebug(sprintf(
+                'Report %s: upload status is %s',
+                $model->getId(),
+                $uploadResult['status']
+            ));
         }
 
         /* Nothing to do; report isn't ready for us yet
