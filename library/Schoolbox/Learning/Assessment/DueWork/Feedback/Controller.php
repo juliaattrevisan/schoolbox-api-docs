@@ -300,7 +300,7 @@ class Controller extends Base
 
                         /* Set up detached function so turnitin can continue in the background
                          */
-                        $detachedFunction = static function () use ($api,  $response) {
+                        $detachedFunction = static function () use ($api, $response) {
 
                             /* Set up a record processor
                              */
