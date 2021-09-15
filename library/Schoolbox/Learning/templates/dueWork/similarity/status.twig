@@ -9,6 +9,9 @@
  #
  # @param bool $turnitinApiEnabled              A bool declaring whether Turnitin was configured adequately
  # @param bool $plagscanApiEnabled              A bool declaring whether PLagscan was configured adequately
+ # @param IAssessable $assessment               An assessment instance (typically a due work)
+ # @param IResponse $response                   A response instance (what the student submitted)
+ # @param Participant $participant              The participating student
  # @param SingleFile\Model $currentFile         A student submission file instance (Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile)
  #}
 
@@ -20,8 +23,11 @@
      # instead of plag (mutually exclusive)
      #}
     {% include '@learning/dueWork/turnitin/status.twig' with {
-        currentFile: currentFile
-    } %}
+        assessment:   assessment,
+        response:     response,
+        participant:  participant,
+        currentFile:  currentFile
+    } only %}
 {% elseif plagscanApiEnabled %}
     {# If the plagscan api was configured then assume we're using that
      # instead of turnitin (mutually exclusive)

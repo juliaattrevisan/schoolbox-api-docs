@@ -128,6 +128,59 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Turnitin report finished processing
+     * 
+     * @return bool
+     */
+    public function isComplete(): bool
+    {
+        return self::STATUS_COMPLETE === $this->getStatus();
+    }
+
+
+    /**
+     * Turnitin report still processing - can be in any of these turnitin states
+     *
+     * @return bool
+     */
+    public function isProcessing(): bool
+    {
+        return \in_array($this->getStatus(), [
+            self::STATUS_SETUP_GROUP,
+            self::STATUS_SETUP_SUBMISSION,
+            self::STATUS_SETUP_UPLOADING,
+            self::STATUS_SETUP_LOADED,
+            self::STATUS_ANALYSING
+        ]);
+    }
+
+
+    /**
+     * Turnitin report died for any number of reasons
+     *
+     * @return bool
+     */
+    public function isError(): bool
+    {
+        return self::STATUS_ERROR === $this->getStatus();
+    }
+
+
+    /**
+     * Turnitin report pending
+     *
+     * @return bool
+     */
+    public function isPending(): bool
+    {
+        return self::STATUS_SETUP_PENDING === $this->getStatus();
+    }
+
+
+    /* Getters/Setters
+     */
+
+    /**
      * @return string
      */
     public function getStatus(): string
