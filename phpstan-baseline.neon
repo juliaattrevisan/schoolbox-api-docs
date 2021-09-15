@@ -3621,11 +3621,6 @@ parameters:
 			path: library/Schoolbox/Calendar/EventNotifier.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventNotifier.php
-
-		-
 			message: "#^Result of \\|\\| is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/EventNotifier.php
