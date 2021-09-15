@@ -599,17 +599,7 @@ class Controller extends Base
         ]);
 
         if (null !== $viewerUrl) {
-            $url = $viewerUrl['viewer_url'];
-
-            $data = [
-                'url' => $url,
-                'turnitin' => $turnitin,
-                'assessment' => $assessment,
-                'response' => $response,
-                'participant' => $participant,
-            ];
-
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
+            $this->response->redirect->to($viewerUrl['viewer_url']);
         }
 
         /* TODO You might error out here when json_decode returns null
