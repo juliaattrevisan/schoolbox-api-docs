@@ -10,10 +10,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Assessment\Component;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
-use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -62,8 +59,9 @@ Find every Analysing turnitin report in turnitin_report and try to get the simil
 This tool can be used in conjunction with transmit.php to manually complete the turnitin
 process, in case their webhooks fail or if you just want to do it by hand.
 
-1. A Similarity Report was requested ("analysing")
-2. Cache some report data locally ("completed")
+1. An upload finished being sent to turnitin; you start here ("loaded")
+2. Turnitin finishes processing the upload and generating the report; some sub-steps occur
+3. Report finished and we cache some report data locally ("completed")
 
 ----
 
