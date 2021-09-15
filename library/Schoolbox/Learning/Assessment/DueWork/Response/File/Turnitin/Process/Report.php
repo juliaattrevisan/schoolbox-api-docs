@@ -92,9 +92,15 @@ class Report
         try {
             $reportInfo = $this->getReportInfo($model);
 
+            /* If we got report data, cache some of it locally
+             * then clear away all previous errors I suppose,
+             * since they no longer have meaning...but is this wise?
+             */
             if (null !== $reportInfo) {
                 $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
-                    ->setStatus(Turnitin\Model::STATUS_COMPLETE);
+                    ->setStatus(Turnitin\Model::STATUS_COMPLETE)
+                    ->setErrorCode(null)
+                    ->setErrorMessage(null);
 
                 $this->turnitinMapper->save($model);
             }
