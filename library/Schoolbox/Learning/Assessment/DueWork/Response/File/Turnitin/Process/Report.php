@@ -26,6 +26,13 @@ class Report
      */
     private const UPLOAD_COMPLETE = 'COMPLETE';
 
+
+    /**
+     * Status string from turnitin if they are still processing our upload
+     */
+    private const UPLOAD_PROCESSING = 'PROCESSING';
+
+
     /**
      * Status string from turnitin if there was something wrong with our upload
      */
@@ -136,7 +143,7 @@ class Report
 
         if (null !== $uploadResult) {
             $this->logDebug(sprintf(
-                'Report %s: upload complete; requesting report data',
+                'Report %s: upload complete, but turnitin might still need to process it',
                 $model->getId()
             ));
 
@@ -145,6 +152,11 @@ class Report
              * Otherwise, come back later and ask again
              */
             if (self::UPLOAD_COMPLETE === $uploadResult['status']) {
+                $this->logDebug(sprintf(
+                    'Report %s: upload processed; requesting report data',
+                    $model->getId()
+                ));
+
                 try {
                     $reportResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
                 } catch (Turnitin\Exception\BadEndpoint $e) {
@@ -194,16 +206,19 @@ class Report
                     ->setStatus(Turnitin\Model::STATUS_ERROR);
 
                 $this->turnitinMapper->save($model);
+            } elseif (self::UPLOAD_PROCESSING === $uploadResult['status']) {
+                /* When the upload is still PROCESSING, or otherwise being tended to,
+                 * I guess we just say this
+                 */
+                $this->logDebug(sprintf(
+                    'Report %s: upload status is %s',
+                    $model->getId(),
+                    $uploadResult['status']
+                ));
             }
 
-            /* When the upload is still PROCESSING, or otherwise being tended to,
-             * I guess we just say this
+            /* Any other cases...?
              */
-            $this->logDebug(sprintf(
-                'Report %s: upload status is %s',
-                $model->getId(),
-                $uploadResult['status']
-            ));
         }
 
         /* Nothing to do; report isn't ready for us yet
