@@ -156,8 +156,8 @@ if (Config::get('mail_enable') == 1) {
 
     $page->setVar($output);
 
-    $uri = (new \Schoolbox\Url\Factory($page->getDi()->get('config')->getInstance()))->buildFullyQualified();
-    $urlOrigin = array( 'URLORIGIN' => $uri );
+    $uri = (new \Schoolbox\Url\Factory($page->getDi()->get('config')->getInstance()))->buildFullyQualified()->setScheme("https");
+    $urlOrigin = array( 'BASE_HREF' => $uri );
     $page->setVar($urlOrigin);
 
     $page->outputPage();

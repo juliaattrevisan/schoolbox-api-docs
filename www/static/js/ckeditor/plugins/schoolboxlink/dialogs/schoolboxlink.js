@@ -38,18 +38,12 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
      */
     function inject(editorInstance, selection, fields) {
         var element = editorInstance.document.createElement('a'),
-            urlPath = false,
-            urlOrigin = editorInstance.config.urlOrigin ? editorInstance.config.urlOrigin : '' ;
-        try {
-            urlPath = new URL(fields.url.getValue()).toString();
+            urlPath = fields.url.getValue();
+
+        if(editorInstance.config.baseHref) {
+            urlPath = new URL(fields.url.getValue(), editorInstance.config.baseHref).href;
         }
-        catch (e) {
-            if (e.message === "Failed to construct 'URL': Invalid URL") {
-                urlPath = urlOrigin + fields.url.getValue();
-            } else {
-                throw e;
-            }
-        }
+
         element.setAttribute('href', urlPath);
 
         if (fields.target.getValue() == '_blank') {
