@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Api as TurnitinApi;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -571,19 +572,49 @@ class Controller extends Base
      * @param IResponse   $response
      * @param Turnitin    $turnitin
      * @param Participant $participant
+     * @throws File\Turnitin\Exception\BadEndpoint
+     * @throws File\Turnitin\Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
-    public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin $turnitin, Participant $participant)
+    public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin $turnitin, Participant $participant): void
     {
-        new \Alaress_Probe('turnitin report goes here');
+        /* We need this api
+         */
+        $api = new TurnitinApi(
+            $this->getConfigLoader()->get('site_version'),
+            $this->getConfigLoader()->get('turnitin_api_host'),
+            $this->getConfigLoader()->get('turnitin_api_key')
+        );
 
-        $data = [
-            'turnitin' => $turnitin,
-            'assessment' => $assessment,
-            'response' => $response,
-            'participant' => $participant,
-        ];
+        /* TODO Apparently localisation is a thing, set via locale tuple;
+         *  but I have assumed en for now
+         */
+        $viewerUrl = $api->retrieve('POST', "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url", [
+            'viewer_user_id' => $this->getUser()->getId(),
+            'locale' => 'en'
+        ]);
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
+        if (null !== $viewerUrl) {
+            $url = $viewerUrl['viewer_url'];
+
+            $data = [
+                'url' => $url,
+                'turnitin' => $turnitin,
+                'assessment' => $assessment,
+                'response' => $response,
+                'participant' => $participant,
+            ];
+
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
+        }
+
+        /* TODO You might error out here when json_decode returns null
+         *  in odd circumstances; but what do we display in that case?
+         */
     }
 
 
