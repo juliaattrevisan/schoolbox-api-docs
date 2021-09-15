@@ -23,11 +23,10 @@
      # instead of plag (mutually exclusive)
      #}
     {% include '@learning/dueWork/turnitin/link.twig' with {
-        assessmentId: assessment.id,
         assessment:   assessment,
-        responseId:   response.id,
         response:     response,
-        participant:  participant
+        participant:  participant,
+        currentFile:  currentFile
     } %}
 {% elseif plagscanApiEnabled %}
     {# If the plagscan api was configured then assume we're using that
