@@ -1019,8 +1019,14 @@ class Controller extends Assessment\Controller
                  */
                 $turnitinMapper = Turnitin\Mapper::getInstance();
 
+                $models = [];
+
                 foreach ($response->getAllFiles() as $currentFile) {
-                    $turnitinMapper->saveStub($currentFile);
+                    $model = $turnitinMapper->saveStub($currentFile);
+
+                    if ($model) {
+                        $models[] = $model;
+                    }
                 }
 
                 /* We need this api
@@ -1033,7 +1039,7 @@ class Controller extends Assessment\Controller
 
                 /* Set up detached function so turnitin can continue in the background
                  */
-                $detachedFunction = static function () use ($api, $response) {
+                $detachedFunction = static function () use ($api, $models) {
 
                     /* Set up a record processor
                      */
@@ -1047,15 +1053,8 @@ class Controller extends Assessment\Controller
 
                     /* Shank them all up
                      */
-                    foreach ($response->getAllFiles() as $file) {
-                        try {
-                            $model = Turnitin\Mapper::getInstance()->findOneByColumn('student_submission_file_id', $file->getId());
-                            $processor->process($model);
-                        } catch (\Schoolbox\Mapper\Exception $e) {
-                            /* TODO I guess we log this somewhere; file not found in detached process
-                             *  seems like an obscure scenario
-                             */
-                        }
+                    foreach ($models as $model) {
+                        $processor->process($model);
                     }
                 };
             } else {

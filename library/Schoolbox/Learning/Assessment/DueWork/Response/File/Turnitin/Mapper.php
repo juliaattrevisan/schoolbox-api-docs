@@ -47,28 +47,32 @@ class Mapper extends \Schoolbox\Mapper
      * if it doesn't already commence via the controller's detached function
      *
      * @param SubmissionFile $file
-     * @return array
+     * @return Model|null
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function saveStub(SubmissionFile $file): array
+    public function saveStub(SubmissionFile $file): ?Model
     {
         /* Invalid file? Do nothing, exit early
          */
         if (!(new ValidFile())->isSatisfiedBy($file)) {
-            return [];
+            return null;
         }
 
         /* Otherwise save a stub record for later
          */
         $now = \Alaress_Date_Format::now();
 
-        return $this->save($this->createModel()
+        $model = $this->createModel()
             ->setStatus(Model::STATUS_SETUP_PENDING)
             ->setStudentSubmissionFileId($file->getId())
             ->setCreatedAt($now)
-            ->setUpdatedAt($now));
+            ->setUpdatedAt($now);
+
+        $this->save($model);
+
+        return $model;
     }
 
 

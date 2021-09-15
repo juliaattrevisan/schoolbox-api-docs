@@ -286,8 +286,14 @@ class Controller extends Base
                          */
                         $turnitinMapper = DueWork\Response\File\Turnitin\Mapper::getInstance();
 
+                        $models = [];
+
                         foreach ($response->getAllFiles() as $currentFile) {
-                            $turnitinMapper->saveStub($currentFile);
+                            $model = $turnitinMapper->saveStub($currentFile);
+
+                            if ($model) {
+                                $models[] = $model;
+                            }
                         }
 
                         /* We need this api
@@ -300,7 +306,7 @@ class Controller extends Base
 
                         /* Set up detached function so turnitin can continue in the background
                          */
-                        $detachedFunction = static function () use ($api, $response) {
+                        $detachedFunction = static function () use ($api, $models) {
 
                             /* Set up a record processor
                              */
@@ -314,15 +320,8 @@ class Controller extends Base
 
                             /* Shank them all up
                              */
-                            foreach ($response->getAllFiles() as $file) {
-                                try {
-                                    $model = Turnitin\Mapper::getInstance()->findOneByColumn('student_submission_file_id', $file->getId());
-                                    $processor->process($model);
-                                } catch (\Schoolbox\Mapper\Exception $e) {
-                                    /* TODO I guess we log this somewhere; file not found in detached process
-                                     *  seems like an obscure scenario
-                                     */
-                                }
+                            foreach ($models as $model) {
+                                $processor->process($model);
                             }
                         };
                     } else {
