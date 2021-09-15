@@ -123,7 +123,10 @@ class Report
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
+     * @throws \PDOException
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     private function getReportInfo(Turnitin\Model $model): ?array
     {
