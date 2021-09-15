@@ -116,6 +116,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 // session management isn't working for whatever reason.
                 $code = 400;
                 $info = 'If the problem persists, please contact your System Administrator including the following information:';
+                $infoFromLocation = false;
 
                 if ($e instanceof SchoolboxException) {
                     $code    = $e->getHttpStatusCode();
@@ -127,9 +128,17 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 } elseif ($e instanceof RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
+                } elseif (preg_match("/(Maximum execution time of \d+ seconds? exceeded)|(Allowed memory size of \d+ bytes? exhausted)/", $error['message'] ?? '')) {
+                    ob_clean();
+                    $code             = 504;
+                    $message          = $error['message'];
+                    $infoFromLocation = true;
                 } else {
-                    $message = 'Schoolbox has encountered a fatal error.';
+                    $message          = 'Schoolbox has encountered a fatal error.';
+                    $infoFromLocation = true;
+                }
 
+                if ($infoFromLocation) {
                     // decide what to tell the user based on where this error came from
                     // use the document_root to get a Schoolbox-relative file in which the error occurred
                     $cause = substr($error['file'], \strlen($_SERVER['DOCUMENT_ROOT']) - 4);
@@ -205,7 +214,11 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      */
     protected function registerShutdownHandling(): void
     {
-        register_shutdown_function(array(ShutdownHandler::instance(), 'onShutdown'));
+        register_shutdown_function(
+            new ResourceLimitExceededHandler(function () {
+                $this->shutdownSafely(error_get_last(), debug_backtrace());
+            })
+        );
     }
 
 
