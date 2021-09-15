@@ -12,6 +12,7 @@ use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Transformation;
 use League\Flysystem\Filesystem;
+use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -21,6 +22,13 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
+$kernel->getShutdownHandler()->registerFunction(
+    new ResourceLimitExceededHandler(function () {
+        header('Cache-Control: no-store');
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
+    }),
+    0 // Max Priority
+);
 
 $logoSizes = [
     'skin_logo_square' => [

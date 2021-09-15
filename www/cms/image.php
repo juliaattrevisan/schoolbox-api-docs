@@ -14,6 +14,7 @@ use Alaress\Image\Transformation;
 use League\Flysystem\Filesystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
@@ -23,7 +24,13 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
-
+$kernel->getShutdownHandler()->registerFunction(
+    new ResourceLimitExceededHandler(function () {
+        header('Cache-Control: no-store');
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
+    }),
+    0 // Max Priority
+);
 /* Choose a caching method to use
  */
 

@@ -10,12 +10,20 @@
 
 use Alaress\Image;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
+$kernel->getShutdownHandler()->registerFunction(
+    new ResourceLimitExceededHandler(function () {
+        header('Cache-Control: no-store');
+        redirectToBroken(504);
+    }),
+    0 // Max Priority
+);
 
 if (empty($_SESSION['id'])) {
     redirectToBroken(403);

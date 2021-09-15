@@ -11,11 +11,19 @@
 use Alaress\Image\Cache\LocalFS;
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
+$kernel->getShutdownHandler()->registerFunction(
+    new ResourceLimitExceededHandler(function () {
+        header('Cache-Control: no-store');
+        SitePage::redirectToBrokenImage();
+    }),
+    0 // Max Priority
+);
 
 $path = '/static/images/icons/activity-icons-64x64px.png';
 
