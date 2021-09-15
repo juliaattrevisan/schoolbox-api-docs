@@ -113,8 +113,8 @@ class Report
             }
         } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
             $this->turnitinMapper->save($model
-            ->setErrorCode((string)$e->getCode())
-            ->setErrorMessage($e->getMessage()));
+                ->setErrorCode((string)$e->getCode())
+                ->setErrorMessage($e->getMessage()));
         }
     }
 
