@@ -77,7 +77,24 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * If the turnitin host and key was set in config, then\ turnitin is enabled for the $user specified
+     * Decide if turnitin was configured adequately
+     *
+     * @return bool
+     */
+    public function isConfigured(): bool
+    {
+        /* If both of these are set, then Turnitin was configured presumably correctly
+         * and should take precedence over plag
+         */
+        $host = trim((string)$this->getConfigLoader()->get('turnitin_api_host'));
+        $key = trim((string)$this->getConfigLoader()->get('turnitin_api_key'));
+
+        return '' !== $host && '' !== $key;
+    }
+
+
+    /**
+     * If the turnitin host and key was set in config, and turnitin is enabled for the $user specified
      *
      * Assuming this is the case, the following policies are obeyed:
      * - Students and parents can see similarity results allowed via config
@@ -91,10 +108,7 @@ class Mapper extends \Schoolbox\Mapper
         /* If both of these are set, then Turnitin was configured presumably correctly
          * and should take precedence over plag
          */
-        $host = trim((string)$this->getConfigLoader()->get('turnitin_api_host'));
-        $key = trim((string)$this->getConfigLoader()->get('turnitin_api_key'));
-
-        if ('' !== $host && '' !== $key) {
+        if ($this->isConfigured()){
             /* Staffs and super can always see similarity results
              */
             if ($user->isSuperuser() || $user->getRole()->isStaff()) {

@@ -276,16 +276,16 @@ class Controller extends Base
                 $detachedFunction = null;
 
                 if ($assessment->getSimilarityCheckEnabled()) {
+                    $turnitinMapper = Turnitin\Mapper::getInstance();
+
                     /* Only one of these can be active at a time, but both universes can co-exist
                      * Specifically enable turnitin if its api key was set
                      */
-                    if ('' !== trim((string)$this->getConfigLoader()->get('turnitin_api_key'))) {
+                    if ($turnitinMapper->isConfigured()) {
                         /* Set up a turnitin stub record
                          * This allows it to be picked up and processed by an async script later
                          * if it doesn't start processing via the $detachedFunction
                          */
-                        $turnitinMapper = DueWork\Response\File\Turnitin\Mapper::getInstance();
-
                         $models = [];
 
                         foreach ($response->getAllFiles() as $currentFile) {
