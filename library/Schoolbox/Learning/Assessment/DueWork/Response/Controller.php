@@ -563,6 +563,30 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildContent('', $data));
     }
 
+
+    /**
+     * Dump out a plagscan report
+     *
+     * @param IAssessable $assessment
+     * @param IResponse   $response
+     * @param Turnitin    $turnitin
+     * @param Participant $participant
+     */
+    public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin $turnitin, Participant $participant)
+    {
+        new \Alaress_Probe('turnitin report goes here');
+
+        $data = [
+            'turnitin' => $turnitin,
+            'assessment' => $assessment,
+            'response' => $response,
+            'participant' => $participant,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
+    }
+
+
     /**
      * Dump out a plagscan report
      *

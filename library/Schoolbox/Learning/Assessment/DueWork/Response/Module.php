@@ -65,6 +65,9 @@ class Module extends BaseModule
         $preloadParticipant     = function (array $params) {
             return $this->preloadParticipant($params);
         };
+        $preloadTurnitinWithAss = function (array $params) {
+            return $this->preloadTurnitinWithAssessment($params);
+        };
         $preloadPlagscanWithAss = function (array $params) {
             return $this->preloadPlagscanWithAssessment($params);
         };
@@ -92,7 +95,7 @@ class Module extends BaseModule
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
-        $hasPlagscanAccess = new Rule\All(
+        $hasSimilarityAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 $this->buildRuleHasWriteAccess(),
@@ -104,6 +107,7 @@ class Module extends BaseModule
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
+        $turnitinPattern    = '/similarity/{assessmentId:\d+}/{responseId:\d+}/{turnitinId:\d+}';
         $plagscanPattern    = '/plagscans/{assessmentId:\d+}/{responseId:\d+}/{plagscanId:\d+}';
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
@@ -115,8 +119,11 @@ class Module extends BaseModule
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
         $this->register('GET', $participantPattern . '/responses/self/{responseId:\d+}', 'getParticularResponseForSelfReflection', $hasSelfAccess, $preloadParticipant); // a || r
 
-        $this->register('GET', $plagscanPattern, 'getPlagscanReport', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
-        $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
+        $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
+        $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
+
+        $this->register('GET', $plagscanPattern, 'getPlagscanReport', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
+        $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
 
         // For now, same auth rules as crocodoc.
         $canAccessKami = new Rule\All(
@@ -270,6 +277,56 @@ class Module extends BaseModule
             'student'     => $student,
         ];
     }
+
+
+    /**
+     * @param array $params
+     * @return array [ assessment, response, turnitin ]
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function preloadTurnitinWithAssessment(array $params): array
+    {
+        try {
+            $turnitinReport = File\Turnitin\Mapper::getInstance()->findById($params['turnitinId']);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Die early when requested Assessment doesn't exist
+         */
+        try {
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Die early when requested Response doesn't exist in $assessment
+         */
+        try {
+            $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
+        } catch (OutOfBoundsException $e) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Die early when participant isn't found
+         */
+        try {
+            $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
+        } catch (OutOfBoundsException $e) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        return [
+            'assessment' => $assessment,
+            'turnitin'  => $turnitinReport,
+            'response' => $response,
+            'participant' => $participant
+        ];
+    }
+
 
     /**
      * @param array $params
