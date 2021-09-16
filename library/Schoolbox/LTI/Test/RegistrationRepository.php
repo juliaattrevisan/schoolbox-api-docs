@@ -146,42 +146,42 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $keyChainFactory = new KeyChainFactory();
         $sharedPublicKey = <<<PUBLICKEY
             -----BEGIN PUBLIC KEY-----
-            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyZXlfd5yqChtTH91N76V
-            okquRu2r1EwNDUjA0GAygrPzCpPbYokasxzs+60Do/lyTIgd7nRzudAzHnujIPr8
-            GOPIlPlOKT8HuL7xQEN6gmUtz33iDhK97zK7zOFEmvS8kYPwFAjQ03YKv+3T9b/D
-            brBZWy2Vx4Wuxf6mZBggKQfwHUuJxXDv79NenZarUtC5iFEhJ85ovwjW7yMkcflh
-            Ugkf1o/GIR5RKoNPttMXhKYZ4hTlLglMm1FgRR63pvYoy9Eq644a9x2mbGelO3Hn
-            GbkaFo0HxiKbFW1vplHzixYCyjc15pvtBxw/x26p8+lNthuxzaX5HaFMPGs10rRP
-            LwIDAQAB
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs5BfD0/+IeYbzNJJbeib
+            HDQsHb1jaNOrG63HtzM7H+K2I/X3b9NGQNFEkhQxMTwbVVkbWITFoXOZHR0vNAb8
+            w04ZxPOgtk1pwFwgQ9ERiZgyE8hfkSVwe4URh88sC+A+zWja+6OtBamM/dAGuDki
+            FzzzdRH1G++l4joa8KywqgZm9AY63jTHRkEBv96bIXSPYnYa3EOnnXG9loh1ArT2
+            KE57d6G8rIkblEBB4h+Jv+rIemrlVjO1YuwynNCoCcWox090i6ejKe2OEc4FsP/x
+            JYFXIIlay95laYzypfPbpo4qeCoCCqY8W2zsWXx409G0DcEzDUpvq9xj4xo1ozBz
+            SQIDAQAB
             -----END PUBLIC KEY-----
             PUBLICKEY;
         $sharedPrivateKey = <<<PRIVATEKEY
             -----BEGIN RSA PRIVATE KEY-----
-            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
+            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
             -----END RSA PRIVATE KEY-----
             PRIVATEKEY;
 
