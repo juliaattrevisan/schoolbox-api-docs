@@ -58,7 +58,8 @@ MAILTO="support@schoolbox.com.au"
 */10 * * * * root /usr/share/schoolbox/tools/set-config-data-dirs-perms.sh --skip storage_dir --owner www-data --group www-data >> /var/log/schoolbox/set-config-data-dirs-perms.log 2>&1
 
 # Submit system metrics to telegraf server every day at 3:15am
-15 3 * * * www-data php /usr/share/schoolbox/tools/stats.php | curl -s -X POST -d @- 'http://localhost:8128/telegraf' 2>&1
+# Pipe OUTPUT from php as INPUT to curl. Pipe ERROR from php + STDOUT/STDERR from curl to log file
+15 3 * * *	www-data	eval "{ php /usr/share/schoolbox/tools/stats.php | curl --silent --show-error -d @- 'http://localhost:8128/telegraf'; }" >> /var/log/schoolbox/stats.log 2>&1
 
 # Rebuild notification routes for users by polling group and class memberships
 30 2 * * * www-data php /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php -vv >>/var/log/schoolbox/binder.log 2>&1
