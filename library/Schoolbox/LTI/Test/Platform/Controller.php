@@ -16,8 +16,9 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use Schoolbox\LTI\Test\RegistrationRepository;
+use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
-use Schoolbox\Url\Factory;
+use Schoolbox\LTI\Test\UserAuthenticatorFactory;
 
 /**
  * LTI test platform controller
@@ -114,9 +115,7 @@ class Controller extends Base
      */
     private function buildRegistrationRepository(): RegistrationRepository
     {
-        return new RegistrationRepository(
-            (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https')->toString(),
-        );
+        return (new RegistrationRepositoryFactory($this->getConfigLoader()))->build();
     }
 
     /**
@@ -126,6 +125,6 @@ class Controller extends Base
      */
     private function buildUserAuthenticator(): UserAuthenticator
     {
-        return new UserAuthenticator($this->getUser()->getId() ? $this->getUser() : null);
+        return (new UserAuthenticatorFactory())->build($this->getUser());
     }
 }

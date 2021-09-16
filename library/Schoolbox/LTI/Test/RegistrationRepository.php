@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Test;
 
+use Laminas\Uri\UriInterface;
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
@@ -17,7 +18,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Tool\Tool;
 
 /**
- * Registration repository for the test platform.
+ * Registration repository for the test platform and tool.
  */
 class RegistrationRepository implements RegistrationRepositoryInterface
 {
@@ -47,6 +48,13 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public const REGISTRATION_DEPLOYMENT_IDS = ['deploymentId3'];
 
+
+    /**
+     * The base URL for the tool and platform.
+     */
+    private UriInterface $baseUrl;
+
+
     /**
      * The test registration.
      */
@@ -55,13 +63,14 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     /**
      * Constructor
      *
-     * @param string $platformAudience The audience for this repo's
-     *                                 registration's platform: should be the
-     *                                 same as the platform's base URL.
+     * @param UriInterface $baseUrl The current base URL: used as the audience
+     *                              for the platform and tool, and also as the
+     *                              base for their URLs.
      */
-    public function __construct(string $platformAudience)
+    public function __construct(UriInterface $baseUrl)
     {
-        $this->registration = $this->buildTestRegistration($platformAudience);
+        $this->baseUrl      = $baseUrl;
+        $this->registration = $this->buildTestRegistration();
     }
 
     /**
@@ -139,10 +148,9 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     /**
      * Build the test registration.
      *
-     * @param string $platformAudience
      * @return Registration
      */
-    private function buildTestRegistration(string $platformAudience): Registration
+    private function buildTestRegistration(): Registration
     {
         // Configure security keys
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-security-keys
@@ -189,14 +197,14 @@ class RegistrationRepository implements RegistrationRepositoryInterface
             PRIVATEKEY;
 
 
-        // Tool keychain needs only the public key: I don't know its private key
+        // Tool and platform keychains both need both a private and public key,
+        // as this provides info for both the tool and platform
         $toolKeyChain = $keyChainFactory->create(
             '1',
             'test',
             $sharedPublicKey,
+            $sharedPrivateKey,
         );
-
-        // OTOH: I am the platform, I need to know my own private key
         $platformKeyChain = $keyChainFactory->create(
             '1',
             'test',
@@ -208,17 +216,18 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-platform
         $platform = new Platform(
             'schoolboxVagrantPlatform',
-            'Schoolbox [vagrant]',
-            $platformAudience,
+            'Schoolbox [vagrant] Platform',
+            $this->baseUrl->toString(),
+            (clone $this->baseUrl)->setPath('/lti-test/platform/oidc/authentication')->toString(),
         );
 
         // Configure a tool
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-tool
         $tool = new Tool(
-            'devkitTool',
-            'LTI 1.3 DevKit (as tool)',
-            self::TOOL_AUDIENCE,
-            self::TOOL_OIDC_INITIATION_URL,
+            'schoolboxVagrantTool',
+            'Schoolbox [vagrant] Tool',
+            $this->baseUrl->toString(),
+            (clone $this->baseUrl)->setPath('/lti-test/tool/oidc/initiation')->toString(),
         );
 
         // Configure a registration

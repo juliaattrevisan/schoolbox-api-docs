@@ -17,7 +17,7 @@ use OAT\Library\Lti1p3Core\User\UserIdentity;
 use Schoolbox\User;
 
 /**
- * User authenticator for the test platform.
+ * User authenticator for the test platform and tool.
  *
  * Simply authenticates whatever user is passed in the constructor: if no user
  * was passed, authentication fails.
