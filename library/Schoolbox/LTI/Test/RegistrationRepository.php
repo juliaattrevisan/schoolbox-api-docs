@@ -23,17 +23,6 @@ use OAT\Library\Lti1p3Core\Tool\Tool;
 class RegistrationRepository implements RegistrationRepositoryInterface
 {
     /**
-     * Audience of the test tool
-     */
-    public const TOOL_AUDIENCE = 'http://devkit-lti1p3.localhost/tool';
-
-    /**
-     * Tool's OIDC initiation URL: the platform will send an authorization
-     * request to this URL
-     */
-    public const TOOL_OIDC_INITIATION_URL = 'http://devkit-lti1p3.localhost/lti1p3/oidc/initiation';
-
-    /**
      * Registration's unique identifier
      */
     public const REGISTRATION_IDENTIFIER = 'schoolboxVagrant';
@@ -46,7 +35,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     /**
      * Registration's deployment IDs
      */
-    public const REGISTRATION_DEPLOYMENT_IDS = ['deploymentId3'];
+    public const REGISTRATION_DEPLOYMENT_IDS = ['deploymentId'];
 
 
     /**
@@ -232,7 +221,6 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
         // Configure a registration
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-registration
-        // Need to set this up in the devkit
         return new Registration(
             self::REGISTRATION_IDENTIFIER,
             self::REGISTRATION_CLIENT_ID,
