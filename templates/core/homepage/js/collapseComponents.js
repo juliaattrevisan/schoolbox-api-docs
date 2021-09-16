@@ -5,6 +5,7 @@
 
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
+import { EXISTING_COMPONENT_SELECTOR, ON_COMPONENT_ADDED } from './updateHomepage';
 
 const COLLAPSABLE_SELECTOR = '[data-collapsable="true"]';
 const COLLAPSE_BUTTON_SELECTOR = '[data-collapser="true"]';
@@ -12,17 +13,25 @@ const ANIMATE_SPEED = 0.4; //the speed of animations
 
 
 /**
- * 
+ * Set up all components and listen for newly added ones
  */
- export const initCollapseComponent = () => {
-    document.querySelectorAll('[data-component]').forEach((component) => {
-        const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
-        collapseButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            isComponentUncollapsed(component) ? collapseComponent(component) : uncollapseComponent(component);
-        });
-    });
+export const initCollapseComponents = () => {
+    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
+    document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
 }
+
+/**
+ * Open and close a component
+ * 
+ * @param { Element } 
+ */
+const init = (component) => {
+    const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
+    collapseButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        isComponentUncollapsed(component) ? collapseComponent(component) : uncollapseComponent(component);
+    });
+} 
 
 /**
  * Check to determine components collapse state

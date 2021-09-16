@@ -1,3 +1,7 @@
+/*
+ * Basic DOM manipulation utilities
+ *
+ */
 
 /**
  * returns an integer indicating the position of the 
@@ -18,7 +22,6 @@ export function getIndex (element) {
     }
     return i;
 }
-
 
 /**
  * empty the element of children

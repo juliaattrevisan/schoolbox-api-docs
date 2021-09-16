@@ -3,43 +3,34 @@
  *
  */
 
-import axios from 'axios';
-
+/**
+ * Listen for the button press and then save the link to DB and dipslay it on the page
+ */
 export const initPostToMyLinks = () => {
-    // Adds page to my links
     document.getElementById('postToMyLinks').addEventListener('click', (event) => {
         event.preventDefault();
         postLink();
-        // $(this).ajaxForm({
-        //     url: "/cms/myLinksForm.php",
-        //     data: { url: {HOMEPAGE_URL_JS}, description: {HEADING_JS}},
-        //     type: 'post'
-        // }).on('done.ajaxForm', function() {
-        //     location.reload();
-        // });
     });
 }
 
 /**
  * Save the settings to the DB
- * 
- * @param { Element } 
- * @param { HTMLFormElement } 
  */
 const postLink = async () => {
     try {
-        await axios.post('/cms/myLinksForm.php', getFormData());
+        await fetch('/cms/myLinksForm.php', {
+            method: 'POST',
+            body: getFormData(),
+        })
     } catch (error) {
         console.warn(error);
     } finally { 
-        location.reload();
-    }
+        displayLinkOnPage();
+    } 
 }
 
 /**
- * To pass through the required FormData to delete the component in the DB
- * 
- * @param { Element } 
+ * To pass through the required FormData to save the page to my links
  * 
  * @returns { FormData }  
  */
@@ -47,6 +38,22 @@ const getFormData = () => {
     const formData = new FormData();
     formData.append('url', document.getElementById('homepageURL').value);
     formData.append('description', document.getElementById('heading').value);
-    debugger;
     return formData;
+}
+
+/**
+ * Add the link to the side panel
+ */
+const displayLinkOnPage = () => {
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', document.getElementById('homepageURL').value);
+    link.innerText = document.getElementById('heading').value;
+    
+    const linkListItem = document.createElement('li');
+    linkListItem.appendChild(link);
+
+    const myLinksList = document.getElementById('side-menu-mylinks').querySelector('ul');
+    myLinksList.appendChild(linkListItem);
+
 }

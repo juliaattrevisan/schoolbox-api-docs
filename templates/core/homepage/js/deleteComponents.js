@@ -4,9 +4,8 @@
  */
 
 import { gsap } from 'gsap/all';
-import axios from 'axios';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
 
 const ANIMATE_SPEED = 0.4;
 
@@ -14,33 +13,41 @@ const ANIMATE_SPEED = 0.4;
 /**
  * Toggle the delete palette and manage the confirm/deny actions
  */
-export const initDeleteComponent = () => {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => {
-        const deletePanel = component.querySelector('[data-component-panel="delete"]');
-        const deleteButton = component.querySelector('[data-target="delete"]');
-        initDeleteComponentButton(deletePanel, deleteButton);
-        initCancelDeleteComponentButton(component, deletePanel, deleteButton);
-        initConfirmDeleteComponent(component);
-    });
+export const initDeleteComponents = () => {
+    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
+    document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
 }
 
 /**
  * To show/hide the confirm/cancel delete component panel
  * 
  * @param { Element } 
+ */
+const init = (component) => {
+    const panel = component.querySelector('[data-component-panel="delete"]');
+    const toggleButton = component.querySelector('[data-target="delete"]');
+    initToggleButon(panel, toggleButton);
+    initCancelButton(component, panel, toggleButton);
+    initConfirmButton(component);
+}   
+
+/**
+ * The show/hide button
+ * 
+ * @param { Element } 
  * @param { Element } 
  */
-const initDeleteComponentButton = (deletePanel, deleteButton) => {
-    deleteButton.addEventListener('click', (event) => {
+const initToggleButon = (panel, toggleButton) => {
+    toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
-        if (deleteButton.getAttribute('data-state') === 'closed') {
-            deleteButton.setAttribute('data-state', 'opened');
-            gsap.to(deleteButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-            slideDown(deletePanel, ANIMATE_SPEED);
+        if (toggleButton.getAttribute('data-state') === 'closed') {
+            toggleButton.setAttribute('data-state', 'opened');
+            gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+            slideDown(panel, ANIMATE_SPEED);
         } else {
-            deleteButton.setAttribute('data-state', 'closed');
-            gsap.to(deleteButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-            slideUp(deletePanel, ANIMATE_SPEED);
+            toggleButton.setAttribute('data-state', 'closed');
+            gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+            slideUp(panel, ANIMATE_SPEED);
         }
     });
 }
@@ -52,13 +59,13 @@ const initDeleteComponentButton = (deletePanel, deleteButton) => {
  * @param { Element } 
  * @param { Element } 
  */
-const initCancelDeleteComponentButton = (component, deletePanel, deleteButton) => {
+const initCancelButton = (component, panel, toggleButton) => {
     const cancelDeleteButton = component.querySelector('[data-remove="0"]');
     cancelDeleteButton.addEventListener('click', (event) => {
         event.preventDefault();
-        if (deleteButton.getAttribute('data-state') === 'opened') {
-            deleteButton.setAttribute('data-state', 'closed');
-            slideUp(deletePanel, ANIMATE_SPEED);
+        if (toggleButton.getAttribute('data-state') === 'opened') {
+            toggleButton.setAttribute('data-state', 'closed');
+            slideUp(panel, ANIMATE_SPEED);
         } 
     });
 }
@@ -68,7 +75,7 @@ const initCancelDeleteComponentButton = (component, deletePanel, deleteButton) =
  * 
  * @param { Element } 
  */
-const initConfirmDeleteComponent = (component) => {
+const initConfirmButton = (component) => {
     const comfirmDeleteButton = component.querySelector('[data-remove="1"]');
     comfirmDeleteButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -83,18 +90,22 @@ const initConfirmDeleteComponent = (component) => {
  */
 const deleteComponent = async (component) => {
     try {
-        await axios.post(UPDATE_URL, getDeleteComponentFormData(component));
+        await fetch(UPDATE_URL, {
+            method: 'POST',
+            body: getFormData(component),
+        });
         await slideUp(component);
-        // if it was the last component in a column, reshow the placeholder
-        document.dispatchEvent(new CustomEvent(ON_COMPONENT_REMOVED, { //dispatch to allow sortableComponents.js to remove from sortable list
+    } catch (error) {
+        console.warn(error);
+    } finally {
+        document.dispatchEvent(new CustomEvent(ON_COMPONENT_REMOVED, { //dispatch to allow removing from the sortable list in addAndSortComponents.js
             detail: {
-                componentID: getComponentID(component) //id will be used to remove the sortable
+                component: component 
             }
         })); 
         component.remove();
-    } catch (error) {
-        console.warn(error);
-    } 
+        // if it was the last component in a column, reshow the placeholder
+    }
 }
 
 /**
@@ -104,7 +115,7 @@ const deleteComponent = async (component) => {
  * 
  * @returns { FormData }  
  */
-const getDeleteComponentFormData = (component) => {
+const getFormData = (component) => {
     const formData = new FormData();
     formData.append('cid', document.getElementById('categoryID').value);
     formData.append('delete', getComponentID(component));

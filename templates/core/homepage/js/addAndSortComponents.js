@@ -3,7 +3,7 @@ import { insertElementBefore, insertElementAfter, getClosestElement, isElementAb
     isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from './saveComponentOrder';
-import { ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
+import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -45,8 +45,8 @@ export const initAddAndSortComponents = () => {
  * Fire up Draggable instances, looping through each sortable to assign a Draggable instance 
  */
 const initDraggables = () => {
-    document.querySelectorAll(COMPONENT_SELECTOR).forEach((sortableItem) => {
-        __draggablesList = [...__draggablesList, getDraggable(sortableItem)];
+    document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
+        __draggablesList = [...__draggablesList, getDraggable(component)];
     });
 }
 
@@ -54,13 +54,13 @@ const initDraggables = () => {
  * To enable Dragging functionality to the chosen item
  * Refer to https://greensock.com/docs/v3/Plugins/Draggable for further info
  */
-const getDraggable = (sortableItem) => {
-    const sortableItemTrigger = isExistingComponent(sortableItem) ? sortableItem.querySelector(COMPONENT_TRIGGER_SELECTOR) : sortableItem; //existing components use a handle, the ones in the palette do not
-    sortableItemTrigger.addEventListener('click', (event) => event.preventDefault());
-    sortableItemTrigger.addEventListener('dblclick', (event) => event.preventDefault());
-    return Draggable.create(sortableItem, {
+const getDraggable = (component) => {
+    const componentTrigger = isExistingComponent(component) ? component.querySelector(COMPONENT_TRIGGER_SELECTOR) : component; //existing components use a handle, the ones in the palette do not
+    componentTrigger.addEventListener('click', (event) => event.preventDefault());
+    componentTrigger.addEventListener('dblclick', (event) => event.preventDefault());
+    return Draggable.create(component, {
         type: 'x, y',
-        trigger: sortableItemTrigger,
+        trigger: componentTrigger,
         autoScroll: 1,
         onDragStart: (event) => onDragStart(event),
         onDrag: () => onDrag(),
@@ -116,8 +116,9 @@ const isNewComponent = (component) => {
  * To add a newly created component to the sortable list
  */
  const initOnComponentAddedListener = () => {
-    document.addEventListener('jquery.masonry__onComponentAdded', (event) => {
-        const newDraggable = getDraggable(document.getElementById(event.detail.componentID));
+    document.addEventListener(ON_COMPONENT_ADDED, (event) => {
+        console.warn('ON_COMPONENT_ADDED');
+        const newDraggable = getDraggable(event.detail.component);
         const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
         newDraggable.enabled(componentLockSwitchStatus); //check 
         __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
@@ -130,9 +131,9 @@ const isNewComponent = (component) => {
  */
  const initOnComponentRemovedListener = () => {
     document.addEventListener(ON_COMPONENT_REMOVED, (event) => {
-        const draggableToRemove = __draggablesList.find((draggable) => getComponentID(draggable.target) === event.detail.componentID);
+        const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
         draggableToRemove.kill(); //disables the Draggable instance
-        __draggablesList = __draggablesList.filter((draggable) => getComponentID(draggable.target) !== event.detail.componentID); //update the __draggablesList list, pullling out the removed component
+        __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
         updateSortableElements(); //update the position of all elements due to the new element being added
     });
 }
@@ -336,12 +337,12 @@ const addPlaceHolderComponents = () => {
  * there's a bit of an issue where we can FLIP on sort change, and then also remove the placeHolderComponent
  * that is within the FLIP. This causes an issue we need to check for
  * 
- * @param { DOMElement }
+ * @param { Element }
  * 
  * @returns { Boolean }
  */
 const canAddPlaceHolderComponent = (parentContainer) => {
-    return (parentContainer.children.length === 1) || //only the existing .masonry-placeholder is in the container
+    return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
            (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
 }
 
@@ -366,11 +367,11 @@ const hideExistingMasonryPlaceHolders = () => {
  * To be able to sort elements and snap back to correct position
  */
 const updateSortableElements = () => {
-    document.querySelectorAll(COMPONENT_SELECTOR).forEach((sortableItem) => {
-        sortableItem.dataset.originalLeft = sortableItem.getBoundingClientRect().left;
-        sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
-        sortableItem.dataset.leftDifference = 0;
-        sortableItem.dataset.topDifference = 0;
+    document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
+        component.dataset.originalLeft = component.getBoundingClientRect().left;
+        component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
+        component.dataset.leftDifference = 0;
+        component.dataset.topDifference = 0;
     });
 }
 
@@ -506,7 +507,7 @@ const showExistingMasonryPlaceHolders = () => {
 }
 
 /**
- * Move the component back to its original spot or its new 
+ * Move the component back to its original spot or its new updated by sort spot
  */
 const snapBackActiveComponent = () => {
     gsap.to(__activeComponent, {
@@ -591,7 +592,9 @@ const onActiveComponentExpanded = async () => {
     updateSortableElements();
 
     if (__hasSortChange && isNewComponent(__activeComponent)) {
-        await getNewComponent(__activeComponent);
+        const newComponent = await getNewComponent(__activeComponent);
+        console.warn('saveComponentOrder');
+        await saveComponentOrder(newComponent);
         __hasSortChange = false;
     } else if (__hasSortChange && isExistingComponent(__activeComponent)) {
         await saveComponentOrder(__activeComponent);

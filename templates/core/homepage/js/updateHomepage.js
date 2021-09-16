@@ -5,16 +5,17 @@
 
 
 import { initPostToMyLinks } from './postToMyLinks';
+import { initUpdateColumnWidths } from './updateColumnWidths';
 import { initAddAndSortComponents } from './addAndSortComponents';
-import { initUpdateComponentSettings } from './updateComponentSettings';
-import { initDeleteComponent } from './deleteComponent';
-import { initCollapseComponent } from './collapseComponent';
+import { initUpdateComponentsSettings } from './updateComponentsSettings';
+import { initDeleteComponents } from './deleteComponents';
+import { initCollapseComponents } from './collapseComponents';
         
 export const EXISTING_COMPONENT_SELECTOR = '[data-component]'; 
 export const UPDATE_URL = '/homepage/configForm.php'; 
 
-export const ON_COMPONENT_ADDED = 'ON_COMPONENT_ADDED'; 
-export const ON_COMPONENT_REMOVED = 'ON_COMPONENT_REMOVED'; 
+export const ON_COMPONENT_ADDED = 'updateHomepage.ON_COMPONENT_ADDED'; //dispatched with the { Element } component
+export const ON_COMPONENT_REMOVED = 'updateHomepage.ON_COMPONENT_REMOVED'; //dispatched with the { Element } component
 
 
 /**
@@ -22,10 +23,11 @@ export const ON_COMPONENT_REMOVED = 'ON_COMPONENT_REMOVED';
  */
 export const init = () => {
     initPostToMyLinks();
+    initUpdateColumnWidths();
     initAddAndSortComponents();
-    initUpdateComponentSettings();
-    initDeleteComponent();
-    initCollapseComponent();
+    initUpdateComponentsSettings();
+    initDeleteComponents();
+    initCollapseComponents();
 }
 
 document.addEventListener('DOMContentLoaded', init);

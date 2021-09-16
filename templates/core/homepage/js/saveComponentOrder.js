@@ -3,9 +3,8 @@
  *
  */
 
-import axios from 'axios';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from './updateHomepage';
-import { updateDeletedComponent } from './deleteComponent';
+import { updateDeletedComponent } from './deleteComponents';
 
 
 /**
@@ -13,8 +12,12 @@ import { updateDeletedComponent } from './deleteComponent';
  */
 export const saveComponentOrder = async (component) => {
     try {
-        const response = await axios.post(UPDATE_URL, getNewComponentOrderFormData(component));
-        if (response.data.hasComponentBeenDeleted) {
+        const response = await fetch(UPDATE_URL, {
+            method: 'POST',
+            body: getFormData(component),
+        });
+        const responseData = await response.json();
+        if (responseData.hasComponentBeenDeleted) {
             updateDeletedComponent(component);
         }
     } catch (error) {
@@ -29,7 +32,7 @@ export const saveComponentOrder = async (component) => {
  * 
  * @returns { FormData }  
  */
-const getNewComponentOrderFormData = (component) => {
+const getFormData = (component) => {
     const formData = new FormData();
     formData.append('column1', getContainerComponentIDs(document.querySelector('[data-position="left"]'))); //left side panel
     formData.append('column2', getContainerComponentIDs(document.querySelector('[data-position="right"]'))); //right side panel

@@ -4,12 +4,11 @@
  */
 
 import { gsap } from 'gsap/all';
-import axios from 'axios';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { timeout } from '@js/util/jsUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from './updateHomepage';
-import { updateDeletedComponent } from './deleteComponent';
-import { isComponentUncollapsed, collapseComponent, uncollapseComponent, isCollapseComponentSelected } from './collapseComponent';
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, getComponentID } from './updateHomepage';
+import { updateDeletedComponent } from './deleteComponents';
+import { isComponentUncollapsed, collapseComponent, uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
 
 const ANIMATE_SPEED = 0.4;
 const SETTINGS_BUTTON_SELECTOR = '[data-target="settings"]';
@@ -20,26 +19,34 @@ const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed
 
 
 /**
- * initiate the toggle and form
+ * initiate the setings toggle and form
  */
-export const initUpdateComponentSettings = () => {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => {   //run through every component on the page
-        initToggleSettingsButton(component);
-        initSettingsForm(component);
-    });
+export const initUpdateComponentsSettings = () => {
+    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
+    document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
 }
+
+/**
+ * 
+ * 
+ * @param { Element } 
+ */
+const init = (component) => {
+    initToggleButton(component);
+    initForm(component);
+}   
 
 /**
  * To show/hide the settings panel with the toggle button
  * 
  * @param { Element } 
  */
-const initToggleSettingsButton = (component) => {
-    const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    settingsButton.addEventListener('click', (event) => {
+const initToggleButton = (component) => {
+    const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
+    toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
-        gsap.to(settingsButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-        isSettingsOpen(component) ? closeSettings(component) : openSettings(component);
+        gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+        isOpen(component) ? close(component) : open(component);
     });
 }
 
@@ -50,9 +57,9 @@ const initToggleSettingsButton = (component) => {
  * 
  * @returns { Boolean }
  */
-const isSettingsOpen = (component) => {
-    const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    return settingsButton.getAttribute(STATE_ATTRIBUTE) === 'opened';
+const isOpen = (component) => {
+    const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
+    return toggleButton.getAttribute(STATE_ATTRIBUTE) === 'opened';
 }
 
 /**
@@ -60,12 +67,12 @@ const isSettingsOpen = (component) => {
  * 
  * @param { Element } 
  */
-const openSettings = (component) => {
-    const settingsPanel = component.querySelector(SETTINGS_PANEL_SELECTOR);
-    const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    settingsButton.setAttribute(STATE_ATTRIBUTE, 'opened');
-    settingsButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
-    slideDown(settingsPanel, ANIMATE_SPEED);
+const open = (component) => {
+    const panel = component.querySelector(SETTINGS_PANEL_SELECTOR);
+    const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
+    toggleButton.setAttribute(STATE_ATTRIBUTE, 'opened');
+    toggleButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
+    slideDown(panel, ANIMATE_SPEED);
 }
 
 /**
@@ -76,8 +83,8 @@ const openSettings = (component) => {
  * @returns { String }  
  */
 const getQueryString = (component) => {
-    const settingsPanelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
-    const formData = Object.fromEntries(new FormData(settingsPanelForm));
+    const panelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
+    const formData = Object.fromEntries(new FormData(panelForm));
     return Object.keys(formData).map(key => key + '=' + encodeURIComponent(formData[key])).join('&'); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
 }
 
@@ -86,11 +93,11 @@ const getQueryString = (component) => {
  * 
  * @param { Element } 
  */
-const closeSettings = async (component) => {
-    const settingsPanel = component.querySelector(SETTINGS_PANEL_SELECTOR);
-    const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    settingsButton.setAttribute(STATE_ATTRIBUTE, 'closed');
-    await slideUp(settingsPanel, ANIMATE_SPEED);
+const close = async (component) => {
+    const panel = component.querySelector(SETTINGS_PANEL_SELECTOR);
+    const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
+    toggleButton.setAttribute(STATE_ATTRIBUTE, 'closed');
+    await slideUp(panel, ANIMATE_SPEED);
 }
 
 /**
@@ -98,12 +105,12 @@ const closeSettings = async (component) => {
  * 
  * @param { Element } 
  */
-const initSettingsForm = (component) => {
-    const settingsPanelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
-    const settingsButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
-    settingsPanelForm.addEventListener('submit', (event) => {
+const initForm = (component) => {
+    const panelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
+    const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
+    panelForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        settingsButton.getAttribute(QUERY_STRING_ATTRIBUTE) === getQueryString(component) ? closeSettings(component) : saveComponentSettings(component, settingsPanelForm);
+        toggleButton.getAttribute(QUERY_STRING_ATTRIBUTE) === getQueryString(component) ? close(component) : saveComponentSettings(component, panelForm);
     });
 }
 
@@ -118,15 +125,16 @@ const saveComponentSettings = async (component, form) => {
     try {
         submitFormButton.disabled = true;
         submitFormButton.value = 'Updating...';
-        const response = await axios.get(UPDATE_URL, getSaveComponentSettingsParams(form));
-        await updateComponent(component, response.data);
+        const response = await fetch(UPDATE_URL + '?' + getSaveComponentSettingsParams(form));
+        const responseData = await response.text(); 
+        await updateComponent(component, responseData);
     } catch (error) {
         console.warn(error);
         updateDeletedComponent(component); //currently the assumed error, that the component no longer exists
         slideUp(component.querySelector(SETTINGS_PANEL_SELECTOR), ANIMATE_SPEED);
     } finally { //now the update is complete notify with the button and close the settings, enabling once the settings are closed 
         submitFormButton.value = 'Updated';
-        await closeSettings(component);
+        await close(component);
         submitFormButton.disabled = false;
         submitFormButton.value = 'Update';
     }
@@ -143,7 +151,8 @@ const getSaveComponentSettingsParams = (form) => {
     const formData = Object.fromEntries(new FormData(form));
     const queryString = Object.keys(formData).map(key => key + '=' + encodeURIComponent(formData[key])).join('&'); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
     const params = new URLSearchParams(queryString);
-    return { params };
+    return params;
+    // return { params };
 }
 
 /**
