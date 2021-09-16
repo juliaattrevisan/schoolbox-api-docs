@@ -154,7 +154,7 @@ class Controller extends Base
 
         // Get all attachments associated with this record
 
-        $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
+        $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId(), ['deleted' => true]);
 
         if (is_array($post["attachment"])) {
             $storages = (new CollectorFactory())->build($post["attachment"])->getAll();
@@ -174,6 +174,7 @@ class Controller extends Base
             $storages = [];
         }
 
+        /** @var BlogImageModel $attachment */
         foreach ($attachments as $attachment) {
             $foundAttachment = false;
             foreach ($storages as $storage) {
@@ -183,10 +184,15 @@ class Controller extends Base
                 }
             }
 
-            if (!$foundAttachment) {
+            if (!$foundAttachment && !$attachment->isDeleted()) {
                 // The attachment was found in the database, remove it
                 $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                 $this->getBlogImageMapper()->delete($attachment);
+            } elseif ($attachment->isDeleted()) {
+                // The attachment was found but deleted in the database. Restore it
+                $attachment->setDeletedAt();
+                $this->getBlogImageMapper()->save($attachment);
+                $retainedAttachments[] = $attachment->getHash();
             } else {
                 // We are keeping this attachment
                 $retainedAttachments[] = $attachment->getHash();
@@ -259,7 +265,7 @@ class Controller extends Base
                     'session'           => $_SESSION,
                     'record'            => $blog,
                     'comments'          => $comments,
-                    'images'            => $images
+                    'images'            => $images,
                 ),
             )
         );
