@@ -119,7 +119,8 @@
         "ext-curl": "*",
         "rodneyrehm/plist": "^2.0",
         "oat-sa/lib-lti1p3-core": "^6.2",
-        "oat-sa/lib-lti1p3-ags": "^1.1"
+        "oat-sa/lib-lti1p3-ags": "^1.1",
+        "cache/array-adapter": "^1.1"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
