@@ -139,6 +139,7 @@ NULLTYPE;
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+        $lock->release();
     }
 };
 

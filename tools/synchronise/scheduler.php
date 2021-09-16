@@ -116,6 +116,8 @@ HELP;
          */
         $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
         (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $calendarFactory, $type, $file, $this->getLogger()))->run(time());
+
+        $lock->release();
     }
 };
 
