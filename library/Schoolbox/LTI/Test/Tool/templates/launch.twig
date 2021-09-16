@@ -2,4 +2,16 @@
 
 <h2>Launch request received from platform</h2>
 
+<h3>About the launch request</h3>
+<dl>
+    <dt>Error?</dt>
+    <dd>{{ result.hasError ? 'Y' : 'N' }}</dd>
+
+    <dt>Version</dt>
+    <dd>{{ result.payload.version }}</dd>
+
+    <dt>Identifier</dt>
+    <dd>{{ result.payload.context.identifier }}</dd>
+</dl>
+
 <a href="/lti-test/platform">Click to return to platform</a>

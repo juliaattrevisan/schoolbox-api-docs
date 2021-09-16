@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Test\Platform;
 
 use Alaress\Web\Controller\Base;
-use Http\Factory\Guzzle\ServerRequestFactory;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use Schoolbox\LTI\Test\RegistrationRepository;
 use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
+use Schoolbox\LTI\Test\ServerRequestFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
 use Schoolbox\LTI\Test\UserAuthenticatorFactory;
 use Schoolbox\Url\Factory;
@@ -89,17 +89,8 @@ class Controller extends Base
             $this->buildRegistrationRepository(),
             $this->buildUserAuthenticator()
         );
-
-        // This library uses PSR-7 `\Psr\Http\Message\ServerRequestInterface`,
-        // which Aura doesn't work with:
-        // have to build one ourselves.
-        $serverRequestFactory = new ServerRequestFactory();
-        $serverRequest        = $serverRequestFactory->createServerRequest(
-            '',
-            $this->request->url->get(),
-            $this->request->server->getArrayCopy(),
-        );
-        $message = $oidcAuthenticator->authenticate($serverRequest);
+        $serverRequest = (new ServerRequestFactory())->build($this->request);
+        $message       = $oidcAuthenticator->authenticate($serverRequest);
 
         $this->response->content->set(
             $this->buildHtmlOutput(

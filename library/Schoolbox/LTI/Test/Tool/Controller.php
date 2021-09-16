@@ -10,10 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Test\Tool;
 
 use Alaress\Web\Controller\Base;
-use Http\Factory\Guzzle\ServerRequestFactory;
+use Cache\Adapter\PHPArray\ArrayCachePool;
+use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
 use Schoolbox\LTI\Test\RegistrationRepository;
 use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
+use Schoolbox\LTI\Test\ServerRequestFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
 use Schoolbox\LTI\Test\UserAuthenticatorFactory;
 
@@ -34,18 +37,8 @@ class Controller extends Base
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#2-tool-side-oidc-initiation
         $repository    = $this->buildRegistrationRepository();
         $oidcInitiator = new OidcInitiator($repository);
-
-
-        // This library uses PSR-7 `\Psr\Http\Message\ServerRequestInterface`,
-        // which Aura doesn't work with:
-        // have to build one ourselves.
-        $serverRequestFactory = new ServerRequestFactory();
-        $serverRequest        = $serverRequestFactory->createServerRequest(
-            '',
-            $this->request->url->get(),
-            $this->request->server->getArrayCopy(),
-        );
-        $message = $oidcInitiator->initiate($serverRequest);
+        $serverRequest = (new ServerRequestFactory())->build($this->request);
+        $message       = $oidcInitiator->initiate($serverRequest);
 
         $this->response->content->set(
             $this->buildHtmlOutput(
@@ -63,10 +56,20 @@ class Controller extends Base
      */
     public function getLaunch()
     {
+        // Validate launch
+        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#4-tool-side-launch-validation
+        $registrationRepository = $this->buildRegistrationRepository();
+        $serverRequest          = (new ServerRequestFactory())->build($this->request);
+        $validator              = new ToolLaunchValidator(
+            $registrationRepository,
+            new NonceRepository(new ArrayCachePool())
+        );
+        $result = $validator->validatePlatformOriginatingLaunch($serverRequest);
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiTestTool/launch.twig',
-                []
+                ['result' => $result]
             )
         );
     }
