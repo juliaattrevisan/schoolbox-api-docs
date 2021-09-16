@@ -4,6 +4,7 @@
  */
 
 import { UPDATE_URL, ON_COMPONENT_ADDED } from './updateHomepage';
+import { updateComponentDisplay, isToggleUnlocked } from './toggleLockComponents';
 
 
 /**
@@ -16,19 +17,28 @@ export const getNewComponent = async (component) => {
             body: getFormData(component),
         });
         const newComponentHTML = await response.text();
-        const tempElement = document.createElement('div'); //just use to insert the updated component html
-        tempElement.innerHTML = newComponentHTML; //now insert it
-        const newComponent = tempElement.firstElementChild; //and then extract the element
-        component.replaceWith(newComponent); //switch over to the newly created component
-        document.dispatchEvent(new CustomEvent(ON_COMPONENT_ADDED, { 
-            detail: {
-                component: newComponent 
-            }
-        })); 
+        const newComponent = replaceExistingComponent(component, newComponentHTML)
+        document.dispatchEvent(new CustomEvent(ON_COMPONENT_ADDED, { detail: { component: newComponent } } ) ); 
         return newComponent;
     } catch (error) {
         console.warn(error);
     } 
+}
+
+/**
+ * Update the just added component to the actual component that's been loaded in
+ * 
+ * @params { String } the component that's been moved
+ * 
+ * @returns { Element }  
+ */
+const replaceExistingComponent = (component, newComponentHTML) => {
+    const tempElement = document.createElement('div'); //just use to insert the updated component html
+    tempElement.innerHTML = newComponentHTML; //now insert it
+    const newComponent = tempElement.firstElementChild; //and then extract the element
+    component.replaceWith(newComponent); //switch over to the newly created component
+    updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
+    return newComponent;
 }
 
 /**

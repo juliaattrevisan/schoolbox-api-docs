@@ -3,20 +3,24 @@
  *
  */
 
+ import { EXISTING_COMPONENT_SELECTOR } from './updateHomepage';
+
 /**
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
 export const initToggleLockComponents = () => {
     const componentLockSwitch = document.getElementById('component-lock-switch').querySelector('input');
-    componentLockSwitch.addEventListener('change', () => updateDisplay());
+    componentLockSwitch.addEventListener('change', (event) => {
+        document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => updateComponentDisplay(component, event.target.checked));
+    });
 }
 
 /**
  * Show or hide the relevant component editing elements 
  */
-const updateDisplay = () => {
-    document.querySelectorAll('a[data-component-settings], [data-component-handle]').forEach((element) => {
-        isToggleLocked ? element.style.display = 'inline-block' : element.style.display = 'none';
+export const updateComponentDisplay = (component, isUnlocked) => {
+    component.querySelectorAll('a[data-component-settings], [data-component-handle]').forEach((element) => {
+        isUnlocked ? element.style.display = 'inline-block' : element.style.display = 'none';
     });
 }
 
@@ -26,6 +30,6 @@ const updateDisplay = () => {
  * 
  * @returns { Boolean }
  */
-export const isToggleLocked = () => {
+export const isToggleUnlocked = () => {
     return document.getElementById('component-lock-switch').querySelector('input').checked;
 }
