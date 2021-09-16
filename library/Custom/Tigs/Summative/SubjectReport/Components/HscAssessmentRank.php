@@ -158,6 +158,11 @@ class HscAssessmentRank extends BaseComponent
             $feedback
         ))->generate();
 
+        // Year 12 students only see rank, not the mark
+        if ($this->getAttributes()->getCurriculumYearLevel() > 11) {
+            unset($statistics['studentMark'], $statistics['cohortAverage']);
+        }
+
         return $statistics;
     }
 
