@@ -65,7 +65,6 @@ class Controller extends Base
             new NonceRepository(new ArrayCachePool())
         );
         $result = $validator->validatePlatformOriginatingLaunch($serverRequest);
-
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiTestTool/launch.twig',

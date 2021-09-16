@@ -10,8 +10,14 @@
     <dt>Version</dt>
     <dd>{{ result.payload.version }}</dd>
 
-    <dt>Identifier</dt>
-    <dd>{{ result.payload.context.identifier }}</dd>
+    <dt>User.identity</dt>
+    <dd>{{ result.payload.userIdentity.identifier }}</dd>
+
+    <dt>User.name</dt>
+    <dd>{{ result.payload.userIdentity.name }}</dd>
+
+    <dt>User.email</dt>
+    <dd>{{ result.payload.userIdentity.email }}</dd>
 </dl>
 
 <a href="/lti-test/platform">Click to return to platform</a>
