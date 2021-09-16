@@ -4,6 +4,7 @@
  */
 
 
+import { initToggleLockComponents } from './toggleLockComponents';
 import { initPostToMyLinks } from './postToMyLinks';
 import { initUpdateColumnWidths } from './updateColumnWidths';
 import { initAddAndSortComponents } from './addAndSortComponents';
@@ -17,23 +18,6 @@ export const UPDATE_URL = '/homepage/configForm.php';
 export const ON_COMPONENT_ADDED = 'updateHomepage.ON_COMPONENT_ADDED'; //dispatched with the { Element } component
 export const ON_COMPONENT_REMOVED = 'updateHomepage.ON_COMPONENT_REMOVED'; //dispatched with the { Element } component
 
-
-/**
- * Fire everything up
- */
-export const init = () => {
-    initPostToMyLinks();
-    initUpdateColumnWidths();
-    initAddAndSortComponents();
-    initUpdateComponentsSettings();
-    initDeleteComponents();
-    initCollapseComponents();
-}
-
-document.addEventListener('DOMContentLoaded', init);
-
-
-
 /**
  * To retrieve the component id
  * 
@@ -44,3 +28,16 @@ document.addEventListener('DOMContentLoaded', init);
 export const getComponentID = (component) => {
     return component.id.replace('component', ''); //strip the 'component' at the start to just get the id number
 }
+
+/**
+ * Fire everything up
+ */
+ document.addEventListener('DOMContentLoaded', () => {
+    initToggleLockComponents();
+    initPostToMyLinks();
+    initUpdateColumnWidths();
+    initAddAndSortComponents();
+    initUpdateComponentsSettings();
+    initDeleteComponents();
+    initCollapseComponents();
+});

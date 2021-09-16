@@ -3,7 +3,7 @@ import { insertElementBefore, insertElementAfter, getClosestElement, isElementAb
     isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from './saveComponentOrder';
-import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
+import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED } from './updateHomepage';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -117,7 +117,6 @@ const isNewComponent = (component) => {
  */
  const initOnComponentAddedListener = () => {
     document.addEventListener(ON_COMPONENT_ADDED, (event) => {
-        console.warn('ON_COMPONENT_ADDED');
         const newDraggable = getDraggable(event.detail.component);
         const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
         newDraggable.enabled(componentLockSwitchStatus); //check 
@@ -593,7 +592,6 @@ const onActiveComponentExpanded = async () => {
 
     if (__hasSortChange && isNewComponent(__activeComponent)) {
         const newComponent = await getNewComponent(__activeComponent);
-        console.warn('saveComponentOrder');
         await saveComponentOrder(newComponent);
         __hasSortChange = false;
     } else if (__hasSortChange && isExistingComponent(__activeComponent)) {

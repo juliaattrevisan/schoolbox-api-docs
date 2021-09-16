@@ -46,20 +46,6 @@
 <script type="text/javascript">
     $(function() {
 
-        // Lock all components on page load
-        // This is done with JS, otherwise components that are added after page load will be locked,
-        // and who can be bothered wrangling with phplib
-        $('a[data-component-settings], [data-component-handle]').hide();
-
-
-        // Toggle for homepage lock
-        $('#component-lock-toggle').click(function (event) {
-            var locked = this.checked;
-
-            $('a[data-component-settings], [data-component-handle]').toggle(locked);
-
-        });
-
         // Send out a custom trigger for the homepage feature tour
         // This won't trigger if #component-lock-switch doesn't exist on the page (which is what we want)
          $('#component-lock-switch').trigger('editTourStart');

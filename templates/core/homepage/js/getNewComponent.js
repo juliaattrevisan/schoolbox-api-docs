@@ -25,6 +25,7 @@ export const getNewComponent = async (component) => {
                 component: newComponent 
             }
         })); 
+        return newComponent;
     } catch (error) {
         console.warn(error);
     } 
