@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use Http\Factory\Guzzle\ServerRequestFactory;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use Schoolbox\Url\Factory;
 
@@ -44,15 +45,25 @@ class Controller extends Base
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
             'http://devkit-lti1p3.localhost/tool/launch',
             'loginHint',
+            null,
+            [
+                $this->getUser()->getRole()->isStaff()
+                    ? 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
+                    : 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+            ],
+            [
+                new ResourceLinkClaim(
+                    'test',
+                    'http://devkit-lti1p3.localhost/platform/message/launch/lti-resource-link',
+                    'Test resource link',
+                ),
+            ],
         );
 
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiTestPlatform/index.twig',
-                [
-                    'exampleToolConfig' => $exampleToolConfig ?? [],
-                    'messageUrl'        => $message->toUrl(),
-                ]
+                ['messageUrl' => $message->toUrl(),]
             )
         );
     }
@@ -81,11 +92,14 @@ class Controller extends Base
             $this->request->url->get(),
             $this->request->server->getArrayCopy(),
         );
-        $message = $oidcAuthenticator->authenticate(
-            $serverRequest
-        );
+        $message = $oidcAuthenticator->authenticate($serverRequest);
 
-        var_dump($message);
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@ltiTestPlatform/oidcAuthenticationRequest.twig',
+                ['messageUrl' => $message->toUrl(),]
+            )
+        );
     }
 
     /**
