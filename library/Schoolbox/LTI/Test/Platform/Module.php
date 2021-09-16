@@ -7,13 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\TestPlatform;
+namespace Schoolbox\LTI\Test\Platform;
 
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 
+/**
+ * LTI test platform module
+ */
 class Module extends BaseModule
 {
     /**

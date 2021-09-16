@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\TestPlatform;
+namespace Schoolbox\LTI\Test\Platform;
 
 use Alaress\Web\Controller\Base;
 use Http\Factory\Guzzle\ServerRequestFactory;
@@ -15,14 +15,19 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuild
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
+use Schoolbox\LTI\Test\RegistrationRepository;
+use Schoolbox\LTI\Test\UserAuthenticator;
 use Schoolbox\Url\Factory;
 
+/**
+ * LTI test platform controller
+ */
 class Controller extends Base
 {
     /**
      * Index for test platform.
      *
-     * @api GET /lti-test-platform
+     * @api GET /lti-test/platform
      * @since 21.1.0
      */
     public function getIndex(): void
@@ -71,7 +76,7 @@ class Controller extends Base
     /**
      * Authenticate an OIDC request
      *
-     * @api GET /lti-test-platform/oidc/authentication
+     * @api GET /lti-test/platform/oidc/authentication
      * @since 21.1.0
      */
     public function getOidcAuthenticationRequest(): void
