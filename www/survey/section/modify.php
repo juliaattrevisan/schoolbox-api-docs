@@ -23,11 +23,11 @@ if (!empty($_POST)) {
     $survey = $surveyHandler->getByID(Scrub::text($_POST['assess_id']));
 
     if ($surveyHandler->isDeleted($_POST['assess_id'])) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-        error(130);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY_2);
     }
 
     $sectionHandler = new Survey_Section();
@@ -45,14 +45,14 @@ if (!empty($_POST)) {
     SitePage::localRedir('/survey/summary/' . Scrub::text($_POST['assess_id']));
 } else {
     if (!is_numeric($this->arg[0])) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     $sectionHandler = new Survey_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
 
     if (!$section) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
@@ -62,18 +62,18 @@ if (!empty($_POST)) {
     $survey = $surveyHandler->getByID($section['assess_id']);
 
     if (!$surveyHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-        error(130);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY_2);
     }
 
     if ($surveyHandler->isDeleted($section['assess_id'])) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($survey['category_id']);
     } catch (\Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     $assessStartDate  = new Alaress_Date_Format(strtotime($survey['start']), 'U');

@@ -33,7 +33,7 @@ $user       = $userMapper->findById($userId);
 // PERMISSION: must be either session user, or staff
 $groupHandler = new Group();
 if (!($groupHandler->isStaff() || $userId == $_SESSION['id'])) {
-    error(19);
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 // instantiate handlers
@@ -48,7 +48,7 @@ if ($this->arg[0] == 'new') {
     if ($myFolderId == 0) {
         $parent = array('id' => 0);
     } elseif (!$parent = $folderHandler->getByID($myFolderId)) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     $this->setTitle('Add File');
@@ -93,7 +93,7 @@ if ($this->arg[0] == 'new') {
 
     $file = $fileHandler->getByID($myFileId);
     if (!is_array($file)) {
-        error(41);
+        error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
     }
 
     $zone->attachFiles(array($myFileId));
@@ -135,7 +135,7 @@ if ($this->arg[0] == 'new') {
     ]);
 } else {
     // unknown case
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }
 
 

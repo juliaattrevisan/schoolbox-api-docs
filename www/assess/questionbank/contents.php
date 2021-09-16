@@ -9,14 +9,14 @@ try {
     $quizMapper = new QuizMapper();
     $quiz = $quizMapper->findById($this->arg[1]);
 } catch (\Exception $e) {
-    error(112);
+    error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($quiz->getCategory()->getId());
 } catch (\Exception $e) {
-    error(13);
+    error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
 }
 
 $sectionHandler = new \Assess_Section();

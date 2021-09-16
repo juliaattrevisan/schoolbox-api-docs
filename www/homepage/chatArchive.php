@@ -43,10 +43,10 @@ try {
 
     // Check if user has a permission to read this page
     if (Access::getInstance()->getFolderAccess($_SESSION['user'], $folder->getId()) < UserAccess::ACCESS_READ) {
-        error(6);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
     }
 } catch (\Exception $e) {
-    error(19);
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setTitle("Chat Archive: {$folder->getName()}");

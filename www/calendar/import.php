@@ -23,7 +23,7 @@ if (!isset($this)) {
 $groupHandler = new Group();
 
 if ($groupHandler->getPermission($this->arg[0]) < UserAccess::ACCESS_WRITE) {
-    error(19);
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 } else {
     try {
         $folderMapper = new FolderMapper();
@@ -61,6 +61,6 @@ if ($groupHandler->getPermission($this->arg[0]) < UserAccess::ACCESS_WRITE) {
             'HOMEPAGE_NAME' => $folder->getName()
         ));
     } catch (\Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 }

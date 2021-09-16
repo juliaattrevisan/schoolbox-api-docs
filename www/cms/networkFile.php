@@ -4,7 +4,7 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Attachment\Zone;
 
 if (!Config::get('webdav_enable')) {
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }
 
 $fileHandler = PortfolioWebDAV::factory();
@@ -25,7 +25,7 @@ if (is_numeric($this->arg[0])) {
 
     $file = $fileHandler->getByID($this->arg[0]);
     if (!is_array($file)) {
-        error(41);
+        error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
     }
 
     $this->setFile(TEMPLATE_content, 'cms/networkFile.html');
@@ -68,7 +68,7 @@ if (is_numeric($this->arg[0])) {
     if ($this->arg[1] == 0) {
         $parent = array('id' => 0);
     } elseif (!$parent = $folderHandler->getByID($this->arg[1])) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     $this->setFile(TEMPLATE_content, 'cms/networkFile.html');
@@ -106,5 +106,5 @@ if (is_numeric($this->arg[0])) {
         ]
     ]);
 } else {
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }

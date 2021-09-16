@@ -20,7 +20,7 @@ $groupHandler = new Group();
  */
 if (!empty($_POST)) {
     if (!is_numeric($_POST['type_id'])) {
-        error(116);
+        error(\Schoolbox\Error\Mapper::ERROR_QUESTION_TYPE_UNSPECIFIED);
     }
 
     $section = $sectionHandler->getByID(Scrub::text($_POST['section_id']));
@@ -30,15 +30,15 @@ if (!empty($_POST)) {
     }
 
     if ($surveyHandler->isDeleted($survey['assess_id'])) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-        error(130);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY_2);
     }
 
     if ($sectionHandler->isDeleted($section['section_id'])) {
-        error(115);
+        error(\Schoolbox\Error\Mapper::ERROR_SECTION_NOT_FOUND_2);
     }
 
     $questionHandler = $factory->createQuestionModel(Scrub::text($_POST['type_id']));
@@ -70,7 +70,7 @@ if (!empty($_POST)) {
     }
 } else {
     if (!is_numeric($this->arg[0])) {
-        error(115);
+        error(\Schoolbox\Error\Mapper::ERROR_SECTION_NOT_FOUND_2);
     }
 
     /* Render modify page
@@ -96,22 +96,22 @@ if (!empty($_POST)) {
     }
 
     if ($surveyHandler->isDeleted($section['assess_id'])) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-        error(130);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY_2);
     }
 
     if ($sectionHandler->isDeleted($section['section_id'])) {
-        error(115);
+        error(\Schoolbox\Error\Mapper::ERROR_SECTION_NOT_FOUND_2);
     }
 
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($survey['category_id']);
     } catch (\Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     $answerHandler = $factory->createAnswerModel($question['type_id']);
@@ -149,7 +149,7 @@ if (!empty($_POST)) {
 /* Render contents of this Survey
      */
     if (empty($section)) {
-        error(51);
+        error(\Schoolbox\Error\Mapper::ERROR_SECTION_NOT_FOUND);
     }
 
     /* Options for importing into the Question Bank

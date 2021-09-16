@@ -18,12 +18,12 @@ if (is_numeric($this->arg[0])) {
     $poll = $pollHandler->getByID($this->arg[0]);
 
     if (!isset($poll['id'])) {
-        error(101);
+        error(\Schoolbox\Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
     }
 
     // check permission
     if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $this->setFile(TEMPLATE_content, "poll/modify.html");
@@ -61,7 +61,7 @@ if (is_numeric($this->arg[0])) {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($poll['folder_id']);
     } catch (\Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     $trail = new Breadcrumbs();
@@ -80,7 +80,7 @@ if (is_numeric($this->arg[0])) {
 } else if (is_numeric($this->arg[1])) {
     // check permission
     if ($groupHandler->getPermission($this->arg[1]) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $this->setFile(TEMPLATE_content, "poll/modify.html");
@@ -116,7 +116,7 @@ if (is_numeric($this->arg[0])) {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($this->arg[1]);
     } catch (\Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     $trail = new Breadcrumbs();
@@ -133,5 +133,5 @@ if (is_numeric($this->arg[0])) {
         ]
     ]);
 } else {
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }

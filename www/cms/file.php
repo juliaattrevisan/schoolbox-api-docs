@@ -24,11 +24,11 @@ if (is_numeric($this->arg[0])) {
         $file = FileMapper::getInstance()->findById($this->arg[0]);
         $folder = $file->getFolder();
     } catch (Exception $e) {
-        error(41);
+        error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
     }
 
     if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-        error(6);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
     }
 
     $this->setFile(TEMPLATE_content, 'cms/modify-file.html');
@@ -77,7 +77,7 @@ if (is_numeric($this->arg[0])) {
 } elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     // Prevent files attached to root
     if (0 == $this->arg[1]) {
-        error(6);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
     }
 
     /* Add new file to system */
@@ -92,11 +92,11 @@ if (is_numeric($this->arg[0])) {
     try {
         $folder = FolderMapper::getInstance()->findById($this->arg[1]);
     } catch (Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     if ($groupHandler->getPermission($folder->getId()) < UserAccess::ACCESS_WRITE) {
-        error(6);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
     }
 
     $output = array(
@@ -174,5 +174,5 @@ if (is_numeric($this->arg[0])) {
 //        error(154);
 //    }
 } else {
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }
