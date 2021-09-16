@@ -19,6 +19,7 @@ use Schoolbox\LTI\Test\RegistrationRepository;
 use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
 use Schoolbox\LTI\Test\UserAuthenticatorFactory;
+use Schoolbox\Url\Factory;
 
 /**
  * LTI test platform controller
@@ -46,10 +47,11 @@ class Controller extends Base
         // I have a registration: I may now create a message
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#create-the-message
         $builder = new PlatformOriginatingLaunchBuilder();
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
         $message = $builder->buildPlatformOriginatingLaunch(
             $registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            'http://devkit-lti1p3.localhost/tool/launch',
+            (clone $baseUrl)->setPath('/lti-test/tool/launch')->toString(),
             'loginHint',
             null,
             [
@@ -60,7 +62,6 @@ class Controller extends Base
             [
                 new ResourceLinkClaim(
                     'test',
-                    'http://devkit-lti1p3.localhost/platform/message/launch/lti-resource-link',
                     'Test resource link',
                 ),
             ],

@@ -56,6 +56,22 @@ class Controller extends Base
     }
 
     /**
+     * Handle launch request
+     *
+     * @api GET /lti-test/tool/launch
+     * @since 21.1.0
+     */
+    public function getLaunch()
+    {
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@ltiTestTool/launch.twig',
+                []
+            )
+        );
+    }
+
+    /**
      * Build the test registration repository for this platform.
      *
      * @return RegistrationRepository
