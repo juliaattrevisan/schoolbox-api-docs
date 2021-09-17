@@ -54,15 +54,18 @@ class Model implements ISoftDeletable
      */
     public const STATUS_SETUP_UPLOADING = 'uploading';
 
-    /* , now awaiting the next phase to begin
+    /* Transmission ended; now awaiting the next phase to begin
      */
     public const STATUS_SETUP_LOADED = 'loaded';
 
-    /* We finished uploading the file
-     * We started turnitin's analysis process to generate their similarity report
+    /* Upload was processed by turnitin and now ready for report generation
+     */
+    public const STATUS_REPORT_PREPARED = 'prepared';
+
+    /* We started turnitin's analysis process to generate their similarity report
      * This should start when their webhook executes after our successful upload
      */
-    public const STATUS_ANALYSING = 'analysing';
+    public const STATUS_REPORT_ANALYSING = 'analysing';
 
     /* We successfully completed turnitin analysis, yanking their overall percentage
      * and caching that locally
@@ -150,7 +153,7 @@ class Model implements ISoftDeletable
             self::STATUS_SETUP_SUBMISSION,
             self::STATUS_SETUP_UPLOADING,
             self::STATUS_SETUP_LOADED,
-            self::STATUS_ANALYSING
+            self::STATUS_REPORT_ANALYSING
         ]);
     }
 

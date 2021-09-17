@@ -97,25 +97,120 @@ class Report
     public function process(Turnitin\Model $model): void
     {
         try {
-            $reportInfo = $this->getReportInfo($model);
+            $uploadInfo = $this->getUploadInfo($model);
 
-            /* If we got report data, cache some of it locally
-             * then clear away all previous errors I suppose,
-             * since they no longer have meaning...but is this wise?
-             */
-            if (null !== $reportInfo) {
-                $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
-                    ->setStatus(Turnitin\Model::STATUS_COMPLETE)
-                    ->setErrorCode(null)
-                    ->setErrorMessage(null);
+            if (null !== $uploadInfo) {
+                $reportInfo = $this->getReportInfo($model);
 
-                $this->turnitinMapper->save($model);
+                /* If we got report data, cache some of it locally
+                 * then clear away all previous errors I suppose,
+                 * since they no longer have meaning...but is this wise?
+                 */
+                if (null !== $reportInfo) {
+                    $this->changeState(
+                        $model,
+                        sprintf(
+                            'Report %s: generation completed. Overall Match Percentage is %s; setting status to %s',
+                            $model->getId(),
+                            $reportInfo['overall_match_percentage'],
+                            Turnitin\Model::STATUS_COMPLETE
+                        ),
+                        Turnitin\Model::STATUS_COMPLETE
+                    );
+
+                    $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
+                        ->setStatus(Turnitin\Model::STATUS_COMPLETE)
+                        ->setErrorCode(null)
+                        ->setErrorMessage(null);
+
+                    $this->turnitinMapper->save($model);
+                }
             }
         } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($e->getMessage()));
         }
+    }
+
+
+    /**
+     * Find the current status of the upload - that is, whether turnitin finished
+     * processing our upload (whatever that entails). This is a necessary precursor
+     * to report generation
+     *
+     * @param Turnitin\Model $model
+     * @return array|null
+     * @throws Turnitin\Exception\BadEndpoint
+     * @throws Turnitin\Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function getUploadInfo(Turnitin\Model $model): ?array
+    {
+        /* Find out if this upload finished processing in turnitin town
+         */
+        $uploadResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}", []);
+
+        if (null !== $uploadResult) {
+            /* If the upload was complete, find out about the report itself
+             * If it was previously requested, it might be ready now
+             * Otherwise, come back later and ask again
+             */
+            if (self::UPLOAD_COMPLETE === $uploadResult['status']) {
+                $this->changeState(
+                    $model,
+                    sprintf(
+                        'Report %s: Turnitin finished processing our upload; setting status to %s',
+                        $model->getId(),
+                        Turnitin\Model::STATUS_REPORT_PREPARED
+                    ),
+                    Turnitin\Model::STATUS_REPORT_PREPARED
+                );
+
+                /* Good to go: can start making the report itself
+                 */
+                return $uploadResult;
+            }
+
+            /* This can occur if your Online Submission html is too short, for example
+             * Save the error state
+             */
+            if (self::UPLOAD_ERROR === $uploadResult['status']) {
+                $this->logWarning(sprintf(
+                    'Report %s: upload contains error code %s',
+                    $model->getId(),
+                    $uploadResult['error_code']
+                ));
+
+                $model->setErrorCode($uploadResult['error_code'])
+                    ->setStatus(Turnitin\Model::STATUS_ERROR);
+
+                $this->turnitinMapper->save($model);
+
+                return null;
+            }
+
+            /* When the upload is still PROCESSING, or otherwise being tended to,
+             * I guess we just say this
+             */
+            if (self::UPLOAD_PROCESSING === $uploadResult['status']) {
+                $this->logDebug(sprintf(
+                    'Report %s: upload status is %s',
+                    $model->getId(),
+                    $uploadResult['status']
+                ));
+            }
+        }
+
+        /* Default outcome: not ready
+         */
+        return null;
     }
 
 
@@ -137,88 +232,39 @@ class Report
      */
     private function getReportInfo(Turnitin\Model $model): ?array
     {
-        /* Find out if this upload finished processing in turnitin town
+        try {
+            $reportResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
+        } catch (Turnitin\Exception\BadEndpoint $e) {
+            /* When the report hasn't been scheduled for generation, this endpoint returns 404
+             * imho that really should be InvalidArgument because the endpoint exists, but the
+             * remote server hasn't finished populating its contents yet
+             */
+            $this->changeState(
+                $model,
+                sprintf(
+                    'Report %s: report has not been scheduled for creation yet; doing so now and setting status to %s',
+                    $model->getId(),
+                    Turnitin\Model::STATUS_REPORT_ANALYSING
+                ),
+                Turnitin\Model::STATUS_REPORT_ANALYSING
+            );
+
+            /* Schedule a report for generation (don't know if we need $similarity yet)
+             */
+            $similarity = $this->generateReport($model);
+
+            return null;
+        }
+
+        /* Otherwise, the report was scheduled and something might be found here
          */
-        $uploadResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}", []);
-
-        if (null !== $uploadResult) {
-            $this->logDebug(sprintf(
-                'Report %s: upload complete, but turnitin might still need to process it',
-                $model->getId()
-            ));
-
-            /* If the upload was complete, find out about the report itself
-             * If it was previously requested, it might be ready now
-             * Otherwise, come back later and ask again
+        if (null !== $reportResult) {
+            /* If the report finished, just return its data
+             * for caching locally.
              */
-            if (self::UPLOAD_COMPLETE === $uploadResult['status']) {
-                $this->logDebug(sprintf(
-                    'Report %s: upload processed; requesting report data',
-                    $model->getId()
-                ));
-
-                try {
-                    $reportResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
-                } catch (Turnitin\Exception\BadEndpoint $e) {
-                    /* When the report hasn't been scheduled for generation, this endpoint returns 404
-                     * imho that really should be InvalidArgument because the endpoint exists, but the
-                     * remote server hasn't finished populating its contents yet
-                     */
-                    $this->logDebug(sprintf(
-                        'Report %s: report has not been scheduled for creation yet; doing so now',
-                        $model->getId()
-                    ));
-
-                    /* Schedule a report for generation (don't know if we need $similarity yet)
-                     */
-                    $similarity = $this->generateReport($model);
-
-                    return null;
-                }
-
-                /* Otherwise, the report was scheduled and something might be found here
-                 */
-                if (null !== $reportResult) {
-                    /* If the report finished, just return its data
-                     * for caching locally.
-                     */
-                    if (self::REPORT_COMPLETE === $reportResult['status']) {
-                        $this->logDebug(sprintf(
-                            'Report %s: generation completed. Overall Match Percentage is %s',
-                            $model->getId(),
-                            $reportResult['overall_match_percentage']
-                        ));
-
-                        return $reportResult;
-                    }
-                }
-            } elseif (self::UPLOAD_ERROR === $uploadResult['status']) {
-                $this->logWarning(sprintf(
-                    'Report %s: upload contains error code %s',
-                    $model->getId(),
-                    $uploadResult['error_code']
-                ));
-
-                /* This can occur if your Online Submission html is too short, for example
-                 * Save the error state
-                 */
-                $model->setErrorCode($uploadResult['error_code'])
-                    ->setStatus(Turnitin\Model::STATUS_ERROR);
-
-                $this->turnitinMapper->save($model);
-            } elseif (self::UPLOAD_PROCESSING === $uploadResult['status']) {
-                /* When the upload is still PROCESSING, or otherwise being tended to,
-                 * I guess we just say this
-                 */
-                $this->logDebug(sprintf(
-                    'Report %s: upload status is %s',
-                    $model->getId(),
-                    $uploadResult['status']
-                ));
+            if (self::REPORT_COMPLETE === $reportResult['status']) {
+                return $reportResult;
             }
-
-            /* Any other cases...?
-             */
         }
 
         /* Nothing to do; report isn't ready for us yet
@@ -237,7 +283,7 @@ class Report
      * This is the last step in this phase, since turnitin normally uses a webhook
      * to tell us when it's done with this manufacturing.
      *
-     * @param Turnitin\Model   $model
+     * @param Turnitin\Model $model
      * @return array|null
      * @throws Turnitin\Exception\BadEndpoint
      * @throws Turnitin\Exception\Credentials
@@ -246,17 +292,23 @@ class Report
      * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     private function generateReport(Turnitin\Model $model): ?array
     {
         /* Log the state change
          */
-        $this->logDebug(sprintf(
-            'Report %s: requesting Similarity Report for Turnitin submission %s',
-            $model->getId(),
-            $model->getTurnitinSubmissionId()
-        ));
+        $this->changeState(
+            $model,
+            sprintf(
+                'Report %s: requesting Similarity Report for Turnitin submission %s; setting status to %s',
+                $model->getId(),
+                $model->getTurnitinSubmissionId(),
+                Turnitin\Model::STATUS_REPORT_PREPARED
+            ),
+            Turnitin\Model::STATUS_REPORT_PREPARED
+        );
 
         /* These use the default search repositories for now
          * TODO We can refine these search repos later
@@ -291,6 +343,34 @@ class Report
         return $result;
     }
 
+
+    /**
+     * Log to Logger if one was provided (used in cli tools)
+     * Change the state at the same time
+     *
+     * @param Turnitin\Model $model
+     * @param string         $message
+     * @param string         $status
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function changeState(Turnitin\Model $model, string $message, string $status): void
+    {
+        $this->logDebug($message);
+
+        /* Clear error messages from previously-successful stages
+         * because they are no longer relevant; this allows us to
+         * distinguish status states being set in a normal processing
+         * or whether something died -whilst- in that state, giving
+         * support a diagnosis and resolution option
+         */
+        $model->setErrorCode(null)
+            ->setErrorMessage(null)
+            ->setStatus($status);
+
+        $this->turnitinMapper->save($model);
+    }
 
     /**
      * Log to Logger if one was provided (used in cli tools)
