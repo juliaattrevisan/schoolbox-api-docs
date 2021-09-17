@@ -47,7 +47,7 @@ class Api
      * Request timeout
      * Still going after this amount of seconds? You died
      */
-    private const DEFAULT_TIMEOUT = 300;
+    private const DEFAULT_TIMEOUT = 0;
 
 
     /**
