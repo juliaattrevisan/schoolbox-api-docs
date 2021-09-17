@@ -22,6 +22,23 @@ export default {
             type: Object,
             required: true
         },
+        selectedStudents: { //to clear a students selection when cleared by badge-report
+            type: Array,
+            required: true
+        }
+    },
+
+    computed: {
+
+        /**
+         * To ensure it's unchecked when 'Clear Selection' is selected in badge-report
+         * 
+         * @returns { Boolean }
+         */
+        isInSelectedStudents () {
+            return this.selectedStudents.includes(this.student.id);
+        }
+
     },
 
     watch: {
@@ -134,6 +151,7 @@ export default {
                     :id="`checkbox-${student.id}`"
                     type="checkbox"
                     :value="student.id"
+                    :checked="isInSelectedStudents"
                     @change="onStudentSelected($event.target.checked)"
                 />
                 <label :for="`checkbox-${student.id}`"></label>

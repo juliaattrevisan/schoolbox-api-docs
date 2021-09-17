@@ -8,12 +8,14 @@
 import { stringify } from 'qs';
 import BadgeReportStudent from './badge-report-student.vue';
 import AwardDetailModal from './award-detail-modal';
+import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer'
 
 export default {
 
     components: {
         BadgeReportStudent,
-        AwardDetailModal
+        AwardDetailModal,
+        BottomDrawer
     },
     
     props: {
@@ -35,6 +37,28 @@ export default {
             selectedFilters: [], //to show only those badges curently filtered
             selectedStudents: [] //list of student ids that can have badges awarded to them
         }
+    },
+
+    computed: {
+
+        /**
+         * To determine whether to show the bottom-drawer to award badges to students
+         * 
+         * @returns { Boolean }
+         */
+        hasSelectedStudents () {
+            return this.selectedStudents.length > 0;
+        },
+
+        /**
+         * To determine whether to show the bottom-drawer to award badges to students
+         * 
+         * @returns { Boolean }
+         */
+        selectedStudentsCount () {
+            return this.selectedStudents.length;
+        }
+
     },
 
     mounted () {
@@ -75,6 +99,36 @@ export default {
         },
 
         /**
+         * Clear the currently selected students
+         */
+        onClearStudentSelection () {
+            this.selectedStudents = [];
+        },
+
+        /**
+         * Open the selected award detail modal
+         * 
+         * @returns { Object } 
+         */
+        onAwardSelected (award) {
+            this.$refs.awardDetailModal.open(award);
+        },
+
+        /**
+         * Navigate to the set goal page
+         */
+        onSetGoalSelected () {
+            
+        },
+
+        /**
+         * Navigate to the award achievement page
+         */
+        onAwardAchievementSelected () {
+            
+        },
+
+        /**
          * Open the selected award detail modal
          * 
          * @returns { Object } 
@@ -96,10 +150,28 @@ export default {
             
             <div v-if="isDataLoaded">
                 <ul class="action-list">
+                    <li class="awards student">
+                        <div class="small-12 medium-1 column">
+                            <div class="checklist">
+                                <input 
+                                    id="select-all"
+                                    type="checkbox"
+                                />
+                                <label for="select-all"></label>
+                            </div>
+                        </div>
+                        <div class="small-12 medium-1 column">
+                            <h3>Name</h3>
+                        </div>
+                        <div class="small-12 medium-10 column">
+                            <h3>Badges</h3>
+                        </div>
+                    </li>
                     <badge-report-student 
                         v-for="student in studentData" 
                         :key="student.id" 
                         :student="student"
+                        :selected-students="selectedStudents"
                         @on-student-selected="onStudentSelected"
                         @on-award-selected="onAwardSelected"
                     />
@@ -113,8 +185,46 @@ export default {
 
             <div v-else class="loader"></div>
 
+            <bottom-drawer :showDrawer="hasSelectedStudents">
+                <h3 class="selected-count"><em>{{ selectedStudentsCount }} selected</em></h3>
+                <button @click.prevent="onClearStudentSelection" @keyup.enter="onClearStudentSelection" class="button-clear">Clear selection</button>
+                <div class="modal-actions">
+                    <button @click.prevent="onSetGoalSelected" @keyup="onSetGoalSelected" class="button submit button-delete">Set goal</button>
+                    <button @click.prevent="onAwardAchievementSelected" @keyup.enter="onAwardAchievementSelected" class="button submit button-delete">Award achievement</button>
+                </div>
+            </bottom-drawer>
+
         </section>
 
     </div>
 
 </template>
+
+<style lang="scss">
+
+// .VueTables--client {
+//     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
+// }
+
+.selected-count {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.modal-actions {
+	display: flex;
+    margin-bottom: 1rem;
+	button {
+		margin: 0 2px;
+	}
+}
+
+.button-clear {
+    display: inline-block;
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
+}
+
+</style>
