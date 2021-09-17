@@ -5,7 +5,6 @@
  * and from where new goals / acheievements can be assigned
  */
 
-import axios from 'axios';
 import { stringify } from 'qs';
 import BadgeReportStudent from './badge-report-student.vue';
 import AwardDetailModal from './award-detail-modal';
@@ -49,14 +48,10 @@ export default {
          */
         async getStudentData (event) {
             try {
-                const config = {
-                    params: {
-                        filters: event.detail.selectedFilters
-                    },
-                    paramsSerializer: (params) => stringify(params, { arrayFormat: 'brackets' } ),
-                }
-                const response = await axios.get(this.getStudentListsEndpoint, config);
-                this.studentData = response.data.data;
+                const queryString = stringify( { filters: event.detail.selectedFilters }, { arrayFormat: 'brackets' } ); //use stringify to help split open and convert array values to a query string
+                const response = await fetch(this.getStudentListsEndpoint + '?' + queryString);
+                const responseData = await response.json();
+                this.studentData = responseData.data;
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
