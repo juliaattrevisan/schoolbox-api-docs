@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use RangeException;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
@@ -81,22 +82,65 @@ class CapabilityMark
 
 
     /**
-     * Calculates what `$this->value` should be, given a candidate value for
-     * `$this->humanReadableValue`.
+     * Calculates what `$this->value` should be, given a form input.
      *
-     * @param string|null $humanReadableValue
+     * @param string|null $formInput
      * @return float|null
      */
-    public function calculateValueFromHumanReadableValue(?string $humanReadableValue): ?float
+    public function convertFormInputToValue(?string $formInput): ?float
     {
-        if (!isset($humanReadableValue)) {
+        if (!isset($formInput)) {
             return null;
         }
-        $normalisedMark = $this->markScheme->getNormalisedMark($humanReadableValue);
+        $normalisedMark = $this->markScheme->getNormalisedMark($formInput);
         if (!isset($normalisedMark)) {
             return null;
         }
+
+        if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN) {
+            throw new RangeException(
+                sprintf(
+                    'Form input value "%s" normalises to a value < %f',
+                    $formInput,
+                    IMarkScheme::NORMALISED_MARK_MIN
+                )
+            );
+        }
+        if ($normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
+            throw new RangeException(
+                sprintf(
+                    'Form input value "%s" normalises to a value > %f',
+                    $formInput,
+                    IMarkScheme::NORMALISED_MARK_MAX
+                )
+            );
+        }
+
         return $normalisedMark / 100 * $this->capabilityUsage->getMaxValue();
+    }
+
+
+    /**
+     * Calculates what `$this->humanReadableValue` should be, given a form
+     * input.
+     *
+     * @param string|null $formInput
+     * @return string|null
+     */
+    public function convertFormInputToHumanReadableValue(?string $formInput): ?string
+    {
+        return $this->markScheme->convertFormInputToHumanReadableMark($formInput);
+    }
+
+
+    /**
+     * Retrieves a form input value from this mark's human-readable value.
+     *
+     * @return string|null
+     */
+    public function retrieveHumanReadableValueAsFormInput()
+    {
+        return $this->markScheme->convertHumanReadableMarkToFormInput($this->humanReadableValue);
     }
 
 

@@ -25,7 +25,7 @@ class TotalMarkFractionalTest extends TestCase
      *
      *
      */
-    public function test_getHumanReadable_WithoutAttempt()
+    public function testGetHumanReadableWithoutAttempt()
     {
         $this->expectException(\DomainException::class);
         $markScheme = new TotalMarkFractional(null);
@@ -37,39 +37,14 @@ class TotalMarkFractionalTest extends TestCase
      *
      *
      */
-    public function test_getNormalised_WithoutAttempt()
+    public function testGetNormalisedWithoutAttempt()
     {
         $this->expectException(\DomainException::class);
         $markScheme = new TotalMarkFractional(null);
         $markScheme->getNormalisedMark(40);
     }
 
-//    /**
-//     * @dataProvider provider_setValidTotal
-//     * @expectedException RangeException
-//     * @param float $totalMark
-//     */
-//    public function test_getHumanReadable_tooLow($totalMark)
-//    {
-//        $this->markTestSkipped('Total marks less than the minimum value are now allowed');
-//        $normalised = -1.0;
-//        $markScheme = new TotalMarkFractional(null);
-//        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
-//    }
-//
-//    /**
-//     * @expectedException RangeException
-//     */
-//    public function test_getHumanReadable_tooHigh()
-//    {
-//        $this->markTestSkipped('Total marks greater than the maximum value are now allowed');
-//        $normalised = 100.0001;
-//        $totalMark = 50.0;
-//        $markScheme = new TotalMarkFractional(null);
-//        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
-//    }
-
-    public function test_getNormalised_Null()
+    public function testGetNormalisedNull()
     {
         $this->expectException(InvalidArgumentException::class);
         $humanReadable = null;
@@ -78,7 +53,7 @@ class TotalMarkFractionalTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
-    public function test_getNormalised_Empty()
+    public function testGetNormalisedEmpty()
     {
         $this->expectException(InvalidArgumentException::class);
         $humanReadable = '';
@@ -87,7 +62,7 @@ class TotalMarkFractionalTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
-    public function test_getNormalised_Invalid()
+    public function testGetNormalisedInvalid()
     {
         $this->expectException(InvalidArgumentException::class);
         $humanReadable = 'ten';
@@ -98,7 +73,7 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider provider_humanReadableToNormalised
+     * @dataProvider providerHumanReadableToNormalised
      * @param string $humanReadable
      * @param float  $totalMark
      * @param float  $expected
@@ -106,7 +81,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
-    public function test_getNormalised($humanReadable, $totalMark, $expected)
+    public function testGetNormalised($humanReadable, $totalMark, $expected)
     {
         $markScheme = new TotalMarkFractional(null);
         $actual = $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
@@ -116,7 +91,7 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider provider_humanReadableToRecurringNormalised
+     * @dataProvider providerHumanReadableToRecurringNormalised
      * @param string $humanReadable
      * @param float  $totalMark
      * @param float  $expected
@@ -124,7 +99,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
-    public function test_getRecurringNormalised($humanReadable, $totalMark, $expected)
+    public function testGetRecurringNormalised($humanReadable, $totalMark, $expected)
     {
         $delta = 0.00001;
         $markScheme = new TotalMarkFractional(null);
@@ -135,7 +110,7 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalisedToHumanReadable
+     * @dataProvider providerNormalisedToHumanReadable
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
@@ -143,7 +118,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
-    public function test_getHumanReadable($normalised, $totalMark, $humanReadable)
+    public function testGetHumanReadable($normalised, $totalMark, $humanReadable)
     {
         $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
@@ -153,7 +128,7 @@ class TotalMarkFractionalTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalisedToHumanReadableRecurring
+     * @dataProvider providerNormalisedToHumanReadableRecurring
      * @param float  $normalised
      * @param float  $totalMark
      * @param string $humanReadable
@@ -161,7 +136,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
-    public function test_getHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
+    public function testGetHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
     {
         $markScheme = new TotalMarkFractional();
         $actual = $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
@@ -176,7 +151,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \RangeException
      * @throws \UnexpectedValueException
      */
-    public function test_getNormalised_Quiz()
+    public function testGetNormalisedQuiz()
     {
         $quiz = $this->getDummyQuiz();
 
@@ -201,7 +176,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \RangeException
      * @throws \UnexpectedValueException
      */
-    public function test_getNormalised_Quiz_OriginalTotalExceedsAttemptTotal()
+    public function testGetNormalisedQuizOriginalTotalExceedsAttemptTotal()
     {
         $quiz = $this->getDummyQuiz();
 
@@ -225,7 +200,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
-    public function test_getNormalised_Quiz_Total()
+    public function testGetNormalisedQuizTotal()
     {
         $humanReadable = 1;
 
@@ -247,7 +222,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \RangeException
      * @throws \UnexpectedValueException
      */
-    public function test_getHumanReadable_Quiz()
+    public function testGetHumanReadableQuiz()
     {
         $quiz = $this->getDummyQuiz();
 
@@ -270,7 +245,7 @@ class TotalMarkFractionalTest extends TestCase
      * @throws \RangeException
      * @throws \UnexpectedValueException
      */
-    public function test_getHumanReadable_Quiz_Fractional()
+    public function testGetHumanReadableQuizFractional()
     {
         $quiz = $this->getDummyQuiz();
 
@@ -289,7 +264,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * A quiz does not have a max mark
      */
-    public function test_getHumanReadable_Quiz_Fractional_OriginalTotalExceedsAttemptTotal()
+    public function testGetHumanReadableQuizFractionalOriginalTotalExceedsAttemptTotal()
     {
         $quiz = $this->getDummyQuiz();
 
@@ -305,12 +280,64 @@ class TotalMarkFractionalTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkData
+     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertFormInputToHumanReadableMark
+     *
+     * @param TotalMarkFractional $markScheme
+     * @param string|null         $formInput
+     * @param string|null         $expected
+     */
+    public function testConvertFormInputToHumanReadableMark(
+        TotalMarkFractional $markScheme,
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
+     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertFormInputToHumanReadableMark
+     *
+     * @param TotalMarkFractional $markScheme
+     * @param string|null         $formInput
+     */
+    public function testConvertFormInputToHumanReadableMarkInvalid(
+        TotalMarkFractional $markScheme,
+        ?string $formInput
+    ): void {
+        $this->expectException(InvalidArgumentException::class);
+        $markScheme->convertFormInputToHumanReadableMark($formInput);
+    }
+
+
+    /**
+     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
+     * @covers \Schoolbox\Learning\MarkScheme\TotalMarkFractional::convertHumanReadableMarkToFormInput
+     *
+     * @param TotalMarkFractional $markScheme
+     * @param string|null         $humanReadableMark
+     * @param string|null         $expected
+     */
+    public function testConvertHumanReadableMarkToFormInput(
+        TotalMarkFractional $markScheme,
+        ?string $humanReadableMark,
+        ?string $expected
+    ): void {
+        $this->assertSame($expected, $markScheme->convertHumanReadableMarkToFormInput($humanReadableMark));
+    }
+
+
     // ==================== Data Providers ====================
 
     /**
      * @return array
      */
-    public function provider_invalidTotalMarks(): array
+    public function providerInvalidTotalMarks(): array
     {
         return [
             [null],
@@ -328,7 +355,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function provider_humanReadableToRecurringNormalised(): array
+    public function providerHumanReadableToRecurringNormalised(): array
     {
         $totalMark = 3.0;
         return [
@@ -344,7 +371,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function provider_setValidTotal(): array
+    public function providerSetValidTotal(): array
     {
         $originalTotalMark = 50;
         return [
@@ -366,7 +393,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function provider_humanReadableToNormalised(): array
+    public function providerHumanReadableToNormalised(): array
     {
         $totalMark = 100;
         return [
@@ -390,7 +417,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function provider_normalisedToHumanReadable(): array
+    public function providerNormalisedToHumanReadable(): array
     {
         $totalMark = 100;
         return [
@@ -408,7 +435,7 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * @return array
      */
-    public function provider_normalisedToHumanReadableRecurring(): array
+    public function providerNormalisedToHumanReadableRecurring(): array
     {
         $totalMark = 3;
         return [
@@ -421,6 +448,54 @@ class TotalMarkFractionalTest extends TestCase
             [133.3333, $totalMark,   '3 / 3'],
         ];
     }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMark`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    {
+        $total = new TotalMarkFractional(12);
+        yield 'null form input' => [$total, null, null];
+        yield 'numeric form input' => [$total, '6', '6 / 12'];
+        yield 'fraction form input, space' => [$total, '6 / 12', '6 / 12'];
+        yield 'fraction form input, no space' => [$total, '6/12', '6 / 12'];
+        yield 'fraction form input, < 0' => [$total, '-1', '-1 / 12'];
+        yield 'fraction form input, > 100' => [$total, '13', '13 / 12'];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMarkInvalid`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    {
+        $total = new TotalMarkFractional(12);
+        yield 'invalid valid form input 1' => [$total, 'Invalid'];
+        yield 'invalid valid form input 2' => [$total, ''];
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableValueAsFormInput`
+     *
+     * @return iterable
+     */
+    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    {
+        $total = new TotalMarkFractional(12);
+        yield 'null form input' => [$total, null, null];
+        yield 'numeric form input' => [$total, '6', '6'];
+        yield 'fraction form input, space' => [$total, '6 / 12', '6'];
+        yield 'fraction form input, no space' => [$total, '6/12', '6'];
+        yield 'fraction form input, < 0' => [$total, '-1/12', '-1'];
+        yield 'fraction form input, > 100' => [$total, '13/12', '13'];
+    }
+
 
     /**
      * Generate a Quiz with attached Attempts, Feedbacks, Questions + Responses

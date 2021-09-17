@@ -39,13 +39,14 @@
 
                     <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
+                    {% set formInputValue = capabilityMark ? capabilityMark.retrieveHumanReadableValueAsFormInput : null %}
                     {% if markType.mode == 'raw' or markType.mode == 'none' %}
                         <input data-group-mark
                                class="groupMark"
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark ? capabilityMark.humanReadableValue : null }}" /> / {{ capabilityMaxValue }}
+                               value="{{ formInputValue }}" /> / {{ capabilityMaxValue }}
 
                     {% elseif markType.mode == 'letter' %}
                         <select data-group-mark
@@ -60,17 +61,16 @@
                             {% endif %}
 
                             {# Output letter grade select options #}
-                            {% set selectedLetterGrade = capabilityMark ? capabilityMark.humanReadableValue : null %}
                             {% set found = false %}
                             <option value=""
-                                    {% if selectedLetterGrade is null %}{% set found = true %}selected{% endif %}>(no grade)</option>
+                                    {% if formInputValue is null %}{% set found = true %}selected{% endif %}>(no grade)</option>
 
                             <optgroup label="{{ locale.grades.properPlural }}">
                                 {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
                                     <option value="{{ gradeLevel.caption }}"
                                             data-lower-bound="{{ gradeLevel.lowerBound }}"
                                             data-raw-grade="{{ gradeLevel.rawGrade }}"
-                                            {% if selectedLetterGrade == gradeLevel.caption %}{% set found = true %}selected{% endif %}
+                                            {% if formInputValue == gradeLevel.caption %}{% set found = true %}selected{% endif %}
                                             data-letter="{{ gradeLevel.caption }}">
                                         {{ gradeLevel.caption }}
                                     </option>
@@ -80,7 +80,7 @@
                             {% if not found %}
                                 <optgroup label="Original Deleted Grade">
                                     <option selected value="-1" disabled>
-                                        {{ selectedLetterGrade }}
+                                        {{ formInputValue }}
                                     </option>
                                 </optgroup>
                             {% endif %}
@@ -92,9 +92,7 @@
                                id="group-{{ capabilityId }}-mark"
                                type="tel"
                                name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                               value="{{ capabilityMark and capabilityMark.humanReadableValue is not null
-                                ? (capabilityMark.humanReadableValue | round(2))
-                                : null }}"/> %
+                               value="{{ formInputValue }}"/> %
                     {% endif %}
 
                     {% if groupUsage.containsDescriptorsWithValue %}

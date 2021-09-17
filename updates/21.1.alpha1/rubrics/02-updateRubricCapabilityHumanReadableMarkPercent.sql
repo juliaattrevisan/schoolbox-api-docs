@@ -5,7 +5,12 @@ INNER JOIN rubric_capability_usage rcu ON rcm.rubric_capability_id = rcu.rubric_
 INNER JOIN submission_box          sb  ON sr.box_id = sb.id
 INNER JOIN submission_mark_type    smt ON sb.rubric_capability_mark_type_id = smt.mark_type_id
 
-SET rcm.human_readable_value = ROUND((rcm.value / rcu.max_value) * 100, 2)
+-- Remove trailing zeros from percent value:
+-- ROUND value to 2dp, then TRIM to cast to string, then add 0 to remove trailing zeros
+SET rcm.human_readable_value = CONCAT(
+    TRIM(ROUND((rcm.value / rcu.max_value) * 100, 2)) + 0,
+    ' %'
+)
 
 WHERE smt.slug = 'percent'
 AND   COALESCE(rcu.max_value, 0) > 0;

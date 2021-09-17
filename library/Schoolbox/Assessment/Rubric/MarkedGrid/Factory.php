@@ -73,8 +73,8 @@ class Factory
                     // human-readable: whatever was passed in the form
                     // standard value: calculated based on the human-readable value
                     $capabilityMark
-                        ->setHumanReadableValue($capabilityCustomMarkInput)
-                        ->setValue($capabilityMark->calculateValueFromHumanReadableValue($capabilityCustomMarkInput));
+                        ->setHumanReadableValue($capabilityMark->convertFormInputToHumanReadableValue($capabilityCustomMarkInput))
+                        ->setValue($capabilityMark->convertFormInputToValue($capabilityCustomMarkInput));
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
                 }

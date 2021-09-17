@@ -1075,6 +1075,7 @@ class DataSource
                     ->setCapability($capability)
                     ->setSubmissionReturn($destinationReturn)
                     ->setValue($sourceCapabilityMark->getValue())
+                    ->setHumanReadableValue($sourceCapabilityMark->getHumanReadableValue())
                     ->setValid($sourceCapabilityMark->isValid());
             }
 

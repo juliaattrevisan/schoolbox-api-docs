@@ -18,7 +18,7 @@ use InvalidArgumentException;
 class LetterGradeTest extends TestCase
 {
 
-    public function test_Unknown_Caption()
+    public function testUnknownCaption()
     {
         $this->expectException(InvalidArgumentException::class);
         $humanReadable = 'Some Unknown Captions';
@@ -29,13 +29,13 @@ class LetterGradeTest extends TestCase
 
 
     /**
-     * @dataProvider provider_normalisedToHumanReadable
+     * @dataProvider providerNormalisedToHumanReadable
      * @param float  $normalised
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws \RangeException
      */
-    public function test_getHumanReadable($normalised, $expected)
+    public function testGetHumanReadable($normalised, $expected)
     {
         $gradeGroup = $this->getDummyLetterGradeGroup();
         $markScheme = new LetterGrade($gradeGroup);
@@ -46,12 +46,12 @@ class LetterGradeTest extends TestCase
 
 
     /**
-     * @dataProvider provider_humanReadableToNormalised
+     * @dataProvider providerHumanReadableToNormalised
      * @param string $humanReadable
      * @param float  $expected
      * @throws InvalidArgumentException
      */
-    public function test_getNormalised($humanReadable, $expected)
+    public function testGetNormalised($humanReadable, $expected)
     {
         $gradeGroup = $this->getDummyLetterGradeGroup();
         $markScheme = new LetterGrade($gradeGroup);
@@ -60,12 +60,59 @@ class LetterGradeTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkData
+     * @covers \Schoolbox\Learning\MarkScheme\LetterGrade::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     * @param string|null $expected
+     */
+    public function testConvertFormInputToHumanReadableMark(
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $markScheme = new LetterGrade($this->getDummyLetterGradeGroup());
+        $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
+     * @covers \Schoolbox\Learning\MarkScheme\LetterGrade::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     */
+    public function testConvertFormInputToHumanReadableMarkInvalid(?string $formInput): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $markScheme = new LetterGrade($this->getDummyLetterGradeGroup());
+        $markScheme->convertFormInputToHumanReadableMark($formInput);
+    }
+
+
+    /**
+     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
+     * @covers \Schoolbox\Learning\MarkScheme\LetterGrade::convertHumanReadableMarkToFormInput
+     *
+     * @param string|null $humanReadableMark
+     * @param string|null $expected
+     */
+    public function testConvertHumanReadableMarkToFormInput(
+        ?string $humanReadableMark,
+        ?string $expected
+    ): void {
+        $markScheme = new LetterGrade($this->getDummyLetterGradeGroup());
+        $this->assertSame($expected, $markScheme->convertHumanReadableMarkToFormInput($humanReadableMark));
+    }
+
+
     // ==================== Data Providers ====================
 
     /**
      * @return array
      */
-    public function provider_normalisedToHumanReadable(): array
+    public function providerNormalisedToHumanReadable(): array
     {
         return [
             [-5,     'Needs Attention'],
@@ -87,7 +134,7 @@ class LetterGradeTest extends TestCase
     /**
      * @return array
      */
-    public function provider_humanReadableToNormalised(): array
+    public function providerHumanReadableToNormalised(): array
     {
         return [
             ['Needs Attention', 20.0],
@@ -97,6 +144,51 @@ class LetterGradeTest extends TestCase
             ['Excellent',       95.0],
         ];
     }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMark`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'valid form input 1' => ['Needs Attention', 'Needs Attention'];
+        yield 'valid form input 2' => ['Acceptable', 'Acceptable'];
+        yield 'valid form input 3' => ['Good', 'Good'];
+        yield 'valid form input 4' => ['Very Good', 'Very Good'];
+        yield 'valid form input 5' => ['Excellent', 'Excellent'];
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableValueAsFormInput`
+     *
+     * @return iterable
+     */
+    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'valid form input 1' => ['Needs Attention', 'Needs Attention'];
+        yield 'valid form input 2' => ['Acceptable', 'Acceptable'];
+        yield 'valid form input 3' => ['Good', 'Good'];
+        yield 'valid form input 4' => ['Very Good', 'Very Good'];
+        yield 'valid form input 5' => ['Excellent', 'Excellent'];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMarkInvalid`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    {
+        yield 'invalid valid form input 1' => ['Invalid'];
+        yield 'invalid valid form input 2' => [''];
+    }
+
 
     /**
      * @return GradeGroup

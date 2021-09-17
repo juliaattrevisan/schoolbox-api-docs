@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\MarkScheme\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use RangeException;
@@ -16,13 +17,13 @@ class PercentageTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_normalisedToHumanReadable
+     * @dataProvider providerNormalisedToHumanReadable
      * @param float  $normalised
      * @param string $expected
      * @throws RangeException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function test_getHumanReadable_Valid($normalised, $expected)
+    public function testGetHumanReadableValid($normalised, $expected)
     {
         $markScheme = new Percentage();
         $actual = $markScheme->getHumanReadableMark($normalised);
@@ -32,13 +33,13 @@ class PercentageTest extends TestCase
 
 
     /**
-     * @dataProvider provider_humanReadableToNormalised
+     * @dataProvider providerHumanReadableToNormalised
      * @param string $humanReadable
      * @param float  $expected
      * @throws RangeException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function test_getNormalised_Valid($humanReadable, $expected)
+    public function testGetNormalisedValid($humanReadable, $expected)
     {
         $markScheme = new Percentage();
         $actual = $markScheme->getNormalisedMark($humanReadable);
@@ -46,7 +47,7 @@ class PercentageTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
-    public function test_getNormalised_TooLow()
+    public function testGetNormalisedTooLow()
     {
         $this->expectException(RangeException::class);
         $humanReadable = '-0.0001 %';
@@ -55,7 +56,7 @@ class PercentageTest extends TestCase
     }
 
 
-    public function test_getNormalised_TooHigh()
+    public function testGetNormalisedTooHigh()
     {
         $this->expectException(RangeException::class);
         $humanReadable = '100.0000001 %';
@@ -63,12 +64,59 @@ class PercentageTest extends TestCase
         $markScheme->getNormalisedMark($humanReadable);
     }
 
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkData
+     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     * @param string|null $expected
+     */
+    public function testConvertFormInputToHumanReadableMark(
+        ?string $formInput,
+        ?string $expected
+    ): void {
+        $markScheme = new Percentage();
+        $this->assertSame($expected, $markScheme->convertFormInputToHumanReadableMark($formInput));
+    }
+
+
+    /**
+     * @dataProvider getConvertFormInputToHumanReadableMarkInvalidData
+     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertFormInputToHumanReadableMark
+     *
+     * @param string|null $formInput
+     */
+    public function testConvertFormInputToHumanReadableMarkInvalid(?string $formInput): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $markScheme = new Percentage();
+        $markScheme->convertFormInputToHumanReadableMark($formInput);
+    }
+
+
+    /**
+     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
+     * @covers \Schoolbox\Learning\MarkScheme\Percentage::convertHumanReadableMarkToFormInput
+     *
+     * @param string|null $humanReadableMark
+     * @param string|null $expected
+     */
+    public function testConvertHumanReadableMarkToFormInput(
+        ?string $humanReadableMark,
+        ?string $expected
+    ): void {
+        $markScheme = new Percentage();
+        $this->assertSame($expected, $markScheme->convertHumanReadableMarkToFormInput($humanReadableMark));
+    }
+
+
     // ==================== Data Providers ====================
 
     /**
      * @return array
      */
-    public function provider_humanReadableToNormalised(): array
+    public function providerHumanReadableToNormalised(): array
     {
         return [
             ['  0 %',      0.0],
@@ -100,7 +148,7 @@ class PercentageTest extends TestCase
     /**
      * @return array
      */
-    public function provider_normalisedToHumanReadable(): array
+    public function providerNormalisedToHumanReadable(): array
     {
         return [
             [-0.0001,     '0 %'],
@@ -122,5 +170,45 @@ class PercentageTest extends TestCase
             [100.0,       '100 %'],
             [100.0000001, '100 %'],
         ];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMark`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'numeric form input' => ['50', '50 %'];
+        yield 'percent form input, space' => ['50 %', '50 %'];
+        yield 'percent form input, no space' => ['50%', '50 %'];
+    }
+
+
+    /**
+     * Data provider for `testConvertFormInputToHumanReadableMarkInvalid`
+     *
+     * @return iterable
+     */
+    public function getConvertFormInputToHumanReadableMarkInvalidData(): iterable
+    {
+        yield 'invalid valid form input 1' => ['Invalid'];
+        yield 'invalid valid form input 2' => [''];
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableValueAsFormInput`
+     *
+     * @return iterable
+     */
+    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    {
+        yield 'null form input' => [null, null];
+        yield 'numeric form input' => ['50', '50'];
+        yield 'percent form input, space' => ['50 %', '50'];
+        yield 'percent form input, no space' => ['50%', '50'];
     }
 }

@@ -129,6 +129,52 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
         return $floatVal;
     }
 
+    /**
+     * For total marks, the form input is the numerator only:
+     * append the denominator to the end of it.
+     *
+     * @param string|null $formInput
+     * @return string|null
+     * @throws InvalidArgumentException if there's no numeric component to
+     *                                  `$formInput`
+     */
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string
+    {
+        if (!isset($formInput)) {
+            return null;
+        }
+        $matches = [];
+        $pattern = '/^\s*(-?[0-9.]+)/';
+        if (!preg_match($pattern, $formInput, $matches)) {
+            throw new InvalidArgumentException("Unable to parse numerator: $formInput");
+        }
+
+        $denominator = round($this->deriveDenominator(), 2);
+
+        // Prevent divide by 0 Errors
+        if (0 === (int)$denominator) {
+            return null;
+        }
+
+        $floatVal = round(floatval($matches[1]), 2);
+        return sprintf("%s / %s", $floatVal, $denominator);
+    }
+
+    /**
+     * Strip the denominator from the end of the human-readable mark to get its
+     * form input value.
+     *
+     * @param string|null $humanReadableMark
+     * @return string|null
+     */
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
+    {
+        if (isset($humanReadableMark)) {
+            $parts = explode('/', $humanReadableMark);
+            return trim($parts[0]);
+        }
+        return null;
+    }
 
     /* Getters / Setters
      */

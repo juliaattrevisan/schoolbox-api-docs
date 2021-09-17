@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
+use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\IResponse;
 
 /**
@@ -65,6 +66,29 @@ interface IMarkScheme
      * @return float|null
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null);
+
+    /**
+     * Converts a value submitted from the form into a standardised
+     * human-readable mark.
+     *
+     * For example, form inputs of "59" and "59 %" may both be stored as "59 %".
+     *
+     * @param string|null $formInput The mark submitted from the form.
+     * @return string|null A human-readable mark for storage.
+     * @throws InvalidArgumentException if the form input can't be converted
+     */
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string;
+
+    /**
+     * Converts a human-readable mark into a form input value.
+     *
+     * For example, a human-readable mark of "59 %" may be converted to "59" in
+     * a form input.
+     *
+     * @param string|null $humanReadableMark
+     * @return string|null A mark to display in a form input.
+     */
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string;
 
     /**
      * Get the Mark Type's human-readable title

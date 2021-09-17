@@ -89,6 +89,44 @@ class LetterGrade extends AbstractMarkScheme
         throw new InvalidArgumentException("No GradeLevel found. GradeGroup: $gradeGroup, GradeLevel: '.$humanReadableMark");
     }
 
+    /**
+     * For letter grades, the form input and human-readable marks are the same.
+     *
+     * @param string|null $formInput
+     * @return string|null
+     * @throws InvalidArgumentException if `$formInput` isn't a valid level in
+     *                                  the grade group
+     */
+    public function convertFormInputToHumanReadableMark(?string $formInput): ?string
+    {
+        if (!isset($formInput)) {
+            return null;
+        }
+        foreach ($this->gradeGroup->getGradeLevels() as $gradeLevel) {
+            if ($gradeLevel->getCaption() === $formInput) {
+                return $formInput;
+            }
+        }
+        throw new InvalidArgumentException(
+            sprintf(
+                "No GradeLevel found. GradeGroup: %s, GradeLevel: %s",
+                $this->gradeGroup->getName(),
+                $formInput
+            )
+        );
+    }
+
+    /**
+     * For letter grades, the form input and human-readable marks are the same.
+     *
+     * @param string|null $humanReadableMark
+     * @return string|null
+     */
+    public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
+    {
+        return $humanReadableMark;
+    }
+
     /* Getters / Setters
      */
 
