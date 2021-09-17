@@ -24,11 +24,11 @@ if (is_numeric($this->arg[0])) {
     try {
         $folder = $folderMapper->findById($this->arg[0]);
     } catch (\Exception $e) {
-        error(2);
+        error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
     }
 
     if ($groupHandler->getPermission($this->arg[0]) < UserAccess::ACCESS_READ) {
-        error(6);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
     }
 
     $this->setFile(TEMPLATE_content, 'cms/image-gallery.html');
@@ -95,5 +95,5 @@ if (is_numeric($this->arg[0])) {
         ]
     ]);
 } else {
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }

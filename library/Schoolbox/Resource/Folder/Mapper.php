@@ -1654,7 +1654,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $groupHandler = new \Group();
 
         if ($groupHandler->getPermission($category->getId()) < UserAccess::ACCESS_WRITE) {
-            error(6);
+            error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         $allChildren = $this->findByColumn('parent', $category->getId());

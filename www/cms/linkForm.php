@@ -33,10 +33,10 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             $link = LinkMapper::getInstance()->findById($_POST['linkID']);
 
             if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                error(6);
+                error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
             }
         } catch (Exception $e) {
-            error(2);
+            error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         $link->setUrl($url->getUrl());
@@ -67,7 +67,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             $linkCollection = LinkMapper::getInstance()->createCollection();
             foreach ($_POST['category'] as $cat) {
                 if ($groupHandler->getPermission($cat) < UserAccess::ACCESS_WRITE) {
-                    error(6);
+                    error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
                 }
 
                 $linkDest = clone $link;
@@ -77,7 +77,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             $link = $linkCollection;
         } else {
             if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE) {
-                error(6);
+                error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
             }
 
             $link->setFolder(FolderMapper::getInstance()->createModel($_POST['category']));
@@ -120,12 +120,12 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             $link = LinkMapper::getInstance()->findById($_GET['delete']);
 
             if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                error(6);
+                error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
             }
 
             LinkMapper::getInstance()->delete($link);
         } catch (Exception $e) {
-            error(2);
+            error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         if (isset($_REQUEST['ajax'])) {
@@ -136,6 +136,6 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             SitePage::localRedir($_GET['redirect']);
         }
     } else {
-        error(2);
+        error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
     }
 }

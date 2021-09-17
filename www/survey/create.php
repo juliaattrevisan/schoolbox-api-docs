@@ -17,7 +17,7 @@ $surveyHandler = new Survey_Main();
 
 if (!empty($_POST)) {
     if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < UserAccess::ACCESS_WRITE) {
-        error(126);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY);
     }
 
     /* Format date, time
@@ -28,13 +28,13 @@ if (!empty($_POST)) {
     /* Check for valid dates
      */
     if (!$start->isValid() || !$finish->isValid()) {
-        error(15);
+        error(\Schoolbox\Error\Mapper::ERROR_INVALID_DATE);
     }
 
     /* Check that finish time cannot be before start time
      */
     if ($start->getUnixTimeStamp() >= $finish->getUnixTimeStamp()) {
-        error(145);
+        error(\Schoolbox\Error\Mapper::ERROR_START_TIME_GREATER);
     }
 
     $assess_id = $surveyHandler->create(
@@ -56,25 +56,25 @@ if (!empty($_POST)) {
     );
 
     if (!$assess_id) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     SitePage::localRedir('/survey/section/create/' . $assess_id);
 } else {
     if (!is_numeric($this->arg[0])) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($this->arg[0]);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
         exit;
     }
 
     if ($groupHandler->getPermission($this->arg[0]) < UserAccess::ACCESS_WRITE) {
-        error(126);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY);
     }
 
     /* Render create page

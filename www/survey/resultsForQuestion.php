@@ -19,7 +19,7 @@ $questionHandler = new Survey_Question();
 $groupHandler    = new Group();
 
 if (!is_numeric($this->arg[0])) {
-    error(112);
+    error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
@@ -29,14 +29,14 @@ if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
 $survey = $surveyHandler->getByID($this->arg[0]);
 
 if ($surveyHandler->isDeleted($this->arg[0])) {
-    error(112);
+    error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 if (
     !$surveyHandler->isOwner($survey['assess_id'])
     && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)
 ) {
-    error(125);
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW_2);
 }
 
 try {
@@ -45,7 +45,7 @@ try {
     /** @var \Schoolbox\Resource\Folder\Model $folder */
     $folder = $folderMapper->findById($survey['category_id']);
 } catch (\Exception $e) {
-    error(13);
+    error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
 }
 
 $surveyExporter = new Survey_Export_Graph(

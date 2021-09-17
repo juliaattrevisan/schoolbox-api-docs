@@ -13,14 +13,14 @@ use Schoolbox\Learning\Assessment\Redirect;
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
-    error(126);
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY);
 }
 
 if (!empty($_POST)) {
     /* Don't add it if you haven't chozen a category
      */
     if (!is_numeric($_POST['question_category'])) {
-        error(166);
+        error(\Schoolbox\Error\Mapper::ERROR_QUESTION_BANK_CATEGORY);
     }
 
     $questionBankHandler = new Assess_Question_Bank();
@@ -36,7 +36,7 @@ if (!empty($_POST)) {
 
         SitePage::localRedir('/assess/questionbank/added/' . $_POST['question_id'] . $returnUrl);
     } else {
-        error(8);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_RESOURCE_DELETE);
     }
 } elseif (isset($this) && count($this->arg) > 0) {
 
@@ -58,5 +58,5 @@ if (!empty($_POST)) {
     $this->injectGlobalVars();
     $this->template->pparse('finaloutput', TEMPLATE_content);
 } else {
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }

@@ -30,12 +30,12 @@ if (!is_numeric($attemptId)) {
 
 
 if ($surveyHandler->isDeleted($survey['assess_id'])) {
-    error(112);
+    error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 // Sanity check on attempt - does it belong to the current user and survey?
 if (!($attempt['user_id'] == $_SESSION['user']->getId() && $attempt['assess_id'] == $survey['assess_id'])) {
-    error(123);
+    error(\Schoolbox\Error\Mapper::ERROR_ATTEMPT_NOT_RECORDED);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
@@ -47,21 +47,21 @@ if ($surveyHandler->isOwner($this->arg[0])) {
 */
 
 if ($surveyHandler->isExpired($survey['assess_id'])) {
-    error(120);
+    error(\Schoolbox\Error\Mapper::ERROR_QUIZ_EXPIRED);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
 if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-    error(144);
+    error(\Schoolbox\Error\Mapper::ERROR_SURVEY_NOT_OPEN);
 }
 
 try {
     $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
     $folder    = $folderMap->findById($survey['category_id']);
 } catch (\Exception $e) {
-    error(13);
+    error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
 }
 
 $this->setFile(TEMPLATE_content, 'survey/end.html');

@@ -16,10 +16,10 @@ if (is_numeric($this->arg[0])) {
 
         /* Check permissions to submit */
         if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-            error(6);
+            error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
         }
     } catch (Exception $e) {
-        error(41);
+        error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
     }
 
     $this->setFile(TEMPLATE_content, 'cms/modify-link.html');
@@ -62,10 +62,10 @@ if (is_numeric($this->arg[0])) {
 
         /* Check permissions to submit */
         if ($groupHandler->getPermission($folder->getId()) < UserAccess::ACCESS_WRITE) {
-            error(6);
+            error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
         }
     } catch (Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     /* Add new link to system */
@@ -141,5 +141,5 @@ if (is_numeric($this->arg[0])) {
 //        error(154);
 //    }
 } else {
-    error(2);
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }

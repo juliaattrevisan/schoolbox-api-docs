@@ -15,7 +15,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 $surveyHandler = new Survey_Main();
 $groupHandler = new Group();
 if (!is_numeric($this->arg[0])) {
-    error(112);
+    error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
@@ -27,15 +27,15 @@ try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($survey['category_id']);
 } catch (\Exception $e) {
-    error(13);
+    error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
 }
 
 if ($surveyHandler->isDeleted($this->arg[0])) {
-    error(112);
+    error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
 
 if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-    error(125);
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW_2);
 }
 
 $surveyExporter = new Survey_Export_Graph($survey, new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());

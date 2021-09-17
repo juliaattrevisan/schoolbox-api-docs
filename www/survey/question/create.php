@@ -39,15 +39,15 @@ if (!empty($_POST)) {
             $survey['category_id']
         ) < UserAccess::ACCESS_WRITE)
     ) {
-        error(130);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY_2);
     }
 
     if ($surveyHandler->isDeleted($section['assess_id'])) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     if ($sectionHandler->isDeleted($section['section_id'])) {
-        error(115);
+        error(\Schoolbox\Error\Mapper::ERROR_SECTION_NOT_FOUND_2);
     }
 
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
@@ -78,11 +78,11 @@ if (!empty($_POST)) {
     $answer_id = $answerHandler->create($_POST, $question_id);
 
     if (!$question_id) {
-        error(131);
+        error(\Schoolbox\Error\Mapper::ERROR_QUESTION_NOT_SAVED);
     }
 
     if (!$answer_id) {
-        error(132);
+        error(\Schoolbox\Error\Mapper::ERROR_ANSWER_NOT_SAVED);
     }
 
     // Form is AJAX submitted so redirection is handled by javascript
@@ -93,7 +93,7 @@ if (!empty($_POST)) {
     }
 } else {
     if (!is_numeric($this->arg[0])) {
-        error(51);
+        error(\Schoolbox\Error\Mapper::ERROR_SECTION_NOT_FOUND);
     }
 
     $section = $sectionHandler->getByID($this->arg[0]);
@@ -108,22 +108,22 @@ if (!empty($_POST)) {
             $survey['category_id']
         ) < UserAccess::ACCESS_WRITE)
     ) {
-        error(130);
+        error(\Schoolbox\Error\Mapper::ERROR_PERM_TEST_MODIFY_2);
     }
 
     if ($surveyHandler->isDeleted($section['assess_id'])) {
-        error(112);
+        error(\Schoolbox\Error\Mapper::ERROR_QUIZ_NOT_FOUND);
     }
 
     if ($sectionHandler->isDeleted($section['section_id'])) {
-        error(115);
+        error(\Schoolbox\Error\Mapper::ERROR_SECTION_NOT_FOUND_2);
     }
 
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($survey['category_id']);
     } catch (\Exception $e) {
-        error(13);
+        error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
     }
 
     $assessStartDate = new Alaress_Date_Format(strtotime($survey['start']), 'U');

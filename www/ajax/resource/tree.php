@@ -1,16 +1,16 @@
 <?php
 
-use Alaress\Authorizer\Failure\AuthenticationTimedOut;
-use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Resource\Browser\Office365\Tenant;
-use Schoolbox\Resource\Folder\IFolder;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Alaress\Authorizer\Failure\AuthenticationTimedOut;
+use Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\Resource\Browser\Office365\Tenant;
+use Schoolbox\Resource\Folder\IFolder;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
@@ -30,7 +30,7 @@ header('Content-Type: text/html');
 */
 
 if (count($this->arg) != 1) {
-    $this->error(2);
+    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }
 
 $source     = $this->arg[0];
@@ -72,11 +72,11 @@ try {
     $renderer = new \Schoolbox\Resource\Browser\NodeRenderer($this, $nodeData);
     $renderer->render($useFolder);
 } catch (Unauthorized $e) {
-    $this->error(2);
+    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 } catch (\Schoolbox\Resource\Exception $e) {
-    $this->error(6);
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
 } catch (OutOfBoundsException $e) {
-    $this->error(2);
+    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 } catch (AuthenticationTimedOut $e) {
     $this->error(null, "Office 365 error: {$e->getMessage()}");
 } catch (RuntimeException $e) {

@@ -7,14 +7,14 @@ try {
     $surveyHandler = new \Survey_Main();
     $survey = $surveyHandler->getByID($this->arg[1]);
 } catch (\Exception $e) {
-    error(167);
+    error(\Schoolbox\Error\Mapper::ERROR_SURVEY_NOT_FOUND);
 }
 
 try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($survey['category_id']);
 } catch (\Exception $e) {
-    error(13);
+    error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
 }
 
 $sectionHandler = new \Assess_Section();
