@@ -37,7 +37,7 @@ MAILTO="support@schoolbox.com.au"
 13 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/transmit.php --force >> /var/lib/schoolboxdev/cache/logs/turnitin.log 2>&1
 
 # Turnitin reporter - every 10min
-/10 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/report.php >> /var/lib/schoolboxdev/cache/logs/turnitin.log 2>&1
+*/10 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/report.php >> /var/lib/schoolboxdev/cache/logs/turnitin.log 2>&1
 
 # Etherpad - sync back to MySQL - every hour
 0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
