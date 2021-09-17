@@ -30,10 +30,11 @@ export default {
     
     data () {
         return {
-            studentData: [],
-            isDataLoaded: false,
-            hasDataLoadError: false,
-            selectedFilters: [],
+            studentData: [], //hold all student data
+            isDataLoaded: false, //show loading display until true
+            hasDataLoadError: false, //display load error
+            selectedFilters: [], //to show only those badges curently filtered
+            selectedStudents: [] //list of student ids that can have badges awarded to them
         }
     },
 
@@ -65,6 +66,20 @@ export default {
         },
 
         /**
+         * To be able to award badges to multiple students
+         * 
+         * @returns { Number } 
+         * @returns { Boolean } 
+         */
+        onStudentSelected (studentID, isChecked) {
+            if (isChecked) {
+                this.selectedStudents = [...this.selectedStudents, studentID]; //add in
+            } else {
+                this.selectedStudents = this.selectedStudents.filter((selectedStudentsID) => selectedStudentsID !== studentID); //or remove
+            }
+        },
+
+        /**
          * Open the selected award detail modal
          * 
          * @returns { Object } 
@@ -90,6 +105,7 @@ export default {
                         v-for="student in studentData" 
                         :key="student.id" 
                         :student="student"
+                        @on-student-selected="onStudentSelected"
                         @on-award-selected="onAwardSelected"
                     />
                 </ul>

@@ -112,6 +112,15 @@ export default {
             element.style.position = 'static';
         },
 
+        /**
+         * To be able to award badges to multiple students
+         * 
+         * @params { Boolean } 
+         */
+        onStudentSelected (isChecked) {
+            this.$emit('on-student-selected', this.student.id, isChecked);
+        },
+
     }
 
 }
@@ -120,7 +129,15 @@ export default {
 <template>
     <li class="awards student">
         <div class="small-12 medium-1 column">
-            <input id="checkbox1" type="checkbox"><label for="checkbox1">Checkbox 1</label>
+            <div class="checklist">
+                <input 
+                    :id="`checkbox-${student.id}`"
+                    type="checkbox"
+                    :value="student.id"
+                    @change="onStudentSelected($event.target.checked)"
+                />
+                <label :for="`checkbox-${student.id}`"></label>
+            </div>
         </div>
         <div class="small-12 medium-1 column">
             <a :href="`/search/user/${student.id}`">
