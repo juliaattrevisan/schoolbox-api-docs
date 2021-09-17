@@ -153,6 +153,7 @@ class Model implements ISoftDeletable
             self::STATUS_TRANSMIT_SUBMISSION,
             self::STATUS_TRANSMIT_UPLOADING,
             self::STATUS_TRANSMIT_LOADED,
+            self::STATUS_REPORT_PREPARED,
             self::STATUS_REPORT_ANALYSING
         ]);
     }
