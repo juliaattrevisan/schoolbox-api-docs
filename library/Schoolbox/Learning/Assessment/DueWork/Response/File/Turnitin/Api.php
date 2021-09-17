@@ -37,7 +37,15 @@ class Api
 
 
     /**
+     * Request connection timeout
+     * Can't connect after this amount of seconds? You died
+     */
+    private const DEFAULT_CONNECT_TIMEOUT = 3;
+
+
+    /**
      * Request timeout
+     * Still going after this amount of seconds? You died
      */
     private const DEFAULT_TIMEOUT = 300;
 
@@ -101,8 +109,10 @@ class Api
      * Use the Get Features Enabled endpoint to see if we connect, as per
      * https://developers.turnitin.com/turnitin-core-api/best-practice/exposing-tca-settings
      *
+     * @return bool
      * @throws \DomainException
-     * @throws \DebugBar\DebugBarException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function test(): bool
     {
@@ -263,6 +273,7 @@ class Api
         return new Client([
             'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
             'base_uri' => $this->host,
+            'connect_timeout' => self::DEFAULT_CONNECT_TIMEOUT,
             'timeout' => self::DEFAULT_TIMEOUT,
             'http_errors' => false,
         ]);
