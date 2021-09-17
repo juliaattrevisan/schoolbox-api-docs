@@ -1,16 +1,16 @@
 <?php
 
-use Alaress\Authorizer\Failure\AuthenticationTimedOut;
-use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Resource\Browser\Office365\Tenant;
-use Schoolbox\Resource\Folder\IFolder;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Alaress\Authorizer\Failure\AuthenticationTimedOut;
+use Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\Resource\Browser\Office365\Tenant;
+use Schoolbox\Resource\Folder\IFolder;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
