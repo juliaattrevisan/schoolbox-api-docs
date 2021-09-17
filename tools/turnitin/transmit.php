@@ -183,15 +183,15 @@ HELP;
                     $models = Turnitin\Mapper::getInstance()->findByColumnList([
                         'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
                         'status' => [
-                            Turnitin\Model::STATUS_SETUP_PENDING,
-                            Turnitin\Model::STATUS_SETUP_GROUP,
-                            Turnitin\Model::STATUS_SETUP_SUBMISSION,
+                            Turnitin\Model::STATUS_TRANSMIT_PENDING,
+                            Turnitin\Model::STATUS_TRANSMIT_GROUP,
+                            Turnitin\Model::STATUS_TRANSMIT_SUBMISSION,
                         ]
                     ]);
                 } else {
                     $models = Turnitin\Mapper::getInstance()->findByColumnList([
                         'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
-                        'status' => Turnitin\Model::STATUS_SETUP_PENDING
+                        'status' => Turnitin\Model::STATUS_TRANSMIT_PENDING
                     ]);
                 }
             } else {
@@ -203,12 +203,12 @@ HELP;
                  */
                 if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
                     $models = Turnitin\Mapper::getInstance()->findByColumn('status', [
-                        Turnitin\Model::STATUS_SETUP_PENDING,
-                        Turnitin\Model::STATUS_SETUP_GROUP,
-                        Turnitin\Model::STATUS_SETUP_SUBMISSION,
+                        Turnitin\Model::STATUS_TRANSMIT_PENDING,
+                        Turnitin\Model::STATUS_TRANSMIT_GROUP,
+                        Turnitin\Model::STATUS_TRANSMIT_SUBMISSION,
                     ]);
                 } else {
-                    $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+                    $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_TRANSMIT_PENDING);
                 }
             }
 

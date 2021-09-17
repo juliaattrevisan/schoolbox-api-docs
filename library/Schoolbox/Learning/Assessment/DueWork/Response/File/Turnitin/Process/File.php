@@ -211,9 +211,9 @@ class File
                                 $model->getId(),
                                 $ssf->getId(),
                                 $ssf->getBasename(),
-                                Turnitin\Model::STATUS_SETUP_LOADED
+                                Turnitin\Model::STATUS_TRANSMIT_LOADED
                             ),
-                            Turnitin\Model::STATUS_SETUP_LOADED
+                            Turnitin\Model::STATUS_TRANSMIT_LOADED
                         );
                     }
 
@@ -320,9 +320,9 @@ class File
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
-                Turnitin\Model::STATUS_SETUP_GROUP
+                Turnitin\Model::STATUS_TRANSMIT_GROUP
             ),
-            Turnitin\Model::STATUS_SETUP_GROUP
+            Turnitin\Model::STATUS_TRANSMIT_GROUP
         );
 
         /* The box has to exist (i.e. not deleted)
@@ -389,9 +389,9 @@ class File
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
-                Turnitin\Model::STATUS_SETUP_SUBMISSION
+                Turnitin\Model::STATUS_TRANSMIT_SUBMISSION
             ),
-            Turnitin\Model::STATUS_SETUP_SUBMISSION
+            Turnitin\Model::STATUS_TRANSMIT_SUBMISSION
         );
 
         /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
@@ -483,9 +483,9 @@ class File
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
-                Turnitin\Model::STATUS_SETUP_UPLOADING
+                Turnitin\Model::STATUS_TRANSMIT_UPLOADING
             ),
-            Turnitin\Model::STATUS_SETUP_UPLOADING
+            Turnitin\Model::STATUS_TRANSMIT_UPLOADING
         );
 
         $payload = [

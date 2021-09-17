@@ -65,7 +65,7 @@ class Mapper extends \Schoolbox\Mapper
         $now = \Alaress_Date_Format::now();
 
         $model = $this->createModel()
-            ->setStatus(Model::STATUS_SETUP_PENDING)
+            ->setStatus(Model::STATUS_TRANSMIT_PENDING)
             ->setStudentSubmissionFileId($file->getId())
             ->setCreatedAt($now)
             ->setUpdatedAt($now);

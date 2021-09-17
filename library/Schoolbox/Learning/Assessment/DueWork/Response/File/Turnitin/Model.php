@@ -38,25 +38,25 @@ class Model implements ISoftDeletable
     /* We saved a student's submission in schoolbox and set up the turnitin record
      * in the instance, but we haven't told turnitin about this document yet.
      */
-    public const STATUS_SETUP_PENDING = 'pending';
+    public const STATUS_TRANSMIT_PENDING = 'pending';
 
     /* We started setting up a turnitin Group ("submission box") or found an existing
      * one to use, which is th same thing really
      */
-    public const STATUS_SETUP_GROUP = 'group';
+    public const STATUS_TRANSMIT_GROUP = 'group';
 
     /* We started setting up a turnitin Submission which is a container for student's
      * file contents which is sent separately
      */
-    public const STATUS_SETUP_SUBMISSION = 'submission';
+    public const STATUS_TRANSMIT_SUBMISSION = 'submission';
 
     /* We started sending the student's file contents to turnitin
      */
-    public const STATUS_SETUP_UPLOADING = 'uploading';
+    public const STATUS_TRANSMIT_UPLOADING = 'uploading';
 
     /* Transmission ended; now awaiting the next phase to begin
      */
-    public const STATUS_SETUP_LOADED = 'loaded';
+    public const STATUS_TRANSMIT_LOADED = 'loaded';
 
     /* Upload was processed by turnitin and now ready for report generation
      */
@@ -149,10 +149,10 @@ class Model implements ISoftDeletable
     public function isProcessing(): bool
     {
         return \in_array($this->getStatus(), [
-            self::STATUS_SETUP_GROUP,
-            self::STATUS_SETUP_SUBMISSION,
-            self::STATUS_SETUP_UPLOADING,
-            self::STATUS_SETUP_LOADED,
+            self::STATUS_TRANSMIT_GROUP,
+            self::STATUS_TRANSMIT_SUBMISSION,
+            self::STATUS_TRANSMIT_UPLOADING,
+            self::STATUS_TRANSMIT_LOADED,
             self::STATUS_REPORT_ANALYSING
         ]);
     }
@@ -176,7 +176,7 @@ class Model implements ISoftDeletable
      */
     public function isPending(): bool
     {
-        return self::STATUS_SETUP_PENDING === $this->getStatus();
+        return self::STATUS_TRANSMIT_PENDING === $this->getStatus();
     }
 
 
