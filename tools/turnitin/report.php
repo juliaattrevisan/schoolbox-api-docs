@@ -94,12 +94,13 @@ This tool can be used in conjunction with transmit.php to manually complete the 
 process, in case their webhooks fail or if you just want to do it by hand.
 
 1. An upload finished being sent to turnitin; you start here ("loaded")
-2. Turnitin finishes processing the upload and generating the report; some sub-steps occur
-3. Report finished and we cache some report data locally ("completed")
+2. Turnitin finishes processing the upload and is ready for report to be scheduled ("prepared")
+3. Report scheduling succeeds and you're now waiting for report to generate ("analysing")
+4. Report finished and we cached some report data locally ("complete")
 
 You can optionally specify a report id to just affect that report alone, in case you need
 to fix a single report but not any others. The report id is the primary key of turnitin_report
-and its report status must be "loaded" for it to be found.
+and its report status must be one of "loaded", "prepared" or "analysing" for it to be found.
 
 Usage: report.php [--instance=INSTANCE_ID] [--report=1234]
 
