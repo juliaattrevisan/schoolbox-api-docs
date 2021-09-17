@@ -331,9 +331,9 @@ class Report
                 'Report %s: requesting Similarity Report for Turnitin submission %s; setting status to %s',
                 $model->getId(),
                 $model->getTurnitinSubmissionId(),
-                Turnitin\Model::STATUS_REPORT_PREPARED
+                Turnitin\Model::STATUS_REPORT_ANALYSING
             ),
-            Turnitin\Model::STATUS_REPORT_PREPARED
+            Turnitin\Model::STATUS_REPORT_ANALYSING
         );
 
         /* These use the default search repositories for now
