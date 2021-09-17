@@ -46,13 +46,40 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --instance
+     * --instance=...
      */
     private const OPT_LONG_INSTANCE = 'instance:';
 
 
     /**
-     * --report
+     * --force
+     *
+     * Optionally force retransmission of all reports in status Pending, Group, Submission
+     * since having a report sitting in this state for more than a few minutes is sign of a
+     * stalled process. The Group and Submission states aren't really meant to be experienced
+     * by humans, so if you see it, something is going wrong.
+     *
+     * It also doesn't seem to hurt, doing these steps again. The outcome seems the same.
+     * You could experience edge cases where a report will be in Group or Submission status
+     * normally, but get reprocessed forcibly anyway.
+     *
+     * Example scenario:
+     * A network timeout will cause a process to halt in one of these states, and there won't
+     * be an error message. You just have to know that you need to retransmit it, but you
+     * can't distinguish this from another report that is in that state naturally and normally.
+     * This can happen when new reports are made at the time a cron transmit.php happens to run.
+     * This would be a problem regardless of how many status changes you recorded.
+     *
+     * Example scenario:
+     * The backup to turnitin webhooks, a cron task, always grabs any laggards and forcibly
+     * sends them up, assuming anything in Pending, Group, Submission status should really be
+     * pushed onwards immediately.
+     */
+    private const OPT_LONG_FORCE_PUSH = 'force';
+
+
+    /**
+     * --report=...
      *
      * Choose a particular turnitin_report to affect
      */
@@ -79,7 +106,8 @@ $app = new class extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
-            self::OPT_LONG_REPORT_ID
+            self::OPT_LONG_REPORT_ID,
+            self::OPT_LONG_FORCE_PUSH
         ];
     }
 
@@ -111,7 +139,10 @@ You can optionally specify a report id to just affect that report alone, in case
 to fix a single report but not any others. The report id is the primary key of turnitin_report
 and its report status must be "pending" for it to be found.
 
-Usage: transmit.php [--instance=INSTANCE_ID] [--report=1234]
+You can optionally force retransmission of Pending, Group and Submission statuses by using
+the --force flag. Anything in those statuses will be forcibly re-sent to turnitin.
+
+Usage: transmit.php [--instance=INSTANCE_ID] [--report=1234] [--force]
 
 ----
 
@@ -142,12 +173,43 @@ HELP;
             /* Find all the records to process in a synonymous data struct
              */
             if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
-                $models = Turnitin\Mapper::getInstance()->findByColumnList([
-                    'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
-                    'status' => Turnitin\Model::STATUS_SETUP_PENDING
-                ]);
+                /* Optionally:
+                 * Forcibly retransmit everything in Pending, Group, Submission
+                 * regardless of whether they're in those states normally; used
+                 * to recommence a stalled or broken process, but you might also
+                 * reprocess something that's in this state naturally
+                 */
+                if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
+                    $models = Turnitin\Mapper::getInstance()->findByColumnList([
+                        'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
+                        'status' => [
+                            Turnitin\Model::STATUS_SETUP_PENDING,
+                            Turnitin\Model::STATUS_SETUP_GROUP,
+                            Turnitin\Model::STATUS_SETUP_SUBMISSION,
+                        ]
+                    ]);
+                } else {
+                    $models = Turnitin\Mapper::getInstance()->findByColumnList([
+                        'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
+                        'status' => Turnitin\Model::STATUS_SETUP_PENDING
+                    ]);
+                }
             } else {
-                $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+                /* Optionally:
+                 * Forcibly retransmit everything in Pending, Group, Submission
+                 * regardless of whether they're in those states normally; used
+                 * to recommence a stalled or broken process, but you might also
+                 * reprocess something that's in this state naturally
+                 */
+                if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
+                    $models = Turnitin\Mapper::getInstance()->findByColumn('status', [
+                        Turnitin\Model::STATUS_SETUP_PENDING,
+                        Turnitin\Model::STATUS_SETUP_GROUP,
+                        Turnitin\Model::STATUS_SETUP_SUBMISSION,
+                    ]);
+                } else {
+                    $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_PENDING);
+                }
             }
 
             /* Leave immediately when nothing to do
