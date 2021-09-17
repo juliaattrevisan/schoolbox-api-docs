@@ -224,10 +224,16 @@ HELP;
         if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
             $models = Turnitin\Mapper::getInstance()->findByColumnList([
                 'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
-                'status' => Turnitin\Model::STATUS_REPORT_PREPARED
+                'status' => [
+                    Turnitin\Model::STATUS_REPORT_PREPARED,
+                    Turnitin\Model::STATUS_REPORT_ANALYSING
+                ]
             ]);
         } else {
-            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_REPORT_PREPARED);
+            $models = Turnitin\Mapper::getInstance()->findByColumn('status', [
+                Turnitin\Model::STATUS_REPORT_PREPARED,
+                Turnitin\Model::STATUS_REPORT_ANALYSING
+            ]);
         }
 
         /* Leave immediately when nothing to do
