@@ -249,9 +249,17 @@ class File
     {
         $this->logDebug($message);
 
-        /* Actually change the state
+        /* Clear error messages from previously-successful stages
+         * because they are no longer relevant; this allows us to
+         * distinguish status states being set in a normal processing
+         * or whether something died -whilst- in that state, giving
+         * support a diagnosis and resolution option
          */
-        $this->turnitinMapper->save($model->setStatus($status));
+        $model->setErrorCode(null)
+            ->setErrorMessage(null)
+            ->setStatus($status);
+
+        $this->turnitinMapper->save($model);
     }
 
 
