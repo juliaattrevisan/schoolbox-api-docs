@@ -120,7 +120,7 @@ export default {
 <template>
     <li class="awards student">
         <div class="small-12 medium-1 column">
-            <p>Checkbox</p>
+            <input id="checkbox1" type="checkbox"><label for="checkbox1">Checkbox 1</label>
         </div>
         <div class="small-12 medium-1 column">
             <a :href="`/search/user/${student.id}`">
