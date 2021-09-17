@@ -340,6 +340,9 @@ class Report
          * TODO We can refine these search repos later
          */
         $payload = [
+            'indexing_settings' => [
+                'add_to_index' => true
+            ],
             'generation_settings' => [
                 'search_repositories' => [
                     'INTERNET',
@@ -348,7 +351,8 @@ class Report
                     'CROSSREF',
                     'CROSSREF_POSTED_CONTENT'
                 ],
-            ]
+            ],
+            'auto_exclude_self_matching_scope' => 'ALL'
         ];
 
         $result = $this->api->retrieve('PUT', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", $payload);
