@@ -245,17 +245,18 @@ class Manager
     /**
      * Sanitize file prior to storing.
      *
-     * @param Model  $storage    The storage object for the file: required so
+     * @param Model $storage     The storage object for the file: required so
      *                           that the sanitizer knows how to sanitise the
      *                           file.
-     * @param bool   $dryRun     If true: don't actually sanitize: just return
+     * @param bool  $dryRun      If true: don't actually sanitize: just return
      *                           whether it would have been.
      * @return bool
+     * @throws FileNotFoundException
      */
-    public function sanitize(Model &$storage, bool $dryRun = false): bool
+    public function sanitize(Model $storage, bool $dryRun = false): bool
     {
         $fileSystem = $storage->getFilesystem();
-        $path = $storage->getPath();
+        $path       = $storage->getPath();
 
         if (!$this->sanitizer->accepts($storage->getMime())) {
             return false;
@@ -273,8 +274,9 @@ class Manager
             return true;
         }
         // update storage to match sanitized content
-        $storage->setHash(sha1($sanitizedContent));
-        return $fileSystem->put($storage->getPath(), $sanitizedContent);
+        $result = $fileSystem->put($storage->getPath(), $sanitizedContent);
+        $storage->setHash((new HashGenerator())->generateHash($fileSystem->readStream($storage->getPath())));
+        return $result;
     }
 
     /**
