@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Api as TurnitinApi;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process\Report;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -590,12 +591,18 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
 
+        /* Choose a viewer permission set based on your role
+         * Staff members get a different set than students or parents
+         */
+        $viewerPermissionSet = $this->getUser()->getRole()->isStaff() ? Report::VIEWER_PERMISSION_SET_STAFF : Report::VIEWER_PERMISSION_SET_STUDENT;
+
         /* TODO Apparently localisation is a thing, set via locale tuple;
          *  but I have assumed en for now
          */
         $viewerUrl = $api->retrieve('POST', "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url", [
             'viewer_user_id' => $this->getUser()->getId(),
-            'locale' => 'en'
+            'locale' => 'en',
+            'viewer_default_permission_set' => $viewerPermissionSet
         ]);
 
         if (null !== $viewerUrl) {

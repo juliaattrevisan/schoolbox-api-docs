@@ -22,6 +22,14 @@ class Report
 {
 
     /**
+     * Choose a viewer permission set based on your role
+     * Staff members get a different set than students or parents
+     */
+    public const VIEWER_PERMISSION_SET_STAFF = 'INSTRUCTOR';
+    public const VIEWER_PERMISSION_SET_STUDENT = 'LEARNER';
+
+
+    /**
      * Status string from turnitin once it's finished processing our upload
      */
     private const UPLOAD_COMPLETE = 'COMPLETE';
