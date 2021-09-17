@@ -8,20 +8,16 @@
 
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
-import axios from 'axios';
+import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
 import dayjs from 'dayjs';
-import { ResizeObserver } from 'vue-resize';
-import 'vue-resize/dist/vue-resize.css';
 import { mixinFooterUI } from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
 
-    name: 'stale-users-report',
-
     components: {
         Toast,
         RevealModal,
-        ResizeObserver
+        BottomDrawer
     },
 
     mixins: [
@@ -141,7 +137,6 @@ export default {
 
     mounted () {
         this.initShiftKeyDetection();
-        this.initSelectContainer();
         this.loadRows();
     },
 
@@ -149,7 +144,6 @@ export default {
 
         /**
          * to hide a UI note informing of shift-selection once pressed once
-         *
          */
         initShiftKeyDetection () {
             document.addEventListener('keydown', (event) => {
@@ -165,47 +159,14 @@ export default {
         },
 
         /**
-         * To keep the select container the same size as the table
-         *
-         */
-        initSelectContainer () {
-            this.selectContainer = document.querySelector('[data-select-container]');
-        },
-
-        /**
-         * To keep the width of the selected-action-container the same as the parent container
-         * which will change depending on whether the side menu is opened/closed
-         *
-         * @returns { width, height }
-         */
-        onContainerResize (dimensions) {
-            this.selectContainer.style.width = (dimensions.width) + 'px';
-            if (this.$refs.table) { //won't exist at startup, as the data isn't loaded
-                this.updateSelectContainerXPos();
-            }
-        },
-
-        /**
-         * To move the fixed position select container in line with opened/closed pinned menus
-         *
-         */
-        updateSelectContainerXPos () {
-            const xPos = this.$refs.table.$el.getBoundingClientRect().x;
-            this.selectContainer.style.left = xPos + 'px';
-        },
-
-        /**
          * load the stale users for display
-         *
          */
         async loadRows () {
             try {
-                const response = await axios.get(this.src);
-                this.rows = response.data;
+                const response = await fetch(this.src);
+                const responseData = await response.json();
+                this.rows = responseData;
                 this.hasRowsLoaded = true;
-                this.$nextTick(() => {
-                    this.updateSelectContainerXPos();
-                });
             } catch (error) {
                 this.hasLoadError = true; //display error note in the DOM
             }
@@ -213,7 +174,6 @@ export default {
 
         /**
          * To update the table to show the UI in the footer
-         * 
          */
         onLoaded () {
             this.$nextTick(() => this.$_footerUI_update());
@@ -221,7 +181,6 @@ export default {
 
         /**
          * to keep track of selected rows
-         *
          */
         onRowSelected (event) {
             this.selectedRows = event;
@@ -232,7 +191,6 @@ export default {
 
         /**
          * To confirm/cancel selected users deletion
-         *
          */
         onDeleteUsersSelected () {
             this.$refs.deleteModal.open();
@@ -245,7 +203,10 @@ export default {
         async onConfirmDeleteUsersSelected () {
             this.$refs.toast.activate('Deleting...');
             try {
-                await axios.post(this.action, this.getFormData());
+                await fetch(this.action, {
+                    method: 'POST', 
+                    body: this.getFormData()
+                });
                 this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
                 this.rows = this.getUpdatedRowsAfterUserDeletion();
@@ -286,7 +247,6 @@ export default {
 
         /**
          * clear the selection after deletion
-         *
          */
         clearRows () {
             this.selectedRows = [];
@@ -294,7 +254,6 @@ export default {
 
         /**
          * Cancel the the selected users deletion
-         *
          */
         onCancelDeleteUsersSelected () {
             this.$refs.deleteModal.close();
@@ -302,7 +261,6 @@ export default {
 
         /**
          * To confirm/cancel selected users deletion
-         *
          */
         onClearUsersToSelected () {
             this.clearRows();
@@ -322,8 +280,6 @@ export default {
         <div v-else-if="!hasRowsLoaded && hasLoadError" data-alert class="alert-box alert">Sorry, we are currently unable to
             load the Stale Users Report.
         </div>
-
-        <resize-observer @notify="onContainerResize"/>
 
         <v-client-table 
             v-if="hasRowsLoaded"
@@ -356,16 +312,12 @@ export default {
             </ul>
         </reveal-modal>
 
-        <transition name="slide">
-            <div v-show="selectedRowsCount > 0" class="selected-action-container" data-select-container>
-                <section class="content">
-                    <h3><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
-                    <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
-                    <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
-                    <button @click.prevent="onDeleteUsersSelected" class="button submit">Delete Users</button>
-                </section>
-            </div>
-        </transition>
+        <bottom-drawer :showDrawer="selectedRowsCount > 0">
+            <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
+            <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
+            <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
+            <button @click.prevent="onDeleteUsersSelected" class="button submit button-delete">Delete Users</button>
+        </bottom-drawer>
 
     </div>
 </template>
@@ -373,6 +325,35 @@ export default {
 <style lang="scss">
 
 @import '@vue/components/vueTables2/vueTables2';
-@import 'staleUsersReport';
+
+#stale-users-report {
+    position: relative;
+}
+
+.VueTables--client {
+    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
+}
+
+.selected-count {
+    margin-right: 1rem;
+}
+
+.button-clear, .button-delete, .selected-count {
+    display: inline-block;
+}
+
+.shift-select-note {
+    color: #9a9a9a;
+    margin-right: 1rem;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.button-clear {
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
+}
 
 </style>
