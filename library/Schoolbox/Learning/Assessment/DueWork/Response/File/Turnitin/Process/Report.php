@@ -82,8 +82,9 @@ class Report
 
 
     /**
-     * For the given Turnitin instance, go fetch its report info
-     * and remember some of the results for performance reasons
+     * For the given Turnitin instance, get its state from Loaded
+     * to Prepared, which means we need to check when Turnitin finished
+     * processing our upload before we can schedule a report generation
      *
      * @param Turnitin\Model $model
      * @return void
@@ -94,42 +95,59 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function process(Turnitin\Model $model): void
+    public function processLoadedReports(Turnitin\Model $model): void
     {
         try {
             $uploadInfo = $this->getUploadInfo($model);
-
-            if (null !== $uploadInfo) {
-                $reportInfo = $this->getReportInfo($model);
-
-                /* If we got report data, cache some of it locally
-                 * then clear away all previous errors I suppose,
-                 * since they no longer have meaning...but is this wise?
-                 */
-                if (null !== $reportInfo) {
-                    $this->changeState(
-                        $model,
-                        sprintf(
-                            'Report %s: generation completed. Overall Match Percentage is %s; setting status to %s',
-                            $model->getId(),
-                            $reportInfo['overall_match_percentage'],
-                            Turnitin\Model::STATUS_COMPLETE
-                        ),
-                        Turnitin\Model::STATUS_COMPLETE
-                    );
-
-                    $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
-                        ->setStatus(Turnitin\Model::STATUS_COMPLETE)
-                        ->setErrorCode(null)
-                        ->setErrorMessage(null);
-
-                    $this->turnitinMapper->save($model);
-                }
-            }
         } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($e->getMessage()));
+        }
+    }
+
+
+    /**
+     * Schedule a prepared Turnitin report for actual creation
+     * Upon finishing the creation, save the answers for later
+     *
+     * @param Turnitin\Model $model
+     * @throws Turnitin\Exception\BadEndpoint
+     * @throws Turnitin\Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function processPreparedReports(Turnitin\Model $model): void
+    {
+        $reportInfo = $this->getReportInfo($model);
+
+        /* If we got report data, cache some of it locally
+         * then clear away all previous errors I suppose,
+         * since they no longer have meaning...but is this wise?
+         */
+        if (null !== $reportInfo) {
+            $this->changeState(
+                $model,
+                sprintf(
+                    'Report %s: generation completed. Overall Match Percentage is %s; setting status to %s',
+                    $model->getId(),
+                    $reportInfo['overall_match_percentage'],
+                    Turnitin\Model::STATUS_COMPLETE
+                ),
+                Turnitin\Model::STATUS_COMPLETE
+            );
+
+            $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
+                ->setStatus(Turnitin\Model::STATUS_COMPLETE)
+                ->setErrorCode(null)
+                ->setErrorMessage(null);
+
+            $this->turnitinMapper->save($model);
         }
     }
 

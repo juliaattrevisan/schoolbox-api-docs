@@ -129,31 +129,6 @@ HELP;
         }
 
         if ($acquired) {
-            /* Find all the records to process in a synonymous data struct
-             */
-            if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
-                $models = Turnitin\Mapper::getInstance()->findByColumnList([
-                    'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
-                    'status' => Turnitin\Model::STATUS_SETUP_LOADED
-                ]);
-            } else {
-                $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_LOADED);
-            }
-
-            /* Leave immediately when nothing to do
-             */
-            if (!$models->count()) {
-                $this->getLogger()->info('There are no loaded Turnitin reports; nothing to do');
-                exit();
-            }
-
-            /* Otherwise keep going
-             */
-            $this->getLogger()->info(sprintf(
-                'Asking Turnitin for %s Turnitin reports',
-                $models->count()
-            ));
-
             /* We need this api
              */
             $api = new Turnitin\Api(
@@ -170,11 +145,17 @@ HELP;
                 $this->getLogger()
             ));
 
-            /* Shank them all down
+            /* Start kicking things along
+             *
+             * Loaded reports get shoved toward Prepared
+             * Prepared reports get shoved toward Complete
+             *
+             * Both those stages finish whenever turnitin is done
+             * so we have to ask it to finish both stages independently
+             * of each other
              */
-            foreach ($models as $model) {
-                $processor->process($model);
-            }
+            $this->processLoadedReports($processor);
+            $this->processPreparedReports($processor);
 
             $this->getLogger()->info('Done.');
 
@@ -187,6 +168,88 @@ HELP;
         }
     }
 
+
+    /**
+     * Find all the reports that were loaded and move them into Prepared, meaning
+     * we have told turnitin to schedule a report generation
+     *
+     * @param Turnitin\Process\Report $processor
+     */
+    private function processLoadedReports(Turnitin\Process\Report $processor): void
+    {
+        /* Find all the records to process in a synonymous data struct
+         */
+        if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
+            $models = Turnitin\Mapper::getInstance()->findByColumnList([
+                'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
+                'status' => Turnitin\Model::STATUS_SETUP_LOADED
+            ]);
+        } else {
+            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_SETUP_LOADED);
+        }
+
+        /* Leave immediately when nothing to do
+         */
+        if (!$models->count()) {
+            $this->getLogger()->info('There are no loaded Turnitin reports; nothing to do');
+            return;
+        }
+
+        /* Otherwise keep going
+         */
+        $this->getLogger()->info(sprintf(
+            'Asking Turnitin for %s loaded Turnitin reports',
+            $models->count()
+        ));
+
+        /* Shank them all down
+         */
+        foreach ($models as $model) {
+            $processor->processLoadedReports($model);
+        }
+    }
+
+
+    /**
+     * Find all the reports that are currently in Prepared (meaning they're ready to
+     * be generated) and see when they reach Complete, at which point we remember
+     * the answers
+     *
+     * @param Turnitin\Process\Report $processor
+     */
+    private function processPreparedReports(Turnitin\Process\Report $processor): void
+    {
+        /* Find all the records to process in a synonymous data struct
+         */
+        if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
+            $models = Turnitin\Mapper::getInstance()->findByColumnList([
+                'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
+                'status' => Turnitin\Model::STATUS_REPORT_PREPARED
+            ]);
+        } else {
+            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_REPORT_PREPARED);
+        }
+
+        /* Leave immediately when nothing to do
+         */
+        if (!$models->count()) {
+            $this->getLogger()->info('There are no prepared Turnitin reports; nothing to do');
+            return;
+        }
+
+        /* Otherwise keep going
+         */
+        $this->getLogger()->info(sprintf(
+            'Asking Turnitin for %s prepared Turnitin reports',
+            $models->count()
+        ));
+
+        /* Shank them all down
+         */
+        foreach ($models as $model) {
+            $processor->processPreparedReports($model);
+        }
+    }
 
     /**
      * FIXME Decide whether this script must be run as root
