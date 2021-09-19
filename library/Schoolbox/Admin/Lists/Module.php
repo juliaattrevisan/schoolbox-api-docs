@@ -12,7 +12,6 @@ namespace Schoolbox\Admin\Lists;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
@@ -30,6 +29,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
         $this->addGetRoute($router, 'getIndex', $basePath, "{/table}");
+        $this->addGetRoute($router, 'getData', $basePath, "/data{/table}");
         $this->addPostRoute($router, 'postSave', $basePath, "/save");
         $this->addPostRoute($router, 'postDelete', $basePath, "/delete");
     }

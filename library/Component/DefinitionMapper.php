@@ -35,7 +35,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         $this->uses('module', self::TYPE_STRING);
         $this->uses('config_copy', self::TYPE_STRING);
         $this->uses('enabled', self::TYPE_BOOLEAN);
-        $this->uses('visible', self::TYPE_STRING);
+        $this->uses('visible', self::TYPE_BOOLEAN);
         $this->uses('multiple', self::TYPE_STRING);
         $this->uses('component_category', self::TYPE_STRING);
         $this->joins('msg_namespace_slug', NSMapper::class, 'slug', null, null, 'namespace', 'namespace');

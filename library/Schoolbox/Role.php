@@ -41,52 +41,52 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     /**
      * @var bool Users can view student profile (for staff)
      */
-    private bool $viewStudentProfile;
+    private bool $viewStudentProfile = false;
 
     /**
      * @var bool Users can view student grade (for staff)
      */
-    private bool $viewStudentGrades;
+    private bool $viewStudentGrades = false;
 
     /**
      * @var bool Users can view student calendar (for staff)
      */
-    private bool $viewStudentCalendar;
+    private bool $viewStudentCalendar = false;
 
     /**
      * @var bool Users can view parent profile (for staff)
      */
-    private bool $viewParentProfile;
+    private bool $viewParentProfile = false;
 
     /**
      * @var bool Users can access eportfolio (for staff)
      */
-    private bool $accessEportfolio;
+    private bool $accessEportfolio = false;
 
     /**
      * @var bool Users can access pastoral (for staff)
      */
-    private bool $accessPastoral;
+    private bool $accessPastoral = false;
 
     /**
      * @var bool Users can create badges (for staff)
      */
-    private bool $createBadges;
+    private bool $createBadges = false;
 
     /**
      * @var bool Users can create evidence (for staff)
      */
-    private bool $accessEvidence;
+    private bool $accessEvidence = false;
 
     /**
      * @var bool Users can view parent directory (for staff)
      */
-    private bool $viewParentDirectory;
+    private bool $viewParentDirectory = false;
 
     /**
      * @var bool Users can view staff directory (for staff)
      */
-    private bool $viewStaffDirectory;
+    private bool $viewStaffDirectory = false;
 
     /**
      * What's the digest schedule for this group?
@@ -94,7 +94,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
      *
      * @var string|null
      */
-    protected ?string $digestSchedule;
+    protected ?string $digestSchedule = self::DIGEST_NEVER;
 
     /**
      * Role Types

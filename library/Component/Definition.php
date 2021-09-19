@@ -31,10 +31,10 @@ class Component_Definition
     /** @var string $module */
     protected $module;
 
-    /** @var boolean $visible */
+    /** @var bool $enabled */
     protected $enabled;
 
-    /** @var string $visible */
+    /** @var bool $visible */
     protected $visible;
 
     /** @var string $multiple */
@@ -303,7 +303,7 @@ class Component_Definition
     }
 
     /**
-     * @return string
+     * @return bool
      */
     public function getVisible()
     {
@@ -311,7 +311,7 @@ class Component_Definition
     }
 
     /**
-     * @param string $visible
+     * @param bool $visible
      * @return self
      */
     public function setVisible($visible)

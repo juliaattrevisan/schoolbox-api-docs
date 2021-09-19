@@ -1,0 +1,196 @@
+<script>
+
+/**
+ * Display an indivudal row, providing access to view and edit permissions and delete
+ */
+
+import { mapState, mapGetters } from 'vuex';
+import AdminListRowLookup from './admin-list-row-lookup';
+import AdminListRowColour from './admin-list-row-colour';
+import AdminListRowPopOut from './admin-list-row-pop-out';
+import { DELETE_ROW_PROMPT } from '../store/adminListMutationTypes';
+
+export default {
+
+    components: {
+        AdminListRowLookup,
+        AdminListRowColour,
+        AdminListRowPopOut,
+    },
+
+    props: {
+        row: { //row to display
+            type: Object,
+            required: true
+        },
+    },
+
+    computed: {
+
+        ...mapState({
+            isSortable: state => state.loadedData.isSortable,
+            canDelete: state => state.loadedData.canDelete,
+            selectedRow: state => state.selectedRow,
+            isPopOutOpen: state => state.isPopOutOpen,
+            selectedPopOutName: state => state.selectedPopOutName,
+        }),
+
+        ...mapGetters([
+            'headerFields', //the headerFields to display within the list item
+            'popOutHeaderField', //the title field of the pop out
+            'popOutFields', //when a #admin-list-pop-out.vue is in use
+        ]),
+
+        /**
+         * To retrieve a list of key/value pairs contained within the row object
+         *
+         * @returns { Array of Objects }
+         */
+        rowKeyValueList () {
+            const rowKeyValueList = [];
+            for (const [key, value] of Object.entries(this.row)) {
+                rowKeyValueList.push({ key: key, value: value });
+            }
+            return rowKeyValueList;
+        },
+
+        /**
+         * To vary the display whether selected or not
+         *
+         * @returns { Boolean }
+         */
+        isUnselectedRow () {
+            return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
+        },
+
+        message: {
+            get () {
+                return this.$store.state.obj.message
+            },
+            set (value) {
+                this.$store.commit('updateMessage', value)
+            }
+        }
+
+    },
+
+    methods: {
+
+        /**
+         * To confirm whether should delete the row
+         */
+        onDeleteRowSelected () {
+            this.$store.commit(DELETE_ROW_PROMPT, this.row);
+        }
+
+    }
+
+}
+</script>
+
+<template>
+
+    <li :class="[ isUnselectedRow ? 'un-selected-row' : '', 'list-item-container' ]" :data-row-id="row.id">
+
+        <div :class="`actions-small-${ canDelete ? '1' : '0' }`">
+
+            <div v-if="isSortable" class="grip ui-sortable-handle"></div>
+
+            <div class="list-item">
+                <template v-for="(field, index) in headerFields">
+                    <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
+                       
+                        <span class="hide-for-medium-up">{{ field.caption }}</span>
+                        
+                        <template v-if="field.readonly">
+                            <p>{{ row[field.id] }}</p>
+                        </template>
+
+                        <template v-else-if="field.checkbox">
+                            <div class="checklist">
+                                <input 
+                                    :id="`${row.id}-${field.caption}`"
+                                    type="checkbox"
+                                    v-model="row[field.id]"
+                                />
+                                <label :for="`${row.id}-${field.caption}`"></label>
+                            </div>
+                        </template>
+
+                        <template v-else-if="field.lookup">
+                            <admin-list-row-lookup
+                                :field="field"
+                                :row="row"
+                            />
+                        </template>
+
+                        <template v-else-if="field.colour">
+                            <admin-list-row-colour
+                                :caption="field.caption"
+                                :colour="row[field.id]"
+                                @input="row[field.id] = $event"
+                            />
+                        </template>
+
+                        <template v-else-if="field.isPopOutList">
+                            <admin-list-row-pop-out
+                                :row="row"
+                            />
+                        </template>
+
+                        <template v-else>
+                            <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
+                        </template>
+
+                        <!-- <template v-if="field.nullable">
+                            <div class="checklist">
+                                <input 
+                                    :id="`${row.id}-${field.caption}`"
+                                    v-model="row[field.id]"
+                                    type="checkbox"
+                                />
+                                <label :for="`${row.id}-${field.caption}`">
+                                    {{ field.nullable_label }}
+                                </label>
+                            </div>
+                        </template> -->
+                        
+                    </div>
+                </template>
+            </div><!-- .list-item -->
+
+            <nav v-if="canDelete">
+                <a @click.prevent="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
+            </nav>
+
+        </div>
+
+    </li>
+
+</template>
+
+<style lang="scss" scoped>
+
+@import 'www/static/css/foundation/utils/_variables.scss';
+
+.field {
+    @media screen and (max-width: 1500px) {
+        padding: 0px 0.5rem;
+    }
+}
+
+.list-item-container {
+    transition: opacity 0.3s ease-out;
+}
+
+.un-selected-row {
+    opacity: 0.2;
+}
+
+.delete-row-button {
+    width: 40px;
+    height: 40px;
+    margin: 14px 8px 0px 0px;
+}
+
+</style>

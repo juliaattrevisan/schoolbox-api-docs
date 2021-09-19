@@ -44,49 +44,49 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     private $overallGrade;
 
     /** @var bool */
-    private $showOverallGrade;
+    private $showOverallGrade = false;
 
     /** @var bool */
-    private $displayGradePage;
+    private $displayGradePage = false;
 
     /**
      * Grade Page: Class Results
      * @var bool
      */
-    private $displayAssessmentGrade;
+    private $displayAssessmentGrade = false;
 
     /**
      * Grade Page: Learning Levels
      * @var bool
      */
-    private $displayRubricGrade;
+    private $displayRubricGrade = false;
 
     /**
      * Grade Page: Capability Marks
      * @var bool
      */
-    private $displayCapabilityGrade;
+    private $displayCapabilityGrade = false;
 
     /**
      * Grade Page: Progression
      * @var bool
      */
-    private $displayProgressionGrade;
+    private $displayProgressionGrade = false;
 
     /**
      * @var bool
      */
-    private $showRubricPoints;
+    private $showRubricPoints = false;
 
     /**
      * @var bool
      */
-    private $lmsCohortComparison;
+    private $lmsCohortComparison = false;
 
     /**
      * @var bool
      */
-    private $learningMomentsEnabled;
+    private $learningMomentsEnabled = false;
 
     /**
      * @return string
