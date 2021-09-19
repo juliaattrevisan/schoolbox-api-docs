@@ -2,12 +2,12 @@
     
 import axios from 'axios';
 import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
-import { mixinFooterUI } from '@vue/components/vueTables2/mixinFooterUI';
+import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
 
     mixins: [
-        mixinFooterUI //to place and keep the tables UI in the footer
+        footerUI //to place and keep the tables UI in the footer
     ],
 
     props: {

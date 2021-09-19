@@ -3,7 +3,7 @@ import axios from 'axios';
 import filesize from 'filesize';
 import RevealModal from '@vue/components/reveal-modal';
 import Toast from '@vue/components/toast';
-import { mixinFooterUI } from '@vue/components/vueTables2/mixinFooterUI';
+import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -21,7 +21,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
-        mixinFooterUI //to place and keep the tables UI in the footer
+        footerUI //to place and keep the tables UI in the footer
     ],
 
     /**

@@ -9,8 +9,9 @@
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+import axios from 'axios';
 import dayjs from 'dayjs';
-import { mixinFooterUI } from '@vue/components/vueTables2/mixinFooterUI';
+import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -21,7 +22,7 @@ export default {
     },
 
     mixins: [
-        mixinFooterUI //to place and keep the tables UI in the footer
+        footerUI //to place and keep the tables UI in the footer
     ],
 
     props: {
@@ -163,8 +164,10 @@ export default {
          */
         async loadRows () {
             try {
+                // const response = await axios.get(this.src);
                 const response = await fetch(this.src);
                 const responseData = await response.json();
+                debugger;
                 this.rows = responseData;
                 this.hasRowsLoaded = true;
             } catch (error) {
@@ -176,7 +179,7 @@ export default {
          * To update the table to show the UI in the footer
          */
         onLoaded () {
-            this.$nextTick(() => this.$_footerUI_update());
+            this.$nextTick(() => this.footerUI_update());
         },
 
         /**
@@ -203,10 +206,7 @@ export default {
         async onConfirmDeleteUsersSelected () {
             this.$refs.toast.activate('Deleting...');
             try {
-                await fetch(this.action, {
-                    method: 'POST', 
-                    body: this.getFormData()
-                });
+                await axios.post(this.action, this.getFormData());
                 this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
                 this.rows = this.getUpdatedRowsAfterUserDeletion();

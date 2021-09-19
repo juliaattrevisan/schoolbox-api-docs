@@ -6,7 +6,7 @@
  */
 
 import { stringify } from 'qs';
-import BadgeReportStudent from './badge-report-student.vue';
+import BadgeReportStudent from './badge-report-student';
 import AwardDetailModal from './award-detail-modal';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer'
 
