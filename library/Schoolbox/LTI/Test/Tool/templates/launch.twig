@@ -1,6 +1,6 @@
 <h1>LTI Test Tool</h1>
 
-<h2>Launch request received from platform</h2>
+<h2>Authenticated resource link request received from platform</h2>
 
 <h3>About the launch request</h3>
 <dl>
@@ -20,4 +20,4 @@
     <dd>{{ result.payload.userIdentity.email }}</dd>
 </dl>
 
-<a href="/lti-test/platform">Click to return to platform</a>
+<a href="{{ routeLookup('ltiTestPlatform.index') }}" class="button submit">Return to platform</a>

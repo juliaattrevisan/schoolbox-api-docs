@@ -43,7 +43,7 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiTestTool/oidcInitiationRequest.twig',
-                ['messageUrl' => $message->toUrl(),]
+                ['message' => $message,]
             )
         );
     }
