@@ -19,7 +19,9 @@ use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Test\ServerRequestFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
 use Schoolbox\LTI\Test\UserAuthenticatorFactory;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Url\Factory;
+use Schoolbox\UserMapper;
 
 /**
  * LTI test platform controller
@@ -27,12 +29,29 @@ use Schoolbox\Url\Factory;
 class Controller extends Base
 {
     /**
-     * Index for test platform.
+     * Index for test platform: displays a form which contains various claims
+     * which may be added to the resource link request.
      *
      * @api GET /lti-test/platform
      * @since 21.1.0
      */
     public function getIndex(): void
+    {
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@ltiTestPlatform/index.twig',
+                []
+            )
+        );
+    }
+
+    /**
+     * Generate a resource link request, based upon the form values passed.
+     *
+     * @api POST /lti-test/platform/generate-resource-link-request
+     * @since 21.1.0
+     */
+    public function postGenerateResourceLinkRequest(): void
     {
         // Build the registration repository
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/interfaces/#registration-repository-interface
@@ -44,6 +63,19 @@ class Controller extends Base
             $this->sendError('Registration not found');
         }
 
+        // Figure out who's trying to log in: use that to determine their role
+        $role      = null;
+        $loginHint = $this->request->post->get('loginHint');
+        if (strlen($loginHint) > 0) {
+            $user = UserMapper::getInstance()->findByUsername($loginHint);
+            if ($user) {
+                $role = $user->getRole()->isStaff()
+                    ? 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
+                    : 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner';
+            }
+        }
+        $role ??= 'http://purl.imsglobal.org/vocab/lis/v2/system/person#None';
+
         // I have a registration: I may now create a message
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#create-the-message
         $builder = new PlatformOriginatingLaunchBuilder();
@@ -51,25 +83,18 @@ class Controller extends Base
         $message = $builder->buildPlatformOriginatingLaunch(
             $registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            (clone $baseUrl)->setPath('/lti-test/tool/launch')->toString(),
-            'loginHint',
+            (clone $baseUrl)->setPath($this->request->post->get('targetLinkUri'))->toString(),
+            $loginHint,
             null,
+            [$role],
             [
-                $this->getUser()->getRole()->isStaff()
-                    ? 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
-                    : 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
-            ],
-            [
-                new ResourceLinkClaim(
-                    'test',
-                    'Test resource link',
-                ),
+                new ResourceLinkClaim('test', 'Test resource link'),
             ],
         );
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@ltiTestPlatform/index.twig',
+                '@ltiTestPlatform/generateResourceLinkRequest.twig',
                 ['messageUrl' => $message->toUrl(),]
             )
         );

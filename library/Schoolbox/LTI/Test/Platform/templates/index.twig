@@ -1,3 +1,25 @@
 <h1>LTI Test Platform</h1>
 
-<a href="{{ messageUrl }}">Click to authenticate with tool</a>
+<h2>Generate a link request</h2>
+
+<form method="post" action="{{ routeLookup('ltiTestPlatform.postGenerateResourceLinkRequest') }}">
+    <dl>
+        <dt><label for="targetLinkUri">Target Link URI</label></dt>
+        <dd><input readonly
+                   id="targetLinkUri"
+                   name="targetLinkUri"
+                   value="{{ routeLookup('ltiTestTool.getLaunch') }}"></dd>
+
+        <dt><label for="loginHint">Login Hint (a username)</label></dt>
+        <dd>
+            <select id="loginHint" name="loginHint">
+                <option value="alaress">Schoolbox Admin (superuser)</option>
+                <option value="jcoles">Jack Coles (staff)</option>
+                <option value="ereed">Eden Reed (student)</option>
+                <option>Anonymous</option>
+                <option value="x">Non-existent user</option>
+            </select>
+        </dd>
+    </dl>
+    <button type="submit">Generate resource link request</button>
+</form>

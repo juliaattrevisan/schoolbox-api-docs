@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Test\Tool;
 
-use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
@@ -29,7 +28,6 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-//        $this->register(self::METHOD_GET, '', 'getIndex', new IsLoggedIn());
         $this->register(self::METHOD_GET, '/oidc/initiation', 'getOidcInitiationRequest');
         $this->register(self::METHOD_GET, '/launch', 'getLaunch');
     }
