@@ -64,7 +64,7 @@ class UserAuthenticator implements UserAuthenticatorInterface
             return new UserAuthenticationResult(
                 true,
                 new UserIdentity(
-                    (string)$user->getId(),
+                    $user->getUsername(),
                     $user->getFullName(),
                     $user->getEmail()
                 )

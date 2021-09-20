@@ -59,11 +59,11 @@ class Controller extends Base
         };
         $staffUsers   = $this->userMapper->findByColumn('g.group_type', Role::STAFF)
                                          ->filter($excludeCurrentUser)
-                                         ->sortNaturally('fullName')
+                                         ->sortNaturally('username')
                                          ->slice(0, 5);
         $studentUsers = $this->userMapper->findByColumn('g.group_type', Role::STUDENT)
                                          ->filter($excludeCurrentUser)
-                                         ->sortNaturally('fullName')
+                                         ->sortNaturally('username')
                                          ->slice(0, 5);
         $this->response->content->set(
             $this->buildHtmlOutput(
