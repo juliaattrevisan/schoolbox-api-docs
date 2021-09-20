@@ -54,6 +54,8 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        // Show some users in a dropdown on the generate resource link launch
+        // request form.
         $excludeCurrentUser = function (User $user) {
             return $this->getUser()->getId() !== $user->getId();
         };
@@ -98,33 +100,13 @@ class Controller extends Base
             $this->sendError('Registration not found');
         }
 
-        // Figure out who's trying to log in: use that to determine their role
-        $role      = null;
-        $loginHint = $this->request->query->get('loginHint');
-        if (strlen($loginHint) > 0) {
-            $user = $this->userMapper->findByUsername($loginHint);
-            if ($user) {
-                $role = $user->getRole()->isStaff()
-                    ? 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
-                    : 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner';
-            }
-        }
-        $role ??= 'http://purl.imsglobal.org/vocab/lis/v2/system/person#None';
-
         // I have a registration: I may now create a message
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#create-the-message
-        $builder = new PlatformOriginatingLaunchBuilder();
-        $message = $builder->buildPlatformOriginatingLaunch(
-            $registration,
-            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            $this->request->query->get('targetLinkUri'),
-            $loginHint,
-            null,
-            [$role],
-            [
-                new ResourceLinkClaim('test', 'Test resource link'),
-            ],
-        );
+        $message = (new ResourceLinkRequestFactory($this->userMapper, $registration))
+            ->build(
+                $this->request->query->get('loginHint'),
+                $this->request->query->get('targetLinkUri')
+            );
 
         $this->response->content->set(
             $this->buildHtmlOutput(
