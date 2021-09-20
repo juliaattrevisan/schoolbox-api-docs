@@ -167,7 +167,6 @@ export default {
                 // const response = await axios.get(this.src);
                 const response = await fetch(this.src);
                 const responseData = await response.json();
-                debugger;
                 this.rows = responseData;
                 this.hasRowsLoaded = true;
             } catch (error) {

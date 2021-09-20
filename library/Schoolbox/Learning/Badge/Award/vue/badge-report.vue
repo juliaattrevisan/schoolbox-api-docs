@@ -8,7 +8,11 @@
 import { stringify } from 'qs';
 import BadgeReportStudent from './badge-report-student';
 import AwardDetailModal from './award-detail-modal';
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer'
+import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+import footerUI from '@vue/components/vueTables2/mixinFooterUI';
+import BadgeReportStudentName from './badge-report-student-name';
+import BadgeReportStudentBadges from './badge-report-student-badges';
+
 
 export default {
 
@@ -17,15 +21,27 @@ export default {
         AwardDetailModal,
         BottomDrawer
     },
+
+    mixins: [
+        footerUI //to place and keep the tables UI in the footer
+    ],
     
     props: {
         subjectTitle: {
             type: String,
             required: true
         },
-        getStudentListsEndpoint: {
+        getStudentListsEndpoint: { //where to get the student data from
             type: String,
             required: true
+        },
+        returnUrlName: { //Along with `encodedReturnUrl` this is used when generating a link to learning moments and badges, so that the user may be redirected somewhere after those forms are submitted.
+            type: String,
+            required: true,
+        },
+        encodedReturnUrl: { // Along with `returnUrlName` this is used when generating a link to learning moments and badges, so that the user may be redirected somewhere after those forms are submitted.
+            type: String,
+            required: true,
         },
     },
     
@@ -35,7 +51,60 @@ export default {
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
             selectedFilters: [], //to show only those badges curently filtered
-            selectedStudents: [] //list of student ids that can have badges awarded to them
+            selectedStudents: [], //list of student ids that can have badges awarded to them
+            columns: ['fullName', 'badges'],
+            options: {
+                headings: {
+                    fullName: 'Name',
+                    badges: 'Badges',
+                },
+                templates: {
+                    fullName: BadgeReportStudentName,
+                    badges: BadgeReportStudentBadges,
+                },
+                columnsClasses: {
+                    fullName: 'name-column',
+                    badges: 'badges-column',
+                },
+                orderBy: {
+                    ascending: true,
+                    column: 'fullName' //initial sorting display
+                },
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
+                selectable: {
+                    mode: 'multiple' //to enable multi-select
+                },
+                debounce: 100, //faster debouce as data is stored on the client side,
+                resizableColumns: false,
+                tabbable: false,
+                filterable: false, 
+                texts: {
+                    filterPlaceholder: 'Search for users...',
+                    noResults: 'No matching users...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
+                },
+                sortable: ['fullName'],
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
+                },
+                customSorting: {
+                    fullName: (ascending) => { //sort year level naturally
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.lastName >= b.lastName ? 1 : -1;
+                            } else {
+                                return a.lastName <= b.lastName ? 1 : -1;
+                            }
+                        }
+                    }
+                }
+            }
+            
         }
     },
 
@@ -62,7 +131,8 @@ export default {
     },
 
     mounted () {
-        document.addEventListener('badge-report__onFilterChange', this.getStudentData);
+        document.addEventListener('badge-report__onFilterChange', this.getStudentData); //the student data is ready
+        document.addEventListener('badge-report-student-badges__onBadgeSelected', this.onBadgeSelected); //a badge has been selected 
     },
 
     methods: {
@@ -85,17 +155,40 @@ export default {
         },
 
         /**
-         * To be able to award badges to multiple students
-         * 
-         * @returns { Number } 
-         * @returns { Boolean } 
+         * To update the table to show the UI in the footer
          */
-        onStudentSelected (studentID, isChecked) {
-            if (isChecked) {
-                this.selectedStudents = [...this.selectedStudents, studentID]; //add in
-            } else {
-                this.selectedStudents = this.selectedStudents.filter((selectedStudentsID) => selectedStudentsID !== studentID); //or remove
-            }
+        onLoaded () {
+            this.$nextTick(() => this.footerUI_update());
+        },
+
+        /**
+         * to keep track of selected rows
+         */
+        onRowSelected (event) {
+            this.selectedStudents = event;
+        },
+
+        /**
+         * to keep track of selected rows
+         */
+        onFiltered (event) {
+            document.dispatchEvent(new CustomEvent('badge-report__onFiltered', { detail: { event } } ) );
+        },
+
+        /**
+         * to keep track of selected rows
+         */
+        onSorted (event) {
+            document.dispatchEvent(new CustomEvent('badge-report__onSorted', { detail: { event } } ) );
+        },
+
+        /**
+         * Open the selected award detail modal
+         * 
+         * @params { Object } 
+         */
+        onBadgeSelected (event) {
+            this.$refs.awardDetailModal.open(event.detail.badge);
         },
 
         /**
@@ -103,38 +196,19 @@ export default {
          */
         onClearStudentSelection () {
             this.selectedStudents = [];
+            this.$refs.table.resetSelectedRows();
         },
 
         /**
-         * Open the selected award detail modal
-         * 
-         * @returns { Object } 
+         * Navigate to the set goal / award achievement page with the users selected
          */
-        onAwardSelected (award) {
-            this.$refs.awardDetailModal.open(award);
-        },
-
-        /**
-         * Navigate to the set goal page
-         */
-        onSetGoalSelected () {
-            
-        },
-
-        /**
-         * Navigate to the award achievement page
-         */
-        onAwardAchievementSelected () {
-            
-        },
-
-        /**
-         * Open the selected award detail modal
-         * 
-         * @returns { Object } 
-         */
-        onAwardSelected (award) {
-            this.$refs.awardDetailModal.open(award);
+        getUrl (selection) {
+            const url = new URL(window.location.href);
+            url.pathname = `learning/badge/award/user/${selection}`;
+            url.searchParams.append(this.returnUrlName, this.encodedReturnUrl);
+            const selectedStudentIDs = this.selectedStudents.map((selectedStudent) => selectedStudent.id); //just get the student ids to add
+            url.searchParams.append('userIds', selectedStudentIDs.join(','));
+            return url.toString();
         },
 
     }
@@ -144,67 +218,66 @@ export default {
 
 <template>
 
-    <div class="small-12 island">
+    <div v-if="isDataLoaded" class="small-12 island">
 
-        <section class="content">
-            
-            <div v-if="isDataLoaded">
-                <ul class="action-list">
-                    <li class="awards student">
-                        <div class="small-12 medium-1 column">
-                            <div class="checklist">
-                                <input 
-                                    id="select-all"
-                                    type="checkbox"
-                                />
-                                <label for="select-all"></label>
-                            </div>
-                        </div>
-                        <div class="small-12 medium-1 column">
-                            <h3>Name</h3>
-                        </div>
-                        <div class="small-12 medium-10 column">
-                            <h3>Badges</h3>
-                        </div>
-                    </li>
-                    <badge-report-student 
-                        v-for="student in studentData" 
-                        :key="student.id" 
-                        :student="student"
-                        :selected-students="selectedStudents"
-                        @on-student-selected="onStudentSelected"
-                        @on-award-selected="onAwardSelected"
-                    />
-                </ul>
-                <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+        <v-client-table 
+            ref="table"
+            :data="studentData" 
+            :columns="columns" 
+            :options="options" 
+            @loaded="onLoaded"
+            @select="onRowSelected"
+            @filter="onFiltered"
+            @sorted="onSorted"
+        >
+            <div slot="afterTable">
+                <div class="VueTables__table-footer" ref="tableFooter"></div>
             </div>
+        </v-client-table>
 
-            <div v-else-if="hasDataLoadError" class="alert-box alert">
-                Sorry, we are currently unable to load the student data.
+        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+
+        <bottom-drawer :showDrawer="hasSelectedStudents">
+            <h3 class="selected-count"><em>{{ selectedStudentsCount }} selected</em></h3>
+            <button @click.prevent="onClearStudentSelection" @keyup.enter="onClearStudentSelection" class="button-clear">Clear selection</button>
+            <div class="modal-actions">
+                <a :href="getUrl('goal')" title="Set goal" class="button submit icon-goal">Set goal</a>
+                <a :href="getUrl('achievement')" title="Award achievement" class="button submit icon-achievement">Award achievement</a>
             </div>
-
-            <div v-else class="loader"></div>
-
-            <bottom-drawer :showDrawer="hasSelectedStudents">
-                <h3 class="selected-count"><em>{{ selectedStudentsCount }} selected</em></h3>
-                <button @click.prevent="onClearStudentSelection" @keyup.enter="onClearStudentSelection" class="button-clear">Clear selection</button>
-                <div class="modal-actions">
-                    <button @click.prevent="onSetGoalSelected" @keyup="onSetGoalSelected" class="button submit button-delete">Set goal</button>
-                    <button @click.prevent="onAwardAchievementSelected" @keyup.enter="onAwardAchievementSelected" class="button submit button-delete">Award achievement</button>
-                </div>
-            </bottom-drawer>
-
-        </section>
+        </bottom-drawer>
 
     </div>
+
+    <div v-else-if="hasDataLoadError" class="alert-box alert">
+        Sorry, we are currently unable to load the student data.
+    </div>
+
+    <div v-else class="loader"></div>
 
 </template>
 
 <style lang="scss">
 
-// .VueTables--client {
-//     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
-// }
+@import '@vue/components/vueTables2/vueTables2';
+
+.VueTables--client {
+    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
+}
+
+.VueTables__select-row {
+    width: 40px;
+    max-width: 40px;
+}
+
+.name-column {
+    width: 250px;
+    max-width: 250px;
+}
+
+td.badges-column {
+    max-width: 0px; //@TODO look into this, this allows the badges to just fill the remaining horizontal td space, but feels pretty dodgy... 
+    padding: 1rem 0 0 0; //the side buttons and bottom design remove the need for padding, so give the extra space
+}
 
 .selected-count {
     display: inline-block;
@@ -214,7 +287,7 @@ export default {
 .modal-actions {
 	display: flex;
     margin-bottom: 1rem;
-	button {
+	a {
 		margin: 0 2px;
 	}
 }

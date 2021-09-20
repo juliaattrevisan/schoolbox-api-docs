@@ -30,18 +30,27 @@ export default {
         }
     },
 
+    mounted () {
+        this.updatePosition();
+    },
+
     methods: {
+
+        /**
+         * Any changes to the element size are tracked by ResizeObserver so can update dimensions
+         */
+        onContainerResize () {
+            this.updatePosition();
+        },
 
         /**
          * To keep the width and left position of the bottom-drawer the same as the parent container
          * which will change depending on whether the side menu is opened/closed, browser resized etc
-         *
-         * @returns { width, height }
          */
-        onContainerResize (dimensions) {
-            this.width = dimensions.width + 'px';
+        updatePosition () {
+            this.width = this.$el.getBoundingClientRect().width + 'px';
             this.left = this.$el.getBoundingClientRect().x + 'px';
-        },
+        }
 
     }
 
@@ -54,9 +63,7 @@ export default {
         <resize-observer @notify="onContainerResize"/>
         <transition name="slide">
             <div v-show="showDrawer" class="bottom-drawer-container" :style="{ width: width, left: left }">
-                <section class="content">
-                    <slot></slot>
-                </section>
+                <slot></slot>
             </div>
         </transition>
     </div>

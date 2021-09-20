@@ -43,16 +43,16 @@ export default {
 
     watch: {
 
-        student: {
-            deep: true,
-            handler (newStudentData, oldStudentData) {
-                if (newStudentData?.awards?.length !== oldStudentData?.awards?.length) {
-                    setTimeout(() => { 
-                        this.horizontalScroller.refresh();
-                    }, BADGE_ANIMATE_DURATION * 1000);
-                }
-            }
-        }
+        // student: {
+        //     deep: true,
+        //     handler (newStudentData, oldStudentData) {
+        //         if (newStudentData?.awards?.length !== oldStudentData?.awards?.length) {
+        //             setTimeout(() => { 
+        //                 this.horizontalScroller.refresh();
+        //             }, BADGE_ANIMATE_DURATION * 1000);
+        //         }
+        //     }
+        // }
 
     },
 

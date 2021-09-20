@@ -716,7 +716,9 @@ class Controller extends Base
             $data[] = [
                 'id'       => $student->getId(),
                 'fullName' => $student->getFullName(),
-                'awards'   => $studentAwards[$student->getId()],
+                'firstName' => $student->getFirstname(),
+                'lastName' => $student->getLastname(),
+                'badges'   => $studentAwards[$student->getId()],
             ];
         }
 
