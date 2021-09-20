@@ -11,13 +11,8 @@ namespace Schoolbox\LTI\Prototype\Platform;
 
 use Alaress\Web\Controller\Base;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
-use Schoolbox\LTI\Prototype\ServerRequestFactory;
 use Schoolbox\LTI\Prototype\UserAuthenticator;
 use Schoolbox\Role;
 use Schoolbox\Url\Factory;
@@ -126,13 +121,11 @@ class Controller extends Base
     {
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
-        $oidcAuthenticator = new OidcAuthenticator(
-            $this->buildRegistrationRepository(),
-            new UserAuthenticator($this->userMapper),
-        );
-        $serverRequest = (new ServerRequestFactory())->build($this->request);
         try {
-            $message = $oidcAuthenticator->authenticate($serverRequest);
+            $message = (new OidcAuthenticationRequestFactory(
+                $this->buildRegistrationRepository(),
+                new UserAuthenticator($this->userMapper)
+            ))->build($this->request);
             $this->response->content->set(
                 $this->buildHtmlOutput(
                     '@ltiPrototypePlatform/oidcAuthenticationRequest.twig',
