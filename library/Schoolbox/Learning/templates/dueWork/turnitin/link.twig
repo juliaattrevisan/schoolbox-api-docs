@@ -1,0 +1,20 @@
+{##
+ # Turnitin report link
+ #
+ # Click this to view the detailed report
+ #
+ # @param IAssessable $assessment               An assessment instance (typically a due work)
+ # @param IResponse $response                   A response instance (what the student submitted)
+ # @param Participant $participant              The participating student
+ # @param SingleFile\Model $currentFile         A student submission file instance (Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile)
+ #}
+{% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
+    assessmentId: assessment.id,
+    assessment:   assessment,
+    responseId:   response.id,
+    response:     response,
+    participant:  participant,
+    turnitinId:   currentFile.turnitin.id })
+%}
+
+<a href="{{ reportRoute }}" class="icon-report" title="Similarity Report"></a>

@@ -334,9 +334,10 @@ class Controller extends Assessment\Controller
             'selfReflect'            => $participant ? (new ValidSelfReflectionWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
             'selfAssess'             => $participant ? (new ValidSelfGradableWithResponse())->isSatisfiedBy($this->getUser(), $participant) : null,
 
-            /* Plagscan status
+            /* Similarity Check status
              */
-            'plagscanEnabled'        => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanApiEnabled'     => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled'     => Turnitin\Mapper::getInstance()->isEnabled($this->getUser()),
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */
@@ -1008,26 +1009,54 @@ class Controller extends Assessment\Controller
         $detachedFunction = null;
 
         if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+            $turnitinMapper = Turnitin\Mapper::getInstance();
+
             /* Only one of these can be active at a time, but both universes can co-exist
              * Specifically enable turnitin if its api key was set
              */
-            if ('' !== trim((string)$this->getConfigLoader()->get('turnitin_api_key'))) {
+            if ($turnitinMapper->isConfigured()) {
                 /* Set up a turnitin stub record
                  * This allows it to be picked up and processed by an async script later
                  * if it doesn't start processing via the $detachedFunction
                  */
-                $turnitinMapper = Turnitin\Mapper::getInstance();
+                $models = [];
 
                 foreach ($response->getAllFiles() as $currentFile) {
-                    $turnitinMapper->saveStub($currentFile);
+                    $model = $turnitinMapper->saveStub($currentFile);
+
+                    if ($model) {
+                        $models[] = $model;
+                    }
                 }
+
+                /* We need this api
+                 */
+                $api = new Turnitin\Api(
+                    $this->getConfigLoader()->get('site_version'),
+                    $this->getConfigLoader()->get('turnitin_api_host'),
+                    $this->getConfigLoader()->get('turnitin_api_key')
+                );
 
                 /* Set up detached function so turnitin can continue in the background
                  */
-//                $detachedFunction = static function () use ($isFinal, $selfAssessable, $response, $assessment) {
-//                    /* TODO Turnitin api endpoint implementation
-//                     */
-//                };
+                $detachedFunction = static function () use ($api, $models) {
+
+                    /* Set up a record processor
+                     */
+                    $processor = (new Turnitin\Process\File(
+                        $api,
+                        Turnitin\Mapper::getInstance(),
+                        UserMapper::getInstance(),
+                        SubmissionBoxMapper::getInstance(),
+                        SingleFile\Mapper::getInstance()
+                    ));
+
+                    /* Shank them all up
+                     */
+                    foreach ($models as $model) {
+                        $processor->process($model);
+                    }
+                };
             } else {
                 /* This is the original behaviour. Note that the Plagscan Mapper itself can
                  * figure out if plagscan is enabled or not so we don't need to do it here

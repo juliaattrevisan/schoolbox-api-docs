@@ -166,8 +166,8 @@ class Mapper extends \Schoolbox\Mapper
      * If the Gateway spawned, plagscan is enabled for the $user specified
      *
      * Assuming the Gateway spawned:
-     * - Students and parents can see plagscan results allowed via config
-     * - Staff and Superusers can always see plagscan results
+     * - Students and parents can see similarity results allowed via config
+     * - Staff and Superusers can always see similarity results
      *
      * @param User $user
      * @return bool
@@ -178,7 +178,7 @@ class Mapper extends \Schoolbox\Mapper
          * If so, there is a functioning username/apikey
          */
         if ($this->getConnector()) {
-            /* Staffs and super can always see plagscan results
+            /* Staffs and super can always see similarity results
              */
             if ($user->isSuperuser() || $user->getRole()->isStaff()) {
                 return true;
@@ -186,7 +186,7 @@ class Mapper extends \Schoolbox\Mapper
 
             /* If the $user is a student or a parent, check a config var too
              */
-            if ($this->getConfigLoader()->get('plagscan_student_visible') && ($user->getRole()->isStudent() || $user->getRole()->isParent())) {
+            if ($this->getConfigLoader()->get('similarity_check_student_visible') && ($user->getRole()->isStudent() || $user->getRole()->isParent())) {
                 return true;
             }
         }

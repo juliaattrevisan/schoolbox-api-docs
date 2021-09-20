@@ -1,11 +1,10 @@
 {##
  # currentFile      an instance of duework/submission/file with plagscan instance joined
- # plagscanEnabled  whether plagscan is enabled
  #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-{% if plagscanEnabled and currentFile.plagscan %}
+{% if currentFile.plagscan %}
     <p class="meta">
         {% if currentFile.plagscan.isComplete %}
             {% set plagscanReport = routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {
@@ -18,11 +17,11 @@
             ) %}
             {% if plagscanReport %}
                 <a href="{{ plagscanReport }}">
-                    <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                    <span class="{{ urgency.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
                     <span title="Similarity check completed.">similar content</span>
                 </a>
             {% else %}
-                <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                <span class="{{ urgency.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
                 <span title="Similarity check completed.">similar content</span>
             {%  endif %}
         {% elseif currentFile.plagscan.isProcessing %}

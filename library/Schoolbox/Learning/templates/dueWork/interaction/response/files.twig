@@ -5,14 +5,13 @@
                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                 <p>{{ currentFile.filename }}</p>
             </a>
-                {% include '@learning/dueWork/plagscan/status.twig' with {
-                    currentFile: currentFile,
-                    plagscanEnabled: plagscanEnabled,
+                {% include '@learning/dueWork/similarity/status.twig' with {
+                    plagscanApiEnabled: plagscanApiEnabled,
+                    turnitinApiEnabled: turnitinApiEnabled,
                     assessment: assessment,
-                    assessmentId: assessmentId,
                     participant: participant,
                     response: response,
-                    plagscanId: plagscanId
+                    currentFile: currentFile
                 } only %}
         </div>
     </div>

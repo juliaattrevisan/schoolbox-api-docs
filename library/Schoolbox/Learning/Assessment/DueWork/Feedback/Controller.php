@@ -14,10 +14,13 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -273,26 +276,54 @@ class Controller extends Base
                 $detachedFunction = null;
 
                 if ($assessment->getSimilarityCheckEnabled()) {
+                    $turnitinMapper = Turnitin\Mapper::getInstance();
+
                     /* Only one of these can be active at a time, but both universes can co-exist
                      * Specifically enable turnitin if its api key was set
                      */
-                    if ('' !== trim((string)$this->getConfigLoader()->get('turnitin_api_key'))) {
+                    if ($turnitinMapper->isConfigured()) {
                         /* Set up a turnitin stub record
                          * This allows it to be picked up and processed by an async script later
                          * if it doesn't start processing via the $detachedFunction
                          */
-                        $turnitinMapper = DueWork\Response\File\Turnitin\Mapper::getInstance();
+                        $models = [];
 
                         foreach ($response->getAllFiles() as $currentFile) {
-                            $turnitinMapper->saveStub($currentFile);
+                            $model = $turnitinMapper->saveStub($currentFile);
+
+                            if ($model) {
+                                $models[] = $model;
+                            }
                         }
+
+                        /* We need this api
+                         */
+                        $api = new Turnitin\Api(
+                            $this->getConfigLoader()->get('site_version'),
+                            $this->getConfigLoader()->get('turnitin_api_host'),
+                            $this->getConfigLoader()->get('turnitin_api_key')
+                        );
 
                         /* Set up detached function so turnitin can continue in the background
                          */
-//                        $detachedFunction = static function () use ($response, $assessment) {
-//                            /* TODO Turnitin api endpoint implementation
-//                             */
-//                        };
+                        $detachedFunction = static function () use ($api, $models) {
+
+                            /* Set up a record processor
+                             */
+                            $processor = (new Turnitin\Process\File(
+                                $api,
+                                Turnitin\Mapper::getInstance(),
+                                UserMapper::getInstance(),
+                                SubmissionBoxMapper::getInstance(),
+                                SingleFile\Mapper::getInstance()
+                            ));
+
+                            /* Shank them all up
+                             */
+                            foreach ($models as $model) {
+                                $processor->process($model);
+                            }
+                        };
                     } else {
                         /* This is the original behaviour. Note that the Plagscan Mapper itself can
                          * figure out if plagscan is enabled or not so we don't need to do it here

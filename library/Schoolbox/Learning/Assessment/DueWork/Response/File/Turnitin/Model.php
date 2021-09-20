@@ -38,31 +38,34 @@ class Model implements ISoftDeletable
     /* We saved a student's submission in schoolbox and set up the turnitin record
      * in the instance, but we haven't told turnitin about this document yet.
      */
-    public const STATUS_SETUP_PENDING = 'pending';
+    public const STATUS_TRANSMIT_PENDING = 'pending';
 
-    /* We started communicating with turnitin; this status usually denotes when an
-     * automated script has come along and started doing its thing
-     */
-    public const STATUS_PROCESSING = 'processing';
-
-    /* We started seting up a turnitin Group ("submission box") or found an existing
+    /* We started setting up a turnitin Group ("submission box") or found an existing
      * one to use, which is th same thing really
      */
-    public const STATUS_SETUP_GROUP = 'group';
+    public const STATUS_TRANSMIT_GROUP = 'group';
 
     /* We started setting up a turnitin Submission which is a container for student's
      * file contents which is sent separately
      */
-    public const STATUS_SETUP_SUBMISSION = 'submission';
+    public const STATUS_TRANSMIT_SUBMISSION = 'submission';
 
     /* We started sending the student's file contents to turnitin
      */
-    public const STATUS_SETUP_UPLOADING = 'uploading';
+    public const STATUS_TRANSMIT_UPLOADING = 'uploading';
+
+    /* Transmission ended; now awaiting the next phase to begin
+     */
+    public const STATUS_TRANSMIT_LOADED = 'loaded';
+
+    /* Upload was processed by turnitin and now ready for report generation
+     */
+    public const STATUS_REPORT_PREPARED = 'prepared';
 
     /* We started turnitin's analysis process to generate their similarity report
      * This should start when their webhook executes after our successful upload
      */
-    public const STATUS_ANALYSIS = 'analysis';
+    public const STATUS_REPORT_ANALYSING = 'analysing';
 
     /* We successfully completed turnitin analysis, yanking their overall percentage
      * and caching that locally
@@ -128,6 +131,60 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Turnitin report finished processing
+     *
+     * @return bool
+     */
+    public function isComplete(): bool
+    {
+        return self::STATUS_COMPLETE === $this->getStatus();
+    }
+
+
+    /**
+     * Turnitin report still processing - can be in any of these turnitin states
+     *
+     * @return bool
+     */
+    public function isProcessing(): bool
+    {
+        return \in_array($this->getStatus(), [
+            self::STATUS_TRANSMIT_GROUP,
+            self::STATUS_TRANSMIT_SUBMISSION,
+            self::STATUS_TRANSMIT_UPLOADING,
+            self::STATUS_TRANSMIT_LOADED,
+            self::STATUS_REPORT_PREPARED,
+            self::STATUS_REPORT_ANALYSING
+        ]);
+    }
+
+
+    /**
+     * Turnitin report died for any number of reasons
+     *
+     * @return bool
+     */
+    public function isError(): bool
+    {
+        return self::STATUS_ERROR === $this->getStatus();
+    }
+
+
+    /**
+     * Turnitin report pending
+     *
+     * @return bool
+     */
+    public function isPending(): bool
+    {
+        return self::STATUS_TRANSMIT_PENDING === $this->getStatus();
+    }
+
+
+    /* Getters/Setters
+     */
+
+    /**
      * @return string
      */
     public function getStatus(): string
@@ -157,10 +214,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $errorCode
+     * @param string|null $errorCode
      * @return Model
      */
-    public function setErrorCode(string $errorCode): self
+    public function setErrorCode(?string $errorCode): self
     {
         $this->errorCode = $errorCode;
         return $this;
@@ -177,10 +234,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $errorMessage
+     * @param string|null $errorMessage
      * @return Model
      */
-    public function setErrorMessage(string $errorMessage): self
+    public function setErrorMessage(?string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
         return $this;
@@ -217,10 +274,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param string $turnitinSubmissionId
+     * @param string|null $turnitinSubmissionId
      * @return Model
      */
-    public function setTurnitinSubmissionId(string $turnitinSubmissionId): self
+    public function setTurnitinSubmissionId(?string $turnitinSubmissionId): self
     {
         $this->turnitinSubmissionId = $turnitinSubmissionId;
         return $this;
@@ -237,10 +294,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param float $overallMatchPercentage
+     * @param float|null $overallMatchPercentage
      * @return Model
      */
-    public function setOverallMatchPercentage(float $overallMatchPercentage): self
+    public function setOverallMatchPercentage(?float $overallMatchPercentage): self
     {
         $this->overallMatchPercentage = $overallMatchPercentage;
         return $this;

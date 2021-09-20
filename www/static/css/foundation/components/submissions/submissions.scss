@@ -1,16 +1,16 @@
 $table-cell-highlight-background: $content-ui-selected;
 
-/* Plagscan
+/* Similarity Check
  */
-.plagscan-ok {
+.similarity-ok {
     @extend .gradient-10;
 }
 
-.plagscan-warning {
+.similarity-warning {
     @extend .gradient-4;
 }
 
-.plagscan-critical {
+.similarity-critical {
     @extend .gradient-0;
 }
 

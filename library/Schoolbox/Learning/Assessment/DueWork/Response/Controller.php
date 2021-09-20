@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Api as TurnitinApi;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process\Report;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -24,6 +26,8 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper as TurnitinMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Model as Turnitin;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -166,9 +170,11 @@ class Controller extends Base
              */
             'errors' => [],
 
-            /* Plagscan status
+            /* Similarity Check status
              */
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => TurnitinMapper::getInstance()->isEnabled($this->getUser()),
+
             'interactionLocked' => $isInteractionLocked,
             'reviewRoute'       => $reviewRoute,
             'studentView'       => true,
@@ -355,9 +361,10 @@ class Controller extends Base
             'errors' => StateMapper::getInstance()->listDisplayValues(),
             'participant' => $participant,
 
-            /* Plagscan status
+            /* Similarity Check status
              */
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => \Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper::getInstance()->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'studentView' => false,
             'selfAssess' => false,
@@ -557,6 +564,67 @@ class Controller extends Base
         $this->getResponse()->status->set($code);
         $this->getResponse()->content->set($this->buildContent('', $data));
     }
+
+
+    /**
+     * Dump out a turnitin report
+     *
+     * @param IAssessable $assessment
+     * @param IResponse   $response
+     * @param Turnitin    $turnitin
+     * @param Participant $participant
+     * @throws File\Turnitin\Exception\BadEndpoint
+     * @throws File\Turnitin\Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin $turnitin, Participant $participant): void
+    {
+        /* We need this api
+         */
+        $api = new TurnitinApi(
+            $this->getConfigLoader()->get('site_version'),
+            $this->getConfigLoader()->get('turnitin_api_host'),
+            $this->getConfigLoader()->get('turnitin_api_key')
+        );
+
+        /* Choose a viewer permission set based on your role
+         * Staff members get a different set than students or parents
+         */
+        $viewerPermissionSet = $this->getUser()->getRole()->isStaff() ? Report::VIEWER_PERMISSION_SET_STAFF : Report::VIEWER_PERMISSION_SET_STUDENT;
+
+        /* TODO Apparently localisation is a thing, set via locale tuple;
+         *  but I have assumed en for now
+         */
+        $viewerUrl = $api->retrieve('POST', "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url", [
+            'viewer_user_id' => $this->getUser()->getId(),
+            'locale' => 'en',
+            'viewer_default_permission_set' => $viewerPermissionSet
+        ]);
+
+        if (null !== $viewerUrl) {
+            $data = [
+                'url' => $viewerUrl['viewer_url'],
+                'turnitin' => $turnitin,
+                'assessment' => $assessment,
+                'response' => $response,
+                'participant' => $participant,
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                    ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
+                    ->add(['Similarity Check', '']),
+            ];
+
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/turnitin/iframe.twig', $data));
+        }
+
+        /* TODO You might error out here when json_decode returns null
+         *  in odd circumstances; but what do we display in that case?
+         */
+    }
+
 
     /**
      * Dump out a plagscan report

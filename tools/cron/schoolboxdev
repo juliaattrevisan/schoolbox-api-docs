@@ -33,6 +33,12 @@ MAILTO="support@schoolbox.com.au"
 # Plagscan file upload - every 3 hours
 14 */3 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolboxdev/tools/plagscan/submit.php >> /var/lib/schoolboxdev/cache/logs/plagscan.log 2>&1
 
+# Turnitin transmitter - every 1 hour
+13 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolboxdev/tools/turnitin/transmit.php --force >> /var/lib/schoolboxdev/cache/logs/turnitin.log 2>&1
+
+# Turnitin reporter - every 10min
+*/10 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolboxdev/tools/turnitin/report.php >> /var/lib/schoolboxdev/cache/logs/turnitin.log 2>&1
+
 # Etherpad - sync back to MySQL - every hour
 0 * * * *	root	php /usr/share/schoolboxdev/tools/etherpad-sync.php >> /var/log/schoolboxdev/etherpad-sync.log 2>&1
 

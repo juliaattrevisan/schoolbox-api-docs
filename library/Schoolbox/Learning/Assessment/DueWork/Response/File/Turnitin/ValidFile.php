@@ -73,6 +73,13 @@ class ValidFile
 
 
     /**
+     * There's a hidden requirement that text files have at least 50 chars
+     * If it's too short you end up with error code TOO_LITTLE_TEXT
+     */
+    private const MIN_TURNITIN_TEXT_LENGTH = 50;
+
+
+    /**
      * Each $file must pass the stringent whitelist checks here
      *
      * @param SubmissionFile $file
