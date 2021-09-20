@@ -28,11 +28,17 @@ class Uploader extends CliTool\App
 
     public const LOCK_NAME = 'kami_upload';
 
+
+    /**
+     * Default timeout for symfony lock: falsey values trigger exception
+     */
+    private const DEFAULT_TIMEOUT = 60 * 60;
+
+
     private const DEFAULT_BATCH_SIZE           = 100;
     private const DEFAULT_MAX_ATTEMPTS         = 3;
     private const DEFAULT_MAX_SKIPS            = 3;
     private const DEFAULT_BASE_JITTER_BACK_OFF = 500;
-    private const DEFAULT_TIMEOUT              = 300;
 
     /** @inheritDoc */
     public function getLongOpts(): array
@@ -65,6 +71,12 @@ class Uploader extends CliTool\App
         $baseBackOff = $this->getOptAsInt('base-back-off:', self::DEFAULT_BASE_JITTER_BACK_OFF);
         $timeout     = $this->getOptAsInt('timeout:', self::DEFAULT_TIMEOUT);
         $failureRate = $this->getOptAsFloat('failure-rate:', 0.0);
+
+        /* Force default timeout since falsey timeout means something in symfony lock
+         */
+        if (!$timeout) {
+            $timeout = self::DEFAULT_TIMEOUT;
+        }
 
         $dryRun
             ? $this->getLogger()->notice('Performing dry run - no documents will be uploaded to Kami or saved to Database')

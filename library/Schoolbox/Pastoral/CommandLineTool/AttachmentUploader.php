@@ -18,6 +18,8 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Pastoral;
 use Symfony\Component\Lock\LockInterface;
 
+// 60 min timeout
+
 /**
  * Pastoral attachment uploader: uploads files from Schoolbox to the SIS'
  * pastoral document manager.
@@ -25,6 +27,13 @@ use Symfony\Component\Lock\LockInterface;
 class AttachmentUploader extends CliTool\App
 {
     public const LOCK_NAME = 'pastoral_upload';
+
+
+    /**
+     * Default timeout for symfony lock: falsey values trigger exception
+     */
+    private const DEFAULT_TIMEOUT = 10 * 60;
+
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
@@ -92,6 +101,13 @@ HELP;
     private function checkOverlappingExecution(): LockInterface
     {
         $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
+
+        /* Force default timeout since falsey timeout means something in symfony lock
+         */
+        if (!$timeout) {
+            $timeout = self::DEFAULT_TIMEOUT;
+        }
+
         $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
         if ($lock->acquire()) {
             $this->setMaxExecutionTime($timeout);

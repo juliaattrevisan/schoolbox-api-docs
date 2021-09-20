@@ -26,6 +26,13 @@ class StatusChecker extends CliTool\App
 {
     public const LOCK_NAME = 'kami_status_check';
 
+
+    /**
+     * Default timeout for symfony lock: falsey values trigger exception
+     */
+    private const DEFAULT_TIMEOUT = 10 * 60;
+
+
     /** @inheritDoc */
     public function getLongOpts(): array
     {
@@ -51,6 +58,12 @@ class StatusChecker extends CliTool\App
         $maxSkips    = $this->getOptAsInt('max-skips:', Kami\StatusUpdater::DEFAULT_MAX_SKIPS);
         $baseBackOff = $this->getOptAsInt('base-back-off:', Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF);
         $timeout     = $this->getOptAsInt('timeout:', Kami\StatusUpdater::DEFAULT_TIMEOUT);
+
+        /* Force default timeout since falsey timeout means something in symfony lock
+         */
+        if (!$timeout) {
+            $timeout = self::DEFAULT_TIMEOUT;
+        }
 
         $this->logConfigurationState($maxAttempts, $maxSkips, $baseBackOff, $timeout);
 

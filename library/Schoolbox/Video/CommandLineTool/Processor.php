@@ -23,6 +23,8 @@ use Schoolbox\Video\QueueMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 
+// 120 min timeout
+
 /**
  * Video encoder and processor.
  *
@@ -33,6 +35,12 @@ class Processor extends CliTool\App
 {
 
     public const LOCK_NAME = 'video_transcode';
+
+
+    /**
+     * Default timeout for symfony lock: falsey values trigger exception
+     */
+    private const DEFAULT_TIMEOUT = 60 * 60;
 
 
     /** @inheritDoc */
@@ -67,6 +75,13 @@ class Processor extends CliTool\App
         // Allow only a single migration at a time
         // ------------------------------------------------------------------------------------------------------------
         $timeout = (int)$configLoader->get('video_processing_timeout');
+
+        /* Force default timeout since falsey timeout means something in symfony lock
+         */
+        if (!$timeout) {
+            $timeout = self::DEFAULT_TIMEOUT;
+        }
+
         $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
             exit(1);
