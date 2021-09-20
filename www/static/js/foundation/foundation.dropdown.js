@@ -254,8 +254,31 @@
     },
 
     style : function (dropdown, target, settings) {
-      var css = $.extend({position : 'absolute'},
-        this.dirs[settings.align].call(dropdown, target, settings));
+        /**
+         * when there is a preference to render the dropdown towards the
+         * bottom, if it goes below the end of the document, flip the dropdown
+         * to render towards the top instead
+         */
+        var preferredAlignment = settings.align;
+
+        if (preferredAlignment == 'bottom') {
+            var documentHeight = $(document).height();
+            /**
+             * because offsets can return fractional values, we want to always round up.
+             * also make sure that when we grab the outerheight, we include any margins
+             */
+            var targetRelativeHeight = Math.ceil(target.offset().top) + dropdown.outerHeight(true);
+
+            /**
+             * the relative position and height of the dropdown exceeds the document height
+             */
+            if (targetRelativeHeight >= documentHeight) {
+                preferredAlignment = 'top';
+            }
+        }
+
+        var css = $.extend({position : 'absolute'},
+            this.dirs[preferredAlignment].call(dropdown, target, settings));
 
       dropdown.attr('style', '').css(css);
     },
