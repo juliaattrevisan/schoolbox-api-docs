@@ -10,13 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Prototype\Tool;
 
 use Alaress\Web\Controller\Base;
-use Cache\Adapter\PHPArray\ArrayCachePool;
-use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
-use Schoolbox\LTI\Prototype\ServerRequestFactory;
 
 /**
  * LTI test tool controller

@@ -85,12 +85,9 @@ class Controller extends Base
      */
     public function getGenerateResourceLinkRequest(): void
     {
-        // Build the registration repository
+        // Build the registration repository, then get a registration out of it:
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/interfaces/#registration-repository-interface
-        $registrationRepository = $this->buildRegistrationRepository();
-
-        // Get a registration out of it
-        $registration = $registrationRepository->find(RegistrationRepository::REGISTRATION_IDENTIFIER);
+        $registration = $this->buildRegistrationRepository()->find(RegistrationRepository::REGISTRATION_IDENTIFIER);
         if (!$registration) {
             $this->sendError('Registration not found');
         }
