@@ -83,10 +83,10 @@ class Controller extends Base
     /**
      * Generate a resource link request, based upon the form values passed.
      *
-     * @api POST /lti-test/platform/generate-resource-link-request
+     * @api GET /lti-test/platform/generate-resource-link-request
      * @since 21.1.0
      */
-    public function postGenerateResourceLinkRequest(): void
+    public function getGenerateResourceLinkRequest(): void
     {
         // Build the registration repository
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/interfaces/#registration-repository-interface
@@ -100,7 +100,7 @@ class Controller extends Base
 
         // Figure out who's trying to log in: use that to determine their role
         $role      = null;
-        $loginHint = $this->request->post->get('loginHint');
+        $loginHint = $this->request->query->get('loginHint');
         if (strlen($loginHint) > 0) {
             $user = $this->userMapper->findByUsername($loginHint);
             if ($user) {
@@ -117,7 +117,7 @@ class Controller extends Base
         $message = $builder->buildPlatformOriginatingLaunch(
             $registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            $this->request->post->get('targetLinkUri'),
+            $this->request->query->get('targetLinkUri'),
             $loginHint,
             null,
             [$role],

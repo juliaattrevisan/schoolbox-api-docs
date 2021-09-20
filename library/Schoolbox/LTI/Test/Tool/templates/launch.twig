@@ -1,6 +1,6 @@
 <h1>LTI Test Tool</h1>
 
-<h2>Authenticated resource link request received from platform</h2>
+<h2>Resource link launch request received from platform</h2>
 
 <h3>About the launch request</h3>
 <dl>
@@ -10,13 +10,13 @@
     <dt>Version</dt>
     <dd>{{ result.payload.version ?? '' }}</dd>
 
-    <dt>User.identity</dt>
+    <dt>User identity</dt>
     <dd>{{ result.payload.userIdentity.identifier ?? '' }}</dd>
 
-    <dt>User.name</dt>
+    <dt>User name</dt>
     <dd>{{ result.payload.userIdentity.name ?? '' }}</dd>
 
-    <dt>User.email</dt>
+    <dt>User email</dt>
     <dd>{{ result.payload.userIdentity.email ?? '' }}</dd>
 </dl>
 

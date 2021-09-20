@@ -1,6 +1,6 @@
 <h1>LTI Test Tool</h1>
 
-<h2>OIDC initiation request received from platform, for launching a resource link</h2>
+<h2>Resource link launch request + OpenID Connect initiation received from platform</h2>
 
 <h3>About the resource link request</h3>
 <dl>
@@ -11,4 +11,4 @@
     <dd>{{ message.parameters.get('login_hint') }}</dd>
 </dl>
 
-<a href="{{ message.toUrl }}" class="button submit">Send authentication response to platform</a>
+<a href="{{ message.toUrl }}" class="button submit">Send OpenID Connect authentication to platform</a>
