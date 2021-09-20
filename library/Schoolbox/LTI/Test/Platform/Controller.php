@@ -154,7 +154,7 @@ class Controller extends Base
             $this->response->content->set(
                 $this->buildHtmlOutput(
                     '@ltiTestPlatform/oidcAuthenticationRequest.twig',
-                    ['messageUrl' => $message->toUrl(),]
+                    ['message' => $message,]
                 )
             );
         } catch (LtiExceptionInterface $e) {
