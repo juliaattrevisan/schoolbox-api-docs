@@ -20,7 +20,9 @@ use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Test\ServerRequestFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
 use Schoolbox\LTI\Test\UserAuthenticatorFactory;
+use Schoolbox\Role;
 use Schoolbox\Url\Factory;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -53,10 +55,24 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        $excludeCurrentUser = function (User $user) {
+            return $this->getUser()->getId() !== $user->getId();
+        };
+        $staffUsers   = $this->userMapper->findByColumn('g.group_type', Role::STAFF)
+                                         ->filter($excludeCurrentUser)
+                                         ->sortNaturally('fullName')
+                                         ->slice(0, 5);
+        $studentUsers = $this->userMapper->findByColumn('g.group_type', Role::STUDENT)
+                                         ->filter($excludeCurrentUser)
+                                         ->sortNaturally('fullName')
+                                         ->slice(0, 5);
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiTestPlatform/index.twig',
-                []
+                [
+                    'staffUsers'   => $staffUsers,
+                    'studentUsers' => $studentUsers,
+                ]
             )
         );
     }

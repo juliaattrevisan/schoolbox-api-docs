@@ -13,10 +13,18 @@
         <dt><label for="loginHint">Login Hint (a username)</label></dt>
         <dd>
             <select id="loginHint" name="loginHint">
-                <option value="alaress">Schoolbox Admin (superuser)</option>
-                <option value="jcoles">Jack Coles (staff)</option>
-                <option value="ereed">Eden Reed (student)</option>
-                <option value="x">Non-existent user</option>
+                <option value="{{ USER.username }}" selected>Current user ({{ USER.fullname }})</option>
+                <option value="xxxxxxxxxxxxxxx">Non-existent user</option>
+                <optgroup label="Staff">
+                    {% for user in staffUsers %}
+                    <option value="{{ user.username }}">{{ user.fullname }}</option>
+                    {% endfor %}
+                </optgroup>
+                <optgroup label="Students">
+                    {% for user in studentUsers %}
+                        <option value="{{ user.username }}">{{ user.fullname }}</option>
+                    {% endfor %}
+                </optgroup>
             </select>
         </dd>
     </dl>
