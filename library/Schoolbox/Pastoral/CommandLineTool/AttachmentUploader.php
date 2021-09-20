@@ -16,6 +16,8 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Pastoral;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
 // 60 min timeout
@@ -121,7 +123,7 @@ HELP;
     /**
      * Find and upload pending documents to external SIS
      */
-    private function uploadPending(): void
+    private function uploadPending(LockInterface $lock): void
     {
         $success = $failed = 0;
         foreach ($this->pastoralUploadQueueMapper->getPending() as $pendingUpload) {
@@ -130,6 +132,18 @@ HELP;
             } catch (PDOException $e) {
                 $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
                 $failed++;
+            }
+
+            /* Refresh lock while we're still processing; keep using another
+             * $timeout seconds until we're done, or until we died
+             */
+            try {
+                $this->getLogger()->info('Pastoral document upload used more than seconds timeout; refreshing lock');
+
+                $lock->refresh();
+            } catch (LockConflictedException | LockAcquiringException $e) {
+                $this->getLogger()->warning('Could not refresh lock: aborting');
+                break;
             }
         }
         $this->getLogger()->info("Processing of pastoral upload completed: $success succeeded, $failed failed");
