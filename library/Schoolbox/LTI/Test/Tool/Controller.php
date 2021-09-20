@@ -17,8 +17,6 @@ use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
 use Schoolbox\LTI\Test\RegistrationRepository;
 use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Test\ServerRequestFactory;
-use Schoolbox\LTI\Test\UserAuthenticator;
-use Schoolbox\LTI\Test\UserAuthenticatorFactory;
 
 /**
  * LTI test tool controller

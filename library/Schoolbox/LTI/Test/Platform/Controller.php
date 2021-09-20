@@ -19,7 +19,6 @@ use Schoolbox\LTI\Test\RegistrationRepository;
 use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Test\ServerRequestFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
-use Schoolbox\LTI\Test\UserAuthenticatorFactory;
 use Schoolbox\Role;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
