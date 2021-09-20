@@ -10,8 +10,6 @@ namespace Schoolbox\ResourceBooking\Booking;
 
 use DateTime;
 use Alaress_Date_Format;
-use Alaress\Date\Interval;
-use InvalidArgumentException;
 use External_Timetable;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -48,48 +46,40 @@ class Validation
     const ERROR_TIMETABLED_CLASS = 'timetabled_class';
     const ERROR_CURRENT_TERM = 'current_term';
 
-
     /**
      * @var User
      */
     private $user;
-
 
     /**
      * @var BookingMapper
      */
     private $bookingMapper;
 
-
     /**
      * @var StatusMapper
      */
     private $statusMapper;
-
 
     /**
      * @var ResourceMapper
      */
     private $resourceMapper;
 
-
     /**
      * @var TermMapper
      */
     private $termMapper;
-
 
     /**
      * @var External_Timetable
      */
     private $externalTimetableHandler;
 
-
     /**
      * @var CampusMapper
      */
     private $campusMapper;
-
 
     /**
      * @param User               $user
@@ -114,7 +104,6 @@ class Validation
         $this->setExternalTimetableHandler($externalTimetableHandler);
         $this->setCampusMapper($campusMapper);
     }
-
 
     /**
      * Attempts to validate the creation or update of a booking from post data.
@@ -141,8 +130,6 @@ class Validation
         $errors        = [];
         $startDate     = null;
         $endDate       = null;
-        $isNewBooking  = false;
-        $isTimeChanged = false;
 
         // Only moderators of this booking may override validation
         $override = !empty($postData['override_validation'])
@@ -171,116 +158,94 @@ class Validation
             return $errors;
         }
 
-        // New booking
+        /**
+         * we always want to check the start and end times
+         */
+        $errors = array_merge_recursive(
+            $errors,
+            $this->validatePastTime($startDate)
+        );
+
+        $errors = array_merge_recursive(
+            $errors,
+            $this->validateTooShort($resource, $startDate, $endDate)
+        );
+
+        $errors = array_merge_recursive(
+            $errors,
+            $this->validateTooLong($resource, $startDate, $endDate)
+        );
+
+        $errors = array_merge_recursive(
+            $errors,
+            $this->validateLeadTime($resource, $startDate)
+        );
+
+        $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
+
         if (!($existingBooking instanceof Booking)) {
-            $isNewBooking = true;
-        } else {
-            // Updated booking
-            // Get the date and time changes from original booking
-            $startDelta = Interval::createFromDateTimeDifference(
-                clone $existingBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                $startDate
+            // new booking: Validate related and recurrent bookings
+            if ($postData['campus'] > 0) {
+                $campus = $this->getCampusMapper()->findById($postData['campus']);
+            }
+            /** @var Campus $campus */
+            $dateParts = $series->getNewBookingSeries(
+                $resource,
+                $startDate,
+                $endDate,
+                $postData['repeat_until'],
+                $postData['related_item'],
+                $postData['repeat'],
+                $campus
             );
-            $endDelta   = Interval::createFromDateTimeDifference(
-                clone $existingBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                $endDate
-            );
+            foreach ($dateParts as $check) {
+                /** @var Item\Model $thisResource */
+                [$thisResource, $thisStart, $thisEnd] = $check;
 
-            $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
-        }
-        // Validate any new booking or existing booking if dates have been modified
-        if ($isNewBooking || $isTimeChanged) {
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validatePastTime($startDate)
-            );
-
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateTooShort($resource, $startDate, $endDate)
-            );
-
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateTooLong($resource, $startDate, $endDate)
-            );
-
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateLeadTime($resource, $startDate)
-            );
-
-            if ($isNewBooking) {
-                // Validate related and recurrent bookings of a new booking
-                $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
-                if ($postData['campus'] > 0) {
-                    $campus = $this->getCampusMapper()->findById($postData['campus']);
+                // Validate for matching the current term
+                if ($thisResource->getCurrentTermRestriction()) {
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
+                    );
                 }
-                /** @var Campus $campus */
-                $dateParts = $series->getNewBookingSeries(
-                    $resource,
+
+                $errors = array_merge_recursive(
+                    $errors,
+                    $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
+                );
+            }
+        } else {
+            // existing booking: Validate related and recurrent bookings
+            foreach (
+                $series->getExistingSeries(
+                    $existingBooking,
                     $startDate,
                     $endDate,
-                    $postData['repeat_until'],
                     $postData['related_item'],
-                    $postData['repeat'],
-                    $campus
+                    $postData['efficacy']
+                ) as $check
+            ) {
+                /** @var Item\Model $thisResource */
+                [$thisResource, $thisStart, $thisEnd, $thisBooking] = $check;
+
+                // Validate for matching the current term
+                if ($thisResource->getCurrentTermRestriction()) {
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
+                    );
+                }
+
+                $errors = array_merge_recursive(
+                    $errors,
+                    $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
                 );
-                foreach ($dateParts as $check) {
-                    /** @var Item\Model $thisResource */
-                    [$thisResource, $thisStart, $thisEnd] = $check;
-
-                    // Validate for matching the current term
-                    if ($thisResource->getCurrentTermRestriction()) {
-                        $errors = array_merge_recursive(
-                            $errors,
-                            $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
-                        );
-                    }
-
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
-                    );
-                }
-            } else {
-                // Validating an existing booking?
-                // Check each item in the series, adjusting its dates.
-                // Work with a fresh copy of the booking, because it can get
-                // messed with.
-                $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
-
-                foreach (
-                    $series->getExistingSeries(
-                        $existingBooking,
-                        $startDate,
-                        $endDate,
-                        $postData['related_item'],
-                        $postData['efficacy']
-                    ) as $check
-                ) {
-                    /** @var Item\Model $thisResource */
-                    [$thisResource, $thisStart, $thisEnd, $thisBooking] = $check;
-
-                    // Validate for matching the current term
-                    if ($thisResource->getCurrentTermRestriction()) {
-                        $errors = array_merge_recursive(
-                            $errors,
-                            $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
-                        );
-                    }
-
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
-                    );
-                }
             }
         }
 
         return $errors;
     }
-
 
     /**
      * Validates the status change for this booking
@@ -341,7 +306,6 @@ class Validation
 
         return $errors;
     }
-
 
     /**
      * Validate start date not too early
@@ -410,7 +374,6 @@ class Validation
         return $errors;
     }
 
-
     /**
      * Validates whether a booking for this resource conflicts with any
      * bookings that already exist.
@@ -451,7 +414,7 @@ class Validation
             $existingId = $existingBooking->getId();
 
             if ($existingId) {
-                $existingSeriesId = $existingBooking->getEvent()->getSeriesId();
+                $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
                 $conflictingBookings = $conflictingBookings->filter(
                     /**
                      * @param Model $item
@@ -491,7 +454,6 @@ class Validation
         return $errors;
     }
 
-
     /**
      * Validates if booking needs to be within the current term
      *
@@ -511,7 +473,6 @@ class Validation
         return $errors;
     }
 
-
     /**
      * @return Term\Model
      */
@@ -519,7 +480,6 @@ class Validation
     {
         return $this->getTermMapper()->findForToday();
     }
-
 
     /**
      * Get all bookings for a resource in a window
@@ -542,7 +502,6 @@ class Validation
         );
     }
 
-
     /**
      * Get all events for a room in specified period
      *
@@ -558,7 +517,6 @@ class Validation
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }
-
 
     /**
      * @return BookingMapper
