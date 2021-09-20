@@ -78,7 +78,7 @@
             <!-- END socialstream_post_has_player -->
 
             <!-- BEGIN socialstream_post_has_video -->
-            <video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}"
+            <video id="socialstream-{COMPONENT_INSTANCE_ID}-video{SOCIALSTREAM_POST_POST_ID}"
                    controls
                    preload="none"
                    poster="{SOCIALSTREAM_POST_VIDEO_POSTER}"
@@ -88,7 +88,9 @@
                 <source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
             </video>
             <script>
-                $("#socialstream_video{SOCIALSTREAM_POST_POST_ID}").mediaelementplayer();
+                $(function() {
+                    $("#socialstream-{COMPONENT_INSTANCE_ID}-video{SOCIALSTREAM_POST_POST_ID}").mediaelementplayer();
+                });
             </script>
             <!-- END socialstream_post_has_video -->
 
