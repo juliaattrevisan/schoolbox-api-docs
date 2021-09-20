@@ -40,7 +40,7 @@ class Processor extends CliTool\App
     /**
      * Default timeout for symfony lock: falsey values trigger exception
      */
-    private const DEFAULT_TIMEOUT = 60 * 60;
+    private const DEFAULT_TIMEOUT = 10 * 60;
 
 
     /** @inheritDoc */
@@ -179,16 +179,25 @@ class Processor extends CliTool\App
                 }
             }
 
-            // Refresh process lock, or break if it can't be refreshed
-            if ($lock->isExpired()) {
-                $log->warning('Lock expired during processing: aborting');
-                break;
-            }
+            /* Refresh lock while we're still processing; keep using another
+             * $timeout seconds until we're done, or until we died
+             */
             try {
-                $log->info('Refreshing process lock...');
+                $log->info(sprintf(
+                    'Video processing used more than %s seconds timeout; refreshing lock for another %s seconds',
+                    $timeout,
+                    $timeout
+                ));
+
                 $lock->refresh();
             } catch (LockConflictedException | LockAcquiringException $e) {
                 $log->warning('Could not refresh lock: aborting');
+                break;
+            }
+
+            // Refresh process lock, or break if it can't be refreshed
+            if ($lock->isExpired()) {
+                $log->warning('Lock expired during processing: aborting');
                 break;
             }
         }
