@@ -221,7 +221,7 @@ class Uploader
                  * $timeout seconds until we're done, or until we died
                  */
                 try {
-                    $this->log->info('Kami document upload used more than seconds timeout; refreshing lock');
+                    $this->log->info('Kami document upload exceeded timeout; refreshing lock');
 
                     $lock->refresh();
                 } catch (LockConflictedException | LockAcquiringException $e) {

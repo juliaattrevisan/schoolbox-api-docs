@@ -138,7 +138,7 @@ HELP;
              * $timeout seconds until we're done, or until we died
              */
             try {
-                $this->getLogger()->info('Pastoral document upload used more than seconds timeout; refreshing lock');
+                $this->getLogger()->info('Pastoral document upload exceeded timeout; refreshing lock');
 
                 $lock->refresh();
             } catch (LockConflictedException | LockAcquiringException $e) {
