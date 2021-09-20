@@ -6,25 +6,20 @@
  */
 
 import { stringify } from 'qs';
+import BadgeReportHeader from './badge-report-header';
 import BadgeReportStudent from './badge-report-student';
 import AwardDetailModal from './award-detail-modal';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
-import footerUI from '@vue/components/vueTables2/mixinFooterUI';
-import BadgeReportStudentName from './badge-report-student-name';
-import BadgeReportStudentBadges from './badge-report-student-badges';
 
 
 export default {
 
     components: {
+        BadgeReportHeader,
         BadgeReportStudent,
         AwardDetailModal,
         BottomDrawer
     },
-
-    mixins: [
-        footerUI //to place and keep the tables UI in the footer
-    ],
     
     props: {
         subjectTitle: {
@@ -47,64 +42,11 @@ export default {
     
     data () {
         return {
-            studentData: [], //hold all student data
+            studentsData: [], //hold all student data
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
             selectedFilters: [], //to show only those badges curently filtered
             selectedStudents: [], //list of student ids that can have badges awarded to them
-            columns: ['fullName', 'badges'],
-            options: {
-                headings: {
-                    fullName: 'Name',
-                    badges: 'Badges',
-                },
-                templates: {
-                    fullName: BadgeReportStudentName,
-                    badges: BadgeReportStudentBadges,
-                },
-                columnsClasses: {
-                    fullName: 'name-column',
-                    badges: 'badges-column',
-                },
-                orderBy: {
-                    ascending: true,
-                    column: 'fullName' //initial sorting display
-                },
-                perPage: 50, 
-                perPageValues: [50, 100, 200],
-                selectable: {
-                    mode: 'multiple' //to enable multi-select
-                },
-                debounce: 100, //faster debouce as data is stored on the client side,
-                resizableColumns: false,
-                tabbable: false,
-                filterable: false, 
-                texts: {
-                    filterPlaceholder: 'Search for users...',
-                    noResults: 'No matching users...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
-                },
-                sortable: ['fullName'],
-                sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
-                },
-                customSorting: {
-                    fullName: (ascending) => { //sort year level naturally
-                        return (a, b) => {
-                            if (ascending) {
-                                return a.lastName >= b.lastName ? 1 : -1;
-                            } else {
-                                return a.lastName <= b.lastName ? 1 : -1;
-                            }
-                        }
-                    }
-                }
-            }
-            
         }
     },
 
@@ -120,19 +62,36 @@ export default {
         },
 
         /**
-         * To determine whether to show the bottom-drawer to award badges to students
+         * To display how many students are selected
          * 
          * @returns { Boolean }
          */
         selectedStudentsCount () {
             return this.selectedStudents.length;
+        },
+
+        /**
+         * To show an 'indeterminate' state on the header checkbox, currently a dash in the box
+         * 
+         * @returns { Boolean }
+         */
+        hasSomeStudentsSelected () {
+            return this.hasSelectedStudents && this.selectedStudentsCount < this.studentsData.length;
+        },
+
+        /**
+         * Activate the select all when all are checked individually
+         * 
+         * @returns { Boolean }
+         */
+        areAllStudentsSelected () {
+            return this.selectedStudentsCount === this.studentsData.length;
         }
 
     },
 
     mounted () {
         document.addEventListener('badge-report__onFilterChange', this.getStudentData); //the student data is ready
-        document.addEventListener('badge-report-student-badges__onBadgeSelected', this.onBadgeSelected); //a badge has been selected 
     },
 
     methods: {
@@ -145,7 +104,7 @@ export default {
                 const queryString = stringify( { filters: event.detail.selectedFilters }, { arrayFormat: 'brackets' } ); //use stringify to help split open and convert array values to a query string
                 const response = await fetch(this.getStudentListsEndpoint + '?' + queryString);
                 const responseData = await response.json();
-                this.studentData = responseData.data;
+                this.studentsData = responseData.data;
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
@@ -155,31 +114,31 @@ export default {
         },
 
         /**
-         * To update the table to show the UI in the footer
+         * To be able to award badges to multiple students
+         * 
+         * @params { Number } 
+         * @params { Boolean } 
          */
-        onLoaded () {
-            this.$nextTick(() => this.footerUI_update());
+        onSelectAllSelected (isChecked) {
+            if (isChecked) {
+                this.selectedStudents = this.studentsData.map((student) => student.id); //add in all student ids
+            } else {
+                this.selectedStudents = []; //clear all 
+            }
         },
 
         /**
-         * to keep track of selected rows
+         * To be able to award badges to multiple students
+         * 
+         * @params { Number } 
+         * @params { Boolean } 
          */
-        onRowSelected (event) {
-            this.selectedStudents = event;
-        },
-
-        /**
-         * to keep track of selected rows
-         */
-        onFiltered (event) {
-            document.dispatchEvent(new CustomEvent('badge-report__onFiltered', { detail: { event } } ) );
-        },
-
-        /**
-         * to keep track of selected rows
-         */
-        onSorted (event) {
-            document.dispatchEvent(new CustomEvent('badge-report__onSorted', { detail: { event } } ) );
+        onStudentSelected (studentID, isChecked) {
+            if (isChecked) {
+                this.selectedStudents = [...this.selectedStudents, studentID]; //add in
+            } else {
+                this.selectedStudents = this.selectedStudents.filter((selectedStudentsID) => selectedStudentsID !== studentID); //or remove
+            }
         },
 
         /**
@@ -187,8 +146,20 @@ export default {
          * 
          * @params { Object } 
          */
-        onBadgeSelected (event) {
-            this.$refs.awardDetailModal.open(event.detail.badge);
+        onBadgeSelected (badge) {
+            this.$refs.awardDetailModal.open(badge);
+        },
+
+        /**
+         * To update a badge that was previously a goal that is now an achievement
+         * This is so it goes full colour, and can't be awarded again in the award-detail-modal.vue
+         * 
+         * @params { Object } 
+         */
+        onAchievementAwarded (awardedBadge) {
+            const student = this.studentsData.find((student) => student.id === awardedBadge.recipient.id);
+            const badge = student.badges.find((badge) => badge.badge.id === awardedBadge.badge.id);
+            badge.isGoal = false; //this will trigger the badge to update within badge-report-student.vue
         },
 
         /**
@@ -196,7 +167,6 @@ export default {
          */
         onClearStudentSelection () {
             this.selectedStudents = [];
-            this.$refs.table.resetSelectedRows();
         },
 
         /**
@@ -206,8 +176,7 @@ export default {
             const url = new URL(window.location.href);
             url.pathname = `learning/badge/award/user/${selection}`;
             url.searchParams.append(this.returnUrlName, this.encodedReturnUrl);
-            const selectedStudentIDs = this.selectedStudents.map((selectedStudent) => selectedStudent.id); //just get the student ids to add
-            url.searchParams.append('userIds', selectedStudentIDs.join(','));
+            url.searchParams.append('userIds', this.selectedStudents.join(','));
             return url.toString();
         },
 
@@ -218,24 +187,39 @@ export default {
 
 <template>
 
-    <div v-if="isDataLoaded" class="small-12 island">
+    <div class="small-12 island badge-report">
 
-        <v-client-table 
-            ref="table"
-            :data="studentData" 
-            :columns="columns" 
-            :options="options" 
-            @loaded="onLoaded"
-            @select="onRowSelected"
-            @filter="onFiltered"
-            @sorted="onSorted"
-        >
-            <div slot="afterTable">
-                <div class="VueTables__table-footer" ref="tableFooter"></div>
+        <section class="content">
+            
+            <div v-if="isDataLoaded">
+                <badge-report-header 
+                    :has-some-students-selected="hasSomeStudentsSelected"
+                    :are-all-students-selected="areAllStudentsSelected"
+                    @on-select-all-selected="onSelectAllSelected"
+                />
+                <ul class="action-list">
+                    <badge-report-student 
+                        v-for="student in studentsData" 
+                        :key="student.id" 
+                        :student="student"
+                        :selected-students="selectedStudents"
+                        @on-student-selected="onStudentSelected"
+                        @on-badge-selected="onBadgeSelected"
+                    />
+                </ul>
+                <award-detail-modal 
+                    ref="awardDetailModal"
+                    @on-achievement-awarded="onAchievementAwarded"
+                />
             </div>
-        </v-client-table>
 
-        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+            <div v-else-if="hasDataLoadError" class="alert-box alert">
+                Sorry, we are currently unable to load the student data.
+            </div>
+
+            <div v-else class="loader"></div>
+
+        </section>
 
         <bottom-drawer :showDrawer="hasSelectedStudents">
             <h3 class="selected-count"><em>{{ selectedStudentsCount }} selected</em></h3>
@@ -248,35 +232,20 @@ export default {
 
     </div>
 
-    <div v-else-if="hasDataLoadError" class="alert-box alert">
-        Sorry, we are currently unable to load the student data.
-    </div>
-
-    <div v-else class="loader"></div>
-
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
-@import '@vue/components/vueTables2/vueTables2';
-
-.VueTables--client {
+.badge-report {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
 
-.VueTables__select-row {
-    width: 40px;
-    max-width: 40px;
+.content {
+    padding: 1rem 0 0 0; //remove the padding for most
 }
 
-.name-column {
-    width: 250px;
-    max-width: 250px;
-}
-
-td.badges-column {
-    max-width: 0px; //@TODO look into this, this allows the badges to just fill the remaining horizontal td space, but feels pretty dodgy... 
-    padding: 1rem 0 0 0; //the side buttons and bottom design remove the need for padding, so give the extra space
+.action-list {
+    padding: 0 1rem; //decrease the padding
 }
 
 .selected-count {
