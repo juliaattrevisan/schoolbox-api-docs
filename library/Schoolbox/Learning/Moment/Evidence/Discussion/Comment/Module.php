@@ -64,23 +64,28 @@ class Module extends Comment\Module
      */
     protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        return new Auth\Rule\LazyCallback(function () {
-            /** @var UserMapper $userMapper */
-            $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-            return new Auth\Rule\Any(
-                new Auth\Rule\IsSuperuser(),
-                new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-                new Auth\Rule\IsUserOrParentOfUser(
-                    $this->getExternalUser(),
-                    $userMapper,
-                    static function (array $params) {
-                        /** @var Evidence\Model $evidence */
-                        $evidence = $params['context'];
-                        return $evidence->getRecipient()->getId();
-                    },
-                ),
-            );
-        });
+        return new Auth\Rule\LazyCallback(
+            function () {
+                /** @var UserMapper $userMapper */
+                $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+                return new Auth\Rule\All(
+                    new Auth\Rule\IsLoggedIn(),
+                    new Auth\Rule\Any(
+                        new Auth\Rule\IsSuperuser(),
+                        new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
+                        new Auth\Rule\IsUserOrParentOfUser(
+                            $this->getExternalUser(),
+                            $userMapper,
+                            static function (array $params) {
+                                /** @var Evidence\Model $evidence */
+                                $evidence = $params['context'];
+                                return $evidence->getRecipient()->getId();
+                            },
+                        ),
+                    )
+                );
+            }
+        );
     }
 
 
@@ -97,22 +102,25 @@ class Module extends Comment\Module
      */
     protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-            new Auth\Rule\IsUser(
-                static function (array $params) {
-                    /** @var Comment\Model $comment */
-                    $comment = $params['comment'];
-                    $author  = $comment->getAuthor();
+        return new Auth\Rule\All(
+            new Auth\Rule\IsLoggedIn(),
+            new Auth\Rule\Any(
+                new Auth\Rule\IsSuperuser(),
+                new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
+                new Auth\Rule\IsUser(
+                    static function (array $params) {
+                        /** @var Comment\Model $comment */
+                        $comment = $params['comment'];
+                        $author  = $comment->getAuthor();
 
-                    // The comment's author should never be null, as a comment
-                    // cannot be created with a null author.
-                    if ($author) {
-                        return $author->getId();
-                    }
-                    throw new InsufficientHydrationException('Comment author is not hydrated');
-                },
+                        // The comment's author should never be null, as a comment
+                        // cannot be created with a null author.
+                        if ($author) {
+                            return $author->getId();
+                        }
+                        throw new InsufficientHydrationException('Comment author is not hydrated');
+                    },
+                ),
             ),
         );
     }
