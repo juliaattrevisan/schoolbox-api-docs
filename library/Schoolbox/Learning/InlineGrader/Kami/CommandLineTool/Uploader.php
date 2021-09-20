@@ -32,7 +32,7 @@ class Uploader extends CliTool\App
     /**
      * Default timeout for symfony lock: falsey values trigger exception
      */
-    private const DEFAULT_TIMEOUT = 60 * 60;
+    private const DEFAULT_TIMEOUT = 10 * 60;
 
 
     private const DEFAULT_BATCH_SIZE           = 100;
@@ -138,7 +138,7 @@ class Uploader extends CliTool\App
 
         // Run the uploader
         try {
-            $results = $uploader->upload($retryFailed, $batchSize, $maxSkips);
+            $results = $uploader->upload($retryFailed, $batchSize, $maxSkips, $lock);
         } catch (Throwable $e) {
             $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
             $this->getLogger()->error($e->getTraceAsString());

@@ -17,6 +17,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use GuzzleHttp\Exception\ConnectException;
 use Sentry\State\HubInterface;
+use Symfony\Component\Lock\LockInterface;
+
 
 /**
  * Uploads eligible student submission files into Kami and inserts the
@@ -131,13 +133,15 @@ class Uploader
     /**
      * Attempts to upload all Kami documents
      *
-     * @param bool $retryFailed If true, upload 'failed', otherwise upload 'queued'
-     * @param int  $batchSize   When fetching from the DB, break into batches to avoid OOM
-     * @param int  $maxSkips    Successive failures may indicate an API problem.
+     * @param bool          $retryFailed If true, upload 'failed', otherwise upload 'queued'
+     * @param int           $batchSize   When fetching from the DB, break into batches to avoid OOM
+     * @param int           $maxSkips    Successive failures may indicate an API problem.
+     * @param LockInterface $lock
      * @return UploadResults
-     * @throws \Throwable
+     * @throws \LogicException
+     * @throws \PDOException
      */
-    public function upload(bool $retryFailed, int $batchSize, int $maxSkips): UploadResults
+    public function upload(bool $retryFailed, int $batchSize, int $maxSkips, LockInterface $lock): UploadResults
     {
         $this->log->info('Initiating upload');
 
@@ -210,6 +214,11 @@ class Uploader
                 $kamiModel->setKamiCreatedAt($kamiDoc->getCreatedAt());
                 $kamiModel = $this->updateKamiModelState($kamiModel, $kamiDoc);
                 $this->saveKamiModel($kamiModel);
+
+                /* Refresh lock while we're still processing; keep using another
+                 * $timeout seconds until we're done, or until we died
+                 */
+                $lock->refresh();
             }
         }
         return $results;
