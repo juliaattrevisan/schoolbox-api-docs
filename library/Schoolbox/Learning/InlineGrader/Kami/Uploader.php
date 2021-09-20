@@ -17,6 +17,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use GuzzleHttp\Exception\ConnectException;
 use Sentry\State\HubInterface;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
 
@@ -218,7 +220,14 @@ class Uploader
                 /* Refresh lock while we're still processing; keep using another
                  * $timeout seconds until we're done, or until we died
                  */
-                $lock->refresh();
+                try {
+                    $this->log->info('Kami document upload used more than seconds timeout; refreshing lock');
+
+                    $lock->refresh();
+                } catch (LockConflictedException | LockAcquiringException $e) {
+                    $this->log->warning('Could not refresh lock: aborting');
+                    break;
+                }
             }
         }
         return $results;
