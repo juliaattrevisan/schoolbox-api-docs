@@ -352,7 +352,11 @@ class Report
                     'CROSSREF_POSTED_CONTENT'
                 ],
             ],
-            'auto_exclude_self_matching_scope' => 'ALL'
+            'auto_exclude_self_matching_scope' => 'ALL',
+            'view_settings' => [
+                'exclude_bibliography' => true,
+                'exclude_citations'=> true,
+            ],
         ];
 
         $result = $this->api->retrieve('PUT', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", $payload);

@@ -436,7 +436,7 @@ class File
              * I think it should be the submission file since you have multiple
              * student submission files per assessment
              */
-            'title' => "[{$ssf->getId()}] {$ssf->getFilename()}",
+            'title' => $ssf->getFilename(),
             'owner_default_permission_set' => 'LEARNER',
             'metadata' => [
                 'owners' => [
