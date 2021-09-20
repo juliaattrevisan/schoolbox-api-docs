@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Test;
+namespace Schoolbox\LTI\Prototype;
 
 use Laminas\Uri\UriInterface;
 use OAT\Library\Lti1p3Core\Platform\Platform;
@@ -179,7 +179,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
             'schoolboxVagrantPlatform',
             'Schoolbox [vagrant] Platform',
             $this->baseUrl->toString(),
-            (clone $this->baseUrl)->setPath('/lti-test/platform/oidc/authentication')->toString(),
+            (clone $this->baseUrl)->setPath('/lti-prototype/platform/oidc/authentication')->toString(),
         );
 
         // Configure a tool
@@ -188,7 +188,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
             'schoolboxVagrantTool',
             'Schoolbox [vagrant] Tool',
             $this->baseUrl->toString(),
-            (clone $this->baseUrl)->setPath('/lti-test/tool/oidc/initiation')->toString(),
+            (clone $this->baseUrl)->setPath('/lti-prototype/tool/oidc/initiation')->toString(),
         );
 
         // Configure a registration

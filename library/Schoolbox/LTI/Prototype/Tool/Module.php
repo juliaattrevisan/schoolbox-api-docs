@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Test\Tool;
+namespace Schoolbox\LTI\Prototype\Tool;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -21,7 +21,7 @@ class Module extends BaseModule
     /**
      * @var string
      */
-    protected $basename = 'ltiTestTool';
+    protected $basename = 'ltiPrototypeTool';
 
     /**
      * @inheritdoc

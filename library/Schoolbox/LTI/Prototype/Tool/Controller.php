@@ -7,16 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Test\Tool;
+namespace Schoolbox\LTI\Prototype\Tool;
 
 use Alaress\Web\Controller\Base;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
-use Schoolbox\LTI\Test\RegistrationRepository;
-use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
-use Schoolbox\LTI\Test\ServerRequestFactory;
+use Schoolbox\LTI\Prototype\RegistrationRepository;
+use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
+use Schoolbox\LTI\Prototype\ServerRequestFactory;
 
 /**
  * LTI test tool controller
@@ -26,7 +26,7 @@ class Controller extends Base
     /**
      * Handle OIDC initiation request
      *
-     * @api GET /lti-test/tool/oidc/initiation
+     * @api GET /lti-prototype/tool/oidc/initiation
      * @since 21.1.0
      */
     public function getOidcInitiationRequest()
@@ -40,7 +40,7 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@ltiTestTool/oidcInitiationRequest.twig',
+                '@ltiPrototypeTool/oidcInitiationRequest.twig',
                 ['message' => $message,]
             )
         );
@@ -49,7 +49,7 @@ class Controller extends Base
     /**
      * Handle launch request
      *
-     * @api GET /lti-test/tool/launch
+     * @api GET /lti-prototype/tool/launch
      * @since 21.1.0
      */
     public function getLaunch()
@@ -65,7 +65,7 @@ class Controller extends Base
         $result = $validator->validatePlatformOriginatingLaunch($serverRequest);
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@ltiTestTool/launch.twig',
+                '@ltiPrototypeTool/launch.twig',
                 ['result' => $result]
             )
         );

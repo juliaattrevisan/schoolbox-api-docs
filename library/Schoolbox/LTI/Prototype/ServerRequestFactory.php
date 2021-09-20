@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Test;
+namespace Schoolbox\LTI\Prototype;
 
 use Aura\Web\Request;
 use Http\Factory\Guzzle\ServerRequestFactory as GuzzleServerRequestFactory;

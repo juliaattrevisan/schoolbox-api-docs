@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Test;
+namespace Schoolbox\LTI\Prototype;
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;

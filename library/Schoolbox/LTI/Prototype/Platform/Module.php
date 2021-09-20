@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Test\Platform;
+namespace Schoolbox\LTI\Prototype\Platform;
 
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
@@ -23,7 +23,7 @@ class Module extends BaseModule
     /**
      * @var string
      */
-    protected $basename = 'ltiTestPlatform';
+    protected $basename = 'ltiPrototypePlatform';
 
     /**
      * @inheritdoc

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Test\Platform;
+namespace Schoolbox\LTI\Prototype\Platform;
 
 use Alaress\Web\Controller\Base;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
@@ -15,10 +15,10 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuild
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
-use Schoolbox\LTI\Test\RegistrationRepository;
-use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
-use Schoolbox\LTI\Test\ServerRequestFactory;
-use Schoolbox\LTI\Test\UserAuthenticator;
+use Schoolbox\LTI\Prototype\RegistrationRepository;
+use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
+use Schoolbox\LTI\Prototype\ServerRequestFactory;
+use Schoolbox\LTI\Prototype\UserAuthenticator;
 use Schoolbox\Role;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
@@ -49,7 +49,7 @@ class Controller extends Base
      * Index for test platform: displays a form which contains various claims
      * which may be added to the resource link request.
      *
-     * @api GET /lti-test/platform
+     * @api GET /lti-prototype/platform
      * @since 21.1.0
      */
     public function getIndex(): void
@@ -67,14 +67,14 @@ class Controller extends Base
                                          ->slice(0, 5);
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@ltiTestPlatform/index.twig',
+                '@ltiPrototypePlatform/index.twig',
                 [
                     'staffUsers'    => $staffUsers,
                     'studentUsers'  => $studentUsers,
                     'targetLinkUri' => (new Factory($this->getConfigLoader()))
                         ->buildFullyQualified()
                         ->setScheme('https')
-                        ->setPath($this->router->generate('ltiTestTool.getLaunch')),
+                        ->setPath($this->router->generate('ltiPrototypeTool.getLaunch')),
                 ]
             )
         );
@@ -83,7 +83,7 @@ class Controller extends Base
     /**
      * Generate a resource link request, based upon the form values passed.
      *
-     * @api GET /lti-test/platform/generate-resource-link-request
+     * @api GET /lti-prototype/platform/generate-resource-link-request
      * @since 21.1.0
      */
     public function getGenerateResourceLinkRequest(): void
@@ -128,7 +128,7 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@ltiTestPlatform/generateResourceLinkRequest.twig',
+                '@ltiPrototypePlatform/generateResourceLinkRequest.twig',
                 ['messageUrl' => $message->toUrl(),]
             )
         );
@@ -137,7 +137,7 @@ class Controller extends Base
     /**
      * Authenticate an OIDC request
      *
-     * @api GET /lti-test/platform/oidc/authentication
+     * @api GET /lti-prototype/platform/oidc/authentication
      * @since 21.1.0
      */
     public function getOidcAuthenticationRequest(): void
@@ -153,14 +153,14 @@ class Controller extends Base
             $message = $oidcAuthenticator->authenticate($serverRequest);
             $this->response->content->set(
                 $this->buildHtmlOutput(
-                    '@ltiTestPlatform/oidcAuthenticationRequest.twig',
+                    '@ltiPrototypePlatform/oidcAuthenticationRequest.twig',
                     ['message' => $message,]
                 )
             );
         } catch (LtiExceptionInterface $e) {
             $this->response->content->set(
                 $this->buildHtmlOutput(
-                    '@ltiTestPlatform/oidcAuthenticationRequestException.twig',
+                    '@ltiPrototypePlatform/oidcAuthenticationRequestException.twig',
                     ['exception' => $e,]
                 )
             );
