@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Test;
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Factory;
 
@@ -41,6 +42,8 @@ class RegistrationRepositoryFactory
     {
         return new RegistrationRepository(
             (new Factory($this->config))->buildFullyQualified()->setScheme('https'),
+            $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+            $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY)
         );
     }
 }

@@ -37,12 +37,23 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public const REGISTRATION_DEPLOYMENT_IDS = ['deploymentId'];
 
-
     /**
      * The base URL for the tool and platform.
+     *
+     * Used as the audience for the tool and platform, and also as the base for
+     * their URLs.
      */
     private UriInterface $baseUrl;
 
+    /**
+     * The public key used by both the tool and platform.
+     */
+    private string $sharedPublicKey;
+
+    /**
+     * The private key used by both the tool and platform.
+     */
+    private string $sharedPrivateKey;
 
     /**
      * The test registration.
@@ -52,14 +63,16 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     /**
      * Constructor
      *
-     * @param UriInterface $baseUrl The current base URL: used as the audience
-     *                              for the platform and tool, and also as the
-     *                              base for their URLs.
+     * @param UriInterface $baseUrl
+     * @param string       $sharedPublicKey
+     * @param string       $sharedPrivateKey
      */
-    public function __construct(UriInterface $baseUrl)
+    public function __construct(UriInterface $baseUrl, string $sharedPublicKey, string $sharedPrivateKey)
     {
-        $this->baseUrl      = $baseUrl;
-        $this->registration = $this->buildTestRegistration();
+        $this->baseUrl          = $baseUrl;
+        $this->sharedPublicKey  = $sharedPublicKey;
+        $this->sharedPrivateKey = $sharedPrivateKey;
+        $this->registration     = $this->buildTestRegistration();
     }
 
     /**
@@ -144,61 +157,20 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         // Configure security keys
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-security-keys
         $keyChainFactory = new KeyChainFactory();
-        $sharedPublicKey = <<<PUBLICKEY
-            -----BEGIN PUBLIC KEY-----
-            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs5BfD0/+IeYbzNJJbeib
-            HDQsHb1jaNOrG63HtzM7H+K2I/X3b9NGQNFEkhQxMTwbVVkbWITFoXOZHR0vNAb8
-            w04ZxPOgtk1pwFwgQ9ERiZgyE8hfkSVwe4URh88sC+A+zWja+6OtBamM/dAGuDki
-            FzzzdRH1G++l4joa8KywqgZm9AY63jTHRkEBv96bIXSPYnYa3EOnnXG9loh1ArT2
-            KE57d6G8rIkblEBB4h+Jv+rIemrlVjO1YuwynNCoCcWox090i6ejKe2OEc4FsP/x
-            JYFXIIlay95laYzypfPbpo4qeCoCCqY8W2zsWXx409G0DcEzDUpvq9xj4xo1ozBz
-            SQIDAQAB
-            -----END PUBLIC KEY-----
-            PUBLICKEY;
-        $sharedPrivateKey = <<<PRIVATEKEY
-            -----BEGIN RSA PRIVATE KEY-----
-            MIIEowIBAAKCAQEAs5BfD0/+IeYbzNJJbeibHDQsHb1jaNOrG63HtzM7H+K2I/X3
-            b9NGQNFEkhQxMTwbVVkbWITFoXOZHR0vNAb8w04ZxPOgtk1pwFwgQ9ERiZgyE8hf
-            kSVwe4URh88sC+A+zWja+6OtBamM/dAGuDkiFzzzdRH1G++l4joa8KywqgZm9AY6
-            3jTHRkEBv96bIXSPYnYa3EOnnXG9loh1ArT2KE57d6G8rIkblEBB4h+Jv+rIemrl
-            VjO1YuwynNCoCcWox090i6ejKe2OEc4FsP/xJYFXIIlay95laYzypfPbpo4qeCoC
-            CqY8W2zsWXx409G0DcEzDUpvq9xj4xo1ozBzSQIDAQABAoIBAC7jPv9HmwuNA6tb
-            KdNqTr5xnSdy4bdotiB3I1RiK0krMPZ47tCjcY/RVT9zyFib4mNJ7ksR+G0tO0kP
-            6tiCDpSNG0uDdm7EDh4tsDslJ5gvRrxFsTa8eP+4Apjc7xp2xs9qVuwolDCLUoag
-            QHDwckdxIf1q3/8Yd8937rrzzPnIXBIeklLPdiPkJD0Jqbp+Hifr+0eY0svk1bej
-            6Vrvt16cwt5QVIGknFZgbkeg1ciTcHnqQqviDODf3ZcX8gacIm1XUTzpooxcz+yA
-            dxknRoPTLABzyVGYtnEUaJa11rwF6EcT1W9B3XMxhZxazqrWciUngeWZxS0SAgGm
-            OLDrSvUCgYEA4Zf1ifJ+BW/JyQOWlMkGwdiXmZhBPfzZms1YR8CNHtpytxwROXtV
-            4Y6FduI8AFiheUTDPm7qV1Ps74eDXLZS8ccjKiPO6u27cx6hUfQKlluEiV0HHaHs
-            WxDUo1KM+TM2LgObxhxX+pwonTPAsc1Q+XZxB6ZH2WvphxAX4bMIjmcCgYEAy8Qs
-            RQNSsc+cLzBOzg0JMPkXFA2wunyuq6g8+2qAAdBVEMTj/REUnrqqu1I9EAB7bC49
-            LV8KaCwY0hh3HnCDBSBek1BztP0ub5myWvHk46p5B3Pl5tt/exk8DBThVeEXU8It
-            nmRn06j+Izp9qm2pPTjwiI2JFxFFy9m48m5Dgs8CgYEAhpS6BZ6lcabb8VBzr7Ux
-            k8kbv6SmH03Nn10rcjq7tZFKaFSVLf6XIGV+14plkytMwWS1OXS/1nMZ4VetlUyr
-            tNNA9i3AjkRe1HGMebCl9EcKjUvzJ8lmkHk88WYY9b2Ib/D1KD3WeopYbFfod+nt
-            ibUP/ylCqcGH4mxGYv4Ed7cCgYBWjnN7sWisTZN73Bptns37tqPeCd67qQENu/6D
-            kf7kRloMMIbkViAbORITVmDH7lx/XLjyEAA8thapEGlxTbvqLpDeJPuxsybJk1FX
-            Ho/rQdv9lXbgdPcXFGYUf74km+Qr2T1FnkMYfx3NWyhMgB62+fv7FZxZZyXt7QOK
-            P9p/swKBgBiNcCT4wOfEKDP8Uy+yL64eXvwy+0b5uF2gDoaYN5JxPRZ80tjheyZ+
-            Uxglei4Z6RzuWFVgmD4anBZDt8QV7L4y6ByLAxzkg5rxvlxTrOoRkeZIu8QcfrXH
-            nZs9K88+xLUWj7ZAGvGrK5v/Xfm1ape8unwXTXPs7fNz72p3TfYm
-            -----END RSA PRIVATE KEY-----
-            PRIVATEKEY;
-
 
         // Tool and platform keychains both need both a private and public key,
         // as this provides info for both the tool and platform
         $toolKeyChain = $keyChainFactory->create(
             '1',
             'test',
-            $sharedPublicKey,
-            $sharedPrivateKey,
+            $this->sharedPublicKey,
+            $this->sharedPrivateKey,
         );
         $platformKeyChain = $keyChainFactory->create(
             '1',
             'test',
-            $sharedPublicKey,
-            $sharedPrivateKey,
+            $this->sharedPublicKey,
+            $this->sharedPrivateKey,
         );
 
         // Configure a platform
