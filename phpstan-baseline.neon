@@ -2926,11 +2926,6 @@ parameters:
 			path: library/Schoolbox/Admin/LTI/Module.php
 
 		-
-			message: "#^Variable \\$table in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Lists/Controller.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/News/Policy/Module.php

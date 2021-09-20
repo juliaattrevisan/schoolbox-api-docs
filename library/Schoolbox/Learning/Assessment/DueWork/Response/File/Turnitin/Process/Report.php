@@ -355,7 +355,7 @@ class Report
             'auto_exclude_self_matching_scope' => 'ALL',
             'view_settings' => [
                 'exclude_bibliography' => true,
-                'exclude_citations'=> true,
+                'exclude_citations' => true,
             ],
         ];
 
