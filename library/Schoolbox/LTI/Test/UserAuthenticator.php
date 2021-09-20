@@ -15,6 +15,7 @@ use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterfac
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * User authenticator for the test platform and tool.
@@ -25,22 +26,22 @@ use Schoolbox\User;
 class UserAuthenticator implements UserAuthenticatorInterface
 {
     /**
-     * The user to authenticate.
+     * The user mapper, used to find the authenticated user.
      */
-    private ?User $currentUser;
+    private UserMapper $userMapper;
 
     /**
      * Constructor
      *
-     * @param User|null $currentUser
+     * @param UserMapper $userMapper
      */
-    public function __construct(?User $currentUser)
+    public function __construct(UserMapper $userMapper)
     {
-        $this->currentUser = $currentUser;
+        $this->userMapper = $userMapper;
     }
 
     /**
-     * Authenticates whichever user was passed in the constructor.
+     * Authenticates whichever user matches `$loginHint`.
      *
      * @param RegistrationInterface $registration
      * @param string                $loginHint
@@ -48,16 +49,28 @@ class UserAuthenticator implements UserAuthenticatorInterface
      */
     public function authenticate(RegistrationInterface $registration, string $loginHint): UserAuthenticationResultInterface
     {
-        if ($this->currentUser) {
+        if ($loginHint === '') {
             return new UserAuthenticationResult(
                 true,
                 new UserIdentity(
-                    (string)$this->currentUser->getId(),
-                    $this->currentUser->getFullName(),
-                    $this->currentUser->getEmail()
+                    '',
+                    'Unknown User',
                 )
             );
         }
+
+        $user = $this->userMapper->findByUsername($loginHint);
+        if ($user) {
+            return new UserAuthenticationResult(
+                true,
+                new UserIdentity(
+                    (string)$user->getId(),
+                    $user->getFullName(),
+                    $user->getEmail()
+                )
+            );
+        }
+
         return new UserAuthenticationResult(false);
     }
 }

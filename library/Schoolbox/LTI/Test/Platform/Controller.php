@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Test\Platform;
 
 use Alaress\Web\Controller\Base;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
@@ -19,7 +20,6 @@ use Schoolbox\LTI\Test\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Test\ServerRequestFactory;
 use Schoolbox\LTI\Test\UserAuthenticator;
 use Schoolbox\LTI\Test\UserAuthenticatorFactory;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Url\Factory;
 use Schoolbox\UserMapper;
 
@@ -28,6 +28,22 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
+    /**
+     * User mapper, required for authenticating the user who is passed in the
+     * resource link request (this isn't always the logged-in user)
+     */
+    private UserMapper $userMapper;
+
+    /**
+     * Constructor
+     *
+     * @param UserMapper $userMapper
+     */
+    public function __construct(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
+    }
+
     /**
      * Index for test platform: displays a form which contains various claims
      * which may be added to the resource link request.
@@ -67,7 +83,7 @@ class Controller extends Base
         $role      = null;
         $loginHint = $this->request->post->get('loginHint');
         if (strlen($loginHint) > 0) {
-            $user = UserMapper::getInstance()->findByUsername($loginHint);
+            $user = $this->userMapper->findByUsername($loginHint);
             if ($user) {
                 $role = $user->getRole()->isStaff()
                     ? 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
@@ -112,17 +128,25 @@ class Controller extends Base
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
         $oidcAuthenticator = new OidcAuthenticator(
             $this->buildRegistrationRepository(),
-            $this->buildUserAuthenticator()
+            new UserAuthenticator($this->userMapper),
         );
         $serverRequest = (new ServerRequestFactory())->build($this->request);
-        $message       = $oidcAuthenticator->authenticate($serverRequest);
-
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@ltiTestPlatform/oidcAuthenticationRequest.twig',
-                ['messageUrl' => $message->toUrl(),]
-            )
-        );
+        try {
+            $message = $oidcAuthenticator->authenticate($serverRequest);
+            $this->response->content->set(
+                $this->buildHtmlOutput(
+                    '@ltiTestPlatform/oidcAuthenticationRequest.twig',
+                    ['messageUrl' => $message->toUrl(),]
+                )
+            );
+        } catch (LtiExceptionInterface $e) {
+            $this->response->content->set(
+                $this->buildHtmlOutput(
+                    '@ltiTestPlatform/oidcAuthenticationRequestException.twig',
+                    ['exception' => $e,]
+                )
+            );
+        }
     }
 
     /**
@@ -133,15 +157,5 @@ class Controller extends Base
     private function buildRegistrationRepository(): RegistrationRepository
     {
         return (new RegistrationRepositoryFactory($this->getConfigLoader()))->build();
-    }
-
-    /**
-     * Build the test user authenticator for this platform.
-     *
-     * @return UserAuthenticator
-     */
-    private function buildUserAuthenticator(): UserAuthenticator
-    {
-        return (new UserAuthenticatorFactory())->build($this->getUser());
     }
 }

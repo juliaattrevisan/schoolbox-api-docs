@@ -4,20 +4,20 @@
 
 <h3>About the launch request</h3>
 <dl>
-    <dt>Error?</dt>
-    <dd>{{ result.hasError ? 'Y' : 'N' }}</dd>
+    <dt>Valid?</dt>
+    <dd>{{ result.hasError ? 'N' : 'Y' }}</dd>
 
     <dt>Version</dt>
-    <dd>{{ result.payload.version }}</dd>
+    <dd>{{ result.payload.version ?? '' }}</dd>
 
     <dt>User.identity</dt>
-    <dd>{{ result.payload.userIdentity.identifier }}</dd>
+    <dd>{{ result.payload.userIdentity.identifier ?? '' }}</dd>
 
     <dt>User.name</dt>
-    <dd>{{ result.payload.userIdentity.name }}</dd>
+    <dd>{{ result.payload.userIdentity.name ?? '' }}</dd>
 
     <dt>User.email</dt>
-    <dd>{{ result.payload.userIdentity.email }}</dd>
+    <dd>{{ result.payload.userIdentity.email ?? '' }}</dd>
 </dl>
 
-<a href="{{ routeLookup('ltiTestPlatform.index') }}" class="button submit">Return to platform</a>
+<a href="{{ routeLookup('ltiTestPlatform.getIndex') }}" class="button submit">Return to platform</a>

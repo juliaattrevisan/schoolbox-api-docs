@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Schoolbox\UserMapper;
 
 /**
  * LTI test platform module
@@ -39,7 +40,13 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                ['userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)]
+            )
+        );
     }
 
     /**

@@ -82,14 +82,4 @@ class Controller extends Base
     {
         return (new RegistrationRepositoryFactory($this->getConfigLoader()))->build();
     }
-
-    /**
-     * Build the test user authenticator for this platform.
-     *
-     * @return UserAuthenticator
-     */
-    private function buildUserAuthenticator(): UserAuthenticator
-    {
-        return (new UserAuthenticatorFactory())->build($this->getUser());
-    }
 }
