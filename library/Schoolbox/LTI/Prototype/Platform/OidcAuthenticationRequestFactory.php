@@ -18,7 +18,7 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Schoolbox\LTI\Prototype\ServerRequestFactory;
 
 /**
- *
+ * Factory for OIDC authentication requests.
  */
 class OidcAuthenticationRequestFactory
 {

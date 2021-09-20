@@ -33,11 +33,7 @@ class Controller extends Base
     {
         // Handle the OIDC initiation on the tool side
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#2-tool-side-oidc-initiation
-        $repository    = $this->buildRegistrationRepository();
-        $oidcInitiator = new OidcInitiator($repository);
-        $serverRequest = (new ServerRequestFactory())->build($this->request);
-        $message       = $oidcInitiator->initiate($serverRequest);
-
+        $message = (new OidcInitiationRequestFactory($this->buildRegistrationRepository()))->build($this->request);
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiPrototypeTool/oidcInitiationRequest.twig',
@@ -56,13 +52,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#4-tool-side-launch-validation
-        $registrationRepository = $this->buildRegistrationRepository();
-        $serverRequest          = (new ServerRequestFactory())->build($this->request);
-        $validator              = new ToolLaunchValidator(
-            $registrationRepository,
-            new NonceRepository(new ArrayCachePool())
-        );
-        $result = $validator->validatePlatformOriginatingLaunch($serverRequest);
+        $result = (new PlatformOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiPrototypeTool/launch.twig',
