@@ -41,11 +41,21 @@
                 {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folder: class, folderId: class.id}) %}
                 {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
                 <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}" class="icon-modify">Modify</a></li>
+                {% set routes = {} %}
                 {% if courses | length %}
-                    <li class="separator">Analytics</li>
                     {% for courseSpecId, courseSpecTitle in courses %}
+                        {# get the route for analytics #}
                         {% set url = routeLookup('learningAnalytics.folderWithTerm', {courseSpecId: courseSpecId, folderId: class.id, termCode: term.code}) %}
-                        <li><a href="{{ url }}" class="icon-poll">{{ courseSpecTitle }}</a></li>
+                        {# check if url is filled (the url is possibly not available, due to the schoolbox plan) #}
+                        {% if url %}
+                            {% set routes = routes|merge({(loop.index0) : {'title' : courseSpecTitle, 'url' : url}}) %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if routes  %}
+                    <li class="separator">Analytics</li>
+                    {% for route in routes %}
+                        <li><a href="{{ route.url }}" class="icon-poll">{{ route.title }}</a></li>
                     {% endfor %}
                 {% endif %}
 
