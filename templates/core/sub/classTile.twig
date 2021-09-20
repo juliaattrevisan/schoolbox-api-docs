@@ -41,7 +41,7 @@
                 {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folder: class, folderId: class.id}) %}
                 {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
                 <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}" class="icon-modify">Modify</a></li>
-                {% set routes=[] %}
+                {% set routes = {} %}
                 {% if courses | length %}
                     {% for courseSpecId, courseSpecTitle in courses %}
                         {# get the route for analytics #}
