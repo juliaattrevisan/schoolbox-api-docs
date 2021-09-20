@@ -14,6 +14,9 @@ use Alaress\Jitter\IJitter;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\InlineGrader\Kami\Exception\IKamiException;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 use Throwable;
 
 /**
@@ -65,13 +68,19 @@ class ReQueueErrors
 
 
     /**
-     * @param bool        $dryRun
-     * @param int         $maxSkips
-     * @param null|string $errorMessageFilter If supplied, only re-queue documents which match this error message
+     * @param bool               $dryRun
+     * @param int                $maxSkips
+     * @param null|string        $errorMessageFilter If supplied, only re-queue documents which match this error message
+     * @param LockInterface|null $lock
      * @return int
-     * @throws \Throwable
+     * @throws ConnectException
+     * @throws IKamiException
+     * @throws Throwable
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function deleteAndReQueue(bool $dryRun, int $maxSkips, string $errorMessageFilter = null): int
+    public function deleteAndReQueue(bool $dryRun, int $maxSkips, string $errorMessageFilter = null, ?LockInterface $lock = null): int
     {
         $this->resetCounts();
 
@@ -99,6 +108,20 @@ class ReQueueErrors
                 }
             }
             $count++;
+
+            /* Refresh lock while we're still processing; keep using another
+             * $timeout seconds until we're done, or until we died
+             */
+            if ($lock) {
+                try {
+                    $this->log->info('Kami requeuer used more than seconds timeout; refreshing lock');
+
+                    $lock->refresh();
+                } catch (LockConflictedException | LockAcquiringException $e) {
+                    $this->log->warning('Could not refresh lock: aborting');
+                    break;
+                }
+            }
         }
         $this->log->info("Success count: {$this->countSuccess}, Warning count: {$this->countWarning}, Failure count: {$this->countFailure}");
         return $this->countFailure || $this->countWarning ? 1 : 0;

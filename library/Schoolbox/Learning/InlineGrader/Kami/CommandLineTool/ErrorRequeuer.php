@@ -130,7 +130,7 @@ HELP;
         // Run the tool
         $exitStatus = 0;
         try {
-            $exitStatus = $requeueErrors->deleteAndReQueue(!$this->perform(), $maxSkips, $errorMessage);
+            $exitStatus = $requeueErrors->deleteAndReQueue(!$this->perform(), $maxSkips, $errorMessage, $lock);
         } catch (Throwable $e) {
             $this->getLogger()->error($e->getMessage(), $e->getTrace());
             $this->getLogger()->error($e->getTraceAsString());
