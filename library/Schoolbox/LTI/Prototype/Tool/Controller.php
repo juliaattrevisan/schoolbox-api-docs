@@ -14,7 +14,7 @@ use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
 
 /**
- * LTI test tool controller
+ * LTI prototype tool controller
  */
 class Controller extends Base
 {
@@ -30,7 +30,7 @@ class Controller extends Base
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#2-tool-side-oidc-initiation
         $message = (new OidcInitiationRequestFactory($this->buildRegistrationRepository()))->build($this->request);
         $this->response->content->set(
-            $this->buildHtmlOutput(
+            $this->buildUnthemedHtmlOutput(
                 '@ltiPrototypeTool/oidcInitiationRequest.twig',
                 ['message' => $message,]
             )
@@ -49,7 +49,7 @@ class Controller extends Base
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#4-tool-side-launch-validation
         $result = (new PlatformOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
         $this->response->content->set(
-            $this->buildHtmlOutput(
+            $this->buildUnthemedHtmlOutput(
                 '@ltiPrototypeTool/launch.twig',
                 ['result' => $result]
             )
@@ -57,7 +57,7 @@ class Controller extends Base
     }
 
     /**
-     * Build the test registration repository for this platform.
+     * Build the registration repository for this platform.
      *
      * @return RegistrationRepository
      */

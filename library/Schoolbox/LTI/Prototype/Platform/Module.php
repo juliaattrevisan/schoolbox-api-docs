@@ -16,7 +16,7 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\UserMapper;
 
 /**
- * LTI test platform module
+ * LTI prototype platform module
  */
 class Module extends BaseModule
 {

@@ -20,10 +20,15 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * LTI test platform controller
+ * LTI prototype platform controller
  */
 class Controller extends Base
 {
+    /**
+     * Default title for this controller's pages.
+     */
+    private const TITLE = 'LTI Prototype Platform';
+
     /**
      * User mapper, required for authenticating the user who is passed in the
      * resource link request (this isn't always the logged-in user)
@@ -41,8 +46,8 @@ class Controller extends Base
     }
 
     /**
-     * Index for test platform: displays a form which contains various claims
-     * which may be added to the resource link request.
+     * Index for prototype platform: displays a form which contains various
+     * claims which may be added to the resource link request.
      *
      * @api GET /lti-prototype/platform
      * @since 21.1.0
@@ -72,7 +77,8 @@ class Controller extends Base
                         ->buildFullyQualified()
                         ->setScheme('https')
                         ->setPath($this->router->generate('ltiPrototypeTool.getLaunch')),
-                ]
+                ],
+                self::TITLE,
             )
         );
     }
@@ -103,7 +109,8 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiPrototypePlatform/generateResourceLinkRequest.twig',
-                ['messageUrl' => $message->toUrl(),]
+                ['messageUrl' => $message->toUrl(),],
+                self::TITLE,
             )
         );
     }
@@ -133,14 +140,15 @@ class Controller extends Base
             $this->response->content->set(
                 $this->buildHtmlOutput(
                     '@ltiPrototypePlatform/oidcAuthenticationRequestException.twig',
-                    ['exception' => $e,]
+                    ['exception' => $e,],
+                    self::TITLE,
                 )
             );
         }
     }
 
     /**
-     * Build the test registration repository for this platform.
+     * Build the registration repository for this platform.
      *
      * @return RegistrationRepository
      */

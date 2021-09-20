@@ -14,7 +14,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Factory;
 
 /**
- * Factory for the registration repository for the test platform and tool.
+ * Factory for the registration repository for the prototype platform and tool.
  */
 class RegistrationRepositoryFactory
 {

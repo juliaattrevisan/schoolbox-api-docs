@@ -18,7 +18,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Tool\Tool;
 
 /**
- * Registration repository for the test platform and tool.
+ * Registration repository for the prototype platform and tool.
  */
 class RegistrationRepository implements RegistrationRepositoryInterface
 {
@@ -56,7 +56,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     private string $sharedPrivateKey;
 
     /**
-     * The test registration.
+     * The registration.
      */
     private Registration $registration;
 
@@ -76,7 +76,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     }
 
     /**
-     * Find the test registration by its identifier.
+     * Find the registration by its identifier.
      *
      * @param string $identifier
      * @return RegistrationInterface|null
@@ -89,7 +89,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     }
 
     /**
-     * Find all registrations: in this repo, it is only the test registration.
+     * Find all registrations: in this repo, there is only one registration.
      *
      * @return Registration[]
      */
@@ -99,7 +99,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     }
 
     /**
-     * Find the test registration by its client ID,
+     * Find the registration by its client ID,
      *
      * @param string $clientId
      * @return RegistrationInterface|null
@@ -112,8 +112,8 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     }
 
     /**
-     * Find the test registration by its platform issuer (a.k.a. audience),
-     * and optionally its client ID.
+     * Find the registration by its platform issuer (a.k.a. audience), and
+     * optionally its client ID.
      *
      * @param string      $issuer
      * @param string|null $clientId
@@ -130,8 +130,8 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     }
 
     /**
-     * Find the test registration by its tool issuer (a.k.a. audience),
-     * and optionally its client ID.
+     * Find the registration by its tool issuer (a.k.a. audience), and
+     * optionally its client ID.
      *
      * @param string      $issuer
      * @param string|null $clientId
@@ -148,7 +148,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     }
 
     /**
-     * Build the test registration.
+     * Build the registration.
      *
      * @return Registration
      */

@@ -14,7 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 
 /**
- * LTI test tool module
+ * LTI prototype tool module
  */
 class Module extends BaseModule
 {

@@ -1,23 +1,27 @@
-<h1>LTI Test Tool</h1>
+{% extends '@ltiPrototypeTool/base.twig' %}
 
-<h2>Resource link launch request received from platform</h2>
+{% block content %}
+    <h1>LTI Prototype Tool</h1>
 
-<h3>About the launch request</h3>
-<dl>
-    <dt>Valid?</dt>
-    <dd>{{ result.hasError ? 'N' : 'Y' }}</dd>
+    <h2>Resource link launch request received from platform</h2>
 
-    <dt>Version</dt>
-    <dd>{{ result.payload.version ?? '' }}</dd>
+    <h3>About the launch request</h3>
+    <dl>
+        <dt>Valid?</dt>
+        <dd>{{ result.hasError ? 'N' : 'Y' }}</dd>
 
-    <dt>User identity</dt>
-    <dd>{{ result.payload.userIdentity.identifier ?? '' }}</dd>
+        <dt>Version</dt>
+        <dd>{{ result.payload.version ?? '' }}</dd>
 
-    <dt>User name</dt>
-    <dd>{{ result.payload.userIdentity.name ?? '' }}</dd>
+        <dt>User identity</dt>
+        <dd>{{ result.payload.userIdentity.identifier ?? '' }}</dd>
 
-    <dt>User email</dt>
-    <dd>{{ result.payload.userIdentity.email ?? '' }}</dd>
-</dl>
+        <dt>User name</dt>
+        <dd>{{ result.payload.userIdentity.name ?? '' }}</dd>
 
-<a href="{{ routeLookup('ltiPrototypePlatform.getIndex') }}" class="button submit">Return to platform</a>
+        <dt>User email</dt>
+        <dd>{{ result.payload.userIdentity.email ?? '' }}</dd>
+    </dl>
+
+    <a href="{{ routeLookup('ltiPrototypePlatform.getIndex') }}">Return to platform</a>
+{% endblock content %}
