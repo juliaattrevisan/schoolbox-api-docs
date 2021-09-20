@@ -14,7 +14,6 @@ use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**

@@ -69,8 +69,12 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@ltiTestPlatform/index.twig',
                 [
-                    'staffUsers'   => $staffUsers,
-                    'studentUsers' => $studentUsers,
+                    'staffUsers'    => $staffUsers,
+                    'studentUsers'  => $studentUsers,
+                    'targetLinkUri' => (new Factory($this->getConfigLoader()))
+                        ->buildFullyQualified()
+                        ->setScheme('https')
+                        ->setPath($this->router->generate('ltiTestTool.getLaunch')),
                 ]
             )
         );
@@ -110,11 +114,10 @@ class Controller extends Base
         // I have a registration: I may now create a message
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#create-the-message
         $builder = new PlatformOriginatingLaunchBuilder();
-        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
         $message = $builder->buildPlatformOriginatingLaunch(
             $registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            (clone $baseUrl)->setPath($this->request->post->get('targetLinkUri'))->toString(),
+            $this->request->post->get('targetLinkUri'),
             $loginHint,
             null,
             [$role],
