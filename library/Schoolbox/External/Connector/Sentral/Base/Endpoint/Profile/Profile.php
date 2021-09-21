@@ -442,7 +442,9 @@ class Profile implements IStrategy
                  * This set is mixed with emergency contacts and other non-data, so
                  * sift through it all manually for the gems you need
                  */
-                $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
+                if ($externalId == 60961) {
+                    $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
+                }
 
                 /* Remember that we saw a particular student id
                  * (-not- their externalId, the primary key in sentral for this student)
@@ -900,6 +902,21 @@ class Profile implements IStrategy
             $relationship = (string)$contact['attributes']['relationName'];
             $title = (string)$parent['data']['attributes']['title'];
             $username = '';
+
+            /* The student appeared as a contact of themselves
+             * Not sure if misconfiguration or third part vendor tomfoolery
+             * In either case, we don't want this
+             */
+            if ($externalId === $studentBaseProfile->getExternalId()) {
+                $this->log->warning(sprintf(
+                    'Student %s %s appeared as contact of themselves - skipping. Double-check with endpoint: %s',
+                    $firstname,
+                    $lastname,
+                    $endpoint
+                ));
+
+                continue;
+            }
 
             if ('' === trim($externalId)) {
                 $this->log->warning(sprintf(
