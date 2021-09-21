@@ -181,7 +181,7 @@ class Processor extends CliTool\App
              * $timeout seconds until we're done, or until we died
              */
             try {
-                $log->info('Video processing exceeded timeout; refreshing lock');
+                $log->info('Refreshing lock');
 
                 $lock->refresh();
             } catch (LockConflictedException | LockAcquiringException $e) {

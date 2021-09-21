@@ -122,7 +122,7 @@ class StatusUpdater
              */
             if ($this->lock) {
                 try {
-                    $this->log->info('Kami status updater exceeded timeout; refreshing lock');
+                    $this->log->info('Refreshing lock');
 
                     $this->lock->refresh();
                 } catch (LockConflictedException | LockAcquiringException $e) {

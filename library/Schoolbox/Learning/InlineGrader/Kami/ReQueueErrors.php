@@ -121,7 +121,7 @@ class ReQueueErrors
              */
             if ($this->lock) {
                 try {
-                    $this->log->info('Kami requeuer exceeded timeout; refreshing lock');
+                    $this->log->info('Refreshing lock');
 
                     $this->lock->refresh();
                 } catch (LockConflictedException | LockAcquiringException $e) {
