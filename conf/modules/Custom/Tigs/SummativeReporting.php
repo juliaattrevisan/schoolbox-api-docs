@@ -11,7 +11,6 @@ namespace Config\Modules\Custom\Tigs;
 
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
-use Schoolbox\IConfigLoader;
 use Custom\Tigs\Summative;
 
 class SummativeReporting extends ModuleLoader
@@ -21,18 +20,10 @@ class SummativeReporting extends ModuleLoader
      * @inheritdoc
      * @param Kernel $kernel
      * @return void
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function configure($kernel): void
     {
         $di = $kernel->getDependencyInjector();
-
-        /** @var IConfigLoader $config */
-        $config = $di->get('config');
-
-        if ($config->get('site_location') !== 'tigs') {
-            return;
-        }
 
         $basePath = '/modules/custom/tigs/summative';
 

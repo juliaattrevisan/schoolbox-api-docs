@@ -8,7 +8,6 @@
 
 use Schoolbox\Database\Factory as DatabaseFactory;
 
-/** @noinspection PhpUndefinedClassInspection */
 class External_Schoolbox_Ping implements External_PingInterface
 {
     /**

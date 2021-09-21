@@ -1,0 +1,17 @@
+{% if courseCreditSummaryNavigation.all|length > 0 %}
+<div class="row">
+    <div class="small-12 columns">
+        <h2 id="course-credit-summary" class="subheader">{{ courseCreditSummaryNavigation.heading }}</h2>
+
+        <section>
+            <ul class="sub-nav">
+                {% for year in courseCreditSummaryNavigation.all %}
+                <li {% if year == courseCreditSummaryNavigation.selected %}class="active"{% endif %}>
+                    <a href="/modules/custom/diocesan/achievementreport/ncea/{{ externalUser.StudentID }}/{{ year }}#course-credit-summary">{{ year }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endif %}

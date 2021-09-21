@@ -189,7 +189,7 @@ abstract class AbstractController extends BaseController
             $data['namespace'] = $this->namespace;
         }
 
-        $data['site_location'] = \Config::get('site_location');
+        $data['site_school_code'] = \Config::get('site_school_code');
         $data['site_version'] = \Config::get('site_version');
         $data['source_slug'] = $sourceSlug;
         $data['mime'] = $mime;

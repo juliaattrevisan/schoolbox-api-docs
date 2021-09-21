@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Config\Loader;
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -18,11 +20,10 @@ class External_Ping implements External_PingInterface
      * Constructor
      *
      * @throws Exception
-     * @param String $databaseName
      */
-    public function __construct($databaseName = '')
+    public function __construct()
     {
-        $this->database = (new External_DatabaseFactory())->buildPingConnector($databaseName);
+        $this->database = (new External_DatabaseFactory())->buildPingConnector(Loader::getInstance());
     }
 
     public function isResponsive(): bool

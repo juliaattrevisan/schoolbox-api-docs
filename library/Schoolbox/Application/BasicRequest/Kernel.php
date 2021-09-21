@@ -82,7 +82,6 @@ class Kernel extends WebKernelAbstract
             $conf = $di->get('config');
             return new Instance(
                 INSTANCE_ID,
-                $conf->get('site_location'),
                 $conf->get('site_hostname'),
                 $conf->get('site_domain'),
                 $conf->get('site_version'),
@@ -326,15 +325,15 @@ class Kernel extends WebKernelAbstract
                 function () use ($di) {
                     $config      = $di->get('config');
                     $baseLoader  = new FilesystemLoader(array());
-                    // Paths: prefer templates/{site_location} over templates/core
+                    // Paths: prefer templates/{site_school_code} over templates/core
                     $basePath     = SITE_root . '/templates/';
-                    $overridePath = $basePath . $config->get('site_location');
+                    $overridePath = $basePath . $config->get('site_school_code');
                     $corePath     = $basePath . 'core';
                     if (is_dir($overridePath)) {
                         $baseLoader->addPath($overridePath);
                     }
                     $baseLoader->addPath($corePath);
-                    // Core path: always uses templates/core, even if templates/{site_location} exists
+                    // Core path: always uses templates/core, even if templates/{site_school_code} exists
                     // Used as a base for default path templates to inherit from.
                     $baseLoader->addPath($corePath, 'core');
                     return $baseLoader;

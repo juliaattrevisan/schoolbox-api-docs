@@ -1,168 +1,272 @@
 <?php
 
 /**
- * Factory for creating an external database class.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+use External\IConnector;
+use Schoolbox\IConfigLoader;
+
+/**
+ * Factory for creating an external database class.
+ *
+ * Design:
+ *   * If external connection is disabled, always return an Offline implementation to maintain interface
+ *   * If enabled, check that 'external_type' is valid, throw exception if invalid (this is distinct from unsupported!)
+ *   * Try to return specific implementation, fall back to Offline if database connectivity unavailable
+ *
+ * Note that not all external_types are supported, in those cases this simply return an Offline implementation
+ */
 class External_DatabaseFactory
 {
-
-    /**
-     * Builds a database connector to a particular part of an external database.
-     *
-     * If the external database is disabled, or an error occurs, returns an
-     * offline class.
-     *
-     * @param string $databaseType The type of class to create. One of "Class",
-     *                             "Timetable", "User", "Attendance" or "Ping".
-     * @param string $databaseName The database type to use. Defaults to
-     *                             whatever the configured external DB is, or
-     *                             "offline" if it isn't enabled.
-     * @param array  $extraParams  Any extra parameters which may be passed to
-     *                             the connector's constructor.
-     *                             key: param name, value: param value
-     *
-     * @return External\IConnector
-     * @throws LogicException if even the offline class could not be created.
-     *                        (This probably means you passed an invalid value
-     *                         for $databaseType.)
-     */
-    private function buildConnector(string $databaseType, string $databaseName = '', array $extraParams = []): External\IConnector
-    {
-        $offlineClass    = "External_Offline_$databaseType";
-        $databaseClasses = array();
-        if (!Config::get('external_enable')) {
-            $databaseClasses[] = $offlineClass;
-        } else {
-            if (empty($databaseName)) {
-                $databaseName = Config::get('external_type');
-            }
-            if (empty($databaseName)) {
-                $databaseClasses[] = $offlineClass;
-            } else {
-                $databaseClasses[] = "External_" . ucfirst($databaseName) . "_" . ucfirst(Config::get('site_location')) . "_" . $databaseType;
-                // Enable school-specific connection classes
-                if ('tass' === $databaseName && 'User' === $databaseType && Config::get('external_tass_version')) {
-                    $databaseClasses[] = "External_" . ucfirst($databaseName) . '_' . Config::get('external_tass_version') . "_" . $databaseType;
-                }
-                $databaseClasses[] = "External_" . ucfirst($databaseName) . "_" . $databaseType;
-            }
-        }
-
-        // Try each database class in order of definition
-        foreach ($databaseClasses as $databaseClass) {
-            try {
-                return $this->buildClassInstance($databaseClass, $extraParams);
-            } catch (ReflectionException $e) {
-                // Class doesn't exist: try the next one
-                continue;
-            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
-                // Something went wrong, probably could not connect. Try the next one
-                continue;
-            }
-        }
-
-        // At this point: return an offline class.
-        // If even that doesn't exist, error out.
-        try {
-            return $this->buildClassInstance($offlineClass, $extraParams);
-        } catch (ReflectionException | Schoolbox\External\Exception | Alaress\Database\Exception $e) {
-            throw new LogicException("Class \"$offlineClass\" does not exist");
-        }
-    }
-
-
-    /**
-     * Helper method for constructing an instance of `$databaseClass`.
-     *
-     * @param string $databaseClass
-     * @param array  $extraParams
-     * @return External\IConnector
-     * @throws ReflectionException          if `$databaseClass` doesn't exist
-     * @throws BadFunctionCallException     if not all mandatory parameters to
-     *                                      `$databaseClass` constructor were
-     *                                      passed
-     * @throws Schoolbox\External\Exception if for some reason the class could
-     *                                      not be constructed
-     * @throws Alaress\Database\Exception   if the instance couldn't connect to
-     *                                      its DB
-     */
-    private function buildClassInstance(string $databaseClass, array $extraParams): External\IConnector
-    {
-        $reflectionClass = new ReflectionClass($databaseClass);
-
-        /** @var External\IConnector $connector */
-        $connector   = null;
-        $constructor = $reflectionClass->getConstructor();
-        if (!$constructor) {
-            $connector = $reflectionClass->newInstanceWithoutConstructor();
-        } else {
-            // Build a list of params, as that's what `newInstanceArgs` expects.
-            $positionalParams = [];
-
-            foreach ($constructor->getParameters() as $i => $parameter) {
-                $paramName = $parameter->getName();
-                if (array_key_exists($paramName, $extraParams)) {
-                    $positionalParams[$i] = $extraParams[$paramName];
-                } elseif ($parameter->isDefaultValueAvailable()) {
-                    $positionalParams[$i] = $parameter->getDefaultValue();
-                } else {
-                    // No param value was provided, and there's no default:
-                    // this is almost certainly an error
-                    throw new BadFunctionCallException(
-                        sprintf('Class "%s" constructor is missing argument %d (%s)', $databaseClass, $i + 1, $paramName)
-                    );
-                }
-            }
-
-            $connector = $reflectionClass->newInstanceArgs($positionalParams);
-        }
-
-        return $connector;
-    }
-
-
-    /**
-     * Builds an attendance connector.
-     *
-     * @param string $databaseName
-     * @return External_AttendanceInterface
-     * @throws LogicException If cannot build connector
-     */
-    public function buildAttendanceConnector(string $databaseName = ''): External_AttendanceInterface
-    {
-        return $this->buildConnector('Attendance', $databaseName);
-    }
-
     /**
      * Builds an attendance link connector.
      *
-     * @param string $databaseName
-     * @return External_AttendanceLink
-     * @throws LogicException If cannot build connector
+     * @param IConfigLoader $config
+     * @return External_AttendanceLinkInterface
+     * @throws UnexpectedValueException If enabled but external_type is invalid
      */
-    public function buildAttendanceLinkConnector(string $databaseName = '')
+    public function buildAttendanceLinkConnector(IConfigLoader $config): External_AttendanceLinkInterface
     {
-        if (Config::get('external_attendance')) {
-            return $this->buildConnector('AttendanceLink', $databaseName);
+        if ($this->isEnabled($config) && $config->get('external_attendance')) {
+            switch ($this->getValidExternalType($config)) {
+                case IConnector::EXTERNAL_TYPE_TASS:
+                    return new External_Tass_AttendanceLink();
+                case IConnector::EXTERNAL_TYPE_SYNERGETIC:
+                    return new External_Synergetic_AttendanceLink();
+                case IConnector::EXTERNAL_TYPE_SCHOOLBOX:
+                    return new External_Schoolbox_AttendanceLink();
+            }
         }
-        return $this->buildConnector('AttendanceLink', 'Offline');
+        return new External_Offline_AttendanceLink();
     }
+
 
     /**
      * Builds a class connector.
      *
-     * @param string $databaseName
+     * @param IConfigLoader $config
      * @return External_ClassInterface
-     * @throws LogicException If cannot build connector
+     * @throws UnexpectedValueException If external_type is invalid
      */
-    public function buildClassConnector(string $databaseName = ''): External_ClassInterface
+    public function buildClassConnector(IConfigLoader $config): External_ClassInterface
     {
-        return $this->buildConnector('Class', $databaseName);
+        if ($this->isEnabled($config)) {
+            try {
+                return $this->buildEnabledClassConnector($this->getValidExternalType($config), $this->getSchoolCode($config));
+            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
+            }
+        }
+        return new External_Offline_Class();
+    }
+
+
+    /**
+     * Builds a ping connector.
+     *
+     * @param IConfigLoader $config
+     * @return External_PingInterface
+     * @throws UnexpectedValueException If external_type is invalid
+     */
+    public function buildPingConnector(IConfigLoader $config): External_PingInterface
+    {
+        if ($this->isEnabled($config)) {
+            return $this->buildEnabledPingConnector($this->getValidExternalType($config));
+        }
+        return new External_Offline_Ping();
+    }
+
+
+    /**
+     * Builds a timetable connector.
+     *
+     * @param IConfigLoader $config
+     * @return External_TimetableInterface
+     * @throws UnexpectedValueException If external_type is invalid
+     */
+    public function buildTimetableConnector(IConfigLoader $config): External_TimetableInterface
+    {
+        if ($this->isEnabled($config)) {
+            try {
+                return $this->buildEnabledTimetableConnectorInternal($this->getValidExternalType($config), $this->getSchoolCode($config));
+            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
+            }
+        }
+        return new External_Offline_Timetable();
+    }
+
+
+    /**
+     * Builds a user connector.
+     *
+     * @param string        $externalType
+     * @param IConfigLoader $config
+     * @return External_UserInterface
+     * @throws UnexpectedValueException If external_type is invalid
+     */
+    public function buildUserConnector(string $externalType, IConfigLoader $config): External_UserInterface
+    {
+        if ($this->isEnabled($config)) {
+            try {
+                return $this->buildEnabledUserConnector(
+                    $externalType ?: $this->getValidExternalType($config),
+                    $this->getSchoolCode($config),
+                    $config->get('external_tass_version')
+                );
+            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
+            }
+        }
+        return new External_Offline_User();
+    }
+
+
+    /**
+     * Builds a user detention connector.
+     *
+     * @param IConfigLoader $config
+     * @return External_UserDetentionInterface
+     * @throws UnexpectedValueException If external_type is invalid
+     */
+    public function buildUserDetentionConnector(IConfigLoader $config): External_UserDetentionInterface
+    {
+        if ($this->isEnabled($config) && $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
+            try {
+                return new External_Synergetic_UserDetention();
+            } catch (Alaress\Database\Exception $e) {
+            }
+        }
+        return new External_Offline_UserDetention();
+    }
+
+
+    /**
+     * Builds a markbook connector. If its enabled
+     *
+     * @param IConfigLoader $config
+     * @return External_MarkbookInterface
+     * @throws UnexpectedValueException If external_type is invalid
+     * @throws InvalidArgumentException If wrong construction params provided
+     */
+    public function buildMarkbookConnector(IConfigLoader $config): External_MarkbookInterface
+    {
+        if ($this->isEnabled($config) && $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
+            try {
+                return new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'));
+            } catch (Alaress\Database\Exception $e) {
+            }
+        }
+        return new External_Offline_Markbook();
+    }
+
+
+    /**
+     * Builds a pastoral connector. If its enabled
+     *
+     * @param IConfigLoader $config
+     * @return External_PastoralInterface
+     * @throws UnexpectedValueException If external_type is invalid
+     */
+    public function buildPastoralConnector(IConfigLoader $config): External_PastoralInterface
+    {
+        if (
+            $this->isEnabled($config) &&
+            $config->get('external_pastoral') &&
+            $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC
+        ) {
+            try {
+                return $this->buildSynergeticPastoralConnector($this->getSchoolCode($config));
+            } catch (Alaress\Database\Exception $e) {
+            }
+        }
+        return new External_Offline_Pastoral();
+    }
+
+
+    /**
+     * Returns whether external database is online/enabled by examining relevant config
+     *
+     * @param IConfigLoader $config
+     * @return bool
+     */
+    private function isEnabled(IConfigLoader $config): bool
+    {
+        return $config->get('external_enable');
+    }
+
+
+    /**
+     * Returns valid configured 'external_type' from config, throw exception if invalid
+     *
+     * @param IConfigLoader $config
+     * @return string
+     * @throws UnexpectedValueException If external type is unrecognised
+     */
+    private function getValidExternalType(IConfigLoader $config): string
+    {
+        $externalType = $config->get('external_type');
+        if (!in_array($externalType, IConnector::EXTERNAL_TYPES, true)) {
+            throw new UnexpectedValueException("Invalid 'external_type': '$externalType'");
+        }
+        return $externalType;
+    }
+
+
+    /**
+     * Returns configured 'site_school_code' from config
+     *
+     * @param IConfigLoader $config
+     * @return string
+     */
+    private function getSchoolCode(IConfigLoader $config): string
+    {
+        return $config->get('site_school_code');
+    }
+
+
+    /**
+     * @param string $externalType
+     * @param string $siteSchoolCode
+     * @return External_ClassInterface
+     */
+    private function buildEnabledClassConnector(string $externalType, string $siteSchoolCode): External_ClassInterface
+    {
+        switch ($externalType) {
+            case IConnector::EXTERNAL_TYPE_SCHOOLBOX:
+                return new External_Schoolbox_Class();
+            case IConnector::EXTERNAL_TYPE_MAZE:
+                return $siteSchoolCode === 'LK'
+                    ? new External_Maze_Lk_Class()
+                    : new External_Maze_Class();
+            case IConnector::EXTERNAL_TYPE_TASS:
+                return new External_Tass_Class();
+            case IConnector::EXTERNAL_TYPE_ISAMS:
+                return new External_Isams_Class();
+            case IConnector::EXTERNAL_TYPE_DENBIGH:
+                return new External_Denbigh_Class();
+            case IConnector::EXTERNAL_TYPE_EDUMATE:
+                return new External_Edumate_Class();
+            case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
+                return new External_Pcschools_Class();
+            case IConnector::EXTERNAL_TYPE_SCHOOLPRO:
+                return new External_Schoolpro_Class();
+            case IConnector::EXTERNAL_TYPE_SCHOOLEDGE:
+                return new External_Schooledge_Class();
+            case IConnector::EXTERNAL_TYPE_SYNERGETIC:
+                switch ($siteSchoolCode) {
+                    case "SCC":
+                        return new External_Synergetic_Scc_Class();
+                    case "SMCS":
+                        return new External_Synergetic_Smcs_Class();
+                    case "THS":
+                        return new External_Synergetic_Ths_Class();
+                }
+                return new External_Synergetic_Class();
+            case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
+                return new External_Doublefirst_Class();
+        }
+        return new External_Offline_Class();
     }
 
 
@@ -171,83 +275,154 @@ class External_DatabaseFactory
      *
      * @param string $databaseName
      * @return External_PingInterface
-     * @throws LogicException If cannot build connector
      */
-    public function buildPingConnector(string $databaseName = ''): External_PingInterface
+    public function buildEnabledPingConnector(string $databaseName): External_PingInterface
     {
-        return $this->buildConnector('Ping', $databaseName);
+        switch ($databaseName) {
+            case IConnector::EXTERNAL_TYPE_MAZE:
+                return new External_Maze_Ping();
+            case IConnector::EXTERNAL_TYPE_TASS:
+                return new External_Tass_Ping();
+            case IConnector::EXTERNAL_TYPE_ISAMS:
+                return new External_Isams_Ping();
+            case IConnector::EXTERNAL_TYPE_DENBIGH:
+                return new External_Denbigh_Ping();
+            case IConnector::EXTERNAL_TYPE_EDUMATE:
+                return new External_Edumate_Ping();
+            case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
+                return new External_Pcschools_Ping();
+            case IConnector::EXTERNAL_TYPE_SCHOOLBOX:
+                return new External_Schoolbox_Ping();
+            case IConnector::EXTERNAL_TYPE_SCHOOLPRO:
+                return new External_Schoolpro_Ping();
+            case IConnector::EXTERNAL_TYPE_SCHOOLEDGE:
+                return new External_Schooledge_Ping();
+            case IConnector::EXTERNAL_TYPE_SYNERGETIC:
+                try {
+                    return new External_Synergetic_Ping();
+                } catch (Alaress\Database\Exception $e) {
+                }
+                break;
+            case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
+                return new External_Doublefirst_Ping();
+        }
+        return new External_Offline_Ping();
     }
 
 
     /**
      * Builds a timetable connector.
      *
-     * @param string $databaseName
+     * @param string $externalType
+     * @param string $siteSchoolCode
      * @return External_TimetableInterface
-     * @throws LogicException If cannot build connector
      */
-    public function buildTimetableConnector(string $databaseName = ''): External_TimetableInterface
+    public function buildEnabledTimetableConnectorInternal(string $externalType, string $siteSchoolCode): External_TimetableInterface
     {
-        return $this->buildConnector('Timetable', $databaseName);
+        switch ($externalType) {
+            case IConnector::EXTERNAL_TYPE_SYNERGETIC:
+                return new External_Synergetic_Timetable();
+            case IConnector::EXTERNAL_TYPE_SCHOOLEDGE:
+                return new External_Schooledge_Timetable();
+            case IConnector::EXTERNAL_TYPE_MAZE:
+                return new External_Maze_Timetable();
+            case IConnector::EXTERNAL_TYPE_TASS:
+                return new External_Tass_Timetable();
+            case IConnector::EXTERNAL_TYPE_ISAMS:
+                return new External_Isams_Timetable();
+            case IConnector::EXTERNAL_TYPE_DENBIGH:
+                return new External_Denbigh_Timetable();
+            case IConnector::EXTERNAL_TYPE_EDUMATE:
+                return new External_Edumate_Timetable();
+            case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
+                return $siteSchoolCode === 'CC'
+                    ? new External_Pcschools_Cc_Timetable()
+                    : new External_Pcschools_Timetable();
+            case IConnector::EXTERNAL_TYPE_SCHOOLBOX:
+                return new External_Schoolbox_Timetable();
+            case IConnector::EXTERNAL_TYPE_SCHOOLPRO:
+                return new External_Schoolpro_Timetable();
+            case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
+                return new External_Doublefirst_Timetable();
+        }
+        return new External_Offline_Timetable();
     }
 
 
     /**
-     * Builds a user connector.
-     *
-     * @param  string $databaseName
+     * @param string $externalType
+     * @param string $siteSchoolCode
+     * @param string $tassVersion
      * @return External_UserInterface
-     * @throws LogicException If cannot build connector
      */
-    public function buildUserConnector(string $databaseName = ''): External_UserInterface
+    private function buildEnabledUserConnector(string $externalType, string $siteSchoolCode, string $tassVersion): External_UserInterface
     {
-        return $this->buildConnector('User', $databaseName);
-    }
-
-    /**
-     * Builds a user detention connector.
-     *
-     * @param  string $databaseName
-     * @return External_UserDetentionInterface
-     * @throws LogicException If cannot build connector
-     */
-    public function buildUserDetentionConnector(string $databaseName = ''): External_UserDetentionInterface
-    {
-        return $this->buildConnector('UserDetention', $databaseName);
-    }
-
-    /**
-     * Builds a markbook connector. If its enabled
-     *
-     * @param  string $databaseName
-     * @return External_MarkbookInterface
-     * @throws LogicException If cannot build connector
-     */
-    public function buildMarkbookConnector(string $databaseName = ''): External_MarkbookInterface
-    {
-        $extraParams = [
-            'markType' => Config::get('synergetic_mark_sync_value'),
-        ];
-        if (Config::get('external_markbook')) {
-            return $this->buildConnector('Markbook', $databaseName, $extraParams);
+        switch ($externalType) {
+            case IConnector::EXTERNAL_TYPE_MAZE:
+                return $siteSchoolCode === 'LK'
+                    ? new External_Maze_Lk_User()
+                    : new External_Maze_User();
+            case IConnector::EXTERNAL_TYPE_TASS:
+                switch ($tassVersion) {
+                    case 'V52':
+                        return new External_Tass_V52_User();
+                    case 'V53':
+                        return new External_Tass_V53_User();
+                }
+                return new External_Tass_User();
+            case IConnector::EXTERNAL_TYPE_ISAMS:
+                return $siteSchoolCode === 'CISPL'
+                    ? new External_Isams_Cispl_User()
+                    : new External_Isams_User();
+            case IConnector::EXTERNAL_TYPE_DENBIGH:
+                return new External_Denbigh_User();
+            case IConnector::EXTERNAL_TYPE_EDUMATE:
+                return new External_Edumate_User();
+            case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
+                return $siteSchoolCode === 'CC'
+                    ? new External_Pcschools_Cc_User()
+                    : new External_Pcschools_User();
+            case IConnector::EXTERNAL_TYPE_SCHOOLBOX:
+                return new External_Schoolbox_User();
+            case IConnector::EXTERNAL_TYPE_SCHOOLPRO:
+                return new External_Schoolpro_User();
+            case IConnector::EXTERNAL_TYPE_SCHOOLEDGE:
+                return $siteSchoolCode === 'CCB'
+                    ? new External_Schooledge_Ccb_User()
+                    : new External_Schooledge_User();
+            case IConnector::EXTERNAL_TYPE_SYNERGETIC:
+                switch ($siteSchoolCode) {
+                    case 'AMITY':
+                        return new External_Synergetic_Amity_User();
+                    case 'MC':
+                        return new External_Synergetic_Mc_User();
+                    case 'SMCS':
+                        return new External_Synergetic_Smcs_User();
+                    case 'SRCL':
+                        return new External_Synergetic_Srcl_User();
+                    case 'THS':
+                        return new External_Synergetic_Ths_User();
+                }
+                return new External_Synergetic_User();
+            case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
+                return new External_Doublefirst_User();
         }
-
-        return $this->buildConnector('Markbook', 'Offline', $extraParams);
+        return new External_Offline_User();
     }
 
-    /**
-     * Builds a pastoral connector. If its enabled
-     *
-     * @param  string $databaseName
-     * @return External_PastoralInterface
-     * @throws LogicException If cannot build connector
-     */
-    public function buildPastoralConnector(string $databaseName = ''): External_PastoralInterface
-    {
-        if (Config::get('external_pastoral')) {
-            return $this->buildConnector('Pastoral', $databaseName);
-        }
 
-        return $this->buildConnector('Pastoral', 'Offline');
+    /**
+     * @param string $siteSchoolCode
+     * @return External_Synergetic_Pastoral
+     */
+    private function buildSynergeticPastoralConnector(string $siteSchoolCode): External_Synergetic_Pastoral
+    {
+        switch ($siteSchoolCode) {
+            case 'SMCS':
+                return new External_Synergetic_Smcs_Pastoral();
+            case 'THS':
+                return new External_Synergetic_Ths_Pastoral();
+        }
+        return new External_Synergetic_Pastoral();
     }
 }

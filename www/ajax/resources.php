@@ -42,7 +42,7 @@ $defaultFolderId = (int)$_GET['fid'];
 
 $this->setVar([
     'SITE_VERSION'  => Config::get('site_version'),
-    'SITE_LOCATION' => $this->site,
+    'SITE_SCHOOL_CODE' => Config::get('site_school_code'),
 ]);
 
 /** @var IConfigLoader $configLoader */

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Switch school from command line
 # Description:
-#       Gives people a command line tool to get and set school (site_location)
+#       Gives people a command line tool to get and set school (site_school_code)
 #       easily.
 #       Could be trivially extended to update any config variable.
 #
@@ -37,10 +37,9 @@ else
 	sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 	if [ "$1" == "" ]
 	then
-		mysql --skip-column-names -u$sqluser -p$sqlpasswd -h $sqlhost -e "SELECT value FROM config WHERE name='site_location' LIMIT 1" $sqldb
+		mysql --skip-column-names -u$sqluser -p$sqlpasswd -h $sqlhost -e "SELECT value FROM config WHERE name='site_school_code' LIMIT 1" $sqldb
 	else
-		echo "Updating site_location to \"$1\""
-		mysql -u$sqluser -p$sqlpasswd -h $sqlhost -e "UPDATE config SET value='$1' WHERE name='site_location' LIMIT 1" $sqldb
+		echo "Updating site_school_code to \"$1\""
 		mysql -u$sqluser -p$sqlpasswd -h $sqlhost -e "UPDATE config SET value='$1' WHERE name='site_school_code' LIMIT 1" $sqldb
 
 	fi

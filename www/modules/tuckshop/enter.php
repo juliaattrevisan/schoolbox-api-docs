@@ -15,7 +15,7 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 // mask this from all installs but Cathedral
-if (Config::get('site_location') != 'cathedral') {
+if (strtoupper(trim(Config::get('site_school_code'))) !== 'TCS') {
     $this->pageNotFound();
 }
 

@@ -16,53 +16,46 @@ class Instance
     /**
      * @var string
      */
-    private $id;
+    private string $id;
     /**
      * @var string
      */
-    private $location;
+    private string $hostname;
     /**
      * @var string
      */
-    private $hostname;
+    private string $domain;
     /**
      * @var string
      */
-    private $domain;
+    private string $version;
     /**
      * @var string
      */
-    private $version;
+    private string $type;
     /**
      * @var string
      */
-    private $type;
-    /**
-     * @var string
-     */
-    private $schoolCode;
+    private string $schoolCode;
 
 
     /**
-     * @param string $id             the 8 character instance ID (same as INSTANCE_ID const)
-     * @param string $location       (deprecated) name of site used to identify school in custom code and templates
-     * @param string $hostname       hostname used to access server without the domain
-     * @param string $domain         network domain that is used to access server remotely
-     * @param string $version        version of Schoolbox currently installed
-     * @param string $type           whether this system is production or development etc.
-     * @param string $schoolCode     Alaress' unique identifier for the School this instance runs for
+     * @param string $id         the 8 character instance ID (same as INSTANCE_ID const)
+     * @param string $hostname   hostname used to access server without the domain
+     * @param string $domain     network domain that is used to access server remotely
+     * @param string $version    version of Schoolbox currently installed
+     * @param string $type       whether this system is production or development etc.
+     * @param string $schoolCode Alaress' unique identifier for the School this instance runs for
      */
     public function __construct(
-        $id,
-        $location,
-        $hostname,
-        $domain,
-        $version,
-        $type,
-        $schoolCode
+        string $id,
+        string $hostname,
+        string $domain,
+        string $version,
+        string $type,
+        string $schoolCode
     ) {
         $this->id = $id;
-        $this->location = $location;
         $this->hostname = $hostname;
         $this->domain = $domain;
         $this->version = $version;
@@ -77,16 +70,6 @@ class Instance
     public function getId()
     {
         return $this->id;
-    }
-
-
-    /**
-     * @deprecated
-     * @return string
-     */
-    public function getLocation()
-    {
-        return $this->location;
     }
 
 

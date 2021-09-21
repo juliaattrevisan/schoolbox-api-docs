@@ -8,10 +8,10 @@
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Permission\Access\UserAccess;
-use Custom\Diocesan\ValidJuniorSchoolStudent;
+use Custom\Dsfg\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
-use Custom\Verso\TravelLog\Renderer;
+use Custom\Vist\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
@@ -73,7 +73,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 continue;
             }
 
-            if ($this->getConfigLoader()->get('site_location') === 'wenona' && $child['gid'] == 3) {
+            if ($this->getConfigLoader()->get('site_school_code') === 'WSL' && $child['gid'] === 3) {
                 continue;
             }
 
@@ -120,12 +120,13 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Diocesan Junior School Students don't have links to subjects
              */
-            if ($this->getConfigLoader()->get('site_location') === 'diocesan') {
-                if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)) {
-                    $this->setVar([
-                        'subject_item' => ''
-                    ]);
-                }
+            if (
+                ($this->getConfigLoader()->get('site_school_code') === 'DSFG') &&
+                (new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)
+            ) {
+                $this->setVar([
+                    'subject_item' => ''
+                ]);
             }
 
             /* Output calendar date to show */
@@ -207,7 +208,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             // School-specific buttons
-            if ('tigs' === $this->getConfigLoader()->get('site_location')) {
+            if ('TIGS' === $this->getConfigLoader()->get('site_school_code')) {
                 $this->setBlock('student_block', 'continuous_report', 'continuous_report_block');
                 $route  = 'tigsParticipationReport.getReport';
                 $params = ['userId' => $userChild->getId(), 'user' => $userChild,];

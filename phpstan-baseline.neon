@@ -1168,42 +1168,42 @@ parameters:
 		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Authorizer/Rule/IsExternalUser.php
+			path: library/Custom/Dsfg/AchievementReport/Authorizer/Rule/IsExternalUser.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\Base\\:\\:\\$currentYear \\(string\\) does not accept default value of type int\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\Base\\:\\:\\$currentYear \\(string\\) does not accept default value of type int\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
+			path: library/Custom/Dsfg/AchievementReport/Base.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\Base\\:\\:\\$year \\(string\\|null\\) does not accept default value of type int\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\Base\\:\\:\\$year \\(string\\|null\\) does not accept default value of type int\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
+			path: library/Custom/Dsfg/AchievementReport/Base.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findByExternalId\\(\\)\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Module.php
+			path: library/Custom/Dsfg/AchievementReport/Module.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept array\\<string, string\\>\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept array\\<string, string\\>\\.$#"
 			count: 3
-			path: library/Custom/Diocesan/AchievementReport/NavigationSelector.php
+			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept string\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept string\\.$#"
 			count: 5
-			path: library/Custom/Diocesan/AchievementReport/NavigationSelector.php
+			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\StandardisedTest\\\\PAT\\\\ValidPAT\\:\\:\\$year \\(string\\) does not accept default value of type int\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\StandardisedTest\\\\PAT\\\\ValidPAT\\:\\:\\$year \\(string\\) does not accept default value of type int\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/StandardisedTest/PAT/ValidPAT.php
+			path: library/Custom/Dsfg/AchievementReport/StandardisedTest/PAT/ValidPAT.php
 
 		-
 			message: "#^Call to function in_array\\(\\) with arguments string\\|null, array\\(0, 1, 2, 3, 4, 5, 6\\) and true will always evaluate to false\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/StandardisedTest/ValidHasLiteracyNumeracy.php
+			path: library/Custom/Dsfg/AchievementReport/StandardisedTest/ValidHasLiteracyNumeracy.php
 
 		-
 			message: "#^Method Custom\\\\Help\\\\CourseParticipation\\\\Controller\\:\\:getCampusMapper\\(\\) should return Schoolbox\\\\CampusMapper but returns Schoolbox\\\\Mapper\\.$#"
@@ -1286,34 +1286,34 @@ parameters:
 			path: library/Custom/Help/Nesa/Selector.php
 
 		-
-			message: "#^Property Custom\\\\Loyola\\\\Survey\\\\Controller\\:\\:\\$externalClass \\(External_Class\\) does not accept External_ClassInterface\\.$#"
+			message: "#^Property Custom\\\\Lc\\\\Survey\\\\Controller\\:\\:\\$externalClass \\(External_Class\\) does not accept External_ClassInterface\\.$#"
 			count: 1
-			path: library/Custom/Loyola/Survey/Controller.php
+			path: library/Custom/Lc/Survey/Controller.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Method Custom\\\\Meriden\\\\Pastoral\\\\Module\\:\\:getHouseMapper\\(\\) should return HouseMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getHouseMapper\\(\\) should return HouseMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Method Custom\\\\Meriden\\\\Pastoral\\\\Module\\:\\:getSubjectMapper\\(\\) should return Schoolbox\\\\External\\\\SubjectMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getSubjectMapper\\(\\) should return Schoolbox\\\\External\\\\SubjectMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Method Custom\\\\Meriden\\\\Pastoral\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Report/Factory.php
+			path: library/Custom/Ms/Pastoral/StudentInvolvement/Report/Factory.php
 
 		-
 			message: "#^Method Custom\\\\Mggs\\\\Calendar\\\\Event\\\\Type\\\\Submission\\\\Renderer\\\\Javascript\\:\\:getStatus\\(\\) should return string but returns null\\.$#"
@@ -1348,17 +1348,17 @@ parameters:
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
-			path: library/Custom/Stk/NCEA/Availability.php
+			path: library/Custom/Sk/NCEA/Availability.php
 
 		-
 			message: "#^string does not accept array\\<string, mixed\\>\\.$#"
 			count: 1
-			path: library/Custom/Stk/OleReport/Controller.php
+			path: library/Custom/Sk/OleReport/Controller.php
 
 		-
-			message: "#^Method Custom\\\\Stk\\\\OleReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Sk\\\\OleReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Stk/OleReport/Module.php
+			path: library/Custom/Sk/OleReport/Module.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -2291,51 +2291,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/Submission.php
 
 		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildAttendanceConnector\\(\\) should return External_AttendanceInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildAttendanceLinkConnector\\(\\) should return External_AttendanceLink but returns External\\\\IConnector\\.$#"
-			count: 2
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildClassConnector\\(\\) should return External_ClassInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildMarkbookConnector\\(\\) should return External_MarkbookInterface but returns External\\\\IConnector\\.$#"
-			count: 2
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildPastoralConnector\\(\\) should return External_PastoralInterface but returns External\\\\IConnector\\.$#"
-			count: 2
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildPingConnector\\(\\) should return External_PingInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildTimetableConnector\\(\\) should return External_TimetableInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildUserConnector\\(\\) should return External_UserInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildUserDetentionConnector\\(\\) should return External_UserDetentionInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
 			message: "#^Method External_Doublefirst_Timetable\\:\\:getDayNumber\\(\\) should return bool\\|string but returns int\\.$#"
 			count: 1
 			path: library/External/Doublefirst/Timetable.php
@@ -2468,7 +2423,7 @@ parameters:
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
-			path: library/External/Synergetic/Hutchins/Class.php
+			path: library/External/Synergetic/Ths/Class.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -4656,14 +4611,14 @@ parameters:
 			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Oakburn\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
+			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Soc\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Oakburn/Sync.php
+			path: library/Schoolbox/External/Connector/Synergetic/Soc/Sync.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Shore\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
+			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Ss\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Shore/Sync.php
+			path: library/Schoolbox/External/Connector/Synergetic/Ss/Sync.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Smcs\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"

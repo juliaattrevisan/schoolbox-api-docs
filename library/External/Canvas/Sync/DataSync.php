@@ -46,85 +46,85 @@ class DataSync
 {
 
     /** @var IConnector */
-    private $canvasDb;
+    private IConnector $canvasDb;
 
     /** @var IConnector */
-    private $schoolboxDb;
+    private IConnector $schoolboxDb;
 
     /** @var External_ClassInterface */
-    private $externalClass;
+    private External_ClassInterface $externalClass;
 
     /** @var External_UserInterface */
-    private $externalUser;
+    private External_UserInterface $externalUser;
 
     /** @var MarkTypeMapper */
-    private $markTypeMapper;
+    private MarkTypeMapper $markTypeMapper;
 
     /** @var WorkType\Mapper */
-    private $workTypeMapper;
+    private WorkType\Mapper $workTypeMapper;
 
     /** @var Quiz\Mapper */
-    private $quizMapper;
+    private Quiz\Mapper $quizMapper;
 
     /** @var QuizSection\Mapper */
-    private $quizSectionMapper;
+    private QuizSection\Mapper $quizSectionMapper;
 
     /** @var QuizQuestion\Mapper */
-    private $quizQuestionMapper;
+    private QuizQuestion\Mapper $quizQuestionMapper;
 
     /** @var QuestionType\Mapper */
-    private $quizQuestionTypeMapper;
+    private QuestionType\Mapper $quizQuestionTypeMapper;
 
     /** @var QuizSolution\Mapper */
-    private $quizSolutionMapper;
+    private QuizSolution\Mapper $quizSolutionMapper;
 
     /** @var SubmissionBoxMapper */
-    private $submissionBoxMapper;
+    private SubmissionBoxMapper $submissionBoxMapper;
 
     /** @var Assessment\Mapper */
-    private $assessmentMapper;
+    private Assessment\Mapper $assessmentMapper;
 
     /** @var ReturnedWorkMapper */
-    private $returnedWorkMapper;
+    private ReturnedWorkMapper $returnedWorkMapper;
 
     /** @var Assessment\MapperProxy */
-    private $assessmentDataSource;
+    private Assessment\MapperProxy $assessmentDataSource;
 
     /** @var Participant\Plan\Mapper */
-    private $planMapper;
+    private Participant\Plan\Mapper $planMapper;
 
     /** @var Participant\Mapper */
-    private $participantMapper;
+    private Participant\Mapper $participantMapper;
 
     /** @var Folder\Mapper */
-    private $folderMapper;
+    private Folder\Mapper $folderMapper;
 
     /** @var UserMapper */
-    private $userMapper;
+    private UserMapper $userMapper;
 
     /** @var CourseImpl\Mapper */
-    private $courseImplMapper;
+    private CourseImpl\Mapper $courseImplMapper;
 
     /** @var CourseImpl\Mapper */
     private $courseSpecMapper;
 
     /** @var UnitImpl\Mapper */
-    private $unitImplMapper;
+    private UnitImpl\Mapper $unitImplMapper;
 
     /** @var UnitImpl\Mapper */
     private $unitSpecMapper;
 
     /** @var IConfigLoader */
-    private $config;
+    private IConfigLoader $config;
 
     /** @var IConnector */
     private $persist;
 
     /** @var LoggerInterface */
-    private $log;
+    private LoggerInterface $log;
 
     /** @var string */
-    private $siteLocation;
+    private string $siteSchoolCode;
 
     /**
      * @param IConnector              $canvasDb
@@ -208,7 +208,7 @@ class DataSync
         $this->config                 = $config;
         $this->persist                = $persist;
         $this->log                    = $log;
-        $this->siteLocation           = strtolower($config->get('site_location'));
+        $this->siteSchoolCode         = strtolower($config->get('site_school_code'));
     }
 
 
@@ -233,7 +233,7 @@ class DataSync
             $this->schoolboxDb->beginTransaction();
         }
 
-        $bridgeFactory = new BridgeFactory($this->siteLocation);
+        $bridgeFactory = new BridgeFactory($this->siteSchoolCode);
 
         $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge            = new Bridge\Account($this->schoolboxDb);

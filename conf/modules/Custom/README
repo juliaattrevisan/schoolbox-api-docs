@@ -1,2 +1,2 @@
 Configurations for school-specific modules should go here, in:
-{config.site_location|ucfirst}/{module_name}.
+{config.site_school_code|strtolower|upper}/{module_name}.

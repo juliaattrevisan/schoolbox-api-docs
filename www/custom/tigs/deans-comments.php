@@ -83,7 +83,7 @@ function authenticateUser(array $session, IConfigLoader $config): void
         $function->call($config);
     }
 
-    if ($config->get('site_location') !== 'tigs') {
+    if ($config->get('site_school_code') !== 'TIGS') {
         throw new NotFound();
     }
 }

@@ -348,7 +348,6 @@ abstract class Kernel
             $conf = $di->get('config');
             return new Instance(
                 INSTANCE_ID,
-                $conf->get('site_location'),
                 $conf->get('site_hostname'),
                 $conf->get('site_domain'),
                 $conf->get('site_version'),
@@ -750,15 +749,15 @@ abstract class Kernel
                     $config      = $di->get('config');
                     $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
                     $baseLoader  = new FilesystemLoader(array());
-                    // Paths: prefer templates/{site_location} over templates/core
+                    // Paths: prefer templates/{site_school_code} over templates/core
                     $basePath     = SITE_root . '/templates/';
-                    $overridePath = $basePath . $config->get('site_location');
+                    $overridePath = $basePath . strtolower($config->get('site_school_code'));
                     $corePath     = $basePath . 'core';
                     if (is_dir($overridePath)) {
                         $baseLoader->addPath($overridePath);
                     }
                     $baseLoader->addPath($corePath);
-                    // Core path: always uses templates/core, even if templates/{site_location} exists
+                    // Core path: always uses templates/core, even if templates/{site_school_code} exists
                     // Used as a base for default path templates to inherit from.
                     $baseLoader->addPath($corePath, 'core');
                     $chainLoader->addLoader($baseLoader);
@@ -1556,7 +1555,7 @@ abstract class Kernel
 
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
-            ucfirst($this->getDependencyInjector()->get('config')->get('site_location'))
+            ucfirst(strtolower($this->getDependencyInjector()->get('config')->get('site_school_code')))
         );
         $modulePaths = array_merge(
             glob(SITE_root . '/conf/modules/*.php'),

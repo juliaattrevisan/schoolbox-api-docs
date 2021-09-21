@@ -10,6 +10,7 @@
 
 use Alaress\Redis;
 use External\CachingConnectorAbstract;
+use Schoolbox\Config\Loader;
 
 class External_UserDetention extends CachingConnectorAbstract implements External_UserDetentionInterface
 {
@@ -19,13 +20,12 @@ class External_UserDetention extends CachingConnectorAbstract implements Externa
      * Constructor
      *
      * @throws Exception
-     * @param String $databaseName
      */
-    public function __construct($databaseName = '')
+    public function __construct()
     {
         // TODO inject dependencies
         parent::__construct(
-            (new External_DatabaseFactory())->buildUserDetentionConnector($databaseName),
+            (new External_DatabaseFactory())->buildUserDetentionConnector(Loader::getInstance()),
             new External_Offline_UserDetention(),
             Redis::getInstance(),
             Config::get('external_cache_timeout')

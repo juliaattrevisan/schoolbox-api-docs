@@ -1,0 +1,12 @@
+{% import 'macro/spacer.twig' as fn %}
+
+<tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 4, 3) }}</tr>
+<tr>
+  {{ fn.spacer(config.fqdn_cdn_prefix, 48, 4) }}
+  <td colspan="2" valign="middle">
+    <img src="{{ config.fqdn_cdn_prefix }}/images/{{ config.site_school_code }}/email-logo.gif"
+         alt="{{ config.title }}" border="0" height="48"
+    />
+  </td>
+</tr>
+<tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 4, 3) }}</tr>

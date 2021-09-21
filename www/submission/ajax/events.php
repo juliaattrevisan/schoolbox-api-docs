@@ -56,7 +56,7 @@ $renderer             = new Renderer(
 // until this script becomes an Aura route, this is really the best we can do...
 /** @var IConfigLoader $config */
 $config   = $this->getDi()->get('config');
-$strategy = $config->get('site_location') === 'mggs'
+$strategy = $config->get('site_school_code') === 'MGGS'
     ? SubmissionEvent::RENDER_FORMAT_JSON_PBL
     : EventBase::RENDER_FORMAT_JSON;
 

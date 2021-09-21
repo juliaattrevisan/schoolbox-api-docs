@@ -22,18 +22,19 @@ class Factory
     /**
      * Builds a legacy configuration.
      *
-     * @param string $siteLocation This install's site location identifier
-     * @param User   $user         A user to retrieve configuration for
-     * @param array  $session      The current session
+     * @param string $siteSchoolCode
+     * @param User   $user    A user to retrieve configuration for
+     * @param array  $session The current session
      * @return array
      */
-    public static function build($siteLocation, User $user, $session)
+    public static function build(string $siteSchoolCode, User $user, array $session): array
     {
         /** @var YearLevel\Model $year */
         $year     = $session['year'];
         $settings = [];
         $paths    = [];
-        if ($siteLocation === 'wenona') {
+
+        if ($siteSchoolCode === 'WSL') {
             $settings = array(
                 'baseUri' => 'http://oxygen/',
                 'userName' => "wgs/" . $session['username'],
@@ -53,24 +54,7 @@ class Factory
                     '/StudentData/',
                 );
             }
-        } elseif ($siteLocation === 'jpc') {
-            $settings = array(
-                'baseUri' => 'https://malastare/',
-                'userName' => "jpc/" . strtolower($session['username']),
-                'password' => $session['password'],
-            );
-
-            if ($user->getRole()->isStaff()) {
-                $paths = array(
-                    '/Staff/' . strtolower($session['username']) . '/',
-                    '/doclib/',
-                );
-            } else {
-                $paths = array(
-                    '/Students/' . (date('Y') - ((int)$year->getName() - 7)) . '/' . strtolower($session['username']) . '/',
-                );
-            }
-        } elseif ($siteLocation === 'cathedral') {
+        } elseif ($siteSchoolCode === 'TCS') {
             $settings = array(
                 'baseUri' => 'http://senior-server.school.cathedral.qld.edu.au/',
                 'userName' => "cathedral/" . $session['username'],
@@ -100,7 +84,7 @@ class Factory
                     $settings['baseUri'] = 'http://junior-server.school.cathedral.qld.edu.au/';
                 }
             }
-        } elseif ($siteLocation === 'bialik') {
+        } elseif ($siteSchoolCode === 'BC') {
             $settings = array(
                 'baseUri' => 'https://webdav.bialik.vic.edu.au/',
                 'userName' => "bialik/" . $session['username'],
@@ -122,7 +106,7 @@ class Factory
                     '/H-DRIVE/USERS/STUDENTS/YEAR%20' . str_pad($year->getName(), 2, '0', STR_PAD_LEFT) . '/' . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'stmichaels') {
+        } elseif ($siteSchoolCode === 'SMGS') {
             $settings = array(
                 'baseUri' => 'https://drives.stmichaels.vic.edu.au/',
                 'userName' => "smgs/" . $session['username'],
@@ -138,7 +122,7 @@ class Factory
                     $settings['baseUri'] . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'seymour') {
+        } elseif ($siteSchoolCode === 'SC') {
             $settings = array(
                 'baseUri' => 'https://webdav.seymour.sa.edu.au/',
                 'userName' => "sccampus/" . $session['username'],
@@ -154,7 +138,7 @@ class Factory
                     $settings['baseUri'] . 'studenthome/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'mggs') {
+        } elseif ($siteSchoolCode === 'MGGS') {
             $settings = array(
 
                 'userName' => 'mggs/' . $session['username'],
@@ -175,7 +159,7 @@ class Factory
                     '/STUDENTS/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'tintern') {
+        } elseif ($siteSchoolCode === 'TS') {
             $settings = array(
                 'userName' => 'tintern/' . $session['username'],
                 'password' => $session['password'],
@@ -191,7 +175,7 @@ class Factory
                     '/Student/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'oakburn') {
+        } elseif ($siteSchoolCode === 'SOC') {
             $settings = array(
                 'baseUri' => 'http://davusers.soc.tas.edu.au/',
                 'userName' => "soc/" . $session['username'],
@@ -244,7 +228,7 @@ class Factory
                     );
                 }
             }
-        } elseif ($siteLocation === 'iggs') {
+        } elseif ($siteSchoolCode === 'IGGS') {
             $settings = array(
                 'userName' => $session['username'],
                 'password' => $session['password'],
@@ -262,7 +246,7 @@ class Factory
                     $settings['baseUri'] . '/webdav/shared/'
                 );
             }
-        } elseif ($siteLocation === 'sedc') {
+        } elseif ($siteSchoolCode === 'SEDC') {
             $settings = array(
                 'userName' => 'SEC/' . $session['username'],
                 'password' => $session['password'],
@@ -281,7 +265,7 @@ class Factory
                     $settings['baseUri'] . '/StudentHome/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/'
                 );
             }
-        } elseif ($siteLocation === 'btac') {
+        } elseif ($siteSchoolCode === 'BTAC') {
             $settings = array(
                 'userName' => $session['username'],
                 'password' => $session['password'],
@@ -294,7 +278,7 @@ class Factory
                     $settings['baseUri'] . '/vol/shared/',
                 );
             }
-        } elseif ($siteLocation === 'fintona') {
+        } elseif ($siteSchoolCode === 'FGS') {
             $settings = array(
                 'baseUri' => 'https://files.fintona.vic.edu.au/',
                 'userName' => "fintona/" . $session['username'],
@@ -311,7 +295,7 @@ class Factory
                     $settings['baseUri'] . 'public/',
                 );
             }
-        } elseif ($siteLocation === 'loyola') {
+        } elseif ($siteSchoolCode === 'LC') {
             $settings = array(
                 'baseUri' => 'http://lcapache.loyola.local:8080/',
                 'userName' => "loyola/" . $session['username'],
@@ -326,7 +310,7 @@ class Factory
                     $settings['baseUri'] . 'Student%20Home/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'sheldon') {
+        } elseif ($siteSchoolCode === 'SHCL') {
             $settings = array(
                 'baseUri' => 'http://svwebdav01.sheldoncollege.com/',
                 'userName' => $session['username'] . "@sheldoncollege.com",
@@ -352,7 +336,7 @@ class Factory
                     $settings['baseUri'] . 'studentshare/',
                 );
             }
-        } elseif ($siteLocation === 'ngsl') {
+        } elseif ($siteSchoolCode === 'NGSL') {
             if ($user->getRole()->isStaff()) {
                 $settings = array(
                     'baseUri' => 'http://facultycloud.ngs.nsw.edu.au/',
@@ -374,7 +358,7 @@ class Factory
                     $settings['baseUri'] . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'meriden') {
+        } elseif ($siteSchoolCode === 'MS') {
             $settings = array(
                 'baseUri' => 'http://webdav.meriden.nsw.edu.au/',
                 'userName' => "meriden/" . $session['username'],
@@ -392,7 +376,7 @@ class Factory
                     $settings['baseUri'] . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'diocesan') {
+        } elseif ($siteSchoolCode === 'DSFG') {
             $settings = array(
                 'baseUri' => 'http://rdrive.diocesan.school.nz/',
                 'userName' => 'diont/' . $session['username'],
@@ -401,7 +385,7 @@ class Factory
             if ($user->getRole()->isStaff()) {
                 $paths = array($settings['baseUri'] . 'rdrive/',);
             }
-        } elseif ($siteLocation === 'tccll') {
+        } elseif ($siteSchoolCode === 'TCCLL') {
             $settings = array(
                 'baseUri' => 'https://files.trinitylismore.nsw.edu.au/',
                 'userName' => "TRINITY/" . $session['username'],
@@ -418,7 +402,7 @@ class Factory
                     $settings['baseUri'] . 'studentshare/',
                 );
             }
-        } elseif ($siteLocation === 'rlc') {
+        } elseif ($siteSchoolCode === 'RLC') {
             $settings = array(
                 'baseUri' => 'http://WebDavShareDrive.redeemer.net.au',
                 'userName' => 'redeemer/' . $session['username'],
@@ -439,23 +423,7 @@ class Factory
                     'http://WebDavHomeStudent.redeemer.net.au/' . $session['username'] . '/'
                 );
             }
-        } elseif ($siteLocation === 'accac') {
-            $settings = array(
-                'baseUri' => 'http://webdav.aquinas.qld.edu.au:8080',
-                'userName' => $session['username'],
-                'password' => $session['password'],
-            );
-
-            if ($user->getRole()->isStaff()) {
-                $paths = array(
-                    '/'
-                );
-            } elseif ($user->getRole()->isStudent()) {
-                $paths = array(
-                    '/'
-                );
-            }
-        } elseif ($siteLocation === 'slmp') {
+        } elseif ($siteSchoolCode === 'SLMP') {
             $settings = array(
                 'baseUri' => 'https://sldm-wdav-01.stlouisaspendale.catholic.edu.au/',
                 'userName' => 'stlouisdom/' . $session['username'],
@@ -473,7 +441,7 @@ class Factory
                     $settings['baseUri'] . '/reports/' . $year->getName() . '/',
                 );
             }
-        } elseif ($siteLocation === 'sicol') {
+        } elseif ($siteSchoolCode === 'SICOL') {
             $settings = [
                 'baseUri' => 'http://sbox_webdav.siena.vic.edu.au:81/',
                 'userName' => 'siena/' . $session['username'],
@@ -484,7 +452,7 @@ class Factory
             } elseif ($user->getRole()->isStudent()) {
                 $paths = [$settings['baseUri'] . 'StudentHome/CL' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',];
             }
-        } elseif ($siteLocation === 'ducv') {
+        } elseif ($siteSchoolCode === 'DUCV') {
             $settings = array(
                 'baseUri' => 'http://ducvfiles.dulum.vic.edu.au:8461',
                 'userName' => $session['username'],
@@ -496,7 +464,7 @@ class Factory
                     $settings['baseUri'] . '/StaffHome/' . $session['username'] . '/',
                 );
             }
-        } elseif ($siteLocation === 'stpauls') {
+        } elseif ($siteSchoolCode === 'SPGS') {
             $settings = array(
                 'baseUri' => 'https://files.stpauls.nsw.edu.au/',
                 'userName' => $session['username'],
@@ -515,7 +483,7 @@ class Factory
                     $settings['baseUri'] . 'StudentPublic/',
                 ];
             }
-        } elseif ($siteLocation === 'alpgs') {
+        } elseif ($siteSchoolCode === 'ALPGS') {
             $settings = array(
                 'baseUri' => 'https://webdav.ags.vic.edu.au/',
                 'userName' => 'ags\\' . $session['username'],
@@ -532,7 +500,7 @@ class Factory
                     $settings['baseUri'] . 'StudentCommon/',
                 ];
             }
-        } elseif ($siteLocation === 'sohcs') {
+        } elseif ($siteSchoolCode === 'SOHCS') {
             $settings = array(
                 'baseUri' => 'http://10.0.0.1/shares/',
                 'userName' => $session['username'],
@@ -548,7 +516,7 @@ class Factory
                     $settings['baseUri'] . 'student_data/' . $session['username'] . '/',
                 ];
             }
-        } elseif ($siteLocation === 'scsb') {
+        } elseif ($siteSchoolCode === 'SCSB') {
             $settings = array(
                 'baseUri' => 'https://scr-fs02.scr.vic.edu.au/',
                 'userName' => 'SCR\\' . $session['username'],
@@ -563,7 +531,7 @@ class Factory
                     $settings['baseUri'] . 'students/year_12_of_' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 ];
             }
-        } elseif ($siteLocation === 'agsbot') {
+        } elseif ($siteSchoolCode === 'AGSBOT') {
             $settings = array(
                 'baseUri' => 'http://webdav.ags.school.nz/',
                 'userName' => 'AKGRAMMAR/' . $session['username'],
@@ -584,14 +552,6 @@ class Factory
                     $settings['baseUri'] . 'distribution/',
                 ];
             }
-//        } elseif (in_array($siteLocation, array('core', 'demo'))) {
-//            $settings = array(
-//                'baseUri'  => 'http://127.0.0.1:8881/',
-//                'userName' => $session['username'],
-//                'password' => $session['password'],
-//            );
-//
-//            $paths = ['/'];
         }
 
         return [

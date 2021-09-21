@@ -8,7 +8,7 @@ This report contains a list of Users and the Assessments they completed. These A
 * Log in as alaress admin
 * You need to give people some marks. Visit the Alaress Teacher Course at http://192.168.36.10/homepage/1826 and mark some rubrics for people (Due Works begin in Unit 4)
 * The people you marked - they need to be in the `user_professionaldevelopment` table. You can give people this data by visiting their profile screen, or add it manually to the aforementioned table.
-  * Change the `site_location` to `help`. Due to a recent change, the Professional Development form only exists for `help`. 
+  * Change the `site_school_code` to `help`. Due to a recent change, the Professional Development form only exists for `help`.
   * I usually fiddle with http://192.168.36.10/search/user/13 and put him in NSW, with an arbitrary number.
 * Visit http://192.168.36.10/help/nesa
 * Accept the defaults, then click *Generate*

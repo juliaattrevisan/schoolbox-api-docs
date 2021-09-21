@@ -34,7 +34,7 @@ class DAV_Auth_Factory
                 $auth = new DAV_Auth_Digest();
                 break;
         }
-        $auth->setRealm($this->config->get('site_location'));
+        $auth->setRealm($this->config->get('site_school_code'));
         return $auth;
     }
 }

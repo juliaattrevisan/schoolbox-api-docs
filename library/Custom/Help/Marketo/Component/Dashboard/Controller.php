@@ -19,7 +19,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        return $this->getConfigLoader()->get('site_location') === 'help';
+        return $this->getConfigLoader()->get('site_school_code') === 'HELP';
     }
 
     /**

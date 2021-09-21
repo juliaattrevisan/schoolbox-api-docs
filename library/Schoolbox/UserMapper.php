@@ -312,7 +312,7 @@ class UserMapper extends Mapper
     public function updateHash(User $model)
     {
         if ($model->getRetrievablePassword()) {
-            $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
+            $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_school_code') . ':' . $model->getRetrievablePassword()));
         }
         return true;
     }

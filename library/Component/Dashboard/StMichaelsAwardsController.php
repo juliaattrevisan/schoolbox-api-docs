@@ -52,7 +52,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
     public function execute()
     {
         // Not St Michaels? This isn't for you
-        if (!(Config::get('site_location') === 'stmichaels')) {
+        if ($this->getConfig('site_school_code') !== 'SMGS') {
             return false;
         }
 

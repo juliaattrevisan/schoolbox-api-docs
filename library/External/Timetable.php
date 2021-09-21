@@ -9,6 +9,7 @@
 use Alaress\Redis;
 use External\CachingConnectorAbstract;
 use Schoolbox\Campus;
+use Schoolbox\Config\Loader;
 
 /**
  * Class External_Timetable
@@ -22,15 +23,14 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
     /**
      * Constructor
      *
-     * @param String $databaseName
      * @throws InvalidArgumentException
      * @throws LogicException If unable to build connector
      */
-    public function __construct($databaseName = '')
+    public function __construct()
     {
         // TODO inject dependencies
         parent::__construct(
-            (new External_DatabaseFactory())->buildTimetableConnector($databaseName),
+            (new External_DatabaseFactory())->buildTimetableConnector(Loader::getInstance()),
             new External_Offline_Timetable(),
             Redis::getInstance(),
             Config::get('external_cache_timeout')
