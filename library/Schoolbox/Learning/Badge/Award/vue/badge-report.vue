@@ -265,7 +265,7 @@ export default {
 	display: flex;
     margin-bottom: 1rem;
 	a {
-		margin: 0 2px;
+		margin: 0 1px;
 	}
 }
 

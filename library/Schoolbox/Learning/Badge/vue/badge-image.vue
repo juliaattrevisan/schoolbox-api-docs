@@ -82,10 +82,19 @@ export default {
           -- on which fields were null
           -->
         <template v-if="badge.image">
-            <img :src="badge.image._links.image" :alt="badge.name" :class="'badge-image ' + css" />
+            <img :src="badge.image._links.image" :alt="badge.name" :title="badge.name" :class="'badge-image ' + css" />
         </template>
         <template v-else>
-            <img :src="badge._links.icon" :alt="badge.name" :class="'badge-icon ' + css" />
+            <img :src="badge._links.icon" :alt="badge.name" :title="badge.name" :class="'badge-icon ' + css" />
         </template>
     </div>
 </template>
+
+<style lang="scss" scoped>
+
+.selected-badge-image {
+    width: 30px;
+    height: auto;
+}
+
+</style>

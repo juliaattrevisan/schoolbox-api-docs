@@ -252,9 +252,13 @@ export default {
             return this.selectedBadges.length;
         },
         selectedBadgeText () {
-            const plural = this.selectedBadgeCount > 1 ? 's' : '';
-            const typeSelected = this.confirmButtonText.includes('goal') ? `goal${plural} selected` : `achievement${plural} selected`;
-            return `${this.selectedBadgeCount} ${typeSelected}`;    
+            if (this.selectedBadgeCount > 0) {
+                const plural = this.selectedBadgeCount > 1 ? 's' : '';
+                const typeSelected = this.confirmButtonText.includes('goal') ? `goal${plural} selected` : `achievement${plural} selected`;
+                return `${this.selectedBadgeCount} ${typeSelected}`;  
+            } else {
+                return '';
+            }  
         }
     },
     methods: {
@@ -339,14 +343,19 @@ export default {
         </ul>
 
         <bottom-drawer :showDrawer="selectedBadges.length > 0">
+            <transition-group name="selected-badges" class=selected-badges tag="div">
+                <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges-item">
+                    <badge-image :badge="badge" class="selected-badge-image"></badge-image>
+                </span>
+            </transition-group>
             <h3 class="selected-count"><em>{{ selectedBadgeText }}</em></h3>
             <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
             <ul class="flex-list buttons">
                 <li>
-                    <button @click.prevent="$refs.awardModal.open" @keyup.enter="$refs.awardModal.open" class="submit">{{ confirmButtonText }}</button>
+                    <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
                 </li>
                 <li>
-                    <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
+                    <button @click.prevent="$refs.awardModal.open" @keyup.enter="$refs.awardModal.open" class="submit">{{ confirmButtonText }}</button>
                 </li>
             </ul>
         </bottom-drawer>
@@ -381,8 +390,8 @@ export default {
             </template>
 
             <ul class="flex-list buttons">
-                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
                 <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
+                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
             </ul>
         </reveal-modal>
     </div>
@@ -392,6 +401,27 @@ export default {
 
 .badge-list-form {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
+}
+
+.selected-badges {
+    display: inline-block;
+    max-height: 30px;
+}
+
+.selected-badges-item {
+    transition: all 0.3s;
+    display: inline-block;
+    margin: 0px 5px;
+}
+
+.selected-badges-enter, .selected-badges-leave-to
+    /* .selected-badges-leave-active below version 2.1.8 */ {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.selected-badges-leave-active {
+    position: absolute;
 }
 
 .selected-count {
