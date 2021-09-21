@@ -283,7 +283,7 @@ export default {
          */
         onBadgeSelected (badge, isChecked) {
             if (isChecked) {
-                this.selectedBadges = [...this.selectedBadges, badge]; //add in
+                this.selectedBadges = [badge, ...this.selectedBadges]; //add in
             } else {
                 this.selectedBadges = this.selectedBadges.filter((selectedBadge) => selectedBadge.id !== badge.id); //or remove
             }
@@ -405,7 +405,6 @@ export default {
 
 .selected-badges {
     display: inline-block;
-    max-height: 30px;
 }
 
 .selected-badges-item {

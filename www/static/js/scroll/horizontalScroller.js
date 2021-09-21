@@ -17,18 +17,22 @@ export default class HorizontalScroller {
     /**
      * Set everything up
      * 
-     * @params { DOMElement } the container that contains the horizontal scroller
+     * @params { Element } the container that contains the horizontal scroller
+     * @params { Booleab } if there's no previous / next buttons to show
      */
-    constructor (scrollerContainer) {
+    constructor (scrollerContainer, hasButtons = true) {
 
         this.scrollerContainer = scrollerContainer;
+        this.hasButtons = hasButtons;
         
         this.outerContainer = this.scrollerContainer.querySelector('[data-scroller-outer-container]');
         this.innerContainer = this.scrollerContainer.querySelector('[data-scroller-inner-container]');
         
         this.initDraggable();
-        this.initPreviousButton();
-        this.initNextButton();
+        if (this.hasButtons) {
+            this.initPreviousButton();
+            this.initNextButton();
+        }
         this.initScrollBar();
 
         this.refresh();
@@ -75,8 +79,10 @@ export default class HorizontalScroller {
      */
     onUpdate () {
         gsap.set(this.scrollBar, { x: -(gsap.getProperty(this.innerContainer, 'x') * this.scrollBarXFactor) } );
-        this.checkPreviousButtonStatus();
-        this.checkNextButtonStatus();
+        if (this.hasButtons) {
+            this.checkPreviousButtonStatus();
+            this.checkNextButtonStatus();
+        }
     } 
 
     /**
@@ -172,8 +178,10 @@ export default class HorizontalScroller {
     refresh () {
         gsap.to(this.innerContainer, { x: 0, duration: 0.5 } ); //move back to the start
         this.refreshDraggableBounds();
-        this.checkPreviousButtonStatus();
-        this.checkNextButtonStatus();
+        if (this.hasButtons) {
+            this.checkPreviousButtonStatus();
+            this.checkNextButtonStatus();
+        }
         this.minX < 0 ? this.enable() : this.disable(); //only provide scrolling when needed
     }
 
@@ -181,8 +189,10 @@ export default class HorizontalScroller {
      * enable the functionality of scroller, the contents of the container goes beyond the bounds set
      */
      enable () {
-        this.nextButton.style.display = 'block';
-        this.previousButton.style.display = 'block';
+        if (this.hasButtons) {
+            this.nextButton.style.display = 'block';
+            this.previousButton.style.display = 'block';
+        }
         this.draggable.enable();
         this.refreshScrollBarWidth();
     }
@@ -191,8 +201,10 @@ export default class HorizontalScroller {
      * disable all the functionality of scroller, not enough in the container to be needed
      */
     disable () {
-        this.nextButton.style.display = 'none';
-        this.previousButton.style.display = 'none';
+        if (this.hasButtons) {
+            this.nextButton.style.display = 'none';
+            this.previousButton.style.display = 'none';
+        }
         this.draggable.disable();
     }
     
