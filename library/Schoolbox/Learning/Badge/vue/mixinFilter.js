@@ -51,7 +51,7 @@ export default {
             axios
                 .get(this.filter_endpoint, config)
                 .then(response => {
-                    this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
+                    this.data = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
                     if (showToast) {
@@ -67,8 +67,7 @@ export default {
         },
 
         /**
-         * Helper for emitting the change event: this happens when selecting a
-         * badge, or reloading the filter.
+         * Helper for emitting the change event: this happens when reloading the filter
          */
         filter_emitChange () {
             this.$emit(ON_FILTER_CHANGE);

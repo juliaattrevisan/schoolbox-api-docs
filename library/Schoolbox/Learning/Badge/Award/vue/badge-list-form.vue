@@ -5,6 +5,8 @@ import RevealModal from "@vue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
 import toastMixin from '@vue/components/toast-mixin';
+import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -23,6 +25,7 @@ export default {
         BadgeList,
         BadgeImage,
         RevealModal,
+        BottomDrawer //to pop out when +1 badges is selected
     },
     props: {
         /**
@@ -245,8 +248,17 @@ export default {
                 ? this.confirmButtonTextSingular
                 : this.confirmButtonTextPlural;
         },
+        selectedBadgeCount () {
+            return this.selectedBadges.length;
+        },
+        selectedBadgeText () {
+            const plural = this.selectedBadgeCount > 1 ? 's' : '';
+            const typeSelected = this.confirmButtonText.includes('goal') ? `goal${plural} selected` : `achievement${plural} selected`;
+            return `${this.selectedBadgeCount} ${typeSelected}`;    
+        }
     },
     methods: {
+
         /**
          * Callback for when the filters for the badge list form are updated:
          * passed directly to the badge list.
@@ -260,11 +272,24 @@ export default {
         },
 
         /**
-         * Listener for the badge list's change event, emitted when a badge is
-         * selected or deselected.
+         * When a badge is selected, update the list depending on the selections status
+         * 
+         * @params { Object } 
+         * @params { Boolean } 
          */
-        updateSelectedBadges() {
-            this.selectedBadges = this.$refs.badgeList.selectedBadges();
+        onBadgeSelected (badge, isChecked) {
+            if (isChecked) {
+                this.selectedBadges = [...this.selectedBadges, badge]; //add in
+            } else {
+                this.selectedBadges = this.selectedBadges.filter((selectedBadge) => selectedBadge.id !== badge.id); //or remove
+            }
+        },
+
+        /**
+         * Clear the current badge selection
+         */
+        onClearSelectedBadges () {
+            this.selectedBadges = [];
         },
 
         /**
@@ -292,30 +317,39 @@ export default {
                     this.$refs.awardModalSubmit.disabled = false;
                 });
         },
+
     },
 }
 </script>
 
 <template>
-    <div>
+    <div class="badge-list-form">
         <badge-list 
             ref="badgeList"
             :get-badges-route="getBadgesRoute"
             :get-badge-create-form-route="getBadgeCreateFormRoute"
             :allow-selection="true"
             :show-badge-menus="false"
-            @on-filter-change="updateSelectedBadges"
+            :selected-badges="selectedBadges"
+            @on-badge-selected="onBadgeSelected"
         ></badge-list>
 
         <ul class="flex-list buttons">
-            <li><a :href="returnUrl" class="button">Cancel</a></li>
-            <li>
-                <button class="submit"
-                        @click.prevent="$refs.awardModal.open"
-                        :disabled="selectedBadges.length === 0"
-                >{{ confirmButtonText }}</button>
-            </li>
+            <li><a :href="returnUrl" class="button">Return to previous page</a></li>
         </ul>
+
+        <bottom-drawer :showDrawer="selectedBadges.length > 0">
+            <h3 class="selected-count"><em>{{ selectedBadgeText }}</em></h3>
+            <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
+            <ul class="flex-list buttons">
+                <li>
+                    <button @click.prevent="$refs.awardModal.open" @keyup.enter="$refs.awardModal.open" class="submit">{{ confirmButtonText }}</button>
+                </li>
+                <li>
+                    <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
+                </li>
+            </ul>
+        </bottom-drawer>
 
         <reveal-modal ref="awardModal" size="large">
             <h2>{{ confirmModalHeader }}</h2>
@@ -353,3 +387,24 @@ export default {
         </reveal-modal>
     </div>
 </template>
+
+<style lang="scss" scoped>
+
+.badge-list-form {
+    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
+}
+
+.selected-count {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.button-clear {
+    display: inline-block;
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
+}
+
+</style>

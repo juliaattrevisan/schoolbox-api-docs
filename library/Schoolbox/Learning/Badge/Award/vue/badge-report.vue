@@ -250,15 +250,7 @@ export default {
 
 .selected-count {
     display: inline-block;
-    margin-right: 1rem;
-}
-
-.modal-actions {
-	display: flex;
-    margin-bottom: 1rem;
-	a {
-		margin: 0 2px;
-	}
+    margin-right: 0.5rem;
 }
 
 .button-clear {
@@ -267,6 +259,14 @@ export default {
     background: none;
     vertical-align: baseline;
     font-size: 0.8rem;
+}
+
+.modal-actions {
+	display: flex;
+    margin-bottom: 1rem;
+	a {
+		margin: 0 2px;
+	}
 }
 
 </style>

@@ -31,7 +31,7 @@ export default {
     computed: {
 
         /**
-         * To ensure it's unchecked when 'Clear Selection' is selected in badge-report
+         * To ensure it's unchecked when 'Clear Selection' is selected in #badge-report
          * 
          * @returns { Boolean }
          */
