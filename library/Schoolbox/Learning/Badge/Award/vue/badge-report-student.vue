@@ -9,7 +9,7 @@ import BadgeImage from '../../vue/badge-image';
 import { getIndex } from '@js/util/domUtils';
 import HorizontalScroller from '@js/scroll/horizontalScroller';
 
-const BADGE_ANIMATE_DURATION = 0.5;
+const BADGE_ANIMATE_DURATION = 0.3;
 
 export default {
     
@@ -22,6 +22,23 @@ export default {
             type: Object,
             required: true
         },
+        selectedStudents: { //to clear a students selection when cleared by badge-report
+            type: Array,
+            required: true
+        }
+    },
+
+    computed: {
+
+        /**
+         * To ensure it's unchecked when 'Clear Selection' is selected in #badge-report
+         * 
+         * @returns { Boolean }
+         */
+        isInSelectedStudents () {
+            return this.selectedStudents.includes(this.student.id);
+        }
+
     },
 
     watch: {
@@ -29,10 +46,10 @@ export default {
         student: {
             deep: true,
             handler (newStudentData, oldStudentData) {
-                if (newStudentData?.awards?.length !== oldStudentData?.awards?.length) {
+                if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) {
                     setTimeout(() => { 
                         this.horizontalScroller.refresh();
-                    }, BADGE_ANIMATE_DURATION * 1000);
+                    }, BADGE_ANIMATE_DURATION * 2000);
                 }
             }
         }
@@ -57,8 +74,8 @@ export default {
          * 
          * @params { Object } 
          */
-        awardSelected (award) {
-            this.$emit('on-award-selected', award);
+        badgeSelected (award) {
+            this.$emit('on-badge-selected', award);
         },
 
         /**
@@ -78,7 +95,7 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onEnter (element, done) {
-            gsap.to(element, { opacity: 1, y: 0, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
+            gsap.to(element, { opacity: 1, y: 0, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, delay: BADGE_ANIMATE_DURATION, onComplete: done } );
         },
 
         /**
@@ -112,6 +129,15 @@ export default {
             element.style.position = 'static';
         },
 
+        /**
+         * To be able to award badges to multiple students
+         * 
+         * @params { Boolean } 
+         */
+        onStudentSelected (isChecked) {
+            this.$emit('on-student-selected', this.student.id, isChecked);
+        },
+
     }
 
 }
@@ -119,16 +145,32 @@ export default {
 
 <template>
     <li class="awards student">
-        <div class="small-12 medium-1 column">
-            <p>Checkbox</p>
+        <div class="student__checkbox">
+            <div class="checklist">
+                <input 
+                    :id="`checkbox-${student.id}`"
+                    type="checkbox"
+                    :value="student.id"
+                    :checked="isInSelectedStudents"
+                    @change="onStudentSelected($event.target.checked)"
+                />
+                <label :for="`checkbox-${student.id}`"></label>
+            </div>
         </div>
-        <div class="small-12 medium-1 column">
-            <a :href="`/search/user/${student.id}`">
-                <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="student.fullName">
-                <h4>{{ student.fullName }}</h4>
-            </a>
+        <div class="student__portrait-and-name">
+            <div class="portrait-and-name-container">
+                <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="`profile photo of ${student.fullName}`" class="portrait">
+                <template v-if="student.id">
+                    <a :href="`/search/user/${student.id}`" title="View profile" class="name">
+                        {{ student.lastName + ', ' + student.firstName }}
+                    </a>
+                </template>
+                <template v-else>
+                    <span class="name">{{ student.lastName + ', ' + student.firstName }}</span>
+                </template> 
+            </div>
         </div>
-        <div class="small-12 medium-10 column">
+        <div class="student__badges">
             <div class="scroller-container" data-scroller>
                 <div class="scroller-button-container">
                     <button class="scroller-button" data-scroller-previous-button>&lt;</button>
@@ -146,8 +188,8 @@ export default {
                             @leave="onLeave" 
                             @after-leave="onAfterLeave" 
                         >      
-                            <li v-for="award in student.awards" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
-                                <a href="#open-award-modal" @click.prevent="awardSelected(award)" :title="award.badge.name">
+                            <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
+                                <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
                                     <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
                                     <span>{{ award.badge.name }}</span>
                                 </a>
@@ -168,34 +210,55 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-$rowHeight: 140px;
+$rowHeight: 120px;
+$collapseStudent: 1000px;
 
 .student {
+    display: flex;
+    width: 100%;
     height: $rowHeight;
     overflow: hidden;
-    margin-bottom: 1rem;
+    margin: 0 0 0.625rem 0;
+    padding: 0;
+    @media (max-width: $collapseStudent) {
+        flex-wrap: wrap;
+        height: auto;
+        overflow: visible;
+    }
 }
 
-.column {
+.student__checkbox {
+    width: 40px;
     padding-bottom: 0;
 }
 
-// .student {
-//     height: $rowHeight;
-//     margin-bottom: 1rem;
-// }
+.student__portrait-and-name {
+    width: 260px;
+    padding-bottom: 0;
+    @media (max-width: $collapseStudent) {
+        margin-bottom: 1rem;
+    }
+}
 
-// .column-checkbox {
-//     flex: 0 0 50px;
-// }
+.portrait-and-name-container {
+    display: flex;
+}
 
-// .column-name {
-//     flex: 0 0 50px;
-// }
+.portrait {
+    margin-right: 1rem;
+    @media (max-width: $collapseStudent) {
+        width: 50px;
+        height: auto;
+    }
+}
 
-// .column-badges {
-//     flex: 1 1 auto;
-// }
+.student__badges {
+    width: calc(100% - 300px); //minus the checkbox and name
+    padding-bottom: 0;
+    @media (max-width: $collapseStudent) {
+        width: 100%;
+    }
+}
 
 .scroller-container {
     display: flex;
@@ -207,6 +270,9 @@ $rowHeight: 140px;
 .scroller-button-container {
     flex: 0 0 50px;
     height: 100%;
+    @media (max-width: $collapseStudent) {
+        display: none;
+    }
 }
 
 .scroller-button {
@@ -242,13 +308,14 @@ $rowHeight: 140px;
 
 .award::v-deep {
     display: inline-block;
-    width: $rowHeight;
+    min-width: 70px;
+    max-width: 110px;
     margin: 0px 0.5rem;
     vertical-align: top;
     text-align: center;
     transition: all 0.3s;
     img {
-        width: 60px;
+        width: 40px;
         height: auto;
         margin-bottom: 5px;
     }

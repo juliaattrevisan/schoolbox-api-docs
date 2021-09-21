@@ -171,9 +171,11 @@ export default {
                     // Once awarded: update the award within this object
                     this.award = response.data[0];
 
+                    this.$emit('on-achievement-awarded', this.award); //dispatch to react specifically to this badge achievement
+
                     // And post a message to the other components that this
                     // user's awards have updated
-                    // TODO investigate Vuex state management
+                    // @TODO investigate Vuex state management
                     this.emitUpdateToAllUserProfileFeeds();
                 })
                 .catch(() => {
@@ -231,7 +233,7 @@ export default {
                     <section>
                         <a v-if="award._links.goalAward && award.isGoal && !award.award"
                            class="button"
-                           @click.prevent="awardAchievement">Award Achievement</a>
+                           @click.prevent="awardAchievement" @keyup.enter="awardAchievement">Award Achievement</a>
                     </section>
                 </div>
             </div>

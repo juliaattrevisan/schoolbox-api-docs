@@ -17,18 +17,22 @@ export default class HorizontalScroller {
     /**
      * Set everything up
      * 
-     * @params { DOMElement } the container that contains the horizontal scroller
+     * @params { Element } the container that contains the horizontal scroller
+     * @params { Booleab } if there's no previous / next buttons to show
      */
-    constructor (scrollerContainer) {
+    constructor (scrollerContainer, hasButtons = true) {
 
         this.scrollerContainer = scrollerContainer;
+        this.hasButtons = hasButtons;
         
         this.outerContainer = this.scrollerContainer.querySelector('[data-scroller-outer-container]');
         this.innerContainer = this.scrollerContainer.querySelector('[data-scroller-inner-container]');
         
         this.initDraggable();
-        this.initPreviousButton();
-        this.initNextButton();
+        if (this.hasButtons) {
+            this.initPreviousButton();
+            this.initNextButton();
+        }
         this.initScrollBar();
 
         this.refresh();
@@ -44,10 +48,10 @@ export default class HorizontalScroller {
             type: 'x',
             edgeResistance: 0.75,
             inertia: true,
-            onDragStart: () => this.showScrollBar(),
-            onDrag: () => this.updateScrollBar(),
-            onThrowUpdate: () => this.updateScrollBar(),
-            onThrowComplete: () => this.hideScrollBar()
+            onDragStart: () => this.onStart(),
+            onDrag: () => this.onUpdate(),
+            onThrowUpdate: () => this.onUpdate(),
+            onThrowComplete: () => this.onComplete()
         })[0];
     }
 
@@ -63,23 +67,50 @@ export default class HorizontalScroller {
     }
 
     /**
-     * scroller has been activated, so show the scroll bar to track scroll progress
+     * Scroller has been activated, so show the scroll bar to track scroll progress
      */
-    showScrollBar () { 
+    onStart () { 
         gsap.to(this.scrollBar, { alpha: 1, duration: 0.3 } );
     }
 
     /**
      * Keep the scroll bar accurate with the current scroll position
+     * And disable the previous / next buttons when at then scroll bounds
      */
-    updateScrollBar () {
+    onUpdate () {
         gsap.set(this.scrollBar, { x: -(gsap.getProperty(this.innerContainer, 'x') * this.scrollBarXFactor) } );
+        if (this.hasButtons) {
+            this.checkPreviousButtonStatus();
+            this.checkNextButtonStatus();
+        }
+    } 
+
+    /**
+     * Disable when there's no more previous movement
+     */
+    checkPreviousButtonStatus () {
+        if (gsap.getProperty(this.innerContainer, 'x') >= 0) {  //means scrolling is beyond the left edge
+            this.previousButton.setAttribute('disabled', true);
+        } else {
+            this.previousButton.removeAttribute('disabled');
+        }
+    } 
+
+    /**
+     * Disable when there's no more previous movement
+     */
+    checkNextButtonStatus () {
+        if (gsap.getProperty(this.innerContainer, 'x') <= this.minX) {  //means scrolling is beyond the right edge
+            this.nextButton.setAttribute('disabled', true);
+        } else {
+            this.nextButton.removeAttribute('disabled');
+        }
     } 
     
     /**
      * Fade out the scroll bar, when no longer moving
      */
-    hideScrollBar () {
+    onComplete () {
         gsap.to(this.scrollBar, { alpha: 0, duration: 0.3 } );
     } 
 
@@ -92,9 +123,9 @@ export default class HorizontalScroller {
         gsap.to(this.innerContainer, { 
             x: xTarget, 
             duration: 0.5, 
-            onStart: () => this.showScrollBar(),
-            onUpdate: () => this.updateScrollBar(),
-            onComplete: () => this.hideScrollBar()
+            onStart: () => this.onStart(),
+            onUpdate: () => this.onUpdate(),
+            onComplete: () => this.onComplete()
         } );
     }
 
@@ -147,6 +178,10 @@ export default class HorizontalScroller {
     refresh () {
         gsap.to(this.innerContainer, { x: 0, duration: 0.5 } ); //move back to the start
         this.refreshDraggableBounds();
+        if (this.hasButtons) {
+            this.checkPreviousButtonStatus();
+            this.checkNextButtonStatus();
+        }
         this.minX < 0 ? this.enable() : this.disable(); //only provide scrolling when needed
     }
 
@@ -154,8 +189,10 @@ export default class HorizontalScroller {
      * enable the functionality of scroller, the contents of the container goes beyond the bounds set
      */
      enable () {
-        this.nextButton.style.display = 'block';
-        this.previousButton.style.display = 'block';
+        if (this.hasButtons) {
+            this.nextButton.style.display = 'block';
+            this.previousButton.style.display = 'block';
+        }
         this.draggable.enable();
         this.refreshScrollBarWidth();
     }
@@ -164,8 +201,10 @@ export default class HorizontalScroller {
      * disable all the functionality of scroller, not enough in the container to be needed
      */
     disable () {
-        this.nextButton.style.display = 'none';
-        this.previousButton.style.display = 'none';
+        if (this.hasButtons) {
+            this.nextButton.style.display = 'none';
+            this.previousButton.style.display = 'none';
+        }
         this.draggable.disable();
     }
     

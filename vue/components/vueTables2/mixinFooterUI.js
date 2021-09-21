@@ -4,7 +4,7 @@
  */
 
 
-export const mixinFooterUI = {
+export default {
 
     methods: {
 
@@ -13,9 +13,9 @@ export const mixinFooterUI = {
          * putting everything down the bottom right
          * 
          */
-        $_footerUI_update () {
-            this.$_footerUI_pushUIIntoFooterSlot();
-            this.$_footerUI_onlyShowNextPrevPagination();
+        footerUI_update () {
+            this.footerUI_pushUIIntoFooterSlot();
+            this.footerUI_onlyShowNextPrevPagination();
         },
 
         /**
@@ -23,7 +23,7 @@ export const mixinFooterUI = {
          * placing in order of display
          * 
          */
-        $_footerUI_pushUIIntoFooterSlot () {
+        footerUI_pushUIIntoFooterSlot () {
             const perPageControls = document.querySelector('.VueTables__limit');
             if (perPageControls) { //may not exist depending on how many results are currently available / filtered
                 this.$refs.tableFooter.appendChild(perPageControls);
@@ -38,7 +38,7 @@ export const mixinFooterUI = {
          * Keeping it simple, only showing next/previous buttons
          * 
          */
-        $_footerUI_onlyShowNextPrevPagination () {
+        footerUI_onlyShowNextPrevPagination () {
             document.querySelectorAll('.VuePagination__pagination-item').forEach( (item) => {
                 if (item.className.includes('prev-page') && !item.className.includes('prev-chunk')) {
                     item.style.display = 'block';  

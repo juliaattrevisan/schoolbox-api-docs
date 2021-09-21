@@ -28,9 +28,10 @@
     <badge-report
         subject-title="{{ folder.title }}"
         get-student-lists-endpoint="{{ routeLookup('learningBadgeAward.getListByFolderId', {folderId: folder.getId, folder: folder}) }}"
+        return-url-name="{{ RETURN_URL.name }}"
+        encoded-return-url="{{ RETURN_URL.current }}"
     >
     </badge-report>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/badgeReport.js"></script>
 <div id="toaster" class="toast" data-toast></div>
-

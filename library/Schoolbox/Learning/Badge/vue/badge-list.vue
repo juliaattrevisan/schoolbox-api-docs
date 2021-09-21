@@ -51,6 +51,10 @@ export default {
             type: String,
             default: null,
         },
+        selectedBadges: { //to know which badges are currently selected
+            type: Array,
+            default: [],
+        },
     },
 
     data () {
@@ -151,15 +155,6 @@ export default {
         },
 
         /**
-         * Which badges (if any) are selected?
-         *
-         * @return {Array}
-         */
-        selectedBadges () {
-            return this.data.filter(v => v.selected === true);
-        },
-
-        /**
          * Opens a modal window for deleting this badge.
          *
          * @param {Object} badge
@@ -226,6 +221,28 @@ export default {
             return "?" + new URLSearchParams(emptyQueryString).toString();
         },
 
+
+        /**
+         * To ensure it's unchecked when 'Clear Selection' is selected in #badge-list-form
+         * 
+         * @returns { Boolean }
+         * 
+         * @returns { Boolean }
+         */
+        isInSelectedBadges (badgeId) {
+            return this.selectedBadges.some((badge) => badge.id === badgeId);
+        },
+
+        /**
+         * To notify of badge selection change
+         * 
+         * @params { Boolean } 
+         */
+        onBadgeSelected (badge, isChecked) {
+            this.$emit('on-badge-selected', badge, isChecked);
+        },
+
+
     }
 
 }
@@ -283,8 +300,8 @@ export default {
                                     <template v-if="allowSelection">
                                         <input type="checkbox"
                                                :id="'selectBadge-' + String(badge.id)"
-                                               v-model="badge.selected"
-                                               @change="filter_emitChange"
+                                               :checked="isInSelectedBadges(badge.id)"
+                                               @change="onBadgeSelected(badge, $event.target.checked)"
                                         >
                                         <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
                                             {{ badge.name }}
