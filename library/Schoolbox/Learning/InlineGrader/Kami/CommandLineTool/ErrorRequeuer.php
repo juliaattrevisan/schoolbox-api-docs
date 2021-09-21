@@ -116,9 +116,6 @@ HELP;
             exit(0);
         }
 
-        $jitter        = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
-        $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger());
-
         // Ensure only one instance of tool is running at a time
         $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
@@ -127,10 +124,13 @@ HELP;
 
         $this->setMaxExecutionTime($timeout);
 
+        $jitter        = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
+        $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger(), $lock);
+
         // Run the tool
         $exitStatus = 0;
         try {
-            $exitStatus = $requeueErrors->deleteAndReQueue(!$this->perform(), $maxSkips, $errorMessage, $lock);
+            $exitStatus = $requeueErrors->deleteAndReQueue(!$this->perform(), $maxSkips, $errorMessage);
         } catch (Throwable $e) {
             $this->getLogger()->error($e->getMessage(), $e->getTrace());
             $this->getLogger()->error($e->getTraceAsString());

@@ -53,17 +53,25 @@ class ReQueueErrors
 
 
     /**
-     * @param IConnector      $connector
-     * @param Mapper          $mapper
-     * @param IJitter         $jitter
-     * @param LoggerInterface $log
+     * @var LockInterface|null
      */
-    public function __construct(IConnector $connector, Mapper $mapper, IJitter $jitter, LoggerInterface $log)
+    private ?LockInterface $lock;
+
+
+    /**
+     * @param IConnector         $connector
+     * @param Mapper             $mapper
+     * @param IJitter            $jitter
+     * @param LoggerInterface    $log
+     * @param LockInterface|null $lock
+     */
+    public function __construct(IConnector $connector, Mapper $mapper, IJitter $jitter, LoggerInterface $log, ?LockInterface $lock = null)
     {
         $this->connector = $connector;
         $this->mapper    = $mapper;
         $this->jitter    = $jitter;
         $this->log       = $log;
+        $this->lock      = $lock;
     }
 
 
@@ -71,7 +79,6 @@ class ReQueueErrors
      * @param bool               $dryRun
      * @param int                $maxSkips
      * @param null|string        $errorMessageFilter If supplied, only re-queue documents which match this error message
-     * @param LockInterface|null $lock
      * @return int
      * @throws ConnectException
      * @throws IKamiException
@@ -80,7 +87,7 @@ class ReQueueErrors
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function deleteAndReQueue(bool $dryRun, int $maxSkips, string $errorMessageFilter = null, ?LockInterface $lock = null): int
+    public function deleteAndReQueue(bool $dryRun, int $maxSkips, string $errorMessageFilter = null): int
     {
         $this->resetCounts();
 
@@ -112,11 +119,11 @@ class ReQueueErrors
             /* Refresh lock while we're still processing; keep using another
              * $timeout seconds until we're done, or until we died
              */
-            if ($lock) {
+            if ($this->lock) {
                 try {
                     $this->log->info('Kami requeuer exceeded timeout; refreshing lock');
 
-                    $lock->refresh();
+                    $this->lock->refresh();
                 } catch (LockConflictedException | LockAcquiringException $e) {
                     $this->log->warning('Could not refresh lock: aborting');
                     break;
