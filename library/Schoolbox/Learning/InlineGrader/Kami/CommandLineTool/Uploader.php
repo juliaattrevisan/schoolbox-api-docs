@@ -119,15 +119,6 @@ class Uploader extends CliTool\App
         if ($this->getDi()->has('sentry')) {
             $sentry = $this->getDi()->get('sentry');
         }
-        $uploader = new Kami\Uploader(
-            $dryRun,
-            $connector,
-            new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff),
-            $kamiMapper,
-            $this->getLogger(),
-            $sentry instanceof HubInterface ? $sentry : null,
-        );
-
 
         $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
@@ -136,9 +127,21 @@ class Uploader extends CliTool\App
 
         $this->setMaxExecutionTime($timeout);
 
+        /* Only start up an Uploader if we can actually go ahead and do something
+         */
+        $uploader = new Kami\Uploader(
+            $dryRun,
+            $connector,
+            new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff),
+            $kamiMapper,
+            $this->getLogger(),
+            $lock,
+            $sentry instanceof HubInterface ? $sentry : null,
+        );
+
         // Run the uploader
         try {
-            $results = $uploader->upload($retryFailed, $batchSize, $maxSkips, $lock);
+            $results = $uploader->upload($retryFailed, $batchSize, $maxSkips);
         } catch (Throwable $e) {
             $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
             $this->getLogger()->error($e->getTraceAsString());

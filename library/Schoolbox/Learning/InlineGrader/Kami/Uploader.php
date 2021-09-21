@@ -44,6 +44,13 @@ class Uploader
     /** @var Mapper */
     private $kamiMapper;
 
+
+    /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
+
+
     /** @var LoggerInterface */
     private $log;
 
@@ -61,6 +68,7 @@ class Uploader
      * @param IJitter           $jitter
      * @param Mapper            $kamiMapper
      * @param LoggerInterface   $log
+     * @param LockInterface     $lock
      * @param HubInterface|null $sentry
      */
     public function __construct(
@@ -69,6 +77,7 @@ class Uploader
         IJitter $jitter,
         Mapper $kamiMapper,
         LoggerInterface $log,
+        LockInterface $lock,
         ?HubInterface $sentry
     ) {
         $this->dryRun        = $dryRun;
@@ -76,6 +85,7 @@ class Uploader
         $this->jitter        = $jitter;
         $this->kamiMapper    = $kamiMapper;
         $this->log           = $log;
+        $this->lock          = $lock;
         $this->sentry        = $sentry;
     }
 
@@ -138,12 +148,11 @@ class Uploader
      * @param bool          $retryFailed If true, upload 'failed', otherwise upload 'queued'
      * @param int           $batchSize   When fetching from the DB, break into batches to avoid OOM
      * @param int           $maxSkips    Successive failures may indicate an API problem.
-     * @param LockInterface $lock
      * @return UploadResults
      * @throws \LogicException
      * @throws \PDOException
      */
-    public function upload(bool $retryFailed, int $batchSize, int $maxSkips, LockInterface $lock): UploadResults
+    public function upload(bool $retryFailed, int $batchSize, int $maxSkips): UploadResults
     {
         $this->log->info('Initiating upload');
 
@@ -223,7 +232,7 @@ class Uploader
                 try {
                     $this->log->info('Kami document upload exceeded timeout; refreshing lock');
 
-                    $lock->refresh();
+                    $this->lock->refresh();
                 } catch (LockConflictedException | LockAcquiringException $e) {
                     $this->log->warning('Could not refresh lock: aborting');
                     break;
