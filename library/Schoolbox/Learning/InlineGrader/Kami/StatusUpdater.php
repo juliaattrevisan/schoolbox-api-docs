@@ -14,12 +14,10 @@ use Alaress\Jitter\IJitter;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Log\LoggerInterface;
 use LogicException;
-use Sabre\DAV\Xml\Request\Lock;
 use Schoolbox\Learning\InlineGrader\Kami\Exception\IKamiException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
-
 
 /**
  * A tool for checking the status of all 'processing' kami documents

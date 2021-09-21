@@ -21,7 +21,6 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
-
 /**
  * Uploads eligible student submission files into Kami and inserts the
  * document's upload status into the schoolbox database.
