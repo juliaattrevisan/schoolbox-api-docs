@@ -172,6 +172,15 @@ class Project implements IAssessmentTypeTranslator
     private function getSummator(ProjectModel $project): ?ISummator
     {
         $summatorString = $project->getSummator();
+        return self::getSummatorFromString($summatorString);
+    }
+
+    /**
+     * @param string|null $summatorString
+     * @return ISummator|null
+     */
+    public static function getSummatorFromString(?string $summatorString): ?Isummator
+    {
         if (null === $summatorString) {
             return null;
         }

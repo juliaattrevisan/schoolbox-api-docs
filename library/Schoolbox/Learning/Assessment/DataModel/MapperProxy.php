@@ -34,6 +34,10 @@ use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
@@ -373,6 +377,161 @@ class MapperProxy
         return $responses;
     }
 
+    /**
+     * This is introduced to get marks for Cohort comparison
+     * @param array $assessmentIds
+     * @return array $marks[assessment id][user id] = mark
+     */
+    public function findNormalisedMark(array $assessmentIds): array
+    {
+        if (empty($assessmentIds)) {
+            return [];
+        }
+
+        // get quantitative marks only
+        $markTypeMapper = SubmissionBox\MarkTypeMapper::getInstance();
+        $markTypeIds    = $markTypeMapper->findIdsbyColumn(
+            'slug',
+            [LetterGrade::SLUG, Percentage::SLUG, TotalMarkFractional::SLUG]
+        );
+        if (empty($markTypeIds)) {
+            return [];
+        }
+
+        $markTypeIdString   = implode(',', $markTypeIds);
+        $assessmentIdString = implode(',', $assessmentIds);
+
+        // not querying task as it's not quantitative
+        $markQuery = $this->baseMapper->getDatabase()->prepare(
+            "
+           SELECT
+                sb.assessment_id AS assessment_id,
+                sb.weight AS weight,
+                sb.mark_type AS mark_type,
+                sr.owner AS user_id,
+                sr.norm_mark AS mark,
+                sb.max_mark AS max_mark,
+                sr.published_at AS published_at
+           FROM submission_return sr
+                JOIN submission_box sb ON sb.id = sr.box_id
+                JOIN participant_plan pp ON pp.assessment_id = sb.assessment_id AND pp.deleted_at IS NULL
+                JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.user_id = sr.owner
+           WHERE
+                sr.deleted_at IS NULL
+                AND sr.published_at IS NOT NULL
+                AND sr.review_route = 'instructor'
+                AND pc.excluded_at IS NULL
+                AND sb.mark_type IN ($markTypeIdString)
+                AND sb.assessment_id IN ($assessmentIdString)
+
+           UNION
+
+           SELECT
+                a.assessment_id AS assessment_id,
+                a.weight AS weight,
+                null AS mark_type,
+                aa.user_id AS user_id,
+                SUM(ar.mark)  AS mark,
+                SUM(aq.marks) AS max_mark,
+                aa.reviewed_at AS published_at
+           FROM assess_attempt aa
+                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+                RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
+            WHERE
+                a.availability = 'assess'
+                AND aa.reviewed_at IS NOT NULL
+                AND aa.deleted_at IS NULL
+                AND ar.deleted_at IS NULL
+                AND a.assessment_id IN ($assessmentIdString)
+            GROUP BY aa.assess_id, aa.attempt_id
+
+        ORDER BY assessment_id, user_id, published_at DESC
+        "
+        );
+
+        $markQuery->setFetchMode(\PDO::FETCH_ASSOC);
+        $markQuery->execute();
+
+        // $marks[assessment_id][user_id] = mark
+        $marks            = [];
+        $assessmentWeight = [];
+        foreach ($markQuery as $row) {
+            if (!key_exists($row['assessment_id'], $marks)) {
+                $marks[$row['assessment_id']]            = [];
+                $assessmentWeight[$row['assessment_id']] = $row['weight'];
+            }
+            if (key_exists($row['user_id'], $marks[$row['assessment_id']])) {
+                // latest mark is already stored for this user
+                continue;
+            }
+            if ($row['mark'] === null) {
+                $normMark = null;
+            } elseif ($row['mark_type'] === null) {
+                // means Quiz... for now
+                $normMark = IMarkScheme::NORMALISED_MARK_MAX * (float)$row['mark'] / (float)$row['max_mark'];
+            } else {
+                $normMark = (float)$row['mark'];
+            }
+            $marks[$row['assessment_id']][$row['user_id']] = $normMark;
+        }
+
+        // get projects
+        $projectQuery = $this->baseMapper->getDatabase()->prepare(
+            "SELECT
+                  p.assessment_id AS assessment_id,
+                  summator,
+                  pa.assessment_id AS sub_assessment_id
+             FROM project p
+                 LEFT JOIN project_assessment pa ON p.id = pa.project_id AND p.deleted_at IS NULL
+             WHERE p.mark_type_id IN ($markTypeIdString)
+                 AND p.assessment_id IN ($assessmentIdString)"
+        );
+
+        $projectQuery->setFetchMode(\PDO::FETCH_ASSOC);
+        $projectQuery->execute();
+
+        // Store project marks from assessment marks ($marks) above
+        $projects  = [];
+        $summators = [];
+        foreach ($projectQuery as $row) {
+            if (!key_exists($row['assessment_id'], $projects)) {
+                $projects[$row['assessment_id']]  = [];
+                $summators[$row['assessment_id']] = $row['summator'];
+            }
+            if (!key_exists($row['sub_assessment_id'], $marks)) {
+                continue;
+            }
+
+            // Populate marks and weights of assessments in this project
+            foreach ($marks[$row['sub_assessment_id']] as $userId => $mark) {
+                if (!isset($projects[$row['assessment_id']][$userId])) {
+                    $projects[$row['assessment_id']][$userId]              = [
+                        'values'  => [],
+                        'weights' => [],
+                    ];
+                }
+                $projects[$row['assessment_id']][$userId]['values'][]  = $mark;
+                $projects[$row['assessment_id']][$userId]['weights'][] = $assessmentWeight[$row['assessment_id']];
+            }
+        }
+
+        // Calculate project marks and append to $marks
+        foreach ($projects as $assessmentId => $projectMarks) {
+            if (!key_exists($assessmentId, $marks)) {
+                $marks[$assessmentId] = [];
+            }
+            $summator = Translator\Project::getSummatorFromString($summators[$assessmentId]);
+            if (null === $summator) {
+                continue;
+            }
+            foreach ($projectMarks as $userId => $projectMark) {
+                $marks[$assessmentId][$userId] = $summator->summateList($projectMark['values'], $projectMark['weights']);
+            }
+        }
+
+        return $marks;
+    }
 
     /**
      * Optimised method for finding the number of feedbacks for a set of
