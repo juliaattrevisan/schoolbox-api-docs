@@ -115,6 +115,7 @@ HELP;
         $this->lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if ($this->lock->acquire()) {
             $this->setMaxExecutionTime($timeout);
+            return;
         }
 
         exit(1);
