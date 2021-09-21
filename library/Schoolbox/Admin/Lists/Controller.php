@@ -196,7 +196,7 @@ class Controller extends Base
                     continue;
                 }
 
-                if ($model->$getter() != $value[$currentIndex]) {
+                if ($model->$getter() !== $value[$currentIndex]) {
                     // Update values
                     $setter = $mapper->getSetMethodName($field);
                     if (!method_exists($model, $setter)) {
