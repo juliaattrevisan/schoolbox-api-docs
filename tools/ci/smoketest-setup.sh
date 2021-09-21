@@ -64,6 +64,9 @@ export INSTANCE_ID=smoketest
 # Do not extract the build artifact: it clobbers what's in the PR
 #tar xzf $initialdir/build-artifact/*-build.tar.gz;
 
+## Extract the NPM build
+tar xzf $initialdir/assets-artifact/*-assets.tar.gz;
+
 ## Extract the develop vendor build too
 tar xzf $initialdir/vendor-php-artifact-dev/*-vendor-php-dev.tar.gz;
 
