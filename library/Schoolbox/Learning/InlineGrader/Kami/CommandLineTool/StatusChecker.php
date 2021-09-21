@@ -16,6 +16,7 @@ use Proxy;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
+use Symfony\Component\Lock\LockInterface;
 use Throwable;
 
 /**
@@ -67,13 +68,14 @@ class StatusChecker extends CliTool\App
 
         $this->logConfigurationState($maxAttempts, $maxSkips, $baseBackOff, $timeout);
 
-        $statusUpdater = $this->buildStatusUpdater($maxAttempts, $baseBackOff);
-
         $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
             exit(1);
         }
+
         $this->setMaxExecutionTime($timeout);
+
+        $statusUpdater = $this->buildStatusUpdater($maxAttempts, $baseBackOff, $lock);
 
         // Run the status checker
         try {
@@ -143,11 +145,15 @@ HELP;
     /**
      * Builds and returns a StatusUpdater
      *
-     * @param int $maxAttempts
-     * @param int $baseBackOff
+     * @param int           $maxAttempts
+     * @param int           $baseBackOff
+     * @param LockInterface $lock
      * @return Kami\StatusUpdater
+     * @throws GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
      */
-    private function buildStatusUpdater(int $maxAttempts, int $baseBackOff): Kami\StatusUpdater
+    private function buildStatusUpdater(int $maxAttempts, int $baseBackOff, LockInterface $lock): Kami\StatusUpdater
     {
         $config = $this->getConfig();
         /** @var MapperFactory $mapperFactory */
@@ -167,6 +173,6 @@ HELP;
         }
 
         $jitter = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
-        return new Kami\StatusUpdater($connector, $kamiMapper, $jitter, $this->getLogger());
+        return new Kami\StatusUpdater($connector, $kamiMapper, $jitter, $this->getLogger(), $lock);
     }
 }
