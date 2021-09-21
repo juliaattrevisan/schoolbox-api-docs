@@ -343,13 +343,15 @@ export default {
         </ul>
 
         <bottom-drawer :showDrawer="selectedBadges.length > 0">
-            <transition-group name="selected-badges" class=selected-badges tag="div">
-                <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges-item">
-                    <badge-image :badge="badge" class="selected-badge-image"></badge-image>
-                </span>
-            </transition-group>
-            <h3 class="selected-count"><em>{{ selectedBadgeText }}</em></h3>
-            <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
+            <div class="selected-badges-container">
+                <h3 class="selected-count"><em>{{ selectedBadgeText }}</em></h3>
+                <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
+                <transition-group name="selected-badges" class=selected-badges tag="div">
+                    <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges-item">
+                        <badge-image :badge="badge" class="selected-badge-image"></badge-image>
+                    </span>
+                </transition-group>
+            </div>
             <ul class="flex-list buttons">
                 <li>
                     <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
@@ -390,8 +392,8 @@ export default {
             </template>
 
             <ul class="flex-list buttons">
-                <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
-                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
+                <li><a @click.prevent="$refs.awardModal.close" @keyup.enter="$refs.awardModal.close" class="button">Cancel</a></li>
+                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" @keyup.enter="onSubmit" class="submit">Confirm</button></li>
             </ul>
         </reveal-modal>
     </div>
@@ -403,8 +405,18 @@ export default {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
 
-.selected-badges {
+.selected-badges-container {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.button-clear {
     display: inline-block;
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
 }
 
 .selected-badges-item {
@@ -421,19 +433,6 @@ export default {
 
 .selected-badges-leave-active {
     position: absolute;
-}
-
-.selected-count {
-    display: inline-block;
-    margin-right: 0.5rem;
-}
-
-.button-clear {
-    display: inline-block;
-    padding: 0px;
-    background: none;
-    vertical-align: baseline;
-    font-size: 0.8rem;
 }
 
 </style>
