@@ -13,9 +13,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
-use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
-use External_ClassInterface;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
 use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
@@ -31,11 +29,9 @@ use Schoolbox\Assessment\Participant\Plan\Model as Plan;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Badge\Award\Mapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
-use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -45,7 +41,6 @@ use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 use function array_intersect;
 use function array_keys;
@@ -145,48 +140,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @var WorkTypeMapper;
      */
     private $workTypeMapper;
-
-    private External_ClassInterface $externalClass;
-
-    /**
-     * @var UserMapper
-     */
-    private UserMapper $userMapper;
-
-    /**
-     * @inheritdoc
-     *
-     * @throws ServiceNotFound
-     */
-    public static function getSetters(ContainerInterface $di): array
-    {
-        /** @var MapperFactory $mf */
-        $mf = $di->get('mapperFactory');
-
-        return [
-            'setExternalClass' => $di->get('externalClass'),
-            'setUserMapper'    => $mf->getLazy(UserMapper::class),
-        ];
-    }
-
-    /**
-     * Setter for UserMapper
-     * @param UserMapper $userMapper
-     */
-    public function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Setter for ExternalClass
-     * @param External_ClassInterface $externalClass
-     */
-    public function setExternalClass(External_ClassInterface $externalClass)
-    {
-        $this->externalClass = $externalClass;
-    }
-
 
     /**
      * Irrelevant as this could notify about different things, but must exist.
@@ -1403,27 +1356,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $bob->setParam('cat', new SimpleParam($folder->getName()))
             ->setIcon($icon)
             ->setNamespace($namespace);
-
-        // If reply to is enabled and succeeded to get current teachers email address
-        // set it as reply to
-        if ($this->conf->get('mail_replyto_enabled') && $folder->isClass()) {
-            $teachers = $this->externalClass->getTeachers($folder->getCodeString());
-            $replyToUserIds = [];
-            foreach ($teachers as $teacherExternalId) {
-                try {
-                    $teacher = $this->userMapper->findByExternalId($teacherExternalId);
-                    if ($teacher->getEmail()) {
-                        $replyToUserIds[] = $teacher->getId();
-                    }
-                } catch (BaseMapper\Exception $e) {
-                    continue;
-                }
-            }
-            if (count($replyToUserIds) > 0) {
-                $bob->setReplyToUserIds($replyToUserIds);
-            }
-        }
-
         return $bob;
     }
 
