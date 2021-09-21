@@ -307,8 +307,12 @@ class Controller extends Base
     private function processRows(array $fieldNames, string $data): array
     {
         // add "id" as it's not in fields
-        $fieldNames[] = 'id';
-        $fieldNames[] = 'sequence';
+        if (!in_array('id', $fieldNames)) {
+            $fieldNames[] = 'id';
+        }
+        if (!in_array('sequence', $fieldNames)) {
+            $fieldNames[] = 'sequence';
+        }
         $fieldValues = [];
         $rows        = json_decode($data, true);
         foreach ($rows as $row) {
