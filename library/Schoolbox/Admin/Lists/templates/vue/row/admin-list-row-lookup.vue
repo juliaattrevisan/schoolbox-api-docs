@@ -1,7 +1,8 @@
 <script>
 
 /**
- * Select option, also ensuring respects nullable option
+ * Select option, also ensuring respects nullable option and 
+ * checks for options that have been deleted so they are no longer displayed
  */
 
 
@@ -48,8 +49,6 @@ export default {
 
     mounted () {
         this.getCurrentSelection();
-        
-
     },
 
     methods: {
@@ -60,7 +59,7 @@ export default {
          * combination of row, referenced with field id, which is a little confusing otherwise
          */
         getCurrentSelection () {
-            if (this.row[this.field.id]) { //if it's not null, will be a reference to the field.lookup.key
+            if (this.row[this.field.id] && !this.row.isNew) { //if it's not null, or not a new row entry, will be a reference to the field.lookup.key
                 this.currentSelection = this.field.lookup.find((option) => option.key === this.row[this.field.id]);
             }
         },
