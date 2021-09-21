@@ -23,8 +23,6 @@ use Schoolbox\Video\QueueMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 
-// 120 min timeout
-
 /**
  * Video encoder and processor.
  *
