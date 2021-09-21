@@ -6,7 +6,6 @@
  */
 
 import { mapState, mapGetters } from 'vuex';
-import axios from 'axios';
 import { gsap } from 'gsap/all'
 import AdminListHeader from './admin-list-header';
 import AdminListPopOut from './admin-list-pop-out';
@@ -14,7 +13,7 @@ import AdminListNoRows from './admin-list-no-rows';
 import AdminListRow from './row/admin-list-row';
 import AdminListAddRow from './admin-list-add-row';
 import AdminListDeleteRow from './admin-list-delete-row';
-import mixinSaveRows from './mixins/mixinAdminListSaveRows';
+import saveRows from './mixins/mixinAdminListSaveRows';
 import Toast from '@vue/components/toast';
 import { UPDATE_LOADED_DATA } from './store/adminListMutationTypes';
 
@@ -32,7 +31,7 @@ export default {
     },
 
     mixins: [
-        mixinSaveRows
+        saveRows
     ],
 
     props: {
@@ -97,8 +96,9 @@ export default {
          */
         async getData () {
             try {
-                const response = await axios.get(`/adminv2/lists/data/${this.tableName}`);
-                this.$store.commit(UPDATE_LOADED_DATA, response.data);
+                const response = await fetch(`/adminv2/lists/data/${this.tableName}`);
+                const responseData = await response.json();
+                this.$store.commit(UPDATE_LOADED_DATA, responseData);
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error

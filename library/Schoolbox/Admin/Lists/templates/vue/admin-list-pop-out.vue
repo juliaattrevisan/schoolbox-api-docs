@@ -7,7 +7,7 @@
 
 import { mapState, mapGetters } from 'vuex';
 import { gsap } from 'gsap/all';
-import mixinSaveRows from './mixins/mixinAdminListSaveRows';
+import saveRows from './mixins/mixinAdminListSaveRows';
 import { CLOSE_POP_UP } from './store/adminListMutationTypes'
 import Toast from '@vue/components/toast';
 
@@ -25,7 +25,7 @@ export default {
     },
 
     mixins: [
-        mixinSaveRows
+        saveRows
     ],
 
     data () {

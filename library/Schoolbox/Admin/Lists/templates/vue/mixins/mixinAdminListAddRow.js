@@ -21,7 +21,7 @@ export default {
          * Push in a new row, retrieving the default value for each property and 
          * then adding in additional values required to track and add
          */
-        $_mixinAddRow_onNewRowSelected () {
+        addRow_onNewRowSelected () {
             const newRow = {}
             this.loadedData.fields.forEach((field) => {
                 if (Object.keys(field).includes('default')) {

@@ -27,6 +27,6 @@ export default {
 <template>
     <div id="listEmptyState" class="empty-state" >
         <i class="icon-list"></i>
-        <p>The {{ loadedData.title }} list is empty.<br><a @click.prevent="$_mixinAddRow_onNewRowSelected" href="#add-an-item">Add an item to this list</a>.</p>
+        <p>The {{ loadedData.title }} list is empty.<br><a @click.prevent="addRow_onNewRowSelected" href="#add-an-item">Add an item to this list</a>.</p>
     </div>
 </template>

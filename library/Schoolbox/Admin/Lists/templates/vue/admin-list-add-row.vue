@@ -6,7 +6,7 @@
  */
 
 import { mapState } from 'vuex';
-import mixinAddRow from './mixins/mixinAdminListAddRow';
+import addRow from './mixins/mixinAdminListAddRow';
 
 export default {
 
@@ -17,7 +17,7 @@ export default {
     },
 
     mixins: [
-        mixinAddRow
+        addRow
     ],
 
 }
@@ -27,7 +27,7 @@ export default {
 <template>
     <div class="component-action">
         <section>
-            <a @click.prevent="$_mixinAddRow_onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
+            <a @click.prevent="addRow_onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
         </section>
     </div>
 </template>
