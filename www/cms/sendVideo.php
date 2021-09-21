@@ -106,7 +106,7 @@ if (isset($type) && isset($id)) {
         $fileSystem->getAdapter() instanceof S3Adapter
         && $config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)
     ) {
-        $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
+        $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
 
         $preSignedUrlService = new PreSignedUrlService($config);
 

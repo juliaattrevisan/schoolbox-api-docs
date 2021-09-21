@@ -118,7 +118,7 @@ try {
             $storage,
             Alaress_Date_Format::now()->addSeconds($config->get($browserCacheTimeoutConfigName)),
             $transforms->getTranscodePath(Storage\Manager::getPathFromHash($hash), $cache_key),
-            'private',
+            ['private', 'must-revalidate'],
             PreSignedUrlService::DISPOSITION_INLINE,
             'image/png',
             basename($path)
