@@ -76,16 +76,11 @@ class ReQueueErrors
 
 
     /**
-     * @param bool               $dryRun
-     * @param int                $maxSkips
-     * @param null|string        $errorMessageFilter If supplied, only re-queue documents which match this error message
+     * @param bool        $dryRun
+     * @param int         $maxSkips
+     * @param null|string $errorMessageFilter If supplied, only re-queue documents which match this error message
      * @return int
-     * @throws ConnectException
-     * @throws IKamiException
-     * @throws Throwable
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Throwable
      */
     public function deleteAndReQueue(bool $dryRun, int $maxSkips, string $errorMessageFilter = null): int
     {

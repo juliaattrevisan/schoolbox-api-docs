@@ -82,13 +82,7 @@ class StatusUpdater
      * @param bool $dryRun
      * @param int  $maxSkips
      * @return int
-     * @throws IKamiException
-     * @throws LogicException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Throwable
-     * @throws \UnexpectedValueException
      */
     public function checkProcessingDocumentsStatus(bool $dryRun, int $maxSkips): int
     {
