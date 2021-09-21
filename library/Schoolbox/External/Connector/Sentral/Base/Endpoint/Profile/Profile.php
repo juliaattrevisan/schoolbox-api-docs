@@ -60,6 +60,13 @@ class Profile implements IStrategy
 
 
     /**
+     * This relationshipName identifies a contact as a sibling
+     * This might be configurable in sentral, though
+     */
+    private const RELATIONSHIP_SIBLING = 'Sibling';
+
+
+    /**
      * Employment status for departed staff: if a staff member is departed, they
      * should not be synced.
      */
@@ -872,6 +879,23 @@ class Profile implements IStrategy
                 continue;
             }
 
+            /* The relationship of this person to our student
+             *
+             * Siblings and the student themselves might appear here
+             * for no apparent reason, but ok
+             */
+            $relationshipName = (string)$contact['attributes']['relationName'];
+
+            /* Skip Sibling relationships
+             */
+            if ($relationshipName === self::RELATIONSHIP_SIBLING) {
+                $this->log->debug(sprintf(
+                    'Person id %s is a %s of the student - skipping.',
+                    $contact['attributes']['personId'],
+                    $relationshipName
+                ));
+            }
+
             /* Go digging in another endpoint for data
              */
             $endpoint = "enrolments/person/{$contact['attributes']['personId']}?include=phoneNumbers";
@@ -899,12 +923,11 @@ class Profile implements IStrategy
             $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
             $phoneMobile = $numbers[self::MOBILE_TELEPHONE_NUMBER] ?? '';
             $phoneWork = $numbers[self::WORK_TELEPHONE_NUMBER] ?? '';
-            $relationship = (string)$contact['attributes']['relationName'];
             $title = (string)$parent['data']['attributes']['title'];
             $username = '';
 
             /* The student appeared as a contact of themselves
-             * Not sure if misconfiguration or third part vendor tomfoolery
+             * Not sure if misconfiguration or third party vendor tomfoolery
              * In either case, we don't want this
              */
             if ($externalId === $studentBaseProfile->getExternalId()) {
@@ -999,7 +1022,7 @@ class Profile implements IStrategy
             $this->log->info(sprintf(
                 'Adding relation between %s, the %s of %s',
                 trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
-                trim($relationship),
+                trim($relationshipName),
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
 
@@ -1009,7 +1032,7 @@ class Profile implements IStrategy
                 $relationship = $this->relationshipMapper->createModel()
                     ->setUserProfile($parentBaseProfile)
                     ->setChildProfile($studentBaseProfile)
-                    ->setType($relationship);
+                    ->setType($relationshipName);
 
                 $this->relationshipMapper->save($relationship);
             }
