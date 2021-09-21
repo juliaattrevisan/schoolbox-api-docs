@@ -57,23 +57,24 @@ class PreSignedUrlService
      * @param Model             $storage
      * @param AlaressDateFormat $expireAt
      * @param string            $path
-     * @param string            $cacheControl
+     * @param array             $cacheControlItems
      * @param string            $disposition
      * @param string|null       $mimeTypeOverride If non-null, override the storage object's mime type
-     *
+     * @param string|null       $fileNameOverride
      * @return PreSignedUrlDataObject
      */
     public function generate(
         Model $storage,
         AlaressDateFormat $expireAt,
         string $path,
-        string $cacheControl = 'private',
+        array $cacheControlItems = ['private', 'must-revalidate'],
         string $disposition = self::DISPOSITION_INLINE,
         string $mimeTypeOverride = null,
         string $fileNameOverride = null
     ): PreSignedUrlDataObject {
         $expires  = $expireAt->__toString();
         $fileName = utf8_encode($fileNameOverride ?? $storage->getBasename());
+        $cacheControl = implode(',', $cacheControlItems);
 
         $commandObject = $this->s3Client->getCommand('GetObject', [
             'Bucket'                     => $this->bucket,
