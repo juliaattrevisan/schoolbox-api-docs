@@ -61,10 +61,10 @@ cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
 tools/set-plan.php --plan=elite
 export INSTANCE_ID=smoketest
 
-# Extract the build files from either develop or stable depending on where we run
-tar xzf $initialdir/build-artifact/*-build.tar.gz;
+## Extract the NPM build
+tar xzf $initialdir/assets-artifact/*-assets.tar.gz;
 
-## Extract the develop vendor build too
+## Extract the develop vendor build
 tar xzf $initialdir/vendor-php-artifact-dev/*-vendor-php-dev.tar.gz;
 
 ## Make sure the data directory has no permissions issues.
