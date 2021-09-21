@@ -49,12 +49,6 @@ export default {
                 <label for="select-all"></label>
             </div>
         </div>
-        <!-- <div class="student__name">
-            <h6><strong>Name</strong></h6>
-        </div>
-        <div class="student__badges">
-            <h6><strong>Badges</strong></h6>
-        </div> -->
     </div>
 </template>
 
@@ -66,10 +60,6 @@ export default {
     margin: 0 0 0.625rem 0;
     padding: 0 1rem;
 }
-
-// .student {
-    
-// }
 
 .student__checkbox {
     width: 50px;

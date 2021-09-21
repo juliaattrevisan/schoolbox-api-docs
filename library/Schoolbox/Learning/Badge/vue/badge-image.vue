@@ -92,7 +92,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.selected-badge-image {
+.selected-badge-image { //shrink down the image, used by #badge-list-form
     width: 30px;
     height: auto;
 }
