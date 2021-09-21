@@ -91,6 +91,20 @@ class Exif implements ISanitizer
             return null;
         }
 
+        // quickly check whether this image contains gps info
+        $image = new \Imagick();
+        try {
+            $image->readImageBlob($contents);
+            $gpsProps = $image->getImageProperties('*GPS*');
+            $image->clear();
+            if (empty($gpsProps)) {
+                return null;
+            }
+        } catch (\ImagickException $e) {
+            return null;
+        }
+
+        // use PelJpeg to strip GPS data
         $pelImage = new PelJpeg();
         try {
             $pelImage->load(new PelDataWindow($contents));

@@ -125,7 +125,7 @@ class CliSanitizer extends CliTool\App
 //            }
 
             $statement = $storageMapper->getDatabase()->prepare(
-                'UPDATE storage SET actual_hash = :newHash
+                'UPDATE storage SET hash_after_sanitization = :newHash
                   WHERE hash = :originalHash '
             );
             $statement->execute(

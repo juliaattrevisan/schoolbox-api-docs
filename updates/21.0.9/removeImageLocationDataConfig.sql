@@ -14,4 +14,4 @@ VALUES (
            (SELECT MAX(sequence) + 1 FROM config c WHERE `module` = 'settings' AND type_id = (SELECT id FROM lu_config_type WHERE `type` = 'Policy'))
        );
 
-ALTER TABLE storage ADD COLUMN `actual_hash` varchar(100) CHARACTER SET ascii DEFAULT NULL;
+ALTER TABLE storage ADD COLUMN `hash_after_sanitization` varchar(100) CHARACTER SET ascii DEFAULT NULL;
