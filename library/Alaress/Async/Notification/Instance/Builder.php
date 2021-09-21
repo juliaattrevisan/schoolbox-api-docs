@@ -320,6 +320,15 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * Set user id, when need to explicitly set reply-to to other than effector
+     */
+    public function setReplyToUserIds(array $replyToUserIds): self
+    {
+        $this->meta['replyToUserIds'] = $replyToUserIds;
+        return $this;
+    }
+
+    /**
      * Explicitly specify the folder id which this message involves
      * @param int $folderId
      * @return Builder

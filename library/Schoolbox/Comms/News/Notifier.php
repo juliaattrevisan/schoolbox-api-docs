@@ -16,7 +16,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model as Article;
@@ -645,6 +644,7 @@ class Notifier extends AbstractModuleNotifier
             ->setByline("$shortDate by $authorName")
             // timestamp and filters are optional
             ->setTimestamp($activeDate->getUnixTimeStamp())
+            ->setReplyToUserIds([$author->getId()])
             // and then you build
             ->addFilter('roleType', [$roleType]);
 

@@ -36,7 +36,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
-use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -1302,6 +1301,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         } catch (BaseMapper\Exception $e) {
             return null;
         }
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Model $dataModel */
         if ($dataModel->getDueWork()) {
             return "duework." . $dataModel->getDueWork()->getId();
         }
@@ -1488,7 +1488,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $current = new Alaress_Date_Format($planDiff[$dateType][0], Alaress_Date_Format::DATABASE_FORMAT);
         $previous = new Alaress_Date_Format($planDiff[$dateType][1], Alaress_Date_Format::DATABASE_FORMAT);
 
-        if (!$current || !$previous) {
+        if ($current->isNull() || $previous->isNull()) {
             return false;
         }
 

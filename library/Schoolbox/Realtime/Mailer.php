@@ -61,7 +61,7 @@ class Mailer
      * @throws UnderflowException
      * @return bool
      */
-    public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC)
+    public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC): bool
     {
         $address = trim($recipient->getEmail());
 
@@ -97,7 +97,7 @@ class Mailer
         // we can only include the reply-to header if there is but one email
         if ($this->useReplyTo && $decorator->count() === 1) {
             try {
-                $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds());
+                $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getReplyToIds());
                 // do NOT format rcf2822, because swift mailer
                 $email->setReplyTo($this->getReplyTo($effectors));
             } catch (Swift_RfcComplianceException $e) {

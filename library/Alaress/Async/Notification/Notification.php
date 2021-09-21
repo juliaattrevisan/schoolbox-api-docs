@@ -245,18 +245,30 @@ class Notification
         return $this->params;
     }
 
-
     /**
-     * @return int[]
+     * Returns user ids appropriate to set as reply-to
+     * @return array
      */
-    public function getEffectorIds(): array
+    public function getReplyToIds(): array
     {
+        $replyToIds = [];
+        foreach ($this->instances as $instance) {
+            if ($instance->getReplyToUserIds()) {
+                $replyToIds = array_merge($replyToIds, $instance->getReplyToUserIds());
+            }
+        }
+        $replyToIds = array_unique($replyToIds);
+        if (count($replyToIds) > 0) {
+            return $replyToIds;
+        }
+        // this ['user'] is set to effector user id in library/Schoolbox/Realtime/Schedule/Scheduler.php - handleResponse
         return array_filter(
-            array_map(function (Instance $instance) {
-                return isset($instance->getContext()['user'])
-                    ? $instance->getContext()['user']
-                    : null;
-            }, $this->instances)
+            array_map(
+                function (Instance $instance) {
+                    return $instance->getContext()['user'] ?? null;
+                },
+                $this->instances
+            )
         );
     }
 }

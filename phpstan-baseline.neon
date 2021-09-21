@@ -3321,26 +3321,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Participant/Plan/Mapper.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getDueWork\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Participant/Plan/Notifier.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getQuiz\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Participant/Plan/Notifier.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Participant/Plan/Notifier.php
-
-		-
-			message: "#^Result of \\|\\| is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Participant/Plan/Notifier.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Capability\\\\Mapper\\:\\:findForParent\\(\\) should return iterable\\<Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Capability\\\\Model\\>&Schoolbox\\\\GenericCollection but returns array\\<Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Capability\\\\Model\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Capability/Mapper.php
