@@ -20,8 +20,6 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
-// 60 min timeout
-
 /**
  * Pastoral attachment uploader: uploads files from Schoolbox to the SIS'
  * pastoral document manager.
@@ -45,6 +43,12 @@ class AttachmentUploader extends CliTool\App
 
     /** @var External_Pastoral */
     private $externalPastoral;
+
+
+    /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
 
 
     /** @inheritdoc */
@@ -87,9 +91,9 @@ HELP;
         }
 
         $this->getLogger()->info('Uploading of pastoral files started');
-        $lock = $this->checkOverlappingExecution();
+        $this->checkOverlappingExecution();
         $this->uploadPending();
-        $lock->release();
+        $this->lock->release();
     }
 
 
@@ -97,10 +101,8 @@ HELP;
      * Checks whether the execution of this App is overlapping with a prior execution.
      *
      * Returns the acquired lock
-     *
-     * @return LockInterface
      */
-    private function checkOverlappingExecution(): LockInterface
+    private function checkOverlappingExecution(): void
     {
         $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
 
@@ -110,10 +112,9 @@ HELP;
             $timeout = self::DEFAULT_TIMEOUT;
         }
 
-        $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if ($lock->acquire()) {
+        $this->lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        if ($this->lock->acquire()) {
             $this->setMaxExecutionTime($timeout);
-            return $lock;
         }
 
         exit(1);
@@ -123,7 +124,7 @@ HELP;
     /**
      * Find and upload pending documents to external SIS
      */
-    private function uploadPending(LockInterface $lock): void
+    private function uploadPending(): void
     {
         $success = $failed = 0;
         foreach ($this->pastoralUploadQueueMapper->getPending() as $pendingUpload) {
@@ -140,7 +141,7 @@ HELP;
             try {
                 $this->getLogger()->info('Pastoral document upload exceeded timeout; refreshing lock');
 
-                $lock->refresh();
+                $this->lock->refresh();
             } catch (LockConflictedException | LockAcquiringException $e) {
                 $this->getLogger()->warning('Could not refresh lock: aborting');
                 break;
