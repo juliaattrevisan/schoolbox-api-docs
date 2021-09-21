@@ -216,6 +216,7 @@ export default {
                         
                         <input type="submit" 
                             @click.prevent="saveRows_onSaveSelected" 
+                            @keyup.enter="saveRows_onSaveSelected" 
                             :value="saveRows_saveStatus" 
                             :disabled="saveRows_isProcessing" 
                         />

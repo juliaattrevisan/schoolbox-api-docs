@@ -27,7 +27,7 @@ export default {
 <template>
     <div class="component-action">
         <section>
-            <a @click.prevent="addRow_onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
+            <a @click.prevent="addRow_onNewRowSelected" @keyup.enter="addRow_onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
         </section>
     </div>
 </template>

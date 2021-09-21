@@ -125,7 +125,7 @@ export default new Vuex.Store({
         },
 
         /**
-         * 
+         * Ensure the latest sorted order is saved to the DB
          */
          [UPDATE_SEQUENCE] (state, sequenceList) {
             sequenceList.forEach((item, index) => {

@@ -37,6 +37,7 @@ export default {
                 clickoutFiresChange: true,
                 showInitial: true,
                 change: (color) => {
+                    console.warn(color.toHexString());
                     this.$emit('input', color.toHexString())
                 }
             });

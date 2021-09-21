@@ -3,7 +3,6 @@
  */
 
 import { mapState } from 'vuex';
-import axios from 'axios';
 import { UPDATE_SEQUENCE } from '../store/adminListMutationTypes';
  
 export default {
@@ -33,9 +32,16 @@ export default {
                 this.saveRows_saveStatus = 'Saving...';
                 this.$refs.toast.activate(this.saveRows_saveStatus);
                 this.updateSequenceOrder();
-                const response = await axios.post(this.loadedData.saveRoute, this.getSaveAllFormData());
+                const response = await fetch(this.loadedData.saveRoute, {
+                    method: 'POST',
+                    body: this.getSaveAllFormData()
+                });
+                const contentType = response.headers.get('content-type');
                 if (response.status === 200) {
-                    this.updateNewRowIds(response.data.newRowIdList);
+                    if (contentType.includes('application/json')) { //if it's json there's a list of new row ids
+                        const responseJson = await response.json();
+                        this.updateNewRowIds(responseJson.newRowIdList);
+                    }
                     this.$refs.toast.timeout('Save successful', true, 2000);
                 } else {
                     this.$refs.toast.timeout('Unable to save', false, 2000);
