@@ -16,7 +16,7 @@ use lsolesen\pel\PelTag;
 use Schoolbox\IConfigLoader;
 
 /**
- * Sanitizer for HTML files.
+ * Sanitizer for Exif files.
  */
 class Exif implements ISanitizer
 {
