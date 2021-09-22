@@ -11,7 +11,6 @@ import axios              from "axios";
 import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@vue/components/fullcalendar/customised-calendar-event';
-import moment              from 'moment';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
