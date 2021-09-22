@@ -1,24 +1,23 @@
 #!/bin/bash
 # Checks an on-prem server is suitable for an on-prem install
-# When called with no params, w
+# If called with flags, just execute the specified tests. Otherwise execute all tests.
+# Can be also invoked post-install for diagnosis, will include LDAP tests in this case.
 #
 # Usage:
-#   ./check.sh [-v] [--verbose] [system] [dns] [http] [ldap] [schoolbox]
+#   ./check.sh [-v] [--verbose] [system] [dns] [http] [ldap] [ntp] [schoolbox]
 #
 # @copyright   Copyright 2020, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
-# @todo This script's purpose is unclear. One use case is checking on on-prem server is suitable for an install
-# @todo But it also has code that actually checks schoolbox after an install. Consider splitting into distinct scripts.
 
 # Global constants
 readonly COLOUR_RED='\e[91m'
-readonly COLOUR_GREEN='\e[92m'
 readonly COLOUR_END='\e[0m'
 
 readonly ARG_SYSTEM='system'
 readonly ARG_DNS='dns'
 readonly ARG_HTTP='http'
 readonly ARG_LDAP='ldap'
+readonly ARG_NTP='ntp'
 readonly ARG_SB='schoolbox'
 
 # Global vars. Initialised to default values.
@@ -28,6 +27,7 @@ check_system='0';
 check_dns='0';
 check_http='0';
 check_ldap='0';
+check_ntp='0';
 check_sb='0';
 
 ipv6_check_pretty='true'
@@ -58,27 +58,32 @@ function parse_args() {
       verbose="1"
       shift # past argument
       ;;
-      $ARG_SYSTEM)
+      "$ARG_SYSTEM")
       check_system="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_DNS)
+      "$ARG_DNS")
       check_dns="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_HTTP)
+      "$ARG_HTTP")
       check_http="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_LDAP)
+      "$ARG_LDAP")
       check_ldap="1"
       check_specific='1'
       shift # past argument
       ;;
-      $ARG_SB)
+      "$ARG_NTP")
+      check_ntp="1"
+      check_specific='1'
+      shift
+      ;;
+      "$ARG_SB")
       check_sb="1"
       check_specific='1'
       shift # past argument
@@ -127,7 +132,7 @@ function check_system(){
   local disk_space;
   local disk_total_space;
 
-  os=$(cat /etc/lsb-release | grep CODENAME | cut -d'=' -f2);
+  os=$(grep "CODENAME" /etc/lsb-release | cut -d'=' -f2);
   echo "$prefix OS: $os";
   if [ "$os" != "bionic" ]; then
     error "$prefix" "Error: Schoolbox requires Ubuntu 18.04 LTS (bionic) - current: $os";
@@ -137,7 +142,7 @@ function check_system(){
   if [ "$arch" != "x86_64" ]; then
     error "$prefix" "Error: Schoolbox requires 64bit linux - current: $arch";
   fi
-  cpus=$(cat /proc/cpuinfo | grep processor | wc -l);
+  cpus=$(grep -c 'processor' /proc/cpuinfo);
   echo "$prefix CPU Cores: $cpus";
   if [ "$cpus" -lt 4 ]; then
     error "$prefix" "Error: Schoolbox requires a minimum of 4 cpu cores - current: $cpus";
@@ -147,14 +152,14 @@ function check_system(){
   if [ "$mem" -lt 7480 ]; then
     error "$prefix" "Error: Schoolbox requires a minimum of 8 GB of ram - current: $mem MB";
   fi
-  disks=$(lsblk | grep disk | wc -l);
+  disks=$(lsblk | grep -c 'disk');
   echo "$prefix HDDs: $disks";
   disk_space=$(lsblk -b | grep disk | awk '{print $4}' | cut -d'G' -f1);
   disk_total_space=0;
   for disk in $disk_space; do
-    disk_total_space=$(expr $disk_total_space + $disk);
+    disk_total_space=$((disk_total_space + disk));
   done
-  disk_total_space=$(expr "$disk_total_space" / 1024 / 1024 / 1024);
+  disk_total_space=$((disk_total_space / 1024 / 1024 / 1024));
   echo "$prefix HDD Total Space: $disk_total_space GB";
   if [ "$disk_total_space" -lt 190 ]; then
     error "$prefix" "Error: Schoolbox requires a minimum of 200GB of HDD space across system and data disks - current: $disk_total_space GB";
@@ -187,7 +192,7 @@ function check_dns(){
       for resolve_check in $resolve_list; do
         start_time=$(date +%s%N);
         check=$(host "$resolve_check" "$dns_server" -W 10);
-        check_check=$(echo $?);
+        check_check=$?;
         end_time=$(date +%s%N);
         time=$((end_time - start_time));
         time_ms=$((time / 1000000));
@@ -210,7 +215,7 @@ function check_dns(){
 # HTTP Check
 function check_http(){
   prefix='[HTTP]';
-  local timeout;
+  local timeout=15; # in seconds
   local http_list;
   local http_list_ignore_ssl_check;
   local start_time;
@@ -220,9 +225,7 @@ function check_http(){
   local time;
   local time_ms;
 
-  timeout='15'; # in seconds
-  which curl >/dev/null 2>&1;
-  if [ $? -ne 0 ]; then
+  if ! which curl >/dev/null 2>&1; then
     error "$prefix" 'Error: Unable to locate curl';
   else
     http_list='http://google.com.au https://google.com.au http://repo.schoolbox.com.au/testfile.txt https://repo.schoolbox.com.au/testfile.txt https://api.notablepdf.com/';
@@ -233,7 +236,7 @@ function check_http(){
     for http_check in $http_list; do
       start_time=$(date +%s%N);
       check=$(curl -vvv -I --connect-timeout $timeout "$http_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$((end_time - start_time));
       time_ms=$((time / 1000000));
@@ -250,7 +253,7 @@ function check_http(){
     for http_check in $http_list_ignore_ssl_check; do
       start_time=$(date +%s%N);
       check=$(curl -vvv -Ik --connect-timeout $timeout "$http_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$((end_time - start_time));
       time_ms=$((time / 1000000));
@@ -272,8 +275,7 @@ function check_http(){
 function check_sb(){
   prefix='[SCHOOLBOX]';
   local temp_conf_file;
-  local timeout;
-  local timeout;
+  local timeout=5; # seconds
   local start_time;
   local check;
   local check_check;
@@ -285,12 +287,11 @@ function check_sb(){
 
   if [ -f /etc/schoolbox/conf.php ]; then
     temp_conf_file='/etc/schoolbox/conf.php';
-    timeout='5'; # seconds
     http_list='https://localhost/saml/browsertest.php http://localhost/saml/browsertest.php'
     for http_check in $http_list; do
       start_time=$(date +%s%N);
       check=$(curl -vvv -Ik --connect-timeout "$timeout" "$http_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$(("$end_time" - "$start_time"));
       time_ms=$((time / 1000000));
@@ -305,8 +306,7 @@ function check_sb(){
       fi
     done
   fi
-  which openssl >/dev/null 2>&1;
-  if [ $? -ne 0 ]; then
+  if ! which openssl >/dev/null 2>&1; then
     error "$prefix" 'Error: Unable to locate openssl';
   else
     prefix="[TLS]";
@@ -314,7 +314,7 @@ function check_sb(){
     for tls_check in $tls_list; do
       start_time=$(date +%s%N);
       check=$(timeout "$timeout"s openssl s_client -connect "$tls_check" 2>&1);
-      check_check=$(echo $?);
+      check_check=$?;
       end_time=$(date +%s%N);
       time=$(("$end_time" - "$start_time"));
       time_ms=$((time / 1000000));
@@ -349,58 +349,53 @@ function check_ldap(){
   local ldap_pri_user;
 
   if [ -f /etc/schoolbox/conf.php ]; then
-    check=$(which ldapsearch >/dev/null 2>&1);
-    if [ $? -eq 0 ]; then
+    if which ldapsearch >/dev/null 2>&1; then
       temp_conf_file='/etc/schoolbox/conf.php';
       timeout='5'; # seconds
       sql_user=$(grep "\"SQL_user" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
       sql_passwd=$(grep "\"SQL_passwd" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
       sql_host=$(grep "\"SQL_host" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
       sql_schema=$(grep "\"SQL_db" $temp_conf_file | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4);
-      config=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_enable'" 2>/dev/null);
-      if [ $? -eq 0 ]; then
+      if mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_enable'" 2>/dev/null; then
         ldap_pass=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_pass'" 2>/dev/null);
         ldap_enable=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_enable'" 2>/dev/null);
         ldap_pri_host=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_host'" 2>/dev/null);
         ldap_sec_host=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_host_alt'" 2>/dev/null);
         ldap_ter_host=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_host_ter'" 2>/dev/null);
-        if [ "$(echo "$ldap_pri_host" | egrep 'ldap(s|)://' | wc -l)" -eq 0 ]; then
+        if [ "$(echo "$ldap_pri_host" | grep -Ec 'ldap(s|)://')" -eq 0 ]; then
           ldap_pri_host="ldap://$ldap_pri_host";
         fi
-        if [ "$(echo "$ldap_sec_host" | egrep 'ldap(s|)://' | wc -l)" -eq 0 ]; then
+        if [ "$(echo "$ldap_sec_host" | grep -Ec 'ldap(s|)://')" -eq 0 ]; then
           ldap_sec_host="ldap://$ldap_sec_host";
         fi
         if [ "$ldap_enable" == "0" ]; then
           echo "$prefix [LDAP] Ok - disabled";
         else
-          if [ "$(echo "$ldap_pri_host" | wc -c)" -gt 10 ]; then
+          if [ "${#ldap_pri_host}" -gt 10 ]; then
             ldap_pri_user=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user'" 2>/dev/null);
-            ldappribase=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base'" 2>/dev/null);
-            ldappricheck=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_pri_host" -D "$ldap_pri_user" -y /dev/fd/0 -b "$ldappribase" "(userObject=*)" dn 2>&1);
-            if [ $? -eq 0 ]; then
+            ldap_pri_base=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base'" 2>/dev/null);
+            if ldap_pri_check=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_pri_host" -D "$ldap_pri_user" -y /dev/fd/0 -b "$ldap_pri_base" "(userObject=*)" dn 2>&1); then
               echo "$prefix" "[LDAP] [PRIMARY] OK - $ldap_pri_host";
             else
-              error "$prefix" "[LDAP] [PRIMARY] Error with $ldap_pri_host:\n$ldappricheck";
+              error "$prefix" "[LDAP] [PRIMARY] Error with $ldap_pri_host:\n$ldap_pri_check";
             fi
           fi
-          if [ "$(echo "$ldap_sec_host" | wc -c)" -gt 10 ]; then
-            ldapsecuser=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_alt'" 2>/dev/null);
-            ldapsecbase=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null);
-            ldapseccheck=$(echo -n "$ldap_pass" | ldapsearch -H $ldap_sec_host -D "$ldapsecuser" -y /dev/fd/0 -b "$ldapsecbase" "(userObject=*)" dn 2>&1);
-            if [ $? -eq 0 ]; then
+          if [ "${#ldap_sec_host}" -gt 10 ]; then
+            ldap_sec_user=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_alt'" 2>/dev/null);
+            ldap_sec_base=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null);
+            if ldap_sec_check=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_sec_host" -D "$ldap_sec_user" -y /dev/fd/0 -b "$ldap_sec_base" "(userObject=*)" dn 2>&1); then
               echo "$prefix [LDAP] [SECONDARY] OK - $ldap_sec_host";
             else
-              error "$prefix" "[LDAP] [SECONDARY] Error with $ldap_sec_host:\n$ldapseccheck";
+              error "$prefix" "[LDAP] [SECONDARY] Error with $ldap_sec_host:\n$ldap_sec_check";
             fi
           fi
-          if [ "$(echo "$ldap_ter_host" | wc -c)" -gt 10 ]; then
-            ldapteruser=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_ter'" 2>/dev/null);
-            ldapterbase=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_ter'" 2>/dev/null);
-            ldaptercheck=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_ter_host" -D "$ldapteruser" -y /dev/fd/0 -b "$ldapterbase" "(userObject=*)" dn 2>&1);
-            if [ $? -eq 0 ]; then
+          if [ "${#ldap_ter_host}" -gt 10 ]; then
+            ldap_ter_user=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_user_ter'" 2>/dev/null);
+            ldap_ter_base=$(mysql -u "$sql_user" -p"$sql_passwd" -h "$sql_host" "$sql_schema" -BNe "SELECT DISTINCT value FROM config WHERE name='ldap_base_ter'" 2>/dev/null);
+            if ldap_ter_check=$(echo -n "$ldap_pass" | ldapsearch -H "$ldap_ter_host" -D "$ldap_ter_user" -y /dev/fd/0 -b "$ldap_ter_base" "(userObject=*)" dn 2>&1); then
               echo "$prefix [LDAP] [TERTIARY] OK - $ldap_ter_host";
             else
-              error "$prefix" "[LDAP] [TERTIARY] Error with $ldap_ter_host:\n$ldaptercheck";
+              error "$prefix" "[LDAP] [TERTIARY] Error with $ldap_ter_host:\n$ldap_ter_check";
             fi
           fi
         fi
@@ -408,6 +403,17 @@ function check_ldap(){
     else
       error "$prefix" "[LDAP] check missing ldapsearch tool";
     fi
+  fi
+}
+
+# NTP server check
+function check_ntp(){
+  prefix='[NTP]';
+  local output
+  if output=$(nc -z -v -u pool.ntp.org 123 2>&1); then
+    echo "$prefix $output";
+  else
+    error "$prefix" "Unable to connect to NTP server 'pool.ntp.org' port 123. Check firewall outbound rules."
   fi
 }
 
@@ -444,6 +450,9 @@ function main(){
   fi
   if [ "$check_sb" == "1" ] || [ "$check_ldap" == "1" ] || [ "$check_specific" == "0" ]; then
     check_ldap
+  fi
+  if [ "$check_ntp" == "1" ] || [ "$check_specific" == "0" ]; then
+    check_ntp
   fi
   if [ "$check_sb" == "1" ] || [ "$check_specific" == "0" ]; then
     check_sb_health
