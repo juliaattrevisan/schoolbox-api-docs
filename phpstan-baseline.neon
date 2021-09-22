@@ -8516,16 +8516,6 @@ parameters:
 			path: library/SocialStream/File.php
 
 		-
-			message: "#^Cannot call method getDescription\\(\\) on string\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Factory/Creational.php
-
-		-
-			message: "#^Cannot call method getTitle\\(\\) on string\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Factory/Creational.php
-
-		-
 			message: "#^Parameter \\#1 \\$row \\(array\\) of method SocialStream\\\\PostMapper\\:\\:createModel\\(\\) should be compatible with parameter \\$idValue \\(int\\) of method Schoolbox\\\\Mapper\\:\\:createModel\\(\\)$#"
 			count: 1
 			path: library/SocialStream/PostMapper.php
