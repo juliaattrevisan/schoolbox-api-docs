@@ -121,6 +121,7 @@ abstract class BaseThreadLocator implements IThreadLocator
         }
 
         /* Don't allow the object to be associated with a different thread
+         *
          * Now check whether $object has a free spot for a new $thread
          * If something is already here, also throw a 409 Conflict back
          */

@@ -127,15 +127,23 @@ class Controller extends BaseController
 
         /* Presume a new thread if you accessed this method
          * but check whether you are actually allowed, first.
-         *
-         * That's done in associate() which will throw 409
-         * if you can't/aren't supposed to
          */
         $thread = $this->threadMapper->createModel()->setOpen($data->open);
 
-        $this->context->associate($thread, $context);
+        try {
+            /* associate() will throw 409 Conflict if you can't/aren't supposed to
+             * assocaite this $thread and/or $object; that propagates to frontend
+             */
+            $this->context->associate($thread, $context);
 
-        $this->buildResponse($thread, $context, false);
+            $this->buildResponse($thread, $context, false);
+        } catch (\UnexpectedValueException $e) {
+            /* UnexpectedValueException thrown when you're in a conflicting scenario
+             * trying to associate threads to objects, results in http 409 Conflict
+             */
+            $this->response->status->setCode($e->getCode());
+            return;
+        }
     }
 
 
@@ -174,7 +182,7 @@ class Controller extends BaseController
      * @param IThreadLocation $context
      *
      * @throws \Schoolbox\Mapper\Exception
-     *@api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
+     * @api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @since 190
      *
      */
