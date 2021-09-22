@@ -5821,11 +5821,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Project.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Project.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getCompletionMessage\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php

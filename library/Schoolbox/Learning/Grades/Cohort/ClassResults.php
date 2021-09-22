@@ -131,7 +131,7 @@ class ClassResults
 
         /* Find all marks
          */
-        $assessmentMarks = $this->assessmentMapperProxy->findNormalisedMark(array_keys($assessmentTuples)); # TODO mem: 35,273,512
+        $assessmentMarks = $this->assessmentMapperProxy->findNormalisedMark(array_keys($assessmentTuples));
 
         /* Put specifications into the same order as their input implementations
          *
@@ -235,6 +235,7 @@ class ClassResults
              * Index them by specification id; we eventually calculate a five point summary of everything here
              */
             $specificationId = $this->tuples[$assessmentId];
+            $normMarks[$specificationId] ??= [];
             foreach ($marks as $mark) {
                 if ($mark === null) {
                     continue;
@@ -257,9 +258,7 @@ class ClassResults
 
             /* Remember the unique titles of each $assessment we encountered, for highcharts
              */
-            if (!isset($graphAssessments[$specificationId])) {
-                $graphAssessments[$specificationId] = $assessment->getTitle();
-            }
+            $graphAssessments[$specificationId] ??= $assessment->getTitle();
 
             /* Obey visibility restrictions; feedback must be visible to $viewer
              * and assessment's mark scheme must be quantitative

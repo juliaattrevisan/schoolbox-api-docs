@@ -398,13 +398,16 @@ class MapperProxy
             return [];
         }
 
-        $markTypeIdString   = implode(',', $markTypeIds);
-        $assessmentIdString = implode(',', $assessmentIds);
+        $markTypeBindings      = Builder::getArrayBindings($markTypeIds, 'm');
+        $assessmentIdBindings  = Builder::getArrayBindings($assessmentIds, 'a1');
+        $assessmentIdBindings2 = Builder::getArrayBindings($assessmentIds, 'a2');
+        $assessmentIdBindings3 = Builder::getArrayBindings($assessmentIds, 'a3');
 
         // not querying task as it's not quantitative
         $markQuery = $this->baseMapper->getDatabase()->prepare(
             "
            SELECT
+                'dueWork' AS assessment_type,
                 sb.assessment_id AS assessment_id,
                 sb.weight AS weight,
                 sb.mark_type AS mark_type,
@@ -412,21 +415,20 @@ class MapperProxy
                 sr.norm_mark AS mark,
                 sb.max_mark AS max_mark,
                 sr.published_at AS published_at
-           FROM submission_return sr
-                JOIN submission_box sb ON sb.id = sr.box_id
+           FROM submission_box sb
                 JOIN participant_plan pp ON pp.assessment_id = sb.assessment_id AND pp.deleted_at IS NULL
-                JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.user_id = sr.owner
+                LEFT JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
+                LEFT JOIN submission_return sr ON sb.id = sr.box_id AND pc.user_id = sr.owner AND sr.deleted_at IS NULL AND sr.review_route = 'instructor'
            WHERE
-                sr.deleted_at IS NULL
-                AND sr.published_at IS NOT NULL
-                AND sr.review_route = 'instructor'
-                AND pc.excluded_at IS NULL
-                AND sb.mark_type IN ($markTypeIdString)
-                AND sb.assessment_id IN ($assessmentIdString)
+                sb.mark_type IN ({$markTypeBindings['placeholders']})
+                AND sb.assessment_id IN ({$assessmentIdBindings['placeholders']})
+                AND (sr.published_at IS NOT NULL
+                     OR sr.owner IS NULL)
 
            UNION
 
            SELECT
+                'quiz' AS assessment_type,
                 a.assessment_id AS assessment_id,
                 a.weight AS weight,
                 null AS mark_type,
@@ -434,41 +436,66 @@ class MapperProxy
                 SUM(ar.mark)  AS mark,
                 SUM(aq.marks) AS max_mark,
                 aa.reviewed_at AS published_at
-           FROM assess_attempt aa
-                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
-                RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
+           FROM assess a
+                JOIN participant_plan pp ON pp.assessment_id = a.assessment_id AND pp.deleted_at IS NULL
+                JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
+                JOIN assess_attempt aa ON a.assess_id = aa.assess_id AND pc.user_id = aa.user_id AND aa.deleted_at IS NULL
+                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id AND ar.deleted_at IS NULL
+                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id AND aq.deleted_at IS NULL
             WHERE
                 a.availability = 'assess'
+                AND a.assessment_id IN ({$assessmentIdBindings2['placeholders']})
                 AND aa.reviewed_at IS NOT NULL
-                AND aa.deleted_at IS NULL
-                AND ar.deleted_at IS NULL
-                AND a.assessment_id IN ($assessmentIdString)
             GROUP BY aa.assess_id, aa.attempt_id
+
+           UNION
+
+           -- quiz with no reviews
+           SELECT
+                'quiz' AS assessment_type,
+                a.assessment_id AS assessment_id,
+                a.weight AS weight,
+                null AS mark_type,
+                aa.user_id AS user_id,
+                null AS mark,
+                null AS max_mark,
+                aa.reviewed_at AS published_at
+           FROM assess a
+                JOIN participant_plan pp ON pp.assessment_id = a.assessment_id AND pp.deleted_at IS NULL
+                LEFT JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
+                LEFT JOIN assess_attempt aa ON a.assess_id = aa.assess_id AND pc.user_id = aa.user_id
+            WHERE
+                a.availability = 'assess'
+                AND a.assessment_id IN ({$assessmentIdBindings3['placeholders']})
+                AND aa.reviewed_at IS NULL
 
         ORDER BY assessment_id, user_id, published_at DESC
         "
         );
 
         $markQuery->setFetchMode(\PDO::FETCH_ASSOC);
-        $markQuery->execute();
+        $markQuery->execute(
+            array_merge(
+                $markTypeBindings['bindings'],
+                $assessmentIdBindings['bindings'],
+                $assessmentIdBindings2['bindings'],
+                $assessmentIdBindings3['bindings']
+            )
+        );
 
         // $marks[assessment_id][user_id] = mark
         $marks            = [];
         $assessmentWeight = [];
         foreach ($markQuery as $row) {
-            if (!key_exists($row['assessment_id'], $marks)) {
-                $marks[$row['assessment_id']]            = [];
-                $assessmentWeight[$row['assessment_id']] = $row['weight'];
-            }
-            if (key_exists($row['user_id'], $marks[$row['assessment_id']])) {
+            $marks[$row['assessment_id']]            ??= [];
+            $assessmentWeight[$row['assessment_id']] ??= $row['weight'];
+            if (key_exists($row['user_id'], $marks[$row['assessment_id']]) || $row['published_at'] === null) {
                 // latest mark is already stored for this user
                 continue;
             }
             if ($row['mark'] === null) {
                 $normMark = null;
-            } elseif ($row['mark_type'] === null) {
-                // means Quiz... for now
+            } elseif ($row['assessment_type'] === 'quiz') {
                 $normMark = IMarkScheme::NORMALISED_MARK_MAX * (float)$row['mark'] / (float)$row['max_mark'];
             } else {
                 $normMark = (float)$row['mark'];
@@ -484,44 +511,41 @@ class MapperProxy
                   pa.assessment_id AS sub_assessment_id
              FROM project p
                  LEFT JOIN project_assessment pa ON p.id = pa.project_id AND p.deleted_at IS NULL
-             WHERE p.mark_type_id IN ($markTypeIdString)
-                 AND p.assessment_id IN ($assessmentIdString)"
+             WHERE p.mark_type_id IN ({$markTypeBindings['placeholders']})
+                 AND p.assessment_id IN ({$assessmentIdBindings['placeholders']})"
         );
 
         $projectQuery->setFetchMode(\PDO::FETCH_ASSOC);
-        $projectQuery->execute();
+        $projectQuery->execute(array_merge($markTypeBindings['bindings'], $assessmentIdBindings['bindings']));
 
         // Store project marks from assessment marks ($marks) above
         $projects  = [];
         $summators = [];
         foreach ($projectQuery as $row) {
-            if (!key_exists($row['assessment_id'], $projects)) {
-                $projects[$row['assessment_id']]  = [];
-                $summators[$row['assessment_id']] = $row['summator'];
-            }
+            $projects[$row['assessment_id']]  ??= [];
+            $summators[$row['assessment_id']] ??= $row['summator'];
             if (!key_exists($row['sub_assessment_id'], $marks)) {
                 continue;
             }
 
             // Populate marks and weights of assessments in this project
             foreach ($marks[$row['sub_assessment_id']] as $userId => $mark) {
-                if (!isset($projects[$row['assessment_id']][$userId])) {
-                    $projects[$row['assessment_id']][$userId]              = [
-                        'values'  => [],
-                        'weights' => [],
-                    ];
+                if (empty($userId)) {
+                    continue;
                 }
+                $projects[$row['assessment_id']][$userId]              ??= [
+                    'values'  => [],
+                    'weights' => [],
+                ];
                 $projects[$row['assessment_id']][$userId]['values'][]  = $mark;
-                $projects[$row['assessment_id']][$userId]['weights'][] = $assessmentWeight[$row['assessment_id']];
+                $projects[$row['assessment_id']][$userId]['weights'][] = $assessmentWeight[$row['sub_assessment_id']];
             }
         }
 
         // Calculate project marks and append to $marks
         foreach ($projects as $assessmentId => $projectMarks) {
-            if (!key_exists($assessmentId, $marks)) {
-                $marks[$assessmentId] = [];
-            }
-            $summator = Translator\Project::getSummatorFromString($summators[$assessmentId]);
+            $marks[$assessmentId] ??= [];
+            $summator             = Translator\Project::getSummatorFromString($summators[$assessmentId]);
             if (null === $summator) {
                 continue;
             }
