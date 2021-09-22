@@ -103,16 +103,40 @@ abstract class BaseThreadLocator implements IThreadLocator
     {
         $this->assertContextModel($object);
 
-        // Don't allow the thread to be associated with more than one object
+        /* Check whether $object is already associated with $thread
+         * If it is, then there's nothing to do; leave
+         */
+        if ($object->getDiscussionThread() && $object->getDiscussionThread()->getId() === $thread->getId()) {
+            return;
+        }
+
+        /* Don't allow the thread to be associated with more than one object
+         *
+         * Check whether $thread already got associated with something else
+         * If it is, throw a 409 Conflict back, because now you are doing
+         * something that breaks our 1:1 rules for threads
+         */
         if ($this->threadMapper->isThreadAlreadyAssociated($thread)) {
-            throw new UnexpectedValueException('$thread is already associated with an object');
+            throw new UnexpectedValueException('$thread is already associated with an object', 409);
         }
 
-        // Don't allow the object to be associated with a different thread
+        /* Don't allow the object to be associated with a different thread
+         * Now check whether $object has a free spot for a new $thread
+         * If something is already here, also throw a 409 Conflict back
+         */
         if ($object->getDiscussionThread()) {
-            throw new UnexpectedValueException('$object is already associated with a thread');
+            throw new UnexpectedValueException('$object is already associated with a thread', 409);
         }
 
+        /* If $thread is a whole new instance, save it first, then associate it
+         * Otherwise, it was pre-saved from elsewhere and we can associate it directly
+         */
+        if (null === $thread->getId()) {
+            $this->threadMapper->save($thread);
+        }
+
+        /* Then, associate it, since we know that we can
+         */
         $object->setDiscussionThread($thread);
         $this->contextMapper->save($object);
     }

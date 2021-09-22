@@ -116,18 +116,25 @@ class Controller extends BaseController
      *
      * @param IThreadLocation $context The item with which to associate the thread
      * @throws \Schoolbox\Mapper\Exception
-     *@api   POST /discussion/{contextType}/{contextId}/threads/
+     * @api   POST /discussion/{contextType}/{contextId}/threads/
      * @since 190
      *
      */
     public function createThread(IThreadLocation $context): void
     {
         /** @var \stdClass $data */
-        $data   = $this->request->content->get();
-        $thread = $this->threadMapper->createModel()
-            ->setOpen($data->open);
-        $this->threadMapper->save($thread);
+        $data = $this->request->content->get();
+
+        /* Presume a new thread if you accessed this method
+         * but check whether you are actually allowed, first.
+         *
+         * That's done in associate() which will throw 409
+         * if you can't/aren't supposed to
+         */
+        $thread = $this->threadMapper->createModel()->setOpen($data->open);
+
         $this->context->associate($thread, $context);
+
         $this->buildResponse($thread, $context, false);
     }
 
@@ -137,9 +144,8 @@ class Controller extends BaseController
      *
      * @param Model    $thread
      * @param IThreadLocation $context
-     *@api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
+     * @api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @since 190
-     *
      */
     public function getCommentsByThread(Model $thread, IThreadLocation $context): void
     {
