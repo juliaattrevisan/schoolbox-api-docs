@@ -12,29 +12,34 @@ case "$1" in
     install)
     ;;
     upgrade)
-        # Backup instances
-        if [ -f /etc/schoolbox/primary_node ]; then
+        # Backup databases for all instances for package. Exit if any backups fail.
+        if [ ! -f /usr/local/bin/schoolbox-database-backup ]; then
+            echo "Non-primary node. Skipping databases backup" | tee -a /var/log/schoolbox/upgrade.log
+        else
+            echo "Primary node. Backing up databases" | tee -a /var/log/schoolbox/upgrade.log
             instance_list=$(/usr/local/bin/schoolbox-read-instances --ini /etc/schoolbox/instances.ini --option instance-list)
-            echo "Backing up instances" | tee -a tee -a /var/log/schoolbox/upgrade.log
-            for instance_id in $instance_list
-            do
-                echo "Backing up instance $instance_id" | tee -a tee -a /var/log/schoolbox/upgrade.log
-                INSTANCE_ID=$instance_id /usr/local/bin/schoolbox-database-backup --package schoolbox | \
-                tee -a /var/log/schoolbox/"$instance_id"/upgrade.log &
+            for instance_id in $instance_list; do
+                echo "Backing up instance $instance_id" | tee -a /var/log/schoolbox/upgrade.log
+                INSTANCE_ID=$instance_id /usr/local/bin/schoolbox-database-backup 2>&1 | tee -a /var/log/schoolbox/"$instance_id"/upgrade.log &
                 pids="${pids} $!-$instance_id"
             done
 
-            for group in $pids
-            do
-                pid=$(echo group | cut -d '-' -f1)
-                instance_id=$(echo group | cut -d '-' -f2)
+            any_failures=0
+            for group in $pids; do
+                pid=$(echo "$group" | cut -d '-' -f1)
+                instance_id=$(echo "$group" | cut -d '-' -f2)
                 if ! wait "$pid"; then
-                    echo "Error: Failed to backup instance $instance_id" | tee -a tee -a /var/log/schoolbox/upgrade.log
-                    exit 1;
+                    echo "Error: Failed to backup instance $instance_id" | tee -a /var/log/schoolbox/upgrade.log
+                    any_failures=1
                 fi
             done
-            echo "Finished backing up instances" | tee -a tee -a /var/log/schoolbox/upgrade.log
+            if [ $any_failures != '0' ]; then
+                echo "Error: Backup failures detected. Exiting." | tee -a /var/log/schoolbox/upgrade.log
+                exit 1;
+            fi
+            echo "Finished backing up instances" | tee -a /var/log/schoolbox/upgrade.log
         fi
+
         # Temporary fix for moving symlinked conf file as part of 20.2 upgrade
         if [ -L /usr/share/schoolbox/www/conf ]; then
             echo "Converting conf link to dir..." | tee -a /var/log/schoolbox/upgrade.log;
