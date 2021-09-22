@@ -28,6 +28,7 @@ use SocialStream\UrlDetection;
  */
 class Creational extends AbstractFactory
 {
+    private const EXTERNAL_TITLE_LENGTH = 255;
 
     /**
      * The way in which things were uploaded
@@ -374,8 +375,11 @@ class Creational extends AbstractFactory
     private function spawnMetadataFromCurl($curl)
     {
         $chain = new \SocialStream\Post\Metadata\Chain($curl, $this->product->getUrl());
-
-        $this->product->setExternalTitle($chain->getResult()->getTitle());
+        $title = $chain->getResult()->getTitle();
+        if (strlen($title) > self::EXTERNAL_TITLE_LENGTH) {
+            $title = \TextFormatter::cutSentence($title, self::EXTERNAL_TITLE_LENGTH);
+        }
+        $this->product->setExternalTitle($title);
         $this->product->setExternalBody($chain->getResult()->getDescription());
     }
 
