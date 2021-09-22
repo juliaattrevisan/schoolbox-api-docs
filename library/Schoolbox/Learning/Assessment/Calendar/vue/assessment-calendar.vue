@@ -9,7 +9,7 @@ import adaptivePlugin     from '@fullcalendar/adaptive'
 import RevealModal        from '@vue/components/reveal-modal'
 import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
 import axios              from 'axios'
-import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
@@ -63,7 +63,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -215,7 +215,7 @@ export default {
             initialDate: this.termStartDate,
             viewDidMount: this.viewDidMount,
             weekNumberCalculation: 'ISO',
-            loading: this.$_fullCalendarHelper_onLoading,
+            loading: this.fullCalendarHelper_onLoading,
             eventClick: this.onEventClick,
             dateClick: this.onDateClick,
             datesSet: this.datesSet
@@ -226,7 +226,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
         });
     },
 
@@ -404,7 +404,7 @@ export default {
                 }
                 element.setAttribute('event-group-id', eventGrouping);
                 element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
-                element.setAttribute('event-group-date', this.$_fullCalendarHelper_toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
+                element.setAttribute('event-group-date', this.fullCalendarHelper_toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
             }
         },
 
@@ -442,7 +442,7 @@ export default {
          * @returns {*}
          */
         getTermDateDurations() {
-            return this.$_fullCalendarHelper_dateDiff(this.termStartDate, this.termEndDate);
+            return this.fullCalendarHelper_dateDiff(this.termStartDate, this.termEndDate);
         },
 
         /**
@@ -566,7 +566,7 @@ export default {
              * You'll be able to replicate it by just removing all the lines below except for line 519 and 522.
              */
             new Promise((resolve) => {
-                this.$_fullCalendarHelper_onLoading(true);
+                this.fullCalendarHelper_onLoading(true);
                 setTimeout(() => resolve(1), 1000);
             }).then((result) => {
                 // Semester view, will just use the term start date that's set on page load
@@ -583,7 +583,7 @@ export default {
                 return result;
             }).then((result) => {
                 this.viewDidMount()
-                this.$_fullCalendarHelper_onLoading(false);
+                this.fullCalendarHelper_onLoading(false);
 
                 return result;
             });
@@ -629,7 +629,7 @@ export default {
             const termStartDates = Object.values(this.config.termDates).flat().map((row) => {
                 return new Date(row.end);
             });
-            return this.$_fullCalendarHelper_toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return this.fullCalendarHelper_toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -641,7 +641,7 @@ export default {
                 return new Date(row.start);
             });
 
-            return this.$_fullCalendarHelper_toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return this.fullCalendarHelper_toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -694,10 +694,10 @@ export default {
                 // is displaying.
                 // That's because the start of the view may overlap another
                 // term (see `determineVisibleRange`)
-                let startMoment     = this.$_fullCalendarHelper_toMoment(start),
-                    endMoment       = this.$_fullCalendarHelper_toMoment(end),
+                let startMoment     = this.fullCalendarHelper_toMoment(start),
+                    endMoment       = this.fullCalendarHelper_toMoment(end),
                     diff            = endMoment.diff(startMoment, 'day'),
-                    midMoment       = this.$_fullCalendarHelper_toMoment(start).add(Math.ceil(diff / 2), 'day'),
+                    midMoment       = this.fullCalendarHelper_toMoment(start).add(Math.ceil(diff / 2), 'day'),
                     currentIndex    = this.findTermIndex(midMoment.format('YYYY-MM-DD'));
 
                 // Next:  disable if there is no next term
@@ -706,7 +706,7 @@ export default {
                 nextButton.disabled = (currentIndex === this.allTerms.length - 1);
                 prevButton.disabled = (currentIndex === 0);
                 if (!todayButton.disabled) {
-                    let todayIndex       = this.findTermIndex(this.$_fullCalendarHelper_toMoment(now).format('YYYY-MM-DD'));
+                    let todayIndex       = this.findTermIndex(this.fullCalendarHelper_toMoment(now).format('YYYY-MM-DD'));
                     todayButton.disabled = (todayIndex === -1);
                 }
             } else {
@@ -929,7 +929,7 @@ export default {
         <view-event-modal
             ref="event"
             return-to="assessmentCalendar"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :event-create-form-url="urls.createForm"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
@@ -945,7 +945,7 @@ export default {
         />
         <view-grouped-events-modal
             ref="groupedEvents"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"

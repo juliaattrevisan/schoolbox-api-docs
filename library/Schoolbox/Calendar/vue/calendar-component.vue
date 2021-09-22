@@ -8,7 +8,7 @@ import listPlugin         from "@fullcalendar/list";
 import momentPlugin       from "@fullcalendar/moment";
 import adaptivePlugin     from "@fullcalendar/adaptive";
 import axios              from "axios";
-import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@vue/components/fullcalendar/customised-calendar-event';
 
@@ -29,7 +29,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -81,7 +81,7 @@ export default {
             height: 'auto',
             initialView: 'list',
             events: this.events,
-            eventDidMount: this.$_fullCalendarHelper_eventRender,
+            eventDidMount: this.fullCalendarHelper_eventRender,
             noEventsDidMount: null, //hide the no events message
             eventClick: this.onEventClick,
             loading: this.onLoading,
@@ -222,7 +222,7 @@ export default {
     <div>
         <view-event-modal
             ref="event"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :event-modify-form-url="ENDPOINTS.URL_EVENT_MODIFY_FORM"
             :event-modify-form-action-url="ENDPOINTS.URL_EVENT_MODIFY_FORM_ACTION"
             :event-delete-url="ENDPOINTS.URL_EVENT_DELETE"

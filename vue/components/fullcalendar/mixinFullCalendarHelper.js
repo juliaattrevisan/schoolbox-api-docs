@@ -7,7 +7,7 @@ import { toMoment } from '@fullcalendar/moment';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
 
-export const mixinFullCalendarHelper = {
+export default {
 
     data () {
         return {
@@ -31,7 +31,7 @@ export const mixinFullCalendarHelper = {
          * @param {boolean} isLoading True when events start loading,
          *                            false once they are finished.
          */
-        $_fullCalendarHelper_onLoading (isLoading) {
+        fullCalendarHelper_onLoading (isLoading) {
             // TODO find a non-jQuery dependent way to do this
             if (isLoading === true) {
                 // this.$refs.toast.activate('Loading...');
@@ -58,7 +58,7 @@ export const mixinFullCalendarHelper = {
          * @param {object} eventRenderInfo
          * @return {boolean}
          */
-        $_fullCalendarHelper_eventRender(eventRenderInfo) {
+        fullCalendarHelper_eventRender(eventRenderInfo) {
 
             const calEvent = eventRenderInfo.event;
 
@@ -96,7 +96,7 @@ export const mixinFullCalendarHelper = {
          *
          * @param {Date} date
          */
-        $_fullCalendarHelper_toMoment (date) {
+        fullCalendarHelper_toMoment (date) {
             // Attempt to pass in the fullCalendar API itself
             return toMoment(date, this.$refs.fullCalendar.getApi());
         },
@@ -107,7 +107,7 @@ export const mixinFullCalendarHelper = {
          * @param {object} event
          * @return {boolean}
          */
-        $_fullCalendarHelper_isTask (event) {
+        fullCalendarHelper_isTask (event) {
             return event?.extendedProps?.data?.meta?.variant === EVENT_VARIANTS.TASK;
         },
 
@@ -118,9 +118,9 @@ export const mixinFullCalendarHelper = {
          * @param type
          * @returns {*}
          */
-        $_fullCalendarHelper_dateDiff (start, end, type = 'days') {
-            const startDate = this.$_fullCalendarHelper_toMoment(start);
-            const endDate = this.$_fullCalendarHelper_toMoment(end);
+        fullCalendarHelper_dateDiff (start, end, type = 'days') {
+            const startDate = this.fullCalendarHelper_toMoment(start);
+            const endDate = this.fullCalendarHelper_toMoment(end);
             return endDate.diff(startDate, type);
         },
 
@@ -132,7 +132,7 @@ export const mixinFullCalendarHelper = {
          *
          * @return {number}
          */
-        $_fullCalendarHelper_contentHeight() {
+        fullCalendarHelper_contentHeight() {
             const windowHeight = window.innerHeight;
             // FullCalendar is prone to raising a maximum call stack exceeded
             // error when:

@@ -11,7 +11,7 @@ import RevealModal        			from '@vue/components/reveal-modal'
 import ViewEventModal     			from '@vue/components/fullcalendar/view-event-modal';
 import FlatPickr          			from '@vue/components/fullcalendar/flat-pickr';
 import axios              			from 'axios'
-import { mixinFullCalendarHelper } 	from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper           from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        			from 'qs';
 import CustomisedCalendarEvent	  	from '@vue/components/fullcalendar/customised-calendar-event';
 
@@ -42,7 +42,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -113,9 +113,9 @@ export default {
             },
             initialView: 'dayGridMonth',
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            eventDidMount: this.$_fullCalendarHelper_eventRender,
+            eventDidMount: this.fullCalendarHelper_eventRender,
             events: this.events,
-            loading: this.$_fullCalendarHelper_onLoading,
+            loading: this.fullCalendarHelper_onLoading,
             eventClick: this.onEventClick
         }
     },
@@ -125,7 +125,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
             this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
@@ -237,7 +237,7 @@ export default {
     <div>
         <view-event-modal
             ref="event"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"

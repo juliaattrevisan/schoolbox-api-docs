@@ -5,7 +5,7 @@ import MetaList           from '@vue/components/meta/list'
 import MetaItem           from '@vue/components/meta/item'
 import axios              from 'axios';
 import qs                 from 'qs';
-import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
  */
@@ -59,7 +59,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     props: {
@@ -166,7 +166,7 @@ export default {
                     target: data?.classAttendance?.target,
                 },
                 task: {
-                    isTask: this.$_fullCalendarHelper_isTask(event),
+                    isTask: this.fullCalendarHelper_isTask(event),
                     completed: metadata?.completed,
                 },
                 links: {

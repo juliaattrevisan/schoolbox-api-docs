@@ -14,7 +14,7 @@ import FilterModal                from "./filter-modal";
 import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
 import qs                         from "qs";
-import { mixinFullCalendarHelper } from "@vue/components/fullcalendar/mixinFullCalendarHelper";
+import fullCalendarHelper from "@vue/components/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
 
@@ -70,7 +70,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -186,7 +186,7 @@ export default {
             ],
             eventDidMount: this.eventRender,
             viewDidMount: this.viewDidMount,
-            loading: this.$_fullCalendarHelper_onLoading,
+            loading: this.fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
             eventClick: this.onEventClick,
             eventResize: this.onEventResize,
@@ -198,7 +198,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
             this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
@@ -323,7 +323,7 @@ export default {
 
             const calEvent = eventRenderInfo.event;
 
-            if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
+            if (!this.fullCalendarHelper_eventRender(eventRenderInfo)) {
                 calEvent.setProp('display', 'none');
                 return false;
             }
@@ -482,8 +482,8 @@ export default {
          */
         moveEvent(event) {
             const data = {
-                start:  this.$_fullCalendarHelper_toMoment(event.start).format(),
-                end:    this.$_fullCalendarHelper_toMoment(event.end).format(),
+                start:  this.fullCalendarHelper_toMoment(event.start).format(),
+                end:    this.fullCalendarHelper_toMoment(event.end).format(),
                 allDay: event.allDay,
             };
 
@@ -493,7 +493,7 @@ export default {
             // This means that all-day events need their end date set back
             // one day before being sent to Schoolbox.
             if (event.allDay) {
-                data.end = this.$_fullCalendarHelper_toMoment(event.end).add({days: -1}).format();
+                data.end = this.fullCalendarHelper_toMoment(event.end).add({days: -1}).format();
             }
 
             // TODO this needs to consider events in series
@@ -586,7 +586,7 @@ export default {
                 startDate.setAttribute('data-datepicker', '');
                 startDate.setAttribute('data-datepicker-buttontext', '');
                 startDate.setAttribute('value',
-                    (this.listViewDateRange.start) ? this.listViewDateRange.start : this.$_fullCalendarHelper_toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.start) ? this.listViewDateRange.start : this.fullCalendarHelper_toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -596,7 +596,7 @@ export default {
                 endDate.setAttribute('data-datepicker', '');
                 endDate.setAttribute('data-datepicker-buttontext', '');
                 endDate.setAttribute('value',
-                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.$_fullCalendarHelper_toMoment(new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.fullCalendarHelper_toMoment(new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -634,7 +634,7 @@ export default {
                             this.listViewDateRange.start = document.querySelector('#start_date').value;
                             this.listViewDateRange.end = document.querySelector('#end_date').value;
 
-                            this.duration.days = this.$_fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
+                            this.duration.days = this.fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                             this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
 
                         }
@@ -650,9 +650,9 @@ export default {
          * I'm not sure if we can use it..
          */
         updateListViewDateRangeField(start, end = null) {
-            window.history.pushState('', '', '/calendar/' + this.$_fullCalendarHelper_toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
-            this.listViewDateRange.start = this.$_fullCalendarHelper_toMoment(start).format(FORMAT_FLATPICKR_DATE);
-            this.listViewDateRange.end = this.$_fullCalendarHelper_toMoment(end || new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE);
+            window.history.pushState('', '', '/calendar/' + this.fullCalendarHelper_toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
+            this.listViewDateRange.start = this.fullCalendarHelper_toMoment(start).format(FORMAT_FLATPICKR_DATE);
+            this.listViewDateRange.end = this.fullCalendarHelper_toMoment(end || new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE);
 
             let startDate = this.jQuery('#start_date'),
                 endDate   = this.jQuery('#end_date');
@@ -747,7 +747,7 @@ export default {
             :user-id="config.userId"
             :can-invite="config.canInvite"
             :event-types="config.eventTypes"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :event-create-url="urls.create"
             :event-create-form-url="urls.createForm"
             :event-modify-form-url="urls.modifyForm"
@@ -760,7 +760,7 @@ export default {
 
         <view-event-modal
             ref="event"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-delete-url="urls.delete"

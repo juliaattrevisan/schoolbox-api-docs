@@ -10,7 +10,7 @@ import ExportModal                from '@vue/components/fullcalendar/resourceBoo
 import FilterModal                from '@vue/components/fullcalendar/resourceBooking/filter-modal';
 import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
-import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 
 const URL_EVENT_EXPORT = '/calendar/export.php';
@@ -36,7 +36,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -133,7 +133,7 @@ export default {
             events: this.events,
             eventDidMount: this.eventRender,
             defaultTimedEventDuration: '00:05:00',
-            loading: this.$_fullCalendarHelper_onLoading,
+            loading: this.fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
             eventClick: this.onEventClick
         }
@@ -144,7 +144,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
             this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
@@ -210,7 +210,7 @@ export default {
          */
         eventRender(eventRenderInfo) {
 
-            if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
+            if (!this.fullCalendarHelper_eventRender(eventRenderInfo)) {
                 eventRenderInfo.event.setProp('display', 'none');
                 return false;
             }
@@ -351,7 +351,7 @@ export default {
 
         <create-booking-modal
             ref="createBooking"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
             :date-formats="formats"
             :booking-type="'category'"
@@ -359,7 +359,7 @@ export default {
 
         <view-event-modal
             ref="event"
-            :to-moment="$_fullCalendarHelper_toMoment"
+            :to-moment="fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-update-url="urls.update"

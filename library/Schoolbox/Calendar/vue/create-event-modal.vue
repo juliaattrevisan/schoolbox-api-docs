@@ -2,7 +2,7 @@
 
 import RevealModal from '@vue/components/reveal-modal'
 import axios       from 'axios'
-import { mixinFullCalendarHelper } from "@vue/components/fullcalendar/mixinFullCalendarHelper";
+import fullCalendarHelper from "@vue/components/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS} from '@schoolboxCalendarEvent/endpoints';
 
 /* Vue select
