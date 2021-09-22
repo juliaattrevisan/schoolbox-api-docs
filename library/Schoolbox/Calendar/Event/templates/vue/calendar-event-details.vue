@@ -1,5 +1,5 @@
 <script>
-    import moment           from 'moment';
+    import dayjs from 'dayjs';
     import AudiencesModal   from './audiences-modal';
     import qs               from 'qs';
     import axios            from "axios";
@@ -82,10 +82,10 @@
             jQuery: () => window.jQuery,
 
             dateTimeDisplay: function() {
-                if (this.event.options.allDay) return moment(this.event.dates.start).format(FORMAT_LONG_DATE);
+                if (this.event.options.allDay) return dayjs(this.event.dates.start).format(FORMAT_LONG_DATE);
 
-                let startDate = moment(this.event.dates.start),
-                        endDate = moment(this.event.dates.end);
+                let startDate = dayjs(this.event.dates.start),
+                        endDate = dayjs(this.event.dates.end);
 
                 if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
                     return startDate.format(FORMAT_LONG_DATE) +
@@ -96,11 +96,11 @@
             },
 
             monthDisplay: function() {
-                return moment(this.event.dates.start).format('MMM');
+                return dayjs(this.event.dates.start).format('MMM');
             },
 
             dateDisplay: function() {
-                return moment(this.event.dates.start).format('DD');
+                return dayjs(this.event.dates.start).format('DD');
             },
 
             byLine: function() {
