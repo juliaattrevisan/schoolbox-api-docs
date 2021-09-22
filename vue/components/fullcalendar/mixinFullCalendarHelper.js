@@ -4,7 +4,6 @@
  */
 
 import { toMoment } from '@fullcalendar/moment';
-import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
 
@@ -19,7 +18,6 @@ export const mixinFullCalendarHelper = {
                 meridiem: 'short',
                 omitZeroMinute: true
             },
-            test: 'ha'
         }
     },
 

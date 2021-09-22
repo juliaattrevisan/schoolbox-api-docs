@@ -5,7 +5,7 @@ import interactionPlugin          from '@fullcalendar/interaction'
 import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
-import momentPlugin               from '@fullcalendar/moment'
+// import momentPlugin               from '@fullcalendar/moment'
 import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@vue/components/fullcalendar/view-event-modal';
 import CreateBookingModal         from '@vue/components/fullcalendar/resourceBooking/create-booking-modal';
@@ -14,6 +14,10 @@ import FilterModal                from '@vue/components/fullcalendar/resourceBoo
 import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
 import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import arraySupport from 'dayjs/plugin/arraySupport';
+
 
 // Various URLs that FullCalendar may make use of.
 const URL_STATE_CHANGE = '/calendar/changeState';
@@ -74,22 +78,40 @@ export default {
     },
 
     beforeMount() {
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport);
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
+            // plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
             views: {
                 day: {
                     dayHeaders: false,
                     allDaySlot: false,
-                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong, // will produce something like "Tuesday July 16th 2021"
+                    titleFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    } 
                 },
                 week: {
-                    dayHeaderFormat: this.formats.displayWeekDay,
+                    dayHeaderFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.formats.displayWeekDay); // will produce something like "Tuesday July 16th 2021"
+                    },
                     allDaySlot: false,
-                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    // titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    titleFormat: (date) => {
+                        const startDate = dayjs(date.start.array).format('MMMM Do');
+                        const endDate = dayjs(date.end.array).format('MMMM Do');
+                        const endDateYear = dayjs(date.end.array).format('YYYY');
+                        return `${startDate} - ${endDate}, ${endDateYear}`;
+                    } 
                 }
             },
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            // eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                const startTime = dayjs(date.start.array).format('h:mma');
+                const endTime = dayjs(date.end.array).format('h:mma');
+                return `${startTime} - ${endTime}`;
+            },
             eventTextColor: 'black',
             customButtons: {
                 customExport: {
