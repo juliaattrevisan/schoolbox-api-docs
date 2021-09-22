@@ -65,7 +65,7 @@ export default {
     },
 
     mounted: function() {
-        dayjs.extend(relativeTime);
+        dayjs.extend(relativeTime); //to use fromNow()
         this.initDataFromProps();
         this.getThread();
     },
