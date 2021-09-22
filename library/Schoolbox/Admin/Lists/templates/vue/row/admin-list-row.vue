@@ -160,7 +160,7 @@ export default {
             </div><!-- .list-item -->
 
             <nav v-if="canDelete">
-                <a @click.prevent="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
+                <a @click.prevent="onDeleteRowSelected" @keyup.enter="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
             </nav>
 
         </div>

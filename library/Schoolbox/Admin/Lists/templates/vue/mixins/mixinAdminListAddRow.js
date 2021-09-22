@@ -21,13 +21,15 @@ export default {
          * Push in a new row, retrieving the default value for each property and 
          * then adding in additional values required to track and add
          */
-        $_mixinAddRow_onNewRowSelected () {
+        addRow_onNewRowSelected () {
             const newRow = {}
             this.loadedData.fields.forEach((field) => {
                 if (Object.keys(field).includes('default')) {
                     newRow[`${field.id}`] = field.default;
-                } else if (Object.keys(field).includes('lookup')) { //for lookups, use the first value as default
-                    newRow[`${field.id}`] = field.lookup[0]?.key ? field.lookup[0].key : '';
+                } else if (Object.keys(field).includes('lookup') && Object.keys(field).includes('nullable')) { //ensure null is the default select option when available
+                    newRow[`${field.id}`] = null;
+                } else if (Object.keys(field).includes('lookup')) { //otherwise use the first value as default
+                    newRow[`${field.id}`] = field.lookup[0]?.key ? field.lookup[0].key : ''; //use an empty string if can't find a key
                 }
             });
             newRow.sequence = this.getNextSequence();

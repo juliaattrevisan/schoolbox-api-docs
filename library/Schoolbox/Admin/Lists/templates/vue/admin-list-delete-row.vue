@@ -6,7 +6,6 @@
  */
 
 import { mapState } from 'vuex';
-import axios from 'axios';
 import RevealModal from '@vue/components/reveal-modal';
 import Toast from '@vue/components/toast';
 import { DELETE_ROW_CONFIRMED } from './store/adminListMutationTypes';
@@ -57,8 +56,12 @@ export default {
         async onConfirmDeleteRowSelected () {
             try {
                 this.$refs.toast.activate('Deleting row...');
-                const response = await axios.post(this.loadedData.deleteRoute, this.getDeleteRowFormData());
-                if (response.result !== false) {
+                const response = await fetch(this.loadedData.deleteRoute, {
+                    method: 'POST',
+                    body: this.getDeleteRowFormData(),
+                });
+                const responseData = await response.json();
+                if (responseData.result !== false) {
                     const deletedRow = this.rows.find((row) => row.id === this.rowToDelete.id);
                     this.$store.commit(DELETE_ROW_CONFIRMED, deletedRow);
                     this.$refs.toast.timeout('Row Deleted', true, 2000);
@@ -104,8 +107,8 @@ export default {
             <h2>Please Confirm</h2>
             <div data-alert class="alert-box warning">{{ loadedData.deleteWarning ? loadedData.deleteWarning : 'Are you sure you wish to delete this row?' }}</div>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
-                <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
+                <li><a @click.prevent="onConfirmDeleteRowSelected" @keyup.enter="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
+                <li><a @click.prevent="onCancelDeleteRowSelected" @keyup.enter="onCancelDeleteRowSelected" class="button">Cancel</a></li>
             </ul>
         </reveal-modal>
         <toast ref="toast"></toast>
