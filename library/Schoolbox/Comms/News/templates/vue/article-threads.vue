@@ -147,14 +147,14 @@ export default {
         /**
          * The threads 'Allow Comments' has been toggled
          *
-         * @param {event} to determine the status
+         * @param {event} event  To determine the status
          */
         changeThreadStatus (event) {
             let self = this;
+            let changeThreadStatusAction;
 
             this.isThreadEnabled = event.target.checked;
 
-            let changeThreadStatusAction;
             if (this.threadId) {
                 // I already have a thread ID: switch it on/off
                 changeThreadStatusAction = new Promise((resolve, reject) => {
@@ -169,7 +169,7 @@ export default {
                     axios.put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders }).then(() => {
                         resolve();
                     }).catch(function (error) {
-                        reject(error);
+                        reject(error ?? '');
                     });
                 });
             } else {
@@ -184,14 +184,14 @@ export default {
                             this.threadId = response.data.id;
                             resolve();
                         })
-                        .catch(() => {
-                            reject(error);
+                        .catch(function (error) {
+                            reject(error ?? '');
                         });
                 });
             }
 
             // Actually run the promise, setting the toast accordingly
-            this.$refs.toast.activate('Saving...');
+            self.toastActivate('Saving...');
             changeThreadStatusAction
                 .then(() => {
                     self.toastSuccess('Saved');
