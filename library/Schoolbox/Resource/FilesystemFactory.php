@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource;
 
 use Aws\S3\S3Client;
+use GuzzleHttp;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Adapter\Local;
@@ -22,6 +23,8 @@ use Schoolbox\Resource\Storage\S3\Adapter;
 use UnexpectedValueException;
 
 use function trim;
+
+use const PHP_SAPI;
 
 /**
  * Class FilesystemFactory
@@ -36,6 +39,15 @@ class FilesystemFactory
 
     // All storage files in S3 will have this prefix in their key
     public const PREFIX_STORAGE = 'storage/';
+
+    /**
+     * When opening a connection to S3, fail if connection takes longer than this number of seconds during a web request.
+     *
+     * Most likely this will be due to transient DNS failure. We want to detect this and kill the request quickly
+     * so the server doesn't OOM.
+     * @var int
+     */
+    private const S3_CONNECT_TIMEOUT_WEB = 5;
 
 
     /**
@@ -82,6 +94,19 @@ class FilesystemFactory
         ]);
     }
 
+    /**
+     * Returns S3 connection timeout in seconds.
+     *
+     * For CLI, set to '0' (ie don't timeout).
+     * For WEB, set to some sane value
+     *
+     * @return int
+     */
+    public static function getConnectTimeout(): int
+    {
+        return PHP_SAPI === 'cli' ? 0 : self::S3_CONNECT_TIMEOUT_WEB;
+    }
+
 
     /**
      * Returns an AWS S3 file system, optionally with root set to $prefix
@@ -107,6 +132,9 @@ class FilesystemFactory
             ],
             'region'      => $otfs_s3_region,
             'version'     => $otfs_s3_version,
+            'http'    => [
+                GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => self::getConnectTimeout(),
+            ],
         ]);
 
         // Register the S3 stream wrapper, so that the S3 filesystem adapter

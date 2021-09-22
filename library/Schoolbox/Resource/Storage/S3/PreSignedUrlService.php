@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Date_Format as AlaressDateFormat;
 use Aws\S3\S3Client;
+use GuzzleHttp;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
@@ -49,6 +50,9 @@ class PreSignedUrlService
             ],
             'region'      => trim($config->get('otfs_s3_region') ?? ''),
             'version'     => trim($config->get('otfs_s3_version') ?? ''),
+            'http'    => [
+                GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
+            ],
         ]);
         $this->bucket   = trim($config->get('otfs_s3_bucket') ?? '');
     }
