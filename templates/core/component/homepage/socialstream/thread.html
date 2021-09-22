@@ -177,7 +177,7 @@
                     <!-- END socialstream_comment_has_player -->
 
                     <!-- BEGIN socialstream_comment_has_video -->
-                    <video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}"
+                    <video id="socialstream-{COMPONENT_INSTANCE_ID}-video{SOCIALSTREAM_COMMENT_POST_ID}"
                            controls
                            preload="none"
                            poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}"
@@ -187,7 +187,9 @@
                         <source src="{SOCIALSTREAM_COMMENT_VIDEO_SRC}" type='video/mp4'>
                     </video>
                     <script>
-                        $("#socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}").mediaelementplayer();
+                        $(function() {
+                            $("#socialstream-{COMPONENT_INSTANCE_ID}-video{SOCIALSTREAM_COMMENT_POST_ID}").mediaelementplayer();
+                        });
                     </script>
                     <!-- END socialstream_comment_has_video -->
 
@@ -273,11 +275,13 @@
                             <!-- END socialstream_reply_has_player -->
 
                             <!-- BEGIN socialstream_reply_has_video -->
-                            <video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}" controls preload="none" poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}" width="100%" height="400">
+                            <video id="socialstream-{COMPONENT_INSTANCE_ID}-video{SOCIALSTREAM_REPLY_POST_ID}" controls preload="none" poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}" width="100%" height="400">
                                 <source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
                             </video>
                             <script>
-                                $("#socialstream_video{SOCIALSTREAM_REPLY_POST_ID}").mediaelementplayer();
+                                $(function() {
+                                    $("#socialstream-{COMPONENT_INSTANCE_ID}-video{SOCIALSTREAM_REPLY_POST_ID}").mediaelementplayer();
+                                });
                             </script>
                             <!-- END socialstream_reply_has_video -->
 
