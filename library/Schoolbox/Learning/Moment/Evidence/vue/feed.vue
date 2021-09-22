@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import duration from 'dayjs/plugin/duration';
 import MediaArticle from '@vue/components/media-article';
-import Storage      from '@vue/components/storage';
+import Storage from '@vue/components/storage';
 import CommentThread from './comment-thread';
 import RevealModal from "@vue/components/reveal-modal";
 import Toast from "@vue/components/toast";
