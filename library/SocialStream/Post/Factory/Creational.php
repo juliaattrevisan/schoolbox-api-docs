@@ -377,7 +377,7 @@ class Creational extends AbstractFactory
         $chain = new \SocialStream\Post\Metadata\Chain($curl, $this->product->getUrl());
         $title = $chain->getResult()->getTitle();
         if (strlen($title) > self::EXTERNAL_TITLE_LENGTH) {
-            $title = \TextFormatter::cutSentence(\Scrub::html2text($title), self::EXTERNAL_TITLE_LENGTH);
+            $title = \TextFormatter::cutSentence($title, self::EXTERNAL_TITLE_LENGTH);
         }
         $this->product->setExternalTitle($title);
         $this->product->setExternalBody($chain->getResult()->getDescription());
