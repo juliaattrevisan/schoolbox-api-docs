@@ -89,7 +89,7 @@ class Chain
     }
 
     /**
-     * @return string
+     * @return string|OpenGraph
      */
     public function getResult()
     {
