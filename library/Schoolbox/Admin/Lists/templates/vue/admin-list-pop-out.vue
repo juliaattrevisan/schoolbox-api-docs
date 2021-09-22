@@ -131,6 +131,18 @@ export default {
         open () {
             this.isActive = true;
             gsap.to(this.$refs.innerContainer, { right: 0, duration: 0.4 } );
+            this.checkInView();
+        },
+
+        /**
+         * Ensure the pop out does not appear above the current viewport
+         */
+        checkInView () {
+            this.$nextTick(() => {
+                if (this.$refs.innerContainer.getBoundingClientRect().y < 0) { //if it's less than 0 the top will be out of view
+                    this.$refs.innerContainer.style.top = `${-this.$refs.innerContainer.getBoundingClientRect().y}px`; //so move it down how much it's out of view
+                } 
+            });
         },
 
         /**
@@ -139,6 +151,7 @@ export default {
         close () {
             gsap.to(this.$refs.innerContainer, { right: '-100%', duration: 0.3, onComplete: () => {
                 this.isActive = false;
+                this.$refs.innerContainer.style.top = '0px'; //set back to 0, checkInView() can always update on another open
             } } );
         },
 
