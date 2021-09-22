@@ -130,7 +130,7 @@ export default {
             }).catch((error) => {
                 this.isInitialLoad = false;
                 self.toastActivate('Unable to load comments');
-                self.toastTimeout('Unable to load comments');
+                self.toastError('Unable to load comments');
             }).finally(() => {
                 if (this.isInitialLoad) {
                     // Anchored? go to the element once the component has been loaded
