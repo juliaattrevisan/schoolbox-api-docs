@@ -191,12 +191,11 @@ export default {
             }
 
             // Actually run the promise, setting the toast accordingly
-            self.toastActivate('Saving...');
             changeThreadStatusAction
                 .then(() => {
-                    self.toastSuccess('Saved');
                 })
                 .catch((error) => {
+                    self.toastActivate('Saving...');
                     self.toastError('Unable to save');
                 });
         },
