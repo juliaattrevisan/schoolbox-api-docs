@@ -1,8 +1,9 @@
 <script>
 
 import axios  from 'axios';
-import moment from 'moment';
-
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import duration from 'dayjs/plugin/duration';
 import MediaArticle from '@vue/components/media-article';
 import Storage      from '@vue/components/storage';
 import CommentThread from './comment-thread';
@@ -46,6 +47,8 @@ export default {
         }
     },
     created() {
+        dayjs.extend(relativeTime); //to use humanize()
+        dayjs.extend(duration); //to use .duration
     },
     computed: {
         jQuery: () => window.jQuery,
@@ -103,11 +106,11 @@ export default {
         groupFeedResults(feedResults) {
             let groupedEvidenceByDate = {};
             feedResults.forEach(v => {
-                let date = moment(v.date),
+                let date = dayjs(v.date),
                     key  = date.format('YYYYMMDD');
                 if (!(key in groupedEvidenceByDate)) {
                     groupedEvidenceByDate[key] = {
-                        date:     moment(date).startOf('d'),
+                        date:     dayjs(date).startOf('d'),
                         evidence: []
                     }
                 }
@@ -136,7 +139,7 @@ export default {
          * @param {Moment} createdAt
          */
         renderCreatedAt(createdAt) {
-            let now     = moment().startOf('d'),
+            let now     = dayjs().startOf('d'),
                 dayDiff = createdAt.diff(now, 'd');
             if (dayDiff === 0) {
                 return 'today';
@@ -147,7 +150,7 @@ export default {
             if (dayDiff === 1) {
                 return 'tomorrow';
             }
-            return moment.duration(dayDiff, 'd').humanize(true);
+            return dayjs.duration(dayDiff, 'd').humanize(true);
         },
 
 
@@ -228,12 +231,22 @@ export default {
          */
         openViewBadgeAwardModal(badgeAward) {
             this.$refs.awardDetailModal.open(badgeAward);
-        }
+        },
+
+        /**
+         * Format the date as specified
+         *
+         * @param { Date } 
+         * @param { String } 
+         * 
+         * @returns { String }
+         */
+        formatDate (date, format) {
+            return dayjs(date).format(format);
+        },
+
     },
-    filters: {
-        dateFormat: (date, format) => moment(date).format(format),
-        fromNow:    (date)         => moment(date).fromNow(),
-    },
+
 }
 </script>
 
@@ -262,8 +275,8 @@ export default {
                 </div>
               </div>
                 <h2 class="subheader no-margin">
-                    <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
-                          :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
+                    <time :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
+                          :title="formatDate(evidenceGroup.date, dateDisplayFormats.momentJsDateLong)"
                     >{{ renderCreatedAt(evidenceGroup.date) }}</time>
                 </h2>
                 <ul class="information-list">
@@ -276,9 +289,9 @@ export default {
                                         <img :src="evidence.object.creator._links.avatar" alt="View Profile">
                                         <p>{{ evidence.object.creator.fullName }}</p>
                                         <time class="pipe meta"
-                                              :datetime="evidence.object.createdAt | dateFormat"
-                                              :title="evidence.object.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                        >{{ evidence.object.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
+                                              :datetime="formatDate(evidence.object.createdAt)"
+                                              :title="formatDate(evidence.object.createdAt, dateDisplayFormats.momentJsDatetime)"
+                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.momentJsTime) }}</time>
                                     </a>
                                 </div>
                                 <nav v-if="hasMenu(evidence.object)">
@@ -340,9 +353,9 @@ export default {
                                         <template v-if="evidence.object.status === 'goal'">Goal set</template>
                                         by {{ evidence.object.awardedBy.fullName }}
                                         |
-                                        <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
-                                              :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
-                                        {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
+                                        <time class="meta" :datetime="formatDate(evidence.object.awardedAt)"
+                                              :title="formatDate(evidence.object.awardedAt, dateDisplayFormats.momentJsDatetime)">
+                                        {{ formatDate(evidence.object.awardedAt, dateDisplayFormats.momentJsTime) }}
                                         </time>
                                     </p>
                                 </a>
