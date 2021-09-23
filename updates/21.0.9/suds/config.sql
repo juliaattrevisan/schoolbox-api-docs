@@ -1,7 +1,7 @@
 #
 # maximum time used to hold a lock before killing the process used for school data imports
 #
-INSERT INTO config(
+INSERT INTO config (
     name,
     value,
     title,
@@ -11,17 +11,21 @@ INSERT INTO config(
     type_id,
     editable,
     hidden,
-    required
+    required,
+    module,
+    sequence
 ) VALUES (
     'schooldata_import_timeout',
     '10800',
     'Import Timeout',
-    'School Data Import Timeout',
+    'Imports will automatically close after this many seconds have expired.',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     '',
-    (SELECT id FROM lu_config_type WHERE type = 'Site'),
-    'false',
+    null,
     'true',
-    'false'
+    'false',
+    'false',
+    'schoolData',
+    (SELECT MAX(sequence)+1 FROM config c WHERE module = 'schoolData')
 );
 
