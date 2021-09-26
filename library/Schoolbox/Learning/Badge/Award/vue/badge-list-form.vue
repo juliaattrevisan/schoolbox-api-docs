@@ -343,11 +343,11 @@ export default {
         </ul>
 
         <bottom-drawer :showDrawer="selectedBadges.length > 0">
-            <div class="selected-badges-container">
-                <h3 class="selected-count"><em>{{ selectedBadgeText }}</em></h3>
-                <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
-                <transition-group name="selected-badges" class=selected-badges tag="div">
-                    <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges-item">
+            <div class="selected-container">
+                <h3 class="selected-container__count"><em>{{ selectedBadgeText }}</em></h3>
+                <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="selected-container__clear">Clear selection</button>
+                <transition-group name="selected-badges" class="selected-badges" tag="div">
+                    <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges__item">
                         <badge-image :badge="badge" class="selected-badge-image"></badge-image>
                     </span>
                 </transition-group>
@@ -405,21 +405,25 @@ export default {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
 
-.selected-badges-container {
+.selected-container {
     display: flex;
     align-items: baseline;
-    gap: 1rem;
 }
 
-.button-clear {
-    display: inline-block;
-    padding: 0px;
-    background: none;
-    vertical-align: baseline;
-    font-size: 0.8rem;
-}
+    .selected-container__count {
+        margin-right: 1rem;
+    }
 
-.selected-badges-item {
+    .selected-container__clear {
+        display: inline-block;
+        margin-right: 1rem;
+        padding: 0px;
+        background: none;
+        vertical-align: baseline;
+        font-size: 0.8rem;
+    }
+
+.selected-badges__item {
     transition: all 0.3s;
     display: inline-block;
     margin: 0px 5px;

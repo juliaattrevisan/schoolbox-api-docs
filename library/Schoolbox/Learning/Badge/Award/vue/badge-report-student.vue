@@ -31,6 +31,19 @@ export default {
     computed: {
 
         /**
+         * To check if there's badges to display
+         * 
+         * @returns { Boolean }
+         */
+        hasBadges () {
+            if (this.student.badges) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        /**
          * To ensure it's unchecked when 'Clear Selection' is selected in #badge-report
          * 
          * @returns { Boolean }
@@ -66,7 +79,10 @@ export default {
          * To horizontally scroll the badge list
          */
         initHorizontalScroller () {
-            this.horizontalScroller = new HorizontalScroller(this.$el.querySelector('[data-scroller]')); 
+            if (this.hasBadges) { //only if there's badges to show
+                this.horizontalScroller = new HorizontalScroller(this.$el.querySelector('[data-scroller]')); 
+            }
+            
         },
 
         /**
@@ -171,7 +187,7 @@ export default {
             </div>
         </div>
         <div class="student__badges">
-            <div class="scroller-container" data-scroller>
+            <div v-if="hasBadges" class="scroller-container" data-scroller>
                 <div class="scroller-button-container">
                     <button class="scroller-button" data-scroller-previous-button>&lt;</button>
                 </div>
@@ -190,8 +206,12 @@ export default {
                         >      
                             <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
                                 <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
-                                    <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
-                                    <span>{{ award.badge.name }}</span>
+                                    <div class="card-feature-image">
+                                        <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
+                                    </div>
+                                    <div class="card-content">
+                                        <p>{{ award.badge.name }}</p>
+                                    </div>
                                 </a>
                             </li>
                         </transition-group>
@@ -202,6 +222,10 @@ export default {
                     <button class="scroller-button" data-scroller-next-button>&gt;</button>
                 </div>
             </div>
+            <div v-else class="empty-state">
+                <i class="icon-badge"></i>
+                <p>No badges to display.</p>
+            </div>
         </div>
     </li>
 </template>
@@ -210,8 +234,12 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-$rowHeight: 120px;
+$rowHeight: 150px;
 $collapseStudent: 1000px;
+
+.empty-state {
+    height: $rowHeight;
+}
 
 .student {
     display: flex;
@@ -254,7 +282,6 @@ $collapseStudent: 1000px;
 
 .student__badges {
     width: calc(100% - 300px); //minus the checkbox and name
-    padding-bottom: 0;
     @media (max-width: $collapseStudent) {
         width: 100%;
     }
@@ -306,20 +333,32 @@ $collapseStudent: 1000px;
     padding: 0;
 }
 
+.card-feature-image {
+    position: relative;
+    padding: 0.25rem 0.5rem;
+    background-color: #F6F6F6;
+    text-align: center;
+}
+
+.card-content {
+    padding: 0.25rem 0.5rem;
+}
+
 .award::v-deep {
     display: inline-block;
-    min-width: 70px;
-    max-width: 110px;
+    width: 160px;
+    height: $rowHeight - 10px;
+    border: 1px solid #EDEDED;
+    box-shadow: 0 2px 3px 0 rgb(0 0 0 / 10%);
     margin: 0px 0.5rem;
+    padding: 0;
     vertical-align: top;
-    text-align: center;
-    transition: all 0.3s;
     img {
         width: 40px;
         height: auto;
         margin-bottom: 5px;
     }
-    span {
+    p {
         display: inline-block;
         font-size: 0.75rem;
         line-height: 1rem;

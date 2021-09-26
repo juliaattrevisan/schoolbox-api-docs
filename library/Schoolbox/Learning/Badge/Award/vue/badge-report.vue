@@ -53,6 +53,15 @@ export default {
     computed: {
 
         /**
+         * No badges to show if there's no students, so show a 'no students' display
+         * 
+         * @returns { Boolean }
+         */
+        hasStudents () {
+            return this.studentsData.length > 0; 
+        },
+
+        /**
          * To determine whether to show the bottom-drawer to award badges to students
          * 
          * @returns { Boolean }
@@ -191,7 +200,7 @@ export default {
 
         <section class="content">
             
-            <div v-if="isDataLoaded">
+            <div v-if="isDataLoaded && hasStudents">
                 <badge-report-header 
                     :has-some-students-selected="hasSomeStudentsSelected"
                     :are-all-students-selected="areAllStudentsSelected"
@@ -211,6 +220,11 @@ export default {
                     ref="awardDetailModal"
                     @on-achievement-awarded="onAchievementAwarded"
                 />
+            </div>
+
+            <div v-else-if="isDataLoaded && !hasStudents" class="empty-state">
+                <i class="icon-staff-students"></i>
+                <p>There are currently no users within this group.</p>
             </div>
 
             <div v-else-if="hasDataLoadError" class="alert-box alert">
