@@ -8,6 +8,7 @@
  #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{% if currentFile.turnitin %}
 <p class="meta">
     {% if currentFile.turnitin.isComplete %}
         {% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
@@ -36,3 +37,4 @@
         <span class='hint has-tip tip-top' title="Similarity check is unavailable. Most likely this type of file cannot be checked for similarity, or the system is not configured." data-tooltip="">?</span>
     {% endif %}
 </p>
+{% endif %}

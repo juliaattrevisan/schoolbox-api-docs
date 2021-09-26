@@ -8,6 +8,7 @@
  # @param Participant $participant              The participating student
  # @param SingleFile\Model $currentFile         A student submission file instance (Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile)
  #}
+{% if currentFile.turnitin %}
 {% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
     assessmentId: assessment.id,
     assessment:   assessment,
@@ -18,3 +19,4 @@
 %}
 
 <a href="{{ reportRoute }}" class="icon-report" title="Similarity Report"></a>
+{% endif %}
