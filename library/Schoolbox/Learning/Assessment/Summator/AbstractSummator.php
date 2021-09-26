@@ -22,12 +22,16 @@ abstract class AbstractSummator implements ISummator
     /**
      * @inheritDoc
      */
-    public function summateList($values)
+    public function summateList($values, ?array $weights = null)
     {
         $this->reset();
-        foreach ($values as $value) {
+        $weight = 1;
+        foreach ($values as $key => $value) {
+            if ($weights && key_exists($key, $weights)) {
+                $weight = $weights[$key];
+            }
             if (!is_null($value)) {
-                $this->aggregate($value, 1);
+                $this->aggregate($value, $weight);
             }
         }
         return $this->finalise();

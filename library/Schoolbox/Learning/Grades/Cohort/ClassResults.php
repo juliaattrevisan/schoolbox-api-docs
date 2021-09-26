@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 /**
@@ -99,7 +98,7 @@ class ClassResults
      *
      * The resultant assessments' order is then made the same as the input's order.
      *
-     * @return Collection
+     * @return array
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \LogicException
@@ -107,10 +106,10 @@ class ClassResults
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function getCohortAssessmentSet(): Collection
+    private function getCohortAssessmentSet(): array
     {
         if ($this->assessments->count() === 0) {
-            return new Collection();
+            return [];
         }
 
         /* The input implementation ids are in a particular sort order which isn't easy to replicate
@@ -130,17 +129,9 @@ class ClassResults
             $this->term,
         );
 
-        /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
+        /* Find all marks
          */
-        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples));
-
-        /* Populate all the participants' data into this set
-         * We need to build the five-point summary using EVERYONE's feedbacks for this assessment specification
-         * (normally it's just the guys in the same class, but we're getting a broader data set now)
-         */
-        $assessments = $this->assessmentMapperProxy
-            ->loadParticipantsIntoAssessmentCollection($assessments, null, false, false)
-            ->indexBy('id');
+        $assessmentMarks = $this->assessmentMapperProxy->findNormalisedMark(array_keys($assessmentTuples));
 
         /* Put specifications into the same order as their input implementations
          *
@@ -157,7 +148,7 @@ class ClassResults
         /* Index the result set, forcing the $assessments collection to be in the same
          * specification order as $inputImplementationIds (jesus)
          */
-        $result = new Collection();
+        $result = [];
 
         $sortedTuples = [];
 
@@ -165,12 +156,12 @@ class ClassResults
             foreach ($assessmentTuples as $implementationId => $specificationId) {
                 // Only add this implementation to the result set if it actually
                 // is in the list of assessments that are due within this term.
-                if ($specificationId === $sortedSpecificationId && isset($assessments[$implementationId])) {
+                if ($specificationId === $sortedSpecificationId && isset($assessmentMarks[$implementationId])) {
                     $sortedTuples[$implementationId] = $sortedSpecificationId;
 
                     /* Stack it up in the same order
                      */
-                    $result->add($assessments->getOffset($implementationId));
+                    $result[$implementationId] = $assessmentMarks[$implementationId];
                 }
             }
         }
@@ -203,7 +194,7 @@ class ClassResults
 
         /* Get all the assessments we need to analyse
          */
-        $assessments = $this->getCohortAssessmentSet();
+        $assessmentMarks = $this->getCohortAssessmentSet();
 
         /* Remember all the boxplot data series grouped by specification id
          */
@@ -232,28 +223,24 @@ class ClassResults
         /* Get all the cohort's results and pump them into a struct organised by specification id
          * We'll need to make a five-point summary of each of these specifications' values
          */
-        foreach ($assessments as $assessment) {
+        foreach ($assessmentMarks as $assessmentId => $marks) {
             /* Assessment's mark scheme must be quantitative
              *
              * There's no check on isFeedbackVisibleToUser because we're doing cohort analysis
              * and the currently logged in user might not be able to see other class' Feedbacks,
              * but those values still contribute to the statistical numbers
              */
-            if ($assessment->getMarkScheme()->isQuantitative()) {
-                /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
-                 * Index them by specification id; we eventually calculate a five point summary of everything here
-                 */
-                $specificationId = $this->tuples[$assessment->getId()];
 
-                foreach ($assessment->getAllParticipants() as $participant) {
-                    $normMarks[$specificationId][] = $participant->getNormalisedMark(true);
+            /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
+             * Index them by specification id; we eventually calculate a five point summary of everything here
+             */
+            $specificationId = $this->tuples[$assessmentId];
+            $normMarks[$specificationId] ??= [];
+            foreach ($marks as $mark) {
+                if ($mark === null) {
+                    continue;
                 }
-
-                /* Remember the unique titles of each $assessment we encountered, for highcharts
-                 */
-                if (!isset($graphAssessments[$assessment->getTitle()])) {
-                    $graphAssessments[$specificationId] = $assessment->getTitle();
-                }
+                $normMarks[$specificationId][] = $mark;
             }
         }
 
@@ -268,6 +255,10 @@ class ClassResults
          */
         foreach ($this->assessments as $assessment) {
             $specificationId = $this->tuples[$assessment->getId()];
+
+            /* Remember the unique titles of each $assessment we encountered, for highcharts
+             */
+            $graphAssessments[$specificationId] ??= $assessment->getTitle();
 
             /* Obey visibility restrictions; feedback must be visible to $viewer
              * and assessment's mark scheme must be quantitative
@@ -386,7 +377,7 @@ class ClassResults
             'info' => json_encode($statistics['graphInfo'], JSON_THROW_ON_ERROR),
             'assessments' => json_encode($statistics['graphAssessments'], JSON_THROW_ON_ERROR),
             'data' => json_encode($statistics['graphData'], JSON_THROW_ON_ERROR),
-            'scatter' => json_encode($statistics['graphScatter'], JSON_THROW_ON_ERROR)
+            'scatter' => json_encode($statistics['graphScatter'], JSON_THROW_ON_ERROR),
         ];
     }
 }

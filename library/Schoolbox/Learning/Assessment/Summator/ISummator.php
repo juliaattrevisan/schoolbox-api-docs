@@ -19,12 +19,13 @@ interface ISummator
     /**
      * Summation of a generic list of values.
      *
-     * Assumes that weight of all values is equal.
+     * Assumes that weight of all values is equal, if not provided.
      *
-     * @param mixed $values The list of values to summate. Needs to be iterable.
+     * @param mixed      $values  The list of values to summate. Needs to be iterable.
+     * @param array|null $weights Keys and number of values must match $values
      * @return float|null
      */
-    public function summateList($values);
+    public function summateList($values, ?array $weights = null);
 
     /**
      * Execute summation strategy upon a Collection of
