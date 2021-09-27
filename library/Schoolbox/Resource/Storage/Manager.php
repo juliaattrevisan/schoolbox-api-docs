@@ -180,7 +180,6 @@ class Manager
     protected function copy(string $tmpFilePath, Model $storage): bool
     {
         try {
-            $this->sanitize($storage, self::FS_TEMP, $tmpFilePath);
             return $this->mountManager->copy(
                 self::FS_TEMP . "://$tmpFilePath",
                 self::FS_STORAGE . '://' . $storage->getPath()
@@ -203,8 +202,6 @@ class Manager
      */
     private function move(string $tmpFilePath, Model $storage): bool
     {
-        $this->sanitize($storage, self::FS_TEMP, $tmpFilePath);
-
         /** @var Filesystem $fsFrom */
         $fsFrom = $this->mountManager->getFilesystem(self::FS_TEMP);
         /** @var Filesystem $fsTo */
@@ -248,25 +245,24 @@ class Manager
     /**
      * Sanitize file prior to storing.
      *
-     * @param Model  $storage    The storage object for the file: required so
+     * @param Model $storage     The storage object for the file: required so
      *                           that the sanitizer knows how to sanitise the
      *                           file.
-     * @param string $fileSystem Which filesystem contains the file's current
-     *                           content? Required because this may operate on a
-     *                           file before it is actually stored: this may be
-     *                           a temp filesystem.
-     * @param string $path       Where is the file within `$fileSystem`?
-     * @param bool   $dryRun     If true: don't actually sanitize: just return
+     * @param bool  $dryRun      If true: don't actually sanitize: just return
      *                           whether it would have been.
      * @return bool
+     * @throws FileNotFoundException
      */
-    public function sanitize(Model $storage, string $fileSystem, string $path, bool $dryRun = false): bool
+    public function sanitize(Model $storage, bool $dryRun = false): bool
     {
+        $fileSystem = $storage->getFilesystem();
+        $path       = $storage->getPath();
+
         if (!$this->sanitizer->accepts($storage->getMime())) {
             return false;
         }
         try {
-            $unsafeContent = $this->mountManager->getFilesystem($fileSystem)->read($path);
+            $unsafeContent = $fileSystem->read($path);
         } catch (FileNotFoundException $e) {
             return false;
         }
@@ -277,7 +273,10 @@ class Manager
         if ($dryRun) {
             return true;
         }
-        return $this->mountManager->getFilesystem($fileSystem)->put($path, $sanitizedContent);
+        // update storage to match sanitized content
+        $result = $fileSystem->put($storage->getPath(), $sanitizedContent);
+        $storage->setHash((new HashGenerator())->generateHash($fileSystem->readStream($storage->getPath())));
+        return $result;
     }
 
     /**

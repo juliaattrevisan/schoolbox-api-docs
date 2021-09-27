@@ -1484,12 +1484,15 @@ abstract class Kernel
         // Storage upload/download sanitizer
         $di->set(
             'storage.sanitizer',
-            $di->lazy(function () {
+            $di->lazy(function () use ($di) {
+                /** @var IConfigLoader $config */
+                $config = $di->get('config');
                 $baseSvgSanitizer = new BaseSvgSanitizer();
                 $baseSvgSanitizer->minify(true);
                 return new Sanitizer\Composite(
                     new Sanitizer\Svg($baseSvgSanitizer),
-                    new Sanitizer\Html(new ScrubAdapter())
+                    new Sanitizer\Html(new ScrubAdapter()),
+                    new Sanitizer\Exif($config)
                 );
             })
         );
