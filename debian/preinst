@@ -17,11 +17,16 @@ case "$1" in
             echo "Non-primary node. Skipping databases backup" | tee -a /var/log/schoolbox/upgrade.log
         else
             echo "Primary node. Backing up databases" | tee -a /var/log/schoolbox/upgrade.log
+
+            # In POSIX sh, process substitution is undefined, so we'll need to pipe child PID to a temp file
+            temp_pid_file=$(mktemp)
+
             instance_list=$(/usr/local/bin/schoolbox-read-instances --ini /etc/schoolbox/instances.ini --option instance-list)
             for instance_id in $instance_list; do
                 echo "Backing up instance $instance_id" | tee -a /var/log/schoolbox/upgrade.log
-                INSTANCE_ID=$instance_id /usr/local/bin/schoolbox-database-backup 2>&1 | tee -a /var/log/schoolbox/"$instance_id"/upgrade.log &
-                pids="${pids} $!-$instance_id"
+                mkdir -p /var/log/schoolbox/"$instance_id" 2>&1 | tee -a /var/log/schoolbox/upgrade.log
+                INSTANCE_ID=$instance_id /usr/local/bin/schoolbox-database-backup & echo $! >"$temp_pid_file" 2>&1 | tee -a /var/log/schoolbox/"$instance_id"/upgrade.log
+                pids="${pids} $(cat "$temp_pid_file")-$instance_id"
             done
 
             any_failures=0
@@ -33,6 +38,8 @@ case "$1" in
                     any_failures=1
                 fi
             done
+            rm -v "$temp_pid_file" 2>&1 | tee -a /var/log/schoolbox/upgrade.log
+
             if [ $any_failures != '0' ]; then
                 echo "Error: Backup failures detected. Exiting." | tee -a /var/log/schoolbox/upgrade.log
                 exit 1;

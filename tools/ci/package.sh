@@ -106,6 +106,7 @@ do
     sed -i "s/schoolboxdev-rebuild-daemons/schoolbox-rebuild-daemons/g" debian/postinst;
     sed -i "s/schoolboxdev-database-backup/schoolbox-database-backup/g" debian/preinst;
     sed -i "s/schoolboxdev-read-instances/schoolbox-read-instances/g" debian/preinst;
+    sed -iE "s/\/var\/log\/schoolboxdev\/\"\$instance_id\"/\/var\/log\/schoolbox\/\"\$instance_id\"/g" debian/preinst;
   fi
 
 	if [ "$i" == "schoolboxcloud" ];
