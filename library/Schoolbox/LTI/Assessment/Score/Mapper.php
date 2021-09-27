@@ -15,6 +15,8 @@ use Schoolbox\UserMapper;
 
 /**
  * LTI assessment score mapper.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {

@@ -80,18 +80,23 @@ class Model implements ISoftDeletable
     /**
      * The teacher or other user which gave this score (if known).
      */
-    private ?User $markingUser;
+    private ?User $markingUser = null;
 
     /**
      * The score which was given to the student, if any.
      */
-    private ?float $scoreGiven;
+    private ?float $scoreGiven = null;
 
     /**
      * The maximum possible score available for the assessment at time of
      * scoring, if provided.
      */
-    private ?float $scoreMaximum;
+    private ?float $scoreMaximum = null;
+
+    /**
+     * A comment on the score, if any.
+     */
+    private ?string $comment = null;
 
     /**
      * The student's progress toward completing the activity.
@@ -200,6 +205,24 @@ class Model implements ISoftDeletable
     public function setScoreMaximum(?float $scoreMaximum): self
     {
         $this->scoreMaximum = $scoreMaximum;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @param string|null $comment
+     * @return $this
+     */
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
         return $this;
     }
 

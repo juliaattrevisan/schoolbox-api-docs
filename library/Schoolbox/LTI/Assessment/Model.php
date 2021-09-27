@@ -26,7 +26,7 @@ class Model implements IAssessableDataModel, ISoftDeletable
      * The URL of the LTI assessment: the student will be directed to this URL
      * when they attempt the assessment.
      */
-    private ?string $ltiAssessmentUrl;
+    private ?string $ltiAssessmentUrl = null;
 
     /**
      * @return string|null
