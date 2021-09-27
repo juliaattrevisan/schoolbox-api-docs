@@ -14,12 +14,14 @@ CREATE TABLE lti_assessment_score
     marking_user_id   INT UNSIGNED                                                            NULL,
     score_given       FLOAT                                                                   NULL,
     score_maximum     FLOAT                                                                   NULL,
-    timestamp         DATETIME                                                                NOT NULL,
     comment           TEXT                                                                    NULL,
     activity_progress ENUM ('Initialized', 'Started', 'InProgress', 'Submitted', 'Completed') NOT NULL,
     grading_progress  ENUM ('NotReady', 'Failed', 'Pending', 'PendingManual', 'FullyGraded')  NOT NULL,
     is_response       BOOL                                                                    NOT NULL DEFAULT FALSE,
     is_feedback       BOOL                                                                    NOT NULL DEFAULT FALSE,
+    created_at        DATETIME                                                                NOT NULL,
+    updated_at        DATETIME                                                                NOT NULL,
+    deleted_at        DATETIME                                                                NULL,
     CONSTRAINT lti_assessment_score_lti_assessment_id_fk
         FOREIGN KEY (lti_assessment_id) REFERENCES lti_assessment (id),
     CONSTRAINT lti_assessment_score_student_id_fk
