@@ -23,6 +23,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('lti_assessment');
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins(
             'assessment_id',
