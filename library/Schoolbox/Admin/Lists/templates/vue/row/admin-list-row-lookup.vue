@@ -106,7 +106,7 @@ export default {
     <div>
         <template v-if="field.nullable && validatedLookup.length === 0">
             <select v-model="row[field.id]" disabled>
-                <option value="null">{{ field.nullable_label }}</option>
+                <option :value="null">{{ field.nullable_label }}</option>
             </select>
         </template>
         <template v-else-if="validatedLookup.length === 0">
@@ -117,7 +117,7 @@ export default {
         <template v-else>
             <select v-model="row[field.id]">
                 <template v-if="!field.mandatory">
-                    <option value="null">Not Selected</option>
+                    <option :value="null">Not Selected</option>
                 </template>
                 <option v-for="(option, index) in availableOptions" :key="index" :value="option.key" :disabled="option.deleted">{{ getOptionValue(option) }}</option>
             </select>
