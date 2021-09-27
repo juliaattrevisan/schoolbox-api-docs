@@ -299,11 +299,12 @@ class Controller extends Base
 
         /* Group by category
          */
+        /** @var AwardModel $award */
         foreach ($awards as $award) {
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */
-            $badgeId = "badge-{$award->getStatus()}-{$award->getBadge()->getId()}";
+            $badgeId = $award->getBadgeIndex();
             $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
 
             /* Some inline hydration due to curriculum nodes no longer being included
@@ -705,20 +706,18 @@ class Controller extends Base
         $translator    = $this->buildBadgeAwardModelToArrayTranslator();
         /** @var \Schoolbox\Learning\Badge\Award\Model $award */
         foreach ($awards as $award) {
-            if (!key_exists($award->getRecipient()->getId(), $studentAwards)) {
-                $studentAwards[$award->getRecipient()->getId()] = [];
-            }
-            $studentAwards[$award->getRecipient()->getId()][] = $translator($award);
+            $studentAwards[$award->getRecipient()->getId()][$award->getBadgeIndex()] ??= $translator($award);
+            $studentAwards[$award->getRecipient()->getId()][$award->getBadgeIndex()]['count']++;
         }
 
         $data = [];
         foreach ($students as $student) {
             $data[] = [
-                'id'       => $student->getId(),
-                'fullName' => $student->getFullName(),
+                'id'        => $student->getId(),
+                'fullName'  => $student->getFullName(),
                 'firstName' => $student->getFirstname(),
-                'lastName' => $student->getLastname(),
-                'badges'   => $studentAwards[$student->getId()],
+                'lastName'  => $student->getLastname(),
+                'badges'    => $studentAwards[$student->getId()],
             ];
         }
 

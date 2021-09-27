@@ -266,4 +266,13 @@ class Model implements ISoftDeletable
         $this->award = $award;
         return $this;
     }
+
+    /**
+     * Generates index for JSON data
+     * @return string
+     */
+    public function getBadgeIndex(): string
+    {
+        return "badge-{$this->getStatus()}-{$this->getBadge()->getId()}";
+    }
 }
