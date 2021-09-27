@@ -6,6 +6,7 @@ import MetaItem           from '@vue/components/meta/item'
 import axios              from 'axios';
 import qs                 from 'qs';
 import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import dayjs              from 'dayjs';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
  */
@@ -63,7 +64,6 @@ export default {
     ],
 
     props: {
-        toMoment: {},
         eventModifyFormUrl: {},
         eventModifyFormActionUrl: {},
         eventDeleteUrl: {},
@@ -429,13 +429,13 @@ export default {
                 return '';
             }
             let format      = allDay ? this.formatDisplayDate : this.formatDisplayDatetime,
-                momentStart = this.toMoment(startDate),
+                momentStart = dayjs(startDate),
                 start       = momentStart.format(format),
                 momentEnd   = null,
                 end         = null;
 
             if (endDate != null) {
-                momentEnd = this.toMoment(endDate);
+                momentEnd = dayjs(endDate);
                 if (allDay) {
                     // Event end dates in FullCalendar are exclusive.
                     // This means that all-day events from the event source

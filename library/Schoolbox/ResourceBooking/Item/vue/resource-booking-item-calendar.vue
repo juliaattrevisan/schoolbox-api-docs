@@ -5,7 +5,6 @@ import interactionPlugin          from '@fullcalendar/interaction'
 import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
-// import momentPlugin               from '@fullcalendar/moment'
 import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@vue/components/fullcalendar/view-event-modal';
 import CreateBookingModal         from '@vue/components/fullcalendar/resourceBooking/create-booking-modal';
@@ -79,10 +78,9 @@ export default {
 
     beforeMount() {
         dayjs.extend(advancedFormat); //for more format options
-        dayjs.extend(arraySupport);
+        dayjs.extend(arraySupport); //to be able to use an array as a date
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            // plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
             views: {
                 day: {
@@ -358,7 +356,6 @@ export default {
 
         <create-booking-modal
             ref="createBooking"
-            :to-moment="fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
             :date-formats="formats"
             :booking-type="'item'"
@@ -366,7 +363,6 @@ export default {
 
         <view-event-modal
             ref="event"
-            :to-moment="fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-update-url="urls.update"
