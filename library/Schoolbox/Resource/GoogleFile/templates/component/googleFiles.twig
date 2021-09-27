@@ -59,6 +59,7 @@
         </div>
     {% endif %}
 {% endif %}
+{% if not hasError %}
 <div id="gfile" class="reveal-modal" data-reveal aria-labelledby="Google Files" aria-hidden="true" role="dialog">
     <div id="gfile-container">
         {% set levels = {
@@ -124,9 +125,9 @@
         </form>
     </div>
 </div>
-<div 
+<div
     id="googleFiles"
-    data-client-id="{{ clientId }}" 
+    data-client-id="{{ clientId }}"
     data-levels="{{ levels['All group members'] }}"
     data-save-route="{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}"
     data-component-id="{{ component_id }}"
@@ -135,3 +136,4 @@
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js"></script>
+{% endif %}
