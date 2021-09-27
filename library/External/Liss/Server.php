@@ -107,6 +107,10 @@ class External_Liss_Server
      */
     private $log;
 
+    /**
+     * @var TimetableCycle[]
+     */
+    private $cycleCache = [];
 
     /**
      * External_Liss_Server constructor.
@@ -137,11 +141,18 @@ class External_Liss_Server
      */
     public function getCycle(string $identifier)
     {
-        /* Requires schoolbox connector
+
+        /* If the $identifier is somehow an empty string, then it might not have
+         * been set properly in the remote data source - just assume the usual
+         * traditional default identifier in this case, and use that
          */
-        if (!$this->isSchoolboxConnector()) {
-            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        $cycleIdentifier = $identifier ?: self::DEFAULT_CYCLE_IDENTIFIER;
+
+        /*
+         * Return a cycle from the existing cached cycles
+         */
+        if (isset($this->cycleCache[$cycleIdentifier])) {
+            return $this->cycleCache[$cycleIdentifier];
         }
 
         /* Try to find a Timetable Cycle matching $identifier
@@ -149,16 +160,6 @@ class External_Liss_Server
          * Otherwise create a new one
          */
         $cycleMapper = TimetableCycleMapper::getInstance();
-
-        /* If the $identifier is somehow an empty string, then it might not have
-         * been set properly in the remote data source - just assume the usual
-         * traditional default identifier in this case, and use that
-         */
-        $cycleIdentifier = $identifier;
-
-        if ('' === $cycleIdentifier) {
-            $cycleIdentifier = self::DEFAULT_CYCLE_IDENTIFIER;
-        }
 
         try {
             $cycle = $cycleMapper->findOneByColumn('cycle_identifier', $cycleIdentifier);
@@ -191,6 +192,8 @@ class External_Liss_Server
 
             $cycleMapper->save($cycle);
         }
+
+        $this->cycleCache[$cycleIdentifier] = $cycle;
 
         return $cycle;
     }
@@ -636,7 +639,7 @@ class External_Liss_Server
                  * and load that if it exists, creating a new one if it doesn't
                  */
                 $cycleIdentifier = (string)$struct['TtStructure']->me['string'];
-                $cycle = External_Liss_Server::getCycle($cycleIdentifier);
+                $cycle = $this->getCycle($cycleIdentifier);
 
                 $dayNumber = (string)$struct['DayNumber']->me['i4'];
 
