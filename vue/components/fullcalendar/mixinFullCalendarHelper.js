@@ -3,7 +3,7 @@
  * contains common code that can be shared between all implementations.
  */
 
-import { toMoment } from '@fullcalendar/moment';
+import dayjs from 'dayjs';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
 
@@ -91,17 +91,6 @@ export default {
         },
 
         /**
-         * Helper function for converting a native JS Date to a Moment object.
-         * @see https://fullcalendar.io/docs/moment-plugins
-         *
-         * @param {Date} date
-         */
-        fullCalendarHelper_toMoment (date) {
-            // Attempt to pass in the fullCalendar API itself
-            return toMoment(date, this.$refs.fullCalendar.getApi());
-        },
-
-        /**
          * Is the given event a task or not? This affects how it's rendered.
          *
          * @param {object} event
@@ -119,8 +108,8 @@ export default {
          * @returns {*}
          */
         fullCalendarHelper_dateDiff (start, end, type = 'days') {
-            const startDate = this.fullCalendarHelper_toMoment(start);
-            const endDate = this.fullCalendarHelper_toMoment(end);
+            const startDate = dayjs(start);
+            const endDate = dayjs(end);
             return endDate.diff(startDate, type);
         },
 
