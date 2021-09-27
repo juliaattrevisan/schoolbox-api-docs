@@ -72,10 +72,10 @@ export default {
         student: {
             deep: true,
             handler (newStudentData, oldStudentData) {
-                if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) {
-                    setTimeout(() => { 
-                        this.hasContentChange = true;
-                        this.$nextTick(() => this.hasContentChange = false);
+                if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) { //if the number of badges has changed
+                    setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
+                        this.hasContentChange = true; 
+                        this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
                     }, BADGE_ANIMATE_DURATION * 2100);
                 }
             }
@@ -111,7 +111,14 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onEnter (element, done) {
-            gsap.to(element, { opacity: 1, y: 0, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, delay: BADGE_ANIMATE_DURATION, onComplete: done } );
+            gsap.to(element, { 
+                opacity: 1, 
+                y: 0, 
+                ease: 'power1.out', 
+                duration: BADGE_ANIMATE_DURATION, 
+                delay: BADGE_ANIMATE_DURATION, 
+                onComplete: done 
+            } );
         },
 
         /**
@@ -132,7 +139,12 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onLeave (element, done) {
-            gsap.to(element, { opacity: 0, y: 10, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
+            gsap.to(element, { 
+                opacity: 0, 
+                y: 10, ease: 'power1.out', 
+                duration: BADGE_ANIMATE_DURATION, 
+                onComplete: done 
+            } );
         },
 
         /**
@@ -231,9 +243,7 @@ $collapseStudent: 1000px;
 
 .student {
     display: flex;
-    width: 100%;
     height: $rowHeight;
-    overflow: hidden;
     margin: 0 0 0.625rem 0;
     padding: 0;
     @media (max-width: $collapseStudent) {

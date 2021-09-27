@@ -5,6 +5,7 @@ import RevealModal from "@vue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
 import toastMixin from '@vue/components/toast-mixin';
+import HorizontalScoller from '@vue/components/scroll/horizontal-scoller';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
 
 
@@ -25,6 +26,7 @@ export default {
         BadgeList,
         BadgeImage,
         RevealModal,
+        HorizontalScoller, //so badges are contained in one line when a lot are selected
         BottomDrawer //to pop out when +1 badges is selected
     },
     props: {
@@ -207,6 +209,7 @@ export default {
         return {
             selectedBadges: [],
             badgeListChangeEvent: 'EVENT_CHANGE',
+            hasContentChange: false //to track badge addition changes
         }
     },
     computed: {
@@ -260,6 +263,25 @@ export default {
                 return '';
             }  
         }
+    },
+    watch: {
+
+        /**
+         * We need to wait for the transition animation to complete before we re-evaluate
+         * the status of horizontal-scroller.
+         * @TODO - consider using ResizeObserver once Safari 15 is released, as 
+         * this could be handled much better by the feature
+         */
+        selectedBadges (newSelectedBadges, oldSelectedBadges) {
+            if (newSelectedBadges.length !== oldSelectedBadges.length) { //if the number of badges has changed
+                setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
+                    this.hasContentChange = true; 
+                    console.warn('check change');
+                    this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
+                }, 400);
+            }
+        }
+
     },
     methods: {
 
@@ -345,12 +367,19 @@ export default {
         <bottom-drawer :showDrawer="selectedBadges.length > 0">
             <div class="selected-container">
                 <h3 class="selected-container__count"><em>{{ selectedBadgeText }}</em></h3>
-                <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="selected-container__clear">Clear selection</button>
-                <transition-group name="selected-badges" class="selected-badges" tag="div">
-                    <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges__item">
-                        <badge-image :badge="badge" class="selected-badge-image"></badge-image>
-                    </span>
-                </transition-group>
+                <div class="selected-container__badges">
+                    <horizontal-scoller 
+                        :hasButtons="false"
+                        :height="36"
+                        :has-content-change="hasContentChange"
+                    >
+                        <transition-group name="selected-badges" class="selected-badges" tag="div">
+                            <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges__item">
+                                <badge-image :badge="badge" class="selected-badge-image"></badge-image>
+                            </span>
+                        </transition-group>
+                    </horizontal-scoller>
+                </div>
             </div>
             <ul class="flex-list buttons">
                 <li>
@@ -408,19 +437,16 @@ export default {
 .selected-container {
     display: flex;
     align-items: baseline;
+    height: 50px;
 }
 
     .selected-container__count {
-        margin-right: 1rem;
+        width: 220px;
+        margin: 0;
     }
 
-    .selected-container__clear {
-        display: inline-block;
-        margin-right: 1rem;
-        padding: 0px;
-        background: none;
-        vertical-align: baseline;
-        font-size: 0.8rem;
+    .selected-container__badges {
+        width: calc(100% - 220px); //minus the count
     }
 
 .selected-badges__item {
@@ -429,8 +455,8 @@ export default {
     margin: 0px 5px;
 }
 
-.selected-badges-enter, .selected-badges-leave-to
-    /* .selected-badges-leave-active below version 2.1.8 */ {
+.selected-badges-enter, 
+.selected-badges-leave-to {
     opacity: 0;
     transform: translateY(30px);
 }

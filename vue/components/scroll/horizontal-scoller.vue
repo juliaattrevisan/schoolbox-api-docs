@@ -139,7 +139,7 @@ export default {
         refreshScrollBarWidth () {
             const unconstrainedWidth = (this.outerContainer.clientWidth - SCROLL_PADDING) * (this.outerContainer.clientWidth / this.innerContainer.scrollWidth);
             this.scrollBarWidth = (unconstrainedWidth < MIN_SCROLL_BAR_WIDTH) ? MIN_SCROLL_BAR_WIDTH : unconstrainedWidth;  //don't make the scroll bar to small
-            this.$nextTick(() => {
+            this.$nextTick(() => { //to ensure the scrollBarWidth change has occured
                 this.scrollBarXFactor = (this.outerContainer.clientWidth - this.scrollBar.clientWidth - SCROLL_PADDING) / (this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
             });
         },
@@ -301,7 +301,7 @@ export default {
     left: 5px;
     bottom: 0px;
     width: 120px; //will be updated relative to scroll amount with this.scrollBarWidth
-    height: 4px;
+    height: 3px;
     background: $content-ui-foreground;
 }
 
