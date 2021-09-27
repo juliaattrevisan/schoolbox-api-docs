@@ -16,6 +16,11 @@
         <li>
             <a class="icon-search" data-reveal-id="search-modal" title="Search Resources">Search Resources</a>
         </li>
+        {% if isRouteAuthorized('resourceCategory.browse') %}
+            <li>
+                <a class="icon-list" href="{{  routeLookup('resourceCategory.browse') }}" title="Resource Categories">Resource Categories</a>
+            </li>
+        {% endif %}
         {% if isRouteAuthorized('resourceBookingReport.index') %}
             <li>
                 <a class="icon-report" href="{{  routeLookup('resourceBookingReport.index') }}" title="Booking Report">Booking Report</a>
