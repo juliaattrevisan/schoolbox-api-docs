@@ -10,8 +10,11 @@ import ExportModal                from '@vue/components/fullcalendar/resourceBoo
 import FilterModal                from '@vue/components/fullcalendar/resourceBooking/filter-modal';
 import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
-import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper         from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
+import dayjs                      from 'dayjs';
+import advancedFormat             from 'dayjs/plugin/advancedFormat';
+import arraySupport               from 'dayjs/plugin/arraySupport';
 
 const URL_EVENT_EXPORT = '/calendar/export.php';
 
@@ -67,24 +70,49 @@ export default {
     },
 
     beforeMount () {
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport); //to be able to use an array as a date
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, momentPlugin, resourceTimelinePlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, resourceTimelinePlugin, momentPlugin, adaptivePlugin ],
+            // plugins: [ interactionPlugin, resourceTimelinePlugin, adaptivePlugin ],
             views: {
                 resourceTimelineMonth: {
-                    slotLabelFormat: ['ddd D']
+                    // slotLabelFormat: ['ddd D']
+                    slotLabelFormat: (date) => {
+                        return dayjs(date.date.marker).format('ddd D');
+                    }
                 },
                 resourceTimelineWeek: {
-                    slotLabelFormat: ['ddd D/M', 'h'],
+                    // slotLabelFormat: ['ddd D/M', 'h'],
+                    slotLabelFormat: (date) => {
+                        const days = dayjs(date.date.marker).format('ddd D/M');
+                        const hours = dayjs(date.date.marker).format('h');
+                        return [days, hours];
+                    },
                     slotMinWidth: '50',
-                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    // titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    titleFormat: (date) => {
+                        const startDate = dayjs(date.start.array).format('MMMM Do');
+                        const endDate = dayjs(date.end.array).format('MMMM Do');
+                        const endDateYear = dayjs(date.end.array).format('YYYY');
+                        return `${startDate} - ${endDate}, ${endDateYear}`;
+                    } 
                 },
                 resourceTimelineDay: {
                     slotMinWidth: '50',
-                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
+                    // titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
+                    titleFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    } 
                 }
             },
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            // eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                const startTime = dayjs(date.start.array).format('h:mma');
+                const endTime = dayjs(date.end.array).format('h:mma');
+                return `${startTime} - ${endTime}`;
+            },
             eventTextColor: 'black',
 			customButtons: {
                 customExport: {
@@ -351,7 +379,6 @@ export default {
 
         <create-booking-modal
             ref="createBooking"
-            :to-moment="fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
             :date-formats="formats"
             :booking-type="'category'"
@@ -359,7 +386,6 @@ export default {
 
         <view-event-modal
             ref="event"
-            :to-moment="fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-update-url="urls.update"
