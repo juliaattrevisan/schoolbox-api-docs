@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Assessment;
+namespace Schoolbox\LTI\Assessment\DataModel;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
