@@ -15,16 +15,23 @@ export default {
     // },
 
     props: {
-        // student: { //contains all the data needed to display
-        //     type: Object,
-        //     required: true
-        // },
+        hasButtons: { //whether to show prev/next buttons
+            type: Boolean,
+            required: true
+        },
         // selectedStudents: { //to clear a students selection when cleared by badge-report
         //     type: Array,
         //     required: true
         // }
     },
 
+    computed: {
+
+        showButtons () {
+            return this.hasButtons;
+        }
+
+    },
 
     mounted () {
         this.initHorizontalScroller();
@@ -36,7 +43,7 @@ export default {
          * To horizontally scroll the badge list
          */
         initHorizontalScroller () {
-            this.horizontalScroller = new HorizontalScroller(this.$el); 
+            this.horizontalScroller = new HorizontalScroller(this.$el, this.hasButtons); 
         },
 
     }
@@ -46,17 +53,17 @@ export default {
 
 <template>
     <div class="scroller" data-scroller>
-        <div class="scroller-button-container">
-            <button class="scroller-button" data-scroller-previous-button>&lt;</button>
+        <div v-show="showButtons" class="scroller__button-container">
+            <button class="button" data-scroller-previous-button>&lt;</button>
         </div>
-        <div class="scroller-outer-container" data-scroller-outer-container>
-            <div class="scroller-inner-container" data-scroller-inner-container>
+        <div class="scroller__outer-container" data-scroller-outer-container>
+            <div class="scroller__inner-container" data-scroller-inner-container>
                 <slot></slot>
             </div>
             <div class="scroller-bar" data-scroller-scroll-bar></div>
         </div>
-        <div class="scroller-button-container">
-            <button class="scroller-button" data-scroller-next-button>&gt;</button>
+        <div v-show="showButtons" class="scroller__button-container">
+            <button class="button" data-scroller-next-button>&gt;</button>
         </div>
     </div>
 </template>
@@ -66,7 +73,6 @@ export default {
 @import 'www/static/css/foundation/utils/_variables.scss';
 
 $rowHeight: 150px;
-$collapseStudent: 1000px;
 
 .scroller {
     display: flex;
@@ -75,15 +81,12 @@ $collapseStudent: 1000px;
     height: $rowHeight;
 }
 
-.scroller-button-container {
+.scroller__button-container {
     flex: 0 0 50px;
     height: 100%;
-    @media (max-width: $collapseStudent) {
-        display: none;
-    }
 }
 
-.scroller-button {
+.button {
     width: 100%;
     height: 100%;
     margin: 0px auto;
@@ -93,14 +96,7 @@ $collapseStudent: 1000px;
     color: #4f4f4f;
 }
 
-// .scroller-flex-container {
-//     flex: 1 1 auto;
-//     height: 100%;
-//     overflow: hidden;
-//     white-space: nowrap;
-// }
-
-.scroller-outer-container {
+.scroller__outer-container {
     flex: 1 1 auto;
     position: relative;
     width: 100%;
@@ -111,7 +107,7 @@ $collapseStudent: 1000px;
     white-space: nowrap;
 }
 
-.scroller-inner-container {
+.scroller__inner-container {
     height: 100%;
     margin: 0;
     padding: 0;

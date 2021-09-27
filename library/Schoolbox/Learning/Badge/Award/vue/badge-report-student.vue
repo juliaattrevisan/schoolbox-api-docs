@@ -57,16 +57,16 @@ export default {
 
     watch: {
 
-        student: {
-            deep: true,
-            handler (newStudentData, oldStudentData) {
-                if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) {
-                    setTimeout(() => { 
-                        this.horizontalScroller.refresh();
-                    }, BADGE_ANIMATE_DURATION * 2000);
-                }
-            }
-        }
+        // student: {
+        //     deep: true,
+        //     handler (newStudentData, oldStudentData) {
+        //         if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) {
+        //             setTimeout(() => { 
+        //                 this.horizontalScroller.refresh();
+        //             }, BADGE_ANIMATE_DURATION * 2000);
+        //         }
+        //     }
+        // }
 
     },
 
@@ -148,7 +148,7 @@ export default {
 
 <template>
     <li class="awards student">
-        <div class="student__checkbox">
+        <div class="student__select">
             <div class="checklist">
                 <input 
                     :id="`checkbox-${student.id}`"
@@ -161,23 +161,23 @@ export default {
             </div>
         </div>
         <div class="student__portrait-and-name">
-            <div class="portrait-and-name-container">
-                <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="`profile photo of ${student.fullName}`" class="portrait">
-                <template v-if="student.id">
-                    <a :href="`/search/user/${student.id}`" title="View profile" class="name">
-                        {{ student.lastName + ', ' + student.firstName }}
-                    </a>
-                </template>
-                <template v-else>
-                    <span class="name">{{ student.lastName + ', ' + student.firstName }}</span>
-                </template> 
-            </div>
+            <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="`profile photo of ${student.fullName}`" class="portrait">
+            <template v-if="student.id">
+                <a :href="`/search/user/${student.id}`" title="View profile" class="name">
+                    {{ student.lastName + ', ' + student.firstName }}
+                </a>
+            </template>
+            <template v-else>
+                <span class="name">{{ student.lastName + ', ' + student.firstName }}</span>
+            </template> 
         </div>
         <div class="student__badges">
-            <horizontal-scoller v-if="hasBadges">
+            <horizontal-scoller 
+                v-if="hasBadges"
+                :hasButtons="true"
+            >
                 <transition-group
                     tag="ul"
-                    data-scroller-inner-container
                     :css="false"
                     @before-enter="onBeforeEnter"
                     @enter="onEnter"
@@ -187,10 +187,10 @@ export default {
                 >      
                     <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
                         <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
-                            <div class="card-feature-image">
+                            <div class="award__image-container">
                                 <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
                             </div>
-                            <div class="card-content">
+                            <div class="award__title-container">
                                 <p>{{ award.badge.name }}</p>
                             </div>
                         </a>
@@ -212,9 +212,6 @@ export default {
 $rowHeight: 150px;
 $collapseStudent: 1000px;
 
-.empty-state {
-    height: $rowHeight;
-}
 
 .student {
     display: flex;
@@ -230,50 +227,33 @@ $collapseStudent: 1000px;
     }
 }
 
-.student__checkbox {
-    width: 40px;
-    padding-bottom: 0;
-}
-
-.student__portrait-and-name {
-    width: 260px;
-    padding-bottom: 0;
-    @media (max-width: $collapseStudent) {
-        margin-bottom: 1rem;
+    .student__select {
+        width: 40px;
+        padding-bottom: 0;
     }
-}
 
-.portrait-and-name-container {
-    display: flex;
-}
-
-.portrait {
-    margin-right: 1rem;
-    @media (max-width: $collapseStudent) {
-        width: 50px;
-        height: auto;
+    .student__portrait-and-name {
+        display: flex;
+        align-items: flex-start;
+        width: 260px;
+        padding-bottom: 0;
+        @media (max-width: $collapseStudent) {
+            margin-bottom: 1rem;
+        }
     }
-}
 
-.student__badges {
-    width: calc(100% - 300px); //minus the checkbox and name
-    @media (max-width: $collapseStudent) {
-        width: 100%;
+        .portrait {
+            margin-right: 1rem;
+        }
+
+    .student__badges {
+        width: calc(100% - 300px); //minus the checkbox and name
+        @media (max-width: $collapseStudent) {
+            width: 100%;
+        }
     }
-}
 
-.card-feature-image {
-    position: relative;
-    padding: 0.25rem 0.5rem;
-    background-color: #F6F6F6;
-    text-align: center;
-}
-
-.card-content {
-    padding: 0.25rem 0.5rem;
-}
-
-.award::v-deep {
+.award {
     display: inline-block;
     width: 160px;
     height: $rowHeight - 10px;
@@ -282,17 +262,32 @@ $collapseStudent: 1000px;
     margin: 0px 0.5rem;
     padding: 0;
     vertical-align: top;
-    img {
-        width: 40px;
-        height: auto;
-        margin-bottom: 5px;
+    
+}
+
+    .award__image-container::v-deep { //v-deep is used to can target the img succesfully
+        position: relative;
+        padding: 0.25rem 0.5rem;
+        background-color: #F6F6F6;
+        text-align: center;
+        img {
+            width: 40px;
+            height: auto;
+        }
     }
-    p {
-        display: inline-block;
-        font-size: 0.75rem;
-        line-height: 1rem;
-        white-space: normal;
+
+    .award__title-container {
+        padding: 0.25rem 0.5rem;
+        p {
+            display: inline-block;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            white-space: normal;
+        }
     }
+
+.empty-state {
+    height: $rowHeight;
 }
 
 </style>
