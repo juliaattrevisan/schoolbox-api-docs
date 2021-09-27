@@ -29,6 +29,12 @@ export default {
         }
     },
 
+    data () {
+        return {
+            hasContentChange: false //to track badge report changes due to filtering
+        }
+    },
+
     computed: {
 
         /**
@@ -57,16 +63,23 @@ export default {
 
     watch: {
 
-        // student: {
-        //     deep: true,
-        //     handler (newStudentData, oldStudentData) {
-        //         if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) {
-        //             setTimeout(() => { 
-        //                 this.horizontalScroller.refresh();
-        //             }, BADGE_ANIMATE_DURATION * 2000);
-        //         }
-        //     }
-        // }
+        /**
+         * We need to wait for the filter animation to complete before we re-evaluate
+         * the status of horizontal-scroller.
+         * @TODO - consider using ResizeObserver once Safari 15 is released, as 
+         * this could be handled much better by the feature
+         */
+        student: {
+            deep: true,
+            handler (newStudentData, oldStudentData) {
+                if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) {
+                    setTimeout(() => { 
+                        this.hasContentChange = true;
+                        this.$nextTick(() => this.hasContentChange = false);
+                    }, BADGE_ANIMATE_DURATION * 2100);
+                }
+            }
+        }
 
     },
 
@@ -176,9 +189,11 @@ export default {
                 v-if="hasBadges"
                 :hasButtons="true"
                 :height="150"
+                :has-content-change="hasContentChange"
             >
                 <transition-group
                     tag="ul"
+                    class="award-list"
                     :css="false"
                     @before-enter="onBeforeEnter"
                     @enter="onEnter"
@@ -254,16 +269,19 @@ $collapseStudent: 1000px;
         }
     }
 
+.award-list {
+    margin: 0;
+}
+
 .award {
     display: inline-block;
     width: 160px;
-    height: $rowHeight - 10px;
+    height: $rowHeight - 10px; //allow some space at the bottom 
     border: 1px solid #EDEDED;
     box-shadow: 0 2px 3px 0 rgb(0 0 0 / 10%);
-    margin: 0px 0.5rem;
+    margin: 0px 0.25rem;
     padding: 0;
     vertical-align: top;
-    
 }
 
     .award__image-container::v-deep { //v-deep is used to can target the img succesfully
@@ -289,6 +307,8 @@ $collapseStudent: 1000px;
 
 .empty-state {
     height: $rowHeight;
+    margin: 0; //remove the white space at the bottom when there's no badges
+    background: white; //the grey looks a bit dodgy in combination with rows with badges
 }
 
 </style>

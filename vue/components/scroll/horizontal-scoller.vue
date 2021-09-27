@@ -6,6 +6,8 @@
 
 // import HorizontalScroller from '@js/scroll/HorizontalScroller';
 import { gsap, Draggable, InertiaPlugin } from 'gsap/all';
+import { ResizeObserver } from 'vue-resize';
+import 'vue-resize/dist/vue-resize.css';
 
 gsap.registerPlugin(Draggable, InertiaPlugin);
 
@@ -15,9 +17,9 @@ const MIN_SCROLL_BAR_WIDTH = 100;
 
 export default {
     
-    // components: {
-        
-    // },
+    components: {
+        ResizeObserver //to track any size changes to the parent container
+    },
 
     props: {
         hasButtons: { //whether to show prev/next buttons
@@ -26,6 +28,10 @@ export default {
         },
         height: { //to set how high the container will be
             type: Number,
+            required: true
+        },
+        hasContentChange: { //to trigger a resize when the content within changes
+            type: Boolean, 
             required: true
         }
     },
@@ -36,45 +42,54 @@ export default {
             maxX: 0, //to restrict movement to the right
             currentXPos: 0, //to track the scroll progress
             isEnabled: false, //don't always need to scroll horizontally if there's not enough in the container
-            scrollBarWidth: 0 //to adjust the width of the scroll progress indicator based on the amount of content to scroll
+            scrollBarWidth: 0, //to adjust the width of the scroll progress indicator based on the amount of content to scroll
         }
     },
 
-    computed: {
+    watch: {
 
         /**
-         * Only show the buttons when there's something to scroll
+         * Used to notify that the parent has changed the content within, 
+         * so we need to evaluate the scroller again
          * 
          * @params { Boolean } 
          */
-        showButtons () {
-            return this.hasButtons && this.isEnabled;
-        },
+        hasContentChange (hasChange) {
+            if (hasChange) {
+                this.refresh();
+            }
+        }
 
     },
 
     mounted () {
-        
-        this.outerContainer = this.$el.querySelector('[data-scroller-outer-container]');
-        this.innerContainer = this.$el.querySelector('[data-scroller-inner-container]');
-        
+        this.initElements();
         this.initDraggable();
         this.initScrollBar();
         this.refresh();
-        window.addEventListener('resize', () => this.refresh());
-
     },
 
     methods: {
 
         /**
-        * init the draggable instance, which is the core functionality 
+        * Save any dom elements for reference
+        */
+        initElements () {
+            this.outerContainer = this.$el.querySelector('[data-scroller-outer-container]');
+            this.innerContainer = this.$el.querySelector('[data-scroller-inner-container]');
+            this.scrollBar = this.$el.querySelector('[data-scroller-scroll-bar]');
+        },
+
+        /**
+        * Init the draggable instance, which is the core functionality 
+        * https://greensock.com/docs/v2/Utilities/Draggable
         */
         initDraggable () {
             this.draggable = Draggable.create(this.innerContainer, {
                 type: 'x',
                 edgeResistance: 0.75,
                 inertia: true,
+                zIndexBoost: false,
                 onDragStart: () => this.onStart(),
                 onDrag: () => this.onUpdate(),
                 onThrowUpdate: () => this.onUpdate(),
@@ -86,7 +101,6 @@ export default {
          * The visual indication of scroll progress, moves as you scroll
          */
         initScrollBar () {
-            this.scrollBar = this.$el.querySelector('[data-scroller-scroll-bar]');
             gsap.set(this.scrollBar, { alpha: 0 } ); //only show when sliding active
         },
 
@@ -94,7 +108,7 @@ export default {
          * Only need to provide scrolling functionality when we actually need to scroll
          */
         refresh () {
-            this.moveInnerContainer(0);
+            gsap.to(this.innerContainer, { x: 0, duration: 0.5 } ); //don't use moveInnerContainer as we don't want to trigger the scrollBar
             this.refreshDraggableBounds();
             this.minX < 0 ? this.enable() : this.disable(); //only provide scrolling when needed
         },
@@ -194,6 +208,13 @@ export default {
             this.moveInnerContainer(constrainedXTarget);
         },
 
+        /**
+         * Any changes to the element size are tracked by ResizeObserver so can update dimensions
+         */
+        onContainerResize () {
+            this.refresh();
+        },
+
     }
 
 }
@@ -213,6 +234,7 @@ export default {
             </button>
         </div>
         <div class="scroller__outer-container" data-scroller-outer-container>
+            <resize-observer @notify="onContainerResize"/>
             <div class="scroller__inner-container" data-scroller-inner-container>
                 <slot></slot>
             </div>
@@ -236,14 +258,13 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-
 .scroller {
     display: flex;
     align-items: flex-start;
 }
 
 .scroller__button-container {
-    flex: 0 0 50px;
+    flex: 0 0 40px;
     height: 100%;
 }
 
@@ -269,6 +290,7 @@ export default {
 }
 
 .scroller__inner-container {
+    position: relative;
     height: 100%;
     margin: 0;
     padding: 0;

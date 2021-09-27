@@ -228,7 +228,7 @@ export default {
             </div>
 
             <div v-else-if="hasDataLoadError" class="alert-box alert">
-                Sorry, we are currently unable to load the student data.
+                Sorry, we are currently unable to load the group data.
             </div>
 
             <div v-else class="loader"></div>
@@ -255,7 +255,7 @@ export default {
 }
 
 .content {
-    padding: 1rem 0 0 0; //remove the padding for most
+    padding: 0; //remove the padding
 }
 
 .action-list {
@@ -281,6 +281,10 @@ export default {
 	a {
 		margin: 0 1px;
 	}
+}
+
+.empty-state {
+    margin: 0; //remove the white space at the bottom when there's no rows
 }
 
 </style>
