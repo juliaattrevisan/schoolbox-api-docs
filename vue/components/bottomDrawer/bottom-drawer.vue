@@ -48,8 +48,8 @@ export default {
          * which will change depending on whether the side menu is opened/closed, browser resized etc
          */
         updatePosition () {
-            this.width = this.$el.getBoundingClientRect().width + 'px';
-            this.left = this.$el.getBoundingClientRect().x + 'px';
+            this.width = `${ this.$el.getBoundingClientRect().width }px`;
+            this.left = `${ this.$el.getBoundingClientRect().x }px`;
         }
 
     }

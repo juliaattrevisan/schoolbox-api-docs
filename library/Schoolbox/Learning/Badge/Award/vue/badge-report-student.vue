@@ -175,6 +175,7 @@ export default {
             <horizontal-scoller 
                 v-if="hasBadges"
                 :hasButtons="true"
+                :height="150"
             >
                 <transition-group
                     tag="ul"

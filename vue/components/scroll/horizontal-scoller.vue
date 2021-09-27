@@ -4,9 +4,14 @@
  * To scroll a list of items horizontally
  */
 
-import HorizontalScroller from '@js/scroll/HorizontalScroller';
+// import HorizontalScroller from '@js/scroll/HorizontalScroller';
+import { gsap, Draggable, InertiaPlugin } from 'gsap/all';
+
+gsap.registerPlugin(Draggable, InertiaPlugin);
 
 const BADGE_ANIMATE_DURATION = 0.3;
+const SCROLL_PADDING = 10;
+const MIN_SCROLL_BAR_WIDTH = 100;
 
 export default {
     
@@ -19,31 +24,174 @@ export default {
             type: Boolean,
             required: true
         },
-        // selectedStudents: { //to clear a students selection when cleared by badge-report
-        //     type: Array,
-        //     required: true
-        // }
+        height: { //to set how high the container will be
+            type: Number,
+            required: true
+        }
+    },
+
+    data () {
+        return {
+            minX: 0, //to restrict movement to the left
+            maxX: 0, //to restrict movement to the right
+            currentXPos: 0, //to track the scroll progress
+            isEnabled: false, //don't always need to scroll horizontally if there's not enough in the container
+            scrollBarWidth: 0 //to adjust the width of the scroll progress indicator based on the amount of content to scroll
+        }
     },
 
     computed: {
 
+        /**
+         * Only show the buttons when there's something to scroll
+         * 
+         * @params { Boolean } 
+         */
         showButtons () {
-            return this.hasButtons;
-        }
+            return this.hasButtons && this.isEnabled;
+        },
 
     },
 
     mounted () {
-        this.initHorizontalScroller();
+        
+        this.outerContainer = this.$el.querySelector('[data-scroller-outer-container]');
+        this.innerContainer = this.$el.querySelector('[data-scroller-inner-container]');
+        
+        this.initDraggable();
+        this.initScrollBar();
+        this.refresh();
+        window.addEventListener('resize', () => this.refresh());
+
     },
 
     methods: {
 
         /**
-         * To horizontally scroll the badge list
+        * init the draggable instance, which is the core functionality 
+        */
+        initDraggable () {
+            this.draggable = Draggable.create(this.innerContainer, {
+                type: 'x',
+                edgeResistance: 0.75,
+                inertia: true,
+                onDragStart: () => this.onStart(),
+                onDrag: () => this.onUpdate(),
+                onThrowUpdate: () => this.onUpdate(),
+                onThrowComplete: () => this.onComplete()
+            })[0];
+        },
+
+        /**
+         * The visual indication of scroll progress, moves as you scroll
          */
-        initHorizontalScroller () {
-            this.horizontalScroller = new HorizontalScroller(this.$el, this.hasButtons); 
+        initScrollBar () {
+            this.scrollBar = this.$el.querySelector('[data-scroller-scroll-bar]');
+            gsap.set(this.scrollBar, { alpha: 0 } ); //only show when sliding active
+        },
+
+        /**
+         * Only need to provide scrolling functionality when we actually need to scroll
+         */
+        refresh () {
+            this.moveInnerContainer(0);
+            this.refreshDraggableBounds();
+            this.minX < 0 ? this.enable() : this.disable(); //only provide scrolling when needed
+        },
+
+        /**
+         * Ensure can't scroll beyond the bounds of what's in the container
+         */
+        refreshDraggableBounds () { 
+            this.innerContainer.style.width = 'auto'; //reset for accurate re-display and bound detection
+            this.innerContainer.style.width = `${this.innerContainer.scrollWidth}px`; //and ensure can grab the whole container to drag
+            this.minX = -(this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
+            this.maxX = 0;
+            this.draggable.applyBounds( { minX: this.minX, maxX: this.maxX } );
+        },
+
+        /**
+         * enable the functionality of scroller, the contents of the container goes beyond the bounds set
+         */
+        enable () {
+            this.isEnabled = true;
+            this.draggable.enable();
+            this.refreshScrollBarWidth();
+        },
+
+        /**
+         * Ensure the size of the scroll bar accurately reflects the amount of scroll required
+         */
+        refreshScrollBarWidth () {
+            const unconstrainedWidth = (this.outerContainer.clientWidth - SCROLL_PADDING) * (this.outerContainer.clientWidth / this.innerContainer.scrollWidth);
+            this.scrollBarWidth = (unconstrainedWidth < MIN_SCROLL_BAR_WIDTH) ? MIN_SCROLL_BAR_WIDTH : unconstrainedWidth;  //don't make the scroll bar to small
+            this.$nextTick(() => {
+                this.scrollBarXFactor = (this.outerContainer.clientWidth - this.scrollBar.clientWidth - SCROLL_PADDING) / (this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
+            });
+        },
+
+        /**
+         * disable all the functionality of scroller, not enough in the container to be needed
+         */
+        disable () {
+            this.isEnabled = false;
+            this.draggable.disable();
+        },
+
+        /**
+         * Used by the next/previous buttons to move the scroller
+         * 
+         * @param {Number}
+         */
+        moveInnerContainer (xTarget) {
+            gsap.to(this.innerContainer, { 
+                x: xTarget, 
+                duration: 0.5, 
+                onStart: () => this.onStart(),
+                onUpdate: () => this.onUpdate(),
+                onComplete: () => this.onComplete()
+            } );
+        },
+
+        /**
+         * Scroller has been activated, so show the scroll bar to track scroll progress
+         */
+        onStart () { 
+            gsap.to(this.scrollBar, { alpha: 1, duration: 0.3 } );
+        },
+
+        /**
+         * Keep the scroll bar accurate with the current scroll position
+         * And disable the previous / next buttons when at then scroll bounds
+         */
+        onUpdate () {
+            gsap.set(this.scrollBar, { x: -(gsap.getProperty(this.innerContainer, 'x') * this.scrollBarXFactor) } );
+            this.currentXPos = gsap.getProperty(this.innerContainer, 'x');
+        },
+        
+        /**
+         * Fade out the scroll bar, when no longer moving
+         */
+        onComplete () {
+            gsap.to(this.scrollBar, { alpha: 0, duration: 0.3 } );
+        }, 
+
+        /**
+         * Move the scroller to the left
+         */
+        onPreviousButtonSelected () {
+            const xTarget = gsap.getProperty(this.innerContainer, 'x') + this.outerContainer.clientWidth;
+            const constrainedXTarget = (xTarget > this.maxX) ? this.maxX : xTarget; //ensure doesn't move beyond the container bounds
+            this.moveInnerContainer(constrainedXTarget);
+        },
+
+        /**
+         * Move the scroller to the right
+         */
+        onNextButtonSelected () {
+            const xTarget = gsap.getProperty(this.innerContainer, 'x') - this.outerContainer.clientWidth;
+            const constrainedXTarget = (xTarget < this.minX) ? this.minX : xTarget; //ensure doesn't move beyond the container bounds
+            this.moveInnerContainer(constrainedXTarget);
         },
 
     }
@@ -52,18 +200,34 @@ export default {
 </script>
 
 <template>
-    <div class="scroller" data-scroller>
-        <div v-show="showButtons" class="scroller__button-container">
-            <button class="button" data-scroller-previous-button>&lt;</button>
+    <div class="scroller" :style="{ height: `${height}px` } ">
+        <div v-if="hasButtons" class="scroller__button-container">
+            <button 
+                v-if="isEnabled"
+                class="button" 
+                :disabled="currentXPos >= 0"
+                @click.prevent="onPreviousButtonSelected" 
+                @keyup.enter="onPreviousButtonSelected" 
+            >
+                &lt;
+            </button>
         </div>
         <div class="scroller__outer-container" data-scroller-outer-container>
             <div class="scroller__inner-container" data-scroller-inner-container>
                 <slot></slot>
             </div>
-            <div class="scroller-bar" data-scroller-scroll-bar></div>
+            <div class="scroller-bar" data-scroller-scroll-bar :style="{ width: `${scrollBarWidth}px` } "></div>
         </div>
-        <div v-show="showButtons" class="scroller__button-container">
-            <button class="button" data-scroller-next-button>&gt;</button>
+        <div v-if="hasButtons" class="scroller__button-container">
+            <button 
+                v-if="isEnabled"
+                class="button" 
+                :disabled="currentXPos <= minX"
+                @click.prevent="onNextButtonSelected" 
+                @keyup.enter="onNextButtonSelected" 
+            >
+             &gt;
+            </button>
         </div>
     </div>
 </template>
@@ -72,13 +236,10 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-$rowHeight: 150px;
 
 .scroller {
     display: flex;
     align-items: flex-start;
-    justify-content: space-around;
-    height: $rowHeight;
 }
 
 .scroller__button-container {
@@ -117,7 +278,7 @@ $rowHeight: 150px;
     position: absolute;
     left: 5px;
     bottom: 0px;
-    width: 120px; //will be updated relative to scroll amount by horizontalScoller.js
+    width: 120px; //will be updated relative to scroll amount with this.scrollBarWidth
     height: 4px;
     background: $content-ui-foreground;
 }
