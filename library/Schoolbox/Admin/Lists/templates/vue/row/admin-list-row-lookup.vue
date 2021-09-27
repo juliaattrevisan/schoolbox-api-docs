@@ -5,6 +5,8 @@
  * checks for options that have been deleted so they are no longer displayed
  */
 
+import { isObject } from '@js/util/jsUtils'
+
 
 export default {
 
@@ -28,6 +30,21 @@ export default {
     computed: {
 
         /**
+         * When using for example Synergetic, the lookup can return an object 
+         * rather than an array. So we need to convert to array when it's an object
+         * so we can later traverse it
+         * 
+         * @returns { Array } 
+         */
+        validatedLookup () {
+            if (isObject(this.field.lookup)) {
+                return Object.keys(this.field.lookup).map((key) => this.field.lookup[key]); //grab each object and linked key within the object and put in an array
+            } else { //already an Array
+                return this.field.lookup;
+            }
+        },
+
+        /**
          * If the current selection is deleted, we should provide the option to select a blank field,
          * as well as including any options that aren't deleted
          * If there's no options that aren't deleted, there will be no options within the select input
@@ -36,12 +53,12 @@ export default {
          */
         availableOptions () {
             if (this.currentSelection.deleted) {
-                const availableOptions = this.field.lookup.filter((option) => {
+                const availableOptions = this.validatedLookup.filter((option) => {
                     return this.currentSelection.key === option.key || (!option.deleted && this.currentSelection.key !== option.key) //show the current selection, but hide those that are deleted and aren't the current selection
                 }); 
                 return [ { value: null, key: null, deleted: false }, ...availableOptions]; //then also include the blank select option
             } else {
-                return this.field.lookup.filter((option) => !option.deleted); //only those that aren't deleted
+                return this.validatedLookup.filter((option) => !option.deleted); //only those that aren't deleted
             }
         }
 
@@ -52,7 +69,7 @@ export default {
     },
 
     methods: {
-        
+
         /**
          * To properly dispay this.availableOptions, need to reference the currentSelection
          * Using this method just makes it easier to reference, as we are using the 
@@ -60,7 +77,7 @@ export default {
          */
         getCurrentSelection () {
             if (this.row[this.field.id] && !this.row.isNew) { //if it's not null, or not a new row entry, will be a reference to the field.lookup.key
-                this.currentSelection = this.field.lookup.find((option) => option.key === this.row[this.field.id]);
+                this.currentSelection = this.validatedLookup.find((option) => option.key === this.row[this.field.id]);
             }
         },
 
@@ -87,12 +104,12 @@ export default {
 
 <template>
     <div>
-        <template v-if="field.nullable && field.lookup.length === 0">
+        <template v-if="field.nullable && validatedLookup.length === 0">
             <select v-model="row[field.id]" disabled>
                 <option value="null">{{ field.nullable_label }}</option>
             </select>
         </template>
-        <template v-else-if="field.lookup.length === 0">
+        <template v-else-if="validatedLookup.length === 0">
             <select v-model="row[field.id]" disabled>
                 <option value="">None Available</option>
             </select>
