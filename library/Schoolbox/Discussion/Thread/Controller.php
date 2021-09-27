@@ -116,19 +116,34 @@ class Controller extends BaseController
      *
      * @param IThreadLocation $context The item with which to associate the thread
      * @throws \Schoolbox\Mapper\Exception
-     *@api   POST /discussion/{contextType}/{contextId}/threads/
+     * @api   POST /discussion/{contextType}/{contextId}/threads/
      * @since 190
      *
      */
     public function createThread(IThreadLocation $context): void
     {
         /** @var \stdClass $data */
-        $data   = $this->request->content->get();
-        $thread = $this->threadMapper->createModel()
-            ->setOpen($data->open);
-        $this->threadMapper->save($thread);
-        $this->context->associate($thread, $context);
-        $this->buildResponse($thread, $context, false);
+        $data = $this->request->content->get();
+
+        /* Presume a new thread if you accessed this method
+         * but check whether you are actually allowed, first.
+         */
+        $thread = $this->threadMapper->createModel()->setOpen($data->open);
+
+        try {
+            /* associate() will throw 409 Conflict if you can't/aren't supposed to
+             * assocaite this $thread and/or $object; that propagates to frontend
+             */
+            $this->context->associate($thread, $context);
+
+            $this->buildResponse($thread, $context, false);
+        } catch (\UnexpectedValueException $e) {
+            /* UnexpectedValueException thrown when you're in a conflicting scenario
+             * trying to associate threads to objects, results in http 409 Conflict
+             */
+            $this->response->status->setCode($e->getCode());
+            return;
+        }
     }
 
 
@@ -137,9 +152,8 @@ class Controller extends BaseController
      *
      * @param Model    $thread
      * @param IThreadLocation $context
-     *@api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
+     * @api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @since 190
-     *
      */
     public function getCommentsByThread(Model $thread, IThreadLocation $context): void
     {
@@ -168,7 +182,7 @@ class Controller extends BaseController
      * @param IThreadLocation $context
      *
      * @throws \Schoolbox\Mapper\Exception
-     *@api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
+     * @api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @since 190
      *
      */

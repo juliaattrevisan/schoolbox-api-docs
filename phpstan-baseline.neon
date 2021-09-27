@@ -8704,3 +8704,8 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
+			count: 1
+			path: library/Schoolbox/Discussion/Thread/Context/BaseThreadLocator.php

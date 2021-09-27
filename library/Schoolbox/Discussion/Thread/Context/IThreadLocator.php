@@ -36,6 +36,7 @@ interface IThreadLocator
      *
      * @param ThreadModel $thread
      * @param IThreadLocation $object
+     * @throws \UnexpectedValueException
      */
     public function associate(ThreadModel $thread, IThreadLocation $object): void;
 

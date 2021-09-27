@@ -3,7 +3,7 @@
 import moment from 'moment';
 import axios from 'axios';
 import MediaArticle from '@vue/components/media-article';
-import Toast from '@vue/components/toast';
+import toastMixin from '@vue/components/toast-mixin';
 import RevealModal from '@vue/components/reveal-modal';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
 import cKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
@@ -15,13 +15,13 @@ export default {
 
     components: {
         MediaArticle,
-        Toast,
         RevealModal
     },
 
     mixins: [
         cdnPrefixMixin,
-        cKEditor
+        cKEditor,
+        toastMixin
     ],
 
     props: {
@@ -59,7 +59,7 @@ export default {
 
     computed: {
 
-        
+
 
     },
 
@@ -86,7 +86,6 @@ export default {
          *
          */
         getThread () {
-
             this.isProcessing = true;
 
             // Short-circuit if no thread ID
@@ -128,8 +127,8 @@ export default {
 
             }).catch((error) => {
                 this.isInitialLoad = false;
-                this.$refs.toast.activate('Unable to load comments');
-                this.$refs.toast.timeout('Unable to load comments', false);
+                this.toastActivate('Unable to load comments');
+                this.toastError('Unable to load comments');
             }).finally(() => {
                 if (this.isInitialLoad) {
                     // Anchored? go to the element once the component has been loaded
@@ -146,13 +145,13 @@ export default {
         /**
          * The threads 'Allow Comments' has been toggled
          *
-         * @param {event} to determine the status
+         * @param {event} event  To determine the status
          */
         changeThreadStatus (event) {
+            let changeThreadStatusAction;
 
             this.isThreadEnabled = event.target.checked;
 
-            let changeThreadStatusAction;
             if (this.threadId) {
                 // I already have a thread ID: switch it on/off
                 changeThreadStatusAction = new Promise((resolve, reject) => {
@@ -167,7 +166,7 @@ export default {
                     axios.put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders }).then(() => {
                         resolve();
                     }).catch(function (error) {
-                        reject(error);
+                        reject(error ?? '');
                     });
                 });
             } else {
@@ -182,22 +181,20 @@ export default {
                             this.threadId = response.data.id;
                             resolve();
                         })
-                        .catch(() => {
-                            reject(error);
+                        .catch(function (error) {
+                            reject(error ?? '');
                         });
                 });
             }
 
             // Actually run the promise, setting the toast accordingly
-            this.$refs.toast.activate('Saving...');
             changeThreadStatusAction
                 .then(() => {
-                    this.$refs.toast.timeout('Saved', true);
                 })
                 .catch((error) => {
-                    this.$refs.toast.timeout('Unable to save', false);
+                    this.toastActivate('Saving...');
+                    this.toastError('Unable to save');
                 });
-
         },
 
         /**
@@ -212,9 +209,8 @@ export default {
          *
          */
         postComment () {
-
             this.isProcessing = true;
-            this.$refs.toast.activate('Posting comment...');
+            this.toastActivate('Posting comment...');
 
             axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
                 content: this.newComment
@@ -226,11 +222,11 @@ export default {
                 this.newComment = '';
                 CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
 
-                this.$refs.toast.timeout('Comment has been added', true);
+                this.toastSuccess('Comment has been added');
 
             }).catch((error) => {
                 this.isProcessing = false;
-                this.$refs.toast.timeout('Unable to post comment', false);
+                this.toastError('Unable to post comment');
             }).finally(() => {
                 this.isProcessing = false;
             });
@@ -255,9 +251,8 @@ export default {
          * @param {event} to determine the status
          */
         deleteComment () {
-
             this.isProcessing = true;
-            this.$refs.toast.activate('Deleting comment...');
+            this.toastActivate('Deleting comment...');
 
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
 
@@ -274,21 +269,20 @@ export default {
 
                 this.$refs.deleteModal.close();
 
-                this.$refs.toast.timeout('Comment deleted', true);
+                this.toastSuccess('Comment deleted');
                 this.isProcessing = false;
 
             }).catch((error) => {
-                this.$refs.toast.timeout('Unable to delete comment', false);
+                this.toastError('Unable to delete comment');
                 this.isProcessing = false;
             });
-
         },
 
         /**
-         * Return the date from now, 
+         * Return the date from now,
          *
-         * @param { Date } 
-         * 
+         * @param { Date }
+         *
          * @returns { String } ie: 2 hours ago
          */
         fromNow (date) {
@@ -298,8 +292,8 @@ export default {
         /**
          * Dispaly the full date
          *
-         * @param { Date } 
-         * 
+         * @param { Date }
+         *
          * @returns { String }
          */
         fullString (date) {
@@ -382,7 +376,7 @@ export default {
                 </template>
             </div>
         </section>
-        <toast ref="toast"></toast>
+        <div id='toaster' class="toast" data-toast></div>
         <reveal-modal ref="deleteModal">
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this comment?</p>
