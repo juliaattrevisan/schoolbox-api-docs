@@ -86,8 +86,6 @@ export default {
          *
          */
         getThread () {
-            let self = this;
-
             this.isProcessing = true;
 
             // Short-circuit if no thread ID
@@ -129,8 +127,8 @@ export default {
 
             }).catch((error) => {
                 this.isInitialLoad = false;
-                self.toastActivate('Unable to load comments');
-                self.toastError('Unable to load comments');
+                this.toastActivate('Unable to load comments');
+                this.toastError('Unable to load comments');
             }).finally(() => {
                 if (this.isInitialLoad) {
                     // Anchored? go to the element once the component has been loaded
@@ -150,7 +148,6 @@ export default {
          * @param {event} event  To determine the status
          */
         changeThreadStatus (event) {
-            let self = this;
             let changeThreadStatusAction;
 
             this.isThreadEnabled = event.target.checked;
@@ -195,8 +192,8 @@ export default {
                 .then(() => {
                 })
                 .catch((error) => {
-                    self.toastActivate('Saving...');
-                    self.toastError('Unable to save');
+                    this.toastActivate('Saving...');
+                    this.toastError('Unable to save');
                 });
         },
 
@@ -212,9 +209,8 @@ export default {
          *
          */
         postComment () {
-            let self = this;
             this.isProcessing = true;
-            self.toastActivate('Posting comment...');
+            this.toastActivate('Posting comment...');
 
             axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
                 content: this.newComment
@@ -226,11 +222,11 @@ export default {
                 this.newComment = '';
                 CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
 
-                self.toastSuccess('Comment has been added');
+                this.toastSuccess('Comment has been added');
 
             }).catch((error) => {
                 this.isProcessing = false;
-                self.toastError('Unable to post comment');
+                this.toastError('Unable to post comment');
             }).finally(() => {
                 this.isProcessing = false;
             });
@@ -255,9 +251,8 @@ export default {
          * @param {event} to determine the status
          */
         deleteComment () {
-            let self = this;
             this.isProcessing = true;
-            self.toastActivate('Deleting comment...');
+            this.toastActivate('Deleting comment...');
 
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
 
@@ -274,11 +269,11 @@ export default {
 
                 this.$refs.deleteModal.close();
 
-                self.toastSuccess('Comment deleted');
+                this.toastSuccess('Comment deleted');
                 this.isProcessing = false;
 
             }).catch((error) => {
-                self.toastError('Unable to delete comment');
+                this.toastError('Unable to delete comment');
                 this.isProcessing = false;
             });
         },
