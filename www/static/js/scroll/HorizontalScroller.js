@@ -1,7 +1,7 @@
 
 /**
  * A horizontal scroll container that uses GSAP's Draggable 
- * Handy for when there's more to display that what horizontal space will allow
+ * Handy for when there's more to display than what horizontal space will allow
  */
 
 

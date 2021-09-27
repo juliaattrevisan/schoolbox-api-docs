@@ -7,7 +7,7 @@
 import { gsap } from 'gsap/all';
 import BadgeImage from '../../vue/badge-image';
 import { getIndex } from '@js/util/domUtils';
-import HorizontalScroller from '@js/scroll/horizontalScroller';
+import HorizontalScoller from '@vue/components/scroll/horizontal-scoller';
 
 const BADGE_ANIMATE_DURATION = 0.3;
 
@@ -15,6 +15,7 @@ export default {
     
     components: {
         BadgeImage,
+        HorizontalScoller,
     },
 
     props: {
@@ -69,21 +70,7 @@ export default {
 
     },
 
-    mounted () {
-        this.initHorizontalScroller();
-    },
-
     methods: {
-
-        /**
-         * To horizontally scroll the badge list
-         */
-        initHorizontalScroller () {
-            if (this.hasBadges) { //only if there's badges to show
-                this.horizontalScroller = new HorizontalScroller(this.$el.querySelector('[data-scroller]')); 
-            }
-            
-        },
 
         /**
          * Open the selected award detail modal
@@ -187,41 +174,29 @@ export default {
             </div>
         </div>
         <div class="student__badges">
-            <div v-if="hasBadges" class="scroller-container" data-scroller>
-                <div class="scroller-button-container">
-                    <button class="scroller-button" data-scroller-previous-button>&lt;</button>
-                </div>
-                <div class="scroller-flex-container">
-                    <div class="scroller-outer-container" data-scroller-outer-container>
-                        <transition-group
-                            tag="ul"
-                            class="scroller-inner-container"
-                            data-scroller-inner-container
-                            :css="false"
-                            @before-enter="onBeforeEnter"
-                            @enter="onEnter"
-                            @before-leave="onBeforeLeave" 
-                            @leave="onLeave" 
-                            @after-leave="onAfterLeave" 
-                        >      
-                            <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
-                                <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
-                                    <div class="card-feature-image">
-                                        <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
-                                    </div>
-                                    <div class="card-content">
-                                        <p>{{ award.badge.name }}</p>
-                                    </div>
-                                </a>
-                            </li>
-                        </transition-group>
-                        <div class="scroller-bar" data-scroller-scroll-bar></div>
-                    </div>
-                </div>
-                <div class="scroller-button-container">
-                    <button class="scroller-button" data-scroller-next-button>&gt;</button>
-                </div>
-            </div>
+            <horizontal-scoller v-if="hasBadges">
+                <transition-group
+                    tag="ul"
+                    data-scroller-inner-container
+                    :css="false"
+                    @before-enter="onBeforeEnter"
+                    @enter="onEnter"
+                    @before-leave="onBeforeLeave" 
+                    @leave="onLeave" 
+                    @after-leave="onAfterLeave" 
+                >      
+                    <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
+                        <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
+                            <div class="card-feature-image">
+                                <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
+                            </div>
+                            <div class="card-content">
+                                <p>{{ award.badge.name }}</p>
+                            </div>
+                        </a>
+                    </li>
+                </transition-group>
+            </horizontal-scoller>
             <div v-else class="empty-state">
                 <i class="icon-badge"></i>
                 <p>No badges to display.</p>
@@ -287,52 +262,6 @@ $collapseStudent: 1000px;
     }
 }
 
-.scroller-container {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-around;
-    height: $rowHeight;
-}
-
-.scroller-button-container {
-    flex: 0 0 50px;
-    height: 100%;
-    @media (max-width: $collapseStudent) {
-        display: none;
-    }
-}
-
-.scroller-button {
-    width: 100%;
-    height: 100%;
-    margin: 0px auto;
-    background: none;
-    font-weight: bold;
-    font-size: 1.5rem;
-    color: #4f4f4f;
-}
-
-.scroller-flex-container {
-    flex: 1 1 auto;
-    height: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.scroller-outer-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.scroller-inner-container {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
 .card-feature-image {
     position: relative;
     padding: 0.25rem 0.5rem;
@@ -364,15 +293,6 @@ $collapseStudent: 1000px;
         line-height: 1rem;
         white-space: normal;
     }
-}
-
-.scroller-bar {
-    position: absolute;
-    left: 5px;
-    bottom: 0px;
-    width: 120px; //will be updated relative to scroll amount by horizontalScoller.js
-    height: 4px;
-    background: $content-ui-foreground;
 }
 
 </style>
