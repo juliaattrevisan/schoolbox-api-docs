@@ -1,0 +1,32 @@
+<h1>LTI Prototype Platform</h1>
+
+<h2>Generate a resource link launch request</h2>
+
+<form method="get" action="{{ routeLookup('ltiPrototypePlatform.getGenerateResourceLinkRequest') }}">
+    <dl>
+        <dt><label for="targetLinkUri">Target Link URI</label></dt>
+        <dd><input readonly
+                   id="targetLinkUri"
+                   name="targetLinkUri"
+                   value="{{ targetLinkUri }}"></dd>
+
+        <dt><label for="loginHint">Login Hint (a username)</label></dt>
+        <dd>
+            <select id="loginHint" name="loginHint">
+                <option value="{{ USER.username }}" selected>{{ USER.username }} ({{ USER.fullname }}: current user)</option>
+                <option value="xxxxx">xxxxx (non-existent user)</option>
+                <optgroup label="Staff">
+                    {% for user in staffUsers %}
+                    <option value="{{ user.username }}">{{ user.username }} ({{ user.fullname }})</option>
+                    {% endfor %}
+                </optgroup>
+                <optgroup label="Students">
+                    {% for user in studentUsers %}
+                        <option value="{{ user.username }}">{{ user.username }} ({{ user.fullname }})</option>
+                    {% endfor %}
+                </optgroup>
+            </select>
+        </dd>
+    </dl>
+    <button type="submit">Generate resource link launch request</button>
+</form>
