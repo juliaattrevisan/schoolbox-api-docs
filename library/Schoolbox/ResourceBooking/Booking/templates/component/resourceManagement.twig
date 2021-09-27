@@ -43,7 +43,7 @@
                 <li>
                     <div class="card small-12">
                         <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
-                            {% if item.resource.image.hash %}
+                            {% if item.resource.image.hash is defined and item.resource.image.hash %}
                                 <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
                             {% else %}
                                 {# this icon needs to be responsive to screen size #}
