@@ -35,7 +35,7 @@ class AssessmentType implements IType
     const TYPE_DUE_WORK = 'dueWork';
     const TYPE_TASK = 'task';
     const TYPE_QUIZ = 'quiz';
-    const TYPE_LTI_ASSESSMENT = 'ltiAssessment';
+    const TYPE_LTI_ASSESSMENT = 'lti';
 
     use TypeTrait;
 

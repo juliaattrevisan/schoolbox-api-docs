@@ -173,7 +173,7 @@
                         {% for type in types %}
                         <div class="column small-12 medium-6{%  if loop.last %} end{% endif %}">
                             <input type="radio" name="type" value="{{ type.value }}" id="{{ type.id }}" data-radio-block />
-                            <label title="{{ type.title }}" for="{{ type.id }}" class="block"><i class="icon-{{ type.label|replace({' ': '-'})|lower }}"></i>{{ type.label }}</label>
+                            <label title="{{ type.title }}" for="{{ type.id }}" class="block"><i class="icon-{{ type.icon }}"></i>{{ type.label }}</label>
                         </div>
                         {% endfor %}
                         <div class="column small-12 medium-12 error-placeholder"></div>

@@ -408,6 +408,7 @@ class Module extends BaseModule
         $injector->set("$basename/$p", $injector->lazyNew(Assessment\Project\Controller::class));
         $injector->set("$basename/$q", $injector->lazyNew(Assessment\Quiz\Controller::class));
         $injector->set("$basename/$t", $injector->lazyNew(Assessment\Task\Controller::class));
+        $injector->set("$basename/" . AssessmentType::TYPE_LTI_ASSESSMENT, $injector->lazyNew(Assessment\Lti\Controller::class));
     }
 
     /* Getters / Setters
