@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\LTI\Assessment\Model as LtiAssessment;
 
 /**
  * Encapsulates the mapping between Assessment Types and:
@@ -34,6 +35,7 @@ class AssessmentType implements IType
     const TYPE_DUE_WORK = 'dueWork';
     const TYPE_TASK = 'task';
     const TYPE_QUIZ = 'quiz';
+    const TYPE_LTI_ASSESSMENT = 'ltiAssessment';
 
     use TypeTrait;
 
@@ -53,6 +55,8 @@ class AssessmentType implements IType
             return self::TYPE_TASK;
         } elseif ($assessment instanceof Quiz) {
             return self::TYPE_QUIZ;
+        } elseif ($assessment instanceof LtiAssessment) {
+            return self::TYPE_LTI_ASSESSMENT;
         }
         throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessment));
     }
@@ -67,9 +71,9 @@ class AssessmentType implements IType
      */
     public static function stringToObject($stringVal, AssessmentContext $context = null)
     {
-        if (self::TYPE_PROJECT == $stringVal) {
+        if (self::TYPE_PROJECT === $stringVal) {
             return (new Project())->setContext($context);
-        } elseif (self::TYPE_DUE_WORK == $stringVal) {
+        } elseif (self::TYPE_DUE_WORK === $stringVal) {
             $object = (new DueWork())->setContext($context);
 
             if ($context) {
@@ -77,10 +81,12 @@ class AssessmentType implements IType
             }
 
             return $object;
-        } elseif (self::TYPE_TASK == $stringVal) {
+        } elseif (self::TYPE_TASK === $stringVal) {
             return (new Task())->setContext($context);
-        } elseif (self::TYPE_QUIZ == $stringVal) {
+        } elseif (self::TYPE_QUIZ === $stringVal) {
             return (new Quiz())->setContext($context);
+        } elseif (self::TYPE_LTI_ASSESSMENT === $stringVal) {
+            return (new LtiAssessment())->setContext($context);
         }
 
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
@@ -100,6 +106,7 @@ class AssessmentType implements IType
             self::TYPE_DUE_WORK,
             self::TYPE_TASK,
             self::TYPE_QUIZ,
+            self::TYPE_LTI_ASSESSMENT,
         ];
     }
 }
