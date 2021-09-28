@@ -287,7 +287,6 @@ export default {
 
 .modal-actions {
 	display: flex;
-    margin-bottom: 1rem;
 	a {
 		margin: 0 1px;
 	}

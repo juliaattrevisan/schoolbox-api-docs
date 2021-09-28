@@ -262,7 +262,7 @@ $collapseStudent: 1000px;
     .student__portrait-and-name {
         display: flex;
         align-items: flex-start;
-        width: 260px;
+        width: 240px;
         padding-bottom: 0;
         @media (max-width: $collapseStudent) {
             margin-bottom: 1rem;
@@ -274,7 +274,7 @@ $collapseStudent: 1000px;
         }
 
     .student__badges {
-        width: calc(100% - 300px); //minus the checkbox and name
+        width: calc(100% - 280px); //minus the checkbox and name
         @media (max-width: $collapseStudent) {
             width: 100%;
         }

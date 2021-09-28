@@ -276,7 +276,6 @@ export default {
             if (newSelectedBadges.length !== oldSelectedBadges.length) { //if the number of badges has changed
                 setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
                     this.hasContentChange = true; 
-                    console.warn('check change');
                     this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
                 }, 400);
             }
@@ -441,18 +440,21 @@ export default {
 }
 
     .selected-container__count {
-        width: 220px;
-        margin: 0;
+        margin-right: 1rem;
+        @media (max-width: 800px) {
+            font-size: 0.8rem;
+        }
     }
 
     .selected-container__badges {
-        width: calc(100% - 220px); //minus the count
+        flex: 1 1 auto; //fill up all the space that __count doesn't occupy 
+        min-width: 50%; //and don't get too small when shrunk down
     }
 
 .selected-badges__item {
-    transition: all 0.3s;
     display: inline-block;
     margin: 0px 5px;
+    transition: all 0.3s;
 }
 
 .selected-badges-enter, 

@@ -74,7 +74,7 @@ export default {
 .bottom-drawer-container {
     position: fixed;
     width: 100%; //will be updated by the width data prop
-    height: 120px;
+    height: auto;
     left: 0px; //will be updated by the left data prop
     bottom: 0px;
     padding: 1rem;
