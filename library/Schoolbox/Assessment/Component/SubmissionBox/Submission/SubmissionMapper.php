@@ -67,6 +67,7 @@ class SubmissionMapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [ $this, 'restoreSubmissionFiles']);
     }
 
 
@@ -254,6 +255,22 @@ class SubmissionMapper extends BaseMapper
         $submissionFileMapper = $this->getJoinMapper('files');
         $files = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
         $submissionFileMapper->delete($files);
+    }
+
+
+    /**
+     * Restore all Files for the specified Submission
+     *
+     * @param Submission $submission
+     * @return bool
+     */
+    public function restoreSubmissionFiles(Submission $submission): bool
+    {
+        /** @var SingleFile\Mapper $submissionFileMapper */
+        $submissionFileMapper = $this->getJoinMapper('files');
+        $files                = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId(), ['deleted' => true]);
+        $submissionFileMapper->restoreSoftDeleted($files);
+        return true;
     }
 
 

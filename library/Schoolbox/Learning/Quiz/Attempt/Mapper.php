@@ -79,6 +79,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
     }
 
 
@@ -133,6 +134,22 @@ class Mapper extends BaseMapper
         $quizAnswerMapper = $this->getJoinMapper('answers');
         // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
         $quizAnswerMapper->deleteByColumn('attempt_id', $attempt->getId());
+        return true;
+    }
+
+
+    /**
+     * Restore all Answers in the specified Attempt
+     *
+     * @param Model $attempt
+     * @return true
+     */
+    public function restoreAnswers(Model $attempt): bool
+    {
+        /** @var Answer\Mapper $quizAnswerMapper */
+        $quizAnswerMapper = $this->getJoinMapper('answers');
+        $answers          = $quizAnswerMapper->findByColumnList(['attempt_id' => $attempt->getId()], ['deleted' => true]);
+        $quizAnswerMapper->restoreSoftDeleted($answers);
         return true;
     }
 

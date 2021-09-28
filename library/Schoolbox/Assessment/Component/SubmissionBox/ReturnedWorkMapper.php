@@ -96,6 +96,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreReturnedWorkFiles']);
     }
 
     /**
@@ -171,6 +172,22 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $returnedWorkFileMapper = $this->getJoinMapper('files');
         $files                  = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
         $returnedWorkFileMapper->delete($files);
+    }
+
+
+    /**
+     * Restore all Files for the specified Return
+     *
+     * @param ReturnedWork $return
+     * @return bool
+     */
+    public function restoreReturnedWorkFiles(ReturnedWork $return): bool
+    {
+        /** @var ReturnedWork\SingleFile\Mapper $returnedWorkFileMapper */
+        $returnedWorkFileMapper = $this->getJoinMapper('files');
+        $files                  = $returnedWorkFileMapper->findByColumn('submission_return_id', $return->getId(), ['deleted' => true]);
+        $returnedWorkFileMapper->restoreSoftDeleted($files);
+        return true;
     }
 
 
