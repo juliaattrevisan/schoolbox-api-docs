@@ -79,17 +79,20 @@ class Controller extends Base
             /* Turnitin finished processing our upload
              */
             case self::SUBMISSION_COMPLETE:
-                $this->postUploadComplete(); break;
+                $this->postUploadComplete();
+                break;
 
             /* Turnitin finished generating a report
              */
             case self::SIMILARITY_COMPLETE:
-                $this->postReportComplete(); break;
+                $this->postReportComplete();
+                break;
 
             /* User updated a report through the turnitin interface
              */
             case self::SIMILARITY_UPDATED:
-                $this->postReportUpdated(); break;
+                $this->postReportUpdated();
+                break;
 
             /* Unknown header; do nothing
              */
