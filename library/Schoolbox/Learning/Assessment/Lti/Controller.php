@@ -17,7 +17,9 @@ class Controller extends Assessment\Controller
 {
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
-        return [];
+        return [
+            'acceptingResponses' => true,
+        ];
     }
 
     public function getStatus(IAssessable $assessment)
