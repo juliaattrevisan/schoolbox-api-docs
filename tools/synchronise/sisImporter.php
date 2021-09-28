@@ -30,12 +30,10 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *   sis_timetable_cycle
  *   sis_timetable_period
  */
-$app = new class extends CliTool\App
-{
+$app = new class extends CliTool\App {
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
-
 
     /**
      * --file
@@ -43,7 +41,6 @@ $app = new class extends CliTool\App
      * Load xml contents from a file path specified by this arg
      */
     private const OPT_LONG_FILE = 'file:';
-
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -53,7 +50,6 @@ $app = new class extends CliTool\App
             self::OPT_LONG_FILE
         ];
     }
-
 
     /**
      * Execute each strat in the composite
@@ -87,12 +83,13 @@ HELP;
          * to Hourly to facilitate this behaviour; check ValidScheduleExecution
          * for the logic)
          */
-        $host = $this->getConfig()->get('schooldata_import_endpoint_host');
-        $key = $this->getConfig()->get('schooldata_import_endpoint_key');
-        $frequency = Endpoint\Scheduler::HOURLY;
+        $host        = $this->getConfig()->get('schooldata_import_endpoint_host');
+        $key         = $this->getConfig()->get('schooldata_import_endpoint_key');
+        $frequency   = Endpoint\Scheduler::HOURLY;
         $customHours = [];
-        $type = $this->getConfig()->get('schooldata_import_data_source');
-        $file = $this->getOpt(self::OPT_LONG_FILE);
+        $type        = $this->getConfig()->get('schooldata_import_data_source');
+        $file        = $this->getOpt(self::OPT_LONG_FILE);
+        $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
@@ -105,6 +102,36 @@ You haven't specified a SUDS Data Source in Admin.
 NULLTYPE;
             exit;
         }
+
+        /* SUDS imports can take a notoriously long time to complete based on sis etc.
+         * and the instances could start up a new import before the existing one
+         * has even finished. If you can't reserve this, then abort.
+         */
+        $lock = $this->acquireLock(Endpoint\Scheduler::LOCK_NAME, $timeout);
+
+        if (!$lock->isAcquired()) {
+            exit(1);
+        }
+
+        /* SUDS imports sometimes take multiple hours to finish, even when they're
+         * not supposed to; we would normally implement a $lock->refresh() instead
+         * so that we're continually reserving an extra chunk of time while we're
+         * still working. But that would mean shoving a $lock down into the Endpoint
+         * Factory as an extra var, affecting the entire SUDS family.
+         *
+         * For now, we can presume a maximum execution time in case this process
+         * continues for too long. This implementation needs to change if you
+         * implement the $lock->refresh() as that has a very different meaning
+         */
+        $this->setMaxExecutionTime($timeout);
+
+        /* Announce some basic details
+         */
+        $this->getLogger()->debug(sprintf(
+            'Locking %s seconds for processing; max execution time is %s seconds',
+            $timeout,
+            $timeout
+        ));
 
         /* Accept perform param from opts
          */
@@ -130,6 +157,12 @@ NULLTYPE;
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+
+        /* Announce lock release
+          */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
     }
 };
 

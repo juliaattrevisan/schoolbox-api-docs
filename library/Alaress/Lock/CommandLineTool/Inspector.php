@@ -14,6 +14,7 @@ use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\Uploader;
@@ -50,6 +51,7 @@ class Inspector extends CliTool\App
         AttachmentUploader::LOCK_NAME => 'Pastoral Attachment Uploader (./tools/docman/pastoral-upload.php)',
         Processor::LOCK_NAME          => 'Video Processor (./tools/video/processor.php)',
         Manager::LOCK_NAME            => 'Image Processor (./tools/image/processor.php)',
+        Scheduler::LOCK_NAME          => 'SUDS On-Demand Importer (./tools/synchronise/sisImporter.php) and SUDS Automated Scheduler (./tools/synchronise/scheduler.php)',
     ];
 
 
