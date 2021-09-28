@@ -188,7 +188,7 @@ class Controller extends Base
                 // The attachment was found in the database, remove it
                 $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                 $this->getBlogImageMapper()->delete($attachment);
-            } elseif ($attachment->isDeleted()) {
+            } elseif ($foundAttachment && $attachment->isDeleted()) {
                 // The attachment was found but deleted in the database. Restore it
                 $attachment->setDeletedAt();
                 $this->getBlogImageMapper()->save($attachment);
