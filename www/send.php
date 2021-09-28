@@ -77,7 +77,7 @@ if (is_numeric($_GET['id'])) {
     /** @var Storage $storage */
     $storage      = $file->getStorage();
     $fileSystem   = $storage->getFilesystem();
-    $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
+    $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
 
     if (
         $fileSystem instanceof Flysystem\Filesystem

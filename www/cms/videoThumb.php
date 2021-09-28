@@ -104,7 +104,7 @@ if (isset($type, $id)) {
                     $videoQueue->getStorage()->setMimetype(new Mimetype()),
                     Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
                     $imageFilename,
-                    'private',
+                    ['private', 'must-revalidate'],
                     PreSignedUrlService::DISPOSITION_INLINE,
                     $mimeType,
                     // In the event a user selects 'save as', derive hinted filename from original video name + transcode size
