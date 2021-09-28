@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\Calendar\Events\Module as AssessmentCalendarEv
 use Schoolbox\Learning\Assessment\Calendar\Module as AssessmentCalendarModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbackFileModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Module as TurnitinModule;
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
@@ -100,5 +101,13 @@ class Learning extends ModuleLoader
                 "/{$namespace}/assessment/calendar/events"
             );
         }
+
+        /* Turnitin webhook controller
+         *
+         * TODO optional load
+         *  make webhooks accessible if your turnitin configuration exists
+         *  and based on plan availability settings?
+         */
+        $this->loadModule($kernel, TurnitinModule::class, "/{$namespace}/turnitin");
     }
 }
