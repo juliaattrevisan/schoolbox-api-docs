@@ -137,6 +137,17 @@ abstract class AbstractCsvImporterFactory
         $isLastRowNewCap = false;
         $levelCount      = count($levels);
         while ($row = $this->readCsvLine($fp, $maxLevels)) {
+            /* If the $row is just a bunch of zero-length strings, there's no meaningful data here
+             * Just skip it, instead of trying to process empty rows somehow "intuitively"
+             */
+            $trimmedRow = array_filter($row, static function ($element) {
+                return '' !== (string)$element;
+            });
+
+            if (!\count($trimmedRow)) {
+                continue;
+            }
+
             if ($isLastRowNewCap) {
                 $capMaxValue     = $row[0];
                 $isLastRowNewCap = false;
