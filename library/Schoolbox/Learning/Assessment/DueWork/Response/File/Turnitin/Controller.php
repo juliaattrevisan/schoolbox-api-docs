@@ -83,51 +83,16 @@ class Controller extends Base
      */
     public function postUploadComplete(): void
     {
+        $currentFunction = __FUNCTION__;
+
         /* Only accept the SUBMISSION_COMPLETE header
          */
-        if (self::SUBMISSION_COMPLETE !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
-            throw new \DomainException(sprintf(
-                'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
-                'postUploadComplete',
-                self::HEADER_EVENT_TYPE,
-                $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)
-            ));
-        }
-
-        /* Receive payloads and start digging through its guts
-         */
-        $rawPayload = file_get_contents('php://input');
-
-        try {
-            $payload = json_decode($rawPayload, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            throw new \RuntimeException(sprintf(
-                'Turnitin send %s json payload but we cannot decode it: %s',
-                'postUploadComplete',
-                $rawPayload
-            ));
-        }
-
-        /* If you got this far you should have a payload that you can use
-         * Dig out the submission identifier
-         */
-        $turnitinSubmissionId = $payload['id'];
-
-        /* Find the corresponding report, if it exists
-         */
-        try {
-            $model = $this->turnitinMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new \RuntimeException(sprintf(
-                'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
-                $turnitinSubmissionId
-            ));
-        }
+        $data = $this->generateModelAndPayload(self::SUBMISSION_COMPLETE, $currentFunction, 'id');
 
         /* If we found it, tell turnitin to make a report for it
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->getReportInfo($model);
+        (new Process\Report($this->produceApi(), $this->turnitinMapper))->getReportInfo($data['model']);
     }
 
 
@@ -139,55 +104,16 @@ class Controller extends Base
      */
     public function postReportComplete(): void
     {
+        $currentFunction = __FUNCTION__;
+
         /* Only accept the SIMILARITY_COMPLETE header
          */
-        if (self::SIMILARITY_COMPLETE !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
-            throw new \DomainException(sprintf(
-                'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
-                'postReportComplete',
-                self::HEADER_EVENT_TYPE,
-                $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)
-            ));
-        }
-
-        /* Receive payloads and start digging through its guts
-         */
-        $rawPayload = file_get_contents('php://input');
-
-        try {
-            $payload = json_decode($rawPayload, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            throw new \RuntimeException(sprintf(
-                'Turnitin send %s json payload but we cannot decode it: %s',
-                'postUploadComplete',
-                $rawPayload
-            ));
-        }
-
-        /* If you got this far you should have a payload that you can use
-         * Dig out the submission identifier
-         *
-         * Note that the submission identifier is different here than in
-         * postUploadComplete! All you copypasta nerds (including me) be
-         * careful pls, don't mass pasta without checking the spec first
-         */
-        $turnitinSubmissionId = $payload['submission_id'];
-
-        /* Find the corresponding report, if it exists
-         */
-        try {
-            $model = $this->turnitinMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new \RuntimeException(sprintf(
-                'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
-                $turnitinSubmissionId
-            ));
-        }
+        $data = $this->generateModelAndPayload(self::SIMILARITY_COMPLETE, $currentFunction, 'submission_id');
 
         /* If we found it, tell turnitin to save some data locally
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($model, $payload);
+        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($data['model'], $data['payload']);
     }
 
 
@@ -199,12 +125,42 @@ class Controller extends Base
      */
     public function postReportUpdated(): void
     {
+        $currentFunction = __FUNCTION__;
+
         /* Only accept the SIMILARITY_UPDATED header
          */
-        if (self::SIMILARITY_UPDATED !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
+        $data = $this->generateModelAndPayload(self::SIMILARITY_UPDATED, $currentFunction, 'submission_id');
+
+        /* If we found it, tell turnitin to save some data locally
+         * Everything after here is kind of a rip from the cli tools
+         */
+        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($data['model'], $data['payload']);
+    }
+
+
+    /**
+     * Generate the local $model instance and the turnitin payload for usage
+     * This turned out to be common across all the webhooks, so condense it
+     * all into a SPOC and use that instead
+     *
+     * $currentFunction is used for error reporting into sentry so you can tell
+     * which webhook went awry
+     *
+     * @param string $headerKey
+     * @param string $currentFunction
+     * @param string $submissionIdentifierKey
+     * @return array
+     * @throws \DomainException
+     * @throws \RuntimeException
+     */
+    private function generateModelAndPayload(string $headerKey, string $currentFunction, string $submissionIdentifierKey): array
+    {
+        /* Only accept a specific header
+         */
+        if ($headerKey !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
             throw new \DomainException(sprintf(
                 'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
-                'postReportUpdated',
+                $currentFunction,
                 self::HEADER_EVENT_TYPE,
                 $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)
             ));
@@ -231,7 +187,7 @@ class Controller extends Base
          * postUploadComplete! All you copypasta nerds (including me) be
          * careful pls, don't mass pasta without checking the spec first
          */
-        $turnitinSubmissionId = $payload['submission_id'];
+        $turnitinSubmissionId = $payload[$submissionIdentifierKey];
 
         /* Find the corresponding report, if it exists
          */
@@ -244,10 +200,10 @@ class Controller extends Base
             ));
         }
 
-        /* If we found it, tell turnitin to save some data locally
-         * Everything after here is kind of a rip from the cli tools
-         */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($model, $payload);
+        return [
+            'model' => $model,
+            'payload' => $payload
+        ];
     }
 
 
