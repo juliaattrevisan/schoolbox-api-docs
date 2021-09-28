@@ -195,10 +195,11 @@ class Module extends BaseModule
     {
         // TODO centralise this into a factory
         $map = [
-            AssessmentType::TYPE_DUE_WORK => Assessment\DueWork\Controller::class,
-            AssessmentType::TYPE_PROJECT  => Assessment\Project\Controller::class,
-            AssessmentType::TYPE_QUIZ     => Assessment\Quiz\Controller::class,
-            AssessmentType::TYPE_TASK     => Assessment\Task\Controller::class,
+            AssessmentType::TYPE_DUE_WORK       => Assessment\DueWork\Controller::class,
+            AssessmentType::TYPE_PROJECT        => Assessment\Project\Controller::class,
+            AssessmentType::TYPE_QUIZ           => Assessment\Quiz\Controller::class,
+            AssessmentType::TYPE_TASK           => Assessment\Task\Controller::class,
+            AssessmentType::TYPE_LTI_ASSESSMENT => Assessment\Lti\Controller::class,
         ];
 
         // set the controller class for later
