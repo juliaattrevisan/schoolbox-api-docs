@@ -25,10 +25,17 @@ class Controller extends Base
 {
 
     /**
+     * @var Mapper
+     */
+    private Mapper $turnitinMapper;
+
+
+    /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(Mapper $turnitinMapper)
     {
+        $this->turnitinMapper = $turnitinMapper;
     }
 
 
@@ -37,6 +44,8 @@ class Controller extends Base
      */
     public function getUploadComplete(): void
     {
+        $api = $this->produce();
+
         new \Alaress_Probe('Webhook: submission completed');
     }
 
@@ -46,6 +55,41 @@ class Controller extends Base
      */
     public function getReportComplete(): void
     {
+        $api = $this->produce();
+
         new \Alaress_Probe('Webhook: report completed');
+    }
+
+
+    /**
+     * Check whether turnitin configuration was provided. If it wasn't provided
+     * then we can't/shouldn't process anything
+     *
+     * You don't have access to getConfigLoader() in the constructor so you can't
+     * exit any earlier than this, afaict
+     *
+     * @return Api
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     */
+    private function produce(): Api
+    {
+        /* This will continually throw exceptions to sentry if someone turns off
+         * turnitin, but turnitin still fires its webhooks
+         *
+         * This could get noisy
+         *
+         * Alternatively, just return null and check for Api instances being
+         * produced in the webhook endpoints above
+         */
+        if (!$this->turnitinMapper->isConfigured()) {
+            throw new \DomainException('Turnitin configuration invalid.');
+        }
+
+        return new Api(
+            $this->getConfigLoader()->get('site_version'),
+            $this->getConfigLoader()->get('turnitin_api_host'),
+            $this->getConfigLoader()->get('turnitin_api_key')
+        );
     }
 }

@@ -14,8 +14,6 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Mapper;
-use Schoolbox\UserMapper;
 
 /**
  * Turnitin Webhooks route through this controller
@@ -67,6 +65,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
+            'turnitinMapper' => $this->getMapperFactory()->getLazy(Mapper::class)
         ];
     }
 }
