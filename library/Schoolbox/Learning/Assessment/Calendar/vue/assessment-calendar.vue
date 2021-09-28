@@ -4,7 +4,6 @@ import FullCalendar       from '@fullcalendar/vue'
 import interactionPlugin  from '@fullcalendar/interaction'
 import dayGridPlugin      from '@fullcalendar/daygrid'
 import timeGridPlugin     from '@fullcalendar/timegrid'
-import momentPlugin       from '@fullcalendar/moment'
 import adaptivePlugin     from '@fullcalendar/adaptive'
 import RevealModal        from '@vue/components/reveal-modal'
 import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
@@ -14,7 +13,9 @@ import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
-
+import dayjs                      from 'dayjs';
+import advancedFormat             from 'dayjs/plugin/advancedFormat';
+import arraySupport               from 'dayjs/plugin/arraySupport';
 
 // Various URLs this calendar can make use of
 const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -132,15 +133,17 @@ export default {
     },
 
     beforeMount () {
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport); //to be able to use an array as a date
         this.resourceTimelineSemester = {
             type: 'resourceTimeline',
             visibleRange: this.determineVisibleRange,
             slotDuration: { weeks: 1 },
             weekNumbers: true,
-            slotLabelFormat: [
-                'MMM',
-                'w'
-            ],
+            // slotLabelFormat: [
+            //     'MMM',
+            //     'w'
+            // ],
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true,
             validRange: {
@@ -149,29 +152,43 @@ export default {
             },
             resourceAreaHeaderContent: 'Week',
             slotMinWidth: '50',
-            titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+            titleFormat: (date) => {
+                const startDate = dayjs(date.start.array).format('MMMM Do');
+                const endDate = dayjs(date.end.array).format('MMMM Do');
+                const endDateYear = dayjs(date.end.array).format('YYYY');
+                return `${startDate} - ${endDate}, ${endDateYear}`;
+            } 
         };
         this.resourceTimelineWeek = {
-            dayHeaderFormat: this.formats.displayWeekDay,
+            dayHeaderFormat: (date) => {
+                return dayjs(date.date.marker).format(this.formats.displayWeekDay);
+            },
             duration: { weeks: 1 },
             slotDuration: { days: 1 },
-            slotLabelFormat: [
-                'ddd DD'
-            ],
+            // slotLabelFormat: [
+            //     'ddd DD'
+            // ],
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true,
-            titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+            titleFormat: (date) => { // will produce something like "July 26th – August 1st, 2021"
+                const startDate = dayjs(date.start.array).format('MMMM Do');
+                const endDate = dayjs(date.end.array).format('MMMM Do');
+                const endDateYear = dayjs(date.end.array).format('YYYY');
+                return `${startDate} - ${endDate}, ${endDateYear}`;
+            } 
         };
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, adaptivePlugin ],
             views: {
                 resourceTimelineSemester: this.resourceTimelineSemester,
                 resourceTimelineWeek: this.resourceTimelineWeek
             },
             initialView: 'resourceTimelineSemester',
             weekText: "''",
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                return dayjs(date.date.marker).format(this.fullCalendarHelper_eventTimeFormat);
+            },
             headerToolbar: {
                 left: 'customToday,customPrev,customNext',
                 center: 'title',
@@ -404,7 +421,7 @@ export default {
                 }
                 element.setAttribute('event-group-id', eventGrouping);
                 element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
-                element.setAttribute('event-group-date', this.fullCalendarHelper_toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
+                element.setAttribute('event-group-date', dayjs(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
             }
         },
 
@@ -629,7 +646,7 @@ export default {
             const termStartDates = Object.values(this.config.termDates).flat().map((row) => {
                 return new Date(row.end);
             });
-            return this.fullCalendarHelper_toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return dayjs(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -641,7 +658,7 @@ export default {
                 return new Date(row.start);
             });
 
-            return this.fullCalendarHelper_toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return dayjs(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -694,10 +711,10 @@ export default {
                 // is displaying.
                 // That's because the start of the view may overlap another
                 // term (see `determineVisibleRange`)
-                let startMoment     = this.fullCalendarHelper_toMoment(start),
-                    endMoment       = this.fullCalendarHelper_toMoment(end),
+                let startMoment     = dayjs(start),
+                    endMoment       = dayjs(end),
                     diff            = endMoment.diff(startMoment, 'day'),
-                    midMoment       = this.fullCalendarHelper_toMoment(start).add(Math.ceil(diff / 2), 'day'),
+                    midMoment       = dayjs(start).add(Math.ceil(diff / 2), 'day'),
                     currentIndex    = this.findTermIndex(midMoment.format('YYYY-MM-DD'));
 
                 // Next:  disable if there is no next term
@@ -706,7 +723,7 @@ export default {
                 nextButton.disabled = (currentIndex === this.allTerms.length - 1);
                 prevButton.disabled = (currentIndex === 0);
                 if (!todayButton.disabled) {
-                    let todayIndex       = this.findTermIndex(this.fullCalendarHelper_toMoment(now).format('YYYY-MM-DD'));
+                    let todayIndex       = this.findTermIndex(dayjs(now).format('YYYY-MM-DD'));
                     todayButton.disabled = (todayIndex === -1);
                 }
             } else {
@@ -929,7 +946,6 @@ export default {
         <view-event-modal
             ref="event"
             return-to="assessmentCalendar"
-            :to-moment="fullCalendarHelper_toMoment"
             :event-create-form-url="urls.createForm"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
@@ -945,7 +961,6 @@ export default {
         />
         <view-grouped-events-modal
             ref="groupedEvents"
-            :to-moment="fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"

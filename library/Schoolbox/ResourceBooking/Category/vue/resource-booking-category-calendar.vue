@@ -89,7 +89,6 @@ export default {
                     //     return [ days, hours ];
                     // },
                     slotMinWidth: '50',
-                    // titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
                     titleFormat: (date) => {
                         const startDate = dayjs(date.start.array).format('MMMM Do');
                         const endDate = dayjs(date.end.array).format('MMMM Do');

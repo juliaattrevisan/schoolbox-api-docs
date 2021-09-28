@@ -3,6 +3,7 @@
 import RevealModal from '@vue/components/reveal-modal'
 import MetaList    from '@vue/components/meta/list'
 import MetaItem    from '@vue/components/meta/item'
+import dayjs       from 'dayjs';
 
 const EVENT_VIEW_WEEK = 'eventViewWeek';
 
@@ -17,7 +18,6 @@ export default {
     },
 
     props: {
-        toMoment: {},
         eventModifyFormUrl: {},
         eventModifyFormActionUrl: {},
         eventUpdateUrl: {},
@@ -84,13 +84,13 @@ export default {
                 return '';
             }
             let format      = allDay ? this.formatDisplayDate : this.formatDisplayDatetime,
-                momentStart = this.toMoment(startDate),
+                momentStart = dayjs(startDate),
                 start       = momentStart.format(format),
                 momentEnd   = null,
                 end         = null;
 
             if (endDate != null) {
-                momentEnd = this.toMoment(endDate);
+                momentEnd = dayjs(endDate);
                 if (allDay) {
                     // Event end dates in FullCalendar are exclusive.
                     // This means that all-day events from the event source
