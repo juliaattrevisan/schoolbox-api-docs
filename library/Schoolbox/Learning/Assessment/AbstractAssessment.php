@@ -408,6 +408,35 @@ abstract class AbstractAssessment implements IAssessable
     }
 
 
+    /**
+     * By default, any instructor may create a response for any participating
+     * student.
+     *
+     * Otherwise, they may create a response for themselves only if the
+     * assessment has a dynamic plan.
+     *
+     * @param User $instructor
+     * @param User $submittedOnBehalfOf
+     * @return bool
+     */
+    public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf)
+    {
+        // Specified student not a participant?
+        $participant = $this->getParticipantIfExtant($submittedOnBehalfOf);
+        if ($participant) {
+            return true;
+        }
+
+        // Is instructor wishing to create response for themselves?
+        if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
+            // If no participation, must be a dynamic plan available
+            return $this->hasDynamicPlan();
+        }
+
+        return false;
+    }
+
+
     /* Traversals
      */
 

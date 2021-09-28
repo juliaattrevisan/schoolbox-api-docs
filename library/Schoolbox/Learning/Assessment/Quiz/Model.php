@@ -272,24 +272,18 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @inheritdoc
+     * Quizzes do not support instructors submitting on behalf of learners:
+     * otherwise, the rules are the same.
+     *
+     * @param User $instructor
+     * @param User $submittedOnBehalfOf
+     * @return bool
      */
     public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf)
     {
-        // Specified student not a participant ?
-        $participant = $this->getParticipantIfExtant($submittedOnBehalfOf);
-
-        // Is instructor wishing to create response for themself?
-        if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
-            // If no participation, must be a dynamic plan available
-            if ($participant) {
-                return true;
-            }
-            return $this->hasDynamicPlan();
+        if (parent::canInstructorCreateResponse($instructor, $submittedOnBehalfOf)) {
+            return $instructor->getId() == $submittedOnBehalfOf->getId();
         }
-
-        // Can instructor SOBO for the learner?
-        // Quiz does not currently support submission-on-behalf-of
         return false;
     }
 
