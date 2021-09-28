@@ -11,8 +11,9 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
-use Schoolbox\LTI\Component\Homepage\Module as LTIComponent;
-use Schoolbox\LTI\Consumer\Module as LTIConsumer;
+use Schoolbox\LTI\Assessment\Component\Homepage\Module as LtiAssessmentComponent;
+use Schoolbox\LTI\Component\Homepage\Module as LtiComponent;
+use Schoolbox\LTI\Consumer\Module as LtiConsumer;
 use Schoolbox\LTI\Prototype\Platform\Module as LtiPrototypePlatform;
 use Schoolbox\LTI\Prototype\Tool\Module as LtiPrototypeTool;
 
@@ -26,9 +27,10 @@ class LTI extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, LTIComponent::class, "/lti");
-        $this->loadModule($kernel, LTIConsumer::class, "/lti-consumer");
+        $this->loadModule($kernel, LtiComponent::class, "/lti");
+        $this->loadModule($kernel, LtiConsumer::class, "/lti-consumer");
         $this->loadModule($kernel, LtiPrototypePlatform::class, "/lti-prototype/platform");
         $this->loadModule($kernel, LtiPrototypeTool::class, "/lti-prototype/tool");
+        $this->loadModule($kernel, LtiAssessmentComponent::class, "/lti-assessment/component");
     }
 }
