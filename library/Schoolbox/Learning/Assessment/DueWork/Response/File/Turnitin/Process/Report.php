@@ -139,24 +139,40 @@ class Report
          * since they no longer have meaning...but is this wise?
          */
         if (null !== $reportInfo) {
-            $this->changeState(
-                $model,
-                sprintf(
-                    'Report %s: generation completed. Overall Match Percentage is %s; setting status to %s',
-                    $model->getId(),
-                    $reportInfo['overall_match_percentage'],
-                    Turnitin\Model::STATUS_COMPLETE
-                ),
-                Turnitin\Model::STATUS_COMPLETE
-            );
-
-            $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
-                ->setStatus(Turnitin\Model::STATUS_COMPLETE)
-                ->setErrorCode(null)
-                ->setErrorMessage(null);
-
-            $this->turnitinMapper->save($model);
+            $this->cacheLocally($model, $reportInfo);
         }
+    }
+
+
+    /**
+     * Turnitin gave us the report details; save some locally
+     * This is used by the cli processor and the webhooks too
+     *
+     * @param Turnitin\Model $model
+     * @param array          $reportInfo
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function cacheLocally(Turnitin\Model $model, array $reportInfo): void
+    {
+        $this->changeState(
+            $model,
+            sprintf(
+                'Report %s: generation completed. Overall Match Percentage is %s; setting status to %s',
+                $model->getId(),
+                $reportInfo['overall_match_percentage'],
+                Turnitin\Model::STATUS_COMPLETE
+            ),
+            Turnitin\Model::STATUS_COMPLETE
+        );
+
+        $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
+            ->setStatus(Turnitin\Model::STATUS_COMPLETE)
+            ->setErrorCode(null)
+            ->setErrorMessage(null);
+
+        $this->turnitinMapper->save($model);
     }
 
 
