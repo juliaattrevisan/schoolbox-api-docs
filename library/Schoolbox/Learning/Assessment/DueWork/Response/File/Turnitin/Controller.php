@@ -25,6 +25,26 @@ class Controller extends Base
 {
 
     /**
+     * The header which turnitin uses to tell us which step it just did
+     */
+    private const HEADER_EVENT_TYPE = 'X-Turnitin-EventType';
+
+
+    /**
+     * The webhook header value for turnitin when it finishes an upload
+     * https://developers.turnitin.com/docs/tca#event-types
+     */
+    private const SUBMISSION_COMPLETE = 'SUBMISSION_COMPLETE';
+
+
+    /**
+     * The webhook header value for turnitin when it finishes a report
+     * https://developers.turnitin.com/docs/tca#event-types
+     */
+    private const SIMILARITY_COMPLETE = 'SIMILARITY_COMPLETE';
+
+
+    /**
      * @var Mapper
      */
     private Mapper $turnitinMapper;
@@ -41,23 +61,51 @@ class Controller extends Base
 
     /**
      * This method fires when Turnitin finishes processing our upload
+     *
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function postUploadComplete(): void
     {
+        /* Only accept the SUBMISSION_COMPLETE header
+         */
+        if (self::SUBMISSION_COMPLETE !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
+            throw new \DomainException(sprintf(
+                'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
+                'postUploadComplete',
+                self::HEADER_EVENT_TYPE,
+                $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)
+            ));
+        }
+
         $api = $this->produce();
 
-        new \Alaress_Probe('Webhook: submission completed');
+        print_r('Webhook: upload completed');
     }
 
 
     /**
      * This method fires when Turnitin finishes processing our report
+     *
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function postReportComplete(): void
     {
+        /* Only accept the SIMILARITY_COMPLETE header
+         */
+        if (self::SIMILARITY_COMPLETE !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
+            throw new \DomainException(sprintf(
+                'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
+                'postReportComplete',
+                self::HEADER_EVENT_TYPE,
+                $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)
+            ));
+        }
+
         $api = $this->produce();
 
-        new \Alaress_Probe('Webhook: report completed');
+        print_r('Webhook: report completed');
     }
 
 
