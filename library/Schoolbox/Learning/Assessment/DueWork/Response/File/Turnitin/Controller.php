@@ -69,6 +69,17 @@ class Controller extends Base
 
     /**
      * Based on the header, decide how to process it
+     *
+     * @throws Exception\BadEndpoint
+     * @throws Exception\Credentials
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postWebhook(): void
     {
