@@ -217,6 +217,7 @@ export default {
                         <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
                             <div class="award__image-container">
                                 <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
+                                <div v-if="award.count > 1" class="award-count" :title="`Awarded ${award.count} times`">x{{ award.count }}</div>
                             </div>
                             <div class="award__title-container">
                                 <p>{{ award.badge.name }}</p>

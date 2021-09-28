@@ -100,7 +100,7 @@ export default {
     },
 
     mounted () {
-        document.addEventListener('badge-report__onFilterChange', this.getStudentData); //the student data is ready
+        document.addEventListener('badge-report__onFilterChange', this.getStudentData); //the group data is ready
     },
 
     methods: {
@@ -161,14 +161,24 @@ export default {
 
         /**
          * To update a badge that was previously a goal that is now an achievement
-         * This is so it goes full colour, and can't be awarded again in the award-detail-modal.vue
+         * There are two scenarios, one is that the badge is already an achievment, in which case
+         * the count on the badge will be incremented
+         * Otherwise 
          * 
          * @params { Object } 
          */
         onAchievementAwarded (awardedBadge) {
             const student = this.studentsData.find((student) => student.id === awardedBadge.recipient.id);
-            const badge = student.badges.find((badge) => badge.badge.id === awardedBadge.badge.id);
-            badge.isGoal = false; //this will trigger the badge to update within badge-report-student.vue
+            debugger;
+            const badgeToUpdate = student.badges.find((badge) => badge.badge.id === awardedBadge.badge.id);
+            const hasBadgeMatch = student.badges.some((badge) => badge.badge.id === badgeToUpdate.badge.id);
+            if (hasBadgeMatch) {
+                const badgeToIncrement = student.badges.find((badge) => badge.badge.id === badgeToUpdate.badge.id);
+                badgeToIncrement.count++;
+                this.studentsData.badges = this.studentsData.badges.filter((badge) => badge.badge.id !== badgeToUpdate.badge.id);
+            } else {
+                badgeToUpdate.isGoal = false; //this will trigger the badge to update within badge-report-student.vue
+            }
         },
 
         /**
