@@ -23,6 +23,11 @@ class Model extends AbstractAssessment
     private const DEFAULT_TYPE_NAME = 'LTI Assessment';
 
     /**
+     * The LTI assessment's URL, if there is one.
+     */
+    private ?string $ltiAssessmentUrl = null;
+
+    /**
      * Standard rules for whether a learner may create a response:
      * they must be a participant, and the assessment must be open.
      *
@@ -127,10 +132,28 @@ class Model extends AbstractAssessment
         }
 
         $this->assertDateSequence([
-                                      'publish' => $this->getPublishAt(),
-                                      'open'    => $this->getOpenAt(),
-                                      'due'     => $this->getDueAt(),
-                                      'late'    => $this->getCloseAt(),
-                                  ]);
+            'publish' => $this->getPublishAt(),
+            'open'    => $this->getOpenAt(),
+            'due'     => $this->getDueAt(),
+            'late'    => $this->getCloseAt(),
+        ]);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLtiAssessmentUrl(): ?string
+    {
+        return $this->ltiAssessmentUrl;
+    }
+
+    /**
+     * @param string|null $ltiAssessmentUrl
+     * @return static
+     */
+    public function setLtiAssessmentUrl(?string $ltiAssessmentUrl): self
+    {
+        $this->ltiAssessmentUrl = $ltiAssessmentUrl;
+        return $this;
     }
 }

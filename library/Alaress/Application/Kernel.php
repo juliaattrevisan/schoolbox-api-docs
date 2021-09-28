@@ -96,6 +96,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
+use Schoolbox\LTI\Assessment\DataModel as LtiAssessment;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
@@ -1142,7 +1143,7 @@ abstract class Kernel
         // Register assessment data source
         $di->set(
             'assessmentTranslator',
-            $di->lazy(function () use ($di) {
+            $di->lazy(function () use ($di, $mapperFactory) {
                 $translator = new AssessmentDataModelTranslator(
                     new MarkSchemeFactory(),
                     $di->get('mapperFactory')->get(AssessmentMapper::class),
@@ -1152,6 +1153,7 @@ abstract class Kernel
                     ->addSubTranslator(new TaskTranslator())
                     ->addSubTranslator(new DueWorkTranslator())
                     ->addSubTranslator(new QuizTranslator())
+                    ->addSubTranslator(new LtiAssessment\Translator($mapperFactory->get(LtiAssessment\Mapper::class)))
                     ->addSubTranslator(new ProjectTranslator($translator))
                 ;
                 return $translator;
