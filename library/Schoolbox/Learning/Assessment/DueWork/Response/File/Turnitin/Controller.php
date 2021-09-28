@@ -233,6 +233,13 @@ class Controller extends Base
          * postUploadComplete! All you copypasta nerds (including me) be
          * careful pls, don't mass pasta without checking the spec first
          */
+        if (!isset($payload[$submissionIdentifierKey])) {
+            throw new \RuntimeException(sprintf(
+                'Turnitin submission identifier key %s does not exist in the payload; cannot find turnitin model.',
+                $submissionIdentifierKey
+            ));
+        }
+
         $turnitinSubmissionId = $payload[$submissionIdentifierKey];
 
         /* Find the corresponding report, if it exists
