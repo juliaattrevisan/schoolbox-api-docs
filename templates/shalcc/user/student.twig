@@ -1,0 +1,9 @@
+{% extends '@core/user/student.twig' %}
+{% block details_tutorGroup %}
+    {% if showClasses %}
+        {% if externalUser.StudentTutorDescription ?? false %}
+            <dt class="small-4 medium-3 columns">PC Group:</dt>
+            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_tutorGroup %}
