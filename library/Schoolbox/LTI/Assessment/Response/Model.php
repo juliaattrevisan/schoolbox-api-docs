@@ -12,6 +12,9 @@ namespace Schoolbox\LTI\Assessment\Response;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\AbstractResponse;
 
+/**
+ * Domain model for LTI assessment responses.
+ */
 class Model extends AbstractResponse
 {
     /**
