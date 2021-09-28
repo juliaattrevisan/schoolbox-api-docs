@@ -5,26 +5,15 @@
     {% set createRouteType = createRoute ~ '?type=' ~ assessmentType -%}
 {% endif %}
 
-{% if assessmentType == 'dueWork' %}
-    {% set teacherMessage = 'to assess your students' %}
-    {% set studentMessage = 'There is no ' ~ locale.dueWork ~ ' to complete at this time.' %}
-{% elseif assessmentType == 'quiz'  %}
-    {% set teacherMessage = 'to test your students' %}
-    {% set studentMessage = 'There are no quizzes to complete at this time.' %}
-{% elseif assessmentType == 'task'  %}
-    {% set teacherMessage = 'for your students to complete' %}
-    {% set studentMessage = 'There are no tasks to complete at this time.' %}
-{% endif %}
-
-{% set indef = (assessmentType == 'dueWork' ? '' : 'a ') %}
-
-
 <div id="assessment-empty-state-{{ component_id }}" class="empty-state {% if assessables is not empty %}hide{% endif %}">
     <i class="{{ icon }}"></i>
 
     {% if readOnly ?? false %}
-
-        <p>{{ studentMessage }}</p>
+        <p>
+            {% block studentMessage %}
+                There are no assessments to complete at this time.
+            {% endblock studentMessage %}
+        </p>
         {% set route = routeLookupIfAuthorized(
             'learningGrades.getGrades', {
                 viewee:    USER,
@@ -40,9 +29,11 @@
         {% endif %}
 
     {% elseif createRouteType is defined %}
-
-        <p><a href="{{ createRouteType }}">Create {{ indef }}{{ typeLabel | lower }}</a> that is not a part of your course {{ teacherMessage }}.</p>
-
+        <p>
+            {% block teacherMessage %}
+                <a href="{{ createRouteType }}">Create assessment</a> that is not a part of your course for your students to complete.
+            {% endblock teacherMessage %}
+        </p>
     {% endif %}
 
 </div>
@@ -60,7 +51,9 @@
         {% if createRoute and not readOnly and createRouteType is defined %}
             <div class="component-action">
                 <section>
-                    <a href="{{ createRouteType }}" class="button">Create {{ typeLabel }}</a>
+                    {% block createButton %}
+                        <a href="{{ createRouteType }}" class="button">Create Assessment</a>
+                    {% endblock createButton %}
                 </section>
             </div>
         {% endif %}

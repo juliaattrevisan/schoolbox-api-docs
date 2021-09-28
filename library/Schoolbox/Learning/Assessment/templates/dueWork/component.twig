@@ -1,5 +1,17 @@
 {% extends '@learningAssessment/component.twig' %}
 
 {% set assessmentType = 'dueWork' %}
-{% set typeLabel = locale.dueWork.proper %}
 {% set icon = 'icon-due-work' %}
+
+{% block studentMessage %}
+    There is no {{ locale.dueWork }} to complete at this time.
+{% endblock studentMessage %}
+
+{% block teacherMessage %}
+    <a href="{{ createRouteType }}">Create {{ locale.dueWork }}</a>
+    that is not a part of your course to assess your students.
+{% endblock teacherMessage %}
+
+{% block createButton %}
+    <a href="{{ createRouteType }}" class="button">Create {{ locale.dueWork.proper }}</a>
+{% endblock createButton %}
