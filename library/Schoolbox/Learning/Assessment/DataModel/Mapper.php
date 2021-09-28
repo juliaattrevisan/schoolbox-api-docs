@@ -419,6 +419,15 @@ class Mapper extends BaseMapper
                   {$planJoin}
             WHERE {$where}
 
+            UNION
+
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
+            JOIN  {$this->getJoinSql('ltiAssessment.score', 'l', 'ls')} AND ls.student_id = :userId
+                  {$planJoin}
+            WHERE {$where}
+
             ORDER BY id ASC
         ";
 
@@ -447,6 +456,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
                 {$this->getJoinColumnString('quiz', 'q')},
+                {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -468,6 +478,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -749,9 +760,14 @@ class Mapper extends BaseMapper
             // Quiz?
             if ($row['q.assess_id']) {
                 $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
-                $quizIds[] = $row['q.assess_id'];
             } else {
                 $model->setQuiz(null);
+            }
+            // LTI assessment?
+            if ($row['l.id']) {
+                $model->setLtiAssessment($this->hydrateJoin($row, 'ltiAssessment', 'l'));
+            } else {
+                $model->setLtiAssessment(null);
             }
             // Project?
             if ($row['p.id']) {
