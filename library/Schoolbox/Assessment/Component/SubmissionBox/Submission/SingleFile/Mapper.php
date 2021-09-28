@@ -48,9 +48,12 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('student_submission_file_id', Turnitin\Mapper::class, 'turnitin', 'turnitin');
         $this->joinsReverseSingle('student_submission_file_id', Kami\Mapper::class, 'kami', 'kami');
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteTurnitin' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteKami' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePlagScan']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTurnitin']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteKami']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restorePlagScan']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreTurnitin']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreKami']);
     }
 
 
@@ -98,6 +101,54 @@ class Mapper extends BaseMapper
         $kamiMapper = $this->getJoinMapper('kami');
         $kamiFiles = $kamiMapper->findByColumn('student_submission_file_id', $file->getId());
         $kamiMapper->delete($kamiFiles);
+        return true;
+    }
+
+
+    /**
+     * Restore any PlagScan for the specified File
+     *
+     * @param Model $file
+     * @return bool
+     */
+    public function restorePlagScan(Model $file): bool
+    {
+        /** @var Plagscan\Mapper $plagScanMapper */
+        $plagScanMapper = $this->getJoinMapper('plagscan');
+        $plagScans      = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $plagScanMapper->restoreSoftDeleted($plagScans);
+        return true;
+    }
+
+
+    /**
+     * Restore any Turnitin for the specified File
+     *
+     * @param Model $file
+     * @return bool
+     */
+    public function restoreTurnitin(Model $file): bool
+    {
+        /** @var Turnitin\Mapper $turnitinMapper */
+        $turnitinMapper = $this->getJoinMapper('turnitin');
+        $turnitins      = $turnitinMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $turnitinMapper->restoreSoftDeleted($turnitins);
+        return true;
+    }
+
+
+    /**
+     * Restore any kami docs for this file
+     *
+     * @param Model $file
+     * @return bool
+     */
+    public function restoreKami(Model $file): bool
+    {
+        /** @var Kami\Mapper $kamiMapper */
+        $kamiMapper = $this->getJoinMapper('kami');
+        $kamiFiles  = $kamiMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
+        $kamiMapper->restoreSoftDeleted($kamiFiles);
         return true;
     }
 
