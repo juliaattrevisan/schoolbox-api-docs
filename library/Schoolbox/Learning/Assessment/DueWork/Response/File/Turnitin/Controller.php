@@ -206,9 +206,40 @@ class Controller extends Base
             ));
         }
 
-        $api = $this->produceApi();
+        /* Receive payloads and start digging through its guts
+         */
+        $rawPayload = file_get_contents('php://input');
 
-        print_r('Webhook: report updated');
+        try {
+            $payload = json_decode($rawPayload, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new \RuntimeException(sprintf(
+                'Turnitin send %s json payload but we cannot decode it: %s',
+                'postUploadComplete',
+                $rawPayload
+            ));
+        }
+
+        /* If you got this far you should have a payload that you can use
+         * Dig out the submission identifier
+         */
+        $turnitinSubmissionId = $payload['submission_id'];
+
+        /* Find the corresponding report, if it exists
+         */
+        try {
+            $model = $this->turnitinMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new \RuntimeException(sprintf(
+                'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
+                $turnitinSubmissionId
+            ));
+        }
+
+        /* If we found it, tell turnitin to save some data locally
+         * Everything after here is kind of a rip from the cli tools
+         */
+        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($model, $payload);
     }
 
 
