@@ -61,6 +61,7 @@ class Mapper extends BaseMapper
         $this->uses('score_given', self::TYPE_DECIMAL);
         $this->uses('score_maximum', self::TYPE_DECIMAL);
         $this->uses('comment', self::TYPE_STRING);
+        $this->uses('submitted_at', self::TYPE_DATETIME);
         $this->uses(
             'activity_progress',
             self::TYPE_STRING,
