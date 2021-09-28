@@ -31,10 +31,12 @@ class Controller extends Assessment\Controller
 
     public function getStatus(IAssessable $assessment)
     {
-        $this->getResponse()->content->set(
+        $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/status.twig',
-                [],
+                [
+                    'assessment' => $assessment,
+                ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
             )
@@ -43,7 +45,17 @@ class Controller extends Assessment\Controller
 
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        // TODO: Implement getSummary() method.
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@learningAssessment/lti/summary.twig',
+                [
+                    'assessment' => $assessment,
+                    'student'    => $student,
+                ],
+                "Status of {$assessment->getTitle()}",
+                'submission'
+            )
+        );
     }
 
     /**
