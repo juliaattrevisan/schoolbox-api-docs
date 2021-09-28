@@ -45,6 +45,14 @@ class Controller extends Base
 
 
     /**
+     * The webhook header value for turnitin when it finishes saving
+     * changes to one of its reports
+     * https://developers.turnitin.com/docs/tca#event-types
+     */
+    private const SIMILARITY_UPDATED = 'SIMILARITY_UPDATED';
+
+
+    /**
      * @var Mapper
      */
     private Mapper $turnitinMapper;
@@ -106,6 +114,31 @@ class Controller extends Base
         $api = $this->produce();
 
         print_r('Webhook: report completed');
+    }
+
+
+    /**
+     * This method fires when Turnitin finishes processing user-made changes to a report
+     *
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     */
+    public function postReportUpdated(): void
+    {
+        /* Only accept the SIMILARITY_COMPLETE header
+         */
+        if (self::SIMILARITY_UPDATED !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
+            throw new \DomainException(sprintf(
+                'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
+                'postReportUpdated',
+                self::HEADER_EVENT_TYPE,
+                $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)
+            ));
+        }
+
+        $api = $this->produce();
+
+        print_r('Webhook: report updated');
     }
 
 
