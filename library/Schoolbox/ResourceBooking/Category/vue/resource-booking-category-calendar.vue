@@ -75,21 +75,19 @@ export default {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, resourceTimelinePlugin, momentPlugin, adaptivePlugin ],
-            // plugins: [ interactionPlugin, resourceTimelinePlugin, adaptivePlugin ],
             views: {
                 resourceTimelineMonth: {
-                    // slotLabelFormat: ['ddd D']
                     slotLabelFormat: (date) => {
                         return dayjs(date.date.marker).format('ddd D');
                     }
                 },
                 resourceTimelineWeek: {
-                    // slotLabelFormat: ['ddd D/M', 'h'],
-                    slotLabelFormat: (date) => {
-                        const days = dayjs(date.date.marker).format('ddd D/M');
-                        const hours = dayjs(date.date.marker).format('h');
-                        return [days, hours];
-                    },
+                    slotLabelFormat: ['ddd D/M', 'h'],
+                    // slotLabelFormat: (date) => {
+                    //     const days = dayjs(date.date.marker).format('ddd D/M');
+                    //     const hours = dayjs(date.date.marker).format('h');
+                    //     return [ days, hours ];
+                    // },
                     slotMinWidth: '50',
                     // titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
                     titleFormat: (date) => {
@@ -101,7 +99,6 @@ export default {
                 },
                 resourceTimelineDay: {
                     slotMinWidth: '50',
-                    // titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
                     titleFormat: (date) => {
                         return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
                     } 
