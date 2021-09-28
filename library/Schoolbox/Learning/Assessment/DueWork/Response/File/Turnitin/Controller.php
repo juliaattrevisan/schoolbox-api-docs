@@ -166,6 +166,10 @@ class Controller extends Base
 
         /* If you got this far you should have a payload that you can use
          * Dig out the submission identifier
+         *
+         * Note that the submission identifier is different here than in
+         * postUploadComplete! All you copypasta nerds (including me) be
+         * careful pls, don't mass pasta without checking the spec first
          */
         $turnitinSubmissionId = $payload['submission_id'];
 
@@ -195,7 +199,7 @@ class Controller extends Base
      */
     public function postReportUpdated(): void
     {
-        /* Only accept the SIMILARITY_COMPLETE header
+        /* Only accept the SIMILARITY_UPDATED header
          */
         if (self::SIMILARITY_UPDATED !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
             throw new \DomainException(sprintf(
@@ -222,6 +226,10 @@ class Controller extends Base
 
         /* If you got this far you should have a payload that you can use
          * Dig out the submission identifier
+         *
+         * Note that the submission identifier is different here than in
+         * postUploadComplete! All you copypasta nerds (including me) be
+         * careful pls, don't mass pasta without checking the spec first
          */
         $turnitinSubmissionId = $payload['submission_id'];
 
