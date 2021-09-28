@@ -6,6 +6,7 @@
  */
 
 import { stringify } from 'qs';
+import { isObject, convertObjectToArray } from '@js/util/jsUtils';
 import BadgeReportHeader from './badge-report-header';
 import BadgeReportStudent from './badge-report-student';
 import AwardDetailModal from './award-detail-modal';
@@ -169,13 +170,12 @@ export default {
          */
         onAchievementAwarded (awardedBadge) {
             const student = this.studentsData.find((student) => student.id === awardedBadge.recipient.id);
-            debugger;
-            const badgeToUpdate = student.badges.find((badge) => badge.badge.id === awardedBadge.badge.id);
-            const hasBadgeMatch = student.badges.some((badge) => badge.badge.id === badgeToUpdate.badge.id);
-            if (hasBadgeMatch) {
-                const badgeToIncrement = student.badges.find((badge) => badge.badge.id === badgeToUpdate.badge.id);
-                badgeToIncrement.count++;
-                this.studentsData.badges = this.studentsData.badges.filter((badge) => badge.badge.id !== badgeToUpdate.badge.id);
+            const studentBadges = isObject(student.badges) ? convertObjectToArray(student.badges) : student.badges; //needs to be converted to an array if it hasn't already
+            const badgeToUpdate = studentBadges.find((badge) => badge.badge.id === awardedBadge.badge.id);
+            const hasBadgeMatch = studentBadges.find((badge) => badge.badge.id === badgeToUpdate.badge.id && badge.id !== badgeToUpdate.id);
+            if (hasBadgeMatch) { //if the badge has already been achieved, increment the count and pull the badge goal out of the list
+                hasBadgeMatch.count++; 
+                student.badges = studentBadges.filter((badge) => badge.id !== badgeToUpdate.id);
             } else {
                 badgeToUpdate.isGoal = false; //this will trigger the badge to update within badge-report-student.vue
             }

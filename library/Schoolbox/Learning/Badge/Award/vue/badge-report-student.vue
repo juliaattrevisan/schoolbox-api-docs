@@ -317,7 +317,6 @@ $collapseStudent: 1000px;
     }
 
 .empty-state {
-    height: $rowHeight;
     margin: 0; //remove the white space at the bottom when there's no badges
     background: white; //the grey looks a bit dodgy in combination with rows with badges
 }
