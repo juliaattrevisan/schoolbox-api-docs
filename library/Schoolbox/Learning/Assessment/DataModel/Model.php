@@ -24,6 +24,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\LTI\Assessment\DataModel\Model as LtiAssessment;
 use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Curriculum\Node;
 use TypeError;
@@ -134,8 +135,8 @@ class Model implements ISoftDeletable
     /**
      * The task which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz or project may be associated with a
-     * single assessment.
+     * Only one of task, due work, quiz, LTI assessment or project may be
+     * associated with a single assessment.
      *
      * @var null|Task
      */
@@ -144,8 +145,8 @@ class Model implements ISoftDeletable
     /**
      * The due work which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz or project may be associated with a
-     * single assessment.
+     * Only one of task, due work, quiz, LTI assessment or project may be
+     * associated with a single assessment.
      *
      * @var null|DueWork
      */
@@ -154,18 +155,27 @@ class Model implements ISoftDeletable
     /**
      * The quiz which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz or project may be associated with a
-     * single assessment.
+     * Only one of task, due work, quiz, LTI assessment or project may be
+     * associated with a single assessment.
      *
      * @var null|Quiz
      */
     protected $quiz;
 
     /**
+     * The LTI assessment which may or may not be associated with this
+     * assessment.
+     *
+     * Only one of task, due work, quiz, LTI assessment or project may be
+     * associated with a single assessment.
+     */
+    private ?LtiAssessment $ltiAssessment = null;
+
+    /**
      * The project which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz or project may be associated with a
-     * single assessment.
+     * Only one of task, due work, quiz, LTI assessment or project may be
+     * associated with a single assessment.
      *
      * @var null|Project
      */
@@ -253,6 +263,9 @@ class Model implements ISoftDeletable
         }
         if ($this->hasTask()) {
             $this->task = clone $this->task;
+        }
+        if ($this->hasLtiAssessment()) {
+            $this->ltiAssessment = clone $this->ltiAssessment;
         }
         if ($this->hasProject()) {
             $this->project = clone $this->project;
@@ -349,6 +362,16 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Does this have an LTI assessment?
+     *
+     * @return bool
+     */
+    public function hasLtiAssessment()
+    {
+        return ($this->getLtiAssessment() instanceof LtiAssessment);
+    }
+
+    /**
      * Does this have a project?
      *
      * This is whether this is a project, not whether this is within the context of one.
@@ -386,6 +409,9 @@ class Model implements ISoftDeletable
         if ($this->hasQuiz()) {
             return $this->getQuiz();
         }
+        if ($this->hasLtiAssessment()) {
+            return $this->getLtiAssessment();
+        }
         if ($this->hasProject()) {
             return $this->getProject();
         }
@@ -418,6 +444,8 @@ class Model implements ISoftDeletable
             return $this->setDueWork($subObject);
         } elseif ($subObject instanceof Quiz) {
             return $this->setQuiz($subObject);
+        } elseif ($subObject instanceof LtiAssessment) {
+            return $this->setLtiAssessment($subObject);
         } elseif ($subObject instanceof Project) {
             return $this->setProject($subObject);
         }
@@ -656,6 +684,24 @@ class Model implements ISoftDeletable
     public function setQuiz(Quiz $quiz = null)
     {
         $this->quiz = $quiz;
+        return $this;
+    }
+
+    /**
+     * @return LtiAssessment|null
+     */
+    public function getLtiAssessment(): ?LtiAssessment
+    {
+        return $this->ltiAssessment;
+    }
+
+    /**
+     * @param LtiAssessment|null $ltiAssessment
+     * @return static
+     */
+    public function setLtiAssessment(?LtiAssessment $ltiAssessment = null): self
+    {
+        $this->ltiAssessment = $ltiAssessment;
         return $this;
     }
 
