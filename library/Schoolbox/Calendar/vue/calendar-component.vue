@@ -5,12 +5,13 @@ import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
 import ExportUrlModal     from './export-url-modal';
 import interactionPlugin  from "@fullcalendar/interaction";
 import listPlugin         from "@fullcalendar/list";
-import momentPlugin       from "@fullcalendar/moment";
 import adaptivePlugin     from "@fullcalendar/adaptive";
 import axios              from "axios";
 import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@vue/components/fullcalendar/customised-calendar-event';
+import dayjs              from 'dayjs';
+import advancedFormat     from 'dayjs/plugin/advancedFormat';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
@@ -65,19 +66,24 @@ export default {
     },
 
     beforeMount () {
+        dayjs.extend(advancedFormat); //for more format options
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, listPlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, listPlugin, adaptivePlugin ],
             views: {
                 list: {
                     type: 'list',
                     duration: { days: this.config.days },
-                    listDayFormat: this.config.momentJsDateLong,
+                    listDayFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.config.momentJsDateLong); 
+                    },
                     listDaySideFormat: false
                 }
             },
             headerToolbar: false,
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                return dayjs(date.date.marker).format(this.fullCalendarHelper_eventTimeFormat); 
+            },
             height: 'auto',
             initialView: 'list',
             events: this.events,
@@ -222,7 +228,6 @@ export default {
     <div>
         <view-event-modal
             ref="event"
-            :to-moment="fullCalendarHelper_toMoment"
             :event-modify-form-url="ENDPOINTS.URL_EVENT_MODIFY_FORM"
             :event-modify-form-action-url="ENDPOINTS.URL_EVENT_MODIFY_FORM_ACTION"
             :event-delete-url="ENDPOINTS.URL_EVENT_DELETE"
