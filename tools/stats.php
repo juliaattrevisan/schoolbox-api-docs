@@ -1,9 +1,6 @@
 <?php
 
-/*
- * This script queries the database for various different key indicators of engagement and returns the data in JSON.
- * This data is used to populate our engagement database in influxDB and populate the graphs in monitor.schoolbox.com.au
- *
+/**
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,6 +12,11 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
+/**
+ * Queries the database for various different key indicators of engagement and pipes the data in JSON to STDOUT.
+ * This data is used to populate our engagement database in influxDB and populate the graphs in monitor.schoolbox.com.au
+ * Logging is piped to STDERR
+ */
 $app = new class extends CliTool\App {
     public function run(): void
     {
