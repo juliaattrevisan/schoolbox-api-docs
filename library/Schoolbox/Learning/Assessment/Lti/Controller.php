@@ -9,12 +9,19 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Lti;
 
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 class Controller extends Assessment\Controller
 {
+    /**
+     * Fill in Twig data required for rendering the create LTI assessment form.
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         return [
@@ -26,7 +33,7 @@ class Controller extends Assessment\Controller
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@learningAssessment/ltiAssessment/status.twig',
+                '@learningAssessment/lti/status.twig',
                 [],
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -39,13 +46,21 @@ class Controller extends Assessment\Controller
         // TODO: Implement getSummary() method.
     }
 
+    /**
+     * @param IAssessable $assessment
+     * @param User        $student
+     */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
-        // TODO: Implement getCreateResponseForm() method.
+        throw new NotFound();
     }
 
+    /**
+     * @param IAssessable $assessment
+     * @param User        $student
+     */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
-        // TODO: Implement postCreateResponse() method.
+        throw new NotFound();
     }
 }
