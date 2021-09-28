@@ -282,5 +282,4 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
     }
-
 }
