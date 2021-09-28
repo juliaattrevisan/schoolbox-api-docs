@@ -153,10 +153,7 @@ export default {
             resourceAreaHeaderContent: 'Week',
             slotMinWidth: '50',
             titleFormat: (date) => {
-                const startDate = dayjs(date.start.array).format('MMMM Do');
-                const endDate = dayjs(date.end.array).format('MMMM Do');
-                const endDateYear = dayjs(date.end.array).format('YYYY');
-                return `${startDate} - ${endDate}, ${endDateYear}`;
+                return this.fullCalendarHelper_titleFormatWeek(date);
             } 
         };
         this.resourceTimelineWeek = {
@@ -165,16 +162,13 @@ export default {
             },
             duration: { weeks: 1 },
             slotDuration: { days: 1 },
-            // slotLabelFormat: [
-            //     'ddd DD'
-            // ],
+            slotLabelFormat: (date) => {
+                return dayjs(date.date.marker).format('ddd D');
+            },
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true,
-            titleFormat: (date) => { // will produce something like "July 26th – August 1st, 2021"
-                const startDate = dayjs(date.start.array).format('MMMM Do');
-                const endDate = dayjs(date.end.array).format('MMMM Do');
-                const endDateYear = dayjs(date.end.array).format('YYYY');
-                return `${startDate} - ${endDate}, ${endDateYear}`;
+            titleFormat: (date) => {
+                return this.fullCalendarHelper_titleFormatWeek(date);
             } 
         };
         this.calendarOptions = {

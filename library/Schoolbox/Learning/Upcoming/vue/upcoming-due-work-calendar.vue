@@ -88,10 +88,7 @@ export default {
                         return dayjs(date.date.marker).format(this.formats.displayWeekDay); 
                     },
                     titleFormat: (date) => {
-                        const startDate = dayjs(date.start.array).format('MMMM Do');
-                        const endDate = dayjs(date.end.array).format('MMMM Do');
-                        const endDateYear = dayjs(date.end.array).format('YYYY');
-                        return `${startDate} - ${endDate}, ${endDateYear}`;
+                        return this.fullCalendarHelper_titleFormatWeek(date);
                     }
                 },
             },

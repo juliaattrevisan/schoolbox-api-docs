@@ -114,6 +114,26 @@ export default {
         },
 
         /**
+         * To display a week date range like: 
+         * September 26th - October 2nd, 2021
+         * We also add the extra formatting of removing the second dates month if it's the same as the second:
+         * October 3rd - 9th, 2021
+         * 
+         * @param { Object }
+         * 
+         * @returns { String }
+         */
+        fullCalendarHelper_titleFormatWeek (date) {
+            const startDate = date.start.array;
+            const endDate = date.end.array;
+            const startDateFormat = dayjs(startDate).format('MMMM Do');
+            const isSameMonth = dayjs(startDate).isSame(endDate, 'month');
+            const endDateFormat = isSameMonth ? dayjs(endDate).format('Do') : dayjs(endDate).format('MMMM Do');
+            const endDateYearFormat = dayjs(endDate).format('YYYY');
+            return `${startDateFormat} - ${endDateFormat}, ${endDateYearFormat}`;
+        },
+
+        /**
          * Helper function to determine the FullCalendar component's content height.
          *
          * This is a straight port of the old jQuery FullCalendar content height
