@@ -5,7 +5,6 @@ import interactionPlugin  			from '@fullcalendar/interaction'
 import dayGridPlugin      			from '@fullcalendar/daygrid'
 import timeGridPlugin     			from '@fullcalendar/timegrid'
 import listPlugin         			from '@fullcalendar/list'
-import momentPlugin       			from '@fullcalendar/moment'
 import adaptivePlugin     			from '@fullcalendar/adaptive'
 import RevealModal        			from '@vue/components/reveal-modal'
 import ViewEventModal     			from '@vue/components/fullcalendar/view-event-modal';
@@ -14,6 +13,9 @@ import axios              			from 'axios'
 import fullCalendarHelper           from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        			from 'qs';
 import CustomisedCalendarEvent	  	from '@vue/components/fullcalendar/customised-calendar-event';
+import dayjs                        from 'dayjs';
+import advancedFormat               from 'dayjs/plugin/advancedFormat';
+import arraySupport                 from 'dayjs/plugin/arraySupport';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -69,20 +71,35 @@ export default {
     },
 
     beforeMount () {
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport); //to be able to use an array as a date
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
             views: {
                 day: {
                     dayHeaders: false,
-                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
+                    titleFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    }
                 },
                 week: {
-                    dayHeaderFormat: this.formats.displayWeekDay,
-                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    dayHeaderFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.formats.displayWeekDay); 
+                    },
+                    titleFormat: (date) => {
+                        const startDate = dayjs(date.start.array).format('MMMM Do');
+                        const endDate = dayjs(date.end.array).format('MMMM Do');
+                        const endDateYear = dayjs(date.end.array).format('YYYY');
+                        return `${startDate} - ${endDate}, ${endDateYear}`;
+                    }
                 },
             },
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                const startTime = dayjs(date.start.array).format('h:mma');
+                const endTime = dayjs(date.end.array).format('h:mma');
+                return `${startTime} - ${endTime}`;
+            },
             customButtons: {
                 quickSwitchButton: {
                     text: ' ',
@@ -237,7 +254,6 @@ export default {
     <div>
         <view-event-modal
             ref="event"
-            :to-moment="fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
