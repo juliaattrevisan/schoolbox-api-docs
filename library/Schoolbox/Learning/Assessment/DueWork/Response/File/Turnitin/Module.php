@@ -40,9 +40,13 @@ class Module extends BaseModule
          */
         $postPerms = null;
 
-        $this->register('POST', '/upload-complete', 'postUploadComplete', $postPerms);
-        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
-        $this->register('POST', '/report-updated', 'postReportUpdated', $postPerms);
+        $this->register('POST', '/webhook', 'postWebhook', $postPerms);
+
+        /* These are the individual controller methods that you can test in isolation
+         */
+//        $this->register('POST', '/upload-complete', 'postUploadComplete', $postPerms);
+//        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
+//        $this->register('POST', '/report-updated', 'postReportUpdated', $postPerms);
     }
 
 

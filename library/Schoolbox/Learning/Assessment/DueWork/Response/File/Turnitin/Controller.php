@@ -68,6 +68,38 @@ class Controller extends Base
 
 
     /**
+     * Based on the header, decide how to process it
+     */
+    public function postWebhook(): void
+    {
+        /* Pick a destination based on the X-Turnitin headers in the payload, but
+         * you'd probably want to do some further validation here before you continue
+         */
+        switch ($this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
+            /* Turnitin finished processing our upload
+             */
+            case self::SUBMISSION_COMPLETE:
+                $this->postUploadComplete(); break;
+
+            /* Turnitin finished generating a report
+             */
+            case self::SIMILARITY_COMPLETE:
+                $this->postReportComplete(); break;
+
+            /* User updated a report through the turnitin interface
+             */
+            case self::SIMILARITY_UPDATED:
+                $this->postReportUpdated(); break;
+
+            /* Unknown header; do nothing
+             */
+            default:
+                break;
+        }
+    }
+
+
+    /**
      * This method fires when Turnitin finishes processing our upload
      *
      * @throws Exception\BadEndpoint
