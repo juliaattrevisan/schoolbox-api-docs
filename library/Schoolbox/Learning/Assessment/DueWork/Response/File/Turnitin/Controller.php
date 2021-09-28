@@ -42,7 +42,7 @@ class Controller extends Base
     /**
      * This method fires when Turnitin finishes processing our upload
      */
-    public function getUploadComplete(): void
+    public function postUploadComplete(): void
     {
         $api = $this->produce();
 
@@ -53,7 +53,7 @@ class Controller extends Base
     /**
      * This method fires when Turnitin finishes processing our report
      */
-    public function getReportComplete(): void
+    public function postReportComplete(): void
     {
         $api = $this->produce();
 

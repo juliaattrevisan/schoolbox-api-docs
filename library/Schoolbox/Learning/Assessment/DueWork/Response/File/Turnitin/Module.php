@@ -33,12 +33,15 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can post to the endpoint
+        /* Anyone can post to the endpoint, for now
+         *
+         * ...but we should really be validating the Turnitin payloads before
+         * blindly accepting them
          */
         $postPerms = null;
 
-        $this->register('GET', '/upload-complete', 'getUploadComplete', $postPerms);
-        $this->register('GET', '/report-complete', 'getReportComplete', $postPerms);
+        $this->register('POST', '/upload-complete', 'postUploadComplete', $postPerms);
+        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
     }
 
 
