@@ -33,6 +33,20 @@
         <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
     </label>
 
+
+    {# ----------------------------------------------------------- #}
+    {# Assessment URL #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Assessment URL
+        <input name="ltiAssessmentUrl"
+               type="text"
+               maxlength="2048"
+               placeholder="Assessment URL"
+               value="{{ assessment.ltiAssessmentUrl }}">
+    </label>
+
+
     {# ----------------------------------------------------------- #}
     {# Assessment Location #}
     {# ----------------------------------------------------------- #}
@@ -40,6 +54,8 @@
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
 
+    {# Enforce Safe Exam Browser #}
+    {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
 </fieldset>
 
 
@@ -52,27 +68,21 @@
 
 
 {# ----------------------------------------------------------- #}
-{# Attachments #}
-{# ----------------------------------------------------------- #}
-<div id='taskEditor'>
-    <div class="row">
-        <div class="small-12 columns">
-            <label for="ltiAssessmentUrl">Assessment URL</label>
-            <input id="ltiAssessmentUrl"
-                   name="ltiAssessmentUrl"
-                   type="text"
-                   maxlength="2048"
-                   placeholder="Assessment URL"
-                   value="{{ assessment.ltiAssessmentUrl }}">
-        </div>
-    </div>
-</div>
-
-
-{# ----------------------------------------------------------- #}
 {# Default Activity Duration #}
 {# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+
+
+{# ----------------------------------------------------------- #}
+{# Grading #}
+{# ----------------------------------------------------------- #}
+<fieldset>
+    <legend>{{ locale.grading.proper }}</legend>
+
+    {% include '@learningAssessment/fragments/weight.twig' with {
+        assessment: assessment,
+    } only %}
+</fieldset>
 
 
 {# ----------------------------------------------------------- #}
