@@ -2,8 +2,9 @@
 
 import RevealModal from '@vue/components/reveal-modal'
 import axios       from 'axios'
-import fullCalendarHelper from "@vue/components/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS} from '@schoolboxCalendarEvent/endpoints';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 /* Vue select
     */
@@ -32,8 +33,6 @@ export default {
         'userId',
         'canInvite',
         'eventTypes',
-        // TODO why do I have to pass this method around? -because it's linked to the fullCalenderApi, which is not availble in this context
-        'toMoment',
         'eventCreateUrl',
         'eventCreateFormUrl',
         'eventModifyFormUrl',
@@ -73,7 +72,7 @@ export default {
          */
         formDate() {
             return this.event.date
-                ? this.toMoment(this.event.date).format(
+                ? dayjs(this.event.date).format(
                     this.event.allDay
                         ? this.formatFormDate
                         : this.formatFormDatetime
@@ -88,7 +87,7 @@ export default {
          */
         displayDate() {
             return this.event.date
-                ? this.toMoment(this.event.date).format(
+                ? dayjs(this.event.date).format(
                     this.event.allDay
                         ? this.formatDisplayDate
                         : this.formatDisplayDatetime
@@ -113,6 +112,7 @@ export default {
 
     created() {
         this.ENDPOINTS = ENDPOINTS;
+        dayjs.extend(advancedFormat); //for more format options
     },
 
     methods: {

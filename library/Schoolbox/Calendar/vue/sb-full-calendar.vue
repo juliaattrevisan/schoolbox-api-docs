@@ -5,7 +5,6 @@ import interactionPlugin          from '@fullcalendar/interaction'
 import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
-import momentPlugin               from '@fullcalendar/moment'
 import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@vue/components/fullcalendar/view-event-modal';
 import CreateEventModal           from './create-event-modal';
@@ -17,6 +16,9 @@ import qs                         from "qs";
 import fullCalendarHelper from "@vue/components/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
+import dayjs                      from 'dayjs';
+import advancedFormat             from 'dayjs/plugin/advancedFormat';
+import arraySupport               from 'dayjs/plugin/arraySupport';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -117,25 +119,40 @@ export default {
     },
 
     beforeMount () {
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport); //to be able to use an array as a date
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
             views: {
                 day: {
                     dayHeaders: false,
-                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
+                    titleFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    } 
                 },
                 week: {
-                    dayHeaderFormat: this.formats.displayWeekDay,
-                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    dayHeaderFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.formats.displayWeekDay); 
+                    },
+                    titleFormat: (date) => {
+                        const startDate = dayjs(date.start.array).format('MMMM Do');
+                        const endDate = dayjs(date.end.array).format('MMMM Do');
+                        const endDateYear = dayjs(date.end.array).format('YYYY');
+                        return `${startDate} - ${endDate}, ${endDateYear}`;
+                    } 
                 },
                 list: {
                     buttonText: 'List',
                     duration: this.duration,
-                    listDayFormat: this.config.dateDisplayFormats.momentJsDateLong
+                    listDayFormat: (date) => {
+                        return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong);
+                    }
                 }
             },
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                return dayjs(date.date.marker).format(this.fullCalendarHelper_eventTimeFormat);
+            },
             customButtons: {
                 customExport: {
                     text: 'Export',
@@ -482,8 +499,8 @@ export default {
          */
         moveEvent(event) {
             const data = {
-                start:  this.fullCalendarHelper_toMoment(event.start).format(),
-                end:    this.fullCalendarHelper_toMoment(event.end).format(),
+                start:  dayjs(event.start).format(),
+                end:    dayjs(event.end).format(),
                 allDay: event.allDay,
             };
 
@@ -493,7 +510,7 @@ export default {
             // This means that all-day events need their end date set back
             // one day before being sent to Schoolbox.
             if (event.allDay) {
-                data.end = this.fullCalendarHelper_toMoment(event.end).add({days: -1}).format();
+                data.end = dayjs(event.end).add({days: -1}).format();
             }
 
             // TODO this needs to consider events in series
@@ -586,7 +603,7 @@ export default {
                 startDate.setAttribute('data-datepicker', '');
                 startDate.setAttribute('data-datepicker-buttontext', '');
                 startDate.setAttribute('value',
-                    (this.listViewDateRange.start) ? this.listViewDateRange.start : this.fullCalendarHelper_toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.start) ? this.listViewDateRange.start : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -596,7 +613,7 @@ export default {
                 endDate.setAttribute('data-datepicker', '');
                 endDate.setAttribute('data-datepicker-buttontext', '');
                 endDate.setAttribute('value',
-                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.fullCalendarHelper_toMoment(new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.end) ? this.listViewDateRange.end : dayjs(new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -627,8 +644,8 @@ export default {
                 // Register an event listener when update button is clicked.
                 document.querySelector('#update_date_range_button').addEventListener('click', () => {
                     if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
-                        const startDateValue = moment(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE);
-                        const endDateValue = moment(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
+                        const startDateValue = dayjs(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE);
+                        const endDateValue = dayjs(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
                             this.listViewDateRange.start = document.querySelector('#start_date').value;
@@ -650,9 +667,9 @@ export default {
          * I'm not sure if we can use it..
          */
         updateListViewDateRangeField(start, end = null) {
-            window.history.pushState('', '', '/calendar/' + this.fullCalendarHelper_toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
-            this.listViewDateRange.start = this.fullCalendarHelper_toMoment(start).format(FORMAT_FLATPICKR_DATE);
-            this.listViewDateRange.end = this.fullCalendarHelper_toMoment(end || new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE);
+            window.history.pushState('', '', '/calendar/' + dayjs(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
+            this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
+            this.listViewDateRange.end = dayjs(end || new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE);
 
             let startDate = this.jQuery('#start_date'),
                 endDate   = this.jQuery('#end_date');
@@ -747,7 +764,6 @@ export default {
             :user-id="config.userId"
             :can-invite="config.canInvite"
             :event-types="config.eventTypes"
-            :to-moment="fullCalendarHelper_toMoment"
             :event-create-url="urls.create"
             :event-create-form-url="urls.createForm"
             :event-modify-form-url="urls.modifyForm"
@@ -760,7 +776,6 @@ export default {
 
         <view-event-modal
             ref="event"
-            :to-moment="fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-delete-url="urls.delete"
