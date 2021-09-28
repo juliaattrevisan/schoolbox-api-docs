@@ -15,8 +15,10 @@ use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Lti\Decorator\Decorator as LtiDecorator;
 use Schoolbox\Learning\Assessment\Lti\Decorator\LtiTrait;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\LTI\Assessment\Model as LtiAssessment;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
@@ -375,6 +377,8 @@ class Factory
                 $this->getMaxAttempts(),
                 $this->getCompletionMessage()
             );
+        } elseif ($assessment instanceof LtiAssessment) {
+            $decorator = new LtiDecorator($this->getLtiAssessmentUrl());
         } else {
             throw new DomainException('Please select an assessment type');
         }
