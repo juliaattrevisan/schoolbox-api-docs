@@ -18,6 +18,7 @@ use Schoolbox\User;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {

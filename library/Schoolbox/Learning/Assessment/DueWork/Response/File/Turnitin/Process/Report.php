@@ -256,7 +256,7 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function getReportInfo(Turnitin\Model $model): ?array
+    public function getReportInfo(Turnitin\Model $model): ?array
     {
         try {
             $reportResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);

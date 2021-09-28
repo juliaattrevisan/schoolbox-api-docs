@@ -70,8 +70,16 @@ class Controller extends Base
     /**
      * This method fires when Turnitin finishes processing our upload
      *
+     * @throws Exception\BadEndpoint
+     * @throws Exception\Credentials
      * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postUploadComplete(): void
     {
@@ -86,9 +94,40 @@ class Controller extends Base
             ));
         }
 
-        $api = $this->produce();
+        /* Receive payloads and start digging through its guts
+         */
+        $rawPayload = file_get_contents('php://input');
 
-        print_r('Webhook: upload completed');
+        try {
+            $payload = json_decode($rawPayload, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new \RuntimeException(sprintf(
+                'Turnitin send %s json payload but we cannot decode it: %s',
+                'postUploadComplete',
+                $rawPayload
+            ));
+        }
+
+        /* If you got this far you should have a payload that you can use
+         * Dig out the submission identifier
+         */
+        $turnitinSubmissionId = $payload['id'];
+
+        /* Find the corresponding report, if it exists
+         */
+        try {
+            $model = $this->turnitinMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new \RuntimeException(sprintf(
+                'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
+                $turnitinSubmissionId
+            ));
+        }
+
+        /* If we found it, tell turnitin to make a report for it
+         * Everything after here is kind of a rip from the cli tools
+         */
+        (new Process\Report($this->produceApi(), $this->turnitinMapper))->getReportInfo($model);
     }
 
 
@@ -111,7 +150,7 @@ class Controller extends Base
             ));
         }
 
-        $api = $this->produce();
+        $api = $this->produceApi();
 
         print_r('Webhook: report completed');
     }
@@ -136,7 +175,7 @@ class Controller extends Base
             ));
         }
 
-        $api = $this->produce();
+        $api = $this->produceApi();
 
         print_r('Webhook: report updated');
     }
@@ -153,7 +192,7 @@ class Controller extends Base
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    private function produce(): Api
+    private function produceApi(): Api
     {
         /* This will continually throw exceptions to sentry if someone turns off
          * turnitin, but turnitin still fires its webhooks
@@ -173,4 +212,5 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
     }
+
 }
