@@ -162,9 +162,9 @@ export default {
 
         /**
          * To update a badge that was previously a goal that is now an achievement
-         * There are two scenarios, one is that the badge is already an achievment, in which case
-         * the count on the badge will be incremented
-         * Otherwise 
+         * There are two scenarios, one is that the badge is already an achievement, in which case
+         * the count on the badge will be incremented.
+         * Otherwise the goal is just turned into an achievement by going full colour. 
          * 
          * @params { Object } 
          */
