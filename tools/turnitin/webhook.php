@@ -183,9 +183,10 @@ HELP;
         ];
 
         $this->getLogger()->info(sprintf(
-            'Registering webhook: %s (%s) for event types %s',
+            'Registering webhook: %s (%s) for %s values %s',
             $payload['description'],
             $payload['url'],
+            Turnitin\Controller::HEADER_EVENT_TYPE,
             implode(', ', $payload['event_types'])
         ));
 
