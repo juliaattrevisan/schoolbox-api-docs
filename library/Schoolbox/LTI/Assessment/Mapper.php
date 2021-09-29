@@ -36,6 +36,15 @@ class Mapper extends BaseMapper
             'assessmentModel',
             'assessmentModel',
         );
+        $this->hasJoin(
+            'scores',
+            [
+                'mapper'    => Score\Mapper::class,
+                'multiple'  => true,
+                'this_key'  => 'id',
+                'other_key' => 'lti_assessment_id',
+            ],
+        );
         $this->uses('lti_assessment_url', self::TYPE_STRING);
     }
 
