@@ -27,21 +27,21 @@ class Controller extends Base
     /**
      * The header which turnitin uses to tell us which step it just did
      */
-    private const HEADER_EVENT_TYPE = 'X-Turnitin-EventType';
+    public const HEADER_EVENT_TYPE = 'X-Turnitin-EventType';
 
 
     /**
      * The webhook header value for turnitin when it finishes an upload
      * https://developers.turnitin.com/docs/tca#event-types
      */
-    private const SUBMISSION_COMPLETE = 'SUBMISSION_COMPLETE';
+    public const SUBMISSION_COMPLETE = 'SUBMISSION_COMPLETE';
 
 
     /**
      * The webhook header value for turnitin when it finishes a report
      * https://developers.turnitin.com/docs/tca#event-types
      */
-    private const SIMILARITY_COMPLETE = 'SIMILARITY_COMPLETE';
+    public const SIMILARITY_COMPLETE = 'SIMILARITY_COMPLETE';
 
 
     /**
@@ -49,7 +49,7 @@ class Controller extends Base
      * changes to one of its reports
      * https://developers.turnitin.com/docs/tca#event-types
      */
-    private const SIMILARITY_UPDATED = 'SIMILARITY_UPDATED';
+    public const SIMILARITY_UPDATED = 'SIMILARITY_UPDATED';
 
 
     /**
