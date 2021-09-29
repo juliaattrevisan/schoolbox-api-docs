@@ -11,7 +11,7 @@ INSERT INTO component_definition (
     config_copy
 ) VALUES (
     'LTI Assessments',
-    'Schoolbox\\LTI\\Assessment\\Component\\Homepage\\Controller',
+    'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller',
     'Output all LTI assessments for this homepage.',
     'homepage',
     3, # Learning
@@ -28,37 +28,37 @@ INSERT INTO component_config_definition (
     label,
     description
 ) VALUES (
-    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\LTI\\Assessment\\Component\\Homepage\\Controller'),
+    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller'),
     'size',
     0,
     'Limit',
     null
 ), (
-    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\LTI\\Assessment\\Component\\Homepage\\Controller'),
+    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller'),
     'compactMode',
     1,
     'Compact Mode',
     null
 ), (
-    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\LTI\\Assessment\\Component\\Homepage\\Controller'),
+    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller'),
     'collapse',
     0,
     'Collapse Content',
     null
 ), (
-    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\LTI\\Assessment\\Component\\Homepage\\Controller'),
+    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller'),
     'showClosed',
     0,
     'Show Closed',
     'Whether to include closed assessments in the list'
 ), (
-    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\LTI\\Assessment\\Component\\Homepage\\Controller'),
+    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller'),
     'showComponentTitle',
     1,
     'Show Title to Read-Only Users',
     null
 ), (
-    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\LTI\\Assessment\\Component\\Homepage\\Controller'),
+    (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller'),
     'componentname',
     'LTI Assessments',
     'Heading',

@@ -7,11 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Assessment\Component\Homepage;
+namespace Schoolbox\Learning\Assessment\Lti\Component\Homepage;
 
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Component\Homepage\Controller as BaseAssessmentController;
 
+/**
+ * LTI assessment homepage component.
+ */
 class Controller extends BaseAssessmentController
 {
     /**
@@ -19,7 +22,7 @@ class Controller extends BaseAssessmentController
      */
     protected function getTwigTemplate()
     {
-        return '@ltiAssessmentComponent/component.twig';
+        return '@learningAssessment/lti/component.twig';
     }
 
     /**
