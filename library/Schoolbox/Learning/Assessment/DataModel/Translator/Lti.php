@@ -7,14 +7,17 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Assessment\DataModel;
+namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
-use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\LTI\Assessment\DataModel\Model;
 use Schoolbox\LTI\Assessment\Model as DomainObject;
 
-class Translator implements IAssessmentTypeTranslator
+/**
+ * Sub-translator for LTI assessment specific fields.
+ */
+class Lti implements IAssessmentTypeTranslator
 {
     /**
      * @inheritDoc

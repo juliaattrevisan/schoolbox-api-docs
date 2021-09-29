@@ -12,7 +12,6 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\LTI\Assessment\DataModel as LtiAssessment;
 use Schoolbox\User;
 
 /**
@@ -58,7 +57,7 @@ trait TestTrait
             ->addSubTranslator(new Translator\Task())
             ->addSubTranslator(new Translator\DueWork())
             ->addSubTranslator(new Translator\Quiz())
-            ->addSubTranslator(new LtiAssessment\Translator())
+            ->addSubTranslator(new Translator\Lti())
             ->addSubTranslator(new Translator\Project($this->translator))
         ;
 

@@ -71,10 +71,6 @@ use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as Markbook
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\Quiz as QuizTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\Task as TaskTranslator;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
@@ -96,7 +92,6 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
-use Schoolbox\LTI\Assessment\DataModel as LtiAssessment;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
@@ -1149,11 +1144,11 @@ abstract class Kernel
                     AssessmentDataModelTranslator::MAX_PROJECT_LEVELS_DEFAULT
                 );
                 $translator
-                    ->addSubTranslator(new TaskTranslator())
-                    ->addSubTranslator(new DueWorkTranslator())
-                    ->addSubTranslator(new QuizTranslator())
-                    ->addSubTranslator(new LtiAssessment\Translator())
-                    ->addSubTranslator(new ProjectTranslator($translator))
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Task())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\DueWork())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Quiz())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Lti())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Project($translator))
                 ;
                 return $translator;
             })
