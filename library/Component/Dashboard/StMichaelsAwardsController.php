@@ -66,160 +66,160 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         }
 
 //        // Here's some test data, because this only works on St Michaels servers
-        $this->detentionList = array(
-            array(
-                'ID'                   => $userId,
-                'DetentionDate'        => date('Y-m-d'),
-                'DetentionDescription' => 'Noobed out',
-                'DetentionComment'     => 'You are a noob',
-            ),
-            array(
-                'ID'                   => $userId,
-                'DetentionDate'        => date('Y-m-d'),
-                'DetentionDescription' => 'Fell asleep at desk',
-                'DetentionComment'     => "* Fell asleep at desk\nAgain",
-            ),
-        );
-        $this->absenceList = array(
-            array(
-                'ID'                  => $userId,
-                'EventDateTime'       => date('Y-m-d H:i:s'),
-                'AbsenceTypeCode'     => 'LT',
-                'AbsenceDescription'  => 'Late',
-                'ClassCode'           => 'ENC17',
-                'ClassCampus'         => 'SEN',
-                'ClassDescription'    => 'English Unit 1',
-                'AttendanceDayNumber' => '1',
-                'AttendancePeriod'    => '1',
-                'LateArrivalFlag'     => true,
-                'LateArrivalTime'     => date('H:i:s'),
-            ),
-            array(
-                'ID'                  => $userId,
-                'EventDateTime'       => date('Y-m-d H:i:s'),
-                'AbsenceTypeCode'     => 'ABS',
-                'AbsenceDescription'  => 'Absent',
-                'ClassCode'           => 'ENC17',
-                'ClassCampus'         => 'SEN',
-                'ClassDescription'    => 'English Unit 1',
-                'AttendanceDayNumber' => '1',
-                'AttendancePeriod'    => '1',
-                'LateArrivalFlag'     => false,
-                'LateArrivalTime'     => '',
-            ),
-        );
-        $this->awardList = array(
-            array(
-                'ID'               => $userId,
-                'FileYear'         => $_SESSION['FileYear'],
-                'FileSemester'     => $_SESSION['FileSemester'],
-                'AwardCode'        => 'EIA',
-                'AwardDescription' => 'Everything is awesome',
-                'AwardDate'        => date('Y-m-d'),
-                'AwardAchievement' => 'was awesome',
-                'AwardComment'     => 'You are awesome',
-                'AwardAchievementDescription'   => '',
-
-            ),
-            array(
-                'ID'               => $userId,
-                'FileYear'         => $_SESSION['FileYear'],
-                'FileSemester'     => $_SESSION['FileSemester'],
-                'AwardCode'        => 'PRO',
-                'AwardDescription' => 'You are a pro',
-                'AwardDate'        => date('Y-m-d'),
-                'AwardAchievement' => 'graduated from noob to pro',
-                'AwardComment'     => 'Stopped sucking and started being awesome',
-                'AwardAchievementDescription'   => '',
-
-            ),
-            array(
-                'ID'               => $userId,
-                'FileYear'         => $_SESSION['FileYear'],
-                'FileSemester'     => $_SESSION['FileSemester'],
-                'AwardCode'        => '',
-                'AwardDescription' => 'DEsc v1',
-                'AwardDate'        => date('Y-m-d'),
-                'AwardAchievement' => '',
-                'AwardComment'     => '',
-                'AwardAchievementDescription'   => '',
-
-            ),
-
-            array(
-                'ID'               => $userId,
-                'FileYear'         => $_SESSION['FileYear'],
-                'FileSemester'     => $_SESSION['FileSemester'],
-                'AwardCode'        => '',
-                'AwardDescription' => 'DEsc v2',
-                'AwardDate'        => date('Y-m-d'),
-                'AwardAchievement' => 'ACH',
-                'AwardComment'     => '',
-                'AwardAchievementDescription'   => '',
-
-            ),
-            array(
-                'ID'               => $userId,
-                'FileYear'         => $_SESSION['FileYear'],
-                'FileSemester'     => $_SESSION['FileSemester'],
-                'AwardCode'        => '',
-                'AwardDescription' => 'DEsc v3',
-                'AwardDate'        => date('Y-m-d'),
-                'AwardAchievement' => 'ACH',
-                'AwardComment'     => 'COMM',
-                'AwardAchievementDescription'   => 'AchievementDescription',
-
-            ),
-
-            array(
-                'ID'               => $userId,
-                'FileYear'         => $_SESSION['FileYear'],
-                'FileSemester'     => $_SESSION['FileSemester'],
-                'AwardCode'        => 'CODE',
-                'AwardDescription' => 'DEsc v4',
-                'AwardDate'        => date('Y-m-d'),
-                'AwardAchievement' => 'ACH',
-                'AwardComment'     => 'COMM',
-                'AwardAchievementDescription'   => 'AchievementDescription',
-
-            ),
-
-            array(
-                'ID'               => $userId,
-                'FileYear'         => $_SESSION['FileYear'],
-                'FileSemester'     => $_SESSION['FileSemester'],
-                'AwardCode'        => 'CODE',
-                'AwardDescription' => 'DEsc v5',
-                'AwardDate'        => date('Y-m-d'),
-                'AwardAchievement' => '',
-                'AwardComment'     => 'COMM',
-                'AwardAchievementDescription'   => 'AchievementDescription',
-
-            ),
-
-            array(
-                'ID'                            => $userId,
-                'FileYear'                      => $_SESSION['FileYear'],
-                'FileSemester'                  => $_SESSION['FileSemester'],
-                'AwardCode'                     => 'CODE',
-                'AwardDescription'              => 'DEsc v6',
-                'AwardDate'                     => date('Y-m-d'),
-                'AwardAchievement'              => '',
-                'AwardComment'                  => '',
-                'AwardAchievementDescription'   => 'AchievementDescription',
-            ),
-        );
+//        $this->detentionList = array(
+//            array(
+//                'ID'                   => $userId,
+//                'DetentionDate'        => date('Y-m-d'),
+//                'DetentionDescription' => 'Noobed out',
+//                'DetentionComment'     => 'You are a noob',
+//            ),
+//            array(
+//                'ID'                   => $userId,
+//                'DetentionDate'        => date('Y-m-d'),
+//                'DetentionDescription' => 'Fell asleep at desk',
+//                'DetentionComment'     => "* Fell asleep at desk\nAgain",
+//            ),
+//        );
+//        $this->absenceList = array(
+//            array(
+//                'ID'                  => $userId,
+//                'EventDateTime'       => date('Y-m-d H:i:s'),
+//                'AbsenceTypeCode'     => 'LT',
+//                'AbsenceDescription'  => 'Late',
+//                'ClassCode'           => 'ENC17',
+//                'ClassCampus'         => 'SEN',
+//                'ClassDescription'    => 'English Unit 1',
+//                'AttendanceDayNumber' => '1',
+//                'AttendancePeriod'    => '1',
+//                'LateArrivalFlag'     => true,
+//                'LateArrivalTime'     => date('H:i:s'),
+//            ),
+//            array(
+//                'ID'                  => $userId,
+//                'EventDateTime'       => date('Y-m-d H:i:s'),
+//                'AbsenceTypeCode'     => 'ABS',
+//                'AbsenceDescription'  => 'Absent',
+//                'ClassCode'           => 'ENC17',
+//                'ClassCampus'         => 'SEN',
+//                'ClassDescription'    => 'English Unit 1',
+//                'AttendanceDayNumber' => '1',
+//                'AttendancePeriod'    => '1',
+//                'LateArrivalFlag'     => false,
+//                'LateArrivalTime'     => '',
+//            ),
+//        );
+//        $this->awardList = array(
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => 'EIA',
+//                'AwardDescription' => 'Everything is awesome',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'was awesome',
+//                'AwardComment'     => 'You are awesome',
+//                'AwardAchievementDescription'   => '',
+//
+//            ),
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => 'PRO',
+//                'AwardDescription' => 'You are a pro',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'graduated from noob to pro',
+//                'AwardComment'     => 'Stopped sucking and started being awesome',
+//                'AwardAchievementDescription'   => '',
+//
+//            ),
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => '',
+//                'AwardDescription' => 'DEsc v1',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => '',
+//                'AwardComment'     => '',
+//                'AwardAchievementDescription'   => '',
+//
+//            ),
+//
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => '',
+//                'AwardDescription' => 'DEsc v2',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'ACH',
+//                'AwardComment'     => '',
+//                'AwardAchievementDescription'   => '',
+//
+//            ),
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => '',
+//                'AwardDescription' => 'DEsc v3',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'ACH',
+//                'AwardComment'     => 'COMM',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
+//
+//            ),
+//
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => 'CODE',
+//                'AwardDescription' => 'DEsc v4',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'ACH',
+//                'AwardComment'     => 'COMM',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
+//
+//            ),
+//
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => 'CODE',
+//                'AwardDescription' => 'DEsc v5',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => '',
+//                'AwardComment'     => 'COMM',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
+//
+//            ),
+//
+//            array(
+//                'ID'                            => $userId,
+//                'FileYear'                      => $_SESSION['FileYear'],
+//                'FileSemester'                  => $_SESSION['FileSemester'],
+//                'AwardCode'                     => 'CODE',
+//                'AwardDescription'              => 'DEsc v6',
+//                'AwardDate'                     => date('Y-m-d'),
+//                'AwardAchievement'              => '',
+//                'AwardComment'                  => '',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
+//            ),
+//        );
 
         // Live data
-//        $userDb              = new External_User();
-//        $this->externalDb    = new External_UserDetention();
-//        $this->detentionList = $this->externalDb->getDetentions($userId, new DateTime('now'));
-//        $this->absenceList   = $this->externalDb->getAbsences($userId);
-//        $this->awardList     = $this->externalDb->getAwards(
-//            $userId,
-//            $userDb->getCurrentYear($this->getUser()->getExternalId()),
-//            $userDb->getCurrentSemester($this->getUser()->getExternalId())
-//        );
+        $userDb              = new External_User();
+        $this->externalDb    = new External_UserDetention();
+        $this->detentionList = $this->externalDb->getDetentions($userId, new DateTime('now'));
+        $this->absenceList   = $this->externalDb->getAbsences($userId);
+        $this->awardList     = $this->externalDb->getAwards(
+            $userId,
+            $userDb->getCurrentYear($this->getUser()->getExternalId()),
+            $userDb->getCurrentSemester($this->getUser()->getExternalId())
+        );
 
         // Filter award list into absences and lateness
         $absenceList = $this->absenceList;
@@ -282,17 +282,34 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             $this->setVar('award_block', '');
             foreach ($this->awardList as $award) {
                 $date   = new Alaress_Date_Format(new DateTime($award['AwardDate']));
-                //check if needing AwardAcheivement, or AwardAchievementDescription, then build the system
+
+                /*
+                 * updated logic:
+                 * Evan Bailey
+                    Sep 15 2021 01:22 pm
+                    Hi Roberto,
+                    I’ve just had a look at the data in vAwards (which I assume is the view being used to power the notification)…conscious that the field names in the DB don’t correspond to the UI sometimes!
+                    The first past of the notification is always going to be the AwardDescription field.
+                    The second part is going to vary based on what field(s) out of AwardAchievement, AwardComment and AwardAchievementCode in the DB is/are populated…
+                    * If AwardAchievementCode field is populated (regardless of the other two fields), then the second part should be the AwardAchievementDescription field.
+                    * If AwardAchievement field (only) is populated, then the second part should be the AwardAchievement field.
+                    * If AwardComment field (only) is populated, then the second part should be the AwardComment field.
+                    * If AwardAchievement and AwardComment is populated, then handle as currently is (perhaps there is no handling for this at the moment, if so, use AwardAchievement
+                 * */
+
                 $tail = '';
-                if ($award['AwardAchievementDescription']) {
+
+                if ($award['AwardAchievementCode']) {
                     $AwardAchievementDescription = Scrub::text($award['AwardAchievementDescription']);
                     $tail = "for<b class='award-desc'> ${AwardAchievementDescription}</b>";
-//                    $tail = "for {$award['AwardAchievementDescription']}";
-                } elseif ($award['AwardAchievement']) {
+                } else if ($award['AwardAchievement']) {
                     $AwardAchievement = Scrub::text($award['AwardAchievement']);
                     $tail = "for<b class='award-desc'> ${AwardAchievement}</b>";
-//                    $tail = "for {$award['AwardAchievement']}";
+                } else if ($award['AwardComment']) {
+                    $AwardComment = Scrub::text($award['AwardComment']);
+                    $tail = "for<b class='award-desc'> ${AwardComment}</b>";
                 }
+
                 $params = array(
                     'AWARD_CODE'        => $award['AwardCode'],
                     'AWARD_DESCRIPTION' => $award['AwardDescription'],
@@ -300,8 +317,6 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'AWARD_DATE_LABEL'  => $date->getLongDateOnly(),
                     'AWARD_ACHIEVEMENT' => $award['AwardAchievement'],
 //                    'awardLine_block'   => '',
-
-
 
                 );
                 // Scrub. Assume comments may have line breaks
