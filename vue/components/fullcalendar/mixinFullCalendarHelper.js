@@ -9,18 +9,6 @@ import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
 export default {
 
-    data () {
-        return {
-            fullCalendarHelper_eventTimeFormat: {
-                hour: 'numeric',
-                hour12: true,
-                minute: '2-digit',
-                meridiem: 'short',
-                omitZeroMinute: true
-            },
-        }
-    },
-
     methods: {
 
         /**
@@ -131,6 +119,20 @@ export default {
             const endDateFormat = isSameMonth ? dayjs(endDate).format('Do') : dayjs(endDate).format('MMMM Do');
             const endDateYearFormat = dayjs(endDate).format('YYYY');
             return `${startDateFormat} - ${endDateFormat}, ${endDateYearFormat}`;
+        },
+
+        /**
+         * To display an event time like 8:30am - 9:45am
+         * Zero minutes will also be taken off, so 11:00am will become 11am
+         * 
+         * @param { Object }
+         * 
+         * @returns { String }
+         */
+        fullCalendarHelper_eventTimeFormat (date) {
+            const startTime = dayjs(date.start.array).format('h:mma').replace(':00', '');
+            const endTime = dayjs(date.end.array).format('h:mma').replace(':00', '');
+            return `${startTime} - ${endTime}`;
         },
 
         /**

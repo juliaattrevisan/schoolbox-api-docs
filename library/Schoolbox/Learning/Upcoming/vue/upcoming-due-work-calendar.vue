@@ -93,9 +93,7 @@ export default {
                 },
             },
             eventTimeFormat: (date) => {
-                const startTime = dayjs(date.start.array).format('h:mma');
-                const endTime = dayjs(date.end.array).format('h:mma');
-                return `${startTime} - ${endTime}`;
+                return this.fullCalendarHelper_eventTimeFormat(date);
             },
             customButtons: {
                 quickSwitchButton: {

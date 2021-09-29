@@ -148,7 +148,7 @@ export default {
                 }
             },
             eventTimeFormat: (date) => {
-                return dayjs(date.date.marker).format(this.fullCalendarHelper_eventTimeFormat);
+                return this.fullCalendarHelper_eventTimeFormat(date);
             },
             customButtons: {
                 customExport: {

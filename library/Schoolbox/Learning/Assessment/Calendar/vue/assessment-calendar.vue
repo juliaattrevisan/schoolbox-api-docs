@@ -187,7 +187,7 @@ export default {
             initialView: 'resourceTimelineSemester',
             weekText: "''",
             eventTimeFormat: (date) => {
-                return dayjs(date.date.marker).format(this.fullCalendarHelper_eventTimeFormat);
+                return this.fullCalendarHelper_eventTimeFormat(date);
             },
             headerToolbar: {
                 left: 'customToday,customPrev,customNext',

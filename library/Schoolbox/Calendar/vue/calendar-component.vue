@@ -82,7 +82,7 @@ export default {
             },
             headerToolbar: false,
             eventTimeFormat: (date) => {
-                return dayjs(date.date.marker).format(this.fullCalendarHelper_eventTimeFormat); 
+                return this.fullCalendarHelper_eventTimeFormat(date);
             },
             height: 'auto',
             initialView: 'list',
@@ -277,7 +277,7 @@ export default {
         <div class="component-action" v-if="config.folderId && eventsLoaded && hasEvents">
             <section>
                 <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
-                <a href="#" @click="$refs.exportModal.open" class="button">Export Events</a>
+                <a href="#" @click.prevent="$refs.exportModal.open" @keyup.enter="$refs.exportModal.open" class="button">Export Events</a>
                 <a v-if="config.canCreateEvent" :href="config.importEventsUrl" class="button">Import Events</a>
             </section>
         </div>
