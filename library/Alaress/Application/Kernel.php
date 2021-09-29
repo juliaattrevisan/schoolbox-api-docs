@@ -1137,10 +1137,12 @@ abstract class Kernel
         // Register assessment data source
         $di->set(
             'assessmentTranslator',
-            $di->lazy(function () use ($di, $mapperFactory) {
-                $translator = new AssessmentDataModelTranslator(
+            $di->lazy(function () use ($mapperFactory) {
+                /** @var AssessmentMapper $assessmentMapper */
+                $assessmentMapper = $mapperFactory->get(AssessmentMapper::class);
+                $translator       = new AssessmentDataModelTranslator(
                     new MarkSchemeFactory(),
-                    $di->get('mapperFactory')->get(AssessmentMapper::class),
+                    $assessmentMapper,
                     AssessmentDataModelTranslator::MAX_PROJECT_LEVELS_DEFAULT
                 );
                 $translator
