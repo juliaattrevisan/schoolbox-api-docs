@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\LTI\Assessment\Model;
@@ -66,6 +67,9 @@ class Lti implements IAssessmentTypeTranslator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
-        $domainObject->setLtiAssessmentUrl($dataModel->getLtiAssessmentUrl());
+        // TODO set an actual mark type
+        $domainObject
+            ->setMarkType((new MarkType())->setId(MarkType::TYPE_NONE))
+            ->setLtiAssessmentUrl($dataModel->getLtiAssessmentUrl());
     }
 }
