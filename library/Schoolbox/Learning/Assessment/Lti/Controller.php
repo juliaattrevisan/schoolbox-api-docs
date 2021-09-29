@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Lti;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\LTI\Assessment\Model as LtiAssessment;
 use Schoolbox\User;
 
 class Controller extends Assessment\Controller
@@ -29,6 +30,14 @@ class Controller extends Assessment\Controller
         ];
     }
 
+    /**
+     * Placeholder for progress summary for all students on an LTI assessment.
+     *
+     * @api GET /learning/assessment/:assessmentId/status
+     * @since 21.1.0
+     *
+     * @param IAssessable|LtiAssessment $assessment
+     */
     public function getStatus(IAssessable $assessment)
     {
         $this->response->content->set(
@@ -43,6 +52,14 @@ class Controller extends Assessment\Controller
         );
     }
 
+    /**
+     * Placeholder for a summary of a student's progress on an LTI assessment.
+     *
+     * @api   GET /learning/assessments/:assessmentId/:userId
+     * @since 21.1.0
+     *
+     * @param IAssessable|LtiAssessment $assessment
+     */
     public function getSummary(IAssessable $assessment, User $student): void
     {
         $this->getResponse()->content->set(
@@ -59,6 +76,9 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Student's won't create responses to LTI assessments directly: they will
+     * be created via the LTI tool publishing a score to Schoolbox.
+     *
      * @param IAssessable $assessment
      * @param User        $student
      */
@@ -68,6 +88,9 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Student's won't create responses to LTI assessments directly: they will
+     * be created via the LTI tool publishing a score to Schoolbox.
+     *
      * @param IAssessable $assessment
      * @param User        $student
      */
