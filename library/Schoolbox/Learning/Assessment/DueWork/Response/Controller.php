@@ -593,17 +593,32 @@ class Controller extends Base
 
         /* Choose a viewer permission set based on your role
          * Staff members get a different set than students or parents
+         *
+         * Start with the lowest-permission settings
          */
-        $viewerPermissionSet = $this->getUser()->getRole()->isStaff() ? Report::VIEWER_PERMISSION_SET_STAFF : Report::VIEWER_PERMISSION_SET_STUDENT;
+        $payload = [
+            'viewer_user_id' => $this->getUser()->getId(),
+            'locale' => 'en',
+            'viewer_default_permission_set' => Report::VIEWER_PERMISSION_SET_STUDENT
+        ];
+
+        /* Then decide if you're a staff and you need more stuff
+         */
+        if ($this->getUser()->getRole()->isStaff()) {
+            $payload = array_merge($payload, [
+                'viewer_default_permission_set' => Report::VIEWER_PERMISSION_SET_STAFF,
+                'similarity' => [
+                    'view_settings' => [
+                        'save_changes' => true
+                    ]
+                ]
+            ]);
+        }
 
         /* TODO Apparently localisation is a thing, set via locale tuple;
          *  but I have assumed en for now
          */
-        $viewerUrl = $api->retrieve('POST', "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url", [
-            'viewer_user_id' => $this->getUser()->getId(),
-            'locale' => 'en',
-            'viewer_default_permission_set' => $viewerPermissionSet
-        ]);
+        $viewerUrl = $api->retrieve('POST', "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url", $payload);
 
         if (null !== $viewerUrl) {
             $data = [
