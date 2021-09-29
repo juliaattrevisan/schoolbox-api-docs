@@ -253,7 +253,6 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $this->setBlock($templateHandle, 'emptyList', 'emptyList_block');
         $this->setBlock($templateHandle, 'awardList', 'awardList_block');
         $this->setBlock('awardList', 'award', 'award_block');
-        $this->setBlock('award', 'awardLine', 'awardLine_block');
         $this->setBlock($templateHandle, 'detentionList', 'detentionList_block');
         $this->setBlock('detentionList', 'detention', 'detention_block');
         $this->setBlock('detention', 'detentionLine', 'detentionLine_block');
@@ -316,16 +315,9 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
                     'AWARD_DATE'        => $award['AwardDate'],
                     'AWARD_DATE_LABEL'  => $date->getLongDateOnly(),
                     'AWARD_ACHIEVEMENT' => $award['AwardAchievement'],
-//                    'awardLine_block'   => '',
-
                 );
                 // Scrub. Assume comments may have line breaks
                 $params = array_map(array('Scrub', 'text'), $params);
-//                foreach ($this->splitComment($params['AWARD_COMMENT']) as $line) {
-//                    $this->setVar('AWARD_COMMENT_LINE', Scrub::text($line));
-//                    $this->parse('awardLine_block', 'awardLine', true);
-//                    $this->setVar('AWARD_COMMENT_LINE', '');
-//                }
 
                 $this->setVar($params);
                 $this->setVar('AWARD_TAIL', $tail);
