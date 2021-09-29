@@ -24,3 +24,20 @@ CREATE TABLE `turnitin_report` (
     INDEX `turnitin_submission_id_idx` (`turnitin_submission_id` ASC),
     CONSTRAINT `fk_turnitin_subfile_id` FOREIGN KEY (student_submission_file_id) REFERENCES student_submission_file (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- The Turnitin Group Attachment processing queue and its processing result
+-- The last known error is cached here
+CREATE TABLE `turnitin_group_attachment` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `status` ENUM('pending', 'complete', 'error') NOT NULL,
+    `error_code` VARCHAR(255) NULL,
+    `error_message` VARCHAR(255) NULL,
+    `submission_box_file_id` INT UNSIGNED NOT NULL,
+    `turnitin_group_attachment_id` VARCHAR(255) NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME NULL,
+    PRIMARY KEY (`id`),
+    INDEX `turnitin_group_attachment_id_idx` (`turnitin_group_attachment_id` ASC),
+    CONSTRAINT `fk_turnitin_turnitin_group_attachment_id` FOREIGN KEY (submission_box_file_id) REFERENCES submission_box_file (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
