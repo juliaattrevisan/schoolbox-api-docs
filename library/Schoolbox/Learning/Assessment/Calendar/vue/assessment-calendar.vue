@@ -16,6 +16,7 @@ import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-
 import dayjs                      from 'dayjs';
 import advancedFormat             from 'dayjs/plugin/advancedFormat';
 import arraySupport               from 'dayjs/plugin/arraySupport';
+import weekOfYear                 from 'dayjs/plugin/weekOfYear';
 
 // Various URLs this calendar can make use of
 const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -135,15 +136,20 @@ export default {
     beforeMount () {
         dayjs.extend(advancedFormat); //for more format options
         dayjs.extend(arraySupport); //to be able to use an array as a date
+        dayjs.extend(weekOfYear); //to returns weeks of the year
         this.resourceTimelineSemester = {
             type: 'resourceTimeline',
             visibleRange: this.determineVisibleRange,
             slotDuration: { weeks: 1 },
             weekNumbers: true,
-            // slotLabelFormat: [
-            //     'MMM',
-            //     'w'
-            // ],
+            slotLabelFormat: [
+                (date) => {
+                    return dayjs(date.date.marker).format('MMM');
+                },
+                (date) => {
+                    return dayjs(date.date.marker).format('w');
+                }
+            ],
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true,
             validRange: {

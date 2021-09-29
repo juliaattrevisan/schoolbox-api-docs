@@ -2,7 +2,6 @@
 
 import FullCalendar               from '@fullcalendar/vue'
 import interactionPlugin          from '@fullcalendar/interaction'
-import momentPlugin               from '@fullcalendar/moment'
 import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@vue/components/fullcalendar/view-event-modal';
 import CreateBookingModal         from '@vue/components/fullcalendar/resourceBooking/create-booking-modal';
@@ -74,7 +73,7 @@ export default {
         dayjs.extend(arraySupport); //to be able to use an array as a date
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, resourceTimelinePlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, resourceTimelinePlugin, adaptivePlugin ],
             views: {
                 resourceTimelineMonth: {
                     slotLabelFormat: (date) => {
@@ -82,12 +81,14 @@ export default {
                     }
                 },
                 resourceTimelineWeek: {
-                    slotLabelFormat: ['ddd D/M', 'h'],
-                    // slotLabelFormat: (date) => {
-                    //     const days = dayjs(date.date.marker).format('ddd D/M');
-                    //     const hours = dayjs(date.date.marker).format('h');
-                    //     return [ days, hours ];
-                    // },
+                    slotLabelFormat: [
+                        (date) => {
+                            return dayjs(date.date.marker).format('ddd D/M');
+                        },
+                        (date) => {
+                            return dayjs(date.date.marker).format('h');
+                        }
+                    ],
                     slotMinWidth: '50',
                     titleFormat: (date) => {
                         return this.fullCalendarHelper_titleFormatWeek(date);
