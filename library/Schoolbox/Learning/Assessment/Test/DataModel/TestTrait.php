@@ -58,7 +58,7 @@ trait TestTrait
             ->addSubTranslator(new Translator\Task())
             ->addSubTranslator(new Translator\DueWork())
             ->addSubTranslator(new Translator\Quiz())
-            ->addSubTranslator(new LtiAssessment\Translator(LtiAssessment\Mapper::getInstance()))
+            ->addSubTranslator(new LtiAssessment\Translator())
             ->addSubTranslator(new Translator\Project($this->translator))
         ;
 

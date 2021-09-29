@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model as DueWorkFileModel;
 use Schoolbox\GenericCollection;
@@ -26,21 +25,12 @@ use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
  */
 class DueWork implements IAssessmentTypeTranslator
 {
-    /** @var DueWorkModel\MarkTypeMapper */
-    private $markTypeMapper;
-
-    public function __construct()
-    {
-        $this->markTypeMapper = DueWorkModel\MarkTypeMapper::getInstance(); // TODO inject
-    }
-
-
     /**
      * @return IAssessableDataModel
      */
     public function createDataModel(): IAssessableDataModel
     {
-        return new SubmissionBox();
+        return new DueWorkModel();
     }
 
 
@@ -111,19 +101,19 @@ class DueWork implements IAssessmentTypeTranslator
         $markScheme = $domainObject->getMarkScheme();
         if ($markScheme instanceof TotalMarkFractional) {
             $dataModel->setMaxMark($markScheme->getTotalMark());
-            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_TOTAL));
+            $dataModel->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_TOTAL));
         } elseif ($markScheme instanceof Percentage) {
-            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_PERCENT));
+            $dataModel->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_PERCENT));
         } elseif ($markScheme instanceof LetterGrade) {
             $dataModel->setGradeGroup($markScheme->getGradeGroup());
-            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_LETTER));
+            $dataModel->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_LETTER));
         } elseif ($markScheme instanceof None) {
-            $dataModel->setMarkType($this->markTypeMapper->createModel(DueWorkModel\MarkType::TYPE_NONE));
+            $dataModel->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
         }
 
         // Translate files
         if ($domainObject->getAttachedFiles() !== null) {
-            $dataModel->setAttachments(new GenericCollection(SubmissionBox\SingleFile\Model::class));
+            $dataModel->setAttachments(new GenericCollection(DueWorkModel\SingleFile\Model::class));
 
             $seen = [];
 

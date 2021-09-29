@@ -131,7 +131,6 @@ use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Scrub;
 use SitePage;
@@ -1149,13 +1148,11 @@ abstract class Kernel
                     $di->get('mapperFactory')->get(AssessmentMapper::class),
                     AssessmentDataModelTranslator::MAX_PROJECT_LEVELS_DEFAULT
                 );
-                /** @var LtiAssessment\Mapper $ltiAssessmentMapper */
-                $ltiAssessmentMapper = $mapperFactory->get(LtiAssessment\Mapper::class);
                 $translator
                     ->addSubTranslator(new TaskTranslator())
                     ->addSubTranslator(new DueWorkTranslator())
                     ->addSubTranslator(new QuizTranslator())
-                    ->addSubTranslator(new LtiAssessment\Translator($ltiAssessmentMapper))
+                    ->addSubTranslator(new LtiAssessment\Translator())
                     ->addSubTranslator(new ProjectTranslator($translator))
                 ;
                 return $translator;

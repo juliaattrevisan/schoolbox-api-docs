@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator as BaseTranslator;
@@ -37,9 +36,6 @@ class Project implements IAssessmentTypeTranslator
      */
     protected $baseTranslator;
 
-    /** @var MarkTypeMapper */
-    private $markTypeMapper;
-
 
     /**
      * Constructor
@@ -49,7 +45,6 @@ class Project implements IAssessmentTypeTranslator
     public function __construct(BaseTranslator $baseTranslator)
     {
         $this->baseTranslator = $baseTranslator;
-        $this->markTypeMapper = MarkTypeMapper::getInstance(); // TODO inject
     }
 
 
@@ -125,12 +120,12 @@ class Project implements IAssessmentTypeTranslator
         // TODO move this to the mark scheme translator
         $markScheme = $domainObject->getMarkScheme();
         if ($markScheme instanceof Percentage) {
-            $dataModel->setMarkType($this->markTypeMapper->createModel(MarkType::TYPE_PERCENT));
+            $dataModel->setMarkType((new MarkType())->setId(MarkType::TYPE_PERCENT));
         } elseif ($markScheme instanceof LetterGrade) {
-            $dataModel->setMarkType($this->markTypeMapper->createModel(MarkType::TYPE_LETTER));
+            $dataModel->setMarkType((new MarkType())->setId(MarkType::TYPE_LETTER));
             $dataModel->setGradeGroup($markScheme->getGradeGroup());
         } elseif ($markScheme instanceof None) {
-            $dataModel->setMarkType($this->markTypeMapper->createModel(MarkType::TYPE_NONE));
+            $dataModel->setMarkType((new MarkType())->setId(MarkType::TYPE_NONE));
         }
     }
 

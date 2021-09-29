@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Learning\Quiz\Model as QuizModel;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -20,22 +19,12 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
  */
 class Quiz implements IAssessmentTypeTranslator
 {
-
-    private $quizMapper;
-
-
-    public function __construct()
-    {
-        $this->quizMapper = QuizMapper::getInstance(); // TODO inject
-    }
-
-
     /**
      * @return IAssessableDataModel
      */
     public function createDataModel(): IAssessableDataModel
     {
-        return $this->quizMapper->createModel(); // TODO consider using ID
+        return new QuizModel();
     }
 
 

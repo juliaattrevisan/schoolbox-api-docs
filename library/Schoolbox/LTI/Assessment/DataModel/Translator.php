@@ -16,19 +16,12 @@ use Schoolbox\LTI\Assessment\Model as DomainObject;
 
 class Translator implements IAssessmentTypeTranslator
 {
-    private Mapper $mapper;
-
-    public function __construct(Mapper $mapper)
-    {
-        $this->mapper = $mapper;
-    }
-
     /**
      * @inheritDoc
      */
     public function createDataModel(): IAssessableDataModel
     {
-        return $this->mapper->createModel();
+        return new Model();
     }
 
     /**
