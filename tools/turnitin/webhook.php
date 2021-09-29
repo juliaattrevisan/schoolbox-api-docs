@@ -188,7 +188,7 @@ HELP;
             $payload['url'],
             implode(', ', $payload['event_types'])
         ));
-        
+
         try {
             $result = $api->retrieve('POST', '/api/v1/webhooks', $payload);
         } catch (\DomainException $e) {
@@ -217,7 +217,7 @@ HELP;
      */
     private function getWebhooks(Turnitin\Api $api): array
     {
-        return $api->retrieve('GET','/api/v1/webhooks', []);
+        return $api->retrieve('GET', '/api/v1/webhooks', []);
     }
 
 
@@ -250,7 +250,7 @@ HELP;
 
             $this->getLogger()->info(sprintf(
                 'Webhook %s: %s',
-                $i+1,
+                $i + 1,
                 $webhook['description']
             ));
 
@@ -258,7 +258,7 @@ HELP;
                 '%s is set up to receive %s values %s',
                 $webhook['url'],
                 Turnitin\Controller::HEADER_EVENT_TYPE,
-                implode (', ', $webhook['event_types'])
+                implode(', ', $webhook['event_types'])
             ));
 
             $this->getLogger()->debug(sprintf(
