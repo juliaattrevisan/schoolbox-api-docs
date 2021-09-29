@@ -24,7 +24,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
-use Schoolbox\LTI\Assessment\DataModel\Model as LtiAssessment;
+use Schoolbox\LTI\Assessment\Model as LtiAssessment;
 use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Curriculum\Node;
 use TypeError;

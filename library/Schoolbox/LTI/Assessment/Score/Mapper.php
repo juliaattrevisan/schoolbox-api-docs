@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Assessment\DataModel\Score;
+namespace Schoolbox\LTI\Assessment\Score;
 
-use Schoolbox\LTI\Assessment\DataModel\Mapper as LTIAssessmentMapper;
+use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 

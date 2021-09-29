@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Assessment\DataModel\Score;
+namespace Schoolbox\LTI\Assessment\Score;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\LTI\Assessment\DataModel\Model as LTIAssessmentModel;
+use Schoolbox\LTI\Assessment\Model as LTIAssessmentModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;

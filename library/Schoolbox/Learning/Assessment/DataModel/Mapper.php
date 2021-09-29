@@ -30,7 +30,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
-use Schoolbox\LTI\Assessment\DataModel as LtiAssessment;
+use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
