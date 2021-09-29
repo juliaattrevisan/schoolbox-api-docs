@@ -917,12 +917,13 @@ abstract class Component_ControllerAbstract
     /**
      * Return whether we are able to render this component's content for current user.
      * False if lacks read permission on content, or because content is deleted.
+     * if getSource()->getId() is null (database deleted, but still referred to) also show as deleted.
      *
      * @return bool
      */
     public function isSourceRenderable()
     {
-        if (!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())) {
+        if (!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted() || $this->getSource()->getId() === null)) {
             return false;
         }
 
