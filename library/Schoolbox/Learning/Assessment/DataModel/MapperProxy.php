@@ -1293,6 +1293,14 @@ class MapperProxy
             }
 
             $boxMapper->saveFiles($subObject);
+
+            /* If turnitin is enabled, create a group and remember it
+             * The turnitin group id is generally the same as the submission_box_id
+             * which seems superfluous; but this tuple indicates that a group
+             * was actually created in turnitin rather than blindly assume it
+             */
+
+
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());

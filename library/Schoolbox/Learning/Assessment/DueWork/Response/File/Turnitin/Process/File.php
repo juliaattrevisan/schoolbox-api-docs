@@ -177,12 +177,29 @@ class File
         /* Commencing Purification.
          */
         try {
+
+            /* Find a (submission_box_id, group_id) tuple from turnitin_group
+             * If it's there, use that identifier and keep going
+             *
+             * $group is an array consisting of the following fields which we
+             * can dynamically re-construct here without the authentic payload:
+             *
+             * [
+             *      id: $submission_box_id,
+             *      name: $submission_box_name
+             *      type: self::GROUP_TYPE
+             * ]
+             *
+             * If the group doesn't exist, create one and continue with that
+             * You can do this if you check for the tuple in turnitin_group;
+             * if it's not there, make a row and continue; otherwise just
+             * use the fabricated array described above (turnitin doesn't care
+             * if you repeatedly a group, it just updates it)
+             */
+
             /* Create a Turnitin Group
              */
             $group = $this->createGroup($model, $ssf);
-
-            /* TODO: Remember the group_id in turnitin_group (later)
-             */
 
             /* Create a Turnitin Submission
              */
