@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\LTI\Assessment\DataModel\Model;
-use Schoolbox\LTI\Assessment\Model as DomainObject;
+use Schoolbox\Learning\Assessment\Lti\Model as DomainObject;
 
 /**
  * Sub-translator for LTI assessment specific fields.

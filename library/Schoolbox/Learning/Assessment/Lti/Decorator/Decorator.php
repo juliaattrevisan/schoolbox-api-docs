@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti\Decorator;
 
 use Schoolbox\Learning\Assessment\DecoratorInterface;
-use Schoolbox\LTI\Assessment\Model;
+use Schoolbox\Learning\Assessment\Lti\Model;
 
 class Decorator implements DecoratorInterface
 {

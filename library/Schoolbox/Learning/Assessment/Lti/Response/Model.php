@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Assessment\Response;
+namespace Schoolbox\Learning\Assessment\Lti\Response;
 
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\AbstractResponse;

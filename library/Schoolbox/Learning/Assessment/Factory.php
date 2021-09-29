@@ -18,7 +18,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Lti\Decorator\Decorator as LtiDecorator;
 use Schoolbox\Learning\Assessment\Lti\Decorator\LtiTrait;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\LTI\Assessment\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;

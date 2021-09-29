@@ -10,10 +10,10 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\LTI\Assessment\Model as LtiAssessment;
 
 /**
  * Encapsulates the mapping between Assessment Types and:
@@ -29,6 +29,8 @@ use Schoolbox\LTI\Assessment\Model as LtiAssessment;
  */
 class AssessmentType implements IType
 {
+    use TypeTrait;
+
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
     const TYPE_PROJECT = 'project';
@@ -36,8 +38,6 @@ class AssessmentType implements IType
     const TYPE_TASK = 'task';
     const TYPE_QUIZ = 'quiz';
     const TYPE_LTI_ASSESSMENT = 'lti';
-
-    use TypeTrait;
 
     /**
      * Get twig template directory for a given IAssessable

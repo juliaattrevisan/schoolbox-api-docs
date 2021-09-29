@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Assessment\Feedback;
+namespace Schoolbox\Learning\Assessment\Lti\Feedback;
 
 use Schoolbox\Learning\Assessment\AbstractFeedback;
 

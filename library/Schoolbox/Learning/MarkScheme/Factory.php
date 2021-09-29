@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
-use Schoolbox\LTI\Assessment\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use UnexpectedValueException;

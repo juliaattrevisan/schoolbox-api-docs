@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\Lti;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\LTI\Assessment\Model as LtiAssessment;
 use Schoolbox\User;
 
 class Controller extends Assessment\Controller
@@ -36,7 +35,7 @@ class Controller extends Assessment\Controller
      * @api GET /learning/assessment/:assessmentId/status
      * @since 21.1.0
      *
-     * @param IAssessable|LtiAssessment $assessment
+     * @param IAssessable|Model $assessment
      */
     public function getStatus(IAssessable $assessment)
     {
@@ -58,7 +57,7 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @since 21.1.0
      *
-     * @param IAssessable|LtiAssessment $assessment
+     * @param IAssessable|Model $assessment
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
