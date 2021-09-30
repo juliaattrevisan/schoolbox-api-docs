@@ -717,6 +717,7 @@ class Controller extends Base
                 'fullName'  => $student->getFullName(),
                 'firstName' => $student->getFirstname(),
                 'lastName'  => $student->getLastname(),
+                'role'      => $student->getRole()->getName(),
                 'badges'    => $studentAwards[$student->getId()],
             ];
         }

@@ -185,16 +185,19 @@ export default {
                 <label :for="`checkbox-${student.id}`"></label>
             </div>
         </div>
-        <div class="student__portrait-and-name">
+        <div class="student__profile">
             <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="`profile photo of ${student.fullName}`" class="portrait">
-            <template v-if="student.id">
-                <a :href="`/search/user/${student.id}`" title="View profile" class="name">
-                    {{ student.lastName + ', ' + student.firstName }}
-                </a>
-            </template>
-            <template v-else>
-                <span class="name">{{ student.lastName + ', ' + student.firstName }}</span>
-            </template> 
+            <div>
+                <template v-if="student.id">
+                    <a :href="`/search/user/${student.id}`" title="View profile" class="name">
+                        {{ student.lastName + ', ' + student.firstName }}
+                    </a>
+                </template>
+                <template v-else>
+                    <span class="name">{{ student.lastName + ', ' + student.firstName }}</span>
+                </template> 
+                <p v-if="student.role" class="meta">{{ student.role }}</p>
+            </div>
         </div>
         <div class="student__badges">
             <horizontal-scoller 
@@ -257,7 +260,7 @@ $collapseStudent: 1000px;
         padding-bottom: 0;
     }
 
-    .student__portrait-and-name {
+    .student__profile {
         display: flex;
         align-items: flex-start;
         width: 240px;
