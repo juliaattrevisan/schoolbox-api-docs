@@ -579,7 +579,7 @@ class ListController extends Web\Controller\Base
          */
         $db = $this->getUserMapper()->getDatabase();
         try {
-            $db->beginTransaction();
+//            $db->beginTransaction();
             // Create a notifier proxy so that I may notify about assessment changes
             $notifier = $this->assessmentMapper->getNotifier();
             $before   = $notifier->dehydrate($assessment);
@@ -611,14 +611,14 @@ class ListController extends Web\Controller\Base
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         } catch (\Exception $e) {
-            $db->rollback();
+//            $db->rollback();
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
 
         // If we're here the assessment must have saved properly.
         // Commit and send the notifications
-        $db->commit();
+//        $db->commit();
         // Retrieve assessment, as I need the assessment's participation
         $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
 

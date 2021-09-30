@@ -14,7 +14,11 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper as SingleFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -23,6 +27,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -202,6 +207,71 @@ class Transactor
             }
             $this->assessmentMapperProxy->delete($originalAssessment);
             $relocated = true;
+        }
+
+        /* If Similarity Check is enabled, and turnitin is enabled,
+         * send the attachments to turnitin to use as exclusion data for student submissions
+         */
+        if ($this->assessment instanceof DueWork\Model && $this->assessment->getSimilarityCheckEnabled()) {
+            /* If turnitin is enabled, create a group attachment for each file
+             */
+            if ((new Helper(Loader::getInstance()))->isConfigured()) {
+                /* Note that $this->assessment and $assessment files do not have a primary id
+                 * when you first create a Due Work, which means you have to obtain them by
+                 * alternative means.
+                 *
+                 * new \Alaress_Probe($this->assessment->getAttachedFiles());
+                 *
+                 * TODO There should be an easier way to do this, but idk,
+                 *  something is going funny in the swamp
+                 */
+                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $this->assessment->getId(), ['cache' => false]);
+                $files = SingleFileMapper::getInstance()->findByColumn('box_id', $submissionBox->getId(), ['cache' => false]);
+
+                $turnitinMapper = Turnitin\Mapper::getInstance();
+
+                /* Set up a turnitin stub record
+                 * This allows it to be picked up and processed by an async script later
+                 * if it doesn't start processing via the $detachedFunction
+                 */
+                $models = [];
+
+                foreach ($files as $currentFile) {
+                    $model = $turnitinMapper->saveStub($currentFile);
+
+                    if ($model) {
+                        $models[] = $model;
+                    }
+                }
+                /* We need this api
+                 */
+//                        $api = new Api(
+//                            $configLoader->get('site_version'),
+//                            $configLoader->get('turnitin_api_host'),
+//                            $configLoader->get('turnitin_api_key')
+//                        );
+//
+//                        /* Set up detached function so turnitin can continue in the background
+//                         */
+//                        $detachedFunction = static function () use ($api, $models) {
+//
+//                            /* Set up a record processor
+//                             */
+//                            $processor = (new Turnitin\Process\File(
+//                                $api,
+//                                Turnitin\Mapper::getInstance(),
+//                                UserMapper::getInstance(),
+//                                SubmissionBoxMapper::getInstance(),
+//                                SingleFile\Mapper::getInstance()
+//                            ));
+//
+//                            /* Shank them all up
+//                             */
+//                            foreach ($models as $model) {
+//                                $processor->process($model);
+//                            }
+//                        };
+            }
         }
 
         /* The conclusion of how $returnUrl was derived
