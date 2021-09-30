@@ -138,19 +138,24 @@ class Payload
         /* List of allowed urls
          */
         $whitelistUrls = [
-            "{$domain}/login",
-            $startUrl,
-            "{$domain}/assess/",
-            "{$domain}/storage/fetch.php",
-            "{$domain}/storage/image.php",
-            "{$domain}/cms/sendVideo.php"
+            "{$domain}/login*",
+            "{$startUrl}*",
+            "{$domain}/assess/*",
+            "{$domain}/storage/fetch.php*",
+            "{$domain}/storage/image.php*",
+            "{$domain}/cms/sendVideo.php*"
         ];
 
         if ($this->config->get('saml_enabled')) {
+            $whitelistUrls[] = "{$domain}/saml*";
             $urlSso          = parse_url(trim($this->config->get('saml_sso_url')));
-            $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/";
+            $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/*";
             $urlIdp          = parse_url(trim($this->config->get('saml_idp_metadata_url')));
-            $whitelistUrls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/";
+            $whitelistUrls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/*";
+        }
+
+        if ($this->config->get('seb_whitelist')) {
+            $whitelistUrls = array_merge($whitelistUrls, array_map('trim', explode("\n", $this->config->get('seb_whitelist'))));
         }
 
         /* Manufacture a phplib style struct for strings and their replacements
@@ -388,7 +393,7 @@ class Payload
         <key>regex</key>
         <false />
         <key>expression</key>
-        <string>{$url}*</string>
+        <string>{$url}</string>
         <key>action</key>
         <integer>1</integer>
       </dict>";
