@@ -62,6 +62,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -1032,7 +1033,7 @@ class Controller extends Assessment\Controller
 
                 /* We need this api
                  */
-                $api = new Turnitin\Api(
+                $api = new Api(
                     $this->getConfigLoader()->get('site_version'),
                     $this->getConfigLoader()->get('turnitin_api_host'),
                     $this->getConfigLoader()->get('turnitin_api_key')

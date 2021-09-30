@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -299,7 +300,7 @@ class Controller extends Base
 
                         /* We need this api
                          */
-                        $api = new Turnitin\Api(
+                        $api = new Api(
                             $this->getConfigLoader()->get('site_version'),
                             $this->getConfigLoader()->get('turnitin_api_host'),
                             $this->getConfigLoader()->get('turnitin_api_key')

@@ -13,6 +13,7 @@ use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
@@ -132,7 +133,7 @@ HELP;
         if ($acquired) {
             /* We need this api
              */
-            $api = new Turnitin\Api(
+            $api = new Api(
                 $this->getConfig()->get('site_version'),
                 $this->getConfig()->get('turnitin_api_host'),
                 $this->getConfig()->get('turnitin_api_key')
