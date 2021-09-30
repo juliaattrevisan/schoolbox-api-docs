@@ -48,8 +48,8 @@ export default {
          * which will change depending on whether the side menu is opened/closed, browser resized etc
          */
         updatePosition () {
-            this.width = this.$el.getBoundingClientRect().width + 'px';
-            this.left = this.$el.getBoundingClientRect().x + 'px';
+            this.width = `${ this.$el.getBoundingClientRect().width }px`;
+            this.left = `${ this.$el.getBoundingClientRect().x }px`;
         }
 
     }
@@ -74,7 +74,7 @@ export default {
 .bottom-drawer-container {
     position: fixed;
     width: 100%; //will be updated by the width data prop
-    height: 120px;
+    height: auto;
     left: 0px; //will be updated by the left data prop
     bottom: 0px;
     padding: 1rem;

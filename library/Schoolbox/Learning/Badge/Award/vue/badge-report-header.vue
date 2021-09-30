@@ -57,7 +57,7 @@ export default {
 .header {
     display: flex;
     width: 100%;
-    margin: 0 0 0.625rem 0;
+    margin: 1rem 0 0.625rem 0;
     padding: 0 1rem;
 }
 

@@ -140,10 +140,6 @@ export default {
          * closing it the first time.
          */
         checkBadgeAnimationCleanedUp () {
-            const badgeImageClone = this.$refs.badgeImage.$el.querySelector('[data-is-badge-clone]');
-            if (badgeImageClone) { //remove the animated background
-                badgeImageClone.remove();
-            }
             const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
             badgeImage.style = ''; //gsap applies some style attributes, which should be cleared again
         },

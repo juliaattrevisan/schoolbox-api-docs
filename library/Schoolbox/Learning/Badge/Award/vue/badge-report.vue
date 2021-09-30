@@ -6,6 +6,7 @@
  */
 
 import { stringify } from 'qs';
+import { isObject, convertObjectToArray } from '@js/util/jsUtils';
 import BadgeReportHeader from './badge-report-header';
 import BadgeReportStudent from './badge-report-student';
 import AwardDetailModal from './award-detail-modal';
@@ -53,6 +54,15 @@ export default {
     computed: {
 
         /**
+         * No badges to show if there's no students, so show a 'no students' display
+         * 
+         * @returns { Boolean }
+         */
+        hasStudents () {
+            return this.studentsData.length > 0; 
+        },
+
+        /**
          * To determine whether to show the bottom-drawer to award badges to students
          * 
          * @returns { Boolean }
@@ -91,7 +101,7 @@ export default {
     },
 
     mounted () {
-        document.addEventListener('badge-report__onFilterChange', this.getStudentData); //the student data is ready
+        document.addEventListener('badge-report__onFilterChange', this.getStudentData); //the group data is ready
     },
 
     methods: {
@@ -152,14 +162,23 @@ export default {
 
         /**
          * To update a badge that was previously a goal that is now an achievement
-         * This is so it goes full colour, and can't be awarded again in the award-detail-modal.vue
+         * There are two scenarios, one is that the badge is already an achievement, in which case
+         * the count on the badge will be incremented.
+         * Otherwise the goal is just turned into an achievement by going full colour. 
          * 
          * @params { Object } 
          */
         onAchievementAwarded (awardedBadge) {
             const student = this.studentsData.find((student) => student.id === awardedBadge.recipient.id);
-            const badge = student.badges.find((badge) => badge.badge.id === awardedBadge.badge.id);
-            badge.isGoal = false; //this will trigger the badge to update within badge-report-student.vue
+            const studentBadges = isObject(student.badges) ? convertObjectToArray(student.badges) : student.badges; //needs to be converted to an array if it hasn't already
+            const badgeToUpdate = studentBadges.find((badge) => badge.badge.id === awardedBadge.badge.id);
+            const hasBadgeMatch = studentBadges.find((badge) => badge.badge.id === badgeToUpdate.badge.id && badge.id !== badgeToUpdate.id);
+            if (hasBadgeMatch) { //if the badge has already been achieved, increment the count and pull the badge goal out of the list
+                hasBadgeMatch.count++; 
+                student.badges = studentBadges.filter((badge) => badge.id !== badgeToUpdate.id);
+            } else {
+                badgeToUpdate.isGoal = false; //this will trigger the badge to update within badge-report-student.vue
+            }
         },
 
         /**
@@ -191,7 +210,7 @@ export default {
 
         <section class="content">
             
-            <div v-if="isDataLoaded">
+            <div v-if="isDataLoaded && hasStudents">
                 <badge-report-header 
                     :has-some-students-selected="hasSomeStudentsSelected"
                     :are-all-students-selected="areAllStudentsSelected"
@@ -213,8 +232,13 @@ export default {
                 />
             </div>
 
+            <div v-else-if="isDataLoaded && !hasStudents" class="empty-state">
+                <i class="icon-staff-students"></i>
+                <p>There are currently no users within this group.</p>
+            </div>
+
             <div v-else-if="hasDataLoadError" class="alert-box alert">
-                Sorry, we are currently unable to load the student data.
+                Sorry, we are currently unable to load the group data.
             </div>
 
             <div v-else class="loader"></div>
@@ -241,7 +265,7 @@ export default {
 }
 
 .content {
-    padding: 1rem 0 0 0; //remove the padding for most
+    padding: 0; //remove the padding
 }
 
 .action-list {
@@ -263,10 +287,13 @@ export default {
 
 .modal-actions {
 	display: flex;
-    margin-bottom: 1rem;
 	a {
 		margin: 0 1px;
 	}
+}
+
+.empty-state {
+    margin: 0; //remove the white space at the bottom when there's no rows
 }
 
 </style>

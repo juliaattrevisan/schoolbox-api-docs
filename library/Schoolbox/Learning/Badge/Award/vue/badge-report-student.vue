@@ -7,7 +7,7 @@
 import { gsap } from 'gsap/all';
 import BadgeImage from '../../vue/badge-image';
 import { getIndex } from '@js/util/domUtils';
-import HorizontalScroller from '@js/scroll/horizontalScroller';
+import HorizontalScoller from '@vue/components/scroll/horizontal-scoller';
 
 const BADGE_ANIMATE_DURATION = 0.3;
 
@@ -15,6 +15,7 @@ export default {
     
     components: {
         BadgeImage,
+        HorizontalScoller,
     },
 
     props: {
@@ -28,7 +29,26 @@ export default {
         }
     },
 
+    data () {
+        return {
+            hasContentChange: false //to track badge report changes due to filtering
+        }
+    },
+
     computed: {
+
+        /**
+         * To check if there's badges to display
+         * 
+         * @returns { Boolean }
+         */
+        hasBadges () {
+            if (this.student.badges) {
+                return true;
+            } else {
+                return false;
+            }
+        },
 
         /**
          * To ensure it's unchecked when 'Clear Selection' is selected in #badge-report
@@ -43,31 +63,27 @@ export default {
 
     watch: {
 
+        /**
+         * We need to wait for the filter animation to complete before we re-evaluate
+         * the status of horizontal-scroller.
+         * @TODO - consider using ResizeObserver once Safari 15 is released, as 
+         * this could be handled much better by the feature
+         */
         student: {
             deep: true,
             handler (newStudentData, oldStudentData) {
-                if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) {
-                    setTimeout(() => { 
-                        this.horizontalScroller.refresh();
-                    }, BADGE_ANIMATE_DURATION * 2000);
+                if (newStudentData?.badges?.length !== oldStudentData?.badges?.length) { //if the number of badges has changed
+                    setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
+                        this.hasContentChange = true; 
+                        this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
+                    }, BADGE_ANIMATE_DURATION * 2100);
                 }
             }
         }
 
     },
 
-    mounted () {
-        this.initHorizontalScroller();
-    },
-
     methods: {
-
-        /**
-         * To horizontally scroll the badge list
-         */
-        initHorizontalScroller () {
-            this.horizontalScroller = new HorizontalScroller(this.$el.querySelector('[data-scroller]')); 
-        },
 
         /**
          * Open the selected award detail modal
@@ -95,7 +111,14 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onEnter (element, done) {
-            gsap.to(element, { opacity: 1, y: 0, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, delay: BADGE_ANIMATE_DURATION, onComplete: done } );
+            gsap.to(element, { 
+                opacity: 1, 
+                y: 0, 
+                ease: 'power1.out', 
+                duration: BADGE_ANIMATE_DURATION, 
+                delay: BADGE_ANIMATE_DURATION, 
+                onComplete: done 
+            } );
         },
 
         /**
@@ -116,7 +139,12 @@ export default {
          * @param {Function} done - to be called once animation is complete
          */
         onLeave (element, done) {
-            gsap.to(element, { opacity: 0, y: 10, ease: 'power1.out', duration: BADGE_ANIMATE_DURATION, onComplete: done } );
+            gsap.to(element, { 
+                opacity: 0, 
+                y: 10, ease: 'power1.out', 
+                duration: BADGE_ANIMATE_DURATION, 
+                onComplete: done 
+            } );
         },
 
         /**
@@ -145,7 +173,7 @@ export default {
 
 <template>
     <li class="awards student">
-        <div class="student__checkbox">
+        <div class="student__select">
             <div class="checklist">
                 <input 
                     :id="`checkbox-${student.id}`"
@@ -157,9 +185,9 @@ export default {
                 <label :for="`checkbox-${student.id}`"></label>
             </div>
         </div>
-        <div class="student__portrait-and-name">
-            <div class="portrait-and-name-container">
-                <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="`profile photo of ${student.fullName}`" class="portrait">
+        <div class="student__profile">
+            <img :src="`/portrait.php?id=${student.id}&size=square64`" :alt="`profile photo of ${student.fullName}`" class="portrait">
+            <div>
                 <template v-if="student.id">
                     <a :href="`/search/user/${student.id}`" title="View profile" class="name">
                         {{ student.lastName + ', ' + student.firstName }}
@@ -168,40 +196,41 @@ export default {
                 <template v-else>
                     <span class="name">{{ student.lastName + ', ' + student.firstName }}</span>
                 </template> 
+                <p v-if="student.role" class="meta">{{ student.role }}</p>
             </div>
         </div>
         <div class="student__badges">
-            <div class="scroller-container" data-scroller>
-                <div class="scroller-button-container">
-                    <button class="scroller-button" data-scroller-previous-button>&lt;</button>
-                </div>
-                <div class="scroller-flex-container">
-                    <div class="scroller-outer-container" data-scroller-outer-container>
-                        <transition-group
-                            tag="ul"
-                            class="scroller-inner-container"
-                            data-scroller-inner-container
-                            :css="false"
-                            @before-enter="onBeforeEnter"
-                            @enter="onEnter"
-                            @before-leave="onBeforeLeave" 
-                            @leave="onLeave" 
-                            @after-leave="onAfterLeave" 
-                        >      
-                            <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
-                                <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
+            <horizontal-scoller 
+                v-if="hasBadges"
+                :hasButtons="true"
+                :height="80"
+                :has-content-change="hasContentChange"
+            >
+                <transition-group
+                    tag="ul"
+                    class="award-list"
+                    :css="false"
+                    @before-enter="onBeforeEnter"
+                    @enter="onEnter"
+                    @before-leave="onBeforeLeave" 
+                    @leave="onLeave" 
+                    @after-leave="onAfterLeave" 
+                >      
+                    <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
+                        <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
+                            <div class="award__container">
+                                <div class="award__image-container">
                                     <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
-                                    <span>{{ award.badge.name }}</span>
-                                </a>
-                            </li>
-                        </transition-group>
-                        <div class="scroller-bar" data-scroller-scroll-bar></div>
-                    </div>
-                </div>
-                <div class="scroller-button-container">
-                    <button class="scroller-button" data-scroller-next-button>&gt;</button>
-                </div>
-            </div>
+                                    <div v-if="award.count > 1" class="award-count" :title="`Awarded ${award.count} times`">x{{ award.count }}</div>
+                                </div>
+                                <div class="award__title-container">
+                                    <p>{{ award.badge.name }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </transition-group>
+            </horizontal-scoller>
         </div>
     </li>
 </template>
@@ -210,14 +239,13 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-$rowHeight: 120px;
+$rowHeight: 80px;
 $collapseStudent: 1000px;
+
 
 .student {
     display: flex;
-    width: 100%;
     height: $rowHeight;
-    overflow: hidden;
     margin: 0 0 0.625rem 0;
     padding: 0;
     @media (max-width: $collapseStudent) {
@@ -227,113 +255,79 @@ $collapseStudent: 1000px;
     }
 }
 
-.student__checkbox {
-    width: 40px;
-    padding-bottom: 0;
-}
-
-.student__portrait-and-name {
-    width: 260px;
-    padding-bottom: 0;
-    @media (max-width: $collapseStudent) {
-        margin-bottom: 1rem;
-    }
-}
-
-.portrait-and-name-container {
-    display: flex;
-}
-
-.portrait {
-    margin-right: 1rem;
-    @media (max-width: $collapseStudent) {
-        width: 50px;
-        height: auto;
-    }
-}
-
-.student__badges {
-    width: calc(100% - 300px); //minus the checkbox and name
-    padding-bottom: 0;
-    @media (max-width: $collapseStudent) {
-        width: 100%;
-    }
-}
-
-.scroller-container {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-around;
-    height: $rowHeight;
-}
-
-.scroller-button-container {
-    flex: 0 0 50px;
-    height: 100%;
-    @media (max-width: $collapseStudent) {
-        display: none;
-    }
-}
-
-.scroller-button {
-    width: 100%;
-    height: 100%;
-    margin: 0px auto;
-    background: none;
-    font-weight: bold;
-    font-size: 1.5rem;
-    color: #4f4f4f;
-}
-
-.scroller-flex-container {
-    flex: 1 1 auto;
-    height: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.scroller-outer-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.scroller-inner-container {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.award::v-deep {
-    display: inline-block;
-    min-width: 70px;
-    max-width: 110px;
-    margin: 0px 0.5rem;
-    vertical-align: top;
-    text-align: center;
-    transition: all 0.3s;
-    img {
+    .student__select {
         width: 40px;
-        height: auto;
-        margin-bottom: 5px;
+        padding-bottom: 0;
     }
-    span {
-        display: inline-block;
-        font-size: 0.75rem;
-        line-height: 1rem;
-        white-space: normal;
+
+    .student__profile {
+        display: flex;
+        align-items: flex-start;
+        width: 240px;
+        padding-bottom: 0;
+        @media (max-width: $collapseStudent) {
+            margin-bottom: 1rem;
+        }
     }
+
+        .portrait {
+            margin-right: 1rem;
+        }
+
+    .student__badges {
+        width: calc(100% - 280px); //minus the checkbox and name
+        @media (max-width: $collapseStudent) {
+            width: 100%;
+        }
+    }
+
+.award-list {
+    margin: 0;
 }
 
-.scroller-bar {
-    position: absolute;
-    left: 5px;
-    bottom: 0px;
-    width: 120px; //will be updated relative to scroll amount by horizontalScoller.js
-    height: 4px;
-    background: $content-ui-foreground;
+.award {
+    display: inline-block;
+    width: 180px;
+    height: 64px; //to match the height of the students portrait
+    border: 1px solid #EDEDED;
+    margin: 0px 0.25rem;
+    padding: 0;
+}
+
+    .award__container { //flex needs to occur in a container within .award as the transition elements require display: inline-block
+        display: flex;
+        height: 100%;
+    }
+
+    .award__image-container::v-deep { //v-deep is used so can target the img succesfully
+        position: relative;
+        flex: 0 0 50px;
+        padding: 0.25rem 0.5rem;
+        background-color: #F6F6F6;
+        img {
+            width: 40px;
+            height: auto;
+        }
+    }
+
+    .award__title-container {
+        flex: 1 1 auto;
+        padding: 0.25rem 0.5rem;
+        p {
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-line-clamp: 3; //clamp the lines to a max of three, cutting off the rest: https://css-tricks.com/almanac/properties/l/line-clamp/
+            -webkit-box-orient: vertical;  
+            font-size: 0.75rem;
+            line-height: 1rem;
+            white-space: normal;
+        }
+    }
+
+.award-count { //overwrite the base styles, changing the position a bit and forcing the text to black, as the link has changed it
+    top: 1.25rem;
+    right: -0.3rem;
+    color: #333;
 }
 
 </style>

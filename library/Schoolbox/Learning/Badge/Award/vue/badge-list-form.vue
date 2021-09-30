@@ -5,6 +5,7 @@ import RevealModal from "@vue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
 import toastMixin from '@vue/components/toast-mixin';
+import HorizontalScoller from '@vue/components/scroll/horizontal-scoller';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
 
 
@@ -25,6 +26,7 @@ export default {
         BadgeList,
         BadgeImage,
         RevealModal,
+        HorizontalScoller, //so badges are contained in one line when a lot are selected
         BottomDrawer //to pop out when +1 badges is selected
     },
     props: {
@@ -207,6 +209,7 @@ export default {
         return {
             selectedBadges: [],
             badgeListChangeEvent: 'EVENT_CHANGE',
+            hasContentChange: false //to track badge addition changes
         }
     },
     computed: {
@@ -260,6 +263,24 @@ export default {
                 return '';
             }  
         }
+    },
+    watch: {
+
+        /**
+         * We need to wait for the transition animation to complete before we re-evaluate
+         * the status of horizontal-scroller.
+         * @TODO - consider using ResizeObserver once Safari 15 is released, as 
+         * this could be handled much better by the feature
+         */
+        selectedBadges (newSelectedBadges, oldSelectedBadges) {
+            if (newSelectedBadges.length !== oldSelectedBadges.length) { //if the number of badges has changed
+                setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
+                    this.hasContentChange = true; 
+                    this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
+                }, 400);
+            }
+        }
+
     },
     methods: {
 
@@ -343,14 +364,21 @@ export default {
         </ul>
 
         <bottom-drawer :showDrawer="selectedBadges.length > 0">
-            <div class="selected-badges-container">
-                <h3 class="selected-count"><em>{{ selectedBadgeText }}</em></h3>
-                <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
-                <transition-group name="selected-badges" class=selected-badges tag="div">
-                    <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges-item">
-                        <badge-image :badge="badge" class="selected-badge-image"></badge-image>
-                    </span>
-                </transition-group>
+            <div class="selected-container">
+                <h3 class="selected-container__count"><em>{{ selectedBadgeText }}</em></h3>
+                <div class="selected-container__badges">
+                    <horizontal-scoller 
+                        :hasButtons="false"
+                        :height="36"
+                        :has-content-change="hasContentChange"
+                    >
+                        <transition-group name="selected-badges" class="selected-badges" tag="div">
+                            <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges__item">
+                                <badge-image :badge="badge" class="selected-badge-image"></badge-image>
+                            </span>
+                        </transition-group>
+                    </horizontal-scoller>
+                </div>
             </div>
             <ul class="flex-list buttons">
                 <li>
@@ -405,28 +433,32 @@ export default {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
 
-.selected-badges-container {
+.selected-container {
     display: flex;
     align-items: baseline;
-    gap: 1rem;
+    height: 50px;
 }
 
-.button-clear {
-    display: inline-block;
-    padding: 0px;
-    background: none;
-    vertical-align: baseline;
-    font-size: 0.8rem;
-}
+    .selected-container__count {
+        margin-right: 1rem;
+        @media (max-width: 800px) {
+            font-size: 0.8rem;
+        }
+    }
 
-.selected-badges-item {
-    transition: all 0.3s;
+    .selected-container__badges {
+        flex: 1 1 auto; //fill up all the space that __count doesn't occupy 
+        min-width: 50%; //and don't get too small when shrunk down
+    }
+
+.selected-badges__item {
     display: inline-block;
     margin: 0px 5px;
+    transition: all 0.3s;
 }
 
-.selected-badges-enter, .selected-badges-leave-to
-    /* .selected-badges-leave-active below version 2.1.8 */ {
+.selected-badges-enter, 
+.selected-badges-leave-to {
     opacity: 0;
     transform: translateY(30px);
 }
