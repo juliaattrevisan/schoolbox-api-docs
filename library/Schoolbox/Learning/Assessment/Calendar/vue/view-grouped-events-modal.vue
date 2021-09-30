@@ -79,42 +79,39 @@ export default {
          * @param allDay
          * @return {string}
          */
-        determineDateSpan(startDate, endDate, allDay) {
+        determineDateSpan (startDate, endDate, allDay) {
             if (!startDate) {
                 return '';
             }
-            let format      = allDay ? this.formatDisplayDate : this.formatDisplayDatetime,
-                momentStart = dayjs(startDate),
-                start       = momentStart.format(format),
-                momentEnd   = null,
-                end         = null;
+            const format = allDay ? this.formatDisplayDate : this.formatDisplayDatetime;
+            const startDateFormatted = dayjs(startDate).format(format);
+            let endDateFormatted = null;
 
             if (endDate != null) {
-                momentEnd = dayjs(endDate);
                 if (allDay) {
                     // Event end dates in FullCalendar are exclusive.
                     // This means that all-day events from the event source
                     // have had their end date incremented by one day:
                     // roll it back for rendering the user-visible end.
-                    end = momentEnd.subtract(1, 'd').format(format);
+                    endDateFormatted = dayjs(endDate).subtract(1, 'd').format(format);
                 } else {
-                    end = momentEnd.format(format);
+                    endDateFormatted = dayjs(endDate).format(format);
                 }
             }
 
-            if (momentEnd && momentEnd.isValid() && !momentStart.isSame(momentEnd)) {
+            if (dayjs(endDate) && dayjs(endDate).isValid() && !dayjs(startDate).isSame(dayjs(endDate).subtract(1, 'd'))) {
                 // Start and end aren't the same - stitch them together.
-                if (!allDay && momentStart.isSame(momentEnd, 'day')) {
+                if (!allDay && dayjs(startDate).isSame(dayjs(endDate), 'day')) {
                     // Between two times on the same day - show the timespan but only one date
-                    return start + " – " + momentEnd.format(this.formatDisplayTime);
+                    return startDateFormatted + " – " + dayjs(endDate).format(this.formatDisplayTime);
                 } else {
                     // Between two different days - show the whole timespan
-                    return start + " – " + end;
+                    return startDateFormatted + " – " + endDateFormatted;
                 }
             }
 
             // Otherwise start and end are the same - just show the start
-            return start;
+            return startDateFormatted;
         },
 
 
