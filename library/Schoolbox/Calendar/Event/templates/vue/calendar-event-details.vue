@@ -1,5 +1,5 @@
 <script>
-    import dayjs from 'dayjs';
+    import dayjs            from 'dayjs';
     import AudiencesModal   from './audiences-modal';
     import qs               from 'qs';
     import axios            from "axios";
@@ -24,9 +24,9 @@
     vSelect.props.components.default = () => ({ Deselect });
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
-    const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
+    const FORMAT_LONG_DATE_WITH_TIME = 'dddd, MMMM DD, YYYY h:mma'; // Monday, October 01, 2019 02:30pm
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
-    const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
+    const FORMAT_TIME_ONLY = 'h:mma'; // 02:30pm
 
     export default {
 
