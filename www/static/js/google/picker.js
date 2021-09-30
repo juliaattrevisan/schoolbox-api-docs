@@ -16,7 +16,7 @@
 
         /* Only proceed if both parts set
          */
-        if (config.clientId.length && config.modules.length) {
+        if (config.clientId.length && config.listener) {
             setupListeners();
         } else {
             authorize();
@@ -65,7 +65,7 @@
                 /* A google setting
                  */
                 scope: 'https://www.googleapis.com/auth/drive',
-                modules: []
+                listener: true
             };
             $('#gfile-google-ids').val('');
             return $.extend(defaults, options);
@@ -73,11 +73,11 @@
 
 
         /**
-         * Activate links
+         * Set up listener
          */
         function setupListeners() {
             $(config.element).on('click', function () {
-                loadGoogleApi(config.modules, authorize);
+                authorize();
             });
         }
 

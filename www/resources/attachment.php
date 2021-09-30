@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\Factory as ResourceAttachmentFactory;
@@ -25,6 +26,7 @@ $this->setAjax();
 $this->setFile(TEMPLATE_content, '/resources/attach-browser.html');
 $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 $this->setBlock(TEMPLATE_content, 'source_panel', 'source_panel_block');
+$this->setBlock(TEMPLATE_content, 'google_api', 'google_api_block');
 
 $multi             = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
@@ -89,6 +91,16 @@ foreach ($factory->getMappedControllers() as $controller) {
     /* Render out the attachment option's corresponding panel
      */
     $this->parse('source_panel_block', 'source_panel', true);
+}
+
+if (
+    $configLoader->get(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED)
+    && $configLoader->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID)
+) {
+    $this->setVar('GOOGLE_CLIENT_ID', $configLoader->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID));
+    $this->parse('google_api_block', 'google_api', true);
+} else {
+    $this->setVar('google_api_block', '');
 }
 
 $this->injectGlobalVars();

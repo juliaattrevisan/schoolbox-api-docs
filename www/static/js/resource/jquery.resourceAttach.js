@@ -482,24 +482,6 @@
         singletonModal.find('#attachment-browser-filesystems')[0].innerHTML = this.attachmentBrowserFilesystemsInnerHTML;
         singletonModal.find('#attachment-browser-panel-container')[0].innerHTML = this.attachmentBrowserPanelContainerInnerHTML;
 
-        window.gpick = {
-            picked: function (docs) {
-                var i;
-                for(i = 0; i < docs.length; ++i) {
-                var doc = docs[i];
-                fiil();
-
-                }
-            },
-            cancel: function () { /* noop */ },
-            needAuth: function () { /* noop */ },
-            loaded: function () {
-                $('#external-google-panel')
-                    .find('div.explorer')
-                    .removeClass('preload');
-            }
-        };
-
         $(document).foundation();
 
         let filesystems = $('#attachment-browser-filesystems');
@@ -508,6 +490,11 @@
         filesystems.find('[data-source]').on('click', function(event) {
 
             let source = $(this).attr('data-source');
+
+            // google is handled separately
+            if (source === 'filesystem-google') {
+                return;
+            }
             let panel = $('#' + source + '-panel');
 
             let url = $(this).attr('data-url');
@@ -523,7 +510,7 @@
             * Inline content starts with a preloader class which should be removed
             * once content has loaded
             */
-           
+
             if (method === 'inline') {
                 fetch(url).then((response) => {
                     response.text().then((text) => {
@@ -535,6 +522,22 @@
             }
 
         });
+
+        // authenticate once to prevent popup blocker
+        if (filesystems.find('[data-source="filesystem-google"]').length > 0) {
+            filesystems.find('[data-source="filesystem-google"]').googlePicker({
+                clientId: this.options.googleClientId,
+                listener: true,
+                onAuth: function () {
+                    let el = filesystems.find('[data-source="filesystem-google"]');
+                    let source = el.attr('data-source');
+                    let panel = $('#' + source + '-panel');
+
+                    let url = el.attr('data-url');
+                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
+                }
+            });
+        }
 
 
     };
