@@ -13,8 +13,6 @@ import { gsap } from 'gsap/all'
 
 export default {
 
-    name: 'admin-settings-search',
-
 	components: {
 		AdminSettingsSearchResult
 	},
@@ -24,9 +22,9 @@ export default {
 			settingsList: [],
             isLoaded: false,
 			hasLoadError: false,
-			searchQuery: '',
-			minSearchQueryLength: 3,
-            searchResultsShownLimit: 6,
+			query: '',
+			minQueryLength: 3,
+            resultsShownLimit: 6,
             activeIndex: 0 //to track which index is selected
     	}
   	},
@@ -36,9 +34,9 @@ export default {
         /**
          * to notify whether still loading the results or not
          * 
-         * @returns {String} loading status
+         * @returns { String } loading status
          */
-        searchInputPlaceholder () {
+        inputPlaceholder () {
 			if (this.isLoaded) {
                 return 'Search administration settings...';
             } else {
@@ -47,12 +45,12 @@ export default {
 		},
 
         /**
-         * only when started typing beyond minSearchQueryLength count and there's actual results
+         * only when started typing beyond minQueryLength count and there's actual results
          * 
-         * @returns {String} start displaying results or not
+         * @returns { Boolean } start displaying results or not
          */
-        isSearchActive () {
-			if ((this.searchQuery.length >= this.minSearchQueryLength) && (this.filteredSearchList.length > 0)) {
+        isActive () {
+			if ((this.query.length >= this.minQueryLength) && (this.resultsList.length > 0)) {
                 return true
             } else {
                 return false;
@@ -62,10 +60,10 @@ export default {
         /**
          * the search string broken into words, to search for each word
          *
-         * @returns {Array} the search string broken into single words
+         * @returns { Array } the search string broken into single words
          */
-        searchStringWordList () {
-			const allWords = this.searchQuery.match(/\b(\w+)\b/g);
+        queryWordList () {
+			const allWords = this.query.match(/\b(\w+)\b/g);
             const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
             return onlyWordsAboveTwoLetters;
 		},
@@ -73,10 +71,10 @@ export default {
         /**
          * the settings relevant to the search input
          * 
-         * @returns {Array} all relevant search results, with title matches first over those just with description matches
+         * @returns { Array } all relevant search results, with title matches first over those just with description matches
          */
-		filteredSearchList () {
-			if (this.searchQuery.length < this.minSearchQueryLength) {
+		resultsList () {
+			if (this.query.length < this.minQueryLength) {
 				return [];
 			}
             const matchedTitleList = this.settingsList.filter(this.searchForTitle);
@@ -85,25 +83,25 @@ export default {
 		},
 
         /**
-         * the settings relevant to the search input and capped to searchResultsShownLimit
+         * the settings relevant to the search input and capped to resultsShownLimit
          * 
-         * @returns {Array} 
+         * @returns { Array } 
          */
-		filteredSearchListLimited () {
-            if (this.filteredSearchList.length > this.searchResultsShownLimit) { //return the capped results
-                return this.filteredSearchList.filter((setting, index) => index < this.searchResultsShownLimit);
+		resultsListLimited () {
+            if (this.resultsList.length > this.resultsShownLimit) { //return the capped results
+                return this.resultsList.filter((setting, index) => index < this.resultsShownLimit);
             } else { //otherwise just return the whole list
-                return this.filteredSearchList;
+                return this.resultsList;
             }
 		},
 
         /**
          * to show the search refine note
          * 
-         * @returns {Boolean}
+         * @returns { Boolean }
          */
-        hasResultsBeydondSearchResultsShownLimit () {
-			if (this.filteredSearchList.length > this.searchResultsShownLimit) {
+        hasResultsBeydondLimit () {
+			if (this.resultsList.length > this.resultsShownLimit) {
 				return true
 			} else {
                 return false;
@@ -113,10 +111,10 @@ export default {
         /**
          * to show the count of how many aren't appearing in the search
          * 
-         * @returns {Number}
+         * @returns { Number }
          */
-        resultsBeydondSearchResultsShownLimitCount () {
-			return this.filteredSearchList.length - this.searchResultsShownLimit;
+        resultsBeyondLimitCount () {
+			return this.resultsList.length - this.resultsShownLimit;
 		}
 
 	},
@@ -126,7 +124,7 @@ export default {
         /**
          * reset the active index when the list changes as the index may become out of range
          */
-		filteredSearchList (newValue, oldValue) {
+		resultsList (newValue, oldValue) {
 			if ((newValue.length !== oldValue.length) && (this.activeIndex > 0)) {
                 this.activeIndex = 0;
             }
@@ -146,18 +144,18 @@ export default {
          * find all those results that match EACH search word
          * within the the title field
          *
-         * @params {Object}
+         * @params { Object }
          *
-         * @return {Boolean} true if found
+         * @return { Boolean } true if found
          */
         searchForTitle (setting) {
             let wordMatchCount = 0;
-            this.searchStringWordList.forEach(wordInSearch => {
+            this.queryWordList.forEach(wordInSearch => {
                 if (setting.title?.toLowerCase().includes(wordInSearch.toLowerCase())) {
                     wordMatchCount++;
                 }
             });
-            if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
+            if (wordMatchCount === this.queryWordList.length) { //all words have to match
                 return true;
             } else {
                 return false;
@@ -168,20 +166,20 @@ export default {
          * find all those results that match EACH search word
          * within the name and description fields
          *
-         * @params {Object}
+         * @params { Object }
          *
-         * @return {Boolean} true if found
+         * @return { Boolean } true if found
          */
         searchForNameAndDescription (setting) {
             let wordMatchCount = 0;
-            this.searchStringWordList.forEach(wordInSearch => {
+            this.queryWordList.forEach(wordInSearch => {
                 if ((setting.name?.toLowerCase().includes(wordInSearch.toLowerCase())
                     || setting.description?.toLowerCase().includes(wordInSearch.toLowerCase()))
                     && (!setting.title?.toLowerCase().includes(wordInSearch.toLowerCase()))) {
                     wordMatchCount++;
                 }
             });
-            if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
+            if (wordMatchCount === this.queryWordList.length) { //all words have to match
                 return true;
             } else {
                 return false;
@@ -197,7 +195,7 @@ export default {
                 const keyName = event.key;
 
                 if (keyName === 'Enter') {
-                    this.selectResult(this.filteredSearchList[this.activeIndex].url);
+                    this.selectResult(this.resultsList[this.activeIndex].url);
 
                 } else if (keyName === 'ArrowUp') {
                     this.decrementActiveIndex();
@@ -212,7 +210,6 @@ export default {
         /**
          * to be able to move up and down through the selections
          * with the arrow keys
-         *
          */
         decrementActiveIndex () {
             if (this.activeIndex > 0) {
@@ -223,10 +220,9 @@ export default {
         /**
          * to be able to move up and down through the selections
          * with the arrow keys
-         *
          */
         incrementActiveIndex () {
-            if (this.activeIndex < (this.filteredSearchListLimited.length-1)) {
+            if (this.activeIndex < (this.resultsListLimited.length-1)) {
 			    this.activeIndex++;
             }
 		},
@@ -234,7 +230,6 @@ export default {
         /**
          * to be able to close the menu when something else
          * is selected outside the menu
-         *
          */
 		initMouseEvents () {
 			document.addEventListener('click', (event) => {
@@ -246,7 +241,6 @@ export default {
 
         /**
          * check if already loaded and saved, or load up
-         *
          */
 		loadSettings () {
 			if (sessionStorage.getItem('sb_settingsList')) {
@@ -258,7 +252,6 @@ export default {
 
         /**
          * pull the settings from local storage
-         *
          */
 		loadSessionSettings () {
             const sessionStorageSettingsList  = sessionStorage.getItem('sb_settingsList');
@@ -268,9 +261,8 @@ export default {
 
         /**
          * load the settings for possible retrieval
-         *
          */
-		loadRemoteSettings () {
+		async loadRemoteSettings () {
 			fetchAsJson('/adminv2/setting/search')
 			.then((response) => {
 				this.settingsList = response;
@@ -283,7 +275,6 @@ export default {
 
         /**
          * clear the search button selected
-         *
          */
         onClearInputSelected () {
 			this.clearInput();
@@ -291,18 +282,17 @@ export default {
 
         /**
          * clear the search
-         *
          */
 		clearInput () {
-			this.searchQuery = '';
+			this.query = '';
             this.activeIndex = -1;
 		},
 
         /**
          * how the element animates off
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         checkEachResultIndex () {
@@ -316,7 +306,7 @@ export default {
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
          *
-         * @param {DOMElement} element - the element that's animating
+         * @param { DOMElement } element - the element that's animating
          *
          */
         onBeforeOnEnter (element) {
@@ -326,8 +316,8 @@ export default {
         /**
          * how it element animates on
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         onEnter (element, done) {
@@ -338,8 +328,8 @@ export default {
         /**
          * how the element animates off
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         onLeave (element, done) {
@@ -349,8 +339,8 @@ export default {
         /**
          * how the element animates off
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         onAfterLeave (element) {
@@ -368,6 +358,8 @@ export default {
 
         /**
          * a result has been selected via #admin-settings-search-result
+         * 
+         * @param { String }
          */
         onSelectedResult (url) {
             this.selectResult(url);
@@ -376,6 +368,8 @@ export default {
         /**
          * to move to the page the selected search result is on
          * which will have the result highlighted
+         * 
+         * @param { String }
          */
         selectResult (url) {
             this.clearInput();
@@ -400,10 +394,10 @@ export default {
     <div class="admin-search-container">
         <input
             v-if="!hasLoadError"
-            v-model="searchQuery"
+            v-model="query"
             @input="$event.target.composing = false"
             :readonly="!isLoaded"
-            :placeholder="searchInputPlaceholder"
+            :placeholder="inputPlaceholder"
             type="text"
             class=""
         />
@@ -419,18 +413,18 @@ export default {
                 @after-leave="checkEachResultIndex"
                 @leave-cancelled="checkEachResultIndex"
             >
-                <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
+                <li v-for="(result, index) in resultsListLimited" :key="result.name" :data-index="index">
                     <admin-settings-search-result
                         ref="searchResults"
                         :result="result"
-                        :search-string-word-list="searchStringWordList"
+                        :search-string-word-list="queryWordList"
                         :active-index="activeIndex"
                         @on-mouse-over-result="onMouseOverResult"
                         @on-selected-result="onSelectedResult"
                     />
                 </li>
             </transition-group>
-            <aside v-if="isSearchActive && hasResultsBeydondSearchResultsShownLimit" class="search-refine-note">{{ resultsBeydondSearchResultsShownLimitCount }} search results not shown, try refining your search further.</aside>
+            <aside v-if="isActive && hasResultsBeydondLimit" class="search-refine-note">{{ resultsBeyondLimitCount }} search results not shown, try refining your search further.</aside>
         </div>
     </div>
 </template>
