@@ -106,21 +106,6 @@ const swingDown = (badgeImage) => {
 }
 
 /**
- * Create a clone of the badge image to use as the background,
- * sit it behind the award animation, and spin it slowly
- * 
- * @param { DOMElement }
- */
- const animateBackground = (badgeImage) => {
-    const badgeImageCopy = badgeImage.cloneNode(true);
-    badgeImageCopy.style.position = 'absolute'; //so it doesn't impact the original badge image positioning 
-    badgeImageCopy.dataset.isBadgeClone = true; //so can remove later in #award-detail-modal.vue
-    badgeImage.parentNode.insertBefore(badgeImageCopy, badgeImage); //sit behind the original badge image
-    const copyAnimation = scaleUpAndRotateSlowly(badgeImageCopy);
-    copyAnimation.play();
-}
-
-/**
  * Play a random animation
  * 
  * @param { DOMElement }
@@ -137,6 +122,5 @@ const swingDown = (badgeImage) => {
  * @param { DOMElement }
  */
 export const animateBadgeImage = (badgeImage) => {
-    animateBackground(badgeImage);
     animateForeground(badgeImage)
 }
