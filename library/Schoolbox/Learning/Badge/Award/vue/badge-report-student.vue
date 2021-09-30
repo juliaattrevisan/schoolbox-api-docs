@@ -200,7 +200,7 @@ export default {
             <horizontal-scoller 
                 v-if="hasBadges"
                 :hasButtons="true"
-                :height="150"
+                :height="80"
                 :has-content-change="hasContentChange"
             >
                 <transition-group
@@ -215,12 +215,14 @@ export default {
                 >      
                     <li v-for="award in student.badges" :key="award.id" class="award" data-scroller-item :data-title="award.badge.name">
                         <a href="#open-award-modal" @click.prevent="badgeSelected(award)" @keyup.enter="badgeSelected(award)" :title="award.badge.name">
-                            <div class="award__image-container">
-                                <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
-                                <div v-if="award.count > 1" class="award-count" :title="`Awarded ${award.count} times`">x{{ award.count }}</div>
-                            </div>
-                            <div class="award__title-container">
-                                <p>{{ award.badge.name }}</p>
+                            <div class="award__container">
+                                <div class="award__image-container">
+                                    <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
+                                    <div v-if="award.count > 1" class="award-count" :title="`Awarded ${award.count} times`">x{{ award.count }}</div>
+                                </div>
+                                <div class="award__title-container">
+                                    <p>{{ award.badge.name }}</p>
+                                </div>
                             </div>
                         </a>
                     </li>
@@ -238,7 +240,7 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-$rowHeight: 150px;
+$rowHeight: 80px;
 $collapseStudent: 1000px;
 
 
@@ -286,20 +288,24 @@ $collapseStudent: 1000px;
 
 .award {
     display: inline-block;
-    width: 160px;
-    height: $rowHeight - 10px; //allow some space at the bottom 
+    width: 180px;
+    height: 64px; //to match the height of the students portrait
     border: 1px solid #EDEDED;
-    box-shadow: 0 2px 3px 0 rgb(0 0 0 / 10%);
     margin: 0px 0.25rem;
     padding: 0;
-    vertical-align: top;
+    box-shadow: 0 2px 3px 0 rgb(0 0 0 / 10%);
 }
 
-    .award__image-container::v-deep { //v-deep is used to can target the img succesfully
+    .award__container { //flex needs to occur in a container within .award as the transition elements require display: inline-block
+        display: flex;
+        height: 100%;
+    }
+
+    .award__image-container::v-deep { //v-deep is used so can target the img succesfully
         position: relative;
+        flex: 0 0 50px;
         padding: 0.25rem 0.5rem;
         background-color: #F6F6F6;
-        text-align: center;
         img {
             width: 40px;
             height: auto;
@@ -307,18 +313,38 @@ $collapseStudent: 1000px;
     }
 
     .award__title-container {
+        flex: 1 1 auto;
         padding: 0.25rem 0.5rem;
         p {
-            display: inline-block;
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-line-clamp: 3; //clamp the lines to a max of three, cutting off the rest: https://css-tricks.com/almanac/properties/l/line-clamp/
+            -webkit-box-orient: vertical;  
             font-size: 0.75rem;
             line-height: 1rem;
             white-space: normal;
         }
     }
 
-.empty-state {
-    margin: 0; //remove the white space at the bottom when there's no badges
-    background: white; //the grey looks a bit dodgy in combination with rows with badges
+.award-count { //overwrite the base styles, changing the position a bit and forcing the text to black, as the link has changed it
+    top: 1.25rem;
+    right: -0.3rem;
+    color: #333;
+}
+
+.empty-state { //tighten everything up, shrinking everything down to fit nicely within the row
+    margin: 0; 
+    padding: 0;
+    background: white; //the grey looks a bit dodgy in combination with rows of badges
+    .icon-badge {
+        margin: 0 auto;
+        &:before {
+            font-size: 2rem;
+        }
+    }
+    p {
+        font-size: 0.75rem;
+    }
 }
 
 </style>
