@@ -98,7 +98,7 @@
                                 iframe: {
                                     markup: '<div class="mfp-iframe-scaler">'+
                                         '<div class="mfp-close"></div>'+
-                                        '<iframe class="mfp-iframe" src="//about:blank" frameborder="0" allowfullscreen sandbox="allow-downloads"></iframe>'+
+                                        '<iframe class="mfp-iframe" src="//about:blank" frameborder="0" allowfullscreen sandbox></iframe>'+
                                         '</div>'
                                 }
                             });
