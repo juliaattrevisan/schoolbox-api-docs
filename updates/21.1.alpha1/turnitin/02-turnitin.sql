@@ -29,7 +29,7 @@ CREATE TABLE `turnitin_report` (
 -- The last known error is cached here
 CREATE TABLE `turnitin_group_attachment` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `status` ENUM('pending', 'complete', 'error') NOT NULL,
+    `status` ENUM('pending', 'group_attachment', 'uploading', 'complete', 'error') NOT NULL,
     `error_code` VARCHAR(255) NULL,
     `error_message` VARCHAR(255) NULL,
     `submission_box_file_id` INT UNSIGNED NOT NULL,
