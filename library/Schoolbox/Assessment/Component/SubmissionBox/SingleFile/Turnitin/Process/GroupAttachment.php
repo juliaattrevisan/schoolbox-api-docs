@@ -1,11 +1,13 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
+namespace Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin\Process;
 
 /**
  * Take a Group Attachment from schoolbox and set it up in Turnitin,
