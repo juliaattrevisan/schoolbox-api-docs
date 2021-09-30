@@ -134,7 +134,7 @@ class External_Liss_Server
      * which is not accessible to us)
      *
      * @param string $identifier
-     * @return TimetableCycle|xmlrpcresp
+     * @return TimetableCycle
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
