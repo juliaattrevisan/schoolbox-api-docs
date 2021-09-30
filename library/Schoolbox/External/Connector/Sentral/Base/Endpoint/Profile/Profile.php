@@ -449,9 +449,7 @@ class Profile implements IStrategy
                  * This set is mixed with emergency contacts and other non-data, so
                  * sift through it all manually for the gems you need
                  */
-                if ($externalId == 60961) {
-                    $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
-                }
+                $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
 
                 /* Remember that we saw a particular student id
                  * (-not- their externalId, the primary key in sentral for this student)
