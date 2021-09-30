@@ -13,6 +13,8 @@ use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Model;
 use Schoolbox\Learning\Turnitin\Api;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -143,7 +145,7 @@ HELP;
              */
             $processor = (new Turnitin\Process\Report(
                 $api,
-                Turnitin\Mapper::getInstance(),
+                Mapper::getInstance(),
                 $this->getLogger()
             ));
 
@@ -182,12 +184,12 @@ HELP;
         /* Find all the records to process in a synonymous data struct
          */
         if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
-            $models = Turnitin\Mapper::getInstance()->findByColumnList([
+            $models = Mapper::getInstance()->findByColumnList([
                 'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
-                'status' => Turnitin\Model::STATUS_TRANSMIT_LOADED
+                'status' => Model::STATUS_TRANSMIT_LOADED
             ]);
         } else {
-            $models = Turnitin\Mapper::getInstance()->findByColumn('status', Turnitin\Model::STATUS_TRANSMIT_LOADED);
+            $models = Mapper::getInstance()->findByColumn('status', Model::STATUS_TRANSMIT_LOADED);
         }
 
         /* Leave immediately when nothing to do
@@ -224,17 +226,17 @@ HELP;
         /* Find all the records to process in a synonymous data struct
          */
         if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
-            $models = Turnitin\Mapper::getInstance()->findByColumnList([
+            $models = Mapper::getInstance()->findByColumnList([
                 'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
                 'status' => [
-                    Turnitin\Model::STATUS_REPORT_PREPARED,
-                    Turnitin\Model::STATUS_REPORT_ANALYSING
+                    Model::STATUS_REPORT_PREPARED,
+                    Model::STATUS_REPORT_ANALYSING
                 ]
             ]);
         } else {
-            $models = Turnitin\Mapper::getInstance()->findByColumn('status', [
-                Turnitin\Model::STATUS_REPORT_PREPARED,
-                Turnitin\Model::STATUS_REPORT_ANALYSING
+            $models = Mapper::getInstance()->findByColumn('status', [
+                Model::STATUS_REPORT_PREPARED,
+                Model::STATUS_REPORT_ANALYSING
             ]);
         }
 
