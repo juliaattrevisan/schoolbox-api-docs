@@ -923,7 +923,8 @@ abstract class Component_ControllerAbstract
      */
     public function isSourceRenderable()
     {
-        if (!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted() || $this->getSource()->getId() === null)) {
+        /** @phpstan-ignore-next-line */
+        if (!$this->hasReadAccess() || ($this->isUsingAltSource() && ($this->getSource()->isDeleted() || $this->getSource()->getId() === null))) {
             return false;
         }
 
