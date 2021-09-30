@@ -17,6 +17,9 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use GuzzleHttp\Exception\ConnectException;
 use Sentry\State\HubInterface;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Uploads eligible student submission files into Kami and inserts the
@@ -40,6 +43,13 @@ class Uploader
     /** @var Mapper */
     private $kamiMapper;
 
+
+    /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
+
+
     /** @var LoggerInterface */
     private $log;
 
@@ -57,6 +67,7 @@ class Uploader
      * @param IJitter           $jitter
      * @param Mapper            $kamiMapper
      * @param LoggerInterface   $log
+     * @param LockInterface     $lock
      * @param HubInterface|null $sentry
      */
     public function __construct(
@@ -65,6 +76,7 @@ class Uploader
         IJitter $jitter,
         Mapper $kamiMapper,
         LoggerInterface $log,
+        LockInterface $lock,
         ?HubInterface $sentry
     ) {
         $this->dryRun        = $dryRun;
@@ -72,6 +84,7 @@ class Uploader
         $this->jitter        = $jitter;
         $this->kamiMapper    = $kamiMapper;
         $this->log           = $log;
+        $this->lock          = $lock;
         $this->sentry        = $sentry;
     }
 
@@ -131,11 +144,12 @@ class Uploader
     /**
      * Attempts to upload all Kami documents
      *
-     * @param bool $retryFailed If true, upload 'failed', otherwise upload 'queued'
-     * @param int  $batchSize   When fetching from the DB, break into batches to avoid OOM
-     * @param int  $maxSkips    Successive failures may indicate an API problem.
+     * @param bool          $retryFailed If true, upload 'failed', otherwise upload 'queued'
+     * @param int           $batchSize   When fetching from the DB, break into batches to avoid OOM
+     * @param int           $maxSkips    Successive failures may indicate an API problem.
      * @return UploadResults
-     * @throws \Throwable
+     * @throws \LogicException
+     * @throws \PDOException
      */
     public function upload(bool $retryFailed, int $batchSize, int $maxSkips): UploadResults
     {
@@ -210,6 +224,18 @@ class Uploader
                 $kamiModel->setKamiCreatedAt($kamiDoc->getCreatedAt());
                 $kamiModel = $this->updateKamiModelState($kamiModel, $kamiDoc);
                 $this->saveKamiModel($kamiModel);
+
+                /* Refresh lock while we're still processing; keep using another
+                 * $timeout seconds until we're done, or until we died
+                 */
+                try {
+                    $this->log->info('Refreshing lock');
+
+                    $this->lock->refresh();
+                } catch (LockConflictedException | LockAcquiringException $e) {
+                    $this->log->warning('Could not refresh lock: aborting');
+                    break;
+                }
             }
         }
         return $results;

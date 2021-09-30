@@ -16,6 +16,8 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Pastoral;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -26,6 +28,13 @@ class AttachmentUploader extends CliTool\App
 {
     public const LOCK_NAME = 'pastoral_upload';
 
+
+    /**
+     * Default timeout for symfony lock: falsey values trigger exception
+     */
+    private const DEFAULT_TIMEOUT = 10 * 60;
+
+
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -34,6 +43,12 @@ class AttachmentUploader extends CliTool\App
 
     /** @var External_Pastoral */
     private $externalPastoral;
+
+
+    /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
 
 
     /** @inheritdoc */
@@ -76,9 +91,9 @@ HELP;
         }
 
         $this->getLogger()->info('Uploading of pastoral files started');
-        $lock = $this->checkOverlappingExecution();
+        $this->checkOverlappingExecution();
         $this->uploadPending();
-        $lock->release();
+        $this->lock->release();
     }
 
 
@@ -86,16 +101,21 @@ HELP;
      * Checks whether the execution of this App is overlapping with a prior execution.
      *
      * Returns the acquired lock
-     *
-     * @return LockInterface
      */
-    private function checkOverlappingExecution(): LockInterface
+    private function checkOverlappingExecution(): void
     {
         $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
-        $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if ($lock->acquire()) {
+
+        /* Force default timeout since falsey timeout means something in symfony lock
+         */
+        if (!$timeout) {
+            $timeout = self::DEFAULT_TIMEOUT;
+        }
+
+        $this->lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        if ($this->lock->acquire()) {
             $this->setMaxExecutionTime($timeout);
-            return $lock;
+            return;
         }
 
         exit(1);
@@ -114,6 +134,18 @@ HELP;
             } catch (PDOException $e) {
                 $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
                 $failed++;
+            }
+
+            /* Refresh lock while we're still processing; keep using another
+             * $timeout seconds until we're done, or until we died
+             */
+            try {
+                $this->getLogger()->info('Refreshing lock');
+
+                $this->lock->refresh();
+            } catch (LockConflictedException | LockAcquiringException $e) {
+                $this->getLogger()->warning('Could not refresh lock: aborting');
+                break;
             }
         }
         $this->getLogger()->info("Processing of pastoral upload completed: $success succeeded, $failed failed");

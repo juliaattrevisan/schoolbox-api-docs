@@ -14,6 +14,9 @@ use Alaress\Jitter\IJitter;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\InlineGrader\Kami\Exception\IKamiException;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 use Throwable;
 
 /**
@@ -50,17 +53,25 @@ class ReQueueErrors
 
 
     /**
-     * @param IConnector      $connector
-     * @param Mapper          $mapper
-     * @param IJitter         $jitter
-     * @param LoggerInterface $log
+     * @var LockInterface|null
      */
-    public function __construct(IConnector $connector, Mapper $mapper, IJitter $jitter, LoggerInterface $log)
+    private ?LockInterface $lock;
+
+
+    /**
+     * @param IConnector         $connector
+     * @param Mapper             $mapper
+     * @param IJitter            $jitter
+     * @param LoggerInterface    $log
+     * @param LockInterface|null $lock
+     */
+    public function __construct(IConnector $connector, Mapper $mapper, IJitter $jitter, LoggerInterface $log, ?LockInterface $lock = null)
     {
         $this->connector = $connector;
         $this->mapper    = $mapper;
         $this->jitter    = $jitter;
         $this->log       = $log;
+        $this->lock      = $lock;
     }
 
 
@@ -99,6 +110,20 @@ class ReQueueErrors
                 }
             }
             $count++;
+
+            /* Refresh lock while we're still processing; keep using another
+             * $timeout seconds until we're done, or until we died
+             */
+            if ($this->lock) {
+                try {
+                    $this->log->info('Refreshing lock');
+
+                    $this->lock->refresh();
+                } catch (LockConflictedException | LockAcquiringException $e) {
+                    $this->log->warning('Could not refresh lock: aborting');
+                    break;
+                }
+            }
         }
         $this->log->info("Success count: {$this->countSuccess}, Warning count: {$this->countWarning}, Failure count: {$this->countFailure}");
         return $this->countFailure || $this->countWarning ? 1 : 0;

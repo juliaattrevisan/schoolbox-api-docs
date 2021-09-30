@@ -35,6 +35,12 @@ class Processor extends CliTool\App
     public const LOCK_NAME = 'video_transcode';
 
 
+    /**
+     * Default timeout for symfony lock: falsey values trigger exception
+     */
+    private const DEFAULT_TIMEOUT = 10 * 60;
+
+
     /** @inheritDoc */
     public function getRequiredProcessUser(): ?string
     {
@@ -67,6 +73,13 @@ class Processor extends CliTool\App
         // Allow only a single migration at a time
         // ------------------------------------------------------------------------------------------------------------
         $timeout = (int)$configLoader->get('video_processing_timeout');
+
+        /* Force default timeout since falsey timeout means something in symfony lock
+         */
+        if (!$timeout) {
+            $timeout = self::DEFAULT_TIMEOUT;
+        }
+
         $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
             exit(1);
@@ -164,16 +177,21 @@ class Processor extends CliTool\App
                 }
             }
 
-            // Refresh process lock, or break if it can't be refreshed
-            if ($lock->isExpired()) {
-                $log->warning('Lock expired during processing: aborting');
-                break;
-            }
+            /* Refresh lock while we're still processing; keep using another
+             * $timeout seconds until we're done, or until we died
+             */
             try {
-                $log->info('Refreshing process lock...');
+                $log->info('Refreshing lock');
+
                 $lock->refresh();
             } catch (LockConflictedException | LockAcquiringException $e) {
                 $log->warning('Could not refresh lock: aborting');
+                break;
+            }
+
+            // Refresh process lock, or break if it can't be refreshed
+            if ($lock->isExpired()) {
+                $log->warning('Lock expired during processing: aborting');
                 break;
             }
         }

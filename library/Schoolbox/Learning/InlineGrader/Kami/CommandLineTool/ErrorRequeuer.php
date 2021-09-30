@@ -26,6 +26,13 @@ class ErrorRequeuer extends CliTool\App
 {
     public const LOCK_NAME = 'kami_requeue_errors';
 
+
+    /**
+     * Default timeout for symfony lock: falsey values trigger exception
+     */
+    private const DEFAULT_TIMEOUT = 10 * 60;
+
+
     /** @inheritDoc */
     public function getLongOpts(): array
     {
@@ -49,6 +56,12 @@ class ErrorRequeuer extends CliTool\App
         $maxSkips     = $this->getOptAsInt('max-skips:', Kami\ReQueueErrors::DEFAULT_MAX_SKIPS);
         $baseBackOff  = $this->getOptAsInt('base-back-off:', Kami\ReQueueErrors::DEFAULT_BASE_JITTER_BACK_OFF);
         $timeout      = $this->getOptAsInt('timeout:', Kami\ReQueueErrors::DEFAULT_TIMEOUT);
+
+        /* Force default timeout since falsey timeout means something in symfony lock
+         */
+        if (!$timeout) {
+            $timeout = self::DEFAULT_TIMEOUT;
+        }
 
         if ($displayHelp) {
             $maxAttempts       = Kami\ReQueueErrors::DEFAULT_MAX_ATTEMPTS;
@@ -103,9 +116,6 @@ HELP;
             exit(0);
         }
 
-        $jitter        = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
-        $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger());
-
         // Ensure only one instance of tool is running at a time
         $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
@@ -113,6 +123,9 @@ HELP;
         }
 
         $this->setMaxExecutionTime($timeout);
+
+        $jitter        = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
+        $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger(), $lock);
 
         // Run the tool
         $exitStatus = 0;
