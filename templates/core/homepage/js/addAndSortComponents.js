@@ -24,6 +24,8 @@ let __isScrolling = false;
 let __isFlipping = false; //prevent quick shifts / odd flickers while using FLIP
 let __isChangingSize = false; //if required, wait for the element to shrink down to just the top bar before dragging as some elements are too long to move around effectively
 let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position changes, have to move a minimum amount prior to another change
+let __newComponentClone; //to later insert back into the palette 
+let __newComponentPaletteContainer; //to reset the newComponent back to its base
 
 
 /*****************************************************************
@@ -82,14 +84,14 @@ const isNewComponent = (component) => {
  * 
  * @param { Element } 
  */
- const isExistingComponent = (component) => {
+const isExistingComponent = (component) => {
     return component.hasAttribute('id');
 }
 
 /**
  * To respond to any events that require action
  */
- const initListeners = () => {
+const initListeners = () => {
     // initComponentLockSwitchListener(); - may add in again when actually adding the palette functionality
     initOnComponentAddedListener();
     initOnComponentRemovedListener();
@@ -108,14 +110,14 @@ const isNewComponent = (component) => {
  * 
  * @param { Boolean }  
  */
- const updateDraggablesStatus = (isEnabled) => {
+const updateDraggablesStatus = (isEnabled) => {
     __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 /**
  * To add a newly created component to the sortable list
  */
- const initOnComponentAddedListener = () => {
+const initOnComponentAddedListener = () => {
     document.addEventListener(ON_COMPONENT_ADDED, (event) => {
         const newDraggable = getDraggable(event.detail.component);
         const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
@@ -126,9 +128,9 @@ const isNewComponent = (component) => {
 }
 
 /**
- * To remove a component to the sortable list
+ * To remove a component from the sortable list
  */
- const initOnComponentRemovedListener = () => {
+const initOnComponentRemovedListener = () => {
     document.addEventListener(ON_COMPONENT_REMOVED, (event) => {
         const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
         draggableToRemove.kill(); //disables the Draggable instance
@@ -141,9 +143,10 @@ const isNewComponent = (component) => {
  * need to run through and check each parent container for children
  * if there's no children need to show that items can be dragged into this container
  */
- const initPlaceHolderComponents = () => {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach(() => {
+const initPlaceHolderComponents = () => {
+    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((container, index) => {
         const placeHolderComponent = document.createElement('div');
+        placeHolderComponent.id = `placeHolderComponent-${index}`;
         placeHolderComponent.classList.add('masonry-placeholder');
         placeHolderComponent.style.display = 'block';
         placeHolderComponent.style.height = '51px';
@@ -168,18 +171,17 @@ const isNewComponent = (component) => {
  */
 const onDragStart = (event) => {
     __activeComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
+    __newComponentClone = __activeComponent.cloneNode(true);
     __placeHolderComponent = getPlaceholderElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
-    updateDocumentForDrag();
+    updateDocumentOnDragStart();
     disableAllOtherDraggables();
     extractActiveComponent();
     updateSortableElements(); //ensure we have the most up to date positions
     if (isExistingComponent(__activeComponent)) {
         collapseExistingComponentContent();
     } else {
-        __isChangingSize = false;
         addPlaceHolderComponents();
-        hideExistingMasonryPlaceHolders();
     }
 }
 
@@ -218,7 +220,7 @@ const updateDragPoint = () => {
 /**
  * Prep the document to handle dragging
  */
-const updateDocumentForDrag = () => {
+const updateDocumentOnDragStart = () => {
     document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
     document.documentElement.style.scrollBehavior = 'auto'; //disable smooth scroll as it can jar while moving elements around 
     document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'none') //prevent any mouse interactions interferring while dragging
@@ -252,6 +254,9 @@ const disableAllOtherDraggables = () => {
  * so it doesn't impact our ability to sort through the items and can go into any container
  */
 const extractActiveComponent = () => {
+    if (isNewComponent(__activeComponent)) { //so can put a copy of the __activeComponent back into the palette once the addition is complete
+        __newComponentPaletteContainer = __activeComponent.parentElement;
+    }
     document.body.appendChild(__activeComponent);
     __activeComponent.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
     setStylesOnElement(__activeComponent, { //Update position and styles to match now that the __activeComponent has been moved out of context
@@ -313,7 +318,6 @@ const collapseExistingComponentContent = () => {
         onComplete: () => {
             __isChangingSize = false;
             addPlaceHolderComponents();
-            hideExistingMasonryPlaceHolders();
         }
     } );
 
@@ -341,25 +345,9 @@ const addPlaceHolderComponents = () => {
  * @returns { Boolean }
  */
 const canAddPlaceHolderComponent = (parentContainer) => {
-    return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
-           (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
-}
-
-/**
- * When the add components tab is open, there would be a double up of place holders in parent containers
- * so need to hide them while dragging, and they are shown again when drag is released
- * Refer to: www/static/js/masonry/jquery.masonry.js for reference
- */
-const hideExistingMasonryPlaceHolders = () => {
-    const addComponentTabs = document.getElementById('tabs-1');
-    if (addComponentTabs.classList.contains('active')) {
-        document.querySelectorAll('.masonry-placeholder').forEach((placeHolder) => { 
-            if (placeHolder.dataset.placeHolderComponent !== 'true') { //make sure they are not the placeHolderComponents we need to allow proper sorting 
-                placeHolder.style.position = 'absolute';
-                placeHolder.style.visibility = 'hidden';
-            }
-        });
-    }
+    return (parentContainer.children.length === 0);
+    // return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
+        //    (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
 }
 
 /**
@@ -544,7 +532,7 @@ const onSnapBackActiveComponentComplete = () => {
 }
 
 /**
- * Expand out the existingComponent again now that's its' back in place
+ * Expand out the existingComponent again now that's its back in place
  * The panels will animate regardless of whether they are opened or closed
  */
 const expandExistingComponent = () => {
@@ -575,22 +563,30 @@ const expandExistingComponent = () => {
         }
     } ); 
 
- }
+}
 
 /**
  * To set up for another possible drag of elements
  */
 const onActiveComponentExpanded = async () => {
 
-    document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
-    document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
-    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
-    document.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
-    window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
-    
+    updateDocumentOnDragEnd();
     updateSortableElements();
 
     if (__hasSortChange && isNewComponent(__activeComponent)) {
+        
+        let componentCount = parseInt(__newComponentClone.querySelector('[data-relation="count"]').innerText);
+        componentCount++;
+        __newComponentClone.querySelector('[data-relation="count"]').innerText = componentCount;
+
+        __newComponentPaletteContainer.appendChild(__newComponentClone);
+
+        const newDraggable = getDraggable(__newComponentClone);
+        const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
+        newDraggable.enabled(componentLockSwitchStatus); //check 
+        __draggablesList = [...__draggablesList, newDraggable];
+        //disable if only allowed one element
+
         const newComponent = await getNewComponent(__activeComponent);
         await saveComponentOrder(newComponent);
         __hasSortChange = false;
@@ -602,3 +598,14 @@ const onActiveComponentExpanded = async () => {
     updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
 
 }
+
+/**
+ * Return the document back to its pre onDragStart behaviour 
+ */
+const updateDocumentOnDragEnd = () => {
+    document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
+    document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
+    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
+    document.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
+    window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
+};
