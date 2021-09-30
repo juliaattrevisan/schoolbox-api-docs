@@ -114,25 +114,33 @@ export default {
         fullCalendarHelper_titleFormatWeek (date) {
             const startDate = date.start.array;
             const endDate = date.end.array;
-            const startDateFormat = dayjs(startDate).format('MMMM Do');
-            const isSameMonth = dayjs(startDate).isSame(endDate, 'month');
-            const endDateFormat = isSameMonth ? dayjs(endDate).format('Do') : dayjs(endDate).format('MMMM Do');
-            const endDateYearFormat = dayjs(endDate).format('YYYY');
-            return `${startDateFormat} - ${endDateFormat}, ${endDateYearFormat}`;
+            const isSameYear = dayjs(startDate).isSame(endDate, 'year'); //only display the first year if it's different than the endDate's
+            const startDateFormat = isSameYear ? dayjs(startDate).format('MMMM Do') : dayjs(startDate).format('MMMM Do, YYYY');
+            const isSameMonth = dayjs(startDate).isSame(endDate, 'month'); //only display the end date's month if it's different than the startDate's
+            const endDateFormat = isSameMonth ? dayjs(endDate).format('Do, YYYY') : dayjs(endDate).format('MMMM Do, YYYY');
+            return `${startDateFormat} – ${endDateFormat}`;
         },
 
         /**
          * To display an event time like 8:30am - 9:45am
          * Zero minutes will also be taken off, so 11:00am will become 11am
+         * Will also show only the start date if there's no end
+         * And will consider all day events, returning an empty string
          * 
          * @param { Object }
          * 
          * @returns { String }
          */
         fullCalendarHelper_eventTimeFormat (date) {
-            const startTime = dayjs(date.start.array).format('h:mma').replace(':00', '');
-            const endTime = dayjs(date.end.array).format('h:mma').replace(':00', '');
-            return `${startTime} - ${endTime}`;
+            if (date.start && date.end) {
+                const startTime = dayjs(date.start.array).format('h:mma').replace(':00', '');
+                const endTime = dayjs(date.end.array).format('h:mma').replace(':00', '');
+                return `${startTime} - ${endTime}`;
+            } else if (date.start) {
+                return dayjs(date.start.array).format('h:mma').replace(':00', '');
+            } else { //typically an all day event
+                return '';
+            }
         },
 
         /**

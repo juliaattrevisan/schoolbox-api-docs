@@ -447,7 +447,7 @@ export default {
                 }
             }
 
-            if (momentEnd && momentEnd.isValid() && !momentStart.isSame(momentEnd)) {
+            if (momentEnd && momentEnd.isValid() && !momentStart.isSame(momentEnd.subtract(1, 'd'))) {
                 // Start and end aren't the same - stitch them together.
                 if (!allDay && momentStart.isSame(momentEnd, 'day')) {
                     // Between two times on the same day - show the timespan but only one date

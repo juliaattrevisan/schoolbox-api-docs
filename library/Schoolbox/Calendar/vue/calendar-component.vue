@@ -12,6 +12,7 @@ import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@vue/components/fullcalendar/customised-calendar-event';
 import dayjs              from 'dayjs';
 import advancedFormat     from 'dayjs/plugin/advancedFormat';
+import arraySupport       from 'dayjs/plugin/arraySupport';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
@@ -63,10 +64,11 @@ export default {
 
     created () {
         this.ENDPOINTS = ENDPOINTS;
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport); //to be able to use an array as a date
     },
 
     beforeMount () {
-        dayjs.extend(advancedFormat); //for more format options
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, listPlugin, adaptivePlugin ],
