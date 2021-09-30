@@ -894,6 +894,8 @@ class Profile implements IStrategy
                     $contact['attributes']['personId'],
                     $relationshipName
                 ));
+
+                continue;
             }
 
             /* Go digging in another endpoint for data
