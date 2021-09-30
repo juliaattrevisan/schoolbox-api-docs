@@ -220,9 +220,6 @@ HELP;
             $processor = (new Turnitin\Process\GroupAttachment(
                 $api,
                 Mapper::getInstance(),
-                UserMapper::getInstance(),
-                Component\SubmissionBoxMapper::getInstance(),
-                SingleFile\Mapper::getInstance(),
                 $this->getLogger()
             ));
 

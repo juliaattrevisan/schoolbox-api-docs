@@ -69,7 +69,7 @@ class GroupAttachment
          * This gives you their turnitin_group_attachment_ids, if they exist
          */
         $groupAttachments = $this->turnitinMapper->findByColumn('submission_box_file_id', $files->indexBy('id')->keys());
-        $groupAttachmentIds = $groupAttachments->indexBy('turnitin_group_attachment_id')->keys();
+        $groupAttachmentIds = $groupAttachments->indexBy('turnitinGroupAttachmentId')->keys();
 
         /* Find a list of the existing group attachments
          * then compare it to the list of current submission box attachments
@@ -77,40 +77,29 @@ class GroupAttachment
         $existingAttachments = $this->api->retrieve('GET',"/api/v1/groups/{$groupId}/attachments", []);
 
         foreach ($existingAttachments as $existingAttachment) {
-            if (\in_array($existingAttachment['id'], $groupAttachmentIds, true)) {
-                /* Keep these and process them if you need;
-                 * they should be here
-                 */
-            } else {
-                /* Delete these group attachments out of turnitin
-                 * They've been removed from schoolbox side
-                 */
-            }
+            $existingAttachmentIds[] = $existingAttachment['id'];
         }
 
-        /*  - keep the intersection
-         *  - delete the excess group attachments from turnitin
-         *  - add the new ones
+        /* Differential equation
          */
+        print_r((new Differential())->generate($groupAttachmentIds, $existingAttachmentIds));
 
     }
 
-    public function process()
+    public function process(Turnitin\Model $model)
     {
-        $this->createGroupAttachment();
+        $this->createGroupAttachment($model);
 
         $this->uploadFile();
     }
 
 
     /**
-     * Find all the existing group attachments for the group_id
-     * corresponding to a submission box
+     * Send them up
      */
-    public function getExisting() {
-    }
+    public function createGroupAttachment(Turnitin\Model $model) {
 
-    public function createGroupAttachment() {}
+    }
 
     public function uploadFile() {}
 
