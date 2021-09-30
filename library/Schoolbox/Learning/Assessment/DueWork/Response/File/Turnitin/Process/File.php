@@ -13,6 +13,9 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\UserMapper;
 
@@ -39,9 +42,9 @@ class File
 
 
     /**
-     * @var Turnitin\Api
+     * @var Api
      */
-    private Turnitin\Api $api;
+    private Api $api;
 
 
     /**
@@ -77,7 +80,7 @@ class File
     /**
      * Constructor.
      *
-     * @param Turnitin\Api         $api
+     * @param Api                  $api
      * @param Turnitin\Mapper      $turnitinMapper
      * @param UserMapper           $userMapper
      * @param SubmissionBoxMapper  $boxMapper
@@ -85,7 +88,7 @@ class File
      * @param LoggerInterface|null $log
      */
     public function __construct(
-        Turnitin\Api $api,
+        Api $api,
         Turnitin\Mapper $turnitinMapper,
         UserMapper $userMapper,
         SubmissionBoxMapper $boxMapper,
@@ -109,7 +112,7 @@ class File
      * When that's done a secondary process generates the Report info
      *
      * @param Turnitin\Model $model
-     * @throws Turnitin\Exception\Credentials
+     * @throws Credentials
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      * @throws \PDOException
@@ -242,7 +245,7 @@ class File
                      */
                 }
             }
-        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
+        } catch (BadEndpoint | Credentials | \DomainException $e) {
             $this->logWarning($e->getMessage());
 
             $this->turnitinMapper->save($model
@@ -317,8 +320,8 @@ class File
      * @param Turnitin\Model   $model
      * @param SingleFile\Model $ssf
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -385,8 +388,8 @@ class File
      * @param SingleFile\Model $ssf
      * @param array            $group
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -480,8 +483,8 @@ class File
      * @param SingleFile\Model $ssf
      * @param array            $submission
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException

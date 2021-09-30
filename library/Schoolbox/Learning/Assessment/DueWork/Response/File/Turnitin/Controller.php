@@ -11,6 +11,11 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\Helper;
+
 
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps
@@ -70,8 +75,8 @@ class Controller extends Base
     /**
      * Based on the header, decide how to process it
      *
-     * @throws Exception\BadEndpoint
-     * @throws Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
@@ -116,8 +121,8 @@ class Controller extends Base
     /**
      * This method fires when Turnitin finishes processing our upload
      *
-     * @throws Exception\BadEndpoint
-     * @throws Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
@@ -281,7 +286,7 @@ class Controller extends Base
          * Alternatively, just return null and check for Api instances being
          * produced in the webhook endpoints above
          */
-        if (!$this->turnitinMapper->isConfigured()) {
+        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
             throw new \DomainException('Turnitin configuration invalid.');
         }
 

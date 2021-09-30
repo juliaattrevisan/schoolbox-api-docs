@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception;
+namespace Schoolbox\Learning\Turnitin\Exception;
 
 /**
  * The endpoint you specified doesn't exist. Check that you formatted

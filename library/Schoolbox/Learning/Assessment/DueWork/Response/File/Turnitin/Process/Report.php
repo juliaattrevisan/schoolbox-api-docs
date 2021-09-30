@@ -11,6 +11,10 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
+
 
 /**
  * The second half of a Turnitin request
@@ -54,9 +58,9 @@ class Report
 
 
     /**
-     * @var Turnitin\Api
+     * @var Api
      */
-    private Turnitin\Api $api;
+    private Api $api;
 
 
     /**
@@ -74,12 +78,12 @@ class Report
     /**
      * Constructor.
      *
-     * @param Turnitin\Api         $api
+     * @param Api                  $api
      * @param Turnitin\Mapper      $turnitinMapper
      * @param LoggerInterface|null $log
      */
     public function __construct(
-        Turnitin\Api $api,
+        Api $api,
         Turnitin\Mapper $turnitinMapper,
         ?LoggerInterface $log = null
     ) {
@@ -107,7 +111,7 @@ class Report
     {
         try {
             $uploadInfo = $this->getUploadInfo($model);
-        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
+        } catch (BadEndpoint | Credentials | \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($e->getMessage()));
@@ -120,8 +124,8 @@ class Report
      * Upon finishing the creation, save the answers for later
      *
      * @param Turnitin\Model $model
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -183,8 +187,8 @@ class Report
      *
      * @param Turnitin\Model $model
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -262,8 +266,8 @@ class Report
      *
      * @param Turnitin\Model $model
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -276,7 +280,7 @@ class Report
     {
         try {
             $reportResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
-        } catch (Turnitin\Exception\BadEndpoint $e) {
+        } catch (BadEndpoint $e) {
             /* When the report hasn't been scheduled for generation, this endpoint returns 404
              * imho that really should be InvalidArgument because the endpoint exists, but the
              * remote server hasn't finished populating its contents yet
@@ -327,8 +331,8 @@ class Report
      *
      * @param Turnitin\Model $model
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException

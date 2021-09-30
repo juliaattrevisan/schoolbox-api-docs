@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Api as TurnitinApi;
+use Schoolbox\Learning\Turnitin\Api as TurnitinApi;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process\Report;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
@@ -37,6 +37,8 @@ use Schoolbox\Learning\InlineGrader\Factory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
@@ -582,8 +584,8 @@ class Controller extends Base
      * @param IResponse   $response
      * @param Turnitin    $turnitin
      * @param Participant $participant
-     * @throws File\Turnitin\Exception\BadEndpoint
-     * @throws File\Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
