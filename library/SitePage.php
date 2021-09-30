@@ -539,16 +539,18 @@ class SitePage extends Page
      */
     public static function keepProcessingInBackground($output = '')
     {
+        // Discard anything which might be in the buffer already:
+        // SitePage-based pages might have output something unexpected
         ob_end_clean();
-        header("Connection: close\r\n");
-        ignore_user_abort();
-        ob_start();
+
+        // Output now
+        // No content encoding because gzip interferes with content length
+        header('Content-Encoding: none');
+        header("Content-Length: " . strlen($output));
         echo $output;
-        $size = ob_get_length();
-        header("Content-Length: $size");
-        // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
-        ob_end_flush();
-        flush();
+
+        // Finish the request, and close the session
+        fastcgi_finish_request();
         session_write_close();
     }
 
