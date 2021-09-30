@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin\Proce
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin;
+use Schoolbox\Learning\Turnitin\Group\Mapper as TurnitinGroupMapper;
 
 /**
  * Take a Group Attachment from schoolbox and set it up in Turnitin,
@@ -35,6 +36,12 @@ class GroupAttachment
 
 
     /**
+     * @var TurnitinGroupMapper
+     */
+    private TurnitinGroupMapper $turnitinGroupMapper;
+
+
+    /**
      * @var LoggerInterface|null
      */
     private ?LoggerInterface $log;
@@ -45,16 +52,27 @@ class GroupAttachment
      *
      * @param Api                  $api
      * @param Turnitin\Mapper      $turnitinMapper
+     * @param TurnitinGroupMapper  $turnitinGroupMapper
      * @param LoggerInterface|null $log
      */
     public function __construct(
         Api $api,
         Turnitin\Mapper $turnitinMapper,
+        TurnitinGroupMapper $turnitinGroupMapper,
         ?LoggerInterface $log = null
     ) {
         $this->api = $api;
         $this->turnitinMapper = $turnitinMapper;
+        $this->turnitinGroupMapper = $turnitinGroupMapper;
         $this->log = $log;
+    }
+
+
+    public function process(Turnitin\Model $model)
+    {
+        $this->createGroupAttachment($model);
+
+        $this->uploadFile();
     }
 
 
@@ -86,12 +104,6 @@ class GroupAttachment
 
     }
 
-    public function process(Turnitin\Model $model)
-    {
-        $this->createGroupAttachment($model);
-
-        $this->uploadFile();
-    }
 
 
     /**
