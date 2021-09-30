@@ -146,7 +146,7 @@ HELP;
 
         foreach ($webhooks as $webhook) {
             $this->getLogger()->info(sprintf(
-                'Adding webhook %s (%s)',
+                'Removing webhook %s (%s)',
                 $webhook['id'],
                 $webhook['description']
             ));
@@ -183,7 +183,7 @@ HELP;
         ];
 
         $this->getLogger()->info(sprintf(
-            'Registering webhook: %s (%s) for %s values %s',
+            'Adding webhook: %s (%s) for %s values %s',
             $payload['description'],
             $payload['url'],
             Turnitin\Controller::HEADER_EVENT_TYPE,
