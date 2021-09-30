@@ -229,6 +229,40 @@ class Transactor
                 $files = SingleFileMapper::getInstance()->findByColumn('box_id', $submissionBox->getId(), ['cache' => false]);
 
                 $turnitinMapper = Turnitin\Mapper::getInstance();
+                $turnitinGroupMapper = \Schoolbox\Learning\Turnitin\Group\Mapper::getInstance();
+
+                /* TODO Find out what the group identifier is, for this submission box, if it exists
+                 *  Otherwise create a new one here
+                 */
+
+                /* TODO Find existing turnitin_group_attachment records for these $file ids
+                 *  and if you find one already in turnitin_group_attachment,
+                 *  don't create a new stub - just use the existing one
+                 */
+
+                /* TODO once you find the union of new stubs vs existing attachment
+                 *  records, you'll have a full set of turnitin_group_attachment_ids
+                 *  associated with the current submission box's files
+                 */
+
+                /* TODO Then use the differential to figure out which turnitin ids to remove
+                 *  since you've already added the new ones and the existing ones haven't
+                 *  been touched in any meaningful way.
+                 */
+
+                /* TODO When you delete them out of turnitin
+                 *  also softdelete them from turnitin_group_attachment
+                 */
+
+                /* TODO Now you're left with a bunch of turnitin_group_attachment records
+                 *  to process; they can be in mixed states, so just let the groupattachment
+                 *  transmitter chew through them
+                 */
+
+                /* TODO It'd be easier to just delete all of them out of turnitin
+                 *  and just reupload the new set...but that's very costly sometimes
+                 *  OR make this a manual step
+                 */
 
                 /* Set up a turnitin stub record
                  * This allows it to be picked up and processed by an async script later
