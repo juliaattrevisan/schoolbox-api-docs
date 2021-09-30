@@ -315,6 +315,7 @@ class Controller extends Base
                             $processor = (new Turnitin\Process\File(
                                 $api,
                                 Turnitin\Mapper::getInstance(),
+                                \Schoolbox\Learning\Turnitin\Group\Mapper::getInstance(),
                                 UserMapper::getInstance(),
                                 SubmissionBoxMapper::getInstance(),
                                 SingleFile\Mapper::getInstance()

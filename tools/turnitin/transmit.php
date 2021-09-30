@@ -241,6 +241,7 @@ HELP;
             $processor = (new Turnitin\Process\File(
                 $api,
                 Mapper::getInstance(),
+                \Schoolbox\Learning\Turnitin\Group\Mapper::getInstance(),
                 UserMapper::getInstance(),
                 Component\SubmissionBoxMapper::getInstance(),
                 Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),

@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\Group\Mapper as TurnitinGroupMapper;
 use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\UserMapper;
 
@@ -54,6 +55,12 @@ class File
 
 
     /**
+     * @var TurnitinGroupMapper
+     */
+    private TurnitinGroupMapper $turnitinGroupMapper;
+
+    
+    /**
      * @var UserMapper
      */
     private UserMapper $userMapper;
@@ -82,6 +89,7 @@ class File
      *
      * @param Api                  $api
      * @param Turnitin\Mapper      $turnitinMapper
+     * @param TurnitinGroupMapper  $turnitinGroupMapper
      * @param UserMapper           $userMapper
      * @param SubmissionBoxMapper  $boxMapper
      * @param SingleFile\Mapper    $ssfMapper
@@ -90,6 +98,7 @@ class File
     public function __construct(
         Api $api,
         Turnitin\Mapper $turnitinMapper,
+        TurnitinGroupMapper $turnitinGroupMapper,
         UserMapper $userMapper,
         SubmissionBoxMapper $boxMapper,
         SingleFile\Mapper $ssfMapper,
@@ -97,6 +106,7 @@ class File
     ) {
         $this->api = $api;
         $this->turnitinMapper = $turnitinMapper;
+        $this->turnitinGroupMapper = $turnitinGroupMapper;
         $this->userMapper = $userMapper;
         $this->boxMapper = $boxMapper;
         $this->ssfMapper = $ssfMapper;
@@ -359,14 +369,42 @@ class File
             return null;
         }
 
-        /* Got through that? Keep going
+        /* See if there's a Turnitin Group already associated with the submission box
+         * If it already exists, just get its payload instead
          */
-        $payload = [
-            'name' => $box->getName(),
-            'type' => self::GROUP_TYPE
-        ];
+        try {
+            $group = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $box->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* Create a group if it doesn't already exist
+             */
+            $this->logDebug(sprintf(
+                'Turnitin Group does not exist for submission box %s; creating a new one',
+                $box->getId()
+            ));
 
-        return $this->api->retrieve('PUT', "/api/v1/groups/{$box->getId()}", $payload);
+            $payload = [
+                'name' => $box->getName(),
+                'type' => self::GROUP_TYPE
+            ];
+
+            $newGroup = $this->api->retrieve('PUT', "/api/v1/groups/{$box->getId()}", $payload);
+
+            $this->turnitinGroupMapper->save($this->turnitinGroupMapper->createModel()
+                ->setSubmissionBoxId($box->getId())
+                ->setGroupId($newGroup['id']));
+
+            return $newGroup;
+        }
+
+        /* Find an existing one
+         * 404 Not Found occurs when Group no longer exists in turnitin, but should have
+         */
+        $this->logDebug(sprintf(
+            'Turnitin Group already exists for submission box %s; reusing it',
+            $box->getId()
+        ));
+
+        return $this->api->retrieve('GET', "/api/v1/groups/{$group->getId()}", []);
     }
 
 
