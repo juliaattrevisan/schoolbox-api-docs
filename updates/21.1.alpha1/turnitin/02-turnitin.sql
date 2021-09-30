@@ -3,6 +3,9 @@
 CREATE TABLE `turnitin_group` (
     `submission_box_id` INT UNSIGNED NOT NULL,
     `group_id` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME NULL,
     INDEX `group_id_idx` (`group_id` ASC),
     CONSTRAINT `fk_turnitin_submission_box_id` FOREIGN KEY (submission_box_id) REFERENCES submission_box (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
