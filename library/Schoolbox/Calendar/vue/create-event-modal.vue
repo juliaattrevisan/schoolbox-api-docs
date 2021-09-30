@@ -4,7 +4,6 @@ import RevealModal from '@vue/components/reveal-modal'
 import axios       from 'axios'
 import {ENDPOINTS} from '@schoolboxCalendarEvent/endpoints';
 import dayjs from 'dayjs';
-import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 /* Vue select
     */
@@ -112,7 +111,6 @@ export default {
 
     created() {
         this.ENDPOINTS = ENDPOINTS;
-        dayjs.extend(advancedFormat); //for more format options
     },
 
     methods: {

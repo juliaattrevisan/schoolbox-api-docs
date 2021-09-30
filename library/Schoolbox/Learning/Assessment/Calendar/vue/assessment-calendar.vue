@@ -136,7 +136,7 @@ export default {
     beforeMount () {
         dayjs.extend(advancedFormat); //for more format options
         dayjs.extend(arraySupport); //to be able to use an array as a date
-        dayjs.extend(weekOfYear); //to returns weeks of the year
+        dayjs.extend(weekOfYear); //to return weeks of the year
         this.resourceTimelineSemester = {
             type: 'resourceTimeline',
             visibleRange: this.determineVisibleRange,
@@ -169,7 +169,7 @@ export default {
             duration: { weeks: 1 },
             slotDuration: { days: 1 },
             slotLabelFormat: (date) => {
-                return dayjs(date.date.marker).format('ddd D');
+                return dayjs(date.date.marker).format('ddd DD');
             },
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true,
