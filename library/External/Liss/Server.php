@@ -139,7 +139,7 @@ class External_Liss_Server
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function getCycle(string $identifier)
+    private function getCycle(string $identifier)
     {
 
         /* If the $identifier is somehow an empty string, then it might not have
