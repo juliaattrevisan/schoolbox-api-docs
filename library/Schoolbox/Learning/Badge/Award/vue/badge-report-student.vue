@@ -228,10 +228,6 @@ export default {
                     </li>
                 </transition-group>
             </horizontal-scoller>
-            <div v-else class="empty-state">
-                <i class="icon-badge"></i>
-                <p>No badges to display.</p>
-            </div>
         </div>
     </li>
 </template>
@@ -293,7 +289,6 @@ $collapseStudent: 1000px;
     border: 1px solid #EDEDED;
     margin: 0px 0.25rem;
     padding: 0;
-    box-shadow: 0 2px 3px 0 rgb(0 0 0 / 10%);
 }
 
     .award__container { //flex needs to occur in a container within .award as the transition elements require display: inline-block
@@ -330,21 +325,6 @@ $collapseStudent: 1000px;
     top: 1.25rem;
     right: -0.3rem;
     color: #333;
-}
-
-.empty-state { //tighten everything up, shrinking everything down to fit nicely within the row
-    margin: 0; 
-    padding: 0;
-    background: white; //the grey looks a bit dodgy in combination with rows of badges
-    .icon-badge {
-        margin: 0 auto;
-        &:before {
-            font-size: 2rem;
-        }
-    }
-    p {
-        font-size: 0.75rem;
-    }
 }
 
 </style>
