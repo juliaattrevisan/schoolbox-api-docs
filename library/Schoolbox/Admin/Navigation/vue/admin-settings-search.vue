@@ -8,8 +8,10 @@
  */
 
 import AdminSettingsSearchResult from './admin-settings-search-result';
-import { fetchAsJson } from '@js/fetch/fetch';
-import { gsap } from 'gsap/all'
+import { gsap } from 'gsap/all';
+
+const SB_SETTINGS_LIST = 'sb_settingsList';
+
 
 export default {
 
@@ -188,22 +190,16 @@ export default {
 
         /**
          * to be able to select by enter and navigate by up/down arrows
-         *
          */
 		initKeyboardEvents () {
 			document.addEventListener('keyup', (event) => {
                 const keyName = event.key;
-
-                if (keyName === 'Enter') {
-                    this.selectResult(this.resultsList[this.activeIndex].url);
-
-                } else if (keyName === 'ArrowUp') {
-                    this.decrementActiveIndex();
-
-                } else if (keyName === 'ArrowDown') {
-                    this.incrementActiveIndex();
-
+                const keyOptions = {
+                    'Enter': () => this.selectResult(this.resultsList[this.activeIndex].url),
+                    'ArrowUp': () => this.decrementActiveIndex(),
+                    'ArrowDown': () => this.incrementActiveIndex(),
                 }
+                keyOptions[keyName]();
             });
 		},
 
@@ -243,7 +239,7 @@ export default {
          * check if already loaded and saved, or load up
          */
 		loadSettings () {
-			if (sessionStorage.getItem('sb_settingsList')) {
+			if (sessionStorage.getItem(SB_SETTINGS_LIST)) {
                 this.loadSessionSettings();
             } else {
                 this.loadRemoteSettings();
@@ -254,7 +250,7 @@ export default {
          * pull the settings from local storage
          */
 		loadSessionSettings () {
-            const sessionStorageSettingsList  = sessionStorage.getItem('sb_settingsList');
+            const sessionStorageSettingsList  = sessionStorage.getItem(SB_SETTINGS_LIST);
             this.settingsList = JSON.parse(sessionStorageSettingsList); //conver the saved string var back to JSON
             this.isLoaded = true;
         },
@@ -263,14 +259,16 @@ export default {
          * load the settings for possible retrieval
          */
 		async loadRemoteSettings () {
-			fetchAsJson('/adminv2/setting/search')
-			.then((response) => {
-				this.settingsList = response;
-                sessionStorage.setItem('sb_settingsList', JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
-				this.isLoaded = true;
-			}).catch((error) => {
-				this.hasLoadError = true; //hide search bar in the dom
-			});
+            try {
+                const response = await fetch('/adminv2/setting/search');
+                const responseJson = await response.json();
+                this.settingsList = responseJson;
+                sessionStorage.setItem(SB_SETTINGS_LIST, JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
+            } catch (error) {
+                this.hasLoadError = true; //hide search bar in the dom
+            } finally {
+                this.isLoaded = true;
+            }
 		},
 
         /**
