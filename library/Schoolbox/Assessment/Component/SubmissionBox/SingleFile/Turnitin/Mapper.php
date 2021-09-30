@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin;
 
 use Schoolbox\Resource\File\IFile;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\ValidFile;
+use Schoolbox\Learning\Turnitin\ValidFile;
 
 /**
  * Transacts Turnitin models into the turnitin_group_attachment db table

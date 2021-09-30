@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+namespace Schoolbox\Learning\Turnitin;
 
 use Schoolbox\Resource\File\IFile;
 

@@ -17,7 +17,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\ValidFile;
+use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\Resource\Storage\Model as Storage;
 
 /**
