@@ -167,19 +167,14 @@ class Base implements OutputInterface
         $callbacks = $this->getPostOutputCallbacks();
 
         if (!empty($callbacks)) {
-            header('Content-Encoding: none');
-            header("Content-Length: " . strlen($output));
-            header('Connection: close');
-
             // Output now
             // No content encoding because gzip interferes with content length
-
+            header('Content-Encoding: none');
+            header("Content-Length: " . strlen($output));
             echo $output;
 
-            // this appears to do nothing. With no param, this is a getter, not setter...
-
-            ignore_user_abort();
-            flush();
+            // Finish the request, and close the session
+            fastcgi_finish_request();
             session_write_close();
 
             // Allow the process however long it needs to finish:
@@ -187,7 +182,6 @@ class Base implements OutputInterface
             set_time_limit(60 * 30);
 
             // Callbacks
-
             foreach ($callbacks as $callback) {
                 if (is_callable($callback)) {
                     $callback();
