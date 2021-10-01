@@ -12,7 +12,8 @@ namespace Schoolbox\Learning\Turnitin\Group\Process;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Turnitin;
-use Schoolbox\Assessment\Component\SubmissionBox\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
  * Take a Group Attachment from schoolbox and set it up in Turnitin,
@@ -22,6 +23,12 @@ use Schoolbox\Assessment\Component\SubmissionBox\SingleFile;
  */
 class GroupAttachment
 {
+
+    /**
+     * Group type in Turnitin
+     */
+    private const GROUP_TYPE = 'ASSIGNMENT';
+
 
     /**
      * @var Turnitin\Api
@@ -42,9 +49,15 @@ class GroupAttachment
 
 
     /**
-     * @var SingleFile\Mapper
+     * @var SubmissionBoxMapper
      */
-    private SingleFile\Mapper $submissionBoxFileMapper;
+    private SubmissionBoxMapper $submissionBoxMapper;
+
+
+    /**
+     * @var SubmissionBox\SingleFile\Mapper
+     */
+    private SubmissionBox\SingleFile\Mapper $submissionBoxFileMapper;
 
 
     /**
@@ -59,45 +72,24 @@ class GroupAttachment
      * @param Turnitin\Api                     $api
      * @param Turnitin\Group\Mapper            $turnitinGroupMapper
      * @param Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper
-     * @param SingleFile\Mapper                $submissionBoxFileMapper
+     * @param SubmissionBoxMapper              $submissionBoxMapper
+     * @param SubmissionBox\SingleFile\Mapper  $submissionBoxFileMapper
      * @param LoggerInterface|null             $log
      */
     public function __construct(
         Turnitin\Api $api,
         Turnitin\Group\Mapper $turnitinGroupMapper,
         Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper,
-        SingleFile\Mapper $submissionBoxFileMapper,
+        SubmissionBoxMapper $submissionBoxMapper,
+        SubmissionBox\SingleFile\Mapper $submissionBoxFileMapper,
         ?LoggerInterface $log = null
     ) {
         $this->api = $api;
         $this->turnitinGroupMapper = $turnitinGroupMapper;
         $this->turnitinGroupAttachmentMapper = $turnitinGroupAttachmentMapper;
+        $this->submissionBoxMapper = $submissionBoxMapper;
         $this->submissionBoxFileMapper = $submissionBoxFileMapper;
         $this->log = $log;
-    }
-
-
-    /**
-     * Process the set of turnitin_group $models
-     *
-     * @param Collection $turnitinGroups
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    public function process(Collection $turnitinGroups): void
-    {
-        /* Set up any submission boxes that haven't already been made ready
-         */
-        foreach ($turnitinGroups as $turnitinGroup) {
-            $this->processOne($turnitinGroup);
-        }
     }
 
 
@@ -115,7 +107,7 @@ class GroupAttachment
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processOne(Turnitin\Group\Model $turnitinGroup): void
+    public function process(Turnitin\Group\Model $turnitinGroup): void
     {
         $model = $this->createGroup($turnitinGroup);
 
@@ -164,7 +156,10 @@ class GroupAttachment
                 Turnitin\Group\Model::STATUS_TRANSMIT_GROUP
             );
 
-            $group = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", []);
+            $group = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
+                'name' => $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId())->getName(),
+                'type' => self::GROUP_TYPE
+            ]);
 
             $turnitinGroup->setGroupId($group['id']);
 

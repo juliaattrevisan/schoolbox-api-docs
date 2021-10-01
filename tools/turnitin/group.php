@@ -12,13 +12,10 @@ declare(strict_types=1);
 use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Assessment\Component;
-use Schoolbox\Assessment\Component\SubmissionBox\SingleFile;
-use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin;
-use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin\Mapper;
-use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin\Model;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Turnitin\Api;
-use Schoolbox\UserMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
@@ -70,17 +67,17 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --groupattachment=...
+     * --group=...
      *
-     * Choose a particular turnitin_group_attachment to affect
+     * Choose a particular turnitin_group to affect
      */
-    private const OPT_LONG_GROUP_ATTACHMENT_ID = 'groupattachment:';
+    private const OPT_LONG_GROUP_ID = 'group:';
 
 
     /**
      * Lock name
      */
-    private const TURNITIN_LOCK_NAME = 'turnitin_group_attachment';
+    private const TURNITIN_LOCK_NAME = 'turnitin_group';
 
 
     /**
@@ -97,7 +94,7 @@ $app = new class extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
-            self::OPT_LONG_GROUP_ATTACHMENT_ID,
+            self::OPT_LONG_GROUP_ID,
             self::OPT_LONG_FORCE_PUSH
         ];
     }
@@ -111,25 +108,25 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Find every Pending turnitin group attachment in turnitin_group_attachment, set up the 
-turnitin Group Attachment and upload the file's contents. Used periodically to kick everything
-up to turnitin in case the detached function fails.
+Find every Pending turnitin_group record and upload the associated files' binaries
+to turnitin. 
 
 Transmission of turnitin files goes through these stages, with their status strings:
 
 1. Saved in schoolbox db with status Pending ("pending")
-2. Set up Turnitin Group Attachment ("group_attachment")
-3. Upload file contents into Turnitin Group Attachment ("uploading")
+2. Set up a Turnitin Group if one doesn't already exist ("group")
+3. Set up Turnitin Group Attachment ("group_attachment")
+4. Upload file contents into Turnitin Group Attachment ("uploading")
 5. Contents finished sending to Turnitin ("complete")
 
-You can optionally specify a group attachment id to just affect that record alone, in case you need
-to fix a single record but not any others. The group attachment id is the primary key of 
-turnitin_group_attachment and its status must be "pending" or "group_attachment" for it to be found.
+You can optionally specify a group id to just affect that record alone, in case you need
+to fix a single record but not any others. The group id is the primary key of turnitin_group 
+and its status must be "pending", "group" or "group_attachment" for it to be found.
 
-You can optionally force retransmission of Pending or Group Attachment statuses by using
+You can optionally force retransmission of Pending, Group or Group Attachment statuses by using
 the --force flag. Anything in those statuses will be forcibly re-sent to turnitin.
 
-Usage: groupattachment.php [--instance=INSTANCE_ID] [--groupattachment=1234] [--force]
+Usage: group.php [--instance=INSTANCE_ID] [--group=1234] [--force]
 
 
 HELP;
@@ -155,7 +152,7 @@ HELP;
         if ($acquired) {
             /* Find all the records to process in a synonymous data struct
              */
-            if ($this->getOpt(self::OPT_LONG_GROUP_ATTACHMENT_ID)) {
+            if ($this->getOpt(self::OPT_LONG_GROUP_ID)) {
                 /* Optionally:
                  * Forcibly retransmit everything in Pending, Group Attachment, Uploading
                  * regardless of whether they're in those states normally; used
@@ -163,17 +160,18 @@ HELP;
                  * reprocess something that's in this state naturally
                  */
                 if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
-                    $models = Mapper::getInstance()->findByColumnList([
-                        'id' => $this->getOpt(self::OPT_LONG_GROUP_ATTACHMENT_ID),
+                    $models = Turnitin\Group\Mapper::getInstance()->findByColumnList([
+                        'id' => $this->getOpt(self::OPT_LONG_GROUP_ID),
                         'status' => [
-                            Model::STATUS_TRANSMIT_PENDING,
-                            Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
+                            Turnitin\Group\Model::STATUS_TRANSMIT_PENDING,
+                            Turnitin\Group\Model::STATUS_TRANSMIT_GROUP,
+                            Turnitin\Group\Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
                         ]
                     ]);
                 } else {
-                    $models = Mapper::getInstance()->findByColumnList([
-                        'id' => $this->getOpt(self::OPT_LONG_GROUP_ATTACHMENT_ID),
-                        'status' => Model::STATUS_TRANSMIT_PENDING
+                    $models = Turnitin\Group\Mapper::getInstance()->findByColumnList([
+                        'id' => $this->getOpt(self::OPT_LONG_GROUP_ID),
+                        'status' => Turnitin\Group\Model::STATUS_TRANSMIT_PENDING
                     ]);
                 }
             } else {
@@ -184,26 +182,26 @@ HELP;
                  * reprocess something that's in this state naturally
                  */
                 if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
-                    $models = Mapper::getInstance()->findByColumn('status', [
-                        Model::STATUS_TRANSMIT_PENDING,
-                        Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
+                    $models = Turnitin\Group\Mapper::getInstance()->findByColumn('status', [
+                        Turnitin\Group\Model::STATUS_TRANSMIT_PENDING,
+                        Turnitin\Group\Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
                     ]);
                 } else {
-                    $models = Mapper::getInstance()->findByColumn('status', Model::STATUS_TRANSMIT_PENDING);
+                    $models = Turnitin\Group\Mapper::getInstance()->findByColumn('status', Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
                 }
             }
 
             /* Leave immediately when nothing to do
              */
             if (!$models->count()) {
-                $this->getLogger()->info('There are no pending Turnitin group attachments; nothing to do');
+                $this->getLogger()->info('There are no pending Turnitin groups; nothing to do');
                 exit();
             }
 
             /* Otherwise keep going
              */
             $this->getLogger()->info(sprintf(
-                'Commencing upload sequence for %s pending Turnitin group attachments',
+                'Commencing upload sequence for %s pending Turnitin groups',
                 $models->count()
             ));
 
@@ -217,9 +215,12 @@ HELP;
 
             /* Set up a record processor
              */
-            $processor = (new Turnitin\Process\GroupAttachment(
+            $processor = (new Turnitin\Group\Process\GroupAttachment(
                 $api,
-                Mapper::getInstance(),
+                Turnitin\Group\Mapper::getInstance(),
+                Turnitin\Group\Attachment\Mapper::getInstance(),
+                SubmissionBoxMapper::getInstance(),
+                SubmissionBox\SingleFile\Mapper::getInstance(),
                 $this->getLogger()
             ));
 
