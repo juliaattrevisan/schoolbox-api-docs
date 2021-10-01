@@ -52,7 +52,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
     public function execute()
     {
         // Not St Michaels? This isn't for you
-        if ($this->getConfig('site_school_code') !== 'SMGS') {
+        if ($this->getConfigLoader()->get('site_school_code') !== 'SMGS') {
             return false;
         }
 
@@ -118,6 +118,8 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 //                'AwardDate'        => date('Y-m-d'),
 //                'AwardAchievement' => 'was awesome',
 //                'AwardComment'     => 'You are awesome',
+//                'AwardAchievementDescription'   => '',
+//
 //            ),
 //            array(
 //                'ID'               => $userId,
@@ -128,6 +130,83 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
 //                'AwardDate'        => date('Y-m-d'),
 //                'AwardAchievement' => 'graduated from noob to pro',
 //                'AwardComment'     => 'Stopped sucking and started being awesome',
+//                'AwardAchievementDescription'   => '',
+//
+//            ),
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => '',
+//                'AwardDescription' => 'DEsc v1',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => '',
+//                'AwardComment'     => '',
+//                'AwardAchievementDescription'   => '',
+//
+//            ),
+//
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => '',
+//                'AwardDescription' => 'DEsc v2',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'ACH',
+//                'AwardComment'     => '',
+//                'AwardAchievementDescription'   => '',
+//
+//            ),
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => '',
+//                'AwardDescription' => 'DEsc v3',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'ACH',
+//                'AwardComment'     => 'COMM',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
+//
+//            ),
+//
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => 'CODE',
+//                'AwardDescription' => 'DEsc v4',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => 'ACH',
+//                'AwardComment'     => 'COMM',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
+//
+//            ),
+//
+//            array(
+//                'ID'               => $userId,
+//                'FileYear'         => $_SESSION['FileYear'],
+//                'FileSemester'     => $_SESSION['FileSemester'],
+//                'AwardCode'        => 'CODE',
+//                'AwardDescription' => 'DEsc v5',
+//                'AwardDate'        => date('Y-m-d'),
+//                'AwardAchievement' => '',
+//                'AwardComment'     => 'COMM',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
+//
+//            ),
+//
+//            array(
+//                'ID'                            => $userId,
+//                'FileYear'                      => $_SESSION['FileYear'],
+//                'FileSemester'                  => $_SESSION['FileSemester'],
+//                'AwardCode'                     => 'CODE',
+//                'AwardDescription'              => 'DEsc v6',
+//                'AwardDate'                     => date('Y-m-d'),
+//                'AwardAchievement'              => '',
+//                'AwardComment'                  => '',
+//                'AwardAchievementDescription'   => 'AchievementDescription',
 //            ),
 //        );
 
@@ -174,7 +253,6 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $this->setBlock($templateHandle, 'emptyList', 'emptyList_block');
         $this->setBlock($templateHandle, 'awardList', 'awardList_block');
         $this->setBlock('awardList', 'award', 'award_block');
-        $this->setBlock('award', 'awardLine', 'awardLine_block');
         $this->setBlock($templateHandle, 'detentionList', 'detentionList_block');
         $this->setBlock('detentionList', 'detention', 'detention_block');
         $this->setBlock('detention', 'detentionLine', 'detentionLine_block');
@@ -203,21 +281,46 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             $this->setVar('award_block', '');
             foreach ($this->awardList as $award) {
                 $date   = new Alaress_Date_Format(new DateTime($award['AwardDate']));
+
+                /*
+                 * updated logic:
+                 * Evan Bailey
+                    Sep 15 2021 01:22 pm
+                    Hi Roberto,
+                    I’ve just had a look at the data in vAwards (which I assume is the view being used to power the notification)…conscious that the field names in the DB don’t correspond to the UI sometimes!
+                    The first past of the notification is always going to be the AwardDescription field.
+                    The second part is going to vary based on what field(s) out of AwardAchievement, AwardComment and AwardAchievementCode in the DB is/are populated…
+                    * If AwardAchievementCode field is populated (regardless of the other two fields), then the second part should be the AwardAchievementDescription field.
+                    * If AwardAchievement field (only) is populated, then the second part should be the AwardAchievement field.
+                    * If AwardComment field (only) is populated, then the second part should be the AwardComment field.
+                    * If AwardAchievement and AwardComment is populated, then handle as currently is (perhaps there is no handling for this at the moment, if so, use AwardAchievement
+                 * */
+
+                $tail = '';
+
+                if ($award['AwardAchievementCode']) {
+                    $AwardAchievementDescription = Scrub::text($award['AwardAchievementDescription']);
+                    $tail = "for<b class='award-desc'> ${AwardAchievementDescription}</b>";
+                } else if ($award['AwardAchievement']) {
+                    $AwardAchievement = Scrub::text($award['AwardAchievement']);
+                    $tail = "for<b class='award-desc'> ${AwardAchievement}</b>";
+                } else if ($award['AwardComment']) {
+                    $AwardComment = Scrub::text($award['AwardComment']);
+                    $tail = "for<b class='award-desc'> ${AwardComment}</b>";
+                }
+
                 $params = array(
                     'AWARD_CODE'        => $award['AwardCode'],
                     'AWARD_DESCRIPTION' => $award['AwardDescription'],
                     'AWARD_DATE'        => $award['AwardDate'],
                     'AWARD_DATE_LABEL'  => $date->getLongDateOnly(),
                     'AWARD_ACHIEVEMENT' => $award['AwardAchievement'],
-                    'awardLine_block'   => '',
                 );
                 // Scrub. Assume comments may have line breaks
                 $params = array_map(array('Scrub', 'text'), $params);
-                foreach ($this->splitComment($params['AWARD_COMMENT']) as $line) {
-                    $this->setVar('AWARD_COMMENT_LINE', Scrub::text($line));
-                    $this->parse('awardLine_block', 'awardLine', true);
-                }
+
                 $this->setVar($params);
+                $this->setVar('AWARD_TAIL', $tail);
                 $this->parse('award_block', 'award', true);
             }
         }

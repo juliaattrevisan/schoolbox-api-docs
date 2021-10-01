@@ -11,7 +11,7 @@
 
                 <!-- BEGIN detentionList -->
                 <div class="detentionList">
-                    <ul class="no-margin">
+                    <ul class="">
                         <!-- BEGIN detention -->
                         <li class="detention">
                             <p>
@@ -31,7 +31,7 @@
 
                 <!-- BEGIN absenceList -->
                 <div class="absenceList">
-                    <ul class="no-margin">
+                    <ul class="">
                         <li class="absence">
                             <p>{ABSENCE_COUNT} {ABSENCE_HEADER}</p>
                             <ul>
@@ -49,7 +49,7 @@
 
                 <!-- BEGIN lateArrivalList -->
                 <div class="lateArrivalList">
-                    <ul class="no-margin">
+                    <ul class="">
                         <li class="absence">
                             <p>{LATE_ARRIVAL_COUNT} {LATE_ARRIVAL_HEADER}</p>
                             <ul>
@@ -68,20 +68,14 @@
 
                 <!-- BEGIN awardList -->
                 <div class="awardList">
-                    <ul class="no-margin">
+                    <ul class="">
                         <!-- BEGIN award -->
                         <li class="award">
                             <p>
                                 Congratulations, you have been awarded
                                 <b class="award-desc">{AWARD_DESCRIPTION}</b>
-                                for
-                                <b class="award-desc">{AWARD_ACHIEVEMENT}</b>
+                                {AWARD_TAIL}
                             </p>
-                            <ul>
-                                <!-- BEGIN awardLine -->
-                                <li class="awards-comment">{AWARD_COMMENT_LINE}</li>
-                                <!-- END awardLine -->
-                            </ul>
                         </li>
                         <!-- END award -->
                     </ul>
