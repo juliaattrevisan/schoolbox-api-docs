@@ -1016,11 +1016,6 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^Offset 'AWARD_COMMENT' does not exist on array\\('AWARD_CODE' \\=\\> string, 'AWARD_DESCRIPTION' \\=\\> string, 'AWARD_DATE' \\=\\> string, 'AWARD_DATE_LABEL' \\=\\> string, 'AWARD_ACHIEVEMENT' \\=\\> string, 'awardLine_block' \\=\\> string\\)\\.$#"
-			count: 1
-			path: library/Component/Dashboard/StMichaelsAwardsController.php
-
-		-
 			message: "#^Parameter \\#1 \\$component \\(array\\) of method Component_DefinitionMapper\\:\\:create\\(\\) should be compatible with parameter \\$object \\(object\\) of method Schoolbox\\\\Mapper\\:\\:create\\(\\)$#"
 			count: 1
 			path: library/Component/DefinitionMapper.php
