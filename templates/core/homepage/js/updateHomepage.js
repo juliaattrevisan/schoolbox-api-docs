@@ -7,7 +7,8 @@
 import { initToggleLockComponents } from './toggleLockComponents';
 import { initPostToMyLinks } from './postToMyLinks';
 import { initUpdateColumnWidths } from './updateColumnWidths';
-import { initAddAndSortComponents } from './addAndSortComponents';
+import { initAddNewComponents } from './addNewComponents';
+import { initSortExistingComponents } from './sortExistingComponents';
 import { initUpdateComponentsSettings } from './updateComponentsSettings';
 import { initDeleteComponents } from './deleteComponents';
 import { initCollapseComponents } from './collapseComponents';
@@ -36,7 +37,8 @@ export const getComponentID = (component) => {
     initToggleLockComponents();
     initPostToMyLinks();
     initUpdateColumnWidths();
-    initAddAndSortComponents();
+    initAddNewComponents();
+    initSortExistingComponents();
     initUpdateComponentsSettings();
     initDeleteComponents();
     initCollapseComponents();

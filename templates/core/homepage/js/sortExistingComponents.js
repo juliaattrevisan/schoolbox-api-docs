@@ -1,16 +1,20 @@
+/** 
+ * Sort existing components, moving them around the page to the 
+ * desired position then updating the DB of the new position
+ *
+ */
+
 import { gsap, Draggable, Flip } from 'gsap/all';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
     isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
-import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from './saveComponentOrder';
 import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED } from './updateHomepage';
 
 gsap.registerPlugin(Draggable, Flip);
 
 const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers
-const COMPONENT_SELECTOR = '[data-component], [data-component-palette]'; //any component that will be dragged/added/sorted
+const COMPONENT_SELECTOR = '[data-component]'; //any existing component that will be sorted
 const COMPONENT_TRIGGER_SELECTOR = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
-const SORTABLE_SELECTOR = '[data-component]'; //existing components that can be sorted
 const ANIMATE_SPEED = 0.3; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
@@ -24,8 +28,6 @@ let __isScrolling = false;
 let __isFlipping = false; //prevent quick shifts / odd flickers while using FLIP
 let __isChangingSize = false; //if required, wait for the element to shrink down to just the top bar before dragging as some elements are too long to move around effectively
 let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position changes, have to move a minimum amount prior to another change
-let __newComponentClone; //to later insert back into the palette 
-let __newComponentPaletteContainer; //to reset the newComponent back to its base
 
 
 /*****************************************************************
@@ -37,7 +39,7 @@ let __newComponentPaletteContainer; //to reset the newComponent back to its base
 /**
  * Fire everything up
  */
-export const initAddAndSortComponents = () => {
+export const initSortExistingComponents = () => {
     initDraggables();
     initListeners();
     initPlaceHolderComponents();
@@ -53,11 +55,11 @@ const initDraggables = () => {
 }
 
 /**
- * To enable Dragging functionality to the chosen item
+ * To enable Dragging functionality on a component
  * Refer to https://greensock.com/docs/v3/Plugins/Draggable for further info
  */
 const getDraggable = (component) => {
-    const componentTrigger = isExistingComponent(component) ? component.querySelector(COMPONENT_TRIGGER_SELECTOR) : component; //existing components use a handle, the ones in the palette do not
+    const componentTrigger = component.querySelector(COMPONENT_TRIGGER_SELECTOR);
     componentTrigger.addEventListener('click', (event) => event.preventDefault());
     componentTrigger.addEventListener('dblclick', (event) => event.preventDefault());
     return Draggable.create(component, {
@@ -71,47 +73,11 @@ const getDraggable = (component) => {
 }
 
 /**
- * Is a new component, one that's currently within the palette
- * 
- * @param { Element } 
- */
-const isNewComponent = (component) => {
-    return component.hasAttribute('data-component-palette');
-}
-
-/**
- * Is already on the page
- * 
- * @param { Element } 
- */
-const isExistingComponent = (component) => {
-    return component.hasAttribute('id');
-}
-
-/**
  * To respond to any events that require action
  */
 const initListeners = () => {
-    // initComponentLockSwitchListener(); - may add in again when actually adding the palette functionality
     initOnComponentAddedListener();
     initOnComponentRemovedListener();
-}
-
-/**
- * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
- */
-// const initComponentLockSwitchListener = () => {
-//     const componentLockSwitch = document.getElementById('component-lock-switch').querySelector('input');
-//     componentLockSwitch.addEventListener('change', (event) => updateDraggablesStatus(event.target.checked));
-// }
-
-/**
- * Run through each Draggable instance and enable/disable
- * 
- * @param { Boolean }  
- */
-const updateDraggablesStatus = (isEnabled) => {
-    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 /**
@@ -140,7 +106,7 @@ const initOnComponentRemovedListener = () => {
 }
 
 /**
- * need to run through and check each parent container for children
+ * Need to run through and check each parent container for children
  * if there's no children need to show that items can be dragged into this container
  */
 const initPlaceHolderComponents = () => {
@@ -171,18 +137,13 @@ const initPlaceHolderComponents = () => {
  */
 const onDragStart = (event) => {
     __activeComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
-    __newComponentClone = __activeComponent.cloneNode(true);
     __placeHolderComponent = getPlaceholderElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
     updateDocumentOnDragStart();
     disableAllOtherDraggables();
     extractActiveComponent();
     updateSortableElements(); //ensure we have the most up to date positions
-    if (isExistingComponent(__activeComponent)) {
-        collapseExistingComponentContent();
-    } else {
-        addPlaceHolderComponents();
-    }
+    collapseExistingComponentContent();
 }
 
 /**
@@ -193,13 +154,9 @@ const onDragStart = (event) => {
  */
 const getPlaceholderElement = () => {
     const cloneElement = __activeComponent.cloneNode(true);
-    if (isExistingComponent(__activeComponent)) { //only existing components have to worry about removing these elements
-        cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference, so remove all component controls that can be expanded
-        cloneElement.querySelector('[data-component-panel="settings"]').remove(); 
-        cloneElement.querySelector('[data-component-panel="delete"]').remove();
-    } else {
-        cloneElement.setAttribute('data-component', ''); //so it can be considered when sorting
-    }
+    cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference, so remove all component controls that can be expanded
+    cloneElement.querySelector('[data-component-panel="settings"]').remove(); 
+    cloneElement.querySelector('[data-component-panel="delete"]').remove();
     cloneElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed 
     insertElementBefore(__activeComponent, cloneElement);
     return cloneElement;
@@ -254,9 +211,6 @@ const disableAllOtherDraggables = () => {
  * so it doesn't impact our ability to sort through the items and can go into any container
  */
 const extractActiveComponent = () => {
-    if (isNewComponent(__activeComponent)) { //so can put a copy of the __activeComponent back into the palette once the addition is complete
-        __newComponentPaletteContainer = __activeComponent.parentElement;
-    }
     document.body.appendChild(__activeComponent);
     __activeComponent.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
     setStylesOnElement(__activeComponent, { //Update position and styles to match now that the __activeComponent has been moved out of context
@@ -265,9 +219,7 @@ const extractActiveComponent = () => {
         left: `${__placeHolderComponent.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
         width: `${__placeHolderComponent.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
-    if (isExistingComponent(__activeComponent)) {
-        updateExistingComponentComputedStyles(__activeComponent);
-    }
+    updateExistingComponentComputedStyles(__activeComponent);
 }
 
 /**
@@ -324,7 +276,7 @@ const collapseExistingComponentContent = () => {
 }
 
 /**
- * need to run through and check each parent container for children
+ * Need to run through and check each parent container for children
  * if there's no children except the .masonry-placeholder need to show that items can be dragged into this container
  */
 const addPlaceHolderComponents = () => {
@@ -337,7 +289,7 @@ const addPlaceHolderComponents = () => {
 }
 
 /**
- * there's a bit of an issue where we can FLIP on sort change, and then also remove the placeHolderComponent
+ * There's a bit of an issue where we can FLIP on sort change, and then also remove the placeHolderComponent
  * that is within the FLIP. This causes an issue we need to check for
  * 
  * @param { Element }
@@ -375,7 +327,7 @@ const updateSortableElements = () => {
  */
 const onDrag = () => {
     if (canCheckForChange()) { 
-        const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
+        const sortablesToCheckList = Array.from(document.querySelectorAll(COMPONENT_SELECTOR)); //grab all sortable elements 
         const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
         if (closestElement && closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
             if (isElementAboveOtherElement(__activeComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
@@ -388,7 +340,7 @@ const onDrag = () => {
 }
 
 /**
- *  Don't be checking while have hardly dragged, while the window is scrolling or while the __activeComponent is still shrinking in collapseExistingComponentContent()
+ * Don't be checking while have hardly dragged, while the window is scrolling or while the __activeComponent is still shrinking in collapseExistingComponentContent()
  * 
  * @returns { Boolean } 
  */
@@ -418,17 +370,12 @@ const flipState = (closestElement, isShiftingDown) => {
         __isFlipping = true;
         __startDragPoint = updateDragPoint();
 
-        const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
+        const state = Flip.getState(document.querySelectorAll(COMPONENT_SELECTOR));
         
         if (isShiftingDown) {
             insertElementAfter(closestElement, __placeHolderComponent);
         } else {
             insertElementBefore(closestElement, __placeHolderComponent);
-        }
-
-        if (isNewComponent(__activeComponent)) {
-            __placeHolderComponent.style.marginBottom = '2rem'; //existing components all have a margin
-            __activeComponent.style.marginBottom = '2rem'; //existing components all have a margin
         }
 
         removePlaceHolderComponents(); //remove prior to recording the new co-ordinates so can snap back on release to correct location
@@ -478,6 +425,15 @@ const onDragEnd = () => {
 }
 
 /**
+ * Run through each Draggable instance and enable/disable
+ * 
+ * @param { Boolean }  
+ */
+ const updateDraggablesStatus = (isEnabled) => {
+    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
+}
+
+/**
  * When the add components tab is open, there would be a double up of place holders in parent containers
  * so need to hide them while dragging, and they are shown again when drag is released
  */
@@ -523,12 +479,8 @@ const onSnapBackActiveComponentComplete = () => {
     insertElementAfter(__placeHolderComponent, __activeComponent); //the element was taken out, so put it back where it now belongs
     __placeHolderComponent.remove(); //and now the placeholder can be pulled out
 
-    if (isExistingComponent(__activeComponent)) {
-        expandExistingComponent();
-    } else {
-        onActiveComponentExpanded();
-    }
-
+    expandExistingComponent();
+    
 }
 
 /**
@@ -569,34 +521,13 @@ const expandExistingComponent = () => {
  * To set up for another possible drag of elements
  */
 const onActiveComponentExpanded = async () => {
-
-    updateDocumentOnDragEnd();
-    updateSortableElements();
-
-    if (__hasSortChange && isNewComponent(__activeComponent)) {
-        
-        let componentCount = parseInt(__newComponentClone.querySelector('[data-relation="count"]').innerText);
-        componentCount++;
-        __newComponentClone.querySelector('[data-relation="count"]').innerText = componentCount;
-
-        __newComponentPaletteContainer.appendChild(__newComponentClone);
-
-        const newDraggable = getDraggable(__newComponentClone);
-        const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
-        newDraggable.enabled(componentLockSwitchStatus); //check 
-        __draggablesList = [...__draggablesList, newDraggable];
-        //disable if only allowed one element
-
-        const newComponent = await getNewComponent(__activeComponent);
-        await saveComponentOrder(newComponent);
-        __hasSortChange = false;
-    } else if (__hasSortChange && isExistingComponent(__activeComponent)) {
+    if (__hasSortChange) {
         await saveComponentOrder(__activeComponent);
         __hasSortChange = false;
     }
-
+    updateDocumentOnDragEnd();
+    updateSortableElements();
     updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
-
 }
 
 /**
@@ -608,4 +539,4 @@ const updateDocumentOnDragEnd = () => {
     document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
     document.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
-};
+}

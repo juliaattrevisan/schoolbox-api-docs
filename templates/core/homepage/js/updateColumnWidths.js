@@ -6,7 +6,9 @@
 import { removeClassesThatContain } from '@js/util/cssUtils';
 
 /**
- * Change the column width 
+ * Change the column width
+ * 
+ * @todo look to remove the jQuery foundation reference 
  */
 export const initUpdateColumnWidths = () => {
     $('[data-interaction="column-width"]').on('change.fndtn.slider', function(event) {
