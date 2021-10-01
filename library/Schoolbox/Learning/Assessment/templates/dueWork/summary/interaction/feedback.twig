@@ -181,10 +181,39 @@ feedback: currentFeedback,
                                         <p class="meta">{{ currentFile.filename }}</p>
                                     </a>
                                 {% else %}
-                                    <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
-                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
-                                        <p>{{ currentFile.filename }} </p>
-                                    </a>
+                                    {% if 'audio' in currentFile.mime %}
+                                    <audio id="schoolbox_audio_preview_{{ currentFile.id }}"
+                                           controls
+                                           preload="none"
+                                           width="100%">
+                                        <source src="/cms/sendVideo.php?hash={{ currentFile.hash }}" type='audio/mp3'>
+                                    </audio>
+
+                                    {% elseif  'video' in currentFile.mime %}
+                                    <script type="text/javascript">
+                                        $(function(){
+                                            //$("#schoolbox_video_preview_{{ currentFile.id }}").mediaelementplayer();
+                                        });
+                                    </script>
+                                    <video id="schoolbox_video_preview_{{ currentFile.id }}"
+                                           controls
+                                           preload="none"
+                                           poster="/cms/videoThumb.php?hash={{ currentFile.hash }}&size=poster"
+                                           width="100%"
+                                           height="500"
+                                           style="max-width: 100%; height: 500px;"
+                                    >
+                                        <source src="/cms/sendVideo.php?hash={{ currentFile.hash }}" type='video/mp4'>
+                                    </video>
+
+
+                                {% else %}
+                                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+                                            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                            <p>{{ currentFile.filename }} </p>
+                                        </a>
+
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>
