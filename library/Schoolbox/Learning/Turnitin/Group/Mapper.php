@@ -10,10 +10,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Group;
 
+use Schoolbox\Collection;
+
 /**
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
+ * @method Collection|Model[] findByColumn($columnName, $columnValue, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {

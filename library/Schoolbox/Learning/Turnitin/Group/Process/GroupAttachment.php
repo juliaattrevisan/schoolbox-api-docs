@@ -224,6 +224,13 @@ class GroupAttachment
          */
         $submissionBoxFileIds = $submissionBoxFiles->getPropertyValues('id');
 
+        $this->logDebug(sprintf(
+            'Submission box %s has %s files associated with it at the moment (%s)',
+            $turnitinGroup->getSubmissionBoxId(),
+            \count($submissionBoxFileIds),
+            implode (', ', $submissionBoxFileIds)
+        ));
+
         $turnitinGroupAttachments = $this->turnitinGroupAttachmentMapper
             ->findByColumn('submission_box_file_id', $submissionBoxFileIds)
             ->indexBy('submission_box_file_id');
@@ -237,16 +244,25 @@ class GroupAttachment
          * If the file id exists, it should already have a group_attachment_id
          * from turnitin; nothing to do
          */
-        foreach ($submissionBoxFileIds as $submissionBoxFileId) {
-            if (null === !$turnitinGroupAttachments->getOffset($submissionBoxFileId)) {
-                $groupAttachmentId = $this->api->retrieve('POST', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments", []);
+        foreach ($submissionBoxFiles as $submissionBoxFile) {
+            $submissionBoxFileId = $submissionBoxFile->getId();
+
+            if (null === $turnitinGroupAttachments->getOffset($submissionBoxFileId)) {
+                $groupAttachmentId = $this->api->retrieve('POST', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments", [
+                    'title' => $submissionBoxFile->getBasename()
+                ]);
 
                 /* Set it to pending, so we know we need to upload its guts
                  */
                 $newGroupAttachment = $this->turnitinGroupAttachmentMapper->createModel()
-                    ->setSubmissionBoxFileId($turnitinGroup->getSubmissionBoxId())
+                    ->setSubmissionBoxFileId($submissionBoxFileId)
                     ->setTurnitinGroupAttachmentId($groupAttachmentId['id'])
                     ->setStatus(Turnitin\Group\Attachment\Model::STATUS_TRANSMIT_PENDING);
+
+                $this->logDebug(sprintf(
+                    'Adding new submission box file %s to turnitin',
+                    $submissionBoxFileId,
+                ));
 
                 $this->turnitinGroupAttachmentMapper->save($newGroupAttachment);
             }
@@ -259,6 +275,12 @@ class GroupAttachment
         foreach ($turnitinGroupAttachments as $turnitinGroupAttachment) {
             if (!\in_array($turnitinGroupAttachment->getSubmissionBoxFileId(), $submissionBoxFileIds, true)) {
                 $this->api->retrieve('DELETE', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}", []);
+
+                $this->logDebug(sprintf(
+                    'Removing iold submission box file %s (%s) from turnitin',
+                    $submissionBoxFileId,
+                    $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
+                ));
 
                 /* Softdelete it out of its home
                  */
@@ -342,7 +364,7 @@ class GroupAttachment
         $this->changeGroupAttachmentState(
             $turnitinGroupAttachment,
             sprintf(
-                'Group Attachment %s: setting up turnitin Group Attachment Contents for submission box file %s %s to status %s',
+                'Group Attachment %s: setting up turnitin Group Attachment Contents for submission box file %s %s; setting status %s',
                 $turnitinGroupAttachment->getId(),
                 $submissionBoxFile->getId(),
                 $submissionBoxFile->getBasename(),
@@ -357,6 +379,18 @@ class GroupAttachment
         ];
 
         $this->api->retrieve('UPLOAD', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}/original", $payload);
+
+        $this->changeGroupAttachmentState(
+            $turnitinGroupAttachment,
+            sprintf(
+                'Group Attachment %s: upload complete for submission box file %s %s; setting status %s',
+                $turnitinGroupAttachment->getId(),
+                $submissionBoxFile->getId(),
+                $submissionBoxFile->getBasename(),
+                Turnitin\Group\Attachment\Model::STATUS_COMPLETE
+            ),
+            Turnitin\Group\Attachment\Model::STATUS_COMPLETE
+        );
     }
 
 
@@ -414,7 +448,7 @@ class GroupAttachment
             ->setErrorMessage(null)
             ->setStatus($status);
 
-        $this->turnitinGroupMapper->save($model);
+        $this->turnitinGroupAttachmentMapper->save($model);
     }
 
 

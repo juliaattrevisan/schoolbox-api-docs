@@ -19,7 +19,7 @@ use Schoolbox\Learning\Turnitin\ValidFile;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Collection findByColumn($columnName, $columnValue, array $options = [])
+ * @method Collection|Model[] findByColumn($columnName, $columnValue, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {
