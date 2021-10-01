@@ -24,8 +24,8 @@ export const timeout = (ms) => {
  */
 export const isObject = (variable) => {
     return typeof variable === 'object' &&
-            !Array.isArray(variable) &&
-            variable !== null;
+        !Array.isArray(variable) &&
+        variable !== null;
 }
 
 /**
@@ -37,4 +37,16 @@ export const isObject = (variable) => {
  */
 export const convertObjectToArray = (object) => {
     return Object.keys(object).map((key) => object[key]);
+}
+
+/**
+ * Escape a regular expression
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
+ * 
+ * @param { String } 
+ * 
+ * @returns { String } 
+ */
+export const escapeRegExp = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

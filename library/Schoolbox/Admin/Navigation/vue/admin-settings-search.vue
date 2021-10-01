@@ -8,131 +8,131 @@
  */
 
 import AdminSettingsSearchResult from './admin-settings-search-result';
-import { fetchAsJson } from '@js/fetch/fetch';
-import { gsap } from 'gsap/all'
+import { gsap } from 'gsap/all';
+
+const SB_SETTINGS_LIST = 'sb_settingsList';
+
 
 export default {
 
-    name: 'admin-settings-search',
-
-	components: {
-		AdminSettingsSearchResult
-	},
+    components: {
+        AdminSettingsSearchResult
+    },
 
     data () {
-    	return {
-			settingsList: [],
+        return {
+            settingsList: [],
             isLoaded: false,
-			hasLoadError: false,
-			searchQuery: '',
-			minSearchQueryLength: 3,
-            searchResultsShownLimit: 6,
+            hasLoadError: false,
+            query: '',
+            minQueryLength: 3,
+            resultsShownLimit: 6,
             activeIndex: 0 //to track which index is selected
-    	}
-  	},
+        }
+      },
 
     computed: {
 
         /**
          * to notify whether still loading the results or not
          * 
-         * @returns {String} loading status
+         * @returns { String } loading status
          */
-        searchInputPlaceholder () {
-			if (this.isLoaded) {
+        inputPlaceholder () {
+            if (this.isLoaded) {
                 return 'Search administration settings...';
             } else {
                 return 'Loading settings, please wait...'
             }
-		},
+        },
 
         /**
-         * only when started typing beyond minSearchQueryLength count and there's actual results
+         * only when started typing beyond minQueryLength count and there's actual results
          * 
-         * @returns {String} start displaying results or not
+         * @returns { Boolean } start displaying results or not
          */
-        isSearchActive () {
-			if ((this.searchQuery.length >= this.minSearchQueryLength) && (this.filteredSearchList.length > 0)) {
+        isActive () {
+            if ((this.query.length >= this.minQueryLength) && (this.resultsList.length > 0)) {
                 return true
             } else {
                 return false;
             }
-		},
+        },
 
         /**
          * the search string broken into words, to search for each word
          *
-         * @returns {Array} the search string broken into single words
+         * @returns { Array } the search string broken into single words
          */
-        searchStringWordList () {
-			const allWords = this.searchQuery.match(/\b(\w+)\b/g);
+        queryWordList () {
+            const allWords = this.query.match(/\b(\w+)\b/g);
             const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
             return onlyWordsAboveTwoLetters;
-		},
+        },
 
         /**
          * the settings relevant to the search input
          * 
-         * @returns {Array} all relevant search results, with title matches first over those just with description matches
+         * @returns { Array } all relevant search results, with title matches first over those just with description matches
          */
-		filteredSearchList () {
-			if (this.searchQuery.length < this.minSearchQueryLength) {
-				return [];
-			}
+        resultsList () {
+            if (this.query.length < this.minQueryLength) {
+                return [];
+            }
             const matchedTitleList = this.settingsList.filter(this.searchForTitle);
             const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
             return matchedTitleList.concat(matchedNameAndDescriptionList); //so those that have title matches take precedence
-		},
+        },
 
         /**
-         * the settings relevant to the search input and capped to searchResultsShownLimit
+         * the settings relevant to the search input and capped to resultsShownLimit
          * 
-         * @returns {Array} 
+         * @returns { Array } 
          */
-		filteredSearchListLimited () {
-            if (this.filteredSearchList.length > this.searchResultsShownLimit) { //return the capped results
-                return this.filteredSearchList.filter((setting, index) => index < this.searchResultsShownLimit);
+        resultsListLimited () {
+            if (this.resultsList.length > this.resultsShownLimit) { //return the capped results
+                return this.resultsList.filter((setting, index) => index < this.resultsShownLimit);
             } else { //otherwise just return the whole list
-                return this.filteredSearchList;
+                return this.resultsList;
             }
-		},
+        },
 
         /**
          * to show the search refine note
          * 
-         * @returns {Boolean}
+         * @returns { Boolean }
          */
-        hasResultsBeydondSearchResultsShownLimit () {
-			if (this.filteredSearchList.length > this.searchResultsShownLimit) {
-				return true
-			} else {
+        hasResultsBeydondLimit () {
+            if (this.resultsList.length > this.resultsShownLimit) {
+                return true
+            } else {
                 return false;
             }
-		},
+        },
 
         /**
          * to show the count of how many aren't appearing in the search
          * 
-         * @returns {Number}
+         * @returns { Number }
          */
-        resultsBeydondSearchResultsShownLimitCount () {
-			return this.filteredSearchList.length - this.searchResultsShownLimit;
-		}
+        resultsBeyondLimitCount () {
+            return this.resultsList.length - this.resultsShownLimit;
+        }
 
-	},
+    },
 
     watch: {
 
         /**
          * reset the active index when the list changes as the index may become out of range
          */
-		filteredSearchList (newValue, oldValue) {
-			if ((newValue.length !== oldValue.length) && (this.activeIndex > 0)) {
+        resultsList (newValue, oldValue) {
+            if ((newValue.length !== oldValue.length) && (this.activeIndex > 0)) {
                 this.activeIndex = 0;
             }
-		}
+        }
 
-	},
+    },
 
     mounted () {
         this.initKeyboardEvents();
@@ -146,163 +146,151 @@ export default {
          * find all those results that match EACH search word
          * within the the title field
          *
-         * @params {Object}
+         * @params { Object }
          *
-         * @return {Boolean} true if found
+         * @return { Boolean } true if found
          */
         searchForTitle (setting) {
             let wordMatchCount = 0;
-            this.searchStringWordList.forEach(wordInSearch => {
+            this.queryWordList.forEach(wordInSearch => {
                 if (setting.title?.toLowerCase().includes(wordInSearch.toLowerCase())) {
                     wordMatchCount++;
                 }
             });
-            if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
+            if (wordMatchCount === this.queryWordList.length) { //all words have to match
                 return true;
             } else {
                 return false;
             }
-		},
+        },
 
         /**
          * find all those results that match EACH search word
          * within the name and description fields
          *
-         * @params {Object}
+         * @params { Object }
          *
-         * @return {Boolean} true if found
+         * @return { Boolean } true if found
          */
         searchForNameAndDescription (setting) {
             let wordMatchCount = 0;
-            this.searchStringWordList.forEach(wordInSearch => {
+            this.queryWordList.forEach(wordInSearch => {
                 if ((setting.name?.toLowerCase().includes(wordInSearch.toLowerCase())
                     || setting.description?.toLowerCase().includes(wordInSearch.toLowerCase()))
                     && (!setting.title?.toLowerCase().includes(wordInSearch.toLowerCase()))) {
                     wordMatchCount++;
                 }
             });
-            if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
+            if (wordMatchCount === this.queryWordList.length) { //all words have to match
                 return true;
             } else {
                 return false;
             }
-		},
+        },
 
         /**
          * to be able to select by enter and navigate by up/down arrows
-         *
          */
-		initKeyboardEvents () {
-			document.addEventListener('keyup', (event) => {
+        initKeyboardEvents () {
+            document.addEventListener('keyup', (event) => {
                 const keyName = event.key;
-
-                if (keyName === 'Enter') {
-                    this.selectResult(this.filteredSearchList[this.activeIndex].url);
-
-                } else if (keyName === 'ArrowUp') {
-                    this.decrementActiveIndex();
-
-                } else if (keyName === 'ArrowDown') {
-                    this.incrementActiveIndex();
-
+                const keyOptions = {
+                    'Enter': () => this.selectResult(this.resultsList[this.activeIndex].url),
+                    'ArrowUp': () => this.decrementActiveIndex(),
+                    'ArrowDown': () => this.incrementActiveIndex(),
                 }
+                keyOptions[keyName]();
             });
-		},
+        },
 
         /**
          * to be able to move up and down through the selections
          * with the arrow keys
-         *
          */
         decrementActiveIndex () {
             if (this.activeIndex > 0) {
                 this.activeIndex--;
             }
-		},
+        },
 
         /**
          * to be able to move up and down through the selections
          * with the arrow keys
-         *
          */
         incrementActiveIndex () {
-            if (this.activeIndex < (this.filteredSearchListLimited.length-1)) {
-			    this.activeIndex++;
+            if (this.activeIndex < (this.resultsListLimited.length-1)) {
+                this.activeIndex++;
             }
-		},
+        },
 
         /**
          * to be able to close the menu when something else
          * is selected outside the menu
-         *
          */
-		initMouseEvents () {
-			document.addEventListener('click', (event) => {
+        initMouseEvents () {
+            document.addEventListener('click', (event) => {
                 if (!this.$el.contains(event.target)) {
                     this.clearInput();
                 }
             });
-		},
+        },
 
         /**
          * check if already loaded and saved, or load up
-         *
          */
-		loadSettings () {
-			if (sessionStorage.getItem('sb_settingsList')) {
+        loadSettings () {
+            if (sessionStorage.getItem(SB_SETTINGS_LIST)) {
                 this.loadSessionSettings();
             } else {
                 this.loadRemoteSettings();
             }
-		},
+        },
 
         /**
          * pull the settings from local storage
-         *
          */
-		loadSessionSettings () {
-            const sessionStorageSettingsList  = sessionStorage.getItem('sb_settingsList');
+        loadSessionSettings () {
+            const sessionStorageSettingsList  = sessionStorage.getItem(SB_SETTINGS_LIST);
             this.settingsList = JSON.parse(sessionStorageSettingsList); //conver the saved string var back to JSON
             this.isLoaded = true;
         },
 
         /**
          * load the settings for possible retrieval
-         *
          */
-		loadRemoteSettings () {
-			fetchAsJson('/adminv2/setting/search')
-			.then((response) => {
-				this.settingsList = response;
-                sessionStorage.setItem('sb_settingsList', JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
-				this.isLoaded = true;
-			}).catch((error) => {
-				this.hasLoadError = true; //hide search bar in the dom
-			});
-		},
+        async loadRemoteSettings () {
+            try {
+                const response = await fetch('/adminv2/setting/search');
+                const responseJson = await response.json();
+                this.settingsList = responseJson;
+                sessionStorage.setItem(SB_SETTINGS_LIST, JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
+            } catch (error) {
+                this.hasLoadError = true; //hide search bar in the dom
+            } finally {
+                this.isLoaded = true;
+            }
+        },
 
         /**
          * clear the search button selected
-         *
          */
         onClearInputSelected () {
-			this.clearInput();
-		},
+            this.clearInput();
+        },
 
         /**
          * clear the search
-         *
          */
-		clearInput () {
-			this.searchQuery = '';
+        clearInput () {
+            this.query = '';
             this.activeIndex = -1;
-		},
+        },
 
         /**
          * how the element animates off
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         checkEachResultIndex () {
@@ -316,7 +304,7 @@ export default {
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
          *
-         * @param {DOMElement} element - the element that's animating
+         * @param { DOMElement } element - the element that's animating
          *
          */
         onBeforeOnEnter (element) {
@@ -326,8 +314,8 @@ export default {
         /**
          * how it element animates on
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         onEnter (element, done) {
@@ -338,8 +326,8 @@ export default {
         /**
          * how the element animates off
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         onLeave (element, done) {
@@ -349,8 +337,8 @@ export default {
         /**
          * how the element animates off
          *
-         * @param {DOMElement} element - the element that's animating
-         * @param {Function} done - to be called once animation is complete
+         * @param { DOMElement } element - the element that's animating
+         * @param { Function } done - to be called once animation is complete
          *
          */
         onAfterLeave (element) {
@@ -364,18 +352,22 @@ export default {
          */
         onMouseOverResult () {
             this.activeIndex = -1; //disable the keyboard selection, mouse takes precedence until search is updated
-		},
+        },
 
         /**
          * a result has been selected via #admin-settings-search-result
+         * 
+         * @param { String }
          */
         onSelectedResult (url) {
             this.selectResult(url);
-		},
+        },
 
         /**
          * to move to the page the selected search result is on
          * which will have the result highlighted
+         * 
+         * @param { String }
          */
         selectResult (url) {
             this.clearInput();
@@ -388,7 +380,7 @@ export default {
                 });
                 document.dispatchEvent(event);
             }
-		}
+        }
 
     }
 
@@ -400,10 +392,10 @@ export default {
     <div class="admin-search-container">
         <input
             v-if="!hasLoadError"
-            v-model="searchQuery"
+            v-model="query"
             @input="$event.target.composing = false"
             :readonly="!isLoaded"
-            :placeholder="searchInputPlaceholder"
+            :placeholder="inputPlaceholder"
             type="text"
             class=""
         />
@@ -419,18 +411,18 @@ export default {
                 @after-leave="checkEachResultIndex"
                 @leave-cancelled="checkEachResultIndex"
             >
-                <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
+                <li v-for="(result, index) in resultsListLimited" :key="result.name" :data-index="index">
                     <admin-settings-search-result
                         ref="searchResults"
                         :result="result"
-                        :search-string-word-list="searchStringWordList"
+                        :query-word-list="queryWordList"
                         :active-index="activeIndex"
                         @on-mouse-over-result="onMouseOverResult"
                         @on-selected-result="onSelectedResult"
                     />
                 </li>
             </transition-group>
-            <aside v-if="isSearchActive && hasResultsBeydondSearchResultsShownLimit" class="search-refine-note">{{ resultsBeydondSearchResultsShownLimitCount }} search results not shown, try refining your search further.</aside>
+            <aside v-if="isActive && hasResultsBeydondLimit" class="search-refine-note">{{ resultsBeyondLimitCount }} search results not shown, try refining your search further.</aside>
         </div>
     </div>
 </template>
@@ -440,47 +432,43 @@ export default {
 @import 'www/static/css/foundation/utils/_variables.scss';
 
 .admin-search-container {
-  position: relative;
-
-  > div {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    position: absolute;
-    top: 40px;
-    z-index: 10;
-  }
+    position: relative;
+    > div {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        position: absolute;
+        top: 40px;
+        z-index: 10;
+    }
 }
 
 ul {
-  margin: 0;
-  list-style: none;
-  width: 500px;
-
-  @media only screen and (max-width: 640px) {
-    width: 100%;
-  }
-
-  li {
-    border-bottom: 1px solid $body-bg;
-    border-left: 1px solid $navigation-hover;
-    border-right: 1px solid $navigation-hover;
-    transform: none !important;
-
-    &:first-child {
-      border-top: 1px solid $navigation-hover;
+    margin: 0;
+    list-style: none;
+    width: 500px;
+    @media only screen and (max-width: 640px) {
+        width: 100%;
     }
-    &:last-child {
-      border-bottom: 1px solid $navigation-hover;
+    li {
+        border-bottom: 1px solid $body-bg;
+        border-left: 1px solid $navigation-hover;
+        border-right: 1px solid $navigation-hover;
+        transform: none !important;
+        &:first-child {
+            border-top: 1px solid $navigation-hover;
+        }
+        &:last-child {
+            border-bottom: 1px solid $navigation-hover;
+        }
     }
-  }
 }
 
 .search-refine-note {
-  background-color: #FAFAFA;
-  border: 1px solid #EDEDED;
-  width: 100%;
-  padding: .75rem;
-  font-size: 13px;
-  font-style: italic;
+    background-color: #FAFAFA;
+    border: 1px solid #EDEDED;
+    width: 100%;
+    padding: .75rem;
+    font-size: 13px;
+    font-style: italic;
 }
 
 </style>
