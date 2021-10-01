@@ -1623,6 +1623,10 @@ class MapperProxy
                     $builder->notNull('q.assess_id');
                     break;
 
+                case AssessmentType::TYPE_LTI_ASSESSMENT:
+                    $builder->notNull('l.id');
+                    break;
+
                 case AssessmentType::TYPE_PROJECT:
                     $builder->notNull('p.id');
                     break;
