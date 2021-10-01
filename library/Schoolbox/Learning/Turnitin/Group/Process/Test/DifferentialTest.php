@@ -13,10 +13,10 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin\Process\Test;
+namespace Schoolbox\Learning\Turnitin\Group\Process\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin\Process\Differential;
+use Schoolbox\Learning\Turnitin\Group\Process\Differential;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 class DifferentialTest extends TestCase

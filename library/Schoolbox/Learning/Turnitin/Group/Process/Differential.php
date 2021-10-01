@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin\Process;
+namespace Schoolbox\Learning\Turnitin\Group\Process;
 
 /**
  * From two arrays, calculate a diff while preserving as much as possible

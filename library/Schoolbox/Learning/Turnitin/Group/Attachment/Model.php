@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin;
+namespace Schoolbox\Learning\Turnitin\Group\Attachment;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;

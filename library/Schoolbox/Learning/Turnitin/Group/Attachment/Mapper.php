@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Turnitin;
+namespace Schoolbox\Learning\Turnitin\Group\Attachment;
 
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Learning\Turnitin\ValidFile;
@@ -28,7 +28,6 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('turnitin_group_attachment');
         $this->hasModel(Model::class);
-
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('status', self::TYPE_STRING);
         $this->uses('error_code', self::TYPE_STRING);
