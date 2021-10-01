@@ -41,7 +41,18 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         parent::setup($context);
 
         $contextId = $this->getContext() ? $this->getContext()->getId() : 0;
-        $sourceId = $this->getSource() ? $this->getSource()->getId() : 0;
+
+        /**
+         * on the occasion that getSource is set/valid, but getSource()->getId() is null.
+         * getsource has been deleted in the database, but is still being referred to. so also set the source as 0
+         * we deal with this in `library/Component/ControllerAbstract.php` when we run `isSourceRenderable`
+         * */
+        //if getSource->GetId is null (database deleted, but still referred to) also show as deleted.
+        if ($this->getSource() && $this->getSource()->getId() != null) {
+            $sourceId = $this->getSource()->getId();
+        } else {
+            $sourceId = 0;
+        }
 
         // Content permission: based on alt source if it's there
         // Control permission: always based on current context
