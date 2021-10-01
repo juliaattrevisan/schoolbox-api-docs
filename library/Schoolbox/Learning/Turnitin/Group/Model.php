@@ -40,6 +40,12 @@ class Model implements ISoftDeletable
      */
     public const STATUS_TRANSMIT_GROUP = 'group';
 
+    /* We need to create/update/delete group attachment containers for this submission box;
+     * creates new ones if they didn't already exist, removes ones that shouldn't be there
+     * anymore, and leaves the intersection untouched
+     */
+    public const STATUS_TRANSMIT_GROUP_ATTACHMENT = 'group_attachment';
+
     /* We started sending the group attachment's file contents to turnitin
      */
     public const STATUS_TRANSMIT_UPLOADING = 'uploading';

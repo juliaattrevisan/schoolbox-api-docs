@@ -2,7 +2,7 @@
 -- group_id is a hyphen-separated alphanumeric e.g. "b5cf0e76-c1c7-11e8-a355-529269fb1459"
 CREATE TABLE `turnitin_group` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `status` ENUM('pending', 'group', 'uploading', 'complete', 'error') NOT NULL,
+    `status` ENUM('pending', 'group', 'group_attachment', 'uploading', 'complete', 'error') NOT NULL,
     `error_code` VARCHAR(255) NULL,
     `error_message` VARCHAR(255) NULL,
     `submission_box_id` INT UNSIGNED NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE `turnitin_report` (
 -- The last known error is cached here
 CREATE TABLE `turnitin_group_attachment` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `status` ENUM('pending', 'group_attachment', 'uploading', 'complete', 'error') NOT NULL,
+    `status` ENUM('pending', 'uploading', 'complete', 'error') NOT NULL,
     `error_code` VARCHAR(255) NULL,
     `error_message` VARCHAR(255) NULL,
     `submission_box_file_id` INT UNSIGNED NOT NULL,

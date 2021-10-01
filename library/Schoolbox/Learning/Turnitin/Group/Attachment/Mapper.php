@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Group\Attachment;
 
+use Schoolbox\Collection;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Learning\Turnitin\ValidFile;
 
@@ -18,6 +19,7 @@ use Schoolbox\Learning\Turnitin\ValidFile;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
+ * @method Collection findByColumn($columnName, $columnValue, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {
