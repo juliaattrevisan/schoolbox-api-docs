@@ -15,21 +15,21 @@ const SB_SETTINGS_LIST = 'sb_settingsList';
 
 export default {
 
-	components: {
-		AdminSettingsSearchResult
-	},
+    components: {
+        AdminSettingsSearchResult
+    },
 
     data () {
-    	return {
-			settingsList: [],
+        return {
+            settingsList: [],
             isLoaded: false,
-			hasLoadError: false,
-			query: '',
-			minQueryLength: 3,
+            hasLoadError: false,
+            query: '',
+            minQueryLength: 3,
             resultsShownLimit: 6,
             activeIndex: 0 //to track which index is selected
-    	}
-  	},
+        }
+      },
 
     computed: {
 
@@ -39,12 +39,12 @@ export default {
          * @returns { String } loading status
          */
         inputPlaceholder () {
-			if (this.isLoaded) {
+            if (this.isLoaded) {
                 return 'Search administration settings...';
             } else {
                 return 'Loading settings, please wait...'
             }
-		},
+        },
 
         /**
          * only when started typing beyond minQueryLength count and there's actual results
@@ -52,12 +52,12 @@ export default {
          * @returns { Boolean } start displaying results or not
          */
         isActive () {
-			if ((this.query.length >= this.minQueryLength) && (this.resultsList.length > 0)) {
+            if ((this.query.length >= this.minQueryLength) && (this.resultsList.length > 0)) {
                 return true
             } else {
                 return false;
             }
-		},
+        },
 
         /**
          * the search string broken into words, to search for each word
@@ -65,37 +65,37 @@ export default {
          * @returns { Array } the search string broken into single words
          */
         queryWordList () {
-			const allWords = this.query.match(/\b(\w+)\b/g);
+            const allWords = this.query.match(/\b(\w+)\b/g);
             const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
             return onlyWordsAboveTwoLetters;
-		},
+        },
 
         /**
          * the settings relevant to the search input
          * 
          * @returns { Array } all relevant search results, with title matches first over those just with description matches
          */
-		resultsList () {
-			if (this.query.length < this.minQueryLength) {
-				return [];
-			}
+        resultsList () {
+            if (this.query.length < this.minQueryLength) {
+                return [];
+            }
             const matchedTitleList = this.settingsList.filter(this.searchForTitle);
             const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
             return matchedTitleList.concat(matchedNameAndDescriptionList); //so those that have title matches take precedence
-		},
+        },
 
         /**
          * the settings relevant to the search input and capped to resultsShownLimit
          * 
          * @returns { Array } 
          */
-		resultsListLimited () {
+        resultsListLimited () {
             if (this.resultsList.length > this.resultsShownLimit) { //return the capped results
                 return this.resultsList.filter((setting, index) => index < this.resultsShownLimit);
             } else { //otherwise just return the whole list
                 return this.resultsList;
             }
-		},
+        },
 
         /**
          * to show the search refine note
@@ -103,12 +103,12 @@ export default {
          * @returns { Boolean }
          */
         hasResultsBeydondLimit () {
-			if (this.resultsList.length > this.resultsShownLimit) {
-				return true
-			} else {
+            if (this.resultsList.length > this.resultsShownLimit) {
+                return true
+            } else {
                 return false;
             }
-		},
+        },
 
         /**
          * to show the count of how many aren't appearing in the search
@@ -116,23 +116,23 @@ export default {
          * @returns { Number }
          */
         resultsBeyondLimitCount () {
-			return this.resultsList.length - this.resultsShownLimit;
-		}
+            return this.resultsList.length - this.resultsShownLimit;
+        }
 
-	},
+    },
 
     watch: {
 
         /**
          * reset the active index when the list changes as the index may become out of range
          */
-		resultsList (newValue, oldValue) {
-			if ((newValue.length !== oldValue.length) && (this.activeIndex > 0)) {
+        resultsList (newValue, oldValue) {
+            if ((newValue.length !== oldValue.length) && (this.activeIndex > 0)) {
                 this.activeIndex = 0;
             }
-		}
+        }
 
-	},
+    },
 
     mounted () {
         this.initKeyboardEvents();
@@ -162,7 +162,7 @@ export default {
             } else {
                 return false;
             }
-		},
+        },
 
         /**
          * find all those results that match EACH search word
@@ -186,13 +186,13 @@ export default {
             } else {
                 return false;
             }
-		},
+        },
 
         /**
          * to be able to select by enter and navigate by up/down arrows
          */
-		initKeyboardEvents () {
-			document.addEventListener('keyup', (event) => {
+        initKeyboardEvents () {
+            document.addEventListener('keyup', (event) => {
                 const keyName = event.key;
                 const keyOptions = {
                     'Enter': () => this.selectResult(this.resultsList[this.activeIndex].url),
@@ -201,7 +201,7 @@ export default {
                 }
                 keyOptions[keyName]();
             });
-		},
+        },
 
         /**
          * to be able to move up and down through the selections
@@ -211,7 +211,7 @@ export default {
             if (this.activeIndex > 0) {
                 this.activeIndex--;
             }
-		},
+        },
 
         /**
          * to be able to move up and down through the selections
@@ -219,37 +219,37 @@ export default {
          */
         incrementActiveIndex () {
             if (this.activeIndex < (this.resultsListLimited.length-1)) {
-			    this.activeIndex++;
+                this.activeIndex++;
             }
-		},
+        },
 
         /**
          * to be able to close the menu when something else
          * is selected outside the menu
          */
-		initMouseEvents () {
-			document.addEventListener('click', (event) => {
+        initMouseEvents () {
+            document.addEventListener('click', (event) => {
                 if (!this.$el.contains(event.target)) {
                     this.clearInput();
                 }
             });
-		},
+        },
 
         /**
          * check if already loaded and saved, or load up
          */
-		loadSettings () {
-			if (sessionStorage.getItem(SB_SETTINGS_LIST)) {
+        loadSettings () {
+            if (sessionStorage.getItem(SB_SETTINGS_LIST)) {
                 this.loadSessionSettings();
             } else {
                 this.loadRemoteSettings();
             }
-		},
+        },
 
         /**
          * pull the settings from local storage
          */
-		loadSessionSettings () {
+        loadSessionSettings () {
             const sessionStorageSettingsList  = sessionStorage.getItem(SB_SETTINGS_LIST);
             this.settingsList = JSON.parse(sessionStorageSettingsList); //conver the saved string var back to JSON
             this.isLoaded = true;
@@ -258,7 +258,7 @@ export default {
         /**
          * load the settings for possible retrieval
          */
-		async loadRemoteSettings () {
+        async loadRemoteSettings () {
             try {
                 const response = await fetch('/adminv2/setting/search');
                 const responseJson = await response.json();
@@ -269,22 +269,22 @@ export default {
             } finally {
                 this.isLoaded = true;
             }
-		},
+        },
 
         /**
          * clear the search button selected
          */
         onClearInputSelected () {
-			this.clearInput();
-		},
+            this.clearInput();
+        },
 
         /**
          * clear the search
          */
-		clearInput () {
-			this.query = '';
+        clearInput () {
+            this.query = '';
             this.activeIndex = -1;
-		},
+        },
 
         /**
          * how the element animates off
@@ -352,7 +352,7 @@ export default {
          */
         onMouseOverResult () {
             this.activeIndex = -1; //disable the keyboard selection, mouse takes precedence until search is updated
-		},
+        },
 
         /**
          * a result has been selected via #admin-settings-search-result
@@ -361,7 +361,7 @@ export default {
          */
         onSelectedResult (url) {
             this.selectResult(url);
-		},
+        },
 
         /**
          * to move to the page the selected search result is on
@@ -380,7 +380,7 @@ export default {
                 });
                 document.dispatchEvent(event);
             }
-		}
+        }
 
     }
 
@@ -415,7 +415,7 @@ export default {
                     <admin-settings-search-result
                         ref="searchResults"
                         :result="result"
-                        :search-string-word-list="queryWordList"
+                        :query-word-list="queryWordList"
                         :active-index="activeIndex"
                         @on-mouse-over-result="onMouseOverResult"
                         @on-selected-result="onSelectedResult"
@@ -432,47 +432,43 @@ export default {
 @import 'www/static/css/foundation/utils/_variables.scss';
 
 .admin-search-container {
-  position: relative;
-
-  > div {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    position: absolute;
-    top: 40px;
-    z-index: 10;
-  }
+    position: relative;
+    > div {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        position: absolute;
+        top: 40px;
+        z-index: 10;
+    }
 }
 
 ul {
-  margin: 0;
-  list-style: none;
-  width: 500px;
-
-  @media only screen and (max-width: 640px) {
-    width: 100%;
-  }
-
-  li {
-    border-bottom: 1px solid $body-bg;
-    border-left: 1px solid $navigation-hover;
-    border-right: 1px solid $navigation-hover;
-    transform: none !important;
-
-    &:first-child {
-      border-top: 1px solid $navigation-hover;
+    margin: 0;
+    list-style: none;
+    width: 500px;
+    @media only screen and (max-width: 640px) {
+        width: 100%;
     }
-    &:last-child {
-      border-bottom: 1px solid $navigation-hover;
+    li {
+        border-bottom: 1px solid $body-bg;
+        border-left: 1px solid $navigation-hover;
+        border-right: 1px solid $navigation-hover;
+        transform: none !important;
+        &:first-child {
+            border-top: 1px solid $navigation-hover;
+        }
+        &:last-child {
+            border-bottom: 1px solid $navigation-hover;
+        }
     }
-  }
 }
 
 .search-refine-note {
-  background-color: #FAFAFA;
-  border: 1px solid #EDEDED;
-  width: 100%;
-  padding: .75rem;
-  font-size: 13px;
-  font-style: italic;
+    background-color: #FAFAFA;
+    border: 1px solid #EDEDED;
+    width: 100%;
+    padding: .75rem;
+    font-size: 13px;
+    font-style: italic;
 }
 
 </style>
