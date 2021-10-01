@@ -460,8 +460,9 @@ class SitePage extends Page
      */
     public function getTemplate($template)
     {
-        if (is_file($this->templateRoot . '/' . $this->site . '/' . $template)) {
-            return $this->site . '/' . $template;
+        $overrideFolder = strtolower($this->site);
+        if (is_file($this->templateRoot . '/' . $overrideFolder . '/' . $template)) {
+            return $overrideFolder . '/' . $template;
         } else {
             if (is_file($this->templateRoot . '/core/' . $template)) {
                 // change this back to "core" for the rest of the releases.
