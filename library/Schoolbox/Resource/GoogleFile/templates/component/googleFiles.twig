@@ -136,4 +136,12 @@
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js"></script>
+    <script type="text/javascript">
+        loadGoogleApi(['client:auth2', 'picker'], function () {
+            gapi.client.init({
+                'client_id': '{{ clientId }}',
+                'scope': 'https://www.googleapis.com/auth/drive'
+            })
+        });
+    </script>
 {% endif %}

@@ -152,7 +152,7 @@
                 .hideTitleBar()
                 .build();
             picker.setVisible(true);
-            
+
             if (config.containerID) { //if it exists, add it into the empty containerId element and ensure it sits at the top left
                 picker.$.style.left = '0px';
                 picker.$.style.top = '0px';

@@ -100,6 +100,7 @@ if (
     $this->setVar('GOOGLE_CLIENT_ID', $configLoader->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID));
     $this->parse('google_api_block', 'google_api', true);
 } else {
+    $this->setVar('GOOGLE_CLIENT_ID', '');
     $this->setVar('google_api_block', '');
 }
 
