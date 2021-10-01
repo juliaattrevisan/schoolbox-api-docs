@@ -224,16 +224,18 @@ class GroupAttachment
          */
         $submissionBoxFileIds = $submissionBoxFiles->getPropertyValues('id');
 
+        $turnitinGroupAttachments = $this->turnitinGroupAttachmentMapper
+            ->findByColumn('turnitin_group_id', $turnitinGroup->getGroupId())
+            ->indexBy('submissionBoxFileId');
+
         $this->logDebug(sprintf(
-            'Submission box %s has %s files associated with it at the moment (%s)',
+            'Submission box %s has %s files associated with it at the moment (%s) but turnitin knows about %s (%s)',
             $turnitinGroup->getSubmissionBoxId(),
             \count($submissionBoxFileIds),
-            implode (', ', $submissionBoxFileIds)
+            implode (', ', $submissionBoxFileIds),
+            $turnitinGroupAttachments->count(),
+            implode(', ', $turnitinGroupAttachments->getPropertyValues('submissionBoxFileId'))
         ));
-
-        $turnitinGroupAttachments = $this->turnitinGroupAttachmentMapper
-            ->findByColumn('submission_box_file_id', $submissionBoxFileIds)
-            ->indexBy('submission_box_file_id');
 
         /* Put the new ones in
          * This way everything will have a turnitin group attachment identifier
@@ -256,6 +258,7 @@ class GroupAttachment
                  */
                 $newGroupAttachment = $this->turnitinGroupAttachmentMapper->createModel()
                     ->setSubmissionBoxFileId($submissionBoxFileId)
+                    ->setTurnitinGroupId($turnitinGroup->getGroupId())
                     ->setTurnitinGroupAttachmentId($groupAttachmentId['id'])
                     ->setStatus(Turnitin\Group\Attachment\Model::STATUS_TRANSMIT_PENDING);
 
@@ -274,13 +277,33 @@ class GroupAttachment
          */
         foreach ($turnitinGroupAttachments as $turnitinGroupAttachment) {
             if (!\in_array($turnitinGroupAttachment->getSubmissionBoxFileId(), $submissionBoxFileIds, true)) {
-                $this->api->retrieve('DELETE', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}", []);
-
-                $this->logDebug(sprintf(
-                    'Removing iold submission box file %s (%s) from turnitin',
-                    $submissionBoxFileId,
-                    $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
-                ));
+                try {
+                    $this->api->retrieve('DELETE', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}", []);
+                } catch (\DomainException | Turnitin\Exception\BadEndpoint $e) {
+                    if (404 === $e->getCode()) {
+                        /* 404 Not Found occurs when you tell turnitin to delete something it doesn't have
+                         * This can happen if your transmit script screws up and it half-does something
+                         * In this case it doesn't mean very much afaict, you're trying to get rid of something
+                         * that doesn't exist anyway - just warn and continue
+                         */
+                        $this->logWarning(sprintf(
+                            'Tried to delete %s from turnitin, but it is not there anyway - skipping',
+                            $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
+                        ));
+                    } elseif (204 === $e->getCode()) {
+                        /* 204 No Content returned if you succeeded
+                         */
+                        $this->logDebug(sprintf(
+                            'Removing old submission box file %s (%s) from turnitin',
+                            $submissionBoxFileId,
+                            $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
+                        ));
+                    } else {
+                        /* Anything else is a death
+                         */
+                        throw $e;
+                    }
+                }
 
                 /* Softdelete it out of its home
                  */

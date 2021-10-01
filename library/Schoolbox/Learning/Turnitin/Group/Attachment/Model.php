@@ -95,6 +95,14 @@ class Model implements ISoftDeletable
 
 
     /**
+     * The Turnitin Group Identifier to which this Attachment belongs
+     *
+     * @var string|null
+     */
+    private ?string $turnitinGroupId = null;
+
+
+    /**
      * A 36-char string that Turnitin uses internally to identify one of their group attachments
      * It's like a guid: e.g. b5cf0e76-c1c7-11e8-a355-529269fb1459
      *
@@ -229,6 +237,26 @@ class Model implements ISoftDeletable
     public function setSubmissionBoxFileId(int $submissionBoxFileId): self
     {
         $this->submissionBoxFileId = $submissionBoxFileId;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getTurnitinGroupId(): ?string
+    {
+        return $this->turnitinGroupId;
+    }
+
+
+    /**
+     * @param string|null $turnitinGroupId
+     * @return $this
+     */
+    public function setTurnitinGroupId(?string $turnitinGroupId): self
+    {
+        $this->turnitinGroupId = $turnitinGroupId;
         return $this;
     }
 
