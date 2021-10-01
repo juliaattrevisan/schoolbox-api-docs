@@ -71,10 +71,6 @@ use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as Markbook
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\Quiz as QuizTranslator;
-use Schoolbox\Learning\Assessment\DataModel\Translator\Task as TaskTranslator;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
@@ -130,7 +126,6 @@ use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Scrub;
 use SitePage;
@@ -1142,17 +1137,20 @@ abstract class Kernel
         // Register assessment data source
         $di->set(
             'assessmentTranslator',
-            $di->lazy(function () use ($di) {
-                $translator = new AssessmentDataModelTranslator(
+            $di->lazy(function () use ($mapperFactory) {
+                /** @var AssessmentMapper $assessmentMapper */
+                $assessmentMapper = $mapperFactory->get(AssessmentMapper::class);
+                $translator       = new AssessmentDataModelTranslator(
                     new MarkSchemeFactory(),
-                    $di->get('mapperFactory')->get(AssessmentMapper::class),
+                    $assessmentMapper,
                     AssessmentDataModelTranslator::MAX_PROJECT_LEVELS_DEFAULT
                 );
                 $translator
-                    ->addSubTranslator(new TaskTranslator())
-                    ->addSubTranslator(new DueWorkTranslator())
-                    ->addSubTranslator(new QuizTranslator())
-                    ->addSubTranslator(new ProjectTranslator($translator))
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Task())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\DueWork())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Quiz())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Lti())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\Project($translator))
                 ;
                 return $translator;
             })

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Assessment\Score;
 
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\LTI\Assessment\Model as LTIAssessmentModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -97,6 +98,16 @@ class Model implements ISoftDeletable
      * A comment on the score, if any.
      */
     private ?string $comment = null;
+
+    /**
+     * The time the score was created in the LTI tool.
+     *
+     * Distinct from `$this->createdAt`: that field stores the time this record
+     * was created in Schoolbox, this field stores when the tool created it.
+     *
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0/#timestamp
+     */
+    private Alaress_Date_Format $submittedAt;
 
     /**
      * The student's progress toward completing the activity.
@@ -223,6 +234,24 @@ class Model implements ISoftDeletable
     public function setComment(?string $comment): self
     {
         $this->comment = $comment;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getSubmittedAt(): Alaress_Date_Format
+    {
+        return $this->submittedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format $submittedAt
+     * @return $this
+     */
+    public function setSubmittedAt(Alaress_Date_Format $submittedAt): self
+    {
+        $this->submittedAt = $submittedAt;
         return $this;
     }
 

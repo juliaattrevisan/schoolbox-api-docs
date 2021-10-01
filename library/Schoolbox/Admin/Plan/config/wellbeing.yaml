@@ -136,3 +136,4 @@ components:
    - Schoolbox\Curriculum\Component\CurriculumDetailsController
    - Schoolbox\Curriculum\Component\CurriculumOverviewController
    - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller
+   - Schoolbox\Learning\Assessment\Lti\Component\Homepage\Controller

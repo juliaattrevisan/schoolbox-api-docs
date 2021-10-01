@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
@@ -28,14 +29,15 @@ use Schoolbox\Learning\AssessmentContext;
  */
 class AssessmentType implements IType
 {
+    use TypeTrait;
+
     // Template Directories / URL Fragments / Radio Values
     // (for now, these are both the same values. Could trivially split into use-case-specific values if desired)
     const TYPE_PROJECT = 'project';
     const TYPE_DUE_WORK = 'dueWork';
     const TYPE_TASK = 'task';
     const TYPE_QUIZ = 'quiz';
-
-    use TypeTrait;
+    const TYPE_LTI_ASSESSMENT = 'lti';
 
     /**
      * Get twig template directory for a given IAssessable
@@ -53,6 +55,8 @@ class AssessmentType implements IType
             return self::TYPE_TASK;
         } elseif ($assessment instanceof Quiz) {
             return self::TYPE_QUIZ;
+        } elseif ($assessment instanceof LtiAssessment) {
+            return self::TYPE_LTI_ASSESSMENT;
         }
         throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessment));
     }
@@ -67,9 +71,9 @@ class AssessmentType implements IType
      */
     public static function stringToObject($stringVal, AssessmentContext $context = null)
     {
-        if (self::TYPE_PROJECT == $stringVal) {
+        if (self::TYPE_PROJECT === $stringVal) {
             return (new Project())->setContext($context);
-        } elseif (self::TYPE_DUE_WORK == $stringVal) {
+        } elseif (self::TYPE_DUE_WORK === $stringVal) {
             $object = (new DueWork())->setContext($context);
 
             if ($context) {
@@ -77,10 +81,12 @@ class AssessmentType implements IType
             }
 
             return $object;
-        } elseif (self::TYPE_TASK == $stringVal) {
+        } elseif (self::TYPE_TASK === $stringVal) {
             return (new Task())->setContext($context);
-        } elseif (self::TYPE_QUIZ == $stringVal) {
+        } elseif (self::TYPE_QUIZ === $stringVal) {
             return (new Quiz())->setContext($context);
+        } elseif (self::TYPE_LTI_ASSESSMENT === $stringVal) {
+            return (new LtiAssessment())->setContext($context);
         }
 
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
@@ -100,6 +106,7 @@ class AssessmentType implements IType
             self::TYPE_DUE_WORK,
             self::TYPE_TASK,
             self::TYPE_QUIZ,
+            self::TYPE_LTI_ASSESSMENT,
         ];
     }
 }

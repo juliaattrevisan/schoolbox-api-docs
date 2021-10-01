@@ -1,0 +1,121 @@
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
+<fieldset>
+    {# ----------------------------------------------------------- #}
+    {# Title #}
+    {# ----------------------------------------------------------- #}
+    <label class="required" for="title">Title</label>
+    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
+
+
+
+    {# ----------------------------------------------------------- #}
+    {# Work Type #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Work Type
+        <select name="workType">
+            <option value="" selected>None</option>
+            {% for workType in allWorkTypes %}
+                <option value="{{ workType.id }}" {% if (assessment.workType.id ?? '') == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+
+    {# ----------------------------------------------------------- #}
+    {# Description #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Description
+        <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
+    </label>
+
+
+    {# ----------------------------------------------------------- #}
+    {# Assessment URL #}
+    {# ----------------------------------------------------------- #}
+    <label>
+        Assessment URL
+        <input name="ltiAssessmentUrl"
+               type="text"
+               maxlength="2048"
+               placeholder="Assessment URL"
+               value="{{ assessment.ltiAssessmentUrl }}">
+    </label>
+
+
+    {# ----------------------------------------------------------- #}
+    {# Assessment Location #}
+    {# ----------------------------------------------------------- #}
+    {% if canRelocate %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
+
+    {# Enforce Safe Exam Browser #}
+    {% include '@learningAssessment/fragments/sebSwitch.twig' with {assessment: assessment} only %}
+</fieldset>
+
+
+{# ----------------------------------------------------------- #}
+{# Dates #}
+{# ----------------------------------------------------------- #}
+{% if context.baseContext is not unitSpecification %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
+
+
+{# ----------------------------------------------------------- #}
+{# Default Activity Duration #}
+{# ----------------------------------------------------------- #}
+{% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+
+
+{# ----------------------------------------------------------- #}
+{# Grading #}
+{# ----------------------------------------------------------- #}
+<fieldset>
+    <legend>{{ locale.grading.proper }}</legend>
+
+    {% include '@learningAssessment/fragments/weight.twig' with {
+        assessment: assessment,
+    } only %}
+</fieldset>
+
+
+{# ----------------------------------------------------------- #}
+{# Participation #}
+{# ----------------------------------------------------------- #}
+{% if context.baseContext is not unitSpecification and custom_assessment_participation %}
+    {% include '@learningAssessment/fragments/participation.twig' %}
+{% endif %}
+
+
+{# ----------------------------------------------------------- #}
+{# Curriculum #}
+{# ----------------------------------------------------------- #}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: locale.dueWork.proper,
+    courseManagedReadonly: courseManaged.isReadonly
+} %}
+
+
+{# ----------------------------------------------------------- #}
+{# Submit #}
+{# ----------------------------------------------------------- #}
+{{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+
+
+{# ----------------------------------------------------------- #}
+{# Scripts #}
+{# ----------------------------------------------------------- #}
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function () {
+        // Init CKEditor
+        $.fn.alaressEditor();
+    });
+</script>

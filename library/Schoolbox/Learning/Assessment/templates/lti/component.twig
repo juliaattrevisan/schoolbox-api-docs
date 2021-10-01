@@ -1,0 +1,16 @@
+{% extends '@learningAssessment/component.twig' %}
+
+{% set assessmentType = 'lti' %}
+{% set icon = 'icon-lti' %}
+
+{% block studentMessage %}
+    There are no LTI assessments to complete at this time.
+{% endblock studentMessage %}
+
+{% block teacherMessage %}
+    <a href="{{ createRouteType }}">Create an LTI assessment</a> that is not a part of your course to assess your students.
+{% endblock teacherMessage %}
+
+{% block createButton %}
+    <a href="{{ createRouteType }}" class="button">Create LTI assessment</a>
+{% endblock createButton %}

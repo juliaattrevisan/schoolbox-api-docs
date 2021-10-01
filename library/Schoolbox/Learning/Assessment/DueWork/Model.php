@@ -512,26 +512,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf)
-    {
-        // Specified student not a participant ?
-        $participant = $this->getParticipantIfExtant($submittedOnBehalfOf);
-        if ($participant) {
-            return true;
-        }
-
-        // Is instructor wishing to create response for themself?
-        if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
-            // If no participation, must be a dynamic plan available
-            return $this->hasDynamicPlan();
-        }
-
-        return false;
-    }
-
     /* Getters/Setters
      */
 

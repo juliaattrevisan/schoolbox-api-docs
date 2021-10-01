@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Course\Task as TaskModel;
-use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\Task\File as TaskFile;
@@ -24,22 +23,12 @@ use Schoolbox\Assessment\Course\Task\File\Model as TaskFileModel;
  */
 class Task implements IAssessmentTypeTranslator
 {
-
-    private $taskMapper;
-
-
-    public function __construct()
-    {
-        $this->taskMapper = TaskMapper::getInstance(); // TODO inject
-    }
-
-
     /**
      * @return IAssessableDataModel
      */
     public function createDataModel(): IAssessableDataModel
     {
-        return $this->taskMapper->createModel(); // TODO consider using ID
+        return new TaskModel();
     }
 
 

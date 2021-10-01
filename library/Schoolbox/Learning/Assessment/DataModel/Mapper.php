@@ -30,6 +30,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
@@ -76,13 +77,15 @@ class Mapper extends BaseMapper
         // * due work
         // * quiz
         // * project
+        // * LTI assessment
         $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
         $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
+        $this->joinsReverseSingle('assessment_id', LtiAssessment\Mapper::class, 'ltiAssessment', 'ltiAssessment');
+
+        // Participation plan join
         $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
-
-
 
         // Context joins (where does this assessment live?)
         // * folder (via assessment_folder)
@@ -173,6 +176,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTask']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteProject']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDueWork']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLtiAssessment']);
     }
 
     /**
@@ -328,6 +332,26 @@ class Mapper extends BaseMapper
 
 
     /**
+     * When deleting an LTI assessment, delete all of its sub-objects.
+     *
+     * @param Model $assessment
+     * @return bool
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws \UnexpectedValueException      If a callback fails and we need to halt
+     */
+    public function softDeleteLtiAssessment(Model $assessment): bool
+    {
+        if ($assessment->getLtiAssessment() instanceof LtiAssessment\Model) {
+            /** @var LtiAssessment\Mapper $ltiAssessmentMapper */
+            $ltiAssessmentMapper = $this->getJoinMapper('ltiAssessment');
+            $ltiAssessments      = $ltiAssessmentMapper->findByColumn('assessment_id', $assessment->getId());
+            $ltiAssessmentMapper->softDelete($ltiAssessments);
+        }
+        return true;
+    }
+
+
+    /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
      * @param User                     $student
@@ -395,6 +419,15 @@ class Mapper extends BaseMapper
                   {$planJoin}
             WHERE {$where}
 
+            UNION
+
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
+            JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
+                  {$planJoin}
+            WHERE {$where}
+
             ORDER BY id ASC
         ";
 
@@ -423,6 +456,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
                 {$this->getJoinColumnString('quiz', 'q')},
+                {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -444,6 +478,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -725,9 +760,14 @@ class Mapper extends BaseMapper
             // Quiz?
             if ($row['q.assess_id']) {
                 $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
-                $quizIds[] = $row['q.assess_id'];
             } else {
                 $model->setQuiz(null);
+            }
+            // LTI assessment?
+            if ($row['l.id']) {
+                $model->setLtiAssessment($this->hydrateJoin($row, 'ltiAssessment', 'l'));
+            } else {
+                $model->setLtiAssessment(null);
             }
             // Project?
             if ($row['p.id']) {

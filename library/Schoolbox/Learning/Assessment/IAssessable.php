@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;

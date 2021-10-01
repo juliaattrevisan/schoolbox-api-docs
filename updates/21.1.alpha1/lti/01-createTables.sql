@@ -15,6 +15,7 @@ CREATE TABLE lti_assessment_score
     score_given       FLOAT                                                                   NULL,
     score_maximum     FLOAT                                                                   NULL,
     comment           TEXT                                                                    NULL,
+    submitted_at      DATETIME                                                                NOT NULL,
     activity_progress ENUM ('Initialized', 'Started', 'InProgress', 'Submitted', 'Completed') NOT NULL,
     grading_progress  ENUM ('NotReady', 'Failed', 'Pending', 'PendingManual', 'FullyGraded')  NOT NULL,
     is_response       BOOL                                                                    NOT NULL DEFAULT FALSE,

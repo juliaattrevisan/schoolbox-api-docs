@@ -420,3 +420,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-google-drive;
   color: $icon-color-google;
 }
+.icon-masonry-Schoolbox_Learning_Assessment_Lti_Component_Homepage_Controller:before {
+    @extend .icon-lti;
+    color: $icon-color-lti;
+}

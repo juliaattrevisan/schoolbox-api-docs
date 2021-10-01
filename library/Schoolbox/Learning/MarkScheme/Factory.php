@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use UnexpectedValueException;
@@ -123,6 +124,11 @@ class Factory
 
         if ($assessable instanceof DueWork) {
             return $this->spawnForDueWork($assessable);
+        }
+
+        if ($assessable instanceof LtiAssessment) {
+            // TODO replace with a proper mark scheme
+            return new None();
         }
 
         if ($assessable instanceof Project) {
@@ -283,6 +289,13 @@ class Factory
 
         if ($assessable instanceof Task) {
             return self::$markTypesTask;
+        }
+
+        if ($assessable instanceof LtiAssessment) {
+            // TODO replace with a proper mark scheme
+            return [
+                MarkType::TYPE_NONE => None::TITLE,
+            ];
         }
 
         throw new UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));

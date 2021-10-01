@@ -15,7 +15,10 @@ use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Lti\Decorator\Decorator as LtiDecorator;
+use Schoolbox\Learning\Assessment\Lti\Decorator\LtiTrait;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
@@ -53,6 +56,7 @@ class Factory
     use TaskTrait;
     use ProjectTrait;
     use AttachedFilesTrait;
+    use LtiTrait;
 
     /**
      * Unique identifier
@@ -239,6 +243,9 @@ class Factory
         $this->setMaxAttempts(intval($post['maxAttempts']));
         $this->setMarkVisibility(intval($post['visibility']));
         $this->setCompletionMessage($post['completion_message']);
+
+        // LTI needs this to instantiate correctly
+        $this->setLtiAssessmentUrl($post['ltiAssessmentUrl'] ?? null);
         $this->original = $original;
     }
 
@@ -370,6 +377,8 @@ class Factory
                 $this->getMaxAttempts(),
                 $this->getCompletionMessage()
             );
+        } elseif ($assessment instanceof LtiAssessment) {
+            $decorator = new LtiDecorator($this->getLtiAssessmentUrl());
         } else {
             throw new DomainException('Please select an assessment type');
         }
