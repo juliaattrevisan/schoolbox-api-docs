@@ -232,6 +232,7 @@ class Api implements IApi
     {
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
+        $lastGuzzleError = '';
         $fails = 0;
 
         /* Try multiple times in case tass dies for a random reason
@@ -248,6 +249,8 @@ class Api implements IApi
                 ]);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
+
+                $lastGuzzleError = $e->getMessage();
 
                 sleep(self::NAP_TIMEOUT);
 
@@ -306,6 +309,16 @@ class Api implements IApi
                 ));
             }
         }
+
+        /* If you got here, something happened NUM_RETRY times trying to connect
+         * and we couldn't even get a payload
+         */
+        throw new RuntimeException(sprintf(
+            'Bad endpoint %s: could not establish connection to server after %s retries. %s',
+            $method,
+            self::NUM_RETRY,
+            $lastGuzzleError
+        ));
     }
 
 
