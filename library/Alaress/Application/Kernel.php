@@ -180,6 +180,7 @@ abstract class Kernel
     {
         $this->di              = new Di\Container(new Di\Factory());
         $this->shutdownHandler = new ShutdownHandler();
+        register_shutdown_function($this->shutdownHandler);
 
         // run the launch sequence
         $this->initialiseExternalConnections();

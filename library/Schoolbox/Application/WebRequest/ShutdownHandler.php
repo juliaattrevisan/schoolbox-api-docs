@@ -31,13 +31,6 @@ class ShutdownHandler
      */
     private array $functions = [];
 
-
-    public function __construct()
-    {
-        register_shutdown_function($this);
-    }
-
-
     /**
      * This class is expected to be registered as a shutdown function
      *
