@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application\WebRequest;
 
 use Alaress\Exception\UnreachableException;
+use DomainException;
 use UnexpectedValueException;
 
 /**
@@ -12,6 +13,16 @@ use UnexpectedValueException;
  */
 class ShutdownHandler
 {
+    /**
+     * Highest possible priority for shutdown functions.
+     */
+    public const PRIORITY_HIGHEST = 0;
+
+    /**
+     * Lowest possible priority for shutdown functions.
+     */
+    public const PRIORITY_LOWEST = 100;
+
     /**
      * Functions to call on shutdown
      * Indexed by priority, functionId
@@ -53,10 +64,21 @@ class ShutdownHandler
      * @param callable $callback Function to invoke
      * @param int      $priority When to invoke the function relative to other callbacks. Lower value => higher priority
      * @param mixed    ...$args  Additional args to pass when invoking the callback
+     * @throws DomainException if `$priority` is outside [self::PRIORITY_HIGHEST, self::PRIORITY_LOWEST]
      */
-    public function registerFunction(callable $callback, int $priority = PHP_INT_MAX, ...$args): bool
+    public function registerFunction(callable $callback, int $priority = self::PRIORITY_LOWEST, ...$args): bool
     {
         $functionId = $this->buildUniqueFunctionId($callback);
+        if ($priority > self::PRIORITY_LOWEST || $priority < self::PRIORITY_HIGHEST) {
+            throw new DomainException(
+                sprintf(
+                    'Priority of registered function must be within [%d, %d]: received %d',
+                    self::PRIORITY_HIGHEST,
+                    self::PRIORITY_LOWEST,
+                    $priority
+                )
+            );
+        }
 
         if (array_key_exists($functionId, $this->functions[$priority] ?? [])) {
             return false;
