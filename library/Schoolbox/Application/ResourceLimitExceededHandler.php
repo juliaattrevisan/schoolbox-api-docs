@@ -39,20 +39,8 @@ class ResourceLimitExceededHandler
             call_user_func($this->function);
         }
         // Request exceeded 'memory_limit'
-        if (preg_match("/Allowed memory size of \d+ bytes? exhausted/", $error['message'] ?? '')) {
-            $memoryLimitString = ini_get('memory_limit');
-            preg_match('/(\d+)([BKMG])?/i', str_replace([',', ' '], '', $memoryLimitString), $matches);
+        if (preg_match("/Allowed memory size of (\d+) bytes? exhausted/", $error['message'] ?? '', $matches)) {
             $memoryLimit = (int)$matches[1];
-            switch (strtoupper($matches[2] ?? '')) {
-                case 'G':
-                    $memoryLimit *= 1024 * 1024 * 1024;
-                    break;
-                case 'M':
-                    $memoryLimit *= 1024 * 1024;
-                    break;
-                case 'K':
-                    $memoryLimit *= 1024;
-            }
             // Extra 10M for handling
             ini_set('memory_limit', (string)($memoryLimit + 10 * 1024 * 1024));
             call_user_func($this->function);
