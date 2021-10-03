@@ -12,6 +12,7 @@ use Alaress\Image\Cache\LocalFS;
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -22,7 +23,7 @@ $kernel->getShutdownHandler()->registerFunction(
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImage();
     }),
-    0 // Max Priority
+    ShutdownHandler::PRIORITY_HIGHEST,
 );
 
 $path = '/static/images/icons/activity-icons-64x64px.png';

@@ -11,6 +11,7 @@
 use Alaress\Image;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
 
@@ -22,7 +23,7 @@ $kernel->getShutdownHandler()->registerFunction(
         header('Cache-Control: no-store');
         redirectToBroken(504);
     }),
-    0 // Max Priority
+    ShutdownHandler::PRIORITY_HIGHEST,
 );
 
 if (empty($_SESSION['id'])) {

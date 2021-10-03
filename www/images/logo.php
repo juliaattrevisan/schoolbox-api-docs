@@ -13,6 +13,7 @@ use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Transformation;
 use League\Flysystem\Filesystem;
 use Schoolbox\Application\ResourceLimitExceededHandler;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -27,7 +28,7 @@ $kernel->getShutdownHandler()->registerFunction(
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
     }),
-    0 // Max Priority
+    ShutdownHandler::PRIORITY_HIGHEST,
 );
 
 $logoSizes = [

@@ -14,6 +14,7 @@ use Alaress\Image;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\ResourceLimitExceededHandler;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
@@ -33,7 +34,7 @@ $kernel->getShutdownHandler()->registerFunction(
         header('Cache-Control: no-store');
         \SitePage::redirectToBrokenImageWithTransform('storage', $size, 504);
     }),
-    0 // Max Priority
+    ShutdownHandler::PRIORITY_HIGHEST,
 );
 
 try {

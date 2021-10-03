@@ -15,6 +15,7 @@ use League\Flysystem\Filesystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
@@ -29,7 +30,7 @@ $kernel->getShutdownHandler()->registerFunction(
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
     }),
-    0 // Max Priority
+    ShutdownHandler::PRIORITY_HIGHEST,
 );
 /* Choose a caching method to use
  */
