@@ -58,15 +58,15 @@ class Controller extends Base
 
 
     /**
-     * @var Turnitin\FIle\Mapper
+     * @var Turnitin\File\Mapper
      */
-    private Turnitin\FIle\Mapper $turnitinFileMapper;
+    private Turnitin\File\Mapper $turnitinFileMapper;
 
 
     /**
      * Controller constructor.
      */
-    public function __construct(Turnitin\FIle\Mapper $turnitinFileMapper)
+    public function __construct(Turnitin\File\Mapper $turnitinFileMapper)
     {
         $this->turnitinFileMapper = $turnitinFileMapper;
     }

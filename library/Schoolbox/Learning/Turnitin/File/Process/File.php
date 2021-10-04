@@ -400,6 +400,8 @@ class File
          * It might happen if you create submissions *then* turn on Similarity Check
          */
         if ('' === (string)$group->getGroupId()) {
+            $groupId = (new Turnitin\Group\IdCodec())->encode($box->getId(), $this->instanceIdentifier);
+
             $newGroup = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
                 'name' => $box->getName(),
                 'type' => self::GROUP_TYPE

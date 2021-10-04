@@ -13,7 +13,7 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Test;
+namespace Schoolbox\Learning\Turnitin\File\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
