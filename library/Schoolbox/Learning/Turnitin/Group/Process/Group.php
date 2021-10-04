@@ -254,7 +254,8 @@ class Group
 
             if (null === $turnitinGroupAttachments->getOffset($submissionBoxFileId)) {
                 $groupAttachmentId = $this->api->retrieve('POST', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments", [
-                    'title' => $submissionBoxFile->getBasename()
+                    'title' => $submissionBoxFile->getBasename(),
+                    'template' => true
                 ]);
 
                 /* Set it to pending, so we know we need to upload its guts
