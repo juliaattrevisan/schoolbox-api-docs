@@ -138,8 +138,11 @@ class Module extends BaseModule
         $getHomepageIdCallback = function ($params) {
             if ($params['layout'] && $params['layout']->getFolder()) {
                 return $params['layout']->getFolder()->getId();
-            } else if ($params['layout']->getDashboardRole() != null) {
+            } else if ($params['layout'] && ($params['layout']->getDashboardRole() !== null && $params['layout']->getFolder() === null)) {
                 // this shouldn't happen, but if it does, the user does not have permissions to edit a dashboard tile component
+                return 0;
+            } else if ($params['component']->getModule() === 'homepage_template') {
+                //only superusers should be able to edit homepage templates.
                 return 0;
             } else if ($params['component']->getModule() != 'homepage') {
                 throw new \Exception('Homepage permission does not apply to dashboard tiles');
