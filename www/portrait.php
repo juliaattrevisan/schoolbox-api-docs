@@ -15,6 +15,7 @@ use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use League\Flysystem\Filesystem;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
@@ -28,7 +29,7 @@ $kernel->getShutdownHandler()->registerFunction(
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', 504);
     }),
-    0 // Max Priority
+    ShutdownHandler::PRIORITY_HIGHEST,
 );
 
 /** @var IConfigLoader $config */
