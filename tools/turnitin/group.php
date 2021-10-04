@@ -216,6 +216,7 @@ HELP;
             /* Set up a record processor
              */
             $processor = (new Turnitin\Group\Process\Group(
+                $this->getConfig()->get('site_type'),
                 $api,
                 Turnitin\Group\Mapper::getInstance(),
                 Turnitin\Group\Attachment\Mapper::getInstance(),

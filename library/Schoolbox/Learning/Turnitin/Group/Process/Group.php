@@ -40,6 +40,12 @@ class Group
 
 
     /**
+     * @var string
+     */
+    private string $instanceIdentifier;
+
+
+    /**
      * @var Turnitin\Api
      */
     private Turnitin\Api $api;
@@ -78,6 +84,7 @@ class Group
     /**
      * Constructor.
      *
+     * @param string                           $instanceIdentifier
      * @param Turnitin\Api                     $api
      * @param Turnitin\Group\Mapper            $turnitinGroupMapper
      * @param Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper
@@ -86,6 +93,7 @@ class Group
      * @param LoggerInterface|null             $log
      */
     public function __construct(
+        string $instanceIdentifier,
         Turnitin\Api $api,
         Turnitin\Group\Mapper $turnitinGroupMapper,
         Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper,
@@ -93,6 +101,7 @@ class Group
         SubmissionBox\SingleFile\Mapper $submissionBoxFileMapper,
         ?LoggerInterface $log = null
     ) {
+        $this->instanceIdentifier = $instanceIdentifier;
         $this->api = $api;
         $this->turnitinGroupMapper = $turnitinGroupMapper;
         $this->turnitinGroupAttachmentMapper = $turnitinGroupAttachmentMapper;
@@ -152,7 +161,10 @@ class Group
     private function createGroup(Turnitin\Group\Model $turnitinGroup): Turnitin\Group\Model
     {
         if ('' === (string)$turnitinGroup->getGroupId()) {
-            $groupId = $this->generateTurnitinGroupId($turnitinGroup->getSubmissionBoxId());
+            /* Use a formal syntax for the turnitin group identifier
+             */
+            $groupId = (new Turnitin\Group\IdCodec())
+                ->encode($turnitinGroup->getSubmissionBoxId(), $this->instanceIdentifier);
 
             $this->changeGroupState(
                 $turnitinGroup,
@@ -176,21 +188,6 @@ class Group
         }
 
         return $turnitinGroup;
-    }
-
-
-    /**
-     * A scheme for building group identifiers in turnitin
-     * Classically, it's the same as our submission box ids, but we have to distinguish
-     * them from staging and production servers for a school since they'll share a
-     * turnitin account. This means that activities conduced in staging might pollute
-     * the live, and vice versa.
-     */
-    private function generateTurnitinGroupId(int $submissionBoxId): string
-    {
-        /* TODO concat with config.site_type and chuck into a codec, I suppose
-         */
-        return (string)$submissionBoxId;
     }
 
 
