@@ -16,7 +16,6 @@ use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Helper;
 
-
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps
  *

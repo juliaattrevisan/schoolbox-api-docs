@@ -59,7 +59,7 @@ class File
      */
     private TurnitinGroupMapper $turnitinGroupMapper;
 
-    
+
     /**
      * @var UserMapper
      */
@@ -191,7 +191,6 @@ class File
         /* Commencing Purification.
          */
         try {
-
             /* Find a (submission_box_id, group_id) tuple from turnitin_group
              * If it's there, use that identifier and keep going
              *

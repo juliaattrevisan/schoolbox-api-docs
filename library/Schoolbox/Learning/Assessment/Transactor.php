@@ -177,10 +177,9 @@ class Transactor
             } catch (MapperException $e) {
                 throw new InvalidArgumentException($e->getMessage(), 0, $e);
             }
-        }
-        /* Otherwise you came from the update screen, just go back there for now
-         */
-        else {
+        } else {
+            /* Otherwise you came from the update screen, just go back there for now
+             */
             $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
             /* Due Work has a special thing going on where it can upload to Plagscan
@@ -228,10 +227,9 @@ class Transactor
 
                 $turnitinGroupMapper = Turnitin\Group\Mapper::getInstance();
 
-                /* Find out what the group identifier is, for this submission box, if it exists
-                 * Otherwise create a new one here
-                 *
-                 * Upon save, set its status to Pending
+                /* Create a turnitin_group queue record if one doesn't already exist
+                 * Upon save, set its status to Pending; we need to find out what files
+                 * needed to be micromanaged into turnitin
                  */
                 try {
                     $turnitinGroup = $turnitinGroupMapper->findOneByColumn('submission_box_id', $submissionBox->getId());

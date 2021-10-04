@@ -16,8 +16,8 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
- * Take a Group Attachment from schoolbox and set it up in Turnitin,
- * setting up the Group Attachment record and uploading the file contents
+ * Take a Submission Box File from schoolbox and set it up in Turnitin,
+ * setting up its Group Attachment record and uploading the file contents
  * just like we do for File.php; since transmission can break at any step
  * we need a way to just force it in
  */
@@ -232,7 +232,7 @@ class GroupAttachment
             'Submission box %s has %s files associated with it at the moment (%s) but turnitin knows about %s (%s)',
             $turnitinGroup->getSubmissionBoxId(),
             \count($submissionBoxFileIds),
-            implode (', ', $submissionBoxFileIds),
+            implode(', ', $submissionBoxFileIds),
             $turnitinGroupAttachments->count(),
             implode(', ', $turnitinGroupAttachments->getPropertyValues('submissionBoxFileId'))
         ));
@@ -295,7 +295,7 @@ class GroupAttachment
                          */
                         $this->logDebug(sprintf(
                             'Removing old submission box file %s (%s) from turnitin',
-                            $submissionBoxFileId,
+                            $turnitinGroupAttachment->getSubmissionBoxFileId(),
                             $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
                         ));
                     } else {

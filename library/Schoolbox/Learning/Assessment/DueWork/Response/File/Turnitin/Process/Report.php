@@ -15,7 +15,6 @@ use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 
-
 /**
  * The second half of a Turnitin request
  *
