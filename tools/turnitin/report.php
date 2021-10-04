@@ -90,14 +90,14 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Find every Loaded turnitin report in turnitin_report and try to get the similarity score.
-This tool can be used in conjunction with transmit.php to manually complete the turnitin
+Find every Loaded Turnitin report in turnitin_report and try to get the similarity score.
+This tool can be used in conjunction with transmit.php to manually complete the Turnitin
 process, in case their webhooks fail or if you just want to do it by hand.
 
-1. An upload finished being sent to turnitin; you start here ("loaded")
-2. Turnitin finishes processing the upload and is ready for report to be scheduled ("prepared")
-3. Report scheduling succeeds and you're now waiting for report to generate ("analysing")
-4. Report finished and we cached some report data locally ("complete")
+1. An upload finished being sent to Turnitin; you start here                        [loaded]
+2. Turnitin finishes processing the upload and is ready for report to be scheduled  [prepared]
+3. Report scheduling succeeds and you're now waiting for report to generate         [analysing]
+4. Report finished and we cached some report data locally                           [complete]
 
 You can optionally specify a report id to just affect that report alone, in case you need
 to fix a single report but not any others. The report id is the primary key of turnitin_report

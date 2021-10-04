@@ -109,15 +109,17 @@ $app = new class extends CliTool\App
             echo <<<HELP
 
 Find every Pending turnitin_group record and upload the associated files' binaries
-to turnitin. 
+to Turnitin. Turnitin Group Attachments are synonymous with our Schoolbox Submission
+Box Files (the attachments to Due Works)
 
-Transmission of turnitin files goes through these stages, with their status strings:
+Transmission of Turnitin Group Attachments goes through these stages, with their 
+status strings:
 
-1. Saved in schoolbox db with status Pending ("pending")
-2. Set up a Turnitin Group if one doesn't already exist ("group")
-3. Set up Turnitin Group Attachment(s) ("group_attachment")
-4. Upload file contents into Turnitin Group Attachment ("uploading")
-5. Contents finished sending to Turnitin ("complete")
+1. Saved in schoolbox db with status Pending             [pending]
+2. Set up a Turnitin Group if one doesn't already exist  [group]
+3. Set up Turnitin Group Attachment(s)                   [group_attachment]
+4. Upload file contents into Turnitin Group Attachment   [uploading]
+5. Contents finished sending to Turnitin                 [complete]
 
 You can optionally specify a group id to just affect that record alone, in case you need
 to fix a single record but not any others. The group id is the primary key of turnitin_group 

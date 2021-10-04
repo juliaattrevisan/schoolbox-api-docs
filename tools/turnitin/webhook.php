@@ -80,7 +80,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Register turnitin webhooks. Turnitin posts payloads to a schoolbox endpoint(s) when it 
+Register Turnitin webhooks. Turnitin posts payloads to a schoolbox endpoint(s) when it 
 finishes various stages of its processing - upload of documents, generation of reports,
 and updating of the report contents. Each webhook's endpoint is an absolute url so that
 Turnitin can send stuff there. 

@@ -120,18 +120,18 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Find every Pending turnitin report in turnitin_report and set up the turnitin Group, Submission
-and upload the file's contents. Used periodically to kick everything up to turnitin for another
+Find every Pending turnitin report in turnitin_report and set up the Turnitin Group, Submission
+and upload the file's contents. Used periodically to kick everything up to Turnitin for another
 async process to do its work.
 
-Transmission of turnitin files goes through these stages, with their status strings:
+Transmission of Turnitin files goes through these stages, with their status strings:
 
-1. Saved in schoolbox db with status Pending ("pending")
-2. Set up Turnitin Group, analogous to our submission boxes ("group")
-3. Set up Turnitin Submission, analogous to our student submission files ("submission")
-3a. Accept EULA on behalf of student; no status for this step, it's kind of implicit
-4. Upload file contents into Turnitin Submission ("uploading")
-5. Contents finished sending to Turnitin for further processing ("loaded")
+1. Saved in schoolbox db with status Pending                                   [pending]
+2. Set up Turnitin Group, analogous to our submission boxes                    [group]
+3. Set up Turnitin Submission, analogous to our student submission files       [submission]
+3a. Accept EULA on behalf of student; no status change, it's kind of implicit  -
+4. Upload file contents into Turnitin Submission                               [uploading]
+5. Contents finished sending to Turnitin for further processing                [loaded]
 
 When you get to stage 5, another async process takes over to retrieve the report itself.
 
@@ -140,7 +140,7 @@ to fix a single report but not any others. The report id is the primary key of t
 and its report status must be "pending" for it to be found.
 
 You can optionally force retransmission of Pending, Group and Submission statuses by using
-the --force flag. Anything in those statuses will be forcibly re-sent to turnitin.
+the --force flag. Anything in those statuses will be forcibly re-sent to Turnitin.
 
 Usage: transmit.php [--instance=INSTANCE_ID] [--report=1234] [--force]
 

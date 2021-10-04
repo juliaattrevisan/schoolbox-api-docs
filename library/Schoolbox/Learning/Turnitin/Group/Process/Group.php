@@ -166,7 +166,7 @@ class Group
             $this->changeGroupState(
                 $turnitinGroup,
                 sprintf(
-                    'Group %s: setting up turnitin Group for submission box %s, setting status %s',
+                    'Group %s: setting up Turnitin Group for submission box %s, setting status [%s]',
                     $turnitinGroup->getId(),
                     $turnitinGroup->getSubmissionBoxId(),
                     Turnitin\Group\Model::STATUS_TRANSMIT_GROUP
@@ -211,7 +211,7 @@ class Group
         $this->changeGroupState(
             $turnitinGroup,
             sprintf(
-                'Group %s: setting up turnitin Group Attachment containers for submission box %s, setting status %s',
+                'Group %s: setting up Turnitin Group Attachment containers for submission box %s; setting status [%s]',
                 $turnitinGroup->getId(),
                 $turnitinGroup->getSubmissionBoxId(),
                 Turnitin\Group\Model::STATUS_TRANSMIT_GROUP_ATTACHMENT
@@ -232,7 +232,7 @@ class Group
             ->indexBy('submissionBoxFileId');
 
         $this->logDebug(sprintf(
-            'Submission box %s has %s files associated with it at the moment (%s) but turnitin knows about %s (%s)',
+            'Submission box %s has %s files associated with it at the moment (%s) but Turnitin knows about %s (%s)',
             $turnitinGroup->getSubmissionBoxId(),
             \count($submissionBoxFileIds),
             implode(', ', $submissionBoxFileIds),
@@ -267,7 +267,7 @@ class Group
                     ->setStatus(Turnitin\Group\Attachment\Model::STATUS_TRANSMIT_PENDING);
 
                 $this->logDebug(sprintf(
-                    'Adding new submission box file %s to turnitin',
+                    'Adding new submission box file %s to Turnitin',
                     $submissionBoxFileId,
                 ));
 
@@ -291,14 +291,14 @@ class Group
                          * that doesn't exist anyway - just warn and continue
                          */
                         $this->logWarning(sprintf(
-                            'Tried to delete %s from turnitin, but it is not there anyway - skipping',
+                            'Tried to delete %s from Turnitin, but it is not there anyway - skipping',
                             $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
                         ));
                     } elseif (204 === $e->getCode()) {
                         /* 204 No Content returned if you succeeded
                          */
                         $this->logDebug(sprintf(
-                            'Removing old submission box file %s (%s) from turnitin',
+                            'Removing old submission box file %s (%s) from Turnitin',
                             $turnitinGroupAttachment->getSubmissionBoxFileId(),
                             $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
                         ));
@@ -343,7 +343,7 @@ class Group
         $this->changeGroupState(
             $turnitinGroup,
             sprintf(
-                'Group %s: uploading file contents into corresponding turnitin Group Attachment containers for submission box %s, setting status %s',
+                'Group %s: uploading file contents into corresponding Turnitin Group Attachment containers for submission box %s, setting status [%s]',
                 $turnitinGroup->getId(),
                 $turnitinGroup->getSubmissionBoxId(),
                 Turnitin\Group\Model::STATUS_TRANSMIT_UPLOADING
@@ -358,7 +358,7 @@ class Group
         $this->changeGroupState(
             $turnitinGroup,
             sprintf(
-                'Group %s: upload complete for submission box %s, setting status %s',
+                'Group %s: upload complete for submission box %s, setting status [%s]',
                 $turnitinGroup->getId(),
                 $turnitinGroup->getSubmissionBoxId(),
                 Turnitin\Group\Model::STATUS_COMPLETE
@@ -391,7 +391,7 @@ class Group
         $this->changeGroupAttachmentState(
             $turnitinGroupAttachment,
             sprintf(
-                'Group Attachment %s: setting up turnitin Group Attachment Contents for submission box file %s %s; setting status %s',
+                'Group Attachment %s: setting up Turnitin Group Attachment Contents for submission box file %s %s; setting status [%s]',
                 $turnitinGroupAttachment->getId(),
                 $submissionBoxFile->getId(),
                 $submissionBoxFile->getBasename(),
@@ -443,7 +443,7 @@ class Group
         $this->changeGroupAttachmentState(
             $turnitinGroupAttachment,
             sprintf(
-                'Group Attachment %s: upload complete for submission box file %s %s; setting status %s',
+                'Group Attachment %s: upload complete for submission box file %s %s; setting status [%s]',
                 $turnitinGroupAttachment->getId(),
                 $submissionBoxFile->getId(),
                 $submissionBoxFile->getBasename(),

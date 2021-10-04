@@ -159,7 +159,7 @@ class Report
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: generation completed. Overall Match Percentage is %s; setting status to %s',
+                'Report %s: generation completed. Overall Match Percentage is %s; setting status [%s]',
                 $model->getId(),
                 $reportInfo['overall_match_percentage'],
                 Turnitin\File\Model::STATUS_COMPLETE
@@ -208,7 +208,7 @@ class Report
                 $this->changeState(
                     $model,
                     sprintf(
-                        'Report %s: Turnitin finished processing our upload; setting status to %s',
+                        'Report %s: Turnitin finished processing our upload; setting status [%s]',
                         $model->getId(),
                         Turnitin\File\Model::STATUS_REPORT_PREPARED
                     ),
@@ -284,7 +284,7 @@ class Report
             $this->changeState(
                 $model,
                 sprintf(
-                    'Report %s: report has not been scheduled for creation yet; doing so now and setting status to %s',
+                    'Report %s: report has not been scheduled for creation yet; doing so now and setting status [%s]',
                     $model->getId(),
                     Turnitin\File\Model::STATUS_REPORT_ANALYSING
                 ),
@@ -344,7 +344,7 @@ class Report
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: requesting Similarity Report for Turnitin submission %s; setting status to %s',
+                'Report %s: requesting Similarity Report for Turnitin submission %s; setting status [%s]',
                 $model->getId(),
                 $model->getTurnitinSubmissionId(),
                 Turnitin\File\Model::STATUS_REPORT_ANALYSING
