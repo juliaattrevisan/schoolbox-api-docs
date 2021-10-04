@@ -232,7 +232,8 @@ class Group
             ->indexBy('submissionBoxFileId');
 
         $this->logDebug(sprintf(
-            'Submission box %s has %s files associated with it at the moment (%s) but Turnitin knows about %s (%s)',
+            'Group %s: submission box %s has %s files associated with it at the moment (%s) but Turnitin knows about %s (%s)',
+            $turnitinGroup->getId(),
             $turnitinGroup->getSubmissionBoxId(),
             \count($submissionBoxFileIds),
             implode(', ', $submissionBoxFileIds),
@@ -340,19 +341,31 @@ class Group
         Collection $turnitinGroupAttachments,
         Collection $submissionBoxFiles
     ): void {
-        $this->changeGroupState(
-            $turnitinGroup,
-            sprintf(
-                'Group %s: uploading file contents into corresponding Turnitin Group Attachment containers for submission box %s, setting status [%s]',
-                $turnitinGroup->getId(),
-                $turnitinGroup->getSubmissionBoxId(),
+        if ($turnitinGroupAttachments->count()) {
+            /* If there are files to upload, tell us
+             */
+            $this->changeGroupState(
+                $turnitinGroup,
+                sprintf(
+                    'Group %s: uploading file contents into corresponding Turnitin Group Attachment containers for submission box %s, setting status [%s]',
+                    $turnitinGroup->getId(),
+                    $turnitinGroup->getSubmissionBoxId(),
+                    Turnitin\Group\Model::STATUS_TRANSMIT_UPLOADING
+                ),
                 Turnitin\Group\Model::STATUS_TRANSMIT_UPLOADING
-            ),
-            Turnitin\Group\Model::STATUS_TRANSMIT_UPLOADING
-        );
+            );
 
-        foreach ($turnitinGroupAttachments as $turnitinGroupAttachment) {
-            $this->uploadFile($turnitinGroup, $turnitinGroupAttachment, $submissionBoxFiles);
+            foreach ($turnitinGroupAttachments as $turnitinGroupAttachment) {
+                $this->uploadFile($turnitinGroup, $turnitinGroupAttachment, $submissionBoxFiles);
+            }
+        } else {
+            /* This happens when you modify the Due Work (its status gets reset to Pending)
+             * but none of the files changed; nothing to upload, nothing to remove, nothing to do
+             */
+            $this->logDebug(sprintf(
+                'Group %s: all files already exist inside Turnitin; no further changes required',
+                $turnitinGroup->getId(),
+            ));
         }
 
         $this->changeGroupState(

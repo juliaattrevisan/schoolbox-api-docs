@@ -129,10 +129,7 @@ class Model implements ISoftDeletable
      */
     public function isProcessing(): bool
     {
-        return \in_array($this->getStatus(), [
-            self::STATUS_TRANSMIT_GROUP_ATTACHMENT,
-            self::STATUS_TRANSMIT_UPLOADING,
-        ]);
+        return $this->getStatus() === self::STATUS_TRANSMIT_UPLOADING;
     }
 
 
