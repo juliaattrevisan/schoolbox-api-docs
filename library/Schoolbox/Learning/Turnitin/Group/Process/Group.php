@@ -407,7 +407,40 @@ class Group
             'contents' => $submissionBoxFile->read()
         ];
 
-        $this->api->retrieve('UPLOAD', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}/original", $payload);
+        try {
+            $this->api->retrieve('UPLOAD', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}/original", $payload);
+        } catch (\DomainException $e) {
+            if (409 === $e->getCode()) {
+                /* 409 is thrown when you try to upload file contents into a container which
+                 * already received file contents. This might be okay if it's the same file
+                 * contents but it might not be okay if it's a different file contents - this
+                 * normally shouldn't happen but it's up to humans to decipher this situation
+                 */
+                $this->logWarning(sprintf(
+                    'Turnitin Group Attachment %s already received file upload contents',
+                    $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
+                ));
+
+                /* Mostly it should result in noop, imho, since it would occur when
+                 * you manually change status to Pending and try to reprocess the same stuff.
+                 * In that case it's the same file sending its same guts but it's already done it
+                 */
+                $turnitinGroupAttachment->setStatus(Turnitin\File\Model::STATUS_COMPLETE);
+            } else {
+                /* All other codes - just report whatever turnitin said, because I have no idea
+                 * at this point why it might have died
+                 */
+                $turnitinGroupAttachment->setStatus(Turnitin\File\Model::STATUS_ERROR);
+            }
+
+            /* Save the error code and error message into the usual two columns
+             */
+            $this->turnitinGroupAttachmentMapper->save($turnitinGroupAttachment
+                ->setErrorCode((string)$e->getCode())
+                ->setErrorMessage($e->getMessage()));
+
+            return;
+        }
 
         $this->changeGroupAttachmentState(
             $turnitinGroupAttachment,
