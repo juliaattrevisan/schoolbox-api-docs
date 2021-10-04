@@ -225,7 +225,7 @@ class Controller extends Base
             $payload = json_decode($rawPayload, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             throw new \RuntimeException(sprintf(
-                'Turnitin send %s json payload but we cannot decode it: %s',
+                'Turnitin sent %s json payload but we cannot decode it: %s',
                 'postUploadComplete',
                 $rawPayload
             ));
