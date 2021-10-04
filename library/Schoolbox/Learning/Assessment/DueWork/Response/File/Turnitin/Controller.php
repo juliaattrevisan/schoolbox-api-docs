@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
@@ -57,17 +58,17 @@ class Controller extends Base
 
 
     /**
-     * @var Mapper
+     * @var Turnitin\FIle\Mapper
      */
-    private Mapper $turnitinMapper;
+    private Turnitin\FIle\Mapper $turnitinFileMapper;
 
 
     /**
      * Controller constructor.
      */
-    public function __construct(Mapper $turnitinMapper)
+    public function __construct(Turnitin\FIle\Mapper $turnitinFileMapper)
     {
-        $this->turnitinMapper = $turnitinMapper;
+        $this->turnitinFileMapper = $turnitinFileMapper;
     }
 
 
@@ -142,7 +143,7 @@ class Controller extends Base
         /* If we found it, tell turnitin to make a report for it
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->getReportInfo($data['model']);
+        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->getReportInfo($data['model']);
     }
 
 
@@ -163,7 +164,7 @@ class Controller extends Base
         /* If we found it, tell turnitin to save some data locally
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($data['model'], $data['payload']);
+        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->cacheLocally($data['model'], $data['payload']);
     }
 
 
@@ -184,7 +185,7 @@ class Controller extends Base
         /* If we found it, tell turnitin to save some data locally
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($data['model'], $data['payload']);
+        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->cacheLocally($data['model'], $data['payload']);
     }
 
 
@@ -249,7 +250,7 @@ class Controller extends Base
         /* Find the corresponding report, if it exists
          */
         try {
-            $model = $this->turnitinMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
+            $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new \RuntimeException(sprintf(
                 'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',

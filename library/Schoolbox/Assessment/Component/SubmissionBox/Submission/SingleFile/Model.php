@@ -22,6 +22,7 @@ use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\Turnitin;
 
 /**
  * A single file within a student's submission to a due work.
@@ -58,9 +59,9 @@ class Model implements IFile, ISoftDeletable
     /**
      * A Turnitin Report model, optionally null
      *
-     * @var DueWork\Response\File\Turnitin\Model|null
+     * @var Turnitin\File\Model|null
      */
-    private ?DueWork\Response\File\Turnitin\Model $turnitin = null;
+    private ?Turnitin\File\Model $turnitin = null;
 
 
     public function __clone()
@@ -127,19 +128,19 @@ class Model implements IFile, ISoftDeletable
 
 
     /**
-     * @return DueWork\Response\File\Turnitin\Model|null
+     * @return Turnitin\File\Model|null
      */
-    public function getTurnItIn(): ?DueWork\Response\File\Turnitin\Model
+    public function getTurnItIn(): ?Turnitin\File\Model
     {
         return $this->turnitin;
     }
 
 
     /**
-     * @param DueWork\Response\File\Turnitin\Model|null $turnitin
+     * @param Turnitin\File\Model|null $turnitin
      * @return $this
      */
-    public function setTurnItIn(?DueWork\Response\File\Turnitin\Model $turnitin): self
+    public function setTurnItIn(?Turnitin\File\Model $turnitin): self
     {
         $this->turnitin = $turnitin;
         return $this;

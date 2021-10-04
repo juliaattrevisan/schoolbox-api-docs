@@ -12,9 +12,7 @@ declare(strict_types=1);
 use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Model;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -143,9 +141,9 @@ HELP;
 
             /* Set up a record processor
              */
-            $processor = (new Turnitin\Process\Report(
+            $processor = (new Turnitin\File\Process\Report(
                 $api,
-                Mapper::getInstance(),
+                Turnitin\File\Mapper::getInstance(),
                 $this->getLogger()
             ));
 
@@ -177,19 +175,19 @@ HELP;
      * Find all the reports that were loaded and move them into Prepared, meaning
      * we have told turnitin to schedule a report generation
      *
-     * @param Turnitin\Process\Report $processor
+     * @param Turnitin\File\Process\Report $processor
      */
-    private function processLoadedReports(Turnitin\Process\Report $processor): void
+    private function processLoadedReports(Turnitin\File\Process\Report $processor): void
     {
         /* Find all the records to process in a synonymous data struct
          */
         if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
-            $models = Mapper::getInstance()->findByColumnList([
+            $models = Turnitin\File\Mapper::getInstance()->findByColumnList([
                 'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
-                'status' => Model::STATUS_TRANSMIT_LOADED
+                'status' => Turnitin\File\Model::STATUS_TRANSMIT_LOADED
             ]);
         } else {
-            $models = Mapper::getInstance()->findByColumn('status', Model::STATUS_TRANSMIT_LOADED);
+            $models = Turnitin\File\Mapper::getInstance()->findByColumn('status', Turnitin\File\Model::STATUS_TRANSMIT_LOADED);
         }
 
         /* Leave immediately when nothing to do
@@ -219,24 +217,24 @@ HELP;
      * be generated) and see when they reach Complete, at which point we remember
      * the answers
      *
-     * @param Turnitin\Process\Report $processor
+     * @param Turnitin\File\Process\Report $processor
      */
-    private function processPreparedReports(Turnitin\Process\Report $processor): void
+    private function processPreparedReports(Turnitin\File\Process\Report $processor): void
     {
         /* Find all the records to process in a synonymous data struct
          */
         if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
-            $models = Mapper::getInstance()->findByColumnList([
+            $models = Turnitin\File\Mapper::getInstance()->findByColumnList([
                 'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
                 'status' => [
-                    Model::STATUS_REPORT_PREPARED,
-                    Model::STATUS_REPORT_ANALYSING
+                    Turnitin\File\Model::STATUS_REPORT_PREPARED,
+                    Turnitin\File\Model::STATUS_REPORT_ANALYSING
                 ]
             ]);
         } else {
-            $models = Mapper::getInstance()->findByColumn('status', [
-                Model::STATUS_REPORT_PREPARED,
-                Model::STATUS_REPORT_ANALYSING
+            $models = Turnitin\File\Mapper::getInstance()->findByColumn('status', [
+                Turnitin\File\Model::STATUS_REPORT_PREPARED,
+                Turnitin\File\Model::STATUS_REPORT_ANALYSING
             ]);
         }
 

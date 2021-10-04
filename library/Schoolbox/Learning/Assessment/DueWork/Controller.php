@@ -24,7 +24,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -62,6 +61,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Mapper\DefinitionException;
@@ -1015,7 +1015,7 @@ class Controller extends Assessment\Controller
              * Specifically enable turnitin if its api key was set
              */
             if ((new TurnitinHelper($this->getConfigLoader()))->isConfigured()) {
-                $turnitinMapper = Turnitin\Mapper::getInstance();
+                $turnitinMapper = Turnitin\File\Mapper::getInstance();
 
                 /* Set up a turnitin stub record
                  * This allows it to be picked up and processed by an async script later
@@ -1041,14 +1041,16 @@ class Controller extends Assessment\Controller
 
                 /* Set up detached function so turnitin can continue in the background
                  */
-                $detachedFunction = static function () use ($api, $models) {
+                $instanceIdentifier = $this->getConfigLoader()->get('site_type');
 
+                $detachedFunction = static function () use ($api, $models, $instanceIdentifier) {
                     /* Set up a record processor
                      */
-                    $processor = (new Turnitin\Process\File(
+                    $processor = (new Turnitin\File\Process\File(
+                        $instanceIdentifier,
                         $api,
-                        Turnitin\Mapper::getInstance(),
-                        \Schoolbox\Learning\Turnitin\Group\Mapper::getInstance(),
+                        Turnitin\File\Mapper::getInstance(),
+                        Turnitin\Group\Mapper::getInstance(),
                         UserMapper::getInstance(),
                         SubmissionBoxMapper::getInstance(),
                         SingleFile\Mapper::getInstance()

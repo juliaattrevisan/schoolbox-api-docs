@@ -13,9 +13,7 @@ use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Model;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\UserMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
@@ -182,18 +180,18 @@ HELP;
                  * reprocess something that's in this state naturally
                  */
                 if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
-                    $models = Mapper::getInstance()->findByColumnList([
+                    $models = Turnitin\File\Mapper::getInstance()->findByColumnList([
                         'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
                         'status' => [
-                            Model::STATUS_TRANSMIT_PENDING,
-                            Model::STATUS_TRANSMIT_GROUP,
-                            Model::STATUS_TRANSMIT_SUBMISSION,
+                            Turnitin\File\Model::STATUS_TRANSMIT_PENDING,
+                            Turnitin\File\Model::STATUS_TRANSMIT_GROUP,
+                            Turnitin\File\Model::STATUS_TRANSMIT_SUBMISSION,
                         ]
                     ]);
                 } else {
-                    $models = Mapper::getInstance()->findByColumnList([
+                    $models = Turnitin\File\Mapper::getInstance()->findByColumnList([
                         'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
-                        'status' => Model::STATUS_TRANSMIT_PENDING
+                        'status' => Turnitin\File\Model::STATUS_TRANSMIT_PENDING
                     ]);
                 }
             } else {
@@ -204,13 +202,13 @@ HELP;
                  * reprocess something that's in this state naturally
                  */
                 if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
-                    $models = Mapper::getInstance()->findByColumn('status', [
-                        Model::STATUS_TRANSMIT_PENDING,
-                        Model::STATUS_TRANSMIT_GROUP,
-                        Model::STATUS_TRANSMIT_SUBMISSION,
+                    $models = Turnitin\File\Mapper::getInstance()->findByColumn('status', [
+                        Turnitin\File\Model::STATUS_TRANSMIT_PENDING,
+                        Turnitin\File\Model::STATUS_TRANSMIT_GROUP,
+                        Turnitin\File\Model::STATUS_TRANSMIT_SUBMISSION,
                     ]);
                 } else {
-                    $models = Mapper::getInstance()->findByColumn('status', Model::STATUS_TRANSMIT_PENDING);
+                    $models = Turnitin\File\Mapper::getInstance()->findByColumn('status', Turnitin\File\Model::STATUS_TRANSMIT_PENDING);
                 }
             }
 
@@ -238,10 +236,11 @@ HELP;
 
             /* Set up a record processor
              */
-            $processor = (new Turnitin\Process\File(
+            $processor = (new Turnitin\File\Process\File(
+                $this->getConfig()->get('site_type'),
                 $api,
-                Mapper::getInstance(),
-                \Schoolbox\Learning\Turnitin\Group\Mapper::getInstance(),
+                Turnitin\File\Mapper::getInstance(),
+                Turnitin\Group\Mapper::getInstance(),
                 UserMapper::getInstance(),
                 Component\SubmissionBoxMapper::getInstance(),
                 Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
