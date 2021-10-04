@@ -268,7 +268,8 @@ class Group
                     ->setStatus(Turnitin\Group\Attachment\Model::STATUS_TRANSMIT_PENDING);
 
                 $this->logDebug(sprintf(
-                    'Adding new submission box file %s to Turnitin',
+                    'Group %s: adding new submission box file %s to Turnitin',
+                    $turnitinGroup->getId(),
                     $submissionBoxFileId,
                 ));
 
@@ -292,14 +293,16 @@ class Group
                          * that doesn't exist anyway - just warn and continue
                          */
                         $this->logWarning(sprintf(
-                            'Tried to delete %s from Turnitin, but it is not there anyway - skipping',
+                            'Group %s: tried to delete %s from Turnitin, but it is not there anyway - skipping',
+                            $turnitinGroup->getId(),
                             $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
                         ));
                     } elseif (204 === $e->getCode()) {
                         /* 204 No Content returned if you succeeded
                          */
                         $this->logDebug(sprintf(
-                            'Removing old submission box file %s (%s) from Turnitin',
+                            'Group %s: removing old submission box file %s (%s) from Turnitin',
+                            $turnitinGroup->getId(),
                             $turnitinGroupAttachment->getSubmissionBoxFileId(),
                             $turnitinGroupAttachment->getTurnitinGroupAttachmentId()
                         ));
