@@ -14,6 +14,7 @@ use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\LogTrait;
 
 /**
  * The second half of a Turnitin request
@@ -23,6 +24,8 @@ use Schoolbox\Learning\Turnitin\Exception\Credentials;
  */
 class Report
 {
+    use LogTrait;
+
 
     /**
      * Choose a viewer permission set based on your role
@@ -66,12 +69,6 @@ class Report
      * @var Turnitin\File\Mapper
      */
     private Turnitin\File\Mapper $turnitinMapper;
-
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private ?LoggerInterface $log;
 
 
     /**
@@ -423,30 +420,5 @@ class Report
             ->setStatus($status);
 
         $this->turnitinMapper->save($model);
-    }
-
-    /**
-     * Log to Logger if one was provided (used in cli tools)
-     *
-     * @param string $message
-     */
-    private function logDebug(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->debug($message);
-        }
-    }
-
-
-    /**
-     * Specifically log a warning to the cli
-     *
-     * @param string $message
-     */
-    private function logWarning(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->warning($message);
-        }
     }
 }

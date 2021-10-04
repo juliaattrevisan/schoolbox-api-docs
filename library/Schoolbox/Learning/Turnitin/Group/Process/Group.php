@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Turnitin\LogTrait;
 
 /**
  * Take a set of Submission Box Files from schoolbox and set it up in Turnitin,
@@ -32,6 +33,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
  */
 class Group
 {
+    use LogTrait;
+
 
     /**
      * Group type in Turnitin
@@ -73,12 +76,6 @@ class Group
      * @var SubmissionBox\SingleFile\Mapper
      */
     private SubmissionBox\SingleFile\Mapper $submissionBoxFileMapper;
-
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private ?LoggerInterface $log;
 
 
     /**
@@ -511,31 +508,5 @@ class Group
             ->setStatus($status);
 
         $this->turnitinGroupAttachmentMapper->save($model);
-    }
-
-
-    /**
-     * Log to Logger if one was provided (used in cli tools)
-     *
-     * @param string $message
-     */
-    private function logDebug(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->debug($message);
-        }
-    }
-
-
-    /**
-     * Specifically log a warning to the cli
-     *
-     * @param string $message
-     */
-    private function logWarning(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->warning($message);
-        }
     }
 }

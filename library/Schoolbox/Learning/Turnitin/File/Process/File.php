@@ -17,6 +17,7 @@ use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Group\Mapper as TurnitinGroupMapper;
+use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\UserMapper;
 
@@ -29,6 +30,8 @@ use Schoolbox\UserMapper;
  */
 class File
 {
+    use LogTrait;
+
 
     /**
      * EULA language for our people to accept
@@ -76,12 +79,6 @@ class File
      * @var SingleFile\Mapper
      */
     private SingleFile\Mapper $ssfMapper;
-
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private ?LoggerInterface $log;
 
 
     /**
@@ -293,32 +290,6 @@ class File
             ->setStatus($status);
 
         $this->turnitinMapper->save($model);
-    }
-
-
-    /**
-     * Log to Logger if one was provided (used in cli tools)
-     *
-     * @param string $message
-     */
-    private function logDebug(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->debug($message);
-        }
-    }
-
-
-    /**
-     * Specifically log a warning to the cli
-     *
-     * @param string $message
-     */
-    private function logWarning(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->warning($message);
-        }
     }
 
 
