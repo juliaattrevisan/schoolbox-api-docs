@@ -12,8 +12,6 @@ import axios                      from 'axios'
 import fullCalendarHelper         from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import dayjs                      from 'dayjs';
-import advancedFormat             from 'dayjs/plugin/advancedFormat';
-import arraySupport               from 'dayjs/plugin/arraySupport';
 
 const URL_EVENT_EXPORT = '/calendar/export.php';
 
@@ -69,8 +67,6 @@ export default {
     },
 
     beforeMount () {
-        dayjs.extend(advancedFormat); //for more format options
-        dayjs.extend(arraySupport); //to be able to use an array as a date
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, resourceTimelinePlugin, adaptivePlugin ],

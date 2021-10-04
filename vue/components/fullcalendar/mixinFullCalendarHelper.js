@@ -4,10 +4,17 @@
  */
 
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import arraySupport from 'dayjs/plugin/arraySupport';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
 
 export default {
+
+    created () {
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport); //to be able to use an array as a date
+    },
 
     methods: {
 

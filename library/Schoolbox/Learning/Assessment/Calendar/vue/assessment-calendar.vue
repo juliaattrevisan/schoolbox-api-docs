@@ -14,8 +14,6 @@ import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
 import dayjs                      from 'dayjs';
-import advancedFormat             from 'dayjs/plugin/advancedFormat';
-import arraySupport               from 'dayjs/plugin/arraySupport';
 import weekOfYear                 from 'dayjs/plugin/weekOfYear';
 
 // Various URLs this calendar can make use of
@@ -134,8 +132,6 @@ export default {
     },
 
     beforeMount () {
-        dayjs.extend(advancedFormat); //for more format options
-        dayjs.extend(arraySupport); //to be able to use an array as a date
         dayjs.extend(weekOfYear); //to return weeks of the year
         this.resourceTimelineSemester = {
             type: 'resourceTimeline',

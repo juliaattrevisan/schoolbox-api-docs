@@ -14,8 +14,6 @@ import fullCalendarHelper           from '@vue/components/fullcalendar/mixinFull
 import {stringify}        			from 'qs';
 import CustomisedCalendarEvent	  	from '@vue/components/fullcalendar/customised-calendar-event';
 import dayjs                        from 'dayjs';
-import advancedFormat               from 'dayjs/plugin/advancedFormat';
-import arraySupport                 from 'dayjs/plugin/arraySupport';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -71,8 +69,6 @@ export default {
     },
 
     beforeMount () {
-        dayjs.extend(advancedFormat); //for more format options
-        dayjs.extend(arraySupport); //to be able to use an array as a date
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
