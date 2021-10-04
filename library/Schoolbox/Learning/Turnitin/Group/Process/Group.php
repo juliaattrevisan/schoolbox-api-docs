@@ -16,12 +16,21 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
- * Take a Submission Box File from schoolbox and set it up in Turnitin,
+ * Take a set of Submission Box Files from schoolbox and set it up in Turnitin,
  * setting up its Group Attachment record and uploading the file contents
  * just like we do for File.php; since transmission can break at any step
  * we need a way to just force it in
+ *
+ * This happens by finding the Submissino Box and getting its list of files
+ * at runtime, then micromanaging the diff with turnitin. It does this specifically
+ * to avoid bottlenecking course imports and due work modifies, which would
+ * result in hammering the turnitin api and maybe desyncing files due to failures
+ * with no recourse.
+ *
+ * Here, it follows the same flavour as turnitin files, giving you a chance
+ * to debug and reprocess them independently of their due works etc.
  */
-class GroupAttachment
+class Group
 {
 
     /**

@@ -215,7 +215,7 @@ HELP;
 
             /* Set up a record processor
              */
-            $processor = (new Turnitin\Group\Process\GroupAttachment(
+            $processor = (new Turnitin\Group\Process\Group(
                 $api,
                 Turnitin\Group\Mapper::getInstance(),
                 Turnitin\Group\Attachment\Mapper::getInstance(),
