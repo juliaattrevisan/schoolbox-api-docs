@@ -115,7 +115,7 @@ Transmission of turnitin files goes through these stages, with their status stri
 
 1. Saved in schoolbox db with status Pending ("pending")
 2. Set up a Turnitin Group if one doesn't already exist ("group")
-3. Set up Turnitin Group Attachment ("group_attachment")
+3. Set up Turnitin Group Attachment(s) ("group_attachment")
 4. Upload file contents into Turnitin Group Attachment ("uploading")
 5. Contents finished sending to Turnitin ("complete")
 
@@ -176,7 +176,7 @@ HELP;
                 }
             } else {
                 /* Optionally:
-                 * Forcibly retransmit everything in Pending, Group, Submission
+                 * Forcibly retransmit everything in Pending, Group, Group Attachment
                  * regardless of whether they're in those states normally; used
                  * to recommence a stalled or broken process, but you might also
                  * reprocess something that's in this state naturally
@@ -184,6 +184,7 @@ HELP;
                 if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
                     $models = Turnitin\Group\Mapper::getInstance()->findByColumn('status', [
                         Turnitin\Group\Model::STATUS_TRANSMIT_PENDING,
+                        Turnitin\Group\Model::STATUS_TRANSMIT_GROUP,
                         Turnitin\Group\Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
                     ]);
                 } else {
