@@ -38,6 +38,7 @@ use Schoolbox\Learning\InlineGrader\Factory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -66,6 +67,12 @@ class Controller extends Base
 
 
     /**
+     * @var Access
+     */
+    private Access $access;
+
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
@@ -81,7 +88,8 @@ class Controller extends Base
         BreadcrumbFactory $bakery,
         Term\Mapper $termMapper,
         Kami\Mapper $kamiMapper,
-        Kami\Connector $kamiConnector
+        Kami\Connector $kamiConnector,
+        Access $access
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -89,6 +97,7 @@ class Controller extends Base
         $this->termMapper         = $termMapper;
         $this->kamiMapper         = $kamiMapper;
         $this->kamiConnector      = $kamiConnector;
+        $this->access             = $access;
     }
 
     /**
@@ -604,7 +613,7 @@ class Controller extends Base
 
         /* Then decide if you're a staff and you need more stuff
          */
-        if ($this->getUser()->getRole()->isStaff()) {
+        if ($this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder())) {
             $payload = array_merge($payload, [
                 'viewer_default_permission_set' => Report::VIEWER_PERMISSION_SET_STAFF,
                 'similarity' => [
