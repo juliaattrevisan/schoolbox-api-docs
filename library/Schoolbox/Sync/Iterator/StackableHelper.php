@@ -40,7 +40,7 @@ trait StackableHelper
 
         // Make it unique and remove blanks before we return the array
 
-        return array_filter(array_unique($array));
+        return array_filter(array_unique($array), 'strlen');
     }
 
     /**
