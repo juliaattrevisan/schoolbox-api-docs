@@ -16,7 +16,6 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
-use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
@@ -44,7 +43,7 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseSingle('student_submission_file_id', Plagscan\Mapper::class, 'plagscan', 'plagscan');
-        $this->joinsReverseSingle('student_submission_file_id', Turnitin\File\Mapper::class, 'turnitin', 'turnitin');
+        $this->joinsReverseSingle('student_submission_file_id', \Schoolbox\Learning\Turnitin\File\Mapper::class, 'turnitin', 'turnitin');
         $this->joinsReverseSingle('student_submission_file_id', Kami\Mapper::class, 'kami', 'kami');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePlagScan']);
