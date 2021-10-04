@@ -81,6 +81,6 @@ trait StackableHelper
             $values[] = trim($row[$columnName]);
         }
 
-        return implode(', ', array_filter(array_unique($values)));
+        return implode(', ', array_filter(array_unique($values), 'strlen'));
     }
 }
