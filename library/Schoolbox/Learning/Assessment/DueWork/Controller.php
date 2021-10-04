@@ -62,6 +62,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -337,7 +338,7 @@ class Controller extends Assessment\Controller
             /* Similarity Check status
              */
             'plagscanApiEnabled'     => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled'     => Turnitin\Mapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled'     => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */
@@ -1009,12 +1010,12 @@ class Controller extends Assessment\Controller
         $detachedFunction = null;
 
         if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-            $turnitinMapper = Turnitin\Mapper::getInstance();
-
             /* Only one of these can be active at a time, but both universes can co-exist
              * Specifically enable turnitin if its api key was set
              */
-            if ($turnitinMapper->isConfigured()) {
+            if ((new TurnitinHelper($this->getConfigLoader()))->isConfigured()) {
+                $turnitinMapper = Turnitin\Mapper::getInstance();
+
                 /* Set up a turnitin stub record
                  * This allows it to be picked up and processed by an async script later
                  * if it doesn't start processing via the $detachedFunction

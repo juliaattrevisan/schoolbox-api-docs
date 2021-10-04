@@ -57,6 +57,9 @@ class Helper
 
 
     /**
+     * This is used to decide if someone can view the Turnitin report based on configuration,
+     * LMS policies and the current user's roletype
+     *
      * If the turnitin host and key was set in config, and turnitin is enabled for the $user specified
      *
      * Assuming this is the case, the following policies are obeyed:

@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\UserMapper;
 
 /**
@@ -154,7 +155,7 @@ class File
          * but who knows how a record might actually get populated beyond our
          * own intended controller usage (ie. 3rd party imports/syncs)
          */
-        if (!(new Turnitin\ValidFile())->isSatisfiedBy($ssf)) {
+        if (!(new ValidFile())->isSatisfiedBy($ssf)) {
             $model
                 ->setErrorCode('Invalid Filetype')
                 ->setErrorMessage('Student Submission File has an invalid mime type');

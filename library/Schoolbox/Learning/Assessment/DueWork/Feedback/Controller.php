@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -276,12 +277,12 @@ class Controller extends Base
                 $detachedFunction = null;
 
                 if ($assessment->getSimilarityCheckEnabled()) {
-                    $turnitinMapper = Turnitin\Mapper::getInstance();
-
                     /* Only one of these can be active at a time, but both universes can co-exist
                      * Specifically enable turnitin if its api key was set
                      */
-                    if ($turnitinMapper->isConfigured()) {
+                    if ((new TurnitinHelper($this->getConfigLoader()))->isConfigured()) {
+                        $turnitinMapper = Turnitin\Mapper::getInstance();
+
                         /* Set up a turnitin stub record
                          * This allows it to be picked up and processed by an async script later
                          * if it doesn't start processing via the $detachedFunction
