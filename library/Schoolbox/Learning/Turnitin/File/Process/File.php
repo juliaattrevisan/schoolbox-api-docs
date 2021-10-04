@@ -16,7 +16,6 @@ use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\Learning\Turnitin\Group\Mapper as TurnitinGroupMapper;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\UserMapper;
@@ -58,9 +57,9 @@ class File
 
 
     /**
-     * @var TurnitinGroupMapper
+     * @var Turnitin\Group\Mapper
      */
-    private TurnitinGroupMapper $turnitinGroupMapper;
+    private Turnitin\Group\Mapper $turnitinGroupMapper;
 
 
     /**
@@ -84,14 +83,14 @@ class File
     /**
      * Constructor.
      *
-     * @param string               $instanceIdentifier
-     * @param Api                  $api
-     * @param Turnitin\File\Mapper $turnitinMapper
-     * @param TurnitinGroupMapper  $turnitinGroupMapper
-     * @param UserMapper           $userMapper
-     * @param SubmissionBoxMapper  $boxMapper
-     * @param SingleFile\Mapper    $ssfMapper
-     * @param LoggerInterface|null $log
+     * @param string                $instanceIdentifier
+     * @param Api                   $api
+     * @param Turnitin\File\Mapper  $turnitinMapper
+     * @param Turnitin\Group\Mapper $turnitinGroupMapper
+     * @param UserMapper            $userMapper
+     * @param SubmissionBoxMapper   $boxMapper
+     * @param SingleFile\Mapper     $ssfMapper
+     * @param LoggerInterface|null  $log
      */
     public function __construct(
         string $instanceIdentifier,
