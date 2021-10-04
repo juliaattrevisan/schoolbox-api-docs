@@ -221,6 +221,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $this->shutdownSafely(error_get_last(), debug_backtrace());
             })
         );
+        register_shutdown_function($this->getShutdownHandler());
     }
 
 

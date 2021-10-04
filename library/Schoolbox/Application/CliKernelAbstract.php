@@ -313,6 +313,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     protected function registerShutdownHandling(): void
     {
         $this->getShutdownHandler()->registerFunction([$this, 'onShutdown']);
+        register_shutdown_function($this->getShutdownHandler());
     }
 
 
