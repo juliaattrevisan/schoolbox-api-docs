@@ -27,7 +27,7 @@
         "axios": "0.21.2",
         "clipboard": "^2.0.6",
         "core-js": "^3.8.3",
-        "datatables.net": "1.10.15",
+        "datatables.net": "1.10.22",
         "datatables.net-fixedcolumns": "3.2.2",
         "date-fns": "^2.19.0",
         "dayjs": "^1.10.4",
@@ -56,9 +56,9 @@
         "vue": "^2.6.12",
         "vue-resize": "^1.0.0",
         "vue-select": "^3.11.2",
-        "vue-style-loader": "^4.1.2",
         "vue-tables-2": "git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git",
-        "vuejs-paginate": "2.0.1"
+        "vuejs-paginate": "2.0.1",
+        "vuex": "^3.6.2"
       },
       "devDependencies": {
         "@babel/core": "^7.12.10",
@@ -75,6 +75,7 @@
         "source-map-loader": "^0.2.4",
         "style-loader": "^2.0.0",
         "vue-loader": "^15.9.6",
+        "vue-style-loader": "^4.1.3",
         "vue-template-compiler": "^2.6.12",
         "webpack": "^5.28.0",
         "webpack-cli": "^4.5.0",
@@ -2736,6 +2737,7 @@
       "version": "5.2.2",
       "resolved": "https://registry.npmjs.org/big.js/-/big.js-5.2.2.tgz",
       "integrity": "sha1-ZfCvOC9Xi83HQr2cKB6cstd2gyg=",
+      "dev": true,
       "engines": {
         "node": "*"
       }
@@ -3157,9 +3159,9 @@
       }
     },
     "node_modules/datatables.net": {
-      "version": "1.10.15",
-      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.10.15.tgz",
-      "integrity": "sha1-x4kHe7/jhedf9aIz+l8jJRpy32g=",
+      "version": "1.10.22",
+      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.10.22.tgz",
+      "integrity": "sha512-ujn8GvkQIBYzYH54XY7OrI0Zb35TKRd9ABYfbnXgBfwTGIFT6UsmXrfHU5Yk+MSDoF0sDu2TB+31V6c+zUZ0Pw==",
       "dependencies": {
         "jquery": ">=1.7"
       }
@@ -3311,6 +3313,7 @@
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/emojis-list/-/emojis-list-2.1.0.tgz",
       "integrity": "sha1-TapNnbAPmBmIDHn6RXrlsJof04k=",
+      "dev": true,
       "engines": {
         "node": ">= 0.10"
       }
@@ -3794,7 +3797,8 @@
     "node_modules/hash-sum": {
       "version": "1.0.2",
       "resolved": "https://registry.npmjs.org/hash-sum/-/hash-sum-1.0.2.tgz",
-      "integrity": "sha1-M7QHd3VMZDJXPBIMw4CLvRDUfwQ="
+      "integrity": "sha1-M7QHd3VMZDJXPBIMw4CLvRDUfwQ=",
+      "dev": true
     },
     "node_modules/hashish": {
       "version": "0.0.4",
@@ -4203,6 +4207,7 @@
       "version": "1.2.3",
       "resolved": "https://registry.npmjs.org/loader-utils/-/loader-utils-1.2.3.tgz",
       "integrity": "sha1-H/XcaRHJ8KBiUxpMBLYJQGEIwsc=",
+      "dev": true,
       "dependencies": {
         "big.js": "^5.2.2",
         "emojis-list": "^2.0.0",
@@ -4216,6 +4221,7 @@
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/json5/-/json5-1.0.1.tgz",
       "integrity": "sha1-d5+wAYYE+oVOrL9iUhgNg1Q+Pb4=",
+      "dev": true,
       "dependencies": {
         "minimist": "^1.2.0"
       },
@@ -4546,7 +4552,8 @@
     "node_modules/minimist": {
       "version": "1.2.5",
       "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz",
-      "integrity": "sha1-Z9ZgFLZqaoqqDAg8X9WN9OTpdgI="
+      "integrity": "sha1-Z9ZgFLZqaoqqDAg8X9WN9OTpdgI=",
+      "dev": true
     },
     "node_modules/minimist-options": {
       "version": "4.1.0",
@@ -6016,6 +6023,11 @@
       "resolved": "https://registry.npmjs.org/babel-plugin-add-module-exports/-/babel-plugin-add-module-exports-0.2.1.tgz",
       "integrity": "sha1-mumh9KjcZ/DN7E9K7aHkOl/2XiU="
     },
+    "node_modules/vue-pagination-2/node_modules/vuex": {
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
+      "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
+    },
     "node_modules/vue-resize": {
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/vue-resize/-/vue-resize-1.0.1.tgz",
@@ -6038,9 +6050,11 @@
       "integrity": "sha1-Pvk+PycH4TPC3wspIKBe6nh2TRg="
     },
     "node_modules/vue-style-loader": {
-      "version": "4.1.2",
-      "resolved": "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.2.tgz",
-      "integrity": "sha1-3t80mAbyXOtOZPOtfApE+6c1/Pg=",
+      "version": "4.1.3",
+      "resolved": "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.3.tgz",
+      "integrity": "sha512-sFuh0xfbtpRlKfm39ss/ikqs9AbKCoXZBpHeVZ8Tx650o0k0q/YCM7FRvigtxpACezfq6af+a7JeqVTWvncqDg==",
+      "dev": true,
+      "license": "MIT",
       "dependencies": {
         "hash-sum": "^1.0.2",
         "loader-utils": "^1.0.2"
@@ -6082,9 +6096,12 @@
       "integrity": "sha1-Nz7W1pLexBE9N6qUZ/lF2jor2a8="
     },
     "node_modules/vuex": {
-      "version": "2.5.0",
-      "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
-      "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
+      "version": "3.6.2",
+      "resolved": "https://registry.npmjs.org/vuex/-/vuex-3.6.2.tgz",
+      "integrity": "sha512-ETW44IqCgBpVomy520DT5jf8n0zoCac+sxWnn+hMe/CzaSejb/eVw2YToiXYX+Ex/AuHHia28vWTq4goAexFbw==",
+      "peerDependencies": {
+        "vue": "^2.0.0"
+      }
     },
     "node_modules/watchpack": {
       "version": "2.1.1",
@@ -8909,7 +8926,8 @@
     "big.js": {
       "version": "5.2.2",
       "resolved": "https://registry.npmjs.org/big.js/-/big.js-5.2.2.tgz",
-      "integrity": "sha1-ZfCvOC9Xi83HQr2cKB6cstd2gyg="
+      "integrity": "sha1-ZfCvOC9Xi83HQr2cKB6cstd2gyg=",
+      "dev": true
     },
     "binary-extensions": {
       "version": "2.2.0",
@@ -9371,7 +9389,8 @@
     "emojis-list": {
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/emojis-list/-/emojis-list-2.1.0.tgz",
-      "integrity": "sha1-TapNnbAPmBmIDHn6RXrlsJof04k="
+      "integrity": "sha1-TapNnbAPmBmIDHn6RXrlsJof04k=",
+      "dev": true
     },
     "enhanced-resolve": {
       "version": "5.7.0",
@@ -9734,7 +9753,8 @@
     "hash-sum": {
       "version": "1.0.2",
       "resolved": "https://registry.npmjs.org/hash-sum/-/hash-sum-1.0.2.tgz",
-      "integrity": "sha1-M7QHd3VMZDJXPBIMw4CLvRDUfwQ="
+      "integrity": "sha1-M7QHd3VMZDJXPBIMw4CLvRDUfwQ=",
+      "dev": true
     },
     "hashish": {
       "version": "0.0.4",
@@ -10047,6 +10067,7 @@
       "version": "1.2.3",
       "resolved": "https://registry.npmjs.org/loader-utils/-/loader-utils-1.2.3.tgz",
       "integrity": "sha1-H/XcaRHJ8KBiUxpMBLYJQGEIwsc=",
+      "dev": true,
       "requires": {
         "big.js": "^5.2.2",
         "emojis-list": "^2.0.0",
@@ -10057,6 +10078,7 @@
           "version": "1.0.1",
           "resolved": "https://registry.npmjs.org/json5/-/json5-1.0.1.tgz",
           "integrity": "sha1-d5+wAYYE+oVOrL9iUhgNg1Q+Pb4=",
+          "dev": true,
           "requires": {
             "minimist": "^1.2.0"
           }
@@ -10325,7 +10347,8 @@
     "minimist": {
       "version": "1.2.5",
       "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz",
-      "integrity": "sha1-Z9ZgFLZqaoqqDAg8X9WN9OTpdgI="
+      "integrity": "sha1-Z9ZgFLZqaoqqDAg8X9WN9OTpdgI=",
+      "dev": true
     },
     "minimist-options": {
       "version": "4.1.0",
@@ -11500,6 +11523,11 @@
           "version": "0.2.1",
           "resolved": "https://registry.npmjs.org/babel-plugin-add-module-exports/-/babel-plugin-add-module-exports-0.2.1.tgz",
           "integrity": "sha1-mumh9KjcZ/DN7E9K7aHkOl/2XiU="
+        },
+        "vuex": {
+          "version": "2.5.0",
+          "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
+          "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
         }
       }
     },
@@ -11527,9 +11555,10 @@
       "integrity": "sha1-Pvk+PycH4TPC3wspIKBe6nh2TRg="
     },
     "vue-style-loader": {
-      "version": "4.1.2",
-      "resolved": "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.2.tgz",
-      "integrity": "sha1-3t80mAbyXOtOZPOtfApE+6c1/Pg=",
+      "version": "4.1.3",
+      "resolved": "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.3.tgz",
+      "integrity": "sha512-sFuh0xfbtpRlKfm39ss/ikqs9AbKCoXZBpHeVZ8Tx650o0k0q/YCM7FRvigtxpACezfq6af+a7JeqVTWvncqDg==",
+      "dev": true,
       "requires": {
         "hash-sum": "^1.0.2",
         "loader-utils": "^1.0.2"
@@ -11570,9 +11599,10 @@
       "integrity": "sha1-Nz7W1pLexBE9N6qUZ/lF2jor2a8="
     },
     "vuex": {
-      "version": "2.5.0",
-      "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
-      "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
+      "version": "3.6.2",
+      "resolved": "https://registry.npmjs.org/vuex/-/vuex-3.6.2.tgz",
+      "integrity": "sha512-ETW44IqCgBpVomy520DT5jf8n0zoCac+sxWnn+hMe/CzaSejb/eVw2YToiXYX+Ex/AuHHia28vWTq4goAexFbw==",
+      "requires": {}
     },
     "watchpack": {
       "version": "2.1.1",

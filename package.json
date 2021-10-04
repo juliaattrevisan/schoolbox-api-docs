@@ -52,7 +52,6 @@
     "vue": "^2.6.12",
     "vue-resize": "^1.0.0",
     "vue-select": "^3.11.2",
-    "vue-style-loader": "^4.1.2",
     "vue-tables-2": "git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git",
     "vuejs-paginate": "2.0.1",
     "vuex": "^3.6.2"
@@ -72,6 +71,7 @@
     "source-map-loader": "^0.2.4",
     "style-loader": "^2.0.0",
     "vue-loader": "^15.9.6",
+    "vue-style-loader": "^4.1.3",
     "vue-template-compiler": "^2.6.12",
     "webpack": "^5.28.0",
     "webpack-cli": "^4.5.0",
