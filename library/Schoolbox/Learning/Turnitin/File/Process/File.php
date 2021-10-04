@@ -31,12 +31,6 @@ class File
 {
 
     /**
-     * Group type in Turnitin
-     */
-    private const GROUP_TYPE = 'ASSIGNMENT';
-
-
-    /**
      * EULA language for our people to accept
      */
     private const EULA_LANGUAGE = 'en-US';
@@ -404,7 +398,7 @@ class File
 
             $newGroup = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
                 'name' => $box->getName(),
-                'type' => self::GROUP_TYPE
+                'type' => Turnitin\Group\Process\Group::GROUP_TYPE
             ]);
 
             $group->setGroupId($newGroup['id']);

@@ -36,7 +36,7 @@ class Group
     /**
      * Group type in Turnitin
      */
-    private const GROUP_TYPE = 'ASSIGNMENT';
+    public const GROUP_TYPE = 'ASSIGNMENT';
 
 
     /**
