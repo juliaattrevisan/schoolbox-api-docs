@@ -402,6 +402,7 @@ class Module extends BaseModule
                 'termMapper' => $this->getMapperFactory()->getLazy(Term\Mapper::class),
                 'kamiMapper' => $this->getMapperFactory()->getLazy(Kami\Mapper::class),
                 'kamiConnector' => $injector->lazyGet('kamiConnector'),
+                'access' => $this->getMapperFactory()->getLazy(Access::class),
             ])
         );
     }
