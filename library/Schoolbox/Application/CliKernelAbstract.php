@@ -122,10 +122,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             E_COMPILE_ERROR => 'Compilation',
         ];
 
-
-        \call_user_func($this->getShutdownHandler());
-
-
         // don't report anything
         if (!isset($error['type'], $cases[$error['type']])) {
             exit(self::EXIT_STATUS_OK);
