@@ -17,6 +17,7 @@ use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\Turnitin;
 
 /**
  * A mapper for a single file within a student's submission to a due work.
@@ -127,7 +128,7 @@ class Mapper extends BaseMapper
      */
     public function restoreTurnitin(Model $file): bool
     {
-        /** @var Turnitin\Mapper $turnitinMapper */
+        /** @var Turnitin\File\Mapper $turnitinMapper */
         $turnitinMapper = $this->getJoinMapper('turnitin');
         $turnitins      = $turnitinMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $turnitinMapper->restoreSoftDeleted($turnitins);
