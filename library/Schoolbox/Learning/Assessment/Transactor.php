@@ -14,7 +14,6 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
-use Schoolbox\Learning\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\Loader;
@@ -26,6 +25,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -182,7 +182,7 @@ class Transactor
              */
             $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
-            /* Due Work has a special thing going on where it can upload to Plagscan
+            /* Due Work has a special thing going on where it can upload to Plagscan/Turnitin
              *
              * If Similarity Check was previously disabled, but has now been enabled,
              * Then attempt to retrofit all the previous submissions
@@ -191,7 +191,14 @@ class Transactor
 
                 /** @var DueWork\Model $assessment */
                 if ($assessment->getSimilarityCheckEnabled()) {
-                    (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
+                    /* If turnitin is enabled, retrofit any old submissions' documents
+                     * Otherwise do the original behaviour (retrofit to plag)
+                     */
+                    if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
+                        (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance()))->retrofit($this->assessment->getId());
+                    } else {
+                        (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
+                    }
                 }
             }
 
@@ -213,7 +220,7 @@ class Transactor
         if ($this->assessment instanceof DueWork\Model && $this->assessment->getSimilarityCheckEnabled()) {
             /* If turnitin is enabled, create a group attachment for each file
              */
-            if ((new Helper(Loader::getInstance()))->isConfigured()) {
+            if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
                 /* Note that $this->assessment and $assessment files do not have a primary id
                  * when you first create a Due Work, which means you have to obtain them by
                  * alternative means.
