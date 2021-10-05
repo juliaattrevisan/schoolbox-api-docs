@@ -56,6 +56,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\LTI\Provider\Mapper as LtiProviderMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -387,6 +388,10 @@ class Module extends BaseModule
             TaskResponseDataSource::class,
             ['mapper' => $this->getMapperFactory()->getLazy(TaskResponseMapper::class)]
         );
+
+        // LTI assessment specific
+        $lc =& $injector->params[Assessment\Lti\Controller::class];
+        $lc['ltiProviderMapper'] = $this->getMapperFactory()->getLazy(LtiProviderMapper::class);
     }
 
     /**

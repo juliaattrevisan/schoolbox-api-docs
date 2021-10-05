@@ -37,14 +37,28 @@
     {# ----------------------------------------------------------- #}
     {# Assessment URL #}
     {# ----------------------------------------------------------- #}
-    <label>
+    <label for="lti-assessment-url" class="required">
         Assessment URL
-        <input name="ltiAssessmentUrl"
-               type="text"
-               maxlength="2048"
-               placeholder="Assessment URL"
-               value="{{ assessment.ltiAssessmentUrl }}">
     </label>
+
+    {% if not assessment.ltiAssessmentUrl %}
+        <div class="empty-state">
+            <i class="icon-lti"></i>
+            <p>Select a third party embedded learning tool to select an assessment from.</p>
+            <p>
+                {% for provider in ltiProviders %}
+                    <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+    <input readonly
+           required
+           id="lti-assessment-url"
+           name="ltiAssessmentUrl"
+           type="text"
+           maxlength="2048"
+           value="{{ assessment.ltiAssessmentUrl }}">
 
 
     {# ----------------------------------------------------------- #}

@@ -10,12 +10,78 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\LTI\Provider;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Controller extends Assessment\Controller
 {
+    /**
+     * Schoolbox's registry of LTI providers (a.k.a. tools).
+     */
+    private Provider\Mapper $ltiProviderMapper;
+
+    /**
+     * Constructor
+     *
+     * @param UserMapper                    $userMapper
+     * @param Error\Mapper                  $errorMapper
+     * @param MapperProxy                   $assessmentMapper
+     * @param WorkTypeMapper                $workTypeMapper
+     * @param Access                        $access
+     * @param Transactor                    $transactor
+     * @param Assessment\Breadcrumb\Factory $bakery
+     * @param Term\Mapper                   $termMapper
+     * @param Participant\DataSource        $participantDataSource
+     * @param CourseSpecificationMapper     $courseSpecificationMapper
+     * @param UnitSpecificationMapper       $unitSpecificationMapper
+     * @param Replicator                    $replicator
+     * @param Provider\Mapper               $ltiProviderMapper
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        Error\Mapper $errorMapper,
+        MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
+        Access $access,
+        Transactor $transactor,
+        Assessment\Breadcrumb\Factory $bakery,
+        Term\Mapper $termMapper,
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator,
+        Provider\Mapper $ltiProviderMapper
+    ) {
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $workTypeMapper,
+            $access,
+            $transactor,
+            $bakery,
+            $termMapper,
+            $participantDataSource,
+            $courseSpecificationMapper,
+            $unitSpecificationMapper,
+            $replicator
+        );
+        $this->ltiProviderMapper = $ltiProviderMapper;
+    }
+
     /**
      * Fill in Twig data required for rendering the create LTI assessment form.
      *
@@ -26,6 +92,10 @@ class Controller extends Assessment\Controller
     {
         return [
             'acceptingResponses' => true,
+            'ltiProviders'       => $this->ltiProviderMapper->findByColumn(
+                'lti_version',
+                Provider\Model::LTI_VERSION_1_3,
+            ),
         ];
     }
 
