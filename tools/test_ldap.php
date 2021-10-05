@@ -2,14 +2,13 @@
 <?php
 
 /**
- * Usage: ./cleanup.php [-p] [-vvv]
+ * Usage: ./test_ldap.php
  *
- * A tool that will remove all UPS logs older than 1 month
+ * This tool will output debug information about connecting to LDAP.  It is useful for debugging SSL certificate
+ * issues with LDAPS connections.
  *
- *  -p          perform: *without* this flag, will only do a dry run
- *  -v[v[v]]    verbosity: how much activity will be logged
  *
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
@@ -28,8 +27,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         $ldapCaCertHash = $this->getConfig()->get('ldap_ca_certificate');
         $session = new Session;
 
+        // This enables the debug output from the LDAP functions
         ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
-
 
         if ($host) {
             if ($ldapCaCertHash) {
