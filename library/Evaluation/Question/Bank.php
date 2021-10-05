@@ -18,6 +18,18 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
     public const MATCHING_PAIRS_TYPE_ID = 4;
 
     /**
+     * The type_id of the Rich Text question type
+     * (it gets special treatment in some places)
+     */
+    public const RICH_TEXT_TYPE_ID = 14;
+
+    /**
+     * The type_id of the Cloze Exercise question type
+     * (it gets special treatment in some places)
+     */
+    public const CLOZE_EXERCISE_TYPE_ID = 3;
+
+    /**
      * @var string
      */
     public $_table = 'assess_question_bank';
