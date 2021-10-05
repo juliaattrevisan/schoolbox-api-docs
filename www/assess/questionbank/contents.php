@@ -101,7 +101,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                     if ($currentQuestion['type_id'] == $questionBankHandler::CLOZE_EXERCISE_TYPE_ID || $currentQuestion['type_id'] == $questionBankHandler::RICH_TEXT_TYPE_ID) {
                         //only add the 'article' tags to Rich Text and Cloze Exercise question types
                         $tmp = Scrub::html($currentQuestion['answer']);
-                        $this->setVar('ANSWER_DESCRIPTION', "<article>${tmp}</article>");
+                        $this->setVar('ANSWER_DESCRIPTION', "<article class='no-clearfix'>${tmp}</article>");
                     } else {
                         $this->setVar('ANSWER_DESCRIPTION', Scrub::html($currentQuestion['answer']));
                     }

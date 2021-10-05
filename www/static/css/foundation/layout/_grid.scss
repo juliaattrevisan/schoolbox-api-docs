@@ -64,13 +64,25 @@ $align-block-grid-to-grid: true;
 .no-pad {
   padding: 0 !important;
 }
+// or margin
 .no-margin {
   margin: 0 !important;
 }
+// or overflow
 .no-overflow {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+// or clearfix
+.no-clearfix {
+  &:before, &:after {
+    content: "";
+    display: none;
+  }
+  &:after {
+    clear: initial;
+  }
 }
 
 // For when you want minimal padding (8px)
