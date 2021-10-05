@@ -140,10 +140,10 @@ export default {
             weekNumbers: true,
             slotLabelFormat: [
                 (date) => {
-                    return dayjs(date.date.marker).format('MMM');
+                    return dayjs(date.date.array).format('MMM');
                 },
                 (date) => {
-                    return dayjs(date.date.marker).format('w');
+                    return dayjs(date.date.array).format('w');
                 }
             ],
             resourceAreaWidth: '15%',
@@ -160,12 +160,12 @@ export default {
         };
         this.resourceTimelineWeek = {
             dayHeaderFormat: (date) => {
-                return dayjs(date.date.marker).format(this.formats.displayWeekDay);
+                return dayjs(date.date.array).format(this.formats.displayWeekDay);
             },
             duration: { weeks: 1 },
             slotDuration: { days: 1 },
             slotLabelFormat: (date) => {
-                return dayjs(date.date.marker).format('ddd DD');
+                return dayjs(date.date.array).format('ddd DD');
             },
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true,

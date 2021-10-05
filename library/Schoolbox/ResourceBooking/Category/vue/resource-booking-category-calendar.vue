@@ -73,16 +73,16 @@ export default {
             views: {
                 resourceTimelineMonth: {
                     slotLabelFormat: (date) => {
-                        return dayjs(date.date.marker).format('ddd D');
+                        return dayjs(date.date.array).format('ddd D');
                     }
                 },
                 resourceTimelineWeek: {
                     slotLabelFormat: [
                         (date) => {
-                            return dayjs(date.date.marker).format('ddd D/M');
+                            return dayjs(date.date.array).format('ddd D/M');
                         },
                         (date) => {
-                            return dayjs(date.date.marker).format('h');
+                            return dayjs(date.date.array).format('h');
                         }
                     ],
                     slotMinWidth: '50',
@@ -93,7 +93,7 @@ export default {
                 resourceTimelineDay: {
                     slotMinWidth: '50',
                     titleFormat: (date) => {
-                        return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
                     } 
                 }
             },

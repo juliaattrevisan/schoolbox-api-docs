@@ -73,7 +73,7 @@ export default {
                     type: 'list',
                     duration: { days: this.config.days },
                     listDayFormat: (date) => {
-                        return dayjs(date.date.marker).format(this.config.momentJsDateLong); 
+                        return dayjs(date.date.array).format(this.config.momentJsDateLong); 
                     },
                     listDaySideFormat: false
                 }

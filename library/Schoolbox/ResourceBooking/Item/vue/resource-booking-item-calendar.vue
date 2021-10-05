@@ -83,12 +83,12 @@ export default {
                     dayHeaders: false,
                     allDaySlot: false,
                     titleFormat: (date) => {
-                        return dayjs(date.date.marker).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
                     } 
                 },
                 week: {
                     dayHeaderFormat: (date) => {
-                        return dayjs(date.date.marker).format(this.formats.displayWeekDay); // will produce something like "Tuesday July 16th 2021"
+                        return dayjs(date.date.array).format(this.formats.displayWeekDay); // will produce something like "Tuesday July 16th 2021"
                     },
                     allDaySlot: false,
                     titleFormat: (date) => {
