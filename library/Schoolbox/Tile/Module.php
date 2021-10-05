@@ -138,12 +138,12 @@ class Module extends BaseModule
         $getHomepageIdCallback = function ($params) {
             if ($params['layout'] && $params['layout']->getFolder()) {
                 return $params['layout']->getFolder()->getId();
-            } else if ($params['component']->getModule() != 'homepage') {
-                throw new \Exception('Homepage permission does not apply to dashboard tiles');
-            } else if ($params['component']) {
+            } else if ($params['component'] && $params['component']->getIdentifier()) {
                 return $params['component']->getIdentifier();
+            } else if ($params['homepage'] && $params['homepage']->getId()) {
+                return $params['homepage']->getId();
             }
-            return $params['homepage']->getId();
+            throw new \Exception('Homepage permission does not apply to dashboard tiles');
         };
 
         $rule = new Rule\Any(
