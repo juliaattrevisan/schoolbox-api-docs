@@ -35,17 +35,6 @@ use Schoolbox\Application\Daemon;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
-$sched = null;
-
-$kernel->registerCustomShutdown(function () use (&$sched) {
-    if (!$sched instanceof Scheduler) {
-        return;
-    }
-
-    if ($d = $sched->getDispatcher()) {
-        $d->releaseWorkerPool();
-    }
-});
 
 // CREATE SCHEDULER APP
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler) {

@@ -13,6 +13,8 @@ namespace SocialStream;
 use Alaress\Image;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemInterface;
+use Schoolbox\Application\ResourceLimitExceededHandler;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
@@ -26,6 +28,14 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CAC
 
 $postId = $_GET['id'];
 $size   = $_GET['size'];
+
+$kernel->getShutdownHandler()->registerFunction(
+    new ResourceLimitExceededHandler(function () use ($size) {
+        header('Cache-Control: no-store');
+        \SitePage::redirectToBrokenImageWithTransform('storage', $size, 504);
+    }),
+    ShutdownHandler::PRIORITY_HIGHEST,
+);
 
 try {
     $post = PostMapper::getInstance()->findById($postId);

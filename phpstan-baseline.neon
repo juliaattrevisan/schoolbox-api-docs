@@ -8641,16 +8641,6 @@ parameters:
 			path: tools/mq/reset-ttls.php
 
 		-
-			message: "#^Instanceof between null and Schoolbox\\\\Realtime\\\\Schedule\\\\Scheduler will always evaluate to false\\.$#"
-			count: 1
-			path: tools/mq/scheduled.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: tools/mq/scheduled.php
-
-		-
 			message: "#^Anonymous function has an unused use \\$opts\\.$#"
 			count: 1
 			path: tools/notif/route/routed.php

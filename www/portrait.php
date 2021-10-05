@@ -13,7 +13,9 @@
 
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Schoolbox\Application\ResourceLimitExceededHandler;
 use League\Flysystem\Filesystem;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
@@ -22,6 +24,13 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT);
+$kernel->getShutdownHandler()->registerFunction(
+    new ResourceLimitExceededHandler(function () {
+        header('Cache-Control: no-store');
+        SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', 504);
+    }),
+    ShutdownHandler::PRIORITY_HIGHEST,
+);
 
 /** @var IConfigLoader $config */
 $config = $kernel->getDependencyInjector()->get('config');

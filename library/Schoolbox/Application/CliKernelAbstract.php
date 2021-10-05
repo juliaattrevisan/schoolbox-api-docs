@@ -122,10 +122,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             E_COMPILE_ERROR => 'Compilation',
         ];
 
-        if (\is_callable($this->shutdown)) {
-            \call_user_func($this->shutdown);
-        }
-
         // don't report anything
         if (!isset($error['type'], $cases[$error['type']])) {
             exit(self::EXIT_STATUS_OK);
@@ -312,10 +308,12 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * Register any shutdown handling required
      *
      * @return void
+     * @throws \InvalidArgumentException
      */
     protected function registerShutdownHandling(): void
     {
-        \register_shutdown_function([$this, 'onShutdown']);
+        $this->getShutdownHandler()->registerFunction([$this, 'onShutdown']);
+        register_shutdown_function($this->getShutdownHandler());
     }
 
 

@@ -502,6 +502,7 @@ class SitePage extends Page
             $file = '/';
         }
         header('Location: ' . $file, null, $responseCode);
+        header('Content-Type:');
         self::disableXssProtectionAfterForm();
         if ($keepProcessing) {
             // don't quit

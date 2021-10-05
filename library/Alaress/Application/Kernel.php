@@ -39,11 +39,13 @@ use External_User;
 use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
+use InvalidArgumentException;
 use Predis;
 use Proxy\Server as ProxyServer;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
@@ -150,8 +152,12 @@ abstract class Kernel
     /** @var Di\Container */
     protected Di\Container $di;
 
-    /** @var callable */
-    protected $shutdown;
+    /**
+     * Wrapper to enable prioritisation of shutdown functions
+     *
+     * @var ShutdownHandler
+     */
+    private ShutdownHandler $shutdownHandler;
 
     /**
      * A list of callbacks to call after an uncaught exception has been raised.
@@ -167,12 +173,13 @@ abstract class Kernel
      * @throws Di\Exception\ServiceNotFound
      * @throws Di\Exception\ServiceNotObject
      * @throws RuntimeException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \Schoolbox\External\Exception
      */
     public function __construct()
     {
-        $this->di = new Di\Container(new Di\Factory());
+        $this->di              = new Di\Container(new Di\Factory());
+        $this->shutdownHandler = new ShutdownHandler();
 
         // run the launch sequence
         $this->initialiseExternalConnections();
@@ -183,6 +190,14 @@ abstract class Kernel
         $this->postInstallDependencies();
         $this->initialiseDebugging();
         $this->checkServerApiEnvironment();
+    }
+
+    /**
+     * @return ShutdownHandler
+     */
+    public function getShutdownHandler(): ShutdownHandler
+    {
+        return $this->shutdownHandler;
     }
 
 
@@ -269,11 +284,9 @@ abstract class Kernel
     /**
      * @param callable $callable
      */
-    public function registerCustomShutdown($callable)
+    public function registerCustomShutdown(callable $callable): void
     {
-        if (is_callable($callable)) {
-            $this->shutdown = $callable;
-        }
+        $this->shutdownHandler->registerFunction($callable);
     }
 
     /**
@@ -323,7 +336,7 @@ abstract class Kernel
      * @throws Di\Exception\ContainerLocked
      * @throws Di\Exception\ServiceNotFound
      * @throws Di\Exception\ServiceNotObject
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \RuntimeException
      */
     protected function installDependencies(Di\Container $di): Di\Container
