@@ -98,7 +98,7 @@ class Retrofit
                 ->setStudentSubmissionFileId((int)$row['id'])
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
-            $this->logInfo(sprintf(
+            $this->logDebug(sprintf(
                 'Student Submission File Id %s: preparing for retrofit',
                 $row['id'],
             ));
@@ -112,7 +112,7 @@ class Retrofit
             return;
         }
 
-        $this->logDebug(sprintf(
+        $this->logInfo(sprintf(
             '%s file(s) prepared for retrofit',
             $numFiles
         ));
@@ -123,7 +123,7 @@ class Retrofit
         foreach ($models as $turnitinFile) {
             $this->turnitinFileMapper->save($turnitinFile);
 
-            $this->logInfo(sprintf(
+            $this->logDebug(sprintf(
                 'Student Submission File Id %s: retrofitting into turnitin_report id %s with status [%s]',
                 $turnitinFile->getStudentSubmissionFileId(),
                 $turnitinFile->getId(),
