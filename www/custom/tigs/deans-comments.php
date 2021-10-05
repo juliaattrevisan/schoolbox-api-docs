@@ -225,6 +225,7 @@ function processCsvData(
             type_id,
             heading,
             body_public,
+            body_private,
             modified_by_user_id,
             created_at,
             updated_at
@@ -234,6 +235,7 @@ function processCsvData(
             (SELECT value FROM config WHERE name = 'tigs_crp_pastoral_type'),
             :heading,
             :body_public,
+            '',
             :modified_by_user_id,
             :created_at,
             :updated_at
