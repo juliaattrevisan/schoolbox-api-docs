@@ -28,7 +28,6 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -94,10 +93,16 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     private $userCache = [];
 
     /** @var array $typeCache Cache of pastoral types for use during importing */
-    private $typeCache = [];
+    private array $typeCache = [];
 
-    /** @var array $pastoralTypeCache Cache of pastoral subtypes for use during importing */
-    private $pastoralTypeCache = [];
+    /** @var int|null sequence */
+    private ?int $typeSequence = 0;
+
+    /** @var array $subtypeCache Cache of pastoral subtypes for use during importing */
+    private array $subtypeCache = [];
+
+    /** @var int|null sequence */
+    private ?int $subtypeSequence = 0;
 
     // This is a magic Synergetic string that gets set as the contents of a pastoral record when there are no private contents
 
@@ -387,8 +392,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             $pastoralRecord->setHeading($heading);
                             $pastoralRecord->setBodyPublic("<p>{$record["Details"]}</p>");
                             $pastoralRecord->setBodyPrivate("<p>{$record["PrivateDetails"]}</p>");
-                            $pastoralRecord->setType($this->getPastoralType($record));
-                            $pastoralRecord->setSubType($this->getPastoralSubType($record));
+                            $this->setPastoralType($pastoralRecord, $record, $owner);
                             $pastoralRecord->setCreatedAt(new Alaress_Date_Format($record['CreatedDate'], Alaress_Date_Format::DATABASE_FORMAT_MS));
                             if ($record['ModifiedByID']) {
                                 $modifier = $this->getSchoolboxUser($record['ModifiedByID']) ?: $defaultOwner;
@@ -1352,69 +1356,72 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Finds/creates a pastoral care type that matches one from Synergetics database
      *
-     * @param array $record Pastoral care record
-     *
-     * @return PastoralType
-     */
-    protected function getPastoralType($record)
-    {
-        // Check the cache first
-
-        if (!isset($this->typeCache[$record["TypeDescription"]])) {
-            // Didn't find a cached record. Try to retrieve an existing pastoral type from Schoolbox
-
-            try {
-                $type = $this->pastoralTypeMapper->findOneByColumn('name', $record["TypeDescription"]);
-            } catch (MapperException $e) {
-                // The records pastoral type doesn't exist in Schoolbox, create one that matches
-                $type = $this->pastoralTypeMapper->createModel();
-                $type->setName($record["TypeDescription"]);
-                $type->setExternalCode($record["TypeCode"]);
-                $this->pastoralTypeMapper->save($type);
-            }
-
-            $this->typeCache[$record["TypeDescription"]] = $type;
-        }
-
-        return $this->typeCache[$record["TypeDescription"]];
-    }
-
-    /**
-     * Finds/creates a pastoral care category that matches one from the Synergetic database
-     *
-     * @param array $record Pastoral care record
-     *
-     * @return PastoralSubType
+     * @param Pastoral $pastoral
+     * @param array    $record Pastoral care record
+     * @param User     $owner
+     * @return void
      * @throws MapperException
      */
-    protected function getPastoralSubType(array $record)
+    protected function setPastoralType(Pastoral $pastoral, array $record, User $owner): void
     {
-        // Check the cache first
-
-        if (!isset($this->pastoralTypeCache[$record['CategoryCode']])) {
-            // Didn't find a cached record. Try to retrieve an existing pastoral type from Schoolbox
-
-            $pastoralType = $this->getPastoralType($record);
-
-            try {
-                $category = $this->pastoralSubTypeMapper->findOneByColumnList([
-                    'name' => $record["CategoryDescription"],
-                    'pastoral_type_id' => $pastoralType->getId(),
-                ]);
-            } catch (MapperException $e) {
-                // The records pastoral category doesn't exist in Schoolbox, create one that matches
-
-                $category = $this->pastoralSubTypeMapper->createModel();
-                $category->setName($record["CategoryDescription"]);
-                $category->setExternalCode($record["CategoryCode"]);
-                $category->setPastoralType($pastoralType);
-                $this->pastoralSubTypeMapper->save($category);
+        if (empty($this->typeCache)) {
+            $types = $this->pastoralTypeMapper->findAll();
+            foreach ($types as $type) {
+                $this->typeCache[$type->getName()] = $type;
+                $this->typeSequence                = $this->typeSequence < $type->getSequence() ? $type->getSequence() : $this->typeSequence;
+                foreach ($type->getSubTypes() as $subtype) {
+                    $this->subtypeSequence                   = $this->subtypeSequence < $subtype->getSequence() ? $subtype->getSequence() : $this->subtypeSequence;
+                    $this->subtypeCache[$type->getName()][$subtype->getName()] = $subtype;
+                }
             }
-
-            $this->pastoralTypeCache[$record["CategoryCode"]] = $category;
         }
 
-        return $this->pastoralTypeCache[$record["CategoryCode"]];
+        if (isset($this->typeCache[$record['TypeDescription']])) {
+            $type = $this->typeCache[$record['TypeDescription']];
+            if (!$type->getExternalCode()) {
+                $type->setExternalCode($record['TypeCode']);
+                $this->pastoralTypeMapper->save($type);
+            }
+        } else {
+            $this->typeSequence++;
+            // Didn't find a cached record. Try to retrieve an existing pastoral type from Schoolbox
+            // The records pastoral type doesn't exist in Schoolbox, create one that matches
+            $type = $this->pastoralTypeMapper->createModel();
+            $type->setName($record['TypeDescription']);
+            $type->setExternalCode($record['TypeCode']);
+            $type->setSequence($this->typeSequence);
+            $type->setUpdatedBy($owner->getId());
+            $this->pastoralTypeMapper->save($type);
+
+            $this->typeCache[$record['TypeDescription']] = $type;
+        }
+
+        $subtype = null;
+        if (isset($this->subtypeCache[$type->getName()][$record['CategoryDescription']])) {
+            $subtype = $this->subtypeCache[$type->getName()][$record['CategoryDescription']];
+            if (!$subtype->getExternalCode()) {
+                $subtype->setExternalCode($record['CategoryCode']);
+                $this->pastoralSubTypeMapper->save($subtype);
+            }
+        } elseif (!empty($record['CategoryDescription'])) {
+            $this->subtypeSequence++;
+            // Didn't find a cached record. Try to retrieve an existing pastoral type from Schoolbox
+            // The records pastoral category doesn't exist in Schoolbox, create one that matches
+
+            /** @var PastoralSubType $subtype */
+            $subtype = $this->pastoralSubTypeMapper->createModel();
+            $subtype->setName($record["CategoryDescription"]);
+            $subtype->setExternalCode($record['CategoryCode']);
+            $subtype->setPastoralType($type);
+            $subtype->setSequence($this->subtypeSequence);
+            $subtype->setUpdatedBy($owner->getId());
+            $this->pastoralSubTypeMapper->save($subtype);
+
+            $this->subtypeCache[$type->getName()][$record['CategoryDescription']] = $subtype;
+        }
+
+        $pastoral->setType($type);
+        $pastoral->setSubType($subtype);
     }
 
     /**
