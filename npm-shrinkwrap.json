@@ -27,7 +27,7 @@
         "axios": "0.21.2",
         "clipboard": "^2.0.6",
         "core-js": "^3.8.3",
-        "datatables.net": "1.10.15",
+        "datatables.net": "1.10.22",
         "datatables.net-fixedcolumns": "3.2.2",
         "date-fns": "^2.19.0",
         "dayjs": "^1.10.4",
@@ -52,13 +52,13 @@
         "tinycolor2": "^1.4.2",
         "ts-ebml": "^2.0.2",
         "videojs-record": "^4.4.0",
-        "vmsg": "^0.4.0",
         "vue": "^2.6.12",
         "vue-resize": "^1.0.0",
         "vue-select": "^3.11.2",
         "vue-style-loader": "^4.1.2",
         "vue-tables-2": "git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git",
-        "vuejs-paginate": "2.0.1"
+        "vuejs-paginate": "2.0.1",
+        "vuex": "^3.6.2"
       },
       "devDependencies": {
         "@babel/core": "^7.12.10",
@@ -3157,9 +3157,9 @@
       }
     },
     "node_modules/datatables.net": {
-      "version": "1.10.15",
-      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.10.15.tgz",
-      "integrity": "sha1-x4kHe7/jhedf9aIz+l8jJRpy32g=",
+      "version": "1.10.22",
+      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.10.22.tgz",
+      "integrity": "sha512-ujn8GvkQIBYzYH54XY7OrI0Zb35TKRd9ABYfbnXgBfwTGIFT6UsmXrfHU5Yk+MSDoF0sDu2TB+31V6c+zUZ0Pw==",
       "dependencies": {
         "jquery": ">=1.7"
       }
@@ -5971,11 +5971,6 @@
         "wavesurfer.js": ">=4.6.0"
       }
     },
-    "node_modules/vmsg": {
-      "version": "0.4.0",
-      "resolved": "https://registry.npmjs.org/vmsg/-/vmsg-0.4.0.tgz",
-      "integrity": "sha512-46BBqRSfqdFGUpO2j+Hpz8T9YE5uWG0/PWal1PT+R1o8NEthtjG/XWl4HzbB8hIHpg/UtmKvsxL2OKQBrIYcHQ=="
-    },
     "node_modules/vue": {
       "version": "2.6.12",
       "resolved": "https://registry.npmjs.org/vue/-/vue-2.6.12.tgz",
@@ -6015,6 +6010,11 @@
       "version": "0.2.1",
       "resolved": "https://registry.npmjs.org/babel-plugin-add-module-exports/-/babel-plugin-add-module-exports-0.2.1.tgz",
       "integrity": "sha1-mumh9KjcZ/DN7E9K7aHkOl/2XiU="
+    },
+    "node_modules/vue-pagination-2/node_modules/vuex": {
+      "version": "2.5.0",
+      "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
+      "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
     },
     "node_modules/vue-resize": {
       "version": "1.0.1",
@@ -6082,9 +6082,12 @@
       "integrity": "sha1-Nz7W1pLexBE9N6qUZ/lF2jor2a8="
     },
     "node_modules/vuex": {
-      "version": "2.5.0",
-      "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
-      "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
+      "version": "3.6.2",
+      "resolved": "https://registry.npmjs.org/vuex/-/vuex-3.6.2.tgz",
+      "integrity": "sha512-ETW44IqCgBpVomy520DT5jf8n0zoCac+sxWnn+hMe/CzaSejb/eVw2YToiXYX+Ex/AuHHia28vWTq4goAexFbw==",
+      "peerDependencies": {
+        "vue": "^2.0.0"
+      }
     },
     "node_modules/watchpack": {
       "version": "2.1.1",
@@ -11456,11 +11459,6 @@
         "wavesurfer.js": ">=4.6.0"
       }
     },
-    "vmsg": {
-      "version": "0.4.0",
-      "resolved": "https://registry.npmjs.org/vmsg/-/vmsg-0.4.0.tgz",
-      "integrity": "sha512-46BBqRSfqdFGUpO2j+Hpz8T9YE5uWG0/PWal1PT+R1o8NEthtjG/XWl4HzbB8hIHpg/UtmKvsxL2OKQBrIYcHQ=="
-    },
     "vue": {
       "version": "2.6.12",
       "resolved": "https://registry.npmjs.org/vue/-/vue-2.6.12.tgz",
@@ -11500,6 +11498,11 @@
           "version": "0.2.1",
           "resolved": "https://registry.npmjs.org/babel-plugin-add-module-exports/-/babel-plugin-add-module-exports-0.2.1.tgz",
           "integrity": "sha1-mumh9KjcZ/DN7E9K7aHkOl/2XiU="
+        },
+        "vuex": {
+          "version": "2.5.0",
+          "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
+          "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
         }
       }
     },
@@ -11570,9 +11573,10 @@
       "integrity": "sha1-Nz7W1pLexBE9N6qUZ/lF2jor2a8="
     },
     "vuex": {
-      "version": "2.5.0",
-      "resolved": "https://registry.npmjs.org/vuex/-/vuex-2.5.0.tgz",
-      "integrity": "sha512-5oJPOJySBgSgSzoeO+gZB/BbN/XsapgIF6tz34UwJqnGZMQurzIO3B4KIBf862gfc9ya+oduY5sSkq+5/oOilQ=="
+      "version": "3.6.2",
+      "resolved": "https://registry.npmjs.org/vuex/-/vuex-3.6.2.tgz",
+      "integrity": "sha512-ETW44IqCgBpVomy520DT5jf8n0zoCac+sxWnn+hMe/CzaSejb/eVw2YToiXYX+Ex/AuHHia28vWTq4goAexFbw==",
+      "requires": {}
     },
     "watchpack": {
       "version": "2.1.1",
