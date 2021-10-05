@@ -21,7 +21,7 @@
             </div>
             {% for provider in providers %}
             <section>
-                {% include '@adminLti/listItem.twig' with {provider: provider} %}
+                {% include '@adminLti/listItem.twig' with {provider: provider, identifier: loop.index0} only %}
             </section>
             {% endfor %}
 
@@ -37,7 +37,7 @@
 
 <div id="addProviderModal" class="reveal-modal" data-reveal aria-labelledby="addProviderModalTitle" aria-hidden="true" role="dialog">
     <h2 id="addProviderModalTitle">Add Provider</h2>
-    {% include '@adminLti/form.twig' %}
+    {% include '@adminLti/form.twig' with {identifier: providers|length} only %}
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 

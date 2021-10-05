@@ -1,4 +1,4 @@
-{% if provider.getId() ?? false %}
+{% if provider.id ?? false %}
     {% set saveValue = 'Update Provider' %}
     {% set saveType  = 'update' %}
 {% else %}
@@ -11,37 +11,37 @@
 
     <div class="row" data-mage-wrapper>
         <div class="small-6 columns">
-            <label>
+            <label class="required" for="name-{{ identifier }}">
                 Provider Name
-                <input required type="text" name="name" value="{{ provider.name ?? '' }}">
             </label>
+            <input required id="name-{{ identifier }}" type="text" name="name" value="{{ provider.name ?? '' }}">
         </div>
         <div class="small-6 columns">
-            <label>
+            <label class="required" for="xml-{{ identifier }}">
                 Configuration XML URL
-                <input required type="text" name="xml" value="{{ provider.xml ?? '' }}">
             </label>
+            <input required id="xml-{{ identifier }}" type="text" name="xml" value="{{ provider.xml ?? '' }}">
         </div>
         <div class="small-6 columns">
-            <label>
-                Consumer Key (Optional)
-                <input type="text" name="key" value="{{ provider.key ?? '' }}">
+            <label for="key-{{ identifier }}">
+                Consumer Key
             </label>
+            <input id="key-{{ identifier }}" type="text" name="key" value="{{ provider.key ?? '' }}">
         </div>
         <div class="small-6 columns">
-            <label>
-                Consumer Secret (Optional)
-                <input type="text" name="secret" value="{{ provider.secret ?? '' }}">
+            <label for="secret-{{ identifier }}">
+                Consumer Secret
             </label>
+            <input id="secret-{{ identifier }}" type="text" name="secret" value="{{ provider.secret ?? '' }}">
         </div>
         <div class="small-12 columns">
-            <label>
+            <label for="launch_type-{{ identifier }}">
                 LTI Request Type
-                <select name="launch_type">
-                    <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_BASIC' %}selected{% endif %} value="LTI_LAUNCH_TYPE_BASIC">Basic Launch</option>
-                    <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_PICKER' %}selected{% endif %} value="LTI_LAUNCH_TYPE_PICKER">Picker</option>
-                </select>
             </label>
+            <select id="launch_type-{{ identifier }}" name="launch_type">
+                <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_BASIC' %}selected{% endif %} value="LTI_LAUNCH_TYPE_BASIC">Basic Launch</option>
+                <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_PICKER' %}selected{% endif %} value="LTI_LAUNCH_TYPE_PICKER">Picker</option>
+            </select>
         </div>
 
         <!-- Don't delete the inline style, it's needed -->
