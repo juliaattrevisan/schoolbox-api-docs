@@ -181,20 +181,21 @@ feedback: currentFeedback,
                                         <p class="meta">{{ currentFile.filename }}</p>
                                     </a>
                                 {% else %}
-                                    {% if 'audio' in currentFile.mime %}
+                                    {# create preview objects for files #}
+                                    {% if currentFile.mimetype.isImage %}
+                                    <a data-plugin="preview" href="/storage/image.php?hash={{ currentFile.hash }}&width=2048&height=2048">
+                                        <img class="icon" src="/storage/image.php?hash={{ currentFile.hash }}&width=64&height=64"/>
+                                        <p>{{ currentFile.filename }} </p>
+                                    </a>
+                                    {% elseif currentFile.mimetype.isAudio %}
                                     <audio id="schoolbox_audio_preview_{{ currentFile.id }}"
+                                           data-audiocomponent
                                            controls
                                            preload="none"
                                            width="100%">
                                         <source src="/cms/sendVideo.php?hash={{ currentFile.hash }}" type='audio/mp3'>
                                     </audio>
-
-                                    {% elseif  'video' in currentFile.mime %}
-                                    <script type="text/javascript">
-                                        $(function(){
-                                            //$("#schoolbox_video_preview_{{ currentFile.id }}").mediaelementplayer();
-                                        });
-                                    </script>
+                                    {% elseif currentFile.mimetype.isVideo %}
                                     <video id="schoolbox_video_preview_{{ currentFile.id }}"
                                            controls
                                            preload="none"
@@ -205,15 +206,18 @@ feedback: currentFeedback,
                                     >
                                         <source src="/cms/sendVideo.php?hash={{ currentFile.hash }}" type='video/mp4'>
                                     </video>
-
-
-                                {% else %}
-                                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
-                                            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
-                                            <p>{{ currentFile.filename }} </p>
-                                        </a>
-
+                                    {% else %}
+                                    <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                        <p>{{ currentFile.filename }} </p>
+                                    </a>
                                     {% endif %}
+                                    <script type="text/javascript">
+                                        $(function(){
+                                            $('[data-plugin="preview"]','#content').preview();
+                                            $('[data-audiocomponent], [data-videocomponent]').mediaelementplayer();
+                                        });
+                                    </script>
                                 {% endif %}
                             </div>
                         </div>
