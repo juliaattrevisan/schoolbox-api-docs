@@ -33,6 +33,9 @@ MAILTO="support@schoolbox.com.au"
 # Plagscan file upload - every 3 hours
 14 */3 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/plagscan/submit.php >> /var/lib/schoolbox/cache/logs/plagscan.log 2>&1
 
+# Turnitin group attachments - every 1 hour
+7 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/group.php --force >> /var/lib/schoolbox/cache/logs/turnitin.log 2>&1
+
 # Turnitin transmitter - every 1 hour
 13 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/transmit.php --force >> /var/lib/schoolbox/cache/logs/turnitin.log 2>&1
 
