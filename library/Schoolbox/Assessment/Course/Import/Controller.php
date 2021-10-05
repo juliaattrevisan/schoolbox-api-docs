@@ -1061,7 +1061,15 @@ class Controller extends Base\Base
     {
         $canReadUnitSpecs = [];
         foreach ($spec->getUnits() as $unit) {
-            $canReadUnitSpecs[$unit->getId()] = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ;
+            if ($unit->isDeleted()) {
+                $canReadUnitSpecs[$unit->getId()] = false;
+                continue;
+            }
+            try {
+                $canReadUnitSpecs[$unit->getId()] = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ;
+            } catch (MapperException $e) {
+                $canReadUnitSpecs[$unit->getId()] = false;
+            }
         }
         return $canReadUnitSpecs;
     }
