@@ -5,13 +5,12 @@
                 {{ provider.name ?? '' }}
             </h3>
             <p class="meta">
-                {{ provider.xml ?? ''}}
+                {% if provider.url is empty %}
+                    <span class="gradient-0">Provider Disabled - No Launch URL detected</span>
+                {% else %}
+                    {{ provider.url ?? ''}}
+                {% endif %}
             </p>
-            {% if provider.url is empty %}
-            <p class="meta">
-                <span class="gradient-0">Provider Disabled - Invalid XML Configuration</span>
-            </p>
-            {% endif %}
         </div>
     </div>
     <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="provider-{{ identifier }}">

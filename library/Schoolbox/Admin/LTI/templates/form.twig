@@ -17,10 +17,23 @@
             <input required id="name-{{ identifier }}" type="text" name="name" value="{{ provider.name ?? '' }}">
         </div>
         <div class="small-6 columns">
-            <label class="required" for="xml-{{ identifier }}">
+            <label for="xml-{{ identifier }}">
                 Configuration XML URL
+                <span data-tooltip class="has-tip tip-top hint" title="If provided, Launch and Icon URL will be extracted from this configuration.">?</span>
             </label>
-            <input required id="xml-{{ identifier }}" type="text" name="xml" value="{{ provider.xml ?? '' }}">
+            <input id="xml-{{ identifier }}" type="text" name="xml" value="{{ provider.xml ?? '' }}">
+        </div>
+        <div class="small-6 columns">
+            <label for="url-{{ identifier }}">
+                Launch URL
+            </label>
+            <input id="url-{{ identifier }}" type="text" name="url" value="{{ provider.url ?? '' }}">
+        </div>
+        <div class="small-6 columns">
+            <label for="icon-{{ identifier }}">
+                Icon URL
+            </label>
+            <input id="icon-{{ identifier }}" type="text" name="icon" value="{{ provider.icon ?? '' }}">
         </div>
         <div class="small-6 columns">
             <label for="key-{{ identifier }}">

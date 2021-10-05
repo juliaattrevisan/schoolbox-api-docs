@@ -108,42 +108,44 @@ class Controller extends Base
             $provider->setSecret($post['secret']);
             $provider->setXml($post['xml']);
             $provider->setLaunchType($post['launch_type']);
-            $provider->setIcon(null);
-            $provider->setUrl(null);
+            $provider->setIcon($post['icon']);
+            $provider->setUrl($post['url']);
 
-            try {
-                $xmlContent = @file_get_contents($post['xml']);
+            if ($post['xml']) {
+                try {
+                    $xmlContent = @file_get_contents($post['xml']);
 
-                if ($xmlContent) {
-                    libxml_use_internal_errors(true);
+                    if ($xmlContent) {
+                        libxml_use_internal_errors(true);
 
-                    $xml = simplexml_load_string($xmlContent);
+                        $xml = simplexml_load_string($xmlContent);
 
 
-                    if ($xml !== false) {
-                        $launchUrl = $xml->children('blti', true)->secure_launch_url;
-
-                        if (!empty($launchUrl)) {
-                            $provider->setUrl((string)$launchUrl);
-                        } else {
-                            $launchUrl = $xml->children('blti', true)->launch_url;
+                        if ($xml !== false) {
+                            $launchUrl = $xml->children('blti', true)->secure_launch_url;
 
                             if (!empty($launchUrl)) {
                                 $provider->setUrl((string)$launchUrl);
+                            } else {
+                                $launchUrl = $xml->children('blti', true)->launch_url;
+
+                                if (!empty($launchUrl)) {
+                                    $provider->setUrl((string)$launchUrl);
+                                }
                             }
-                        }
 
-                        $icon = $xml->children('blti', true)->secure_icon;
+                            $icon = $xml->children('blti', true)->secure_icon;
 
-                        if (!empty($launchUrl)) {
-                            $provider->setIcon((string)$icon);
+                            if (!empty($launchUrl)) {
+                                $provider->setIcon((string)$icon);
+                            }
+                        } else {
+                            $provider->setUrl($post['xml']);
                         }
-                    } else {
-                        $provider->setUrl($post['xml']);
                     }
+                } catch (\Exception $e) {
+                    // Noop
                 }
-            } catch (\Exception $e) {
-                // Noop
             }
 
             $this->providerMapper->save($provider);
