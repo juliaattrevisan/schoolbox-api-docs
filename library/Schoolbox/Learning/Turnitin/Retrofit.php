@@ -109,7 +109,7 @@ class Retrofit
         if (!$numFiles) {
             $this->logInfo('There are no files to retrofit; exiting');
 
-            exit();
+            return;
         }
 
         $this->logDebug(sprintf(
