@@ -1,10 +1,10 @@
 # Turnitin
+
 This third-party vendor replaces Plagscan for checking similarity in student submissions. While it can't detect _plagiarism_ specifically it can detect when content looks kinda the same and leaves it up to the teachers to decide what to do next. A high similiarity score doesn't indicate wrongdoing but it will suggest that a closer look might be warranted.
 
 Before you start, you should ensure you have a grasp on the following terminology and concepts:
 
-* Assessment
-  * Due Work, specifically
+* Assessment (Due Work, specifically)
 * Submission Box and Submission Box Files
 * Student Submissions and Student Submission Files
 * Plag/Plagscan
@@ -17,6 +17,7 @@ Turnitin has synonymous concepts with Schoolbox; I'll always refer to them with 
 * **Submission Box File** synonymous with **Turnitin Group Attachment**
 * **Student Submission File** synonymous with **Turnitin Submission**
 
+> Sometimes I'll have referred to a thing in code called a "container". This is the turnitin file record that we have to set up before uploading the guts of a file into it. You could think of it as synonymous with our `storage` records and the file itself sitting in a data folder somewhere else.  
 
 ## 1 Setup
 
@@ -30,32 +31,36 @@ You need two pieces of data to activate Turnitin:
 Once you've provided both those values, schoolbox will always try to use Turnitin over Plagscan. It will do this even if your actual values are wrong so double check those when you enter them or when you're debugging.
 
 ### 1.1 Accounts
+
 Each school has a Turnitin account, but this might be shared between that school's production and staging instances. This means it's possible to pollute one instance from the other, so be mindful of that.
 
 ### 1.2 Plagscan
+
 If Turnitin is configured, it will always try to run in preference to Plagscan. 
 
 ## 2 Overall Design
 
 Turnitin is only applicable to Due Works. It functions synonymously with Plag so you can simply enable `Similarity Check` on the Due Work configuration screen and that will do two things.
 
-* Any attached files in the Due Work will be uploaded to Turnitin as exclusions; student submissions won't be detect similar content to any of these files
+* Any attached files in the Due Work will be uploaded to Turnitin as exclusions; student submissions won't be detected as similar content to any of these files
 * Any attached files in a student's submission will be uploaded to Turnitin which will then process the content and detect similarity, put it in a report and display it in an iframe for us
 
 There are multiple steps and stages involved in those two simple actions described above, so let's look at them now.
 
 ## 3 Exclusions
 
-High similarity content can exist when students us a form guide or cover sheet as part of their submission; for example, a set of questions where students will write their answers underneath. Since all students share this set of questions, there is a higher probability that similarity might be expectedly high. To avoid this, teachers can upload files as attachments to the Due Work and students won't be compared against this data.
+High similarity content can exist when students use a form guide or cover sheet as part of their submission; for example, a set of questions where students will write their answers underneath. Since all students share this set of questions, their similarity ratings will be expectedly high. To avoid this, teachers can upload files as attachments to the Due Work and students won't be compared against this data.
 
 Simply attach the files. This will do the following:
 * Set the status of this submission box's `turnitin_group` record to `pending`. This means the submission box has changed somehow, but we haven't yet figured out how
-* An asynchronous process `group.php` will come along and look at the submission box's attached files `[1]`
+* An asynchronous process `group.php` will come along and look at the submission box's attached files `[1]` `[2]`
   * The asynchronous process `group.php` finds files that need to be added to Turnitin via api calls. These are added to `turnitin_group_attachment`
   * The asynchronous process `group.php` finds files that need to be removed from Turnitin via api calls. These are softdeleted from `turnitin_group_attachment`
   * The asynchronous process `group.php` will update the status of these `turnitin_group_attachment` records as the upload process executes.
 
- > `[1]` This is a lot of calls to be doing so you don't do it when you save the assessment. This would force users to wait a long time. This might also error out in a weird an unrecoverable manner. This would also apply when you import courses and if you import a lot of due works to a lot of places, you'll be waiting a long time.
+ > `[1]` This is a lot of calls to be doing so you don't do it when you save the assessment. This would force users to wait a long time. This might also error out in a weird and unrecoverable manner. This would also apply when you import courses and if you import a lot of due works to a lot of places, you'll be waiting a long time.
+> 
+> `[2]` This also lets users fiddle with their Attached Files in case they change their minds, upload more files, remove some etc. as they micromanage their Due Works. We can allow them these mutations and only send them up when we think they'll be done with it all, without incurring the penalty of uploading something that has been immediately changed.
 
 ### 3.1 Group CLI Tool
 
@@ -72,7 +77,7 @@ php group.php
 `turnitin_group` records experience five statuses:
 
 * **pending** This submission box has somehow changed, but we haven't yet figured out how
-* **group** The submission box doesn't have a Turnitin Group so we're making one now and assigning it to this record
+* **group** The submission box doesn't have a Turnitin Group so we're making one now and assigning it to this record. 
 * **group_attachment** There are attached files to look at and set up. Attachments are set up in two stages: a file record on Turnitin's end, and then we send the file contents itself into this record.
   * Any attached files that don't have a `turnitin_group_attachment` record will get one and a corresponding `group_attachment_id` from Turnitin 
   * Any files that were previously attached will get their `turnitin_group_attachment` record softdeleted.
@@ -80,6 +85,15 @@ php group.php
 * **uploading** we're sending the file contents to Turnitin. 
 * **complete** we finished sending the file contents to Turnitin.
 * **error** something went wrong; check the `error_code` and `error_message` columns for more information about what went wrong
+
+#### 3.1.1 Turnitin Group Identifiers
+
+A Turnitin Group Identifier consists of the submission box id and the `config.site_type` var, to deconflict staging activity from production activity, since schools will share their Turnitin account across both instances.
+* e.g. `187-vagrant` a Turnitin Group for submission box `187` in a vagrant
+* e.g. `187-prod` a Turnitin Group for submission box `187` in a production instance
+* A staging instance should only see things in the format `187-dev` and a production instance should only see things in the format `187-prod`; if they get mixed up, you're in trouble and something went wildly wrong
+
+> There are other `site_types` that aren't fully described here; check the config table for more options that could exist. And yes, it's called `dev`, not `staging`. I don't know why.
 
 ### 3.2 Reprocessing
 
@@ -114,7 +128,7 @@ php transmit.php
 * **pending** This file was submitted to schoolbox by the student, but we still have to upload it to Turnitin
 * **group** The submission box associated with this file doesn't have a `turnitin_group_id` so we're making one now and assigning it to the corresponding `turnitin_group` record. This is a precautionary measure because this tool might run before `group.php` which would normally obtain the `turnitin_group_id` value for us.
 * **submission** We told Turnitin to set up a file record on their end, into which we upload the actual contents separately.
-* An implicit step occurs here which is the Acceptance of EULA. Turnitin wanted us to prompt uses every time for every file but taht's insanity, so I programmatically accept it on everyone's behalf. There are no status changes for this; it's an implicit step that I arbitrarily take for UX reasons.
+* An implicit step occurs here which is the Acceptance of EULA. Turnitin wanted us to prompt users every time for every file but that's insanity, so I programmatically accept it on everyone's behalf. There are no status changes for this; it's an implicit step that I arbitrarily take for UX reasons.
 * **uploading** We started sending the file's contents to Turnitin.
 * **loaded** We successfully sent the file's contents to Turnitin. This is the last step of Transmission. 
 * **error** something went wrong; check the `error_code` and `error_message` columns for more information about what went wrong
@@ -151,11 +165,17 @@ php report.php
 * **complete** We finished generating the report and we saved some data locally. We can present information to our users now.
 * **error** something went wrong; check the `error_code` and `error_message` columns for more information about what went wrong
 
-There are atcually multiple stages in the Report Generation phase. They are natural boundaries based around Turnitin taking as long as it takes to do whatever it does.  That sounds weird, so let me elaborate with the Upload example.
+There are actually multiple stages in the Report Generation phase. They are natural boundaries based around Turnitin taking as long as it takes to do whatever it does.  That sounds weird, so let me elaborate with the Upload example.
 
 When we upload a file, Turnitin needs to do something on its end to finish the processing. We don't know how long it takes. We don't know when it finishes. We just have to keep asking to see if it's done. Then it goes from the `loaded` status and put into the `prepared` status.
 
+> You'll see this is a distinct step in the tool itself: `$this->processLoadedReports($processor);`
+
 Similarly, when we take a `prepared` report and tell Turnitin to generate a report, we don't know when that finishes either. We just have to keep asking until we find out we can move it from `prepared` to `analysing` and then from `analysing` to `complete`.
+
+> You'll see this is a distinct step in the tool itself: `$this->processPreparedReports($processor);`
+
+They'll run back to back in the intended order, so anything that got moved from `loaded` to `prepared` will immediately be processed toward `analysing`, shuffling everyone along the mortal coil so to speak.
 
 #### 4.2.1 Reprocessing
 
@@ -165,13 +185,13 @@ Additionally you can specify an individual record in `turnitin_report` to be sub
 
 This affords you a very specific tool which can resolve most scenarios where reports just...didn't generate, or if records randomly get stuck in a status.
 
-> I haven't seen reports ever get stuck in a status in this phase, so this should be a rare usage. Most _stuck_ issues occur in the Transmission phase..
+> I haven't seen reports ever get stuck in a status in this phase, so this should be a rare usage. Most _stuck_ issues occur in the Transmission phase.
 
 > This tool is scheduled in cron. Check the crontab for when this runs.
 
 ### 4.3 Retrofit CLI Tool
 
-Sometimes teachers will enable Similarity Check after students have submitted their files and now they're expecting them to be similiarity checked. Since the Similarity Check switch was previously off, none of the files will ever had been sent to Turnitin; none of them will have ever been set up at all.
+Sometimes teachers will enable Similarity Check after students have submitted their files and now they're expecting them to be similiarity checked. Since the Similarity Check switch was previously off, none of the files will have been sent to Turnitin; none of them will have ever been set up at all.
 
 Fortunately it's quite easy to do that, retroactively.
 
@@ -183,7 +203,7 @@ php retrofit.php --help
 php retrofit.php --assessment=1234
 ```
 
-The Transmission phase only ever needed a student_submission_file_id in the `turnitin_report` table for `transmit.php` to do the necessary work.  The `retrofit.php` tool simply does this.
+The Transmission phase only ever needed a `student_submission_file_id` in the `turnitin_report` table for `transmit.php` to do the necessary work.  The `retrofit.php` tool simply does this.
 
 However, it does this in a specific way. It won't upload all of a student's previous submissions' files; it **only uploads the student's most recent submission's files**.
 
@@ -233,9 +253,9 @@ php group.php; echo; php transmit.php; echo; php report.php
 
 The cli tools `group transmit report` are all in the crontab.
 
-`transmit` tool will always run with `--force` to ensure that anything currently in the incomplete statuses will get a little shove. It's true that some files might be in those states normally and arent' stuck at all; they'll still get a little shove anyway.
+`transmit` tool will always run with `--force` to ensure that anything currently in the incomplete statuses will get a little shove. It's true that some files might be in those states normally and aren't stuck at all; they'll still get a little shove anyway.
 
-### 5.3 misc
+### 5.2 misc
 
 I did consider an Explorer tool so you can query things in Turnitin that aren't exposed anywhere else - e.g. _what files does Turnitin know about for this submission box_ in case you suspect Turnitin knows something that schoolbox doesn't (desync). I haven't built that yet. You'll have to make your own for now, in a test.php
 
@@ -249,11 +269,11 @@ Webhooks are specific urls in the schoolbox instance to which Turnitin will `POS
 
 >  However, we can't _guarantee_ this succeeds due to a variety of reasons:
 >
->* Turnitin is firewalled out
+>* It turned out that Turnitin is firewalled out of the school
 >* The internet didn't work when Turnitin tried to tell us something
 >* Schoolbox died randomly e.g. got upgraded, or we broke it
 > 
-> Therefore the entire system was built around the premise of webhooks not working at all.
+> Therefore the entire system was built around the premise of webhooks not working at all. The cli tools themselves can keep the whole process ticking along in case the webhooks didn't work.
 
 ### 6.1 Headers (Turnitin Event Types)
 
@@ -289,7 +309,7 @@ Typically you'll see just one webhook ever listed here with the arbitrary name t
 https://vagrant.dev.schoolbox.cloud/learning/turnitin/webhook is set up to receive X-Turnitin-EventType values SIMILARITY_COMPLETE, SUBMISSION_COMPLETE, SIMILARITY_UPDATED
 ```
 
-This means you can reconfigure the Turnitin webhooks to set up three urls, each dedicated to receiving one of the `X-Turnitin-EventType` headers if you so choose. I've built the Turnitin system to accommodate either approach - unified, or disparate. See the `Turnitin Controller` for more details on how it does this.
+While it's not particularly obvious, this means you could reconfigure the Turnitin webhooks to set up three urls, each dedicated to receiving one of the `X-Turnitin-EventType` headers if you so choose. I've built the Turnitin system to accommodate either approach - unified, or disparate. See the `Turnitin Controller` for more details on how it does this.
 
 Anyway, underneath the description is the Turnitin Webhook Identifier:
 
@@ -311,7 +331,7 @@ This will figure out the absolute url of the schoolbox instance and tell Turniti
 
 For the most part you only need to run `php webhook.php --reset` at the time of setup and then you can not worry about it.
 
-> You can't register multiple webhooks with this tool; you can only register (and re-register) the Unified Turnitin Endpoint.
+> You can't register multiple webhooks with this tool; you can only register (and re-register) the Unified Turnitin Endpoint. Do that if the absolute url of your instance changes.
 
 
 
