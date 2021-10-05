@@ -216,6 +216,7 @@ HELP;
              */
             if (!$models->count()) {
                 $this->getLogger()->info('There are no pending Turnitin reports; nothing to do');
+                $this->getLogger()->info('Done.');
                 exit();
             }
 
