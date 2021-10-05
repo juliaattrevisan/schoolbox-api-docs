@@ -74,7 +74,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         //
                     // Need to be able to create a question and answer for this question
                     // Otherwise, it can't be added to the survey.
-            if ($factory->isQuestionTypeAvailable($currentQuestion['type_id'])) {
+                if ($factory->isQuestionTypeAvailable($currentQuestion['type_id'])) {
                 $this->parse('select_question_block', 'select_question');
                 $this->setVar('missing_class_block', '');
             } else {
@@ -89,6 +89,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         /* Matching pairs uses a different property than
                          * multiple choice
                          */
+                        $var=true;
                         if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
                             $this->setVar('ANSWER_DESCRIPTION', Scrub::Text($answer->answerLeft . ' - ' . $answer->answerRight));
                         } else {
@@ -98,7 +99,13 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                         $this->parse('answers_block', 'answers', true);
                     }
                 } else {
-                    $this->setVar('ANSWER_DESCRIPTION', Scrub::html($currentQuestion['answer']));
+                    if ($currentQuestion['type_id'] == $questionBankHandler::CLOZE_EXERCISE_TYPE_ID || $currentQuestion['type_id'] == $questionBankHandler::RICH_TEXT_TYPE_ID) {
+                        //only add the 'article' tags to Rich Text and Cloze Exercise question types
+                        $tmp = Scrub::html($currentQuestion['answer']);
+                        $this->setVar('ANSWER_DESCRIPTION', "<article>${tmp}</article>");
+                    } else {
+                        $this->setVar('ANSWER_DESCRIPTION', Scrub::html($currentQuestion['answer']));
+                    }
                     $this->parse('answers_block', 'answers', true);
                 }
             }
