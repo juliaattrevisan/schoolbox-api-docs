@@ -37,6 +37,19 @@ trait LogTrait
 
 
     /**
+     * Log to Logger if one was provided (used in cli tools)
+     *
+     * @param string $message
+     */
+    private function logInfo(string $message): void
+    {
+        if (null !== $this->log) {
+            $this->log->info($message);
+        }
+    }
+
+
+    /**
      * Specifically log a warning to the cli
      *
      * @param string $message
