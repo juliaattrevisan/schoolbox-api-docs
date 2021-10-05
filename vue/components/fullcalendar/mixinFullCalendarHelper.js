@@ -6,6 +6,7 @@
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import arraySupport from 'dayjs/plugin/arraySupport';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
 
@@ -14,6 +15,7 @@ export default {
     created () {
         dayjs.extend(advancedFormat); //for more format options
         dayjs.extend(arraySupport); //to be able to use an array as a date
+        dayjs.extend(customParseFormat); //for the dayjs() constructor to support custom formats of input strings
     },
 
     methods: {
@@ -102,7 +104,7 @@ export default {
          * @param type
          * @returns {*}
          */
-        fullCalendarHelper_dateDiff (start, end, type = 'days') {
+        fullCalendarHelper_dateDiff (start, end, type = 'day') {
             const startDate = dayjs(start);
             const endDate = dayjs(end);
             return endDate.diff(startDate, type);

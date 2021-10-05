@@ -647,7 +647,7 @@ export default {
 
                             this.duration.days = this.fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                             this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
-
+                            
                         }
                     }
                 });
