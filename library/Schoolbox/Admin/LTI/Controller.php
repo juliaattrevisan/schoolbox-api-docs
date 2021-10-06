@@ -55,7 +55,8 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => $this->router->generate('adminLti.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
-                'providers' => $this->providerMapper->findAll()
+                'providers' => $this->providerMapper->findAll(),
+                'providerVersions' => Provider::LTI_VERSIONS,
             ],
         ]);
     }
@@ -104,6 +105,7 @@ class Controller extends Base
             }
 
             $provider->setName($post['name']);
+            $provider->setLtiVersion($post['lti_version']);
             $provider->setKey($post['key']);
             $provider->setSecret($post['secret']);
             $provider->setXml($post['xml']);

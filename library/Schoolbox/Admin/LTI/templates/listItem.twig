@@ -14,7 +14,11 @@
         </div>
     </div>
     <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="provider-{{ identifier }}">
-        {% include '@adminLti/form.twig' with {provider: provider, identifier: identifier} only %}
+        {% include '@adminLti/form.twig' with {
+            provider: provider,
+            providerVersions: providerVersions,
+            identifier: identifier,
+        } only %}
     </div>
     <nav>
         <a href="#" class="icon-down-arrow" data-collapser="provider-{{ identifier }}"></a>

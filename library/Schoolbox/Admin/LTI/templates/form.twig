@@ -1,9 +1,11 @@
 {% if provider.id ?? false %}
     {% set saveValue = 'Update Provider' %}
     {% set saveType  = 'update' %}
+    {% set isNew     = false %}
 {% else %}
     {% set saveValue = 'Create Provider' %}
     {% set saveType  = 'create' %}
+    {% set isNew     = true %}
 {% endif %}
 
 <form method="post" action="{{ routeLookup('adminLti.postModify') }}" data-term-form="{{ saveType }}">
@@ -15,6 +17,21 @@
                 Provider Name
             </label>
             <input required id="name-{{ identifier }}" type="text" name="name" value="{{ provider.name ?? '' }}">
+        </div>
+        <div class="small-6 columns">
+            <label {% if isNew %}class="required"{% endif%} for="lti_version-{{ identifier }}">
+                Provider Version
+            </label>
+            {% if isNew %}
+                <select required id="lti_version-{{ identifier }}" name="lti_version">
+                    <option value="" readonly>-- select version --</option>
+                    {% for providerVersion in providerVersions %}
+                        <option value="{{ providerVersion }}" {% if (provider.ltiVersion ?? '') == providerVersion %}selected{% endif %}>{{ providerVersion }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <input readonly id="lti_version-{{ identifier }}" type="text" name="lti_version" value="{{ provider.ltiVersion ?? '' }}">
+            {% endif %}
         </div>
         <div class="small-6 columns">
             <label for="xml-{{ identifier }}">
