@@ -11,6 +11,7 @@
 namespace Schoolbox\Tile;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -143,7 +144,8 @@ class Module extends BaseModule
             } else if ($params['homepage'] && $params['homepage']->getId()) {
                 return $params['homepage']->getId();
             }
-            throw new \Exception('Homepage permission does not apply to dashboard tiles');
+            // No homepage could be determined: deny authorization
+            throw new Unauthorized();
         };
 
         $rule = new Rule\Any(
