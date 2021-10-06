@@ -23,7 +23,6 @@
         "@fullcalendar/vue": "^5.9.0",
         "@gsap/business": "^3.7.1",
         "@microsoft/immersive-reader-sdk": "^1.1.0",
-        "@types/classnames": "^2.2.11",
         "axios": "0.21.2",
         "clipboard": "^2.0.6",
         "datatables.net": "1.10.22",
@@ -1401,11 +1400,6 @@
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/@microsoft/immersive-reader-sdk/-/immersive-reader-sdk-1.1.0.tgz",
       "integrity": "sha1-jo3AeJ9VLT/t6iJxbFtIQ7+Vpwg="
-    },
-    "node_modules/@types/classnames": {
-      "version": "2.2.11",
-      "resolved": "https://registry.npmjs.org/@types/classnames/-/classnames-2.2.11.tgz",
-      "integrity": "sha1-JSHMhvadFcW5BmTkgp2EVmBSwc8="
     },
     "node_modules/@types/eslint": {
       "version": "7.2.7",
@@ -7663,11 +7657,6 @@
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/@microsoft/immersive-reader-sdk/-/immersive-reader-sdk-1.1.0.tgz",
       "integrity": "sha1-jo3AeJ9VLT/t6iJxbFtIQ7+Vpwg="
-    },
-    "@types/classnames": {
-      "version": "2.2.11",
-      "resolved": "https://registry.npmjs.org/@types/classnames/-/classnames-2.2.11.tgz",
-      "integrity": "sha1-JSHMhvadFcW5BmTkgp2EVmBSwc8="
     },
     "@types/eslint": {
       "version": "7.2.7",
