@@ -185,7 +185,7 @@ HELP;
                      */
                     foreach ($attachments['attachments'] as $attachment) {
                         $this->getLogger()->debug(sprintf(
-                            'Turnitin Group %s: deleting Group Attachment %s',
+                            'Turnitin Group %s: found Group Attachment %s',
                             $groupId,
                             $attachment['id']
                         ));
