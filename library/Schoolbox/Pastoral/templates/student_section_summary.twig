@@ -1,19 +1,17 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-<div class="list-item">
-    <div class="small-12 island">
-        <h2 class="subheader">
-                {{ locale.pastoral.proper }} Profile
-        </h2>
+<div class="row">
+    <div class="button-action small-12 columns">
+        <h1 class="subheader">
+            {{ locale.pastoral.proper }} Profile
+        </h1>
+        {% if user.role.isStaff %}
+            {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
+
+                {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="button icon-add" title="Create {{ locale.pastoral.proper }} Record">Create {{ locale.pastoral.proper }} Record</a>{% endif %}
+
+        {% endif %}
     </div>
-</div>
-<div class="row actions-small-2">
-    {% if user.role.isStaff %}
-        {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
-        <nav>
-            {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
-        </nav>
-    {% endif %}
 </div>
 
 <div class="row">
