@@ -56,7 +56,12 @@ class Model implements ISoftDeletable
     public const LAUNCH_TYPE_PICKER = 'LTI_LAUNCH_TYPE_PICKER';
 
     /**
-     * Which LTI version does this provider use?
+     * The name of this tool within Schoolbox.
+     */
+    private string $name;
+
+    /**
+     * Which LTI version does this tool use?
      *
      * Must be in `self::LTI_VERSIONS`.
      */
@@ -95,42 +100,66 @@ class Model implements ISoftDeletable
      * (Deep linking requests will return a URL which may be used in a resource
      *  link launch request.)
      *
-     * Optional? If this tool is a Picker launch type, then this is the only
-     * relevant URL.
+     * Might be optional? If this tool is a Picker launch type, then this is the
+     * only relevant URL.
      */
     private ?string $deepLinkingUrl;
 
-    // LTI 1.1 fields
+    /**
+     * LTI 1.1: likely intended to store custom fields as defined within the XML
+     * configuration: currently unused.
+     */
+    private ?string $custom;
 
-    /** @var string */
-    protected $name;
+    /**
+     * LTI 1.1: the shared key used for oAuth 1 requests between the tool and
+     * Schoolbox.
+     */
+    private ?string $key;
 
-    /** @var string */
-    protected $custom;
+    /**
+     * LTI 1.1: the shared secret used for oAuth 1 requests between the tool and
+     * Schoolbox.
+     */
+    private ?string $secret;
 
-    /** @var string */
-    protected $key;
+    /**
+     * LTI 1.1: the launch URL determined from the XML configuration.
+     */
+    private ?string $url;
 
-    /** @var string */
-    protected $secret;
+    /**
+     * LTI 1.1: a URL at which the XML configuration is available.
+     *
+     * The configuration will be in Common Cartridge format
+     * (@see https://www.imsglobal.org/activity/common-cartridge)
+     */
+    private ?string $xml;
 
-    /** @var string */
-    protected $url;
+    /**
+     * LTI 1.1: the icon determined from the XML configuration: currently
+     * unused.
+     */
+    private ?string $icon;
 
-    /** @var string */
-    protected $xml;
+    /**
+     * LTI 1.1: the launch type, one of the `self::LAUNCH_TYPE_*` constants.
+     */
+    private ?string $launchType;
 
-    /** @var string */
-    protected $icon;
-
-    /** @var string */
-    protected $launchType;
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
     /**
      * @param string $name
-     * @return self
+     * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -139,134 +168,216 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getName()
+    public function getLtiVersion(): string
     {
-        return $this->name;
+        return $this->ltiVersion;
     }
 
     /**
-     * @param string $custom
-     * @return self
+     * @param string $ltiVersion
+     * @return $this
      */
-    public function setCustom($custom)
+    public function setLtiVersion(string $ltiVersion): self
+    {
+        $this->ltiVersion = $ltiVersion;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAudience(): ?string
+    {
+        return $this->audience;
+    }
+
+    /**
+     * @param string|null $audience
+     * @return $this
+     */
+    public function setAudience(?string $audience): self
+    {
+        $this->audience = $audience;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOidcInitiationUrl(): ?string
+    {
+        return $this->oidcInitiationUrl;
+    }
+
+    /**
+     * @param string|null $oidcInitiationUrl
+     * @return $this
+     */
+    public function setOidcInitiationUrl(?string $oidcInitiationUrl): self
+    {
+        $this->oidcInitiationUrl = $oidcInitiationUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLaunchUrl(): ?string
+    {
+        return $this->launchUrl;
+    }
+
+    /**
+     * @param string|null $launchUrl
+     * @return $this
+     */
+    public function setLaunchUrl(?string $launchUrl): self
+    {
+        $this->launchUrl = $launchUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDeepLinkingUrl(): ?string
+    {
+        return $this->deepLinkingUrl;
+    }
+
+    /**
+     * @param string|null $deepLinkingUrl
+     * @return $this
+     */
+    public function setDeepLinkingUrl(?string $deepLinkingUrl): self
+    {
+        $this->deepLinkingUrl = $deepLinkingUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCustom(): ?string
+    {
+        return $this->custom;
+    }
+
+    /**
+     * @param string|null $custom
+     * @return $this
+     */
+    public function setCustom(?string $custom): self
     {
         $this->custom = $custom;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCustom()
+    public function getKey(): ?string
     {
-        return $this->custom;
+        return $this->key;
     }
 
     /**
-     * @param string $key
-     * @return self
+     * @param string|null $key
+     * @return $this
      */
-    public function setKey($key)
+    public function setKey(?string $key): self
     {
         $this->key = $key;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getKey()
+    public function getSecret(): ?string
     {
-        return $this->key;
+        return $this->secret;
     }
 
     /**
-     * @param string $secret
-     * @return self
+     * @param string|null $secret
+     * @return $this
      */
-    public function setSecret($secret)
+    public function setSecret(?string $secret): self
     {
         $this->secret = $secret;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSecret()
+    public function getUrl(): ?string
     {
-        return $this->secret;
+        return $this->url;
     }
 
     /**
-     * @param string $url
-     * @return self
+     * @param string|null $url
+     * @return $this
      */
-    public function setUrl($url)
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUrl()
+    public function getXml(): ?string
     {
-        return $this->url;
+        return $this->xml;
     }
 
     /**
-     * @param string $xml
-     * @return self
+     * @param string|null $xml
+     * @return $this
      */
-    public function setXml($xml)
+    public function setXml(?string $xml): self
     {
         $this->xml = $xml;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getXml()
+    public function getIcon(): ?string
     {
-        return $this->xml;
+        return $this->icon;
     }
 
     /**
-     * @param string $icon
-     * @return self
+     * @param string|null $icon
+     * @return $this
      */
-    public function setIcon($icon)
+    public function setIcon(?string $icon): self
     {
         $this->icon = $icon;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getIcon()
+    public function getLaunchType(): ?string
     {
-        return $this->icon;
+        return $this->launchType;
     }
 
     /**
-     * @param string $launchType
-     * @return self
+     * @param string|null $launchType
+     * @return $this
      */
-    public function setLaunchType($launchType)
+    public function setLaunchType(?string $launchType): self
     {
         $this->launchType = $launchType;
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLaunchType()
-    {
-        return $this->launchType;
     }
 }
