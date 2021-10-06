@@ -333,8 +333,18 @@ For the most part you only need to run `php webhook.php --reset` at the time of 
 
 > You can't register multiple webhooks with this tool; you can only register (and re-register) the Unified Turnitin Endpoint. Do that if the absolute url of your instance changes.
 
+### 6.4 Inspector
 
+The CLI tools have a lock mechanism that prevents you from running them on top of each other. I've added their identifiers to the lock inspector so you can manually unlock it.
 
+```
+vagrant ssh;
+cd /vagrant/tools/lock;
+
+php inspector.php
+```
+
+The inspector prompts you interactively.
 
 
 
