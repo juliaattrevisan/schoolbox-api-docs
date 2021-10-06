@@ -1046,7 +1046,7 @@ class Controller extends Assessment\Controller
                 $detachedFunction = static function () use ($api, $models, $instanceIdentifier) {
                     /* Set up a record processor
                      */
-                    $processor = (new Turnitin\File\Process\File(
+                    $processor = (new Turnitin\File\Process\Transmit(
                         $instanceIdentifier,
                         $api,
                         Turnitin\File\Mapper::getInstance(),

@@ -24,7 +24,7 @@ use Symfony\Component\Lock\Store\RedisStore;
 /**
  * CLI Tool for processing Turnitin Files and their uploads
  */
-class FileTool extends CliTool\App
+class TransmitTool extends CliTool\App
 {
 
     /**
@@ -227,7 +227,7 @@ HELP;
 
             /* Set up a record processor
              */
-            $processor = (new Turnitin\File\Process\File(
+            $processor = (new Turnitin\File\Process\Transmit(
                 $this->getConfig()->get('site_type'),
                 $api,
                 Turnitin\File\Mapper::getInstance(),

@@ -19,7 +19,7 @@ use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\Uploader;
 use Schoolbox\Learning\Turnitin\Cli\CleanserTool;
-use Schoolbox\Learning\Turnitin\Cli\FileTool;
+use Schoolbox\Learning\Turnitin\Cli\TransmitTool;
 use Schoolbox\Learning\Turnitin\Cli\ReportTool;
 use Schoolbox\Learning\Turnitin\Cli\GroupTool;
 use Schoolbox\Learning\Turnitin\Cli\RetrofitTool;
@@ -61,7 +61,7 @@ class Inspector extends CliTool\App
         /* Turnitin CLI Tools
          */
         GroupTool::TURNITIN_LOCK_NAME    => 'Turnitin Group Attachment (./tools/turnitin/group.php)',
-        FileTool::TURNITIN_LOCK_NAME     => 'Turnitin File Transmitter (./tools/turnitin/transmit.php)',
+        TransmitTool::TURNITIN_LOCK_NAME => 'Turnitin File Transmitter (./tools/turnitin/transmit.php)',
         ReportTool::TURNITIN_LOCK_NAME   => 'Turnitin Report Generator (./tools/turnitin/report.php)',
         RetrofitTool::TURNITIN_LOCK_NAME => 'Turnitin File Retrofitter (./tools/turnitin/retrofit.php)',
         CleanserTool::TURNITIN_LOCK_NAME => 'Turnitin Group Cleanser (./tools/turnitin/cleanser.php)',

@@ -27,7 +27,7 @@ use Schoolbox\UserMapper;
  * When turnitin completes, it tells us via a webook
  * to commence the second half of the Turnitin request
  */
-class File
+class Transmit
 {
     use LogTrait;
 

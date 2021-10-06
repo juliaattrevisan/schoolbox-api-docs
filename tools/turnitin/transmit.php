@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *
  *     Example: php example.php 2> log.txt
  */
-$app = new Turnitin\Cli\FileTool();
+$app = new Turnitin\Cli\TransmitTool();
 
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
  *
