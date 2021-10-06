@@ -13,51 +13,41 @@
     </div>
 </div>
 <div class="small-12 island">
-    <div id="google-authenticate" class="button hide">Authenticate</div>
+    <div id="google-authenticate" class="button hide">Authorize Google account to view document</div>
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
 <script type="text/javascript">
-    function authenticate() {
-        let gAuth = gapi.auth2.getAuthInstance();
-        let gUser = gAuth.currentUser.get();
-        let clicked = !$('#google-authenticate').hasClass('hide');
-        if (gUser.isSignedIn()) {
-            if (clicked) {
-                $('#google-authenticate').addClass('hide');
-            }
-            loadDocument();
-        } else if (clicked) {
-            // try authenticate
-            gAuth.signIn({'prompt': 'select_account'}).then(loadDocument);
-        } else {
-            // just show authenticate button
-            $('#google-authenticate').removeClass('hide');
-        }
-    }
-
-    function loadDocument() {
-        gapi.client.load('drive', 'v3', function () {
-            let getViewLink = gapi.client.drive.files.get({
-                'fields': 'webViewLink',
-                'supportsAllDrives': 'true',
-                'fileId': '{{ googleFile.googleId }}',
-            });
-            getViewLink.execute(function (resp) {
-                if (resp.error || resp.webViewLink.length === 0) {
-                    $('#google-error').removeClass('hide');
-                    return;
-                }
-                $('#google-file-content').attr('src', resp.webViewLink);
-                $('#google-file-content').removeClass('hide').addClass('fullscreen');
+    $(function () {
+        loadGoogleApi(['client:auth2'], function () {
+            jQuery.ajax({
+                url: '{{ CDN_PREFIX }}/js/google/picker.js',
+                dataType: 'script',
+                cache: true
+            }).then(function () {
+                $('#google-file-content').googlePicker({
+                    clientId: '{{ config.googleapps_client_id }}',
+                    modules: [],
+                    listener: false,
+                    authBtn: '#google-authenticate',
+                    onAuth: function () {
+                        gapi.client.load('drive', 'v3', function () {
+                            let getViewLink = gapi.client.drive.files.get({
+                                'fields': 'webViewLink',
+                                'supportsAllDrives': 'true',
+                                'fileId': '{{ googleFile.googleId }}',
+                            });
+                            getViewLink.execute(function (resp) {
+                                if (resp.error || resp.webViewLink.length === 0) {
+                                    $('#google-error').removeClass('hide');
+                                    return;
+                                }
+                                $('#google-file-content').attr('src', resp.webViewLink);
+                                $('#google-file-content').removeClass('hide').addClass('fullscreen');
+                            });
+                        });
+                    },
+                });
             });
         });
-    }
-
-    loadGoogleApi(['client:auth2'], function () {
-        gapi.client.init({
-            'client_id': '{{ config.googleapps_client_id }}',
-            'scope': 'https://www.googleapis.com/auth/drive'
-        }).then(authenticate);
     });
-    $('#google-authenticate').on('click', authenticate);
 </script>

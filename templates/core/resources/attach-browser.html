@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <!-- BEGIN google_api -->
-    <script type="text/javascript" src="{CDN_PREFIX}/js/google/apiloader.js"></script>
-    <script type="text/javascript" src="{CDN_PREFIX}/js/google/picker.js"></script>
-    <script type="text/javascript">
-        // Load auth2 first to prevent popup blocker
-        loadGoogleApi(['client:auth2'], function () {
-            gapi.client.init({
-                'client_id': '{GOOGLE_CLIENT_ID}',
-                'scope': 'https://www.googleapis.com/auth/drive'
-            })
-        });
-    </script>
-    <!-- END google_api -->
     <script type="text/javascript">
         $(document).foundation();
 
@@ -25,10 +12,6 @@
 
                 let source = $(this).attr('data-source');
                 let panel = $('#' + source + '-panel');
-
-                if (source == 'filesystem-google') {
-                    return;
-                }
 
                 /* Decide if source was already load previously;
                  * If it wasn't previously loaded, do so asynchronously
@@ -64,22 +47,6 @@
                     }
                 }
             });
-
-            // authenticate once to prevent popup blocker
-            if (filesystems.find('[data-source="filesystem-google"]').length > 0) {
-                filesystems.find('[data-source="filesystem-google"]').googlePicker({
-                    clientId: '{GOOGLE_CLIENT_ID}',
-                    listener: true,
-                    onAuth: function () {
-                        let el = filesystems.find('[data-source="filesystem-google"]');
-                        let source = el.attr('data-source');
-                        let panel = $('#' + source + '-panel');
-
-                        let url = el.attr('data-url');
-                        panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
-                    }
-                });
-            }
 
             /* Activate default tab
              */

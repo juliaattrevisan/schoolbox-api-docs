@@ -490,11 +490,6 @@
         filesystems.find('[data-source]').on('click', function(event) {
 
             let source = $(this).attr('data-source');
-
-            // google is handled separately
-            if (source === 'filesystem-google') {
-                return;
-            }
             let panel = $('#' + source + '-panel');
 
             let url = $(this).attr('data-url');
@@ -523,21 +518,7 @@
 
         });
 
-        // authenticate once to prevent popup blocker
-        if (filesystems.find('[data-source="filesystem-google"]').length > 0) {
-            filesystems.find('[data-source="filesystem-google"]').googlePicker({
-                clientId: this.options.googleClientId,
-                listener: true,
-                onAuth: function () {
-                    let el = filesystems.find('[data-source="filesystem-google"]');
-                    let source = el.attr('data-source');
-                    let panel = $('#' + source + '-panel');
 
-                    let url = el.attr('data-url');
-                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
-                }
-            });
-        }
     };
 
 

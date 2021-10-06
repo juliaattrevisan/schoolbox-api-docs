@@ -19,6 +19,11 @@
         if (config.clientId.length && config.listener) {
             setupListeners();
         } else {
+            if (config.authBtn) {
+                $(config.authBtn).on('click', function () {
+                    authorize();
+                });
+            }
             authorize();
         }
 
@@ -65,7 +70,8 @@
                 /* A google setting
                  */
                 scope: 'https://www.googleapis.com/auth/drive',
-                listener: true
+                listener: true,
+                authBtn: false,
             };
             $('#gfile-google-ids').val('');
             return $.extend(defaults, options);
@@ -87,6 +93,7 @@
          * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
          */
         function authorize() {
+           let showBtn = config.authBtn && $(config.authBtn).hasClass('hide');
             gapi.client.init({
                 'client_id': config.clientId,
                 'scope': config.scope
@@ -96,6 +103,8 @@
                 if (gUser.isSignedIn()) {
                     authResult = gUser.getAuthResponse();
                     handleAuthResult();
+                } else if (showBtn) {
+                    $(config.authBtn).removeClass('hide');
                 } else {
                     gAuth.signIn({'prompt': 'select_account'}).then(
                         function () {
@@ -116,6 +125,9 @@
          */
         function handleAuthResult() {
             if (authResult && !authResult.error) {
+                if (config.authBtn && !$(config.authBtn).hasClass('hide')) {
+                    $(config.authBtn).addClass('hide');
+                }
                 $('#gfile-access-token').val(authResult.access_token);
                 $('#gfile-token-type').val(authResult.token_type);
                 config.onAuth.call($(this.element), authResult.access_token);

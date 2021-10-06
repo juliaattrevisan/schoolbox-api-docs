@@ -29,12 +29,11 @@
       padding: 8px 12px;
       background: #0066b0;
       color: #fff;
-      display: none;
       position: relative;
       top: 295px;
     }
-    #auth-btn.need-auth {
-      display: inline;
+    #auth-btn.hide {
+      display: none;
     }
   </style>
   <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/jquery/dist/jquery.min.js"></script>
@@ -100,7 +99,7 @@
 <body class="gframe">
 <pre id="result"></pre>
 <div id="content">
-  <a href="#" role="button" id="auth-btn">Authorize Google account</a>
+  <a href="#" role="button" id="auth-btn" class="hide">Authorize Google account</a>
 </div>
 <!-- The Google API Loader script. -->
 </body>
