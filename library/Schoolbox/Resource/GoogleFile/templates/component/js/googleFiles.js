@@ -48,7 +48,6 @@ $('#find-files').on('click', function () {
 $('#find-files').googlePicker({
     clientId: clientId,
     containerID: '#gfile-step0',
-    listener: true,
     mimeTypes: [
         'application/msword',
         'application/vnd.ms-powerpoint',
@@ -162,7 +161,6 @@ $(`#component${componentId} [data-action="delete"]`).on('click', function (event
 });
 $(`#component${componentId} [data-action="permission"]`).googlePicker({
     clientId: clientId,
-    listener: true,
     onAuth: function () {
         $('[data-action="continue"]').removeAttr('disabled');
         $('[data-action="share"]').removeAttr('disabled');
