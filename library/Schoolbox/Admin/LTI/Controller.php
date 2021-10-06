@@ -12,12 +12,16 @@ namespace Schoolbox\Admin\LTI;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 
 class Controller extends Base
 {
+    /**
+     * Provider mapper, for fetching and saving LTI providers.
+     */
+    private ProviderMapper $providerMapper;
+
     /**
      * Controller constructor.
      * @param ProviderMapper $providerMapper
@@ -64,8 +68,6 @@ class Controller extends Base
     /**
      * Modify an existing LTI provider
      *
-     * TODO: But I think this is never used?
-     *
      * @param Provider $provider
      */
     public function getModify($provider)
@@ -92,7 +94,7 @@ class Controller extends Base
 
     public function postModify()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->request->post;
 
         if (!empty($post['id'])) {
             $provider = $this->providerMapper->findById($post['id']);
@@ -103,13 +105,22 @@ class Controller extends Base
         $provider->setName($post['name']);
         $provider->setLtiVersion($post['lti_version']);
 
+        // LTI 1.3 fields
+        $provider = $provider
+            ->setAudience($post['audience'])
+            ->setOidcInitiationUrl($post['oidc_initiation_url'])
+            ->setLaunchUrl($post['launch_url'])
+            ->setDeepLinkingUrl($post['deep_linking_url']);
+
         // LTI 1.1 fields, including XML
-        $provider->setKey($post['key']);
-        $provider->setSecret($post['secret']);
-        $provider->setXml($post['xml']);
-        $provider->setLaunchType($post['launch_type']);
-        $provider->setIcon($post['icon']);
-        $provider->setUrl($post['url']);
+        $provider = $provider
+            ->setCustom(null)
+            ->setKey($post['key'])
+            ->setSecret($post['secret'])
+            ->setXml($post['xml'])
+            ->setLaunchType($post['launch_type'])
+            ->setIcon($post['icon'])
+            ->setUrl($post['url']);
         if ($post['xml']) {
             try {
                 $xmlContent = @file_get_contents($post['xml']);
@@ -149,9 +160,6 @@ class Controller extends Base
 
         $this->providerMapper->save($provider);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLti.getIndex'));
+        $this->response->redirect->afterPost($this->router->generate('adminLti.getIndex'));
     }
-
-    /** @var ProviderMapper */
-    private $providerMapper;
 }
