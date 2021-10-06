@@ -177,7 +177,7 @@
                 calendarDate;
             if (hashParts) {
                 viewAlias      = hashParts[1];
-                var momentDate = moment(hashParts[2], dateDisplayFormats.momentJs);
+                var momentDate = moment(hashParts[2], dateDisplayFormats.dayjs);
                 if (momentDate.isValid()) {
                     calendarDate = momentDate.toDate();
                 } else {
@@ -291,7 +291,7 @@
             try {
                 var unit = getViewAlias(calendar.fullCalendar('getView'));
                 var date = calendar.fullCalendar('getDate');
-                window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
+                window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.dayjs)));
             } catch (e) {
                 // Can't recognize view - ignore
             }

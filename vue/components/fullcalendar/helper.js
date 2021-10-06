@@ -155,7 +155,7 @@ export default class FullCalendarHelper {
      * @return {string}
      */
     dayTitleFormat(dateObject) {
-        return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
+        return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.dayjsDateLong);
     }
 
     /**

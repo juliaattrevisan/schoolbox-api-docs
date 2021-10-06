@@ -104,8 +104,8 @@ export default {
                 date = dayjs(datetime),
                 dayDiff = date.diff(now, 'd'),
                 dateFormat = this.dateOnly
-                    ? this.dateDisplayFormats.momentJs
-                    : this.dateDisplayFormats.momentJsDatetime;
+                    ? this.dateDisplayFormats.dayjs
+                    : this.dateDisplayFormats.dayjsDatetime;
 
             let struct = {
                 'absolute': date.format(dateFormat),

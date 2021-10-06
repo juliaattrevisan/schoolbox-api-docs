@@ -28,7 +28,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictTop5Loaded = '5 Heaviest Workloads';
     var dictNoWorkToday = 'Your students have nothing due this day';
     var heatCache = {};
-    var momentFormat = pickerOptions.enableTime ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+    var momentFormat = pickerOptions.enableTime ? dateDisplayFormats.dayjsDatetime : dateDisplayFormats.dayjs;
     // Initial input value as moment.js object
     var momentDate = moment(twigVars.date, momentFormat);
 
@@ -313,7 +313,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         else if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 0) {
             allDay = false;
         }
-        else if (hasTime(moment($picker.val(), dateDisplayFormats.momentJsDatetime)) === false && pickerOptions.allDaySwitch) {
+        else if (hasTime(moment($picker.val(), dateDisplayFormats.dayjsDatetime)) === false && pickerOptions.allDaySwitch) {
             allDay = true;
         }
         else {
@@ -1221,7 +1221,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         if (isInputValueValid()) {
 
             // Create a moment object from the input value
-            var activeDate = moment(getInputValue(), dateDisplayFormats.momentJsDatetime);
+            var activeDate = moment(getInputValue(), dateDisplayFormats.dayjsDatetime);
 
             // Set date on flatpickr to the input date
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
@@ -1238,7 +1238,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function updateCalendarResponse() {
 
-        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs),
+        var activeDate = moment(getInputValue(), dateDisplayFormats.dayjs),
             requestDate = moment(getRequestDate('calendar'), adtp.momentFormats.databaseShort);
         if (activeDate.isValid() && requestDate.diff(activeDate)) {
             requestDataByDate(activeDate.format(adtp.momentFormats.databaseShort), 'calendar');
@@ -1251,7 +1251,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function updateTimetableResponse() {
 
-        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs),
+        var activeDate = moment(getInputValue(), dateDisplayFormats.dayjs),
             timetableDate = moment(getTimetablePickerValue(), adtp.momentFormats.databaseShort),
             requestDate = moment(getRequestDate('timetable'), adtp.momentFormats.databaseShort);
 
@@ -1303,7 +1303,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function isInputValueValid() {
 
-        return moment(getInputValue(), dateDisplayFormats.momentJs).isValid();
+        return moment(getInputValue(), dateDisplayFormats.dayjs).isValid();
 
     }
 };

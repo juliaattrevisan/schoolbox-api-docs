@@ -8,7 +8,7 @@
             <h2 class="subheader">Remove Users <span class="hint has-tip tip-top" data-tooltip title="This list contains staff, students and parents that have not been updated in the last week. This may indicate the UPS is no longer maintaining these users accounts.">?</span></h2>
             <div id='stale-users-report'>
                 <stale-users-report
-                        date-format="{{ config.date_local | momentJsFormat }}"
+                        date-format="{{ config.date_local | dayjsFormat }}"
                         src="{{ listEndpoint }}"
                         action="{{ deleteEndpoint }}"
                 />

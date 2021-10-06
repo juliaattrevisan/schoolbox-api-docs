@@ -126,8 +126,8 @@
      */
     adtp.syncDatesOnElement = function ($element, options, from) {
         var dateFormat = fieldHasTime(options)
-            ? dateDisplayFormats.momentJsDatetime
-            : dateDisplayFormats.momentJs;
+            ? dateDisplayFormats.dayjsDatetime
+            : dateDisplayFormats.dayjs;
 
         var syncOptions = {
             dateFormat: dateFormat

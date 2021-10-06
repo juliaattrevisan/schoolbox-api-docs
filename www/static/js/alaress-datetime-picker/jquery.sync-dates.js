@@ -15,8 +15,8 @@
         var dateFormat = 'DD/MM/YYYY';
         var element = this;
 
-        if ('momentJs' in dateDisplayFormats) {
-            dateFormat = dateDisplayFormats.momentJs;
+        if ('dayjs' in dateDisplayFormats) {
+            dateFormat = dateDisplayFormats.dayjs;
         }
 
         var defaults = {
