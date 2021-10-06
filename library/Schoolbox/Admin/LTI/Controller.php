@@ -60,7 +60,8 @@ class Controller extends Base
                 'pageCurrent' => $this->router->generate('adminLti.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
                 'providers' => $this->providerMapper->findAll(),
-                'providerVersions' => Provider::LTI_VERSIONS,
+                'providerLtiVersion11' => Provider::LTI_VERSION_1_1,
+                'providerLtiVersion13' => Provider::LTI_VERSION_1_3,
             ],
         ]);
     }

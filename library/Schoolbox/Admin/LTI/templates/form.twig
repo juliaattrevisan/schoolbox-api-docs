@@ -8,10 +8,10 @@
     {% set isNew     = true %}
 {% endif %}
 
-<form method="post" action="{{ routeLookup('adminLti.postModify') }}" data-term-form="{{ saveType }}">
+<form method="post" action="{{ routeLookup('adminLti.postModify') }}" data-action="saveProvider">
     <input type="hidden" name="id" value="{{ provider.id ?? '' }}">
 
-    <div class="row" data-mage-wrapper>
+    <div class="row">
         <div class="small-6 columns">
             <label class="required" for="name-{{ identifier }}">
                 Provider Name
@@ -25,9 +25,8 @@
             {% if isNew %}
                 <select required id="lti_version-{{ identifier }}" name="lti_version">
                     <option value="" readonly>-- select version --</option>
-                    {% for providerVersion in providerVersions %}
-                        <option value="{{ providerVersion }}" {% if (provider.ltiVersion ?? '') == providerVersion %}selected{% endif %}>{{ providerVersion }}</option>
-                    {% endfor %}
+                    <option value="{{ providerLtiVersion13 }}" {% if (provider.isLtiVersion13 ?? false) %}selected{% endif %}>{{ providerLtiVersion13 }}</option>
+                    <option value="{{ providerLtiVersion11 }}" {% if (provider.isLtiVersion11 ?? false) %}selected{% endif %}>{{ providerLtiVersion11 }}</option>
                 </select>
             {% else %}
                 <input readonly id="lti_version-{{ identifier }}" type="text" name="lti_version" value="{{ provider.ltiVersion ?? '' }}">
@@ -35,7 +34,7 @@
         </div>
 
         {# 1.3 fields #}
-        <div {% if not (provider.isLtiVersion13 ?? false) %}class="hide"{% endif %}>
+        <div {% if not (provider.isLtiVersion13 ?? false) %}class="hide"{% endif %} data-lti-version="{{ providerLtiVersion13 }}">
             <div class="small-6 columns">
                 <label for="audience-{{ identifier }}" class="required">
                     Audience
@@ -63,7 +62,7 @@
         </div>
 
         {# 1.1 fields #}
-        <div {% if not (provider.isLtiVersion11 ?? false) %}class="hide"{% endif %}>
+        <div {% if not (provider.isLtiVersion11 ?? false) %}class="hide"{% endif %} data-lti-version="{{ providerLtiVersion11 }}">
             <div class="small-6 columns">
                 <label for="xml-{{ identifier }}">
                     Configuration XML URL
@@ -105,11 +104,7 @@
                 </select>
             </div>
         </div>
-
-        <!-- Don't delete the inline style, it's needed -->
-        <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
-        <p data-mage-custom-error class="hide alert alert-box icon-alert"></p>
     </div>
 
-    <input type="submit" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
+    <input type="submit" value="{{ saveValue }}" />
 </form>
