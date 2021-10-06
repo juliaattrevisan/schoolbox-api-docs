@@ -40,7 +40,7 @@ CREATE TABLE `turnitin_report` (
 --
 -- NOTE: Submission Box File are hard-deleted out of submission_box_file
 -- when you unlink them from the ui, preventing me from having foreign keys
--- without hard-deleting these reords. But I need these records to know which
+-- without hard-deleting these records. But I need these records to know which
 -- files should be deleted from turnitin...
 CREATE TABLE `turnitin_group_attachment` (
     `id` INT NOT NULL AUTO_INCREMENT,
