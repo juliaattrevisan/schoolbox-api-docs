@@ -23,7 +23,7 @@ use Symfony\Component\Lock\Store\RedisStore;
  *
  * CLI Tool for deleting Group Attachments out of arbitrary Turnitin Groups
  * that we may have spawned during vagrant testing - reprovisioning will put
- * is in a situation where the same identifier becomes reused, but it won't
+ * us in a situation where the same identifier becomes reused, but it won't
  * necessarily be what you expected since others can pollute the same namespace
  */
 class CleanserTool extends CliTool\App
@@ -33,6 +33,12 @@ class CleanserTool extends CliTool\App
      * Lock name
      */
     public const TURNITIN_LOCK_NAME = 'turnitin_group_attachment_cleanser';
+
+
+    /**
+     * Only purge -vagrant suffixed Turnitin Groups
+     */
+    private const SITE_TYPE = 'vagrant';
 
 
     /**
@@ -50,6 +56,18 @@ class CleanserTool extends CliTool\App
 
 
     /**
+     * --start=...
+     */
+    private const OPT_LONG_START = 'start:';
+
+
+    /**
+     * --end=...
+     */
+    private const OPT_LONG_END = 'end:';
+
+
+    /**
      * Lock ttl
      */
     private const LOCK_TTL = 10 * 60;
@@ -63,6 +81,8 @@ class CleanserTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
+            self::OPT_LONG_START,
+            self::OPT_LONG_END
         ];
     }
 
@@ -86,7 +106,7 @@ just...delete Turnitin Group Attachments from them, so you can test freshly.
 
 This is a dev tool and should not be used in the normal scheme of things
 
-Usage: group.php [--instance=INSTANCE_ID] 
+Usage: group.php --start=300 --end=400 [--instance=INSTANCE_ID] 
 
 
 HELP;
@@ -110,6 +130,13 @@ HELP;
         }
 
         if ($acquired) {
+            /* Needed both the Start and End options
+             */
+            if (!$this->getOpt(self::OPT_LONG_START) || !$this->getOpt(self::OPT_LONG_END)) {
+                $this->getLogger()->info('You need to supply both the start and end submission box ids');
+                return;
+            }
+
             /* We need this api
              */
             $api = new Turnitin\Api(
@@ -118,11 +145,16 @@ HELP;
                 $this->getConfig()->get('turnitin_api_key')
             );
 
-            /* Find all the submission boxes between 700 and 800 primary id
+            /* Find all the submission boxes between --start and --end primary keys
              * These are ones we probably added during testing in our vagrants
              */
-            foreach (range(305, 400) as $id) {
-                $groupIds[] = (new Turnitin\Group\IdCodec())->encode($id, 'vagrant');
+            $boxIds = range((int)$this->getOpt(self::OPT_LONG_START), (int)$this->getOpt(self::OPT_LONG_END));
+
+            $codec = new Turnitin\Group\IdCodec();
+            $groupIds = [];
+
+            foreach ($boxIds as $boxId) {
+                $groupIds[] = $codec->encode($boxId, self::SITE_TYPE);
             }
 
             /* Now find out what Turnitin knows
@@ -137,7 +169,7 @@ HELP;
                     /* Group doesn't exist; noop
                      */
                     $this->getLogger()->debug(sprintf(
-                        'Turnitin Group %s not found; skipping',
+                        'Turnitin Group %s: not found - skipping',
                         $groupId
                     ));
 
@@ -149,10 +181,28 @@ HELP;
                      */
                     $attachments = $api->retrieve('GET', "/api/v1/groups/{$groupId}/attachments", []);
 
-                    foreach ($attachments as $attachment) {
-                        /* If there are any, purge them manually
-                         */
-                        print_r($attachment);
+                    /* If there are any, purge them manually
+                     */
+                    foreach ($attachments['attachments'] as $attachment) {
+                        $this->getLogger()->debug(sprintf(
+                            'Turnitin Group %s: deleting Group Attachment %s',
+                            $groupId,
+                            $attachment['id']
+                        ));
+
+                        try {
+                            $api->retrieve('DELETE', "/api/v1/groups/{$groupId}/attachments/{$attachment['id']}", []);
+                        } catch (\DomainException $e) {
+                            /* No Content means you succeeded, I guess
+                             */
+                            if (204 === $e->getCode()) {
+                                $this->getLogger()->debug(sprintf(
+                                    'Turnitin Group %s: deleted Group Attachment %s successfully.',
+                                    $groupId,
+                                    $attachment['id']
+                                ));
+                            }
+                        }
                     }
                 }
             }
