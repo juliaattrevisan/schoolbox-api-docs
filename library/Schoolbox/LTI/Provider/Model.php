@@ -56,6 +56,11 @@ class Model implements ISoftDeletable
     public const LAUNCH_TYPE_PICKER = 'LTI_LAUNCH_TYPE_PICKER';
 
     /**
+     * Available launch types
+     */
+    public const LAUNCH_TYPES = [self::LAUNCH_TYPE_BASIC, self::LAUNCH_TYPE_PICKER];
+
+    /**
      * The name of this tool within Schoolbox.
      */
     private string $name;
@@ -146,6 +151,26 @@ class Model implements ISoftDeletable
      * LTI 1.1: the launch type, one of the `self::LAUNCH_TYPE_*` constants.
      */
     private ?string $launchType;
+
+    /**
+     * Is this an LTI 1.1 tool?
+     *
+     * @return bool
+     */
+    public function isLtiVersion11(): bool
+    {
+        return $this->ltiVersion === self::LTI_VERSION_1_1;
+    }
+
+    /**
+     * Is this an LTI 1.3 tool?
+     *
+     * @return bool
+     */
+    public function isLtiVersion13(): bool
+    {
+        return $this->ltiVersion === self::LTI_VERSION_1_3;
+    }
 
     /**
      * @return string
