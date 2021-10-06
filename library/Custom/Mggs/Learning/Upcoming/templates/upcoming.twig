@@ -88,8 +88,8 @@
         /**
          * How to fetch the assessments for the current view
          *
-         * @param {Moment} start
-         * @param {Moment} end
+         * @param {Dayjs} start
+         * @param {Dayjs} end
          * @param timezone
          * @param {Function} callback
          */
@@ -121,7 +121,7 @@
 
                 if (visibleTermDates.length) {
                     if (mom.isBefore(visibleTermDates[3]) && mom.isAfter(visibleTermDates[0])) {
-                        disp = mom.diff(visibleTermDates[0], 'weeks');
+                        disp = mom.diff(visibleTermDates[0], 'week');
                     }
                 }
 
@@ -133,8 +133,8 @@
         /**
          * How to fetch the terms for the current view
          *
-         * @param {Moment} start
-         * @param {Moment} end
+         * @param {Dayjs} start
+         * @param {Dayjs} end
          * @param timezone
          * @param {Function} callback
          */
@@ -149,8 +149,8 @@
                     // install background events
                     // find the weeks between terms
                     var shade = {
-                        start: dayjs(termDates[1]).add({ days: 5 }),
-                        end: dayjs(termDates[2]).add({days: -1})
+                        start: dayjs(termDates[1]).add(dayjs.duration({ days: 5 })),
+                        end: dayjs(termDates[2]).add(dayjs.duration({days: -1}))
                     };
 
                     $cal.find('[data-resource-id]').each(function () {
@@ -639,7 +639,7 @@
             var data = {
                 assessmentId: calEvent.data.meta.assessmentId,
                 openDate: calEvent.start.format(format),
-                dueDate: calEvent.start.clone().add({days: 1, minutes: -1}).format(format)
+                dueDate: calEvent.start.clone().add(dayjs.duration({days: 1, minutes: -1})).format(format)
             };
 
             calEvent.className.push('loading');

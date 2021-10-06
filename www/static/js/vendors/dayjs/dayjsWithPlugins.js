@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import duration from 'dayjs/plugin/duration';
 
 //AdvancedFormat extends dayjs().format API to supply more format options: https://day.js.org/docs/en/plugin/advanced-format
 dayjs.extend(advancedFormat); 
@@ -16,4 +17,5 @@ dayjs.extend(advancedFormat);
 dayjs.extend(customParseFormat); 
 //RelativeTime adds .from .to .fromNow .toNow APIs to formats date to relative time strings (e.g. 3 hours ago): https://day.js.org/docs/en/plugin/relative-time
 dayjs.extend(relativeTime); 
-
+//Duration adds .duration .isDuration APIs to support duration: https://day.js.org/docs/en/plugin/duration
+dayjs.extend(duration); 

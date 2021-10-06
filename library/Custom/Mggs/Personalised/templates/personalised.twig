@@ -205,19 +205,19 @@
             switch (view.type) {
                 case 'timelineTerm':
                     return {
-                        unit:    'months',
+                        unit:    'month',
                         quantity: 6
                     };
 
                 case 'timelineTwoMonth':
                     return {
-                        unit:    'months',
+                        unit:    'month',
                         quantity: 1
                     };
 
                 case 'timelineTwoWeek':
                     return {
-                        unit:    'weeks',
+                        unit:    'week',
                         quantity: 1
                     };
             }
@@ -263,7 +263,7 @@
                 assessmentId: calEvent.meta.assessmentId,
                 openDate: calEvent.start.format(format),
                 dueDate: calEvent.allDay
-                    ? calEvent.end.clone().subtract({days: 1}).format(format)
+                    ? calEvent.end.clone().subtract(dayjs.duration({days: 1})).format(format)
                     : calEvent.end.format(format)
             };
 
@@ -310,7 +310,7 @@
                 datetime = '';
             if (allDay) {
                 // All day offset -_- FC is exclusive end, we want inclusive
-                end = end.clone().subtract({days: 1});
+                end = end.clone().subtract(dayjs.duration({days: 1}));
                 datetime = start.format('YYYY-MM-DD') + '/' + end.format('YYYY-MM-DD');
             } else {
                 format = format + ', h:mm a';
@@ -491,8 +491,8 @@
                         var eventEnd = calEvent.end,
                             assessmentEnd = dayjs(calEvent.meta.assessmentEnd);
                         if (calEvent.allDay) {
-                            eventEnd      = eventEnd.clone().subtract({days: 1});
-                            assessmentEnd = assessmentEnd.clone().subtract({days: 1});
+                            eventEnd      = eventEnd.clone().subtract(dayjs.duration({days: 1}));
+                            assessmentEnd = assessmentEnd.clone().subtract(dayjs.duration({days: 1}));
                         }
                         var eventSpan = $.fullCalendar.formatRange(calEvent.start, eventEnd, 'Do MMMM YYYY'),
                             assessmentSpan = $.fullCalendar.formatRange(calEvent.meta.assessmentStart, assessmentEnd, 'Do MMMM YYYY');
@@ -629,7 +629,7 @@
                                 datePiles[key] = [];
                             }
                             datePiles[key].push(anotherDate);
-                            anotherDate = anotherDate.clone().add({days: 1});
+                            anotherDate = anotherDate.clone().add(dayjs.duration({days: 1}));
                         }
 
                         var columns = $();
@@ -712,7 +712,7 @@
                             if (mostRecent.length > 0) {
                                 // If I add one week to its date: is it still less than today?
                                 var mostRecentDate = dayjs(mostRecent.data('date'), 'YYYY-MM-DD');
-                                if (dayjs().isBefore(mostRecentDate.add({weeks: 1}))) {
+                                if (dayjs().isBefore(mostRecentDate.add(dayjs.duration({weeks: 1})))) {
                                     mostRecent.removeClass('fc-past').addClass('fc-today');
                                 }
                             }
