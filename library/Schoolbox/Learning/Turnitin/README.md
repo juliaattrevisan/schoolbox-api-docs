@@ -131,7 +131,7 @@ php transmit.php --help
 php transmit.php
 ```
 
-`turnitin_report` records experiences these five statuses during the Transmission phase:
+`turnitin_report` records experiences these six statuses during the Transmission phase:
 
 * **pending** This file was submitted to schoolbox by the student, but we still have to upload it to Turnitin
 * **group** The submission box associated with this file doesn't have a `turnitin_group_id` so we're making one now and assigning it to the corresponding `turnitin_group` record. This is a precautionary measure because this tool might run before `group.php` which would normally obtain the `turnitin_group_id` value for us.
