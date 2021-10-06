@@ -8,8 +8,8 @@
             event.preventDefault();
 
             var id = $('[data-type=calendar-controls]').find('input[name=userKey]').val();
-            var start_date = moment($('[data-type=calendar-controls]').find('input[name=start_date]').val(), dateDisplayFormats.dayjs).format('DD-MM-YYYY');
-            var finish_date = moment($('[data-type=calendar-controls]').find('input[name=finish_date]').val(), dateDisplayFormats.dayjs).format('DD-MM-YYYY');
+            var start_date = dayjs($('[data-type=calendar-controls]').find('input[name=start_date]').val(), dateDisplayFormats.dayjs).format('DD-MM-YYYY');
+            var finish_date = dayjs($('[data-type=calendar-controls]').find('input[name=finish_date]').val(), dateDisplayFormats.dayjs).format('DD-MM-YYYY');
             var url = '/adminv2/engagement/index/{CURRENT_PAGE}/' + start_date + '/' + finish_date;
             window.location.href = url;
         });

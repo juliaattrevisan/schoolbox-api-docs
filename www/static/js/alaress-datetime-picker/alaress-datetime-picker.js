@@ -294,20 +294,20 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var originalValue;
 
         if (element.val().length > 0) {
-            originalValue = moment(
+            originalValue = dayjs(
                 element.val(),
                 adtp.convertFormat(options.displayFormat)
             );
         }
         // if no value has been passed, use today
         else {
-            originalValue = moment();
+            originalValue = dayjs();
         }
         if (
             options.allDayInput !== false &&
             $("#" + options.allDayInput).val() == 1
         ) {
-            originalValue = moment(
+            originalValue = dayjs(
                 originalValue,
                 adtp.convertFormat(options.displayFormatDate)
             );
@@ -400,7 +400,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     });
 
                     $timetablePicker.find("[data-adtp-tt-submit]").click(function () {
-                        var newDate = moment($(this).attr("data-timetable-value"));
+                        var newDate = dayjs($(this).attr("data-timetable-value"));
                         var selectedCampus = $timetablePicker
                             .find("[data-adtp-tt-campus]")
                             .val();
@@ -424,7 +424,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                 var periodTime = $timetablePicker
                                     .find('[name*="periodTime' + pickerId + '"]:checked')
                                     .val();
-                                var newTime = moment(
+                                var newTime = dayjs(
                                     $timetablePicker
                                         .find(
                                             "[data-adtp-tt-period][data-campus=" +
@@ -559,19 +559,19 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var value;
 
         if (date !== undefined) {
-            value = moment(date);
+            value = dayjs(date);
         } else if (
             window.pickerInstance[pId] !== undefined &&
             window.pickerInstance[pId].input.value
         ) {
-            value = moment(window.pickerInstance[pId].input.value);
+            value = dayjs(window.pickerInstance[pId].input.value);
         } else if (element.val() !== undefined && element.val()) {
-            value = moment(
+            value = dayjs(
                 element.val(),
                 adtp.convertFormat(pickerFormats.convertFrom)
             );
         } else {
-            value = moment();
+            value = dayjs();
         }
 
         // All Day is on
@@ -592,7 +592,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             }
             element.val(v);
         } else {
-            v = moment(value).format(adtp.convertFormat(pickerFormats.convertTo));
+            v = dayjs(value).format(adtp.convertFormat(pickerFormats.convertTo));
             if (window.pickerInstance[pId] !== undefined) {
                 window.pickerInstance[pId].setDate(v.toISOString);
             }
@@ -678,7 +678,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     linkedElements.forEach(function (item) {
                         var itemOptions = adtp.getOptions($(item));
-                        var itemDate = moment(
+                        var itemDate = dayjs(
                             item.val(),
                             adtp.convertFormat(itemOptions.displayFormat)
                         );

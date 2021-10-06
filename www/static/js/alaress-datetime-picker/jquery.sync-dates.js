@@ -73,8 +73,8 @@
         if (settings.startDate) {
             settings.startDate = $(settings.startDate);
 
-            var startDate = moment(settings.startDate.val(), settings.dateFormat, true);
-            var endDate = moment($(this).val(), settings.dateFormat, true);
+            var startDate = dayjs(settings.startDate.val(), settings.dateFormat, true);
+            var endDate = dayjs($(this).val(), settings.dateFormat, true);
 
             if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
                 settings.startDate.val($(this).val()).change();
@@ -84,8 +84,8 @@
         if (settings.endDate) {
             settings.endDate = $(settings.endDate);
 
-            startDate = moment($(this).val(), settings.dateFormat, true);
-            endDate = moment(settings.endDate.val(), settings.dateFormat, true);
+            startDate = dayjs($(this).val(), settings.dateFormat, true);
+            endDate = dayjs(settings.endDate.val(), settings.dateFormat, true);
 
             if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
                 settings.endDate.val($(this).val()).change();

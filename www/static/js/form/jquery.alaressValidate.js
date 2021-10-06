@@ -14,7 +14,7 @@
      * @returns {moment}
      */
     var getDateFromString = function(format, date, hour, minute, second) {
-        return moment(date, format)
+        return dayjs(date, format)
             .hour(hour)
             .minute(minute)
             .second(second)
@@ -97,10 +97,10 @@
         if (typeof $(element).attr('data-datepicker-time') == 'undefined' ||
             $('#'+$(element).attr('data-datepicker-alldayinput')).val() == 1
         ) {
-            datepickerMoment = moment(value, dateDisplayFormats.dayjs, true); // Date
+            datepickerMoment = dayjs(value, dateDisplayFormats.dayjs, true); // Date
         }
         else {
-            datepickerMoment = moment(value, dateDisplayFormats.dayjsDatetime, true); // Datetime
+            datepickerMoment = dayjs(value, dateDisplayFormats.dayjsDatetime, true); // Datetime
         }
 
         return datepickerMoment.isValid();
@@ -130,7 +130,7 @@
      * Validator for a timepicker (format: h:mma)
      */
     $.validator.addMethod('timepickerTime', function(value, element) {
-        return moment(value, 'h:mma', true).isValid();
+        return dayjs(value, 'h:mma', true).isValid();
     }, 'Please enter a valid time');
 
 
@@ -139,8 +139,8 @@
      * than another one.
      */
     $.validator.addMethod('timepickerNotBefore', function(value, element, other_element_selector) {
-        var time = moment(value, 'h:mma', true);
-        var otherTime = moment(other_element_selector.val(), 'h:mma', true);
+        var time = dayjs(value, 'h:mma', true);
+        var otherTime = dayjs(other_element_selector.val(), 'h:mma', true);
         return time.valueOf() >= otherTime.valueOf();
     }, 'Please enter a valid time');
 

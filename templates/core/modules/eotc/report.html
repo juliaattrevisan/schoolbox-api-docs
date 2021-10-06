@@ -35,8 +35,8 @@
                     location = location + '/all';
                 } else if (timespan === 'range') {
                     // Turn into moments, then translate into URL formats
-                    var startDate = moment(inputStartDate.val(), dateDisplayFormats.dayjs),
-                            endDate = moment(inputEndDate.val(), dateDisplayFormats.dayjs);
+                    var startDate = dayjs(inputStartDate.val(), dateDisplayFormats.dayjs),
+                            endDate = dayjs(inputEndDate.val(), dateDisplayFormats.dayjs);
                     location = location + '/range/'
                             + (startDate.isValid() ? startDate.format('DD-MM-YYYY') : '') + '/'
                             + (endDate.isValid() ? endDate.format('DD-MM-YYYY') : '');

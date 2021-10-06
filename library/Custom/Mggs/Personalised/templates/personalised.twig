@@ -177,7 +177,7 @@
                 calendarDate;
             if (hashParts) {
                 viewAlias      = hashParts[1];
-                var momentDate = moment(hashParts[2], dateDisplayFormats.dayjs);
+                var momentDate = dayjs(hashParts[2], dateDisplayFormats.dayjs);
                 if (momentDate.isValid()) {
                     calendarDate = momentDate.toDate();
                 } else {
@@ -489,7 +489,7 @@
 
                         // Build date spans
                         var eventEnd = calEvent.end,
-                            assessmentEnd = moment(calEvent.meta.assessmentEnd);
+                            assessmentEnd = dayjs(calEvent.meta.assessmentEnd);
                         if (calEvent.allDay) {
                             eventEnd      = eventEnd.clone().subtract({days: 1});
                             assessmentEnd = assessmentEnd.clone().subtract({days: 1});
@@ -524,8 +524,8 @@
 
                                 case 'assessmentSpan':
                                     var assessmentSpan = buildDateSpan(
-                                        moment(calEvent.meta.assessmentStart),
-                                        moment(calEvent.meta.assessmentEnd),
+                                        dayjs(calEvent.meta.assessmentStart),
+                                        dayjs(calEvent.meta.assessmentEnd),
                                         calEvent.allDay
                                     );
                                     $this
@@ -619,7 +619,7 @@
                     // First: starts on start of span, until Sunday
                     // Each one after: renders Monday
                     if (isTermView) {
-                        var now         = moment();
+                        var now         = dayjs();
                         var anotherDate = currentView.start.clone();
                         var datePiles   = {};
                         while (anotherDate.isBefore(currentView.end)) {
@@ -711,8 +711,8 @@
                             var mostRecent = calendar.find('.fc-chrono .fc-widget-header.fc-past').last();
                             if (mostRecent.length > 0) {
                                 // If I add one week to its date: is it still less than today?
-                                var mostRecentDate = moment(mostRecent.data('date'), 'YYYY-MM-DD');
-                                if (moment().isBefore(mostRecentDate.add({weeks: 1}))) {
+                                var mostRecentDate = dayjs(mostRecent.data('date'), 'YYYY-MM-DD');
+                                if (dayjs().isBefore(mostRecentDate.add({weeks: 1}))) {
                                     mostRecent.removeClass('fc-past').addClass('fc-today');
                                 }
                             }

@@ -68,7 +68,7 @@
                 case 'range':
                     $('[data-date-end]').removeClass('hide');
                     if('' === $('[name=reportDateEnd]').val()){
-                        var startDate = moment($('[name=reportDateStart]').val(), dateFormat);
+                        var startDate = dayjs($('[name=reportDateStart]').val(), dateFormat);
                         startDate.add('week',1);
                         $('[name=reportDateEnd]').val(startDate.format(dateFormat));
                     }
