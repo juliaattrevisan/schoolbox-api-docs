@@ -61,8 +61,30 @@
 
         $('[data-collapser]').collapsable();
 
-        let saveProviderForms = $('form[data-action="saveProvider"]');
-        saveProviderForms.alaressValidate();
+        // Set up forms: show/hide LTI inputs conditionally
+        $('form[data-action="saveProvider"]').each(function () {
+            let $form = $(this);
+            $form.alaressValidate({
+                ignore: function () {
+                    // Any field for a different LTI version is ignored
+                    let fieldLtiVersion = $(this).attr('data-lti-version');
+                    if (fieldLtiVersion) {
+                        let selectedLtiVersion = $form.find(':input[name="lti_version"]').val();
+                        if (selectedLtiVersion !== fieldLtiVersion) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+            $form.on('change', ':input[name="lti_version"]', function () {
+                let selectedLtiVersion = this.value;
+                $form.find('[data-lti-version-section]').each(function () {
+                    let segmentLtiVersion = $(this).attr('data-lti-version-section');
+                    $(this).toggleClass('hide', segmentLtiVersion !== selectedLtiVersion);
+                })
+            })
+        });
 
 
         // Jellytot actions
