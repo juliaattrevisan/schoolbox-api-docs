@@ -66,6 +66,7 @@ module.exports = {
 
             // DateTime
             './node_modules/moment/moment.js',
+            './www/static/js/vendors/dayjs/dayjsWithPlugins.js',
 
             // Files And Resource Browser
             './www/static/js/socialstream/browser/browser.js',
@@ -232,8 +233,8 @@ module.exports = {
                 loader: 'expose-loader', //see https://webpack.js.org/loaders/expose-loader/ - expose these to the glocal scope, allowing access to the properties in twig / other JS files
                 options: {
                     exposes: [
-                        {globalName: '$', override: true},
-                        {globalName: 'jQuery', override: true}
+                        { globalName: '$', override: true },
+                        { globalName: 'jQuery', override: true }
                     ],
                 },
             },
@@ -241,35 +242,42 @@ module.exports = {
                 test: require.resolve('dropzone'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'Dropzone', override: true}
+                    exposes: { globalName: 'Dropzone', override: true }
                 },
             },
             {
                 test: require.resolve('moment'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'moment', override: true}
+                    exposes: { globalName: 'moment', override: true }
+                },
+            },
+            {
+                test: require.resolve('dayjs'),
+                loader: 'expose-loader',
+                options: {
+                    exposes: { globalName: 'dayjs', override: true }
                 },
             },
             {
                 test: require.resolve('lodash'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: '_', override: true}
+                    exposes: { globalName: '_', override: true }
                 },
             },
             {
                 test: require.resolve('intro.js'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'IntroJs', moduleLocalName: 'introJs', override: true}
+                    exposes: { globalName: 'IntroJs', moduleLocalName: 'introJs', override: true }
                 },
             },
             {
                 test: require.resolve('highcharts'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'Highcharts', override: true}
+                    exposes: { globalName: 'Highcharts', override: true }
                 },
             },
             {
@@ -365,7 +373,6 @@ module.exports = {
             '@vue': path.resolve(__dirname, 'vue'),
             '@js': path.resolve(__dirname, 'www/static/js'),
             '@css': path.resolve(__dirname, 'www/static/css'),
-            '@vue': path.resolve(__dirname, 'vue')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
