@@ -19,7 +19,6 @@
     "@fullcalendar/vue": "^5.9.0",
     "@gsap/business": "^3.7.1",
     "@microsoft/immersive-reader-sdk": "^1.1.0",
-    "@types/classnames": "^2.2.11",
     "axios": "0.21.2",
     "clipboard": "^2.0.6",
     "datatables.net": "1.10.22",
