@@ -4,7 +4,9 @@ ALTER TABLE lti_provider
     ADD audience VARCHAR(2048) NULL AFTER lti_version,
     ADD oidc_initiation_url VARCHAR(2048) NULL AFTER audience,
     ADD launch_url VARCHAR(2048) NULL AFTER oidc_initiation_url,
-    ADD deep_linking_url VARCHAR(2048) NULL AFTER launch_url;
+    ADD deep_linking_url VARCHAR(2048) NULL AFTER launch_url,
+    ADD jwks_url VARCHAR(2048) NULL AFTER deep_linking_url,
+    ADD public_key VARCHAR(2048) NULL AFTER jwks_url;
 
 -- All existing LTI providers are 1.1
 UPDATE lti_provider SET lti_version = '1.1';

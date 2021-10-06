@@ -33,6 +33,8 @@ class Mapper extends BaseMapper
         $this->uses('oidc_initiation_url', self::TYPE_STRING);
         $this->uses('launch_url', self::TYPE_STRING);
         $this->uses('deep_linking_url', self::TYPE_STRING);
+        $this->uses('jwks_url', self::TYPE_STRING);
+        $this->uses('public_key', self::TYPE_STRING);
 
         // LTI 1.1 fields
         $this->uses('key', self::TYPE_STRING);

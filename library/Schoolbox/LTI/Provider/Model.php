@@ -111,6 +111,24 @@ class Model implements ISoftDeletable
     private ?string $deepLinkingUrl;
 
     /**
+     * LTI 1.3: the JSON Web Key Set URL of this tool, will be used to determine
+     * which key to use to sign JWTs.
+     *
+     * Either this or the public key must be provided; the public key will take
+     * precedence if it is provided.
+     */
+    private ?string $jwksUrl;
+
+    /**
+     * LTI 1.3: the public key of this tool, if provided this key will be used
+     * to sign JWTs.
+     *
+     * Either this or the JSON Web Key Set URL must be provided; this will take
+     * precedence if it is provided.
+     */
+    private ?string $publicKey;
+
+    /**
      * LTI 1.1: likely intended to store custom fields as defined within the XML
      * configuration: currently unused.
      */
@@ -277,6 +295,42 @@ class Model implements ISoftDeletable
     public function setDeepLinkingUrl(?string $deepLinkingUrl): self
     {
         $this->deepLinkingUrl = $deepLinkingUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getJwksUrl(): ?string
+    {
+        return $this->jwksUrl;
+    }
+
+    /**
+     * @param string|null $jwksUrl
+     * @return $this
+     */
+    public function setJwksUrl(?string $jwksUrl): self
+    {
+        $this->jwksUrl = $jwksUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPublicKey(): ?string
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * @param string|null $publicKey
+     * @return $this
+     */
+    public function setPublicKey(?string $publicKey): self
+    {
+        $this->publicKey = $publicKey;
         return $this;
     }
 

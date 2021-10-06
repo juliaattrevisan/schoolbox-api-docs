@@ -111,7 +111,9 @@ class Controller extends Base
             ->setAudience($post['audience'])
             ->setOidcInitiationUrl($post['oidc_initiation_url'])
             ->setLaunchUrl($post['launch_url'])
-            ->setDeepLinkingUrl($post['deep_linking_url']);
+            ->setDeepLinkingUrl($post['deep_linking_url'])
+            ->setJwksUrl($post['jwks_url'])
+            ->setPublicKey($post['public_key']);
 
         // LTI 1.1 fields, including XML
         $provider = $provider
