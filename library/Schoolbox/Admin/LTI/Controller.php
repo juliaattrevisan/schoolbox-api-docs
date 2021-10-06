@@ -83,9 +83,6 @@ class Controller extends Base
 
     public function postDelete($provider)
     {
-        $post = $this->getRequest()->post;
-
-
         if (!empty($provider)) {
             $this->providerMapper->delete($provider);
         }
@@ -97,62 +94,60 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        try {
-            if (!empty($post['id'])) {
-                $provider = $this->providerMapper->findById($post['id']);
-            } else {
-                $provider = new Provider();
-            }
+        if (!empty($post['id'])) {
+            $provider = $this->providerMapper->findById($post['id']);
+        } else {
+            $provider = new Provider();
+        }
 
-            $provider->setName($post['name']);
-            $provider->setLtiVersion($post['lti_version']);
-            $provider->setKey($post['key']);
-            $provider->setSecret($post['secret']);
-            $provider->setXml($post['xml']);
-            $provider->setLaunchType($post['launch_type']);
-            $provider->setIcon($post['icon']);
-            $provider->setUrl($post['url']);
+        $provider->setName($post['name']);
+        $provider->setLtiVersion($post['lti_version']);
 
-            if ($post['xml']) {
-                try {
-                    $xmlContent = @file_get_contents($post['xml']);
+        // LTI 1.1 fields, including XML
+        $provider->setKey($post['key']);
+        $provider->setSecret($post['secret']);
+        $provider->setXml($post['xml']);
+        $provider->setLaunchType($post['launch_type']);
+        $provider->setIcon($post['icon']);
+        $provider->setUrl($post['url']);
+        if ($post['xml']) {
+            try {
+                $xmlContent = @file_get_contents($post['xml']);
 
-                    if ($xmlContent) {
-                        libxml_use_internal_errors(true);
+                if ($xmlContent) {
+                    libxml_use_internal_errors(true);
 
-                        $xml = simplexml_load_string($xmlContent);
+                    $xml = simplexml_load_string($xmlContent);
 
 
-                        if ($xml !== false) {
-                            $launchUrl = $xml->children('blti', true)->secure_launch_url;
+                    if ($xml !== false) {
+                        $launchUrl = $xml->children('blti', true)->secure_launch_url;
+
+                        if (!empty($launchUrl)) {
+                            $provider->setUrl((string)$launchUrl);
+                        } else {
+                            $launchUrl = $xml->children('blti', true)->launch_url;
 
                             if (!empty($launchUrl)) {
                                 $provider->setUrl((string)$launchUrl);
-                            } else {
-                                $launchUrl = $xml->children('blti', true)->launch_url;
-
-                                if (!empty($launchUrl)) {
-                                    $provider->setUrl((string)$launchUrl);
-                                }
                             }
-
-                            $icon = $xml->children('blti', true)->secure_icon;
-
-                            if (!empty($launchUrl)) {
-                                $provider->setIcon((string)$icon);
-                            }
-                        } else {
-                            $provider->setUrl($post['xml']);
                         }
-                    }
-                } catch (\Exception $e) {
-                    // Noop
-                }
-            }
 
-            $this->providerMapper->save($provider);
-        } catch (MapperException $e) {
+                        $icon = $xml->children('blti', true)->secure_icon;
+
+                        if (!empty($launchUrl)) {
+                            $provider->setIcon((string)$icon);
+                        }
+                    } else {
+                        $provider->setUrl($post['xml']);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Noop
+            }
         }
+
+        $this->providerMapper->save($provider);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLti.getIndex'));
     }
