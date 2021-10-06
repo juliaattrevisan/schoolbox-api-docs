@@ -12,6 +12,7 @@ CREATE TABLE `turnitin_group` (
     `deleted_at` DATETIME NULL,
     PRIMARY KEY (`id`),
     INDEX `group_id_idx` (`group_id` ASC),
+    INDEX `turnitin_status_idx` (`status` ASC),
     CONSTRAINT `fk_turnitin_submission_box_id` FOREIGN KEY (submission_box_id) REFERENCES submission_box (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -30,6 +31,7 @@ CREATE TABLE `turnitin_report` (
     `deleted_at` DATETIME NULL,
     PRIMARY KEY (`id`),
     INDEX `turnitin_submission_id_idx` (`turnitin_submission_id` ASC),
+    INDEX `turnitin_status_idx` (`status` ASC),
     CONSTRAINT `fk_turnitin_subfile_id` FOREIGN KEY (student_submission_file_id) REFERENCES student_submission_file (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -52,5 +54,6 @@ CREATE TABLE `turnitin_group_attachment` (
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME NULL,
     PRIMARY KEY (`id`),
-    INDEX `turnitin_group_attachment_id_idx` (`turnitin_group_attachment_id` ASC)
+    INDEX `turnitin_group_attachment_id_idx` (`turnitin_group_attachment_id` ASC),
+    INDEX `turnitin_status_idx` (`status` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
