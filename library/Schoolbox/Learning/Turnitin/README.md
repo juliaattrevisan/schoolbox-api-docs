@@ -45,7 +45,15 @@ Turnitin is only applicable to Due Works. It functions synonymously with Plag so
 * Any attached files in the Due Work will be uploaded to Turnitin as exclusions; student submissions won't be detected as similar content to any of these files
 * Any attached files in a student's submission will be uploaded to Turnitin which will then process the content and detect similarity, put it in a report and display it in an iframe for us
 
-There are multiple steps and stages involved in those two simple actions described above, so let's look at them now.
+There are multiple steps and stages involved in those two simple actions described above and we'll look at them in greater detail next; it's worth noting now that they're all controllable via a set of command line tools listed below.
+
+* **group.php** manages attachments in Due Works, setting them up to be excluded from student submissions
+* **transmit.php** uploads student submission files to Turnitin
+* **report.php** tell Turnitin to generate report and comparision percentages
+* **retrofit.php** upload old documents that should be in Turnitin, but aren't at the moment
+* **webhook.php** configure webhooks that Turnitin uses to tell us it did a thing
+
+The first three tools `group transmit report` are integral to the Turnitin integration. All tools are found in the `/tools/turnitin` folder.
 
 ## 3 Exclusions
 
