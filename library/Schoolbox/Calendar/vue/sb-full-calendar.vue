@@ -492,26 +492,26 @@ export default {
          * @param {Object} event
          */
         moveEvent(event) {
+
             const data = {
                 start:  dayjs(event.start).format(),
-                end:    dayjs(event.end).format(),
                 allDay: event.allDay,
             };
 
-            // Account for the difference in all-day end date between FullCalendar and Schoolbox:
-            // * Schoolbox events are inclusive of the end date
-            // * FullCalendar events are exclusive
-            // This means that all-day events need their end date set back
-            // one day before being sent to Schoolbox.
-            if (event.allDay) {
-                data.end = dayjs(event.end).add({days: -1}).format();
+            if (event.allDay) { //when all day, the event start can be the same as the end date
+                data.end = dayjs(event.start).format(); 
+            } else if (dayjs(event.end).isValid()) { //there isn't always an end date, so only add in when it's available
+                data.end = dayjs(event.end).format();
+            } else { //otherwise it's assumed the start date is the same as the end date
+                data.end = dayjs(event.start).format();
             }
 
-            // TODO this needs to consider events in series
+            // @TODO this needs to consider events in series
             axios.post(
                 ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
                 qs.stringify(data)
             );
+            
         },
 
         /**
