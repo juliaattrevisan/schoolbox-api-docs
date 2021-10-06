@@ -47,11 +47,11 @@ Turnitin is only applicable to Due Works. It functions synonymously with Plag so
 
 There are multiple steps and stages involved in those two simple actions described above and we'll look at them in greater detail next; it's worth noting now that they're all controllable via a set of command line tools listed below.
 
-* **group.php** manages attachments in Due Works, setting them up to be excluded from student submissions
-* **transmit.php** uploads student submission files to Turnitin
-* **report.php** tell Turnitin to generate report and comparision percentages
-* **retrofit.php** upload old documents that should be in Turnitin, but aren't at the moment
-* **webhook.php** configure webhooks that Turnitin uses to tell us it did a thing
+* **[group.php](README.md#31-group-cli-tool)** manages attachments in Due Works, setting them up to be excluded from student submissions
+* **[transmit.php](README.md#41-transmission-cli-tool)** uploads student submission files to Turnitin
+* **[report.php](README.md#42-report-generation-cli-tool)** tell Turnitin to generate report and comparision percentages
+* **[retrofit.php](README.md#43-retrofit-cli-tool)** upload old documents that should be in Turnitin, but aren't at the moment
+* **[webhook.php](README.md#6-webhooks)** configure webhooks that Turnitin uses to tell us it did a thing
 
 The first three tools `group transmit report` are integral to the Turnitin integration. All tools are found in the `/tools/turnitin` folder.
 
