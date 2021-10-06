@@ -14,8 +14,33 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
+/**
+ * An LTI provider.
+ *
+ * As of LTI 1.3, this is known as a tool.
+ */
 class Model implements ISoftDeletable
 {
+    use Id;
+    use DeletedAtDate;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+
+    /**
+     * LTI version 1.1
+     */
+    public const LTI_VERSION_1_1 = '1.1';
+
+    /**
+     * LTI version 1.3
+     */
+    public const LTI_VERSION_1_3 = '1.3';
+
+    /**
+     * Available LTI versions
+     */
+    public const LTI_VERSIONS = [self::LTI_VERSION_1_1, self::LTI_VERSION_1_3];
+
     /**
      * DB representation of basic launch type.
      *
@@ -30,13 +55,76 @@ class Model implements ISoftDeletable
      */
     public const LAUNCH_TYPE_PICKER = 'LTI_LAUNCH_TYPE_PICKER';
 
-    use Id;
-    use DeletedAtDate;
-    use CreatedAtDate;
-    use UpdatedAtDate;
+    /**
+     * Which LTI version does this provider use?
+     *
+     * Must be in `self::LTI_VERSIONS`.
+     */
+    private string $ltiVersion;
+
+    /**
+     * LTI 1.3: the audience of this tool.
+     *
+     * This will be provided by the tool, and will be:
+     * * the `iss` claim in any JWTs sent from the tool to Schoolbox
+     * * tge `aud` claim in any JWTs sent from Schoolbox to the tool
+     *
+     * These claims must match the tool's issuer in order for JWTs to verify.
+     */
+    private ?string $audience;
+
+    /**
+     * LTI 1.3: the OIDC initiation URL of this tool, required for
+     * authentication of the Schoolbox user into the tool.
+     */
+    private ?string $oidcInitiationUrl;
+
+    /**
+     * LTI 1.3: the default launch URL of this tool, will be used as the default
+     * target link URL for resource link launch requests.
+     *
+     * Might be optional? If this tool is a Basic launch type, then this is the
+     * only relevant URL.
+     */
+    private ?string $launchUrl;
+
+    /**
+     * LTI 1.3: the deep linking URL of this tool, will be used as the launch
+     * URL for deep linking requests.
+     *
+     * (Deep linking requests will return a URL which may be used in a resource
+     *  link launch request.)
+     *
+     * Optional? If this tool is a Picker launch type, then this is the only
+     * relevant URL.
+     */
+    private ?string $deepLinkingUrl;
+
+    // LTI 1.1 fields
 
     /** @var string */
     protected $name;
+
+    /** @var string */
+    protected $custom;
+
+    /** @var string */
+    protected $key;
+
+    /** @var string */
+    protected $secret;
+
+    /** @var string */
+    protected $url;
+
+    /** @var string */
+    protected $xml;
+
+    /** @var string */
+    protected $icon;
+
+    /** @var string */
+    protected $launchType;
 
     /**
      * @param string $name
@@ -56,9 +144,6 @@ class Model implements ISoftDeletable
         return $this->name;
     }
 
-    /** @var string */
-    protected $custom;
-
     /**
      * @param string $custom
      * @return self
@@ -76,9 +161,6 @@ class Model implements ISoftDeletable
     {
         return $this->custom;
     }
-
-    /** @var string */
-    protected $key;
 
     /**
      * @param string $key
@@ -98,9 +180,6 @@ class Model implements ISoftDeletable
         return $this->key;
     }
 
-    /** @var string */
-    protected $secret;
-
     /**
      * @param string $secret
      * @return self
@@ -118,9 +197,6 @@ class Model implements ISoftDeletable
     {
         return $this->secret;
     }
-
-    /** @var string */
-    protected $url;
 
     /**
      * @param string $url
@@ -140,9 +216,6 @@ class Model implements ISoftDeletable
         return $this->url;
     }
 
-    /** @var string */
-    protected $xml;
-
     /**
      * @param string $xml
      * @return self
@@ -161,9 +234,6 @@ class Model implements ISoftDeletable
         return $this->xml;
     }
 
-    /** @var string */
-    protected $icon;
-
     /**
      * @param string $icon
      * @return self
@@ -181,9 +251,6 @@ class Model implements ISoftDeletable
     {
         return $this->icon;
     }
-
-    /** @var string */
-    protected $launchType;
 
     /**
      * @param string $launchType
