@@ -76,7 +76,7 @@ export default {
                 day: {
                     dayHeaders: false,
                     titleFormat: (date) => {
-                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
                     }
                 },
                 week: {

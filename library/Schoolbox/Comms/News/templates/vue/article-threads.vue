@@ -299,7 +299,7 @@ export default {
          * @returns { String }
          */
         fullString (date) {
-            return dayjs(date.database).format(dateDisplayFormats.momentJsDatetime);
+            return dayjs(date.database).format(dateDisplayFormats.dayjsDatetime);
         }
 
     },
