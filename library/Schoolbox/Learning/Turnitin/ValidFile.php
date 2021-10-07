@@ -37,6 +37,7 @@ class ValidFile
         'hwp',      // Hancom Hangul Word
         'pdf',      // Adobe PDF
         'ps',       // Adobe PostScript
+        'odt',      // OpenOffice
         'doc',      // Microsoft Word/Google Docs
         'docx',     // Microsoft Word/Google Docs
         'ppt',      // Microsoft Powerpoint/Google Docs
