@@ -65,7 +65,6 @@ module.exports = {
             './node_modules/mediaelement/build/mediaelement-and-player.min.js',
 
             // DateTime
-            './node_modules/moment/moment.js',
             './www/static/js/vendors/dayjs/dayjsWithPlugins.js',
 
             // Files And Resource Browser
@@ -243,13 +242,6 @@ module.exports = {
                 loader: 'expose-loader',
                 options: {
                     exposes: { globalName: 'Dropzone', override: true }
-                },
-            },
-            {
-                test: require.resolve('moment'),
-                loader: 'expose-loader',
-                options: {
-                    exposes: { globalName: 'moment', override: true }
                 },
             },
             {
