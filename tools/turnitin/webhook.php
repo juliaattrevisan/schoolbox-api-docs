@@ -10,7 +10,8 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Controller as TurnitinController;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Url\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -79,7 +80,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Register turnitin webhooks. Turnitin posts payloads to a schoolbox endpoint(s) when it 
+Register Turnitin webhooks. Turnitin posts payloads to a schoolbox endpoint(s) when it 
 finishes various stages of its processing - upload of documents, generation of reports,
 and updating of the report contents. Each webhook's endpoint is an absolute url so that
 Turnitin can send stuff there. 
@@ -176,9 +177,9 @@ HELP;
             'description' => 'Unified Turnitin Endpoint',
             'url' => 'https:' . (new Factory($this->getConfig()))->buildFullyQualified() . self::WEBHOOK_URL,
             'event_types' => [
-                Turnitin\Controller::SUBMISSION_COMPLETE,
-                Turnitin\Controller::SIMILARITY_COMPLETE,
-                Turnitin\Controller::SIMILARITY_UPDATED,
+                TurnitinController::SUBMISSION_COMPLETE,
+                TurnitinController::SIMILARITY_COMPLETE,
+                TurnitinController::SIMILARITY_UPDATED,
             ]
         ];
 
@@ -186,7 +187,7 @@ HELP;
             'Adding webhook: %s (%s) for %s values %s',
             $payload['description'],
             $payload['url'],
-            Turnitin\Controller::HEADER_EVENT_TYPE,
+            TurnitinController::HEADER_EVENT_TYPE,
             implode(', ', $payload['event_types'])
         ));
 
@@ -258,7 +259,7 @@ HELP;
             $this->getLogger()->info(sprintf(
                 '%s is set up to receive %s values %s',
                 $webhook['url'],
-                Turnitin\Controller::HEADER_EVENT_TYPE,
+                TurnitinController::HEADER_EVENT_TYPE,
                 implode(', ', $webhook['event_types'])
             ));
 

@@ -11,6 +11,11 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\Helper;
 
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps
@@ -53,25 +58,25 @@ class Controller extends Base
 
 
     /**
-     * @var Mapper
+     * @var Turnitin\File\Mapper
      */
-    private Mapper $turnitinMapper;
+    private Turnitin\File\Mapper $turnitinFileMapper;
 
 
     /**
      * Controller constructor.
      */
-    public function __construct(Mapper $turnitinMapper)
+    public function __construct(Turnitin\File\Mapper $turnitinFileMapper)
     {
-        $this->turnitinMapper = $turnitinMapper;
+        $this->turnitinFileMapper = $turnitinFileMapper;
     }
 
 
     /**
      * Based on the header, decide how to process it
      *
-     * @throws Exception\BadEndpoint
-     * @throws Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
@@ -116,8 +121,8 @@ class Controller extends Base
     /**
      * This method fires when Turnitin finishes processing our upload
      *
-     * @throws Exception\BadEndpoint
-     * @throws Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
@@ -138,7 +143,7 @@ class Controller extends Base
         /* If we found it, tell turnitin to make a report for it
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->getReportInfo($data['model']);
+        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->getReportInfo($data['model']);
     }
 
 
@@ -159,7 +164,7 @@ class Controller extends Base
         /* If we found it, tell turnitin to save some data locally
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($data['model'], $data['payload']);
+        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->cacheLocally($data['model'], $data['payload']);
     }
 
 
@@ -180,7 +185,7 @@ class Controller extends Base
         /* If we found it, tell turnitin to save some data locally
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Process\Report($this->produceApi(), $this->turnitinMapper))->cacheLocally($data['model'], $data['payload']);
+        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->cacheLocally($data['model'], $data['payload']);
     }
 
 
@@ -220,7 +225,7 @@ class Controller extends Base
             $payload = json_decode($rawPayload, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             throw new \RuntimeException(sprintf(
-                'Turnitin send %s json payload but we cannot decode it: %s',
+                'Turnitin sent %s json payload but we cannot decode it: %s',
                 'postUploadComplete',
                 $rawPayload
             ));
@@ -245,7 +250,7 @@ class Controller extends Base
         /* Find the corresponding report, if it exists
          */
         try {
-            $model = $this->turnitinMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
+            $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new \RuntimeException(sprintf(
                 'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
@@ -281,7 +286,7 @@ class Controller extends Base
          * Alternatively, just return null and check for Api instances being
          * produced in the webhook endpoints above
          */
-        if (!$this->turnitinMapper->isConfigured()) {
+        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
             throw new \DomainException('Turnitin configuration invalid.');
         }
 

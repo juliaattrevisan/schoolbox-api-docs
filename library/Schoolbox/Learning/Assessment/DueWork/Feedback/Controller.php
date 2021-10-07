@@ -20,7 +20,6 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -29,6 +28,9 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -276,12 +278,12 @@ class Controller extends Base
                 $detachedFunction = null;
 
                 if ($assessment->getSimilarityCheckEnabled()) {
-                    $turnitinMapper = Turnitin\Mapper::getInstance();
-
                     /* Only one of these can be active at a time, but both universes can co-exist
                      * Specifically enable turnitin if its api key was set
                      */
-                    if ($turnitinMapper->isConfigured()) {
+                    if ((new TurnitinHelper($this->getConfigLoader()))->isConfigured()) {
+                        $turnitinMapper = Turnitin\File\Mapper::getInstance();
+
                         /* Set up a turnitin stub record
                          * This allows it to be picked up and processed by an async script later
                          * if it doesn't start processing via the $detachedFunction
@@ -298,7 +300,7 @@ class Controller extends Base
 
                         /* We need this api
                          */
-                        $api = new Turnitin\Api(
+                        $api = new Api(
                             $this->getConfigLoader()->get('site_version'),
                             $this->getConfigLoader()->get('turnitin_api_host'),
                             $this->getConfigLoader()->get('turnitin_api_key')
@@ -306,13 +308,16 @@ class Controller extends Base
 
                         /* Set up detached function so turnitin can continue in the background
                          */
-                        $detachedFunction = static function () use ($api, $models) {
+                        $instanceIdentifier = $this->getConfigLoader()->get('site_type');
 
+                        $detachedFunction = static function () use ($api, $models, $instanceIdentifier) {
                             /* Set up a record processor
                              */
-                            $processor = (new Turnitin\Process\File(
+                            $processor = (new Turnitin\File\Process\Transmit(
+                                $instanceIdentifier,
                                 $api,
-                                Turnitin\Mapper::getInstance(),
+                                Turnitin\File\Mapper::getInstance(),
+                                Turnitin\Group\Mapper::getInstance(),
                                 UserMapper::getInstance(),
                                 SubmissionBoxMapper::getInstance(),
                                 SingleFile\Mapper::getInstance()

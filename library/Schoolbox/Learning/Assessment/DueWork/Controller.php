@@ -24,7 +24,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -62,6 +61,9 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -337,7 +339,7 @@ class Controller extends Assessment\Controller
             /* Similarity Check status
              */
             'plagscanApiEnabled'     => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled'     => Turnitin\Mapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled'     => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */
@@ -1009,12 +1011,12 @@ class Controller extends Assessment\Controller
         $detachedFunction = null;
 
         if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-            $turnitinMapper = Turnitin\Mapper::getInstance();
-
             /* Only one of these can be active at a time, but both universes can co-exist
              * Specifically enable turnitin if its api key was set
              */
-            if ($turnitinMapper->isConfigured()) {
+            if ((new TurnitinHelper($this->getConfigLoader()))->isConfigured()) {
+                $turnitinMapper = Turnitin\File\Mapper::getInstance();
+
                 /* Set up a turnitin stub record
                  * This allows it to be picked up and processed by an async script later
                  * if it doesn't start processing via the $detachedFunction
@@ -1031,7 +1033,7 @@ class Controller extends Assessment\Controller
 
                 /* We need this api
                  */
-                $api = new Turnitin\Api(
+                $api = new Api(
                     $this->getConfigLoader()->get('site_version'),
                     $this->getConfigLoader()->get('turnitin_api_host'),
                     $this->getConfigLoader()->get('turnitin_api_key')
@@ -1039,13 +1041,16 @@ class Controller extends Assessment\Controller
 
                 /* Set up detached function so turnitin can continue in the background
                  */
-                $detachedFunction = static function () use ($api, $models) {
+                $instanceIdentifier = $this->getConfigLoader()->get('site_type');
 
+                $detachedFunction = static function () use ($api, $models, $instanceIdentifier) {
                     /* Set up a record processor
                      */
-                    $processor = (new Turnitin\Process\File(
+                    $processor = (new Turnitin\File\Process\Transmit(
+                        $instanceIdentifier,
                         $api,
-                        Turnitin\Mapper::getInstance(),
+                        Turnitin\File\Mapper::getInstance(),
+                        Turnitin\Group\Mapper::getInstance(),
                         UserMapper::getInstance(),
                         SubmissionBoxMapper::getInstance(),
                         SingleFile\Mapper::getInstance()

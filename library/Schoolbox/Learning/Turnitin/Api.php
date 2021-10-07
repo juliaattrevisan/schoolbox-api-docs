@@ -7,13 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+namespace Schoolbox\Learning\Turnitin;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\BadEndpoint;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception\Credentials;
 
 /**
  * Establish connectivity to Turnitin
@@ -125,7 +123,7 @@ class Api
              * but how do you make this endpoint fail?
              */
             return true;
-        } catch (BadEndpoint | Credentials | GuzzleException $e) {
+        } catch (Exception\BadEndpoint | Exception\Credentials | GuzzleException $e) {
             // noop: all errors return false
         }
 

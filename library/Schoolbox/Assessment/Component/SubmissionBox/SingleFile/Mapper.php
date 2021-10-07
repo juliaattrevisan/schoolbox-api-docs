@@ -19,6 +19,8 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
  * Mapper for files attached to a submission box (due work).
+ *
+ * @method Collection|Model[] findByColumn($columnName, $columnValue, array $options = [])
  */
 class Mapper extends BaseMapper
 {

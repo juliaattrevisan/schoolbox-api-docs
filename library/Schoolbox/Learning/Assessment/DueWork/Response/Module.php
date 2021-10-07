@@ -35,6 +35,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -290,7 +291,7 @@ class Module extends BaseModule
     private function preloadTurnitinWithAssessment(array $params): array
     {
         try {
-            $turnitinReport = File\Turnitin\Mapper::getInstance()->findById($params['turnitinId']);
+            $turnitinReport = Turnitin\File\Mapper::getInstance()->findById($params['turnitinId']);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }

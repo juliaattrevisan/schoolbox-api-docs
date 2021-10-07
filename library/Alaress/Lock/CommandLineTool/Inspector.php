@@ -18,6 +18,11 @@ use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\Uploader;
+use Schoolbox\Learning\Turnitin\Cli\CleanserTool;
+use Schoolbox\Learning\Turnitin\Cli\TransmitTool;
+use Schoolbox\Learning\Turnitin\Cli\ReportTool;
+use Schoolbox\Learning\Turnitin\Cli\GroupTool;
+use Schoolbox\Learning\Turnitin\Cli\RetrofitTool;
 use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Video\CommandLineTool\Processor;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
@@ -52,6 +57,14 @@ class Inspector extends CliTool\App
         Processor::LOCK_NAME          => 'Video Processor (./tools/video/processor.php)',
         Manager::LOCK_NAME            => 'Image Processor (./tools/image/processor.php)',
         Scheduler::LOCK_NAME          => 'SUDS On-Demand Importer (./tools/synchronise/sisImporter.php) and SUDS Automated Scheduler (./tools/synchronise/scheduler.php)',
+
+        /* Turnitin CLI Tools
+         */
+        GroupTool::TURNITIN_LOCK_NAME    => 'Turnitin Group Attachment (./tools/turnitin/group.php)',
+        TransmitTool::TURNITIN_LOCK_NAME => 'Turnitin File Transmitter (./tools/turnitin/transmit.php)',
+        ReportTool::TURNITIN_LOCK_NAME   => 'Turnitin Report Generator (./tools/turnitin/report.php)',
+        RetrofitTool::TURNITIN_LOCK_NAME => 'Turnitin File Retrofitter (./tools/turnitin/retrofit.php)',
+        CleanserTool::TURNITIN_LOCK_NAME => 'Turnitin Group Cleanser (./tools/turnitin/cleanser.php)',
     ];
 
 

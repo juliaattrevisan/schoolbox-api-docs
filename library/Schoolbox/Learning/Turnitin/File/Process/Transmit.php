@@ -7,12 +7,17 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
+namespace Schoolbox\Learning\Turnitin\File\Process;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\LogTrait;
+use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\UserMapper;
 
 /**
@@ -22,13 +27,9 @@ use Schoolbox\UserMapper;
  * When turnitin completes, it tells us via a webook
  * to commence the second half of the Turnitin request
  */
-class File
+class Transmit
 {
-
-    /**
-     * Group type in Turnitin
-     */
-    private const GROUP_TYPE = 'ASSIGNMENT';
+    use LogTrait;
 
 
     /**
@@ -38,15 +39,27 @@ class File
 
 
     /**
-     * @var Turnitin\Api
+     * @var string
      */
-    private Turnitin\Api $api;
+    private string $instanceIdentifier;
 
 
     /**
-     * @var Turnitin\Mapper
+     * @var Api
      */
-    private Turnitin\Mapper $turnitinMapper;
+    private Api $api;
+
+
+    /**
+     * @var Turnitin\File\Mapper
+     */
+    private Turnitin\File\Mapper $turnitinMapper;
+
+
+    /**
+     * @var Turnitin\Group\Mapper
+     */
+    private Turnitin\Group\Mapper $turnitinGroupMapper;
 
 
     /**
@@ -68,31 +81,31 @@ class File
 
 
     /**
-     * @var LoggerInterface|null
-     */
-    private ?LoggerInterface $log;
-
-
-    /**
      * Constructor.
      *
-     * @param Turnitin\Api         $api
-     * @param Turnitin\Mapper      $turnitinMapper
-     * @param UserMapper           $userMapper
-     * @param SubmissionBoxMapper  $boxMapper
-     * @param SingleFile\Mapper    $ssfMapper
-     * @param LoggerInterface|null $log
+     * @param string                $instanceIdentifier
+     * @param Api                   $api
+     * @param Turnitin\File\Mapper  $turnitinMapper
+     * @param Turnitin\Group\Mapper $turnitinGroupMapper
+     * @param UserMapper            $userMapper
+     * @param SubmissionBoxMapper   $boxMapper
+     * @param SingleFile\Mapper     $ssfMapper
+     * @param LoggerInterface|null  $log
      */
     public function __construct(
-        Turnitin\Api $api,
-        Turnitin\Mapper $turnitinMapper,
+        string $instanceIdentifier,
+        Api $api,
+        Turnitin\File\Mapper $turnitinMapper,
+        Turnitin\Group\Mapper $turnitinGroupMapper,
         UserMapper $userMapper,
         SubmissionBoxMapper $boxMapper,
         SingleFile\Mapper $ssfMapper,
         ?LoggerInterface $log = null
     ) {
+        $this->instanceIdentifier = $instanceIdentifier;
         $this->api = $api;
         $this->turnitinMapper = $turnitinMapper;
+        $this->turnitinGroupMapper = $turnitinGroupMapper;
         $this->userMapper = $userMapper;
         $this->boxMapper = $boxMapper;
         $this->ssfMapper = $ssfMapper;
@@ -107,8 +120,8 @@ class File
      *
      * When that's done a secondary process generates the Report info
      *
-     * @param Turnitin\Model $model
-     * @throws Turnitin\Exception\Credentials
+     * @param Turnitin\File\Model $model
+     * @throws Credentials
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      * @throws \PDOException
@@ -117,7 +130,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
-    public function process(Turnitin\Model $model): void
+    public function process(Turnitin\File\Model $model): void
     {
         /* These are schoolbox errors, not turnitin errors
          * Try to exit early
@@ -140,9 +153,9 @@ class File
                     'Report %s: Student Submission File %s not found; setting to status %s',
                     $model->getId(),
                     $model->getStudentSubmissionFileId(),
-                    Turnitin\Model::STATUS_ERROR
+                    Turnitin\File\Model::STATUS_ERROR
                 ),
-                Turnitin\Model::STATUS_ERROR
+                Turnitin\File\Model::STATUS_ERROR
             );
 
             return;
@@ -154,7 +167,7 @@ class File
          * but who knows how a record might actually get populated beyond our
          * own intended controller usage (ie. 3rd party imports/syncs)
          */
-        if (!(new Turnitin\ValidFile())->isSatisfiedBy($ssf)) {
+        if (!(new ValidFile())->isSatisfiedBy($ssf)) {
             $model
                 ->setErrorCode('Invalid Filetype')
                 ->setErrorMessage('Student Submission File has an invalid mime type');
@@ -166,9 +179,9 @@ class File
                     $model->getId(),
                     $ssf->getId(),
                     $ssf->getBasename(),
-                    Turnitin\Model::STATUS_ERROR
+                    Turnitin\File\Model::STATUS_ERROR
                 ),
-                Turnitin\Model::STATUS_ERROR
+                Turnitin\File\Model::STATUS_ERROR
             );
 
             return;
@@ -177,12 +190,28 @@ class File
         /* Commencing Purification.
          */
         try {
+            /* Find a (submission_box_id, group_id) tuple from turnitin_group
+             * If it's there, use that identifier and keep going
+             *
+             * $group is an array consisting of the following fields which we
+             * can dynamically re-construct here without the authentic payload:
+             *
+             * [
+             *      id: $submission_box_id,
+             *      name: $submission_box_name
+             *      type: self::GROUP_TYPE
+             * ]
+             *
+             * If the group doesn't exist, create one and continue with that
+             * You can do this if you check for the tuple in turnitin_group;
+             * if it's not there, make a row and continue; otherwise just
+             * use the fabricated array described above (turnitin doesn't care
+             * if you repeatedly a group, it just updates it)
+             */
+
             /* Create a Turnitin Group
              */
             $group = $this->createGroup($model, $ssf);
-
-            /* TODO: Remember the group_id in turnitin_group (later)
-             */
 
             /* Create a Turnitin Submission
              */
@@ -211,9 +240,9 @@ class File
                                 $model->getId(),
                                 $ssf->getId(),
                                 $ssf->getBasename(),
-                                Turnitin\Model::STATUS_TRANSMIT_LOADED
+                                Turnitin\File\Model::STATUS_TRANSMIT_LOADED
                             ),
-                            Turnitin\Model::STATUS_TRANSMIT_LOADED
+                            Turnitin\File\Model::STATUS_TRANSMIT_LOADED
                         );
                     }
 
@@ -224,7 +253,7 @@ class File
                      */
                 }
             }
-        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
+        } catch (BadEndpoint | Credentials | \DomainException $e) {
             $this->logWarning($e->getMessage());
 
             $this->turnitinMapper->save($model
@@ -238,14 +267,14 @@ class File
      * Log to Logger if one was provided (used in cli tools)
      * Change the state at the same time
      *
-     * @param Turnitin\Model $model
-     * @param string         $message
-     * @param string         $status
+     * @param Turnitin\File\Model $model
+     * @param string              $message
+     * @param string              $status
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function changeState(Turnitin\Model $model, string $message, string $status): void
+    private function changeState(Turnitin\File\Model $model, string $message, string $status): void
     {
         $this->logDebug($message);
 
@@ -264,43 +293,17 @@ class File
 
 
     /**
-     * Log to Logger if one was provided (used in cli tools)
-     *
-     * @param string $message
-     */
-    private function logDebug(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->debug($message);
-        }
-    }
-
-
-    /**
-     * Specifically log a warning to the cli
-     *
-     * @param string $message
-     */
-    private function logWarning(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->warning($message);
-        }
-    }
-
-
-    /**
      * Create a Turnitin Group, which is synonymous with our Submission Boxes
      *
      * Apparently you just shove in an identifier, turnitin understands that...
      * ...which seems a little odd, but ok. It puts the onus on us (haha) to
      * manage these. Since our Box Ids are guaranteed to be unique, in it goes
      *
-     * @param Turnitin\Model   $model
-     * @param SingleFile\Model $ssf
+     * @param Turnitin\File\Model $model
+     * @param SingleFile\Model     $ssf
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -309,7 +312,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createGroup(Turnitin\Model $model, SingleFile\Model $ssf): ?array
+    private function createGroup(Turnitin\File\Model $model, SingleFile\Model $ssf): ?array
     {
         /* Log the state change
          */
@@ -320,9 +323,9 @@ class File
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
-                Turnitin\Model::STATUS_TRANSMIT_GROUP
+                Turnitin\File\Model::STATUS_TRANSMIT_GROUP
             ),
-            Turnitin\Model::STATUS_TRANSMIT_GROUP
+            Turnitin\File\Model::STATUS_TRANSMIT_GROUP
         );
 
         /* The box has to exist (i.e. not deleted)
@@ -331,21 +334,59 @@ class File
             $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
-                ->setStatus(Turnitin\Model::STATUS_ERROR)
+                ->setStatus(Turnitin\File\Model::STATUS_ERROR)
                 ->setErrorCode('Submission Box Not Found')
                 ->setErrorMessage('Submission Box not found; maybe its record was deleted'));
 
             return null;
         }
 
-        /* Got through that? Keep going
+        /* See if there's a Turnitin Group already associated with the submission box
+         * If it already exists, just get its payload instead
          */
-        $payload = [
-            'name' => $box->getName(),
-            'type' => self::GROUP_TYPE
-        ];
+        try {
+            $group = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $box->getId(), ['cache' => false]);
+        } catch (\Schoolbox\Mapper\Exception | \RuntimeException $e) {
+            /* Create a group if it doesn't already exist
+             */
+            $this->logDebug(sprintf(
+                'Turnitin Group does not exist for submission box %s; creating a new one',
+                $box->getId()
+            ));
 
-        return $this->api->retrieve('PUT', "/api/v1/groups/{$box->getId()}", $payload);
+            $group = $this->turnitinGroupMapper->createModel()
+                ->setSubmissionBoxId($box->getId())
+                ->setStatus(Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
+        }
+
+        /* Record exists, but doesn't have an identifier yet
+         * This occurs when the transmitter runs before the group processor
+         * It might happen if you create submissions *then* turn on Similarity Check
+         */
+        if ('' === (string)$group->getGroupId()) {
+            $groupId = (new Turnitin\Group\IdCodec())->encode($box->getId(), $this->instanceIdentifier);
+
+            $newGroup = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
+                'name' => $box->getName(),
+                'type' => Turnitin\Group\Process\Group::GROUP_TYPE
+            ]);
+
+            $group->setGroupId($newGroup['id']);
+
+            $this->turnitinGroupMapper->save($group);
+
+            return $newGroup;
+        }
+
+        /* Find an existing one
+         * 404 Not Found occurs when Group no longer exists in turnitin, but should have
+         */
+        $this->logDebug(sprintf(
+            'Turnitin Group already exists for submission box %s; reusing it',
+            $box->getId()
+        ));
+
+        return $this->api->retrieve('GET', "/api/v1/groups/{$group->getGroupId()}", []);
     }
 
 
@@ -363,12 +404,12 @@ class File
      *  - There are five subfields, so "the other four" would be submitter, group, group_context, original_submitted_time
      *  - That means "owners" struct, and its fields, is a required subfield in metadata
      *
-     * @param Turnitin\Model   $model
-     * @param SingleFile\Model $ssf
-     * @param array            $group
+     * @param Turnitin\File\Model $model
+     * @param SingleFile\Model    $ssf
+     * @param array               $group
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -377,7 +418,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createSubmission(Turnitin\Model $model, SingleFile\Model $ssf, array $group): ?array
+    private function createSubmission(Turnitin\File\Model $model, SingleFile\Model $ssf, array $group): ?array
     {
 
         /* Log the state change
@@ -389,9 +430,9 @@ class File
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
-                Turnitin\Model::STATUS_TRANSMIT_SUBMISSION
+                Turnitin\File\Model::STATUS_TRANSMIT_SUBMISSION
             ),
-            Turnitin\Model::STATUS_TRANSMIT_SUBMISSION
+            Turnitin\File\Model::STATUS_TRANSMIT_SUBMISSION
         );
 
         /* TODO Maybe should update SingleFile\Mapper to hydrate Owners always, but that's
@@ -403,7 +444,7 @@ class File
             $owner = $this->userMapper->findById($ssf->getOwner()->getId());
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
-                ->setStatus(Turnitin\Model::STATUS_ERROR)
+                ->setStatus(Turnitin\File\Model::STATUS_ERROR)
                 ->setErrorCode('Student Submission File Owner Not Found')
                 ->setErrorMessage('Student Submission File owner not found; maybe their record was deleted'));
 
@@ -458,12 +499,12 @@ class File
     /**
      * Upload a file's contents to turnitin into the given turnitin submission identifier
      *
-     * @param Turnitin\Model   $model
-     * @param SingleFile\Model $ssf
-     * @param array            $submission
+     * @param Turnitin\File\Model $model
+     * @param SingleFile\Model    $ssf
+     * @param array               $submission
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -472,7 +513,7 @@ class File
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function uploadFile(Turnitin\Model $model, SingleFile\Model $ssf, array $submission): ?array
+    private function uploadFile(Turnitin\File\Model $model, SingleFile\Model $ssf, array $submission): ?array
     {
         /* Log the state change
          */
@@ -483,9 +524,9 @@ class File
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
-                Turnitin\Model::STATUS_TRANSMIT_UPLOADING
+                Turnitin\File\Model::STATUS_TRANSMIT_UPLOADING
             ),
-            Turnitin\Model::STATUS_TRANSMIT_UPLOADING
+            Turnitin\File\Model::STATUS_TRANSMIT_UPLOADING
         );
 
         $payload = [

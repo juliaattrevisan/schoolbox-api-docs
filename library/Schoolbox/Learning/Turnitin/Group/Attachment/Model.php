@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+namespace Schoolbox\Learning\Turnitin\Group\Attachment;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -35,40 +35,21 @@ class Model implements ISoftDeletable
      * These statuses update at the start of their respective duties
      */
 
-    /* We saved a student's submission in schoolbox and set up the turnitin record
+    /* We saved a staff's submission box file in schoolbox and set up the turnitin record
      * in the instance, but we haven't told turnitin about this document yet.
      */
     public const STATUS_TRANSMIT_PENDING = 'pending';
 
-    /* We started setting up a turnitin Group ("submission box") or found an existing
-     * one to use, which is th same thing really
-     */
-    public const STATUS_TRANSMIT_GROUP = 'group';
-
-    /* We started setting up a turnitin Submission which is a container for student's
+    /* We started setting up a turnitin Group Attachment which is a container for a group attachment's
      * file contents which is sent separately
      */
-    public const STATUS_TRANSMIT_SUBMISSION = 'submission';
+    public const STATUS_TRANSMIT_GROUP_ATTACHMENT = 'group_attachment';
 
-    /* We started sending the student's file contents to turnitin
+    /* We started sending the group attachment's file contents to turnitin
      */
     public const STATUS_TRANSMIT_UPLOADING = 'uploading';
 
-    /* Transmission ended; now awaiting the next phase to begin
-     */
-    public const STATUS_TRANSMIT_LOADED = 'loaded';
-
-    /* Upload was processed by turnitin and now ready for report generation
-     */
-    public const STATUS_REPORT_PREPARED = 'prepared';
-
-    /* We started turnitin's analysis process to generate their similarity report
-     * This should start when their webhook executes after our successful upload
-     */
-    public const STATUS_REPORT_ANALYSING = 'analysing';
-
-    /* We successfully completed turnitin analysis, yanking their overall percentage
-     * and caching that locally
+    /* We successfully uploaded the group attachment file in its entirety
      */
     public const STATUS_COMPLETE = 'complete';
 
@@ -78,7 +59,7 @@ class Model implements ISoftDeletable
 
 
      /**
-     * A string that represents the current state of a Similarity Report
+     * A string that represents the current state of a group attachment
      * Denotes whether it has successfully finished or not
      *
      * @var string
@@ -106,32 +87,32 @@ class Model implements ISoftDeletable
 
 
     /**
-     * The individual submission file for which we are generating a Similarity Report
+     * The individual submission box file
+     *
      * @var int
      */
-    private int $studentSubmissionFileId;
+    private int $submissionBoxFileId;
 
 
     /**
-     * A 36-char string that Turnitin uses internally to identify one of their submissions
+     * The Turnitin Group Identifier to which this Attachment belongs
+     *
+     * @var string|null
+     */
+    private ?string $turnitinGroupId = null;
+
+
+    /**
+     * A 36-char string that Turnitin uses internally to identify one of their group attachments
      * It's like a guid: e.g. b5cf0e76-c1c7-11e8-a355-529269fb1459
      *
      * @var string|null
      */
-    private ?string $turnitinSubmissionId = null;
+    private ?string $turnitinGroupAttachmentId = null;
 
 
     /**
-     * When Turnitin finishes generating its Similarity Report we can remember the answer
-     * so we can display it liberally throughout the app without querying Turnitin
-     *
-     * @var float|null
-     */
-    private ?float $overallMatchPercentage = null;
-
-
-    /**
-     * Turnitin report finished processing
+     * Turnitin group attachment finished processing
      *
      * @return bool
      */
@@ -142,25 +123,18 @@ class Model implements ISoftDeletable
 
 
     /**
-     * Turnitin report still processing - can be in any of these turnitin states
+     * Turnitin group attachment still processing - can be in any of these turnitin states
      *
      * @return bool
      */
     public function isProcessing(): bool
     {
-        return \in_array($this->getStatus(), [
-            self::STATUS_TRANSMIT_GROUP,
-            self::STATUS_TRANSMIT_SUBMISSION,
-            self::STATUS_TRANSMIT_UPLOADING,
-            self::STATUS_TRANSMIT_LOADED,
-            self::STATUS_REPORT_PREPARED,
-            self::STATUS_REPORT_ANALYSING
-        ]);
+        return $this->getStatus() === self::STATUS_TRANSMIT_UPLOADING;
     }
 
 
     /**
-     * Turnitin report died for any number of reasons
+     * Turnitin group attachment died for any number of reasons
      *
      * @return bool
      */
@@ -171,7 +145,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * Turnitin report pending
+     * Turnitin group attachment pending
      *
      * @return bool
      */
@@ -247,19 +221,19 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getStudentSubmissionFileId(): int
+    public function getSubmissionBoxFileId(): int
     {
-        return $this->studentSubmissionFileId;
+        return $this->submissionBoxFileId;
     }
 
 
     /**
-     * @param int $studentSubmissionFileId
+     * @param int $submissionBoxFileId
      * @return Model
      */
-    public function setStudentSubmissionFileId(int $studentSubmissionFileId): self
+    public function setSubmissionBoxFileId(int $submissionBoxFileId): self
     {
-        $this->studentSubmissionFileId = $studentSubmissionFileId;
+        $this->submissionBoxFileId = $submissionBoxFileId;
         return $this;
     }
 
@@ -267,39 +241,39 @@ class Model implements ISoftDeletable
     /**
      * @return string|null
      */
-    public function getTurnitinSubmissionId(): ?string
+    public function getTurnitinGroupId(): ?string
     {
-        return $this->turnitinSubmissionId;
+        return $this->turnitinGroupId;
     }
 
 
     /**
-     * @param string|null $turnitinSubmissionId
-     * @return Model
+     * @param string|null $turnitinGroupId
+     * @return $this
      */
-    public function setTurnitinSubmissionId(?string $turnitinSubmissionId): self
+    public function setTurnitinGroupId(?string $turnitinGroupId): self
     {
-        $this->turnitinSubmissionId = $turnitinSubmissionId;
+        $this->turnitinGroupId = $turnitinGroupId;
         return $this;
     }
 
 
     /**
-     * @return float|null
+     * @return string|null
      */
-    public function getOverallMatchPercentage(): ?float
+    public function getTurnitinGroupAttachmentId(): ?string
     {
-        return $this->overallMatchPercentage;
+        return $this->turnitinGroupAttachmentId;
     }
 
 
     /**
-     * @param float|null $overallMatchPercentage
+     * @param string|null $turnitinGroupAttachmentId
      * @return Model
      */
-    public function setOverallMatchPercentage(?float $overallMatchPercentage): self
+    public function setTurnitinGroupAttachmentId(?string $turnitinGroupAttachmentId): self
     {
-        $this->overallMatchPercentage = $overallMatchPercentage;
+        $this->turnitinGroupAttachmentId = $turnitinGroupAttachmentId;
         return $this;
     }
 }

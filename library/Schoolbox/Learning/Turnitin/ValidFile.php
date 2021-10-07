@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+namespace Schoolbox\Learning\Turnitin;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Resource\File\IFile;
 
 /**
  * Decide if a Submission File fulfils the TurnItIn requirements
@@ -37,6 +37,7 @@ class ValidFile
         'hwp',      // Hancom Hangul Word
         'pdf',      // Adobe PDF
         'ps',       // Adobe PostScript
+        'odt',      // OpenOffice
         'doc',      // Microsoft Word/Google Docs
         'docx',     // Microsoft Word/Google Docs
         'ppt',      // Microsoft Powerpoint/Google Docs
@@ -82,10 +83,10 @@ class ValidFile
     /**
      * Each $file must pass the stringent whitelist checks here
      *
-     * @param SubmissionFile $file
+     * @param IFile $file
      * @return bool
      */
-    public function isSatisfiedBy(SubmissionFile $file): bool
+    public function isSatisfiedBy(IFile $file): bool
     {
         /* Must be one of the allowed filetypes; reject immediately if not allowed
          */

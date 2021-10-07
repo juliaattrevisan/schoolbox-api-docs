@@ -7,10 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process;
+namespace Schoolbox\Learning\Turnitin\File\Process;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\LogTrait;
 
 /**
  * The second half of a Turnitin request
@@ -20,6 +24,8 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
  */
 class Report
 {
+    use LogTrait;
+
 
     /**
      * Choose a viewer permission set based on your role
@@ -54,33 +60,27 @@ class Report
 
 
     /**
-     * @var Turnitin\Api
+     * @var Api
      */
-    private Turnitin\Api $api;
+    private Api $api;
 
 
     /**
-     * @var Turnitin\Mapper
+     * @var Turnitin\File\Mapper
      */
-    private Turnitin\Mapper $turnitinMapper;
-
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private ?LoggerInterface $log;
+    private Turnitin\File\Mapper $turnitinMapper;
 
 
     /**
      * Constructor.
      *
-     * @param Turnitin\Api         $api
-     * @param Turnitin\Mapper      $turnitinMapper
+     * @param Api                  $api
+     * @param Turnitin\File\Mapper $turnitinMapper
      * @param LoggerInterface|null $log
      */
     public function __construct(
-        Turnitin\Api $api,
-        Turnitin\Mapper $turnitinMapper,
+        Api $api,
+        Turnitin\File\Mapper $turnitinMapper,
         ?LoggerInterface $log = null
     ) {
         $this->api = $api;
@@ -94,7 +94,7 @@ class Report
      * to Prepared, which means we need to check when Turnitin finished
      * processing our upload before we can schedule a report generation
      *
-     * @param Turnitin\Model $model
+     * @param Turnitin\File\Model $model
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -103,11 +103,11 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function processLoadedReports(Turnitin\Model $model): void
+    public function processLoadedReports(Turnitin\File\Model $model): void
     {
         try {
             $uploadInfo = $this->getUploadInfo($model);
-        } catch (Turnitin\Exception\BadEndpoint | Turnitin\Exception\Credentials | \DomainException $e) {
+        } catch (BadEndpoint | Credentials | \DomainException $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($e->getMessage()));
@@ -119,9 +119,9 @@ class Report
      * Schedule a prepared Turnitin report for actual creation
      * Upon finishing the creation, save the answers for later
      *
-     * @param Turnitin\Model $model
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @param Turnitin\File\Model $model
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -130,7 +130,7 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function processPreparedReports(Turnitin\Model $model): void
+    public function processPreparedReports(Turnitin\File\Model $model): void
     {
         $reportInfo = $this->getReportInfo($model);
 
@@ -148,27 +148,27 @@ class Report
      * Turnitin gave us the report details; save some locally
      * This is used by the cli processor and the webhooks too
      *
-     * @param Turnitin\Model $model
-     * @param array          $reportInfo
+     * @param Turnitin\File\Model $model
+     * @param array               $reportInfo
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function cacheLocally(Turnitin\Model $model, array $reportInfo): void
+    public function cacheLocally(Turnitin\File\Model $model, array $reportInfo): void
     {
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: generation completed. Overall Match Percentage is %s; setting status to %s',
+                'Report %s: generation completed. Overall Match Percentage is %s; setting status [%s]',
                 $model->getId(),
                 $reportInfo['overall_match_percentage'],
-                Turnitin\Model::STATUS_COMPLETE
+                Turnitin\File\Model::STATUS_COMPLETE
             ),
-            Turnitin\Model::STATUS_COMPLETE
+            Turnitin\File\Model::STATUS_COMPLETE
         );
 
         $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
-            ->setStatus(Turnitin\Model::STATUS_COMPLETE)
+            ->setStatus(Turnitin\File\Model::STATUS_COMPLETE)
             ->setErrorCode(null)
             ->setErrorMessage(null);
 
@@ -181,10 +181,10 @@ class Report
      * processing our upload (whatever that entails). This is a necessary precursor
      * to report generation
      *
-     * @param Turnitin\Model $model
+     * @param Turnitin\File\Model $model
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -193,7 +193,7 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getUploadInfo(Turnitin\Model $model): ?array
+    public function getUploadInfo(Turnitin\File\Model $model): ?array
     {
         /* Find out if this upload finished processing in turnitin town
          */
@@ -208,11 +208,11 @@ class Report
                 $this->changeState(
                     $model,
                     sprintf(
-                        'Report %s: Turnitin finished processing our upload; setting status to %s',
+                        'Report %s: Turnitin finished processing our upload; setting status [%s]',
                         $model->getId(),
-                        Turnitin\Model::STATUS_REPORT_PREPARED
+                        Turnitin\File\Model::STATUS_REPORT_PREPARED
                     ),
-                    Turnitin\Model::STATUS_REPORT_PREPARED
+                    Turnitin\File\Model::STATUS_REPORT_PREPARED
                 );
 
                 /* Good to go: can start making the report itself
@@ -231,7 +231,7 @@ class Report
                 ));
 
                 $model->setErrorCode($uploadResult['error_code'])
-                    ->setStatus(Turnitin\Model::STATUS_ERROR);
+                    ->setStatus(Turnitin\File\Model::STATUS_ERROR);
 
                 $this->turnitinMapper->save($model);
 
@@ -260,10 +260,10 @@ class Report
      * Decide if the file upload finished; if it's COMPLETE
      * then I guess we're ready to move onto the next step which is to request a report generation
      *
-     * @param Turnitin\Model $model
+     * @param Turnitin\File\Model $model
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -272,11 +272,11 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getReportInfo(Turnitin\Model $model): ?array
+    public function getReportInfo(Turnitin\File\Model $model): ?array
     {
         try {
             $reportResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
-        } catch (Turnitin\Exception\BadEndpoint $e) {
+        } catch (BadEndpoint $e) {
             /* When the report hasn't been scheduled for generation, this endpoint returns 404
              * imho that really should be InvalidArgument because the endpoint exists, but the
              * remote server hasn't finished populating its contents yet
@@ -284,11 +284,11 @@ class Report
             $this->changeState(
                 $model,
                 sprintf(
-                    'Report %s: report has not been scheduled for creation yet; doing so now and setting status to %s',
+                    'Report %s: report has not been scheduled for creation yet; doing so now and setting status [%s]',
                     $model->getId(),
-                    Turnitin\Model::STATUS_REPORT_ANALYSING
+                    Turnitin\File\Model::STATUS_REPORT_ANALYSING
                 ),
-                Turnitin\Model::STATUS_REPORT_ANALYSING
+                Turnitin\File\Model::STATUS_REPORT_ANALYSING
             );
 
             /* Schedule a report for generation (don't know if we need $similarity yet)
@@ -325,10 +325,10 @@ class Report
      * This is the last step in this phase, since turnitin normally uses a webhook
      * to tell us when it's done with this manufacturing.
      *
-     * @param Turnitin\Model $model
+     * @param Turnitin\File\Model $model
      * @return array|null
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
+     * @throws BadEndpoint
+     * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -337,19 +337,19 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function generateReport(Turnitin\Model $model): ?array
+    private function generateReport(Turnitin\File\Model $model): ?array
     {
         /* Log the state change
          */
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: requesting Similarity Report for Turnitin submission %s; setting status to %s',
+                'Report %s: requesting Similarity Report for Turnitin submission %s; setting status [%s]',
                 $model->getId(),
                 $model->getTurnitinSubmissionId(),
-                Turnitin\Model::STATUS_REPORT_ANALYSING
+                Turnitin\File\Model::STATUS_REPORT_ANALYSING
             ),
-            Turnitin\Model::STATUS_REPORT_ANALYSING
+            Turnitin\File\Model::STATUS_REPORT_ANALYSING
         );
 
         /* These use the default search repositories for now
@@ -398,14 +398,14 @@ class Report
      * Log to Logger if one was provided (used in cli tools)
      * Change the state at the same time
      *
-     * @param Turnitin\Model $model
+     * @param Turnitin\File\Model $model
      * @param string         $message
      * @param string         $status
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function changeState(Turnitin\Model $model, string $message, string $status): void
+    private function changeState(Turnitin\File\Model $model, string $message, string $status): void
     {
         $this->logDebug($message);
 
@@ -420,30 +420,5 @@ class Report
             ->setStatus($status);
 
         $this->turnitinMapper->save($model);
-    }
-
-    /**
-     * Log to Logger if one was provided (used in cli tools)
-     *
-     * @param string $message
-     */
-    private function logDebug(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->debug($message);
-        }
-    }
-
-
-    /**
-     * Specifically log a warning to the cli
-     *
-     * @param string $message
-     */
-    private function logWarning(string $message): void
-    {
-        if (null !== $this->log) {
-            $this->log->warning($message);
-        }
     }
 }

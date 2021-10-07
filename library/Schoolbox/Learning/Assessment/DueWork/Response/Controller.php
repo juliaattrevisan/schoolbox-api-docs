@@ -10,8 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Api as TurnitinApi;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Process\Report;
+use Schoolbox\Learning\Turnitin\Api as TurnitinApi;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -26,8 +25,6 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper as TurnitinMapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Model as Turnitin;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -38,6 +35,10 @@ use Schoolbox\Learning\InlineGrader\Factory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
@@ -182,7 +183,7 @@ class Controller extends Base
             /* Similarity Check status
              */
             'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled' => TurnitinMapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             'interactionLocked' => $isInteractionLocked,
             'reviewRoute'       => $reviewRoute,
@@ -373,7 +374,7 @@ class Controller extends Base
             /* Similarity Check status
              */
             'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled' => \Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Mapper::getInstance()->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'studentView' => false,
             'selfAssess' => false,
@@ -578,19 +579,20 @@ class Controller extends Base
     /**
      * Dump out a turnitin report
      *
-     * @param IAssessable $assessment
-     * @param IResponse   $response
-     * @param Turnitin    $turnitin
-     * @param Participant $participant
-     * @throws File\Turnitin\Exception\BadEndpoint
-     * @throws File\Turnitin\Exception\Credentials
+     * @param IAssessable         $assessment
+     * @param IResponse           $response
+     * @param Turnitin\File\Model $turnitin
+     * @param Participant         $participant
+     * @throws BadEndpoint
+     * @throws Credentials
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin $turnitin, Participant $participant): void
+    public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin\File\Model $turnitin, Participant $participant): void
     {
         /* We need this api
          */
@@ -608,14 +610,14 @@ class Controller extends Base
         $payload = [
             'viewer_user_id' => $this->getUser()->getId(),
             'locale' => 'en',
-            'viewer_default_permission_set' => Report::VIEWER_PERMISSION_SET_STUDENT
+            'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT
         ];
 
         /* Then decide if you're a staff and you need more stuff
          */
         if ($this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder())) {
             $payload = array_merge($payload, [
-                'viewer_default_permission_set' => Report::VIEWER_PERMISSION_SET_STAFF,
+                'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF,
                 'similarity' => [
                     'view_settings' => [
                         'save_changes' => true

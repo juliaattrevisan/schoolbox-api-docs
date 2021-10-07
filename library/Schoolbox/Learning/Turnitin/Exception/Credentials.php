@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Exception;
+namespace Schoolbox\Learning\Turnitin\Exception;
 
 /**
  * Turnitin gave you 403 Forbidden, which means your credentials
