@@ -8606,16 +8606,6 @@ parameters:
 			path: tools/custom/wes/changeType.php
 
 		-
-			message: "#^Variable \\$kamiConnector in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: tools/kami/re-upload-failed-kami-docs.php
-
-		-
-			message: "#^Variable \\$kamiMapper in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: tools/kami/re-upload-failed-kami-docs.php
-
-		-
 			message: "#^Variable \\$addParamsShort might not be defined\\.$#"
 			count: 1
 			path: tools/markbook/sync.php
