@@ -199,7 +199,7 @@ export default {
                     'ArrowUp': () => this.decrementActiveIndex(),
                     'ArrowDown': () => this.incrementActiveIndex(),
                 }
-                keyOptions[keyName]();
+                if (keyOptions[keyName]) keyOptions[keyName]();
             });
         },
 
