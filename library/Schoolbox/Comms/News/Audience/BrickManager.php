@@ -54,7 +54,12 @@ class BrickManager
         $this->addSimpleSegments($bricks, $articleId);
         $this->addComplexSegments($bricks, $articleId);
 
-        return $bricks;
+        $combinedBricks = Brick::createCollection();
+        foreach ($bricks as $brick) {
+            $this->addNewBrick($combinedBricks, $brick);
+        }
+
+        return $combinedBricks;
     }
 
 
@@ -118,7 +123,7 @@ class BrickManager
                 [new Dimension($row['entity_type'], $row['entity_value'])],
                 $row['relationship']
             );
-            $this->addNewBrick($bricks, $newBrick);
+            $this->appendBrick($bricks, $newBrick);
         }
     }
 
@@ -147,7 +152,7 @@ class BrickManager
                 ],
                 Model::RELATIONSHIP_SELF
             );
-            $this->addNewBrick($bricks, $newBrick);
+            $this->appendBrick($bricks, $newBrick);
         }
     }
 
@@ -176,6 +181,22 @@ class BrickManager
         $bricks->add($newBrick);
     }
 
+    /**
+     * Append brick to a brick with the same dimension, if exists
+     * @param GenericCollection $bricks
+     * @param Brick             $newBrick
+     */
+    private function appendBrick(GenericCollection $bricks, Brick $newBrick): void
+    {
+        /** @var Brick $brick */
+        foreach ($bricks as $brick) {
+            if ($brick->hasSameDimensions($newBrick)) {
+                $brick->addBrick($newBrick);
+                return;
+            }
+        }
+        $bricks->add($newBrick);
+    }
 
     /**
      * Checks whether the specified brick can be combined with any other brick.
