@@ -17,6 +17,7 @@ import fullCalendarHelper         from "@vue/components/fullcalendar/mixinFullCa
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
 import dayjs                      from 'dayjs';
+import duration                   from 'dayjs/plugin/duration';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -117,7 +118,7 @@ export default {
     },
 
     beforeMount () {
-        
+        dayjs.extend(duration); //to use dayjs.duration
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
@@ -498,8 +499,13 @@ export default {
                 allDay: event.allDay,
             };
 
-            if (event.allDay) { //when all day, the event start can be the same as the end date
-                data.end = dayjs(event.start).format(); 
+            // Account for the difference in all-day end date between FullCalendar and Schoolbox:
+            // * Schoolbox events are inclusive of the end date
+            // * FullCalendar events are exclusive
+            // This means that all-day events need their end date set back
+            // one day before being sent to Schoolbox.
+            if (event.allDay && dayjs(event.end).isValid()) { 
+                data.end = dayjs(event.end).add(dayjs.duration({days: -1})).format();
             } else if (dayjs(event.end).isValid()) { //there isn't always an end date, so only add in when it's available
                 data.end = dayjs(event.end).format();
             } else { //otherwise it's assumed the start date is the same as the end date
