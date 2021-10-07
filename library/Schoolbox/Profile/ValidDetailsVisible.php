@@ -71,14 +71,21 @@ class ValidDetailsVisible
             return $viewer->isSuperuser();
         }
 
-        // Super user and Staff with role which can view student profile
+        // Super user can see any user's detail
         // A viewer can see self
-        if (
-            $viewer->isSuperuser()
-            || ($viewer->getRole()->isStaff() && $viewer->getRole()->getViewStudentProfile())
-            || ($viewer->getId() === $viewee->getId())
-        ) {
+        if ($viewer->isSuperuser() || ($viewer->getId() === $viewee->getId())) {
             return true;
+        }
+
+        // Staff can see profile depending on role permission
+        if ($viewer->getRole()->isStaff()) {
+            if ($viewee->getRole()->isStudent()) {
+                return $viewer->getRole()->getViewStudentProfile();
+            } elseif ($viewee->getRole()->isParent()) {
+                return $viewer->getRole()->getViewParentProfile();
+            } else {
+                return true;
+            }
         }
 
         // Student can see staff's detail
