@@ -121,7 +121,7 @@
             return true;
         }
 
-        return date.isValid() && date.valueOf() >= other_date.valueOf();
+        return date.isValid() && date.isAfter(other_date);
 
     }, 'Please enter a date that is <i>after</i> the previous date');
 
@@ -141,7 +141,7 @@
     $.validator.addMethod('timepickerNotBefore', function(value, element, other_element_selector) {
         var time = dayjs(value, 'h:mma', true);
         var otherTime = dayjs(other_element_selector.val(), 'h:mma', true);
-        return time.valueOf() >= otherTime.valueOf();
+        return time.isAfter(otherTime);
     }, 'Please enter a valid time');
 
 
@@ -162,7 +162,7 @@
      */
     $.validator.addMethod('dateNotBefore', function(value, element, other_date_field) {
         var form = $(element).closest('form');
-        return getNormalizedDate(element).valueOf() >= getNormalizedDate(other_date_field, form).valueOf();
+        return getNormalizedDate(element).isAfter(getNormalizedDate(other_date_field, form));
     }, 'Please enter a date that is after');
 
 

@@ -16,7 +16,7 @@
     };
 
     /**
-     * To keep the date format string the same between the flatpickr format string, and MomentJS need to create a mapping function
+     * To keep the date format string the same between the flatpickr format string, and dayjs need to create a mapping function
      *
      * @param format
      */
@@ -435,8 +435,8 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                     "h:mma"
                                 );
                                 newDate = newDate
-                                    .hours(newTime.hours())
-                                    .minutes(newTime.minutes())
+                                    .hour(newTime.hour())
+                                    .minute(newTime.minute())
                                     .seconds(0);
                             }
                         }

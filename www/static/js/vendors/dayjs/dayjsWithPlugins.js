@@ -10,6 +10,7 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import duration from 'dayjs/plugin/duration';
+import isBetween from 'dayjs/plugin/isBetween';
 
 //AdvancedFormat extends dayjs().format API to supply more format options: https://day.js.org/docs/en/plugin/advanced-format
 dayjs.extend(advancedFormat); 
@@ -19,3 +20,5 @@ dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime); 
 //Duration adds .duration .isDuration APIs to support duration: https://day.js.org/docs/en/plugin/duration
 dayjs.extend(duration); 
+//IsBetween adds .isBetween() API to returns a boolean indicating if a date is between two other dates: https://day.js.org/docs/en/plugin/is-between
+dayjs.extend(isBetween); 

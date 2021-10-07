@@ -28,9 +28,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictTop5Loaded = '5 Heaviest Workloads';
     var dictNoWorkToday = 'Your students have nothing due this day';
     var heatCache = {};
-    var momentFormat = pickerOptions.enableTime ? dateDisplayFormats.dayjsDatetime : dateDisplayFormats.dayjs;
+    var dayjsFormat = pickerOptions.enableTime ? dateDisplayFormats.dayjsDatetime : dateDisplayFormats.dayjs;
     // Initial input value as moment.js object
-    var momentDate = dayjs(twigVars.date, momentFormat);
+    var dayjsDate = dayjs(twigVars.date, dayjsFormat);
 
     // Timetable picker
     var $byDate      = $('#byDate-' + twigVars.id),
@@ -88,7 +88,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     if (twigVars.timetable) {
 
         // Converting JS date to database short formatbyDate-
-        var initialDate = momentDate.format(adtp.momentFormats.databaseShort);
+        var initialDate = dayjsDate.format(adtp.dayjsFormats.databaseShort);
 
         // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
@@ -188,7 +188,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
 
             if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
-                requestDataByDate(momentDate.format(adtp.momentFormats.databaseShort), 'calendar');
+                requestDataByDate(dayjsDate.format(adtp.dayjsFormats.databaseShort), 'calendar');
             }
 
             if (isDueWorkType(twigVars.type)) {
@@ -338,7 +338,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
 
             var optionsHtml = '';
-            var activeDate = dayjs(getTimetablePickerValue(), adtp.momentFormats.databaseShort);
+            var activeDate = dayjs(getTimetablePickerValue(), adtp.dayjsFormats.databaseShort);
 
             $.each(twigVars.timetableVars, function (campus, terms) {
                 $.each(terms.cycles[selectedTerm], function (cycle, value) {
@@ -357,7 +357,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                         hideClass = '';
                     }
 
-                    optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + cycle + '" data-cycle-start="' + startDate.format(adtp.momentFormats.databaseShort) + '" data-cycle-end="' + endDate.format(adtp.momentFormats.databaseShort) + '" data-parent-campus="' + campus + '" data-parent-term="' + selectedTerm + '">';
+                    optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + cycle + '" data-cycle-start="' + startDate.format(adtp.dayjsFormats.databaseShort) + '" data-cycle-end="' + endDate.format(adtp.dayjsFormats.databaseShort) + '" data-parent-campus="' + campus + '" data-parent-term="' + selectedTerm + '">';
                     optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Cycle</span> ' + cycle + '</div>';
                     optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
                     optionsHtml += '</div>';
@@ -401,13 +401,13 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function resetTerms() {
 
-        var activeDate = dayjs(getTimetablePickerValue(), adtp.momentFormats.databaseShort);
+        var activeDate = dayjs(getTimetablePickerValue(), adtp.dayjsFormats.databaseShort);
         // Hide all terms
         timetable.term.val([]);
 
         timetable.term.find('option').each(function () {
-            var termStart = dayjs($(this).attr('data-start-date'), adtp.momentFormats.databaseShort),
-                termEnd = dayjs($(this).attr('data-end-date'), adtp.momentFormats.databaseShort);
+            var termStart = dayjs($(this).attr('data-start-date'), adtp.dayjsFormats.databaseShort),
+                termEnd = dayjs($(this).attr('data-end-date'), adtp.dayjsFormats.databaseShort);
 
             if (activeDate.isBetween(termStart, termEnd, 'day', '[]')) {
                 $(this).prop('selected', true);
@@ -426,11 +426,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function resetCycles() {
 
-        var activeDate = dayjs(getTimetablePickerValue(), adtp.momentFormats.databaseShort),
+        var activeDate = dayjs(getTimetablePickerValue(), adtp.dayjsFormats.databaseShort),
             $selectedCampus = timetable.campus.find(':selected'),
             $selectedTerm = timetable.term.find(':selected'),
-            termStart = dayjs($selectedTerm.attr('data-start-date'), adtp.momentFormats.databaseShort),
-            termEnd = dayjs($selectedTerm.attr('data-end-date'), adtp.momentFormats.databaseShort);
+            termStart = dayjs($selectedTerm.attr('data-start-date'), adtp.dayjsFormats.databaseShort),
+            termEnd = dayjs($selectedTerm.attr('data-end-date'), adtp.dayjsFormats.databaseShort);
 
         // Hide all cycles
         $byTimetable.find('[data-adtp-tt-cycle]').addClass('hide');
@@ -439,8 +439,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         if (activeDate.isBetween(termStart, termEnd, 'day', '[]')) {
             $byTimetable.find('[data-parent-campus="campus_' + $selectedCampus.val() + '"]').each(function () {
                 $(this).addClass('hide');
-                var cycleStart = dayjs($(this).attr('data-cycle-start'), adtp.momentFormats.databaseShort),
-                    cycleEnd = dayjs($(this).attr('data-cycle-end'), adtp.momentFormats.databaseShort);
+                var cycleStart = dayjs($(this).attr('data-cycle-start'), adtp.dayjsFormats.databaseShort),
+                    cycleEnd = dayjs($(this).attr('data-cycle-end'), adtp.dayjsFormats.databaseShort);
 
                 if (activeDate.isBetween(cycleStart, cycleEnd, 'day', '[]')) {
                     $(this).removeClass('hide');
@@ -540,9 +540,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Remove selected on all days for a blank state
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
-        var activeDate = dayjs(getTimetablePickerValue(), adtp.momentFormats.databaseShort);
-        $byTimetable.find('[data-date=' + activeDate.format(adtp.momentFormats.databaseShort) + ']').addClass('selected');
-        $byTimetable.find('[data-tt-selected-date]').text(activeDate.format(adtp.momentFormats.nice));
+        var activeDate = dayjs(getTimetablePickerValue(), adtp.dayjsFormats.databaseShort);
+        $byTimetable.find('[data-date=' + activeDate.format(adtp.dayjsFormats.databaseShort) + ']').addClass('selected');
+        $byTimetable.find('[data-tt-selected-date]').text(activeDate.format(adtp.dayjsFormats.nice));
 
     }
 
@@ -550,11 +550,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * If the field has a time of 12am or 11:59pm, we consider this to not have time if all day is enabled
      * Check if a momentjs date object has time by this definition
      *
-     * @param momentDate {object}
+     * @param dayjsDate {object}
      * @returns {boolean}
      */
-    function hasTime(momentDate) {
-        return ((pickerOptions.endDay === false && momentDate.format('HH:mm') !== '00:00') || (pickerOptions.endDay === true && momentDate.format('HH:mm') !== '23:59'));
+    function hasTime(dayjsDate) {
+        return ((pickerOptions.endDay === false && dayjsDate.format('HH:mm') !== '00:00') || (pickerOptions.endDay === true && dayjsDate.format('HH:mm') !== '23:59'));
     }
 
     /**
@@ -834,7 +834,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         iterateVisibleTimetableDays(
             function (dayMoment) {
-                $(this).attr('data-date', dayMoment.format(adtp.momentFormats.databaseShort)).removeClass('disabled');
+                $(this).attr('data-date', dayMoment.format(adtp.dayjsFormats.databaseShort)).removeClass('disabled');
             },
             function () {
                 $(this).removeAttr('data-date').addClass('disabled');
@@ -1239,9 +1239,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     function updateCalendarResponse() {
 
         var activeDate = dayjs(getInputValue(), dateDisplayFormats.dayjs),
-            requestDate = dayjs(getRequestDate('calendar'), adtp.momentFormats.databaseShort);
+            requestDate = dayjs(getRequestDate('calendar'), adtp.dayjsFormats.databaseShort);
         if (activeDate.isValid() && requestDate.diff(activeDate)) {
-            requestDataByDate(activeDate.format(adtp.momentFormats.databaseShort), 'calendar');
+            requestDataByDate(activeDate.format(adtp.dayjsFormats.databaseShort), 'calendar');
         }
 
     }
@@ -1252,23 +1252,23 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     function updateTimetableResponse() {
 
         var activeDate = dayjs(getInputValue(), dateDisplayFormats.dayjs),
-            timetableDate = dayjs(getTimetablePickerValue(), adtp.momentFormats.databaseShort),
-            requestDate = dayjs(getRequestDate('timetable'), adtp.momentFormats.databaseShort);
+            timetableDate = dayjs(getTimetablePickerValue(), adtp.dayjsFormats.databaseShort),
+            requestDate = dayjs(getRequestDate('timetable'), adtp.dayjsFormats.databaseShort);
 
         // The picker value has been changed externally
         if (activeDate.isValid() && timetableDate.diff(activeDate)) {
             // Set new value
-            setTimetablePickerValue(activeDate.format(adtp.momentFormats.databaseShort));
+            setTimetablePickerValue(activeDate.format(adtp.dayjsFormats.databaseShort));
             // And request data for the new date
-            requestDataByDate(activeDate.format(adtp.momentFormats.databaseShort), 'timetable');
+            requestDataByDate(activeDate.format(adtp.dayjsFormats.databaseShort), 'timetable');
         }
         // Some data has already been requested, check if the data request needs to be updated
         else if (requestDate.isValid() && requestDate.diff(timetableDate)) {
-            requestDataByDate(timetableDate.format(adtp.momentFormats.databaseShort), 'timetable');
+            requestDataByDate(timetableDate.format(adtp.dayjsFormats.databaseShort), 'timetable');
         }
         else {
             // Request data for the current timetable value
-            requestDataByDate(timetableDate.format(adtp.momentFormats.databaseShort), 'timetable');
+            requestDataByDate(timetableDate.format(adtp.dayjsFormats.databaseShort), 'timetable');
         }
 
     }

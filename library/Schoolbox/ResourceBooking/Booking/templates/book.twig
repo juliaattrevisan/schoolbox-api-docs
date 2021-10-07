@@ -79,7 +79,7 @@ $(function() {
                 var startDate       = dayjs($('#startDate').val(),momentFormat);
                 var repeatUntilDate = dayjs(value,momentFormat);
 
-                return '' == value || startDate.valueOf() < repeatUntilDate.valueOf();
+                return '' == value || startDate.isBefore(repeatUntilDate);
             },
             'Repeat-Until date must be after start date'
     );
