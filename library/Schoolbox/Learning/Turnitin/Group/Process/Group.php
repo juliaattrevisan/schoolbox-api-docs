@@ -140,6 +140,7 @@ class Group
         $this->uploadAttachments($turnitinGroup, $turnitinGroupAttachments, $submissionBoxFiles->indexBy('id'));
     }
 
+
     /**
      * Create a Turnitin Group for this submission box if it doesn't already exist
      *
@@ -435,7 +436,7 @@ class Group
 
         try {
             $this->api->retrieve('UPLOAD', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}/original", $payload);
-        } catch (\DomainException $e) {
+        } catch (\DomainException | Turnitin\Exception\BadEndpoint $e) {
             if (409 === $e->getCode()) {
                 /* 409 is thrown when you try to upload file contents into a container which
                  * already received file contents. This might be okay if it's the same file
