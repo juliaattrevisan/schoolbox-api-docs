@@ -324,7 +324,7 @@ class InstanceIdManager extends CliTool\App
         ];
 
         foreach ($daemons as $daemon) {
-            $liveOrDev = $this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING ? Instance::SITE_TYPE_STAGING : '';
+            $liveOrDev = $this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING ? 'dev' : '';
             $command   = "service schoolbox$liveOrDev-$daemon restart";
             $this->getLogger()->debug("Executing:\n    $command");
             exec($command, $output, $returnCode);
