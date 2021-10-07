@@ -16,16 +16,14 @@
     <div id="google-authenticate" class="button hide">Authorize Google account to view document</div>
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript">
     $(function () {
-        loadGoogleApi(['client:auth2'], function () {
-            jQuery.ajax({
-                url: '{{ CDN_PREFIX }}/js/google/picker.js',
-                dataType: 'script',
-                cache: true
-            }).then(function () {
+        $.fn.setupGapi({
+            clientId: '{{ config.googleapps_client_id }}',
+            modules: ['client:auth2'],
+            callback: function () {
                 $('#google-file-content').googlePicker({
-                    clientId: '{{ config.googleapps_client_id }}',
                     modules: [],
                     listener: false,
                     authBtn: '#google-authenticate',
@@ -47,7 +45,7 @@
                         });
                     },
                 });
-            });
+            }
         });
     });
 </script>

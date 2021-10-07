@@ -104,7 +104,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         $twigTemplate = '@googleFile/component/googleFiles.twig';
         $twigData     = [
-            'clientId'     => $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID),
             'folder'       => $this->getContext(),
             'googleFile'   => new Model(),
             'googleFiles'  => $this->googleFiles,

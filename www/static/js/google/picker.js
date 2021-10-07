@@ -16,7 +16,7 @@
 
         /* Only proceed if both parts set
          */
-        if (config.clientId.length && config.listener) {
+        if (config.listener) {
             setupListeners();
         } else {
             if (config.authBtn) {
@@ -50,9 +50,6 @@
                  */
                 containerID: '',
 
-                /* Client id si required, as is postGoogleFileUrl
-                 */
-                clientId: '',
                 postGoogleFileUrl: '',
                 features: [],
                 views: [],
@@ -67,9 +64,6 @@
                     }
                     createPicker(e);
                 },
-                /* A google setting
-                 */
-                scope: 'https://www.googleapis.com/auth/drive',
                 listener: true,
                 authBtn: false,
             };
@@ -90,32 +84,26 @@
 
         /**
          * Ask google to setup picker
-         * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
          */
         function authorize() {
-           let showBtn = config.authBtn && $(config.authBtn).hasClass('hide');
-            gapi.client.init({
-                'client_id': config.clientId,
-                'scope': config.scope
-            }).then(function () {
-                let gAuth = gapi.auth2.getAuthInstance();
-                let gUser = gAuth.currentUser.get();
-                if (gUser.isSignedIn()) {
-                    authResult = gUser.getAuthResponse();
-                    handleAuthResult();
-                } else if (showBtn) {
-                    $(config.authBtn).removeClass('hide');
-                } else {
-                    gAuth.signIn({'prompt': 'select_account'}).then(
-                        function () {
-                            // reset authResult
-                            gUser = gAuth.currentUser.get();
-                            authResult = gUser.getAuthResponse();
-                            handleAuthResult();
-                        }
-                    );
-                }
-            });
+            let showBtn = config.authBtn && $(config.authBtn).hasClass('hide');
+            let gAuth = gapi.auth2.getAuthInstance();
+            let gUser = gAuth.currentUser.get();
+            if (gUser.isSignedIn()) {
+                authResult = gUser.getAuthResponse();
+                handleAuthResult();
+            } else if (showBtn) {
+                $(config.authBtn).removeClass('hide');
+            } else {
+                gAuth.signIn({'prompt': 'select_account'}).then(
+                    function () {
+                        // reset authResult
+                        gUser = gAuth.currentUser.get();
+                        authResult = gUser.getAuthResponse();
+                        handleAuthResult();
+                    }
+                );
+            }
         }
 
 

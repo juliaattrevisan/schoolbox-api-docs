@@ -38,6 +38,7 @@
   </style>
   <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/jquery/dist/jquery.min.js"></script>
   <script type="text/javascript" src="{CDN_PREFIX}/js/google/apiloader.js"></script>
+  <script type="text/javascript" src="{CDN_PREFIX}/js/google/picker.js"></script>
   <script type="text/javascript">
 
       // get a fix on your IE9 origin
@@ -49,19 +50,14 @@
           window.top.postMessage(JSON.stringify({text: 'Connecting to your Google Drive...'}), location.origin);
       }
 
-      loadGoogleApi(['client:auth2', 'picker'], function () {
-          jQuery
-          .ajax({
-              url: '{CDN_PREFIX}/js/google/picker.js',
-              dataType: 'script',
-              cache: true
-          })
-          .then(function () {
+      $.fn.setupGapi({
+          clientId: '{CLIENT_ID}',
+          modules: ['client:auth2', 'picker'],
+          scope: ['{SCOPES}'],
+          callback: function () {
               $('#content').googlePicker({
                   listener: false,
                   modalId: null,
-                  clientId: '{CLIENT_ID}',
-                  scopes: ['{SCOPES}'],
                   views: [{VIEWS}],
                   features: [{FEATURES}],
                   authBtn: '#auth-btn',
@@ -77,10 +73,10 @@
                               tokenType: token.token_type,
                               accessToken: token.access_token
                           },
-                          success: function(data) {
+                          success: function (data) {
                               window.top.postMessage(JSON.stringify({data: data}), location.origin);
                           },
-                          error: function(data) {
+                          error: function (data) {
                               window.top.postMessage(JSON.stringify({data: data}), location.origin);
                           }
                       });
@@ -92,7 +88,7 @@
                       picker.setVisible(true);
                   }
               });
-          });
+          }
       });
   </script>
 </head>
