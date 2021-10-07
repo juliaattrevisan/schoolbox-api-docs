@@ -28,9 +28,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictTop5Loaded = '5 Heaviest Workloads';
     var dictNoWorkToday = 'Your students have nothing due this day';
     var heatCache = {};
-    var dayjsFormat = pickerOptions.enableTime ? dateDisplayFormats.dayjsDatetime : dateDisplayFormats.dayjs;
     // Initial input value as dayjs object
-    var dayjsDate = dayjs(twigVars.date, dayjsFormat);
+    var dayjsDate = dayjs(twigVars.date);
 
     // Timetable picker
     var $byDate      = $('#byDate-' + twigVars.id),
@@ -539,7 +538,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Remove selected on all days for a blank state
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
-
+        
         var activeDate = dayjs(getTimetablePickerValue(), adtp.dayjsFormats.databaseShort);
         $byTimetable.find('[data-date=' + activeDate.format(adtp.dayjsFormats.databaseShort) + ']').addClass('selected');
         $byTimetable.find('[data-tt-selected-date]').text(activeDate.format(adtp.dayjsFormats.nice));
@@ -1160,7 +1159,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * @param date (database short format)
      */
     function setTimetablePickerValue(date) {
-
+        
         var $button = $byTimetable.find('[data-timetable-value]');
         $button.attr('data-timetable-value', date);
 
