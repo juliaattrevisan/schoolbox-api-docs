@@ -29,8 +29,8 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
-if [[ $# -ne 8 ]]; then
-  error "Script requires 8 params, found $#"
+if [[ $# -ne 9 ]]; then
+  error "Script requires 9 params, found $#"
   exit 1
 fi
 
