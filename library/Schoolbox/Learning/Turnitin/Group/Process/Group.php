@@ -453,6 +453,15 @@ class Group
                  */
                 $turnitinGroupAttachment->setStatus(Turnitin\File\Model::STATUS_COMPLETE);
             } else {
+                /* Some other random thing happened
+                 */
+                $this->logWarning(sprintf(
+                    'Turnitin Group Attachment %s: %s %s',
+                    $turnitinGroupAttachment->getTurnitinGroupAttachmentId(),
+                    $e->getCode(),
+                    $e->getMessage()
+                ));
+
                 /* All other codes - just report whatever turnitin said, because I have no idea
                  * at this point why it might have died
                  */
