@@ -16,6 +16,8 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Tool\Tool;
+use Schoolbox\GenericCollection;
+use Schoolbox\LTI\Provider\Model as ToolModel;
 
 /**
  * Registration repository for the prototype platform and tool.
@@ -61,17 +63,30 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     private Registration $registration;
 
     /**
+     * Tools which have been set up
+     *
+     * @var GenericCollection|ToolModel[]
+     */
+    private GenericCollection $tools;
+
+    /**
      * Constructor
      *
-     * @param UriInterface $baseUrl
-     * @param string       $sharedPublicKey
-     * @param string       $sharedPrivateKey
+     * @param UriInterface                  $baseUrl
+     * @param string                        $sharedPublicKey
+     * @param string                        $sharedPrivateKey
+     * @param GenericCollection|ToolModel[] $tools
      */
-    public function __construct(UriInterface $baseUrl, string $sharedPublicKey, string $sharedPrivateKey)
-    {
+    public function __construct(
+        UriInterface $baseUrl,
+        string $sharedPublicKey,
+        string $sharedPrivateKey,
+        GenericCollection $tools
+    ) {
         $this->baseUrl          = $baseUrl;
         $this->sharedPublicKey  = $sharedPublicKey;
         $this->sharedPrivateKey = $sharedPrivateKey;
+        $this->tools            = $tools;
         $this->registration     = $this->buildTestRegistration();
     }
 

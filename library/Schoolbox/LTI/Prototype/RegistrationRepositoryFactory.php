@@ -11,6 +11,8 @@ namespace Schoolbox\LTI\Prototype;
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
+use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\Url\Factory;
 
 /**
@@ -24,13 +26,20 @@ class RegistrationRepositoryFactory
     private IConfigLoader $config;
 
     /**
+     * Mapper for LTI tools.
+     */
+    private ToolMapper $toolMapper;
+
+    /**
      * Constructor
      *
      * @param IConfigLoader $config
+     * @param ToolMapper    $toolMapper
      */
-    public function __construct(IConfigLoader $config)
+    public function __construct(IConfigLoader $config, ToolMapper $toolMapper)
     {
-        $this->config = $config;
+        $this->config     = $config;
+        $this->toolMapper = $toolMapper;
     }
 
     /**
@@ -43,7 +52,8 @@ class RegistrationRepositoryFactory
         return new RegistrationRepository(
             (new Factory($this->config))->buildFullyQualified()->setScheme('https'),
             $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-            $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY)
+            $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
+            $this->toolMapper->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3)
         );
     }
 }

@@ -12,6 +12,7 @@ namespace Schoolbox\LTI\Prototype\Tool;
 use Alaress\Web\Controller\Base;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 
 /**
  * LTI prototype tool controller
@@ -63,6 +64,6 @@ class Controller extends Base
      */
     private function buildRegistrationRepository(): RegistrationRepository
     {
-        return (new RegistrationRepositoryFactory($this->getConfigLoader()))->build();
+        return (new RegistrationRepositoryFactory($this->getConfigLoader(), ToolMapper::getInstance()))->build();
     }
 }

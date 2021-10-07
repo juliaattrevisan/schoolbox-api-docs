@@ -14,6 +14,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Prototype\UserAuthenticator;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Role;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
@@ -154,6 +155,6 @@ class Controller extends Base
      */
     private function buildRegistrationRepository(): RegistrationRepository
     {
-        return (new RegistrationRepositoryFactory($this->getConfigLoader()))->build();
+        return (new RegistrationRepositoryFactory($this->getConfigLoader(), ToolMapper::getInstance()))->build();
     }
 }
