@@ -1,6 +1,8 @@
 <script>
 
 import RevealModal from "@vue/components/reveal-modal";
+import dayjs from 'dayjs';
+
 
 export default {
 
@@ -9,7 +11,6 @@ export default {
     components: { RevealModal },
 
     props: [
-        'toMoment',
         'bookingPath',
         'dateFormats',
         'bookingType',
@@ -33,7 +34,7 @@ export default {
          */
         displayDate() {
             return this.event.date
-                ? this.toMoment(this.event.date).format(
+                ? dayjs(this.event.date).format(
                     this.event.allDay
                         ? this.dateFormats.displayDate
                         : this.dateFormats.displayDatetime
@@ -53,11 +54,11 @@ export default {
 
         submitForm() {
             var createBookingParamsRoute = [
-                'startDate=' + this.toMoment(this.event.date).format('YYYY-MM-DD')
+                'startDate=' + dayjs(this.event.date).format('YYYY-MM-DD')
             ];
 
             if (!this.event.allDay) {
-                createBookingParamsRoute.push('startTime=' + this.toMoment(this.event.date).format('HH:mm'));
+                createBookingParamsRoute.push('startTime=' + dayjs(this.event.date).format('HH:mm'));
             }
 
             var createBookingPath = this.bookingPath + '?' + createBookingParamsRoute.join('&');
@@ -74,7 +75,7 @@ export default {
         },
 
         getStartDate() {
-            return this.event?.date ? this.toMoment(this.event.date).format('YYYY-MM-DD') : '';
+            return this.event?.date ? dayjs(this.event.date).format('YYYY-MM-DD') : '';
         }
     }
 

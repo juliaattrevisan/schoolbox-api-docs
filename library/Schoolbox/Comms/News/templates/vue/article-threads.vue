@@ -1,6 +1,7 @@
 <script>
 
-import moment from 'moment';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import axios from 'axios';
 import MediaArticle from '@vue/components/media-article';
 import toastMixin from '@vue/components/toast-mixin';
@@ -63,7 +64,8 @@ export default {
 
     },
 
-    mounted: function() {
+    mounted () {
+        dayjs.extend(relativeTime); //to use fromNow()
         this.initDataFromProps();
         this.getThread();
     },
@@ -286,7 +288,7 @@ export default {
          * @returns { String } ie: 2 hours ago
          */
         fromNow (date) {
-            return moment(date.database).fromNow();
+            return dayjs(date.database).fromNow();
         },
 
         /**
@@ -297,7 +299,7 @@ export default {
          * @returns { String }
          */
         fullString (date) {
-            return moment(date.database).format(dateDisplayFormats.momentJsDatetime);
+            return dayjs(date.database).format(dateDisplayFormats.momentJsDatetime);
         }
 
     },

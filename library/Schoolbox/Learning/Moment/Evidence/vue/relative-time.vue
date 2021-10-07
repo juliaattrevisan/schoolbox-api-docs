@@ -1,5 +1,7 @@
 <script>
-import moment from "moment";
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import duration from 'dayjs/plugin/duration';
 
 export default {
 
@@ -71,6 +73,8 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+        dayjs.extend(relativeTime); //to use humanize()
+        dayjs.extend(duration); //to use .duration
         this.formattedDate = this.renderFormattedDatetimes(this.datetime);
     },
 
@@ -96,8 +100,8 @@ export default {
          *                     constructor.
          */
         renderFormattedDatetimes(datetime) {
-            let now = moment().startOf('d'),
-                date = moment(datetime),
+            let now = dayjs().startOf('d'),
+                date = dayjs(datetime),
                 dayDiff = date.diff(now, 'd'),
                 dateFormat = this.dateOnly
                     ? this.dateDisplayFormats.momentJs
@@ -119,7 +123,7 @@ export default {
             } else if (dayDiff === 1) {
                 struct.relative = 'tomorrow';
             } else {
-                struct.relative = moment.duration(dayDiff, 'd').humanize(true);
+                struct.relative = dayjs.duration(dayDiff, 'd').humanize(true);
             }
 
             return struct;

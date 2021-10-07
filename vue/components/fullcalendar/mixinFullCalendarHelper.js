@@ -3,24 +3,19 @@
  * contains common code that can be shared between all implementations.
  */
 
-import { toMoment } from '@fullcalendar/moment';
-import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import arraySupport from 'dayjs/plugin/arraySupport';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
 
-export const mixinFullCalendarHelper = {
+export default {
 
-    data () {
-        return {
-            fullCalendarHelper_eventTimeFormat: {
-                hour: 'numeric',
-                hour12: true,
-                minute: '2-digit',
-                meridiem: 'short',
-                omitZeroMinute: true
-            },
-            test: 'ha'
-        }
+    created () {
+        dayjs.extend(advancedFormat); //for more format options
+        dayjs.extend(arraySupport); //to be able to use an array as a date
+        dayjs.extend(customParseFormat); //for the dayjs() constructor to support custom formats of input strings
     },
 
     methods: {
@@ -33,7 +28,7 @@ export const mixinFullCalendarHelper = {
          * @param {boolean} isLoading True when events start loading,
          *                            false once they are finished.
          */
-        $_fullCalendarHelper_onLoading (isLoading) {
+        fullCalendarHelper_onLoading (isLoading) {
             // TODO find a non-jQuery dependent way to do this
             if (isLoading === true) {
                 // this.$refs.toast.activate('Loading...');
@@ -60,7 +55,7 @@ export const mixinFullCalendarHelper = {
          * @param {object} eventRenderInfo
          * @return {boolean}
          */
-        $_fullCalendarHelper_eventRender(eventRenderInfo) {
+        fullCalendarHelper_eventRender(eventRenderInfo) {
 
             const calEvent = eventRenderInfo.event;
 
@@ -93,23 +88,12 @@ export const mixinFullCalendarHelper = {
         },
 
         /**
-         * Helper function for converting a native JS Date to a Moment object.
-         * @see https://fullcalendar.io/docs/moment-plugins
-         *
-         * @param {Date} date
-         */
-        $_fullCalendarHelper_toMoment (date) {
-            // Attempt to pass in the fullCalendar API itself
-            return toMoment(date, this.$refs.fullCalendar.getApi());
-        },
-
-        /**
          * Is the given event a task or not? This affects how it's rendered.
          *
          * @param {object} event
          * @return {boolean}
          */
-        $_fullCalendarHelper_isTask (event) {
+        fullCalendarHelper_isTask (event) {
             return event?.extendedProps?.data?.meta?.variant === EVENT_VARIANTS.TASK;
         },
 
@@ -120,10 +104,52 @@ export const mixinFullCalendarHelper = {
          * @param type
          * @returns {*}
          */
-        $_fullCalendarHelper_dateDiff (start, end, type = 'days') {
-            const startDate = this.$_fullCalendarHelper_toMoment(start);
-            const endDate = this.$_fullCalendarHelper_toMoment(end);
+        fullCalendarHelper_dateDiff (start, end, type = 'day') {
+            const startDate = dayjs(start);
+            const endDate = dayjs(end);
             return endDate.diff(startDate, type);
+        },
+
+        /**
+         * To display a week date range like: 
+         * September 26th - October 2nd, 2021
+         * We also add the extra formatting of removing the second dates month if it's the same as the second:
+         * October 3rd - 9th, 2021
+         * 
+         * @param { Object }
+         * 
+         * @returns { String }
+         */
+        fullCalendarHelper_titleFormatWeek (date) {
+            const startDate = date.start.array;
+            const endDate = date.end.array;
+            const isSameYear = dayjs(startDate).isSame(endDate, 'year'); //only display the first year if it's different than the endDate's
+            const startDateFormat = isSameYear ? dayjs(startDate).format('MMMM Do') : dayjs(startDate).format('MMMM Do, YYYY');
+            const isSameMonth = dayjs(startDate).isSame(endDate, 'month'); //only display the end date's month if it's different than the startDate's
+            const endDateFormat = isSameMonth ? dayjs(endDate).format('Do, YYYY') : dayjs(endDate).format('MMMM Do, YYYY');
+            return `${startDateFormat} – ${endDateFormat}`;
+        },
+
+        /**
+         * To display an event time like 8:30am - 9:45am
+         * Zero minutes will also be taken off, so 11:00am will become 11am
+         * Will also show only the start date if there's no end
+         * And will consider all day events, returning an empty string
+         * 
+         * @param { Object }
+         * 
+         * @returns { String }
+         */
+        fullCalendarHelper_eventTimeFormat (date) {
+            if (date.start && date.end) {
+                const startTime = dayjs(date.start.array).format('h:mma').replace(':00', '');
+                const endTime = dayjs(date.end.array).format('h:mma').replace(':00', '');
+                return `${startTime} - ${endTime}`;
+            } else if (date.start) {
+                return dayjs(date.start.array).format('h:mma').replace(':00', '');
+            } else { //typically an all day event
+                return '';
+            }
         },
 
         /**
@@ -134,7 +160,7 @@ export const mixinFullCalendarHelper = {
          *
          * @return {number}
          */
-        $_fullCalendarHelper_contentHeight() {
+        fullCalendarHelper_contentHeight() {
             const windowHeight = window.innerHeight;
             // FullCalendar is prone to raising a maximum call stack exceeded
             // error when:

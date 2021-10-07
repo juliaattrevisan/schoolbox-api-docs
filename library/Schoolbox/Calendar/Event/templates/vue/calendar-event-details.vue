@@ -1,5 +1,5 @@
 <script>
-    import moment           from 'moment';
+    import dayjs            from 'dayjs';
     import AudiencesModal   from './audiences-modal';
     import qs               from 'qs';
     import axios            from "axios";
@@ -24,9 +24,9 @@
     vSelect.props.components.default = () => ({ Deselect });
 
     const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
-    const FORMAT_LONG_DATE_WITH_TIME = 'LLLL'; // Monday, October 01, 2019 02:30 PM
+    const FORMAT_LONG_DATE_WITH_TIME = 'dddd, MMMM DD, YYYY h:mma'; // Monday, October 01, 2019 02:30pm
     const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
-    const FORMAT_TIME_ONLY = 'LT'; // 02:30 PM
+    const FORMAT_TIME_ONLY = 'h:mma'; // 02:30pm
 
     export default {
 
@@ -82,10 +82,10 @@
             jQuery: () => window.jQuery,
 
             dateTimeDisplay: function() {
-                if (this.event.options.allDay) return moment(this.event.dates.start).format(FORMAT_LONG_DATE);
+                if (this.event.options.allDay) return dayjs(this.event.dates.start).format(FORMAT_LONG_DATE);
 
-                let startDate = moment(this.event.dates.start),
-                        endDate = moment(this.event.dates.end);
+                let startDate = dayjs(this.event.dates.start),
+                        endDate = dayjs(this.event.dates.end);
 
                 if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
                     return startDate.format(FORMAT_LONG_DATE) +
@@ -96,11 +96,11 @@
             },
 
             monthDisplay: function() {
-                return moment(this.event.dates.start).format('MMM');
+                return dayjs(this.event.dates.start).format('MMM');
             },
 
             dateDisplay: function() {
-                return moment(this.event.dates.start).format('DD');
+                return dayjs(this.event.dates.start).format('DD');
             },
 
             byLine: function() {

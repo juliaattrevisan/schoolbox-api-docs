@@ -5,13 +5,12 @@ import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
 import ExportUrlModal     from './export-url-modal';
 import interactionPlugin  from "@fullcalendar/interaction";
 import listPlugin         from "@fullcalendar/list";
-import momentPlugin       from "@fullcalendar/moment";
 import adaptivePlugin     from "@fullcalendar/adaptive";
 import axios              from "axios";
-import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@vue/components/fullcalendar/customised-calendar-event';
-import moment              from 'moment';
+import dayjs              from 'dayjs';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
@@ -30,7 +29,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -68,21 +67,25 @@ export default {
     beforeMount () {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, listPlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, listPlugin, adaptivePlugin ],
             views: {
                 list: {
                     type: 'list',
                     duration: { days: this.config.days },
-                    listDayFormat: this.config.momentJsDateLong,
+                    listDayFormat: (date) => {
+                        return dayjs(date.date.array).format(this.config.momentJsDateLong); 
+                    },
                     listDaySideFormat: false
                 }
             },
             headerToolbar: false,
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                return this.fullCalendarHelper_eventTimeFormat(date);
+            },
             height: 'auto',
             initialView: 'list',
             events: this.events,
-            eventDidMount: this.$_fullCalendarHelper_eventRender,
+            eventDidMount: this.fullCalendarHelper_eventRender,
             noEventsDidMount: null, //hide the no events message
             eventClick: this.onEventClick,
             loading: this.onLoading,
@@ -223,7 +226,6 @@ export default {
     <div>
         <view-event-modal
             ref="event"
-            :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="ENDPOINTS.URL_EVENT_MODIFY_FORM"
             :event-modify-form-action-url="ENDPOINTS.URL_EVENT_MODIFY_FORM_ACTION"
             :event-delete-url="ENDPOINTS.URL_EVENT_DELETE"
@@ -273,7 +275,7 @@ export default {
         <div class="component-action" v-if="config.folderId && eventsLoaded && hasEvents">
             <section>
                 <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
-                <a href="#" @click="$refs.exportModal.open" class="button">Export Events</a>
+                <a href="#" @click.prevent="$refs.exportModal.open" @keyup.enter="$refs.exportModal.open" class="button">Export Events</a>
                 <a v-if="config.canCreateEvent" :href="config.importEventsUrl" class="button">Import Events</a>
             </section>
         </div>

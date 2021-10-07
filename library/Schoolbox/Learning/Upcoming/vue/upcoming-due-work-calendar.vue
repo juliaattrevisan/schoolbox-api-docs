@@ -5,15 +5,15 @@ import interactionPlugin  			from '@fullcalendar/interaction'
 import dayGridPlugin      			from '@fullcalendar/daygrid'
 import timeGridPlugin     			from '@fullcalendar/timegrid'
 import listPlugin         			from '@fullcalendar/list'
-import momentPlugin       			from '@fullcalendar/moment'
 import adaptivePlugin     			from '@fullcalendar/adaptive'
 import RevealModal        			from '@vue/components/reveal-modal'
 import ViewEventModal     			from '@vue/components/fullcalendar/view-event-modal';
 import FlatPickr          			from '@vue/components/fullcalendar/flat-pickr';
 import axios              			from 'axios'
-import { mixinFullCalendarHelper } 	from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper           from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        			from 'qs';
 import CustomisedCalendarEvent	  	from '@vue/components/fullcalendar/customised-calendar-event';
+import dayjs                        from 'dayjs';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -42,7 +42,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -71,18 +71,26 @@ export default {
     beforeMount () {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
             views: {
                 day: {
                     dayHeaders: false,
-                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
+                    titleFormat: (date) => {
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    }
                 },
                 week: {
-                    dayHeaderFormat: this.formats.displayWeekDay,
-                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    dayHeaderFormat: (date) => {
+                        return dayjs(date.date.array).format(this.formats.displayWeekDay); 
+                    },
+                    titleFormat: (date) => {
+                        return this.fullCalendarHelper_titleFormatWeek(date);
+                    }
                 },
             },
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                return this.fullCalendarHelper_eventTimeFormat(date);
+            },
             customButtons: {
                 quickSwitchButton: {
                     text: ' ',
@@ -113,9 +121,9 @@ export default {
             },
             initialView: 'dayGridMonth',
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            eventDidMount: this.$_fullCalendarHelper_eventRender,
+            eventDidMount: this.fullCalendarHelper_eventRender,
             events: this.events,
-            loading: this.$_fullCalendarHelper_onLoading,
+            loading: this.fullCalendarHelper_onLoading,
             eventClick: this.onEventClick
         }
     },
@@ -125,7 +133,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
             this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
@@ -237,7 +245,6 @@ export default {
     <div>
         <view-event-modal
             ref="event"
-            :to-moment="$_fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"

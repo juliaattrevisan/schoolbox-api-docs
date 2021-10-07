@@ -2,7 +2,6 @@
 
 import FullCalendar               from '@fullcalendar/vue'
 import interactionPlugin          from '@fullcalendar/interaction'
-import momentPlugin               from '@fullcalendar/moment'
 import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@vue/components/fullcalendar/view-event-modal';
 import CreateBookingModal         from '@vue/components/fullcalendar/resourceBooking/create-booking-modal';
@@ -10,8 +9,9 @@ import ExportModal                from '@vue/components/fullcalendar/resourceBoo
 import FilterModal                from '@vue/components/fullcalendar/resourceBooking/filter-modal';
 import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
-import { mixinFullCalendarHelper } from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper         from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
+import dayjs                      from 'dayjs';
 
 const URL_EVENT_EXPORT = '/calendar/export.php';
 
@@ -36,7 +36,7 @@ export default {
     },
 
     mixins: [
-        mixinFullCalendarHelper
+        fullCalendarHelper
     ],
 
     data () {
@@ -69,22 +69,37 @@ export default {
     beforeMount () {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, momentPlugin, resourceTimelinePlugin, adaptivePlugin ],
+            plugins: [ interactionPlugin, resourceTimelinePlugin, adaptivePlugin ],
             views: {
                 resourceTimelineMonth: {
-                    slotLabelFormat: ['ddd D']
+                    slotLabelFormat: (date) => {
+                        return dayjs(date.date.array).format('ddd D');
+                    }
                 },
                 resourceTimelineWeek: {
-                    slotLabelFormat: ['ddd D/M', 'h'],
+                    slotLabelFormat: [
+                        (date) => {
+                            return dayjs(date.date.array).format('ddd D/M');
+                        },
+                        (date) => {
+                            return dayjs(date.date.array).format('h');
+                        }
+                    ],
                     slotMinWidth: '50',
-                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
+                    titleFormat: (date) => {
+                        return this.fullCalendarHelper_titleFormatWeek(date);
+                    } 
                 },
                 resourceTimelineDay: {
                     slotMinWidth: '50',
-                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
+                    titleFormat: (date) => {
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    } 
                 }
             },
-            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: (date) => {
+                return this.fullCalendarHelper_eventTimeFormat(date);
+            },
             eventTextColor: 'black',
 			customButtons: {
                 customExport: {
@@ -133,7 +148,7 @@ export default {
             events: this.events,
             eventDidMount: this.eventRender,
             defaultTimedEventDuration: '00:05:00',
-            loading: this.$_fullCalendarHelper_onLoading,
+            loading: this.fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
             eventClick: this.onEventClick
         }
@@ -144,7 +159,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
             this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
@@ -210,7 +225,7 @@ export default {
          */
         eventRender(eventRenderInfo) {
 
-            if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
+            if (!this.fullCalendarHelper_eventRender(eventRenderInfo)) {
                 eventRenderInfo.event.setProp('display', 'none');
                 return false;
             }
@@ -351,7 +366,6 @@ export default {
 
         <create-booking-modal
             ref="createBooking"
-            :to-moment="$_fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
             :date-formats="formats"
             :booking-type="'category'"
@@ -359,7 +373,6 @@ export default {
 
         <view-event-modal
             ref="event"
-            :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-update-url="urls.update"
