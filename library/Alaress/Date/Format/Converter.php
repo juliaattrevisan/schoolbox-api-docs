@@ -71,7 +71,7 @@ class Alaress_Date_Format_Converter
                 's' => 'ss',
                 // day formats
                 'j' => 'D',
-                'S' => 'o',
+                'S' => 'o', 
                 'd' => 'DD',
                 'D' => 'ddd',
                 'l' => 'dddd',
