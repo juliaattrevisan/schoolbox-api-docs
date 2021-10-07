@@ -2,7 +2,7 @@
     // -----------------------------------------------------------------------
     // Public vars & methods
     // -----------------------------------------------------------------------
-    adtp.momentFormats = {
+    adtp.dayjsFormats = {
         database: "YYYY-MM-DD HH:mm:ss",
         databaseShort: "YYYY-MM-DD",
         nice: "dddd, MMM D, Y"
@@ -337,7 +337,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 "/id/" +
                 pickerId +
                 "/value/" +
-                encodeURIComponent(originalValue.format(adtp.momentFormats.database)),
+                encodeURIComponent(originalValue.format(adtp.dayjsFormats.database)),
                 function () {
                     // Capture closure of modal
                     $(document).on(
@@ -664,7 +664,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     $fieldError.show();
                 }
             } else {
-                var newDate = moment.unix(timestamp);
+                var newDate = dayjs().unix(timestamp);
 
                 // If field has all day switch data param and is end or start of day - make all day
                 var state =

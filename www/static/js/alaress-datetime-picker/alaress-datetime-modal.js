@@ -29,7 +29,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictNoWorkToday = 'Your students have nothing due this day';
     var heatCache = {};
     var dayjsFormat = pickerOptions.enableTime ? dateDisplayFormats.dayjsDatetime : dateDisplayFormats.dayjs;
-    // Initial input value as moment.js object
+    // Initial input value as dayjs object
     var dayjsDate = dayjs(twigVars.date, dayjsFormat);
 
     // Timetable picker
@@ -548,7 +548,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     /**
      * If the field has a time of 12am or 11:59pm, we consider this to not have time if all day is enabled
-     * Check if a momentjs date object has time by this definition
+     * Check if a dayjs date object has time by this definition
      *
      * @param dayjsDate {object}
      * @returns {boolean}
@@ -1220,7 +1220,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         if (isInputValueValid()) {
 
-            // Create a moment object from the input value
+            // Create a dayjs object from the input value
             var activeDate = dayjs(getInputValue(), dateDisplayFormats.dayjsDatetime);
 
             // Set date on flatpickr to the input date

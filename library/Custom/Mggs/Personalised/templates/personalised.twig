@@ -177,9 +177,9 @@
                 calendarDate;
             if (hashParts) {
                 viewAlias      = hashParts[1];
-                var momentDate = dayjs(hashParts[2], dateDisplayFormats.dayjs);
-                if (momentDate.isValid()) {
-                    calendarDate = momentDate.toDate();
+                var dayjsDate = dayjs(hashParts[2], dateDisplayFormats.dayjs);
+                if (dayjsDate.isValid()) {
+                    calendarDate = dayjsDate.toDate();
                 } else {
                     calendarDate = new Date();
                 }
@@ -300,8 +300,8 @@
         /**
          * Builds a date span text and datetime tag value.
          *
-         * @param start  A moment object
-         * @param end    A moment object
+         * @param start  A dayjs object
+         * @param end    A dayjs object
          * @param allDay Is this an all day event?
          * @returns {Object} text: a text representation, datetime: an ISO8601 time interval
          */

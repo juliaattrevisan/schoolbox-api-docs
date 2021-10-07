@@ -6,7 +6,7 @@
 
 $(function() {
     // A global variable
-    var momentFormat = dateDisplayFormats.dayjs;
+    var dayjsFormat = dateDisplayFormats.dayjs;
     $.fn.alaressEditor();
 
     // remote validation rules
@@ -76,8 +76,8 @@ $(function() {
     $.validator.addMethod(
             'afterStart',
             function(value,element){
-                var startDate       = dayjs($('#startDate').val(),momentFormat);
-                var repeatUntilDate = dayjs(value,momentFormat);
+                var startDate       = dayjs($('#startDate').val(),dayjsFormat);
+                var repeatUntilDate = dayjs(value,dayjsFormat);
 
                 return '' == value || startDate.isBefore(repeatUntilDate);
             },

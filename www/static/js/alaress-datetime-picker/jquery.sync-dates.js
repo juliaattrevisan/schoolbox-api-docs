@@ -8,10 +8,10 @@
      * Options:
      * * startDate, endDate: selectors for the start and end date input. If either
      *                       is left out, the DOM node in 'this' is used instead.
-     * * dateFormat:         a momentJS date format to expect dates in
+     * * dateFormat:         a dayjs date format to expect dates in
      */
     $.fn.syncDates = function(options) {
-        // Format: use momentJS format if it's there, otherwise d/m/Y
+        // Format: use dayjs format if it's there, otherwise d/m/Y
         var dateFormat = 'DD/MM/YYYY';
         var element = this;
 
@@ -58,7 +58,7 @@
      * Options:
      * * startDate, endDate: selectors for the start and end date input. If either
      *                       is left out, the DOM node in 'this' is used instead.
-     * * dateFormat:         a momentJS date format to expect dates in
+     * * dateFormat:         a dayjs date format to expect dates in
      */
     $.fn.syncDatesNow = function(options) {
 

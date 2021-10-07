@@ -4,14 +4,14 @@
     $.alaressValidate = {};
 
     /**
-     * Gets a momentJS date given a format and date.
+     * Gets a dayjs date given a format and date.
      *
      * @param format the MomentJS format to get this date in.
      * @param date   the date string
      * @param hour   the hour to set
      * @param minute the minute to set
      * @param second the second to set
-     * @returns {moment}
+     * @returns {dayjs}
      */
     var getDateFromString = function(format, date, hour, minute, second) {
         return dayjs(date, format)
@@ -27,7 +27,7 @@
      *
      * @param date_field
      * @param form
-     * @returns {moment}
+     * @returns {dayjs}
      */
     var getNormalizedDate = function(date_field, form) {
         var field_name = date_field;
