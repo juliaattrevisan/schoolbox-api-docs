@@ -59,8 +59,10 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
     /**
      * The registration.
+     *
+     * @var array|Registration[]
      */
-    private Registration $registration;
+    private array $registrations;
 
     /**
      * Tools which have been set up
@@ -87,7 +89,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $this->sharedPublicKey  = $sharedPublicKey;
         $this->sharedPrivateKey = $sharedPrivateKey;
         $this->tools            = $tools;
-        $this->registration     = $this->buildTestRegistration();
+        $this->buildTestRegistrations();
     }
 
     /**
@@ -98,9 +100,12 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function find(string $identifier): ?RegistrationInterface
     {
-        return $this->registration->getIdentifier() === $identifier
-            ? $this->registration
-            : null;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getIdentifier() === $identifier) {
+                return $registration;
+            }
+        }
+        return null;
     }
 
     /**
@@ -110,7 +115,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findAll(): array
     {
-        return [$this->registration];
+        return $this->registrations;
     }
 
     /**
@@ -121,9 +126,12 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findByClientId(string $clientId): ?RegistrationInterface
     {
-        return $this->registration->getClientId() === $clientId
-            ? $this->registration
-            : null;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getClientId() === $clientId) {
+                return $registration;
+            }
+        }
+        return null;
     }
 
     /**
@@ -136,9 +144,11 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
     {
-        if ($this->registration->getPlatform()->getAudience() === $issuer) {
-            if (!isset($clientId) || $this->registration->getClientId() === $clientId) {
-                return $this->registration;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getPlatform()->getAudience() === $issuer) {
+                if (!isset($clientId) || $registration->getClientId() === $clientId) {
+                    return $registration;
+                }
             }
         }
         return null;
@@ -154,20 +164,20 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
     {
-        if ($this->registration->getTool()->getAudience() === $issuer) {
-            if (!isset($clientId) || $this->registration->getClientId() === $clientId) {
-                return $this->registration;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getTool()->getAudience() === $issuer) {
+                if (!isset($clientId) || $registration->getClientId() === $clientId) {
+                    return $registration;
+                }
             }
         }
         return null;
     }
 
     /**
-     * Build the registration.
-     *
-     * @return Registration
+     * Build the registrations
      */
-    private function buildTestRegistration(): Registration
+    private function buildTestRegistrations(): void
     {
         // Configure security keys
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-security-keys
@@ -208,7 +218,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
         // Configure a registration
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-registration
-        return new Registration(
+        $this->registrations[] = new Registration(
             self::REGISTRATION_IDENTIFIER,
             self::REGISTRATION_CLIENT_ID,
             $platform,
@@ -217,5 +227,35 @@ class RegistrationRepository implements RegistrationRepositoryInterface
             $platformKeyChain,
             $toolKeyChain,
         );
+
+
+        // Build a registration out of each tool
+        foreach ($this->tools as $toolModel) {
+//            $keychain = $keyChainFactory->create(
+//                '1',
+//                $toolModel->getName(),
+//                $toolModel->getPublicKey()
+//            );
+            $tool = new Tool(
+                $toolModel->getName(),
+                $toolModel->getName(),
+                $toolModel->getAudience(),
+                $toolModel->getOidcInitiationUrl(),
+                $toolModel->getLaunchUrl(),
+                $toolModel->getDeepLinkingUrl()
+            );
+
+            $this->registrations[] = new Registration(
+                $toolModel->getAudience(),
+                'schoolbox',
+                $platform,
+                $tool,
+                ['deploymentId3', 'deploymentId4'],
+                $platformKeyChain,
+                null,
+                null,
+                $toolModel->getJwksUrl()
+            );
+        }
     }
 }
