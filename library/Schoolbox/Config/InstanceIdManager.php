@@ -17,6 +17,7 @@ use PDOException;
 use Predis;
 use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\MQ;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
@@ -323,7 +324,7 @@ class InstanceIdManager extends CliTool\App
         ];
 
         foreach ($daemons as $daemon) {
-            $liveOrDev = $this->getConfig()->get('site_type') === 'dev' ? 'dev' : '';
+            $liveOrDev = $this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING ? Instance::SITE_TYPE_STAGING : '';
             $command   = "service schoolbox$liveOrDev-$daemon restart";
             $this->getLogger()->debug("Executing:\n    $command");
             exec($command, $output, $returnCode);

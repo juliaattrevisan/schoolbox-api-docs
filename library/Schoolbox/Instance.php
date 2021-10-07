@@ -13,6 +13,14 @@ class Instance
 {
     public const APPLICATION_NAME = 'schoolbox';
 
+    public const SITE_TYPE_DEVELOPMENT  = 'dev';
+
+    public const SITE_TYPE_PRODUCTION   = 'prod';
+
+    public const SITE_TYPE_STAGING      = 'stg';
+
+    public const SITE_TYPE_TRIAL        = 'trial';
+
     /**
      * @var string
      */
@@ -121,35 +129,35 @@ class Instance
     /**
      * @return bool
      */
-    public function isProduction()
+    public function isProduction(): bool
     {
-        return strpos($this->getType(), 'prod') !== false;
+        return strpos($this->getType(), self::SITE_TYPE_PRODUCTION) !== false;
     }
 
 
     /**
      * @return bool
      */
-    public function isDevelopment()
+    public function isStaging(): bool
     {
-        return strpos($this->getType(), 'dev') !== false;
+        return strpos($this->getType(), self::SITE_TYPE_STAGING) !== false;
     }
 
 
     /**
      * @return bool
      */
-    public function isSandbox()
+    public function isTrial(): bool
     {
-        return strpos($this->getType(), 'sandbox') !== false;
+        return strpos($this->getType(), self::SITE_TYPE_TRIAL) !== false;
     }
 
 
     /**
      * @return bool
      */
-    public function isVagrant()
+    public function isDevelopment(): bool
     {
-        return strpos($this->getType(), 'vagrant') !== false;
+        return strpos($this->getType(), self::SITE_TYPE_DEVELOPMENT) !== false;
     }
 }

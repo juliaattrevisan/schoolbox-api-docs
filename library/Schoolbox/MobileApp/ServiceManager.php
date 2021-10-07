@@ -321,13 +321,8 @@ class ServiceManager implements IServiceManager
             return true;
         }
 
-        // use test service in vagrant always
-        if ($this->serverInstance->isVagrant()) {
-            return true;
-        }
-
-        // use test service in dev servers if NOT a sandbox
-        if ($this->serverInstance->isDevelopment() && !$this->serverInstance->isSandbox()) {
+        // use test service in development and staging always
+        if ($this->serverInstance->isDevelopment() || $this->serverInstance->isStaging()) {
             return true;
         }
 
