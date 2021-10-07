@@ -214,6 +214,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
             'Schoolbox [vagrant] Tool',
             $this->baseUrl->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/oidc/initiation')->toString(),
+            (clone $this->baseUrl)->setPath('/lti-prototype/tool/launch')->toString(),
         );
 
         // Configure a registration

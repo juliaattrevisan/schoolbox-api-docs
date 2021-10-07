@@ -74,10 +74,7 @@ class Controller extends Base
                 [
                     'staffUsers'    => $staffUsers,
                     'studentUsers'  => $studentUsers,
-                    'targetLinkUri' => (new Factory($this->getConfigLoader()))
-                        ->buildFullyQualified()
-                        ->setScheme('https')
-                        ->setPath($this->router->generate('ltiPrototypeTool.getLaunch')),
+                    'registrations' => $this->buildRegistrationRepository()->findAll(),
                 ],
                 self::TITLE,
             )
@@ -94,7 +91,7 @@ class Controller extends Base
     {
         // Build the registration repository, then get a registration out of it:
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/interfaces/#registration-repository-interface
-        $registration = $this->buildRegistrationRepository()->find(RegistrationRepository::REGISTRATION_IDENTIFIER);
+        $registration = $this->buildRegistrationRepository()->find($this->request->query->get('registration'));
         if (!$registration) {
             $this->sendError('Registration not found');
         }
@@ -104,7 +101,7 @@ class Controller extends Base
         $message = (new ResourceLinkRequestFactory($this->userMapper, $registration))
             ->build(
                 $this->request->query->get('loginHint'),
-                $this->request->query->get('targetLinkUri')
+                $registration->getTool()->getLaunchUrl()
             );
 
         $this->response->content->set(
