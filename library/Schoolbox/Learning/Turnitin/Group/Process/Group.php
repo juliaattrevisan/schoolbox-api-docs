@@ -253,6 +253,18 @@ class Group
         foreach ($submissionBoxFiles as $submissionBoxFile) {
             $submissionBoxFileId = $submissionBoxFile->getId();
 
+            /* Ensure this is one of the valid filetypes that Turnitin likes
+             */
+            if (!(new Turnitin\ValidFile())->isSatisfiedBy($submissionBoxFile)) {
+                $this->logDebug(sprintf(
+                    'Group %s: submission box file %s is an invalid type and is not accepted by Turnitin - skipping',
+                    $turnitinGroup->getId(),
+                    $submissionBoxFileId,
+                ));
+
+                continue;
+            }
+
             if (null === $turnitinGroupAttachments->getOffset($submissionBoxFileId)) {
                 $groupAttachmentId = $this->api->retrieve('POST', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments", [
                     'title' => $submissionBoxFile->getBasename(),
