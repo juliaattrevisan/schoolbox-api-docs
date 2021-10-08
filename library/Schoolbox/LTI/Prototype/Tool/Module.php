@@ -29,7 +29,7 @@ class Module extends BaseModule
     public function registerRoutes()
     {
         $this->register(self::METHOD_GET, '/oidc/initiation', 'getOidcInitiationRequest');
-        $this->register(self::METHOD_POST, '/launch', 'postLaunch');
+        $this->register(self::METHOD_GET, '/launch', 'getLaunch');
     }
 
     /**

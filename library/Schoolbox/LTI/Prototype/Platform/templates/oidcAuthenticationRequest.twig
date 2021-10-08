@@ -11,9 +11,4 @@
     <dd style="word-break: break-all">{{ message.parameters.get('state') }}</dd>
 </dl>
 
-<form action="{{ message.url }}" method="post">
-    {% for name, value in message.parameters %}
-        <input type="hidden" name="{{ name }}" value="{{ value }}" />
-    {% endfor %}
-    <input type="submit" value="Launch LTI tool" />
-</form>
+<a href="{{ message.toUrl }}" class="button submit">Launch LTI tool</a>

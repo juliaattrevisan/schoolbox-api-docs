@@ -41,10 +41,10 @@ class Controller extends Base
     /**
      * Handle launch request
      *
-     * @api POST /lti-prototype/tool/launch
+     * @api GET /lti-prototype/tool/launch
      * @since 21.1.0
      */
-    public function postLaunch()
+    public function getLaunch()
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#4-tool-side-launch-validation
