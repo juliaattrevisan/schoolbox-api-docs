@@ -27,20 +27,16 @@
                  */
                 clientId: '',
 
-                /* A set of urls used in the google api handshake process
+                /* Scope
+                 * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
                  */
-                url: {
-                    /* Scope
-                     * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
-                     */
-                    scope: 'https://www.googleapis.com/auth/drive',
+                scope: 'https://www.googleapis.com/auth/drive',
 
-                    /* The url to google's api.js file
-                     * We need to load their js asynchronously, which gives us access to the
-                     * object "gapi" that's used everywhere else
-                     */
-                    api: 'https://apis.google.com/js/api.js',
-                },
+                /* The url to google's api.js file
+                 * We need to load their js asynchronously, which gives us access to the
+                 * object "gapi" that's used everywhere else
+                 */
+                url: 'https://apis.google.com/js/api.js',
 
                 /* A list of modules for which to execute the callback provided
                  */
@@ -62,7 +58,7 @@
          */
         function setup() {
             $.ajax({
-                url: config.url.api,
+                url: config.url,
                 dataType: 'script',
                 cache: true
             }).then(function () {
@@ -81,7 +77,7 @@
                         if (++j === config.modules.length && config.callback && config.clientId.length) {
                             gapi.client.init({
                                 'client_id': config.clientId,
-                                'scope': config.url.scope
+                                'scope': config.scope
                             }).then(function () {
                                 config.callback();
                             });
