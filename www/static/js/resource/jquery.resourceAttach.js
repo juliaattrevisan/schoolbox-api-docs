@@ -482,24 +482,6 @@
         singletonModal.find('#attachment-browser-filesystems')[0].innerHTML = this.attachmentBrowserFilesystemsInnerHTML;
         singletonModal.find('#attachment-browser-panel-container')[0].innerHTML = this.attachmentBrowserPanelContainerInnerHTML;
 
-        window.gpick = {
-            picked: function (docs) {
-                var i;
-                for(i = 0; i < docs.length; ++i) {
-                var doc = docs[i];
-                fiil();
-
-                }
-            },
-            cancel: function () { /* noop */ },
-            needAuth: function () { /* noop */ },
-            loaded: function () {
-                $('#external-google-panel')
-                    .find('div.explorer')
-                    .removeClass('preload');
-            }
-        };
-
         $(document).foundation();
 
         let filesystems = $('#attachment-browser-filesystems');
@@ -523,7 +505,7 @@
             * Inline content starts with a preloader class which should be removed
             * once content has loaded
             */
-           
+
             if (method === 'inline') {
                 fetch(url).then((response) => {
                     response.text().then((text) => {

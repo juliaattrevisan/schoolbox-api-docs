@@ -127,7 +127,7 @@
 </div>
 <div
     id="googleFiles"
-    data-client-id="{{ clientId }}"
+    data-client-id="{{ config.googleapps_client_id }}"
     data-levels="{{ levels['All group members'] }}"
     data-save-route="{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}"
     data-component-id="{{ component_id }}"
@@ -136,4 +136,10 @@
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js"></script>
+    <script type="text/javascript">
+        $.fn.setupGapi({
+            clientId: '{{ config.googleapps_client_id }}',
+            modules: ['client:auth2', 'picker'],
+        });
+    </script>
 {% endif %}

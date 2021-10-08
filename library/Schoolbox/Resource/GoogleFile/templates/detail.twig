@@ -12,18 +12,21 @@
         <p>Sorry, we could not find the document at this time.</p>
     </div>
 </div>
+<div class="small-12 island">
+    <div id="google-authenticate" class="button hide">Authorize Google account to view document</div>
+</div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript">
     $(function () {
-        loadGoogleApi(['client:auth2'], function () {
-            jQuery.ajax({
-                url: '{{ CDN_PREFIX }}/js/google/picker.js',
-                dataType: 'script',
-                cache: true
-            }).then(function () {
+        $.fn.setupGapi({
+            clientId: '{{ config.googleapps_client_id }}',
+            modules: ['client:auth2'],
+            callback: function () {
                 $('#google-file-content').googlePicker({
-                    clientId: '{{ config.googleapps_client_id }}',
                     modules: [],
+                    listener: false,
+                    authBtn: '#google-authenticate',
                     onAuth: function () {
                         gapi.client.load('drive', 'v3', function () {
                             let getViewLink = gapi.client.drive.files.get({
@@ -33,7 +36,6 @@
                             });
                             getViewLink.execute(function (resp) {
                                 if (resp.error || resp.webViewLink.length === 0) {
-                                    console.log(resp);
                                     $('#google-error').removeClass('hide');
                                     return;
                                 }
@@ -43,7 +45,7 @@
                         });
                     },
                 });
-            });
+            }
         });
     });
 </script>

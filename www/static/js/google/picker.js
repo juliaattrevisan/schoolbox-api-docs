@@ -16,9 +16,14 @@
 
         /* Only proceed if both parts set
          */
-        if (config.clientId.length && config.modules.length) {
+        if (config.listener) {
             setupListeners();
         } else {
+            if (config.authBtn) {
+                $(config.authBtn).on('click', function () {
+                    authorize();
+                });
+            }
             authorize();
         }
 
@@ -45,9 +50,6 @@
                  */
                 containerID: '',
 
-                /* Client id si required, as is postGoogleFileUrl
-                 */
-                clientId: '',
                 postGoogleFileUrl: '',
                 features: [],
                 views: [],
@@ -62,10 +64,8 @@
                     }
                     createPicker(e);
                 },
-                /* A google setting
-                 */
-                scope: 'https://www.googleapis.com/auth/drive',
-                modules: []
+                listener: true,
+                authBtn: false,
             };
             $('#gfile-google-ids').val('');
             return $.extend(defaults, options);
@@ -73,40 +73,37 @@
 
 
         /**
-         * Activate links
+         * Set up listener
          */
         function setupListeners() {
             $(config.element).on('click', function () {
-                loadGoogleApi(config.modules, authorize);
+                authorize();
             });
         }
 
 
         /**
          * Ask google to setup picker
-         * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
          */
         function authorize() {
-            gapi.client.init({
-                'client_id': config.clientId,
-                'scope': config.scope
-            }).then(function () {
-                let gAuth = gapi.auth2.getAuthInstance();
-                let gUser = gAuth.currentUser.get();
-                if (gUser.isSignedIn()) {
-                    authResult = gUser.getAuthResponse();
-                    handleAuthResult();
-                } else {
-                    gAuth.signIn({'prompt': 'select_account'}).then(
-                        function () {
-                            // reset authResult
-                            gUser = gAuth.currentUser.get();
-                            authResult = gUser.getAuthResponse();
-                            handleAuthResult();
-                        }
-                    );
-                }
-            });
+            let showBtn = config.authBtn && $(config.authBtn).hasClass('hide');
+            let gAuth = gapi.auth2.getAuthInstance();
+            let gUser = gAuth.currentUser.get();
+            if (gUser.isSignedIn()) {
+                authResult = gUser.getAuthResponse();
+                handleAuthResult();
+            } else if (showBtn) {
+                $(config.authBtn).removeClass('hide');
+            } else {
+                gAuth.signIn({'prompt': 'select_account'}).then(
+                    function () {
+                        // reset authResult
+                        gUser = gAuth.currentUser.get();
+                        authResult = gUser.getAuthResponse();
+                        handleAuthResult();
+                    }
+                );
+            }
         }
 
 
@@ -116,6 +113,9 @@
          */
         function handleAuthResult() {
             if (authResult && !authResult.error) {
+                if (config.authBtn && !$(config.authBtn).hasClass('hide')) {
+                    $(config.authBtn).addClass('hide');
+                }
                 $('#gfile-access-token').val(authResult.access_token);
                 $('#gfile-token-type').val(authResult.token_type);
                 config.onAuth.call($(this.element), authResult.access_token);
@@ -152,7 +152,7 @@
                 .hideTitleBar()
                 .build();
             picker.setVisible(true);
-            
+
             if (config.containerID) { //if it exists, add it into the empty containerId element and ensure it sits at the top left
                 picker.$.style.left = '0px';
                 picker.$.style.top = '0px';

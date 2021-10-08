@@ -2,32 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <script type="text/javascript">
-
-        window.gpick = {
-            picked: function (docs) {
-                var i;
-                for (i = 0; i < docs.length; ++i) {
-                    var doc = docs[i];
-                    fiil();
-
-                }
-            },
-            cancel: function () { /* noop */ },
-            needAuth: function () { /* noop */ },
-            loaded: function () {
-                $('#external-google-panel')
-                    .find('div.explorer')
-                    .removeClass('preload');
-            }
-        };
-
         $(document).foundation();
 
         $(function () {
             let filesystems = $('#attachment-browser-filesystems');
+            const MAX_IFRAME_HEIGHT = 550;
 
             filesystems.find('[data-source]').on('click', function (event) {
-                const MAX_IFRAME_HEIGHT = 350;
 
                 let source = $(this).attr('data-source');
                 let panel = $('#' + source + '-panel');

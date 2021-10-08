@@ -1,16 +1,16 @@
 /**
- * To select a file from the Google Drive picker, then step through the file edit permissions, file comment permissions, and lastly file processing 
+ * To select a file from the Google Drive picker, then step through the file edit permissions, file comment permissions, and lastly file processing
  */
 
 import { gsap } from 'gsap/all';
 
-    
+
 const googleFiles = document.getElementById('googleFiles');
-const clientId = googleFiles.dataset.clientId; 
-const levels = googleFiles.dataset.levels; 
-const saveRoute = googleFiles.dataset.saveRoute; 
-const componentId = googleFiles.dataset.componentId; 
-const folderId = googleFiles.dataset.folderId; 
+const clientId = googleFiles.dataset.clientId;
+const levels = googleFiles.dataset.levels;
+const saveRoute = googleFiles.dataset.saveRoute;
+const componentId = googleFiles.dataset.componentId;
+const folderId = googleFiles.dataset.folderId;
 
 const $gModal = $('#gfile');
 const $step0 = $('#gfile-step0');
@@ -25,16 +25,16 @@ const $step3 = $('#gfile-step3');
  */
 function showNextStep ($step) {
     gsap.from($step, {
-        x: '25%', 
-        alpha: 0, 
-        duration: 0.3, 
+        x: '25%',
+        alpha: 0,
+        duration: 0.3,
         onStart: () => {
             $gModal.css( { overflowX: 'hidden' } ); //to avoid the $step element from being shown outside of the modal bounds
             $step.css( { display: 'block' } );
         },
         onComplete: () => {
             $gModal.css( { overflowX: 'visible' } );
-        } 
+        }
     } );
 }
 
@@ -46,9 +46,7 @@ $('#find-files').on('click', function () {
 });
 
 $('#find-files').googlePicker({
-    clientId: clientId,
     containerID: '#gfile-step0',
-    modules: ['client:auth2', 'picker'],
     mimeTypes: [
         'application/msword',
         'application/vnd.ms-powerpoint',
@@ -161,8 +159,6 @@ $(`#component${componentId} [data-action="delete"]`).on('click', function (event
     });
 });
 $(`#component${componentId} [data-action="permission"]`).googlePicker({
-    clientId: clientId,
-    modules: ['client:auth2'],
     onAuth: function () {
         $('[data-action="continue"]').removeAttr('disabled');
         $('[data-action="share"]').removeAttr('disabled');
@@ -175,7 +171,7 @@ $(`#component${componentId} [data-action="permission"]`).googlePicker({
 });
 
 $(`#component${componentId} [data-action="permission"]`).on('click', function (event) {
-    const editLevel = $(event.target).data('edit-level'); 
+    const editLevel = $(event.target).data('edit-level');
     const commentLevel = $(event.target).data('comment-level');
     $('#gfile-edit-' + editLevel).prop('checked', true);
     $('#gfile-comment-' + commentLevel).prop('checked', true);
