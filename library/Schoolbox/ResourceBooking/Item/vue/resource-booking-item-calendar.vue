@@ -13,7 +13,6 @@ import FilterModal                from '@vue/components/fullcalendar/resourceBoo
 import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
 import fullCalendarHelper         from '@vue/components/fullcalendar/mixinFullCalendarHelper';
-import dayjs                      from 'dayjs';
 
 
 // Various URLs that FullCalendar may make use of.

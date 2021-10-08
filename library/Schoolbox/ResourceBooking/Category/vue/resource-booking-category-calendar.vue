@@ -11,7 +11,6 @@ import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr'
 import axios                      from 'axios'
 import fullCalendarHelper         from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
-import dayjs                      from 'dayjs';
 
 const URL_EVENT_EXPORT = '/calendar/export.php';
 

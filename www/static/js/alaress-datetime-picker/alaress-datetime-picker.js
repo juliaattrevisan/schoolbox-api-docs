@@ -664,7 +664,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     $fieldError.show();
                 }
             } else {
-                var newDate = dayjs().unix(timestamp);
+                var newDate = dayjs.unix(timestamp);
 
                 // If field has all day switch data param and is end or start of day - make all day
                 var state =

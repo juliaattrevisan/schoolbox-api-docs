@@ -178,7 +178,7 @@
                     var msgId = this.id.split('-')[1];
                     if(typeof messages[msgId] !== 'undefined') {
                         var timestamp = messages[msgId].timestamp;
-                        $(this).find('[data-' + settings.tplItemTime + ']').text(dayjs().unix(Math.min(timestamp, now)).fromNow());
+                        $(this).find('[data-' + settings.tplItemTime + ']').text(dayjs.unix(Math.min(timestamp, now)).fromNow());
                     }
                 });
             }
@@ -285,7 +285,7 @@
              */
             function applyMessageData(element, data) {
 
-                var now = dayjs().unix(data.timestamp),
+                var now = dayjs.unix(data.timestamp),
                     msg = applyTokens(data.body, data.params);
 
                 element.attr('id', 'm-' + data.id).attr('data-status', data.status).addClass('status-' + data.status);
@@ -296,7 +296,7 @@
                         location.reload();
                     });
                 }
-
+                
                 element.find('[data-' + settings.tplItemHref + ']').attr('href', data.href);
                 element.find('[data-' + settings.tplItemTitle + ']').html(msg);
                 element.find('[data-' + settings.tplItemTime + ']').html(now.fromNow()).attr('title', now.format(settings.itemTimeFormat));

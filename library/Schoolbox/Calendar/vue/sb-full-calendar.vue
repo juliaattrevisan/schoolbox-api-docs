@@ -16,8 +16,6 @@ import qs                         from "qs";
 import fullCalendarHelper         from "@vue/components/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
-import dayjs                      from 'dayjs';
-import duration                   from 'dayjs/plugin/duration';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -118,7 +116,6 @@ export default {
     },
 
     beforeMount () {
-        dayjs.extend(duration); //to use dayjs.duration
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],

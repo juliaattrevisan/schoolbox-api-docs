@@ -1,8 +1,6 @@
 <script>
 
 import axios  from 'axios';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
 import Toast from '@vue/components/toast';
@@ -123,10 +121,6 @@ export default {
             return comments === null ? [] : comments;
         },
 
-    },
-
-    created () {
-        dayjs.extend(relativeTime); //to use fromNow()
     },
 
     methods: {

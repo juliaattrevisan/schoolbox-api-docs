@@ -1,8 +1,6 @@
 <script>
 
 import axios  from 'axios';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import duration from 'dayjs/plugin/duration';
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
@@ -45,10 +43,6 @@ export default {
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
         }
-    },
-    created() {
-        dayjs.extend(relativeTime); //to use humanize()
-        dayjs.extend(duration); //to use .duration
     },
     computed: {
         jQuery: () => window.jQuery,

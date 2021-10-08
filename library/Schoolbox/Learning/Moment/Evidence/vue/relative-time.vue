@@ -1,7 +1,4 @@
 <script>
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import duration from 'dayjs/plugin/duration';
 
 export default {
 
@@ -73,8 +70,6 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        dayjs.extend(relativeTime); //to use humanize()
-        dayjs.extend(duration); //to use .duration
         this.formattedDate = this.renderFormattedDatetimes(this.datetime);
     },
 

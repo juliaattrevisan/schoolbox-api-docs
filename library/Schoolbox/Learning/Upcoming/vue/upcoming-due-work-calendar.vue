@@ -13,7 +13,6 @@ import axios              			from 'axios'
 import fullCalendarHelper           from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        			from 'qs';
 import CustomisedCalendarEvent	  	from '@vue/components/fullcalendar/customised-calendar-event';
-import dayjs                        from 'dayjs';
 
 
 // Various URLs that FullCalendar may make use of.

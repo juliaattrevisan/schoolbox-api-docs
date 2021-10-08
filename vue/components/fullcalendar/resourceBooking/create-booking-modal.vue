@@ -1,7 +1,6 @@
 <script>
 
 import RevealModal from "@vue/components/reveal-modal";
-import dayjs from 'dayjs';
 
 
 export default {

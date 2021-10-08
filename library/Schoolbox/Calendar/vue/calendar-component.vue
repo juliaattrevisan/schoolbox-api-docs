@@ -10,7 +10,6 @@ import axios              from "axios";
 import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@vue/components/fullcalendar/customised-calendar-event';
-import dayjs              from 'dayjs';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';

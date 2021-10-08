@@ -13,8 +13,6 @@ import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
-import dayjs                      from 'dayjs';
-import weekOfYear                 from 'dayjs/plugin/weekOfYear';
 
 // Various URLs this calendar can make use of
 const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -132,7 +130,6 @@ export default {
     },
 
     beforeMount () {
-        dayjs.extend(weekOfYear); //to return weeks of the year
         this.resourceTimelineSemester = {
             type: 'resourceTimeline',
             visibleRange: this.determineVisibleRange,
