@@ -1,8 +1,8 @@
 <h1>LTI Prototype Platform</h1>
 
-<h2>Generate a request</h2>
+<h2>Generate a message</h2>
 
-<form method="get" action="{{ routeLookup('ltiPrototypePlatform.getGenerateResourceLinkRequest') }}">
+<form method="get" action="{{ routeLookup('ltiPrototypePlatform.getGenerateMessage') }}">
     <dl>
         <dt><label for="registration">Registration</label></dt>
         <dd>
@@ -40,5 +40,5 @@
             </select>
         </dd>
     </dl>
-    <button type="submit">Generate launch request</button>
+    <button type="submit">Generate message</button>
 </form>

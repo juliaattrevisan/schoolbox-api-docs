@@ -87,12 +87,12 @@ class Controller extends Base
     }
 
     /**
-     * Generate a resource link request, based upon the form values passed.
+     * Generate a request, based upon the form values passed.
      *
-     * @api GET /lti-prototype/platform/generate-resource-link-request
+     * @api GET /lti-prototype/platform/generate-message
      * @since 21.1.0
      */
-    public function getGenerateResourceLinkRequest(): void
+    public function getGenerateMessage(): void
     {
         // Build the registration repository, then get a registration out of it:
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/interfaces/#registration-repository-interface
@@ -111,7 +111,7 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@ltiPrototypePlatform/generateResourceLinkRequest.twig',
+                '@ltiPrototypePlatform/generateMessage.twig',
                 ['messageUrl' => $message->toUrl(),],
                 self::TITLE,
             )
