@@ -1,6 +1,6 @@
 <h1>LTI Prototype Platform</h1>
 
-<h2>Generate a resource link launch request</h2>
+<h2>Generate a request</h2>
 
 <form method="get" action="{{ routeLookup('ltiPrototypePlatform.getGenerateResourceLinkRequest') }}">
     <dl>
@@ -9,6 +9,15 @@
             <select id="registration" name="registration">
                 {% for registration in registrations %}
                     <option value="{{ registration.identifier }}">{{ registration.tool.name }}</option>
+                {% endfor %}
+            </select>
+        </dd>
+
+        <dt><label for="messageType">Message Type</label></dt>
+        <dd>
+            <select id="messageType" name="messageType">
+                {% for value, label in messageTypes %}
+                    <option value="{{ value }}" label="{{ label }}">{{ label }}</option>
                 {% endfor %}
             </select>
         </dd>
@@ -31,5 +40,5 @@
             </select>
         </dd>
     </dl>
-    <button type="submit">Generate resource link launch request</button>
+    <button type="submit">Generate launch request</button>
 </form>

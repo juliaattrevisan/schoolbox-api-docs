@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Prototype\Platform;
 
 use Alaress\Web\Controller\Base;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Prototype\UserAuthenticator;
@@ -75,6 +76,10 @@ class Controller extends Base
                     'staffUsers'    => $staffUsers,
                     'studentUsers'  => $studentUsers,
                     'registrations' => $this->buildRegistrationRepository()->findAll(),
+                    'messageTypes'  => [
+                        LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST => 'Resource Link',
+                        LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST  => 'Deep Linking',
+                    ],
                 ],
                 self::TITLE,
             )
