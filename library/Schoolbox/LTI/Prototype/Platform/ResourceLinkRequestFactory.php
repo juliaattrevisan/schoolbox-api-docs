@@ -14,8 +14,7 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuild
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
-use OAT\Library\Lti1p3Core\Role\Type\ContextRole;
-use OAT\Library\Lti1p3Core\Role\Type\SystemRole;
+use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use Schoolbox\UserMapper;
 
 /**
@@ -69,11 +68,12 @@ class ResourceLinkRequestFactory
             $user = $this->userMapper->findByUsername($loginHint);
             if ($user) {
                 $role = $user->getRole()->isStaff()
-                    ? new ContextRole(self::CONTEXT_ROLE_INSTRUCTOR)
-                    : new ContextRole(self::CONTEXT_ROLE_LEARNER);
+                    ? RoleInterface::NAMESPACE_CONTEXT . self::CONTEXT_ROLE_INSTRUCTOR
+                    : RoleInterface::NAMESPACE_CONTEXT . self::CONTEXT_ROLE_LEARNER
+                ;
             }
         }
-        $role ??= new SystemRole(self::SYSTEM_ROLE_NONE);
+        $role ??= RoleInterface::NAMESPACE_SYSTEM . self::SYSTEM_ROLE_NONE;
 
         $builder = new PlatformOriginatingLaunchBuilder();
         return $builder->buildPlatformOriginatingLaunch(
