@@ -32,6 +32,6 @@ class ServerRequestFactory
             $request->method->get(),
             $request->url->get(),
             $request->server->getArrayCopy(),
-        );
+        )->withParsedBody($request->post->getArrayCopy());
     }
 }

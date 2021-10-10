@@ -30,6 +30,8 @@ class Module extends BaseModule
     {
         $this->register(self::METHOD_GET, '/oidc/initiation', 'getOidcInitiationRequest');
         $this->register(self::METHOD_GET, '/launch', 'getLaunch');
+        $this->register(self::METHOD_POST, '/oidc/initiation', 'postOidcInitiationRequest');
+        $this->register(self::METHOD_POST, '/launch', 'postLaunch');
     }
 
     /**

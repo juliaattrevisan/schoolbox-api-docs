@@ -39,6 +39,17 @@ class Controller extends Base
     }
 
     /**
+     * Handle OIDC initiation request
+     *
+     * @api POST /lti-prototype/tool/oidc/initiation
+     * @since 21.1.0
+     */
+    public function postOidcInitiationRequest()
+    {
+        $this->getOidcInitiationRequest();
+    }
+
+    /**
      * Handle launch request
      *
      * @api GET /lti-prototype/tool/launch
@@ -55,6 +66,17 @@ class Controller extends Base
                 ['result' => $result]
             )
         );
+    }
+
+    /**
+     * Handle launch request
+     *
+     * @api POST /lti-prototype/tool/launch
+     * @since 21.1.0
+     */
+    public function postLaunch()
+    {
+        $this->getLaunch();
     }
 
     /**
