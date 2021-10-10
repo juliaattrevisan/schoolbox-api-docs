@@ -112,7 +112,7 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiPrototypePlatform/generateMessage.twig',
-                ['messageUrl' => $message->toUrl(),],
+                ['message' => $message,],
                 self::TITLE,
             )
         );
