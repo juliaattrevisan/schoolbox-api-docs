@@ -14,7 +14,11 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuild
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Resource\Link\LinkInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
+use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -77,24 +81,41 @@ class MessageFactory
         $role ??= RoleInterface::NAMESPACE_SYSTEM . self::SYSTEM_ROLE_NONE;
         switch ($messageType) {
             case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
-                $targetLinkUrl = $this->registration->getTool()->getLaunchUrl();
-                break;
+                $builder = new PlatformOriginatingLaunchBuilder();
+                return $builder->buildPlatformOriginatingLaunch(
+                    $this->registration,
+                    $messageType,
+                    $this->registration->getTool()->getLaunchUrl(),
+                    $loginHint,
+                    null,
+                    [$role],
+                    [new ResourceLinkClaim('test', 'Test message'),],
+                );
             case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
-                $targetLinkUrl = $this->registration->getTool()->getDeepLinkingUrl();
-                break;
+                $deepLinkingSettings = new DeepLinkingSettings(
+                    $this->registration->getTool()->getDeepLinkingUrl(),
+                    [LtiResourceLinkInterface::TYPE],
+                    ['window', 'iframe'],
+                    // Accepted media types:
+                    // will be application/vnd.ims.lti.v1.ltiassignment, or is
+                    // that only for LTI 1.1?
+                    null,
+                    false,
+                    false,
+                );
+                $builder = new DeepLinkingLaunchRequestBuilder();
+                return $builder->buildDeepLinkingLaunchRequest(
+                    $deepLinkingSettings,
+                    $this->registration,
+                    $loginHint,
+                    // Return back to platform
+                    null,
+                    null,
+                    [$role]
+                );
             default:
                 throw new UnexpectedValueException('Unrecognised message type');
         }
 
-        $builder = new PlatformOriginatingLaunchBuilder();
-        return $builder->buildPlatformOriginatingLaunch(
-            $this->registration,
-            $messageType,
-            $targetLinkUrl,
-            $loginHint,
-            null,
-            [$role],
-            [new ResourceLinkClaim('test', 'Test message'),],
-        );
     }
 }
