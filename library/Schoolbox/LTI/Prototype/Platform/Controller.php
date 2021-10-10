@@ -106,7 +106,8 @@ class Controller extends Base
         $message = (new MessageFactory($this->userMapper, $registration))
             ->build(
                 $this->request->query->get('loginHint'),
-                $this->request->query->get('messageType')
+                $this->request->query->get('messageType'),
+                (new Factory($this->getConfigLoader()))->buildFullyQualified() . $this->router->generate('ltiPrototypePlatform.getDeepLinkingResponse')
             );
 
         $this->response->content->set(
@@ -148,6 +149,28 @@ class Controller extends Base
                 )
             );
         }
+    }
+
+    /**
+     * Handle a deep linking request response from the tool.
+     *
+     * @api GET /lti-prototype/platform/deep-linking-response
+     * @since 21.1.0
+     */
+    public function getDeepLinkingResponse(): void
+    {
+        var_dump('b');
+    }
+
+    /**
+     * Handle a deep linking request response from the tool.
+     *
+     * @api POST /lti-prototype/platform/deep-linking-response
+     * @since 21.1.0
+     */
+    public function postDeepLinkingResponse(): void
+    {
+        $this->getDeepLinkingResponse();
     }
 
     /**

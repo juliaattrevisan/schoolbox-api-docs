@@ -62,10 +62,11 @@ class MessageFactory
      *
      * @param string $loginHint
      * @param string $messageType
+     * @param string $returnUrl
      * @return LtiMessageInterface
      * @throws LtiExceptionInterface if something goes wrong building message
      */
-    public function build(string $loginHint, string $messageType): LtiMessageInterface
+    public function build(string $loginHint, string $messageType, string $returnUrl): LtiMessageInterface
     {
         // Figure out who's trying to log in: use that to determine their role
         $role = null;
@@ -91,9 +92,10 @@ class MessageFactory
                     [$role],
                     [new ResourceLinkClaim('test', 'Test message'),],
                 );
+
             case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
                 $deepLinkingSettings = new DeepLinkingSettings(
-                    $this->registration->getTool()->getDeepLinkingUrl(),
+                    $returnUrl,
                     [LtiResourceLinkInterface::TYPE],
                     ['window', 'iframe'],
                     // Accepted media types:
@@ -108,14 +110,13 @@ class MessageFactory
                     $deepLinkingSettings,
                     $this->registration,
                     $loginHint,
-                    // Return back to platform
                     null,
                     null,
                     [$role]
                 );
+
             default:
                 throw new UnexpectedValueException('Unrecognised message type');
         }
-
     }
 }
