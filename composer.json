@@ -122,7 +122,8 @@
         "oat-sa/lib-lti1p3-ags": "^1.1",
         "cache/array-adapter": "^1.1",
         "lsolesen/pel": "^0.9.10",
-        "ext-ldap": "*"
+        "ext-ldap": "*",
+        "oat-sa/lib-lti1p3-deep-linking": "^4.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
