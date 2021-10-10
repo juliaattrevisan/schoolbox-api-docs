@@ -16,11 +16,12 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
- * Builder for resource link requests in the prototype.
+ * Builder for messages from the prototype.
  */
-class ResourceLinkRequestFactory
+class MessageFactory
 {
     // The various roles which the current user may be claimed to be.
     // If the LTI tool finds that the authenticated user isn't one of these
@@ -56,11 +57,11 @@ class ResourceLinkRequestFactory
      * Build the message.
      *
      * @param string $loginHint
-     * @param string $targetLinkUri
+     * @param string $messageType
      * @return LtiMessageInterface
      * @throws LtiExceptionInterface if something goes wrong building message
      */
-    public function build(string $loginHint, string $targetLinkUri): LtiMessageInterface
+    public function build(string $loginHint, string $messageType): LtiMessageInterface
     {
         // Figure out who's trying to log in: use that to determine their role
         $role = null;
@@ -74,16 +75,26 @@ class ResourceLinkRequestFactory
             }
         }
         $role ??= RoleInterface::NAMESPACE_SYSTEM . self::SYSTEM_ROLE_NONE;
+        switch ($messageType) {
+            case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
+                $targetLinkUrl = $this->registration->getTool()->getLaunchUrl();
+                break;
+            case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
+                $targetLinkUrl = $this->registration->getTool()->getDeepLinkingUrl();
+                break;
+            default:
+                throw new UnexpectedValueException('Unrecognised message type');
+        }
 
         $builder = new PlatformOriginatingLaunchBuilder();
         return $builder->buildPlatformOriginatingLaunch(
             $this->registration,
-            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            $targetLinkUri,
+            $messageType,
+            $targetLinkUrl,
             $loginHint,
             null,
             [$role],
-            [new ResourceLinkClaim('test', 'Test resource link'),],
+            [new ResourceLinkClaim('test', 'Test message'),],
         );
     }
 }

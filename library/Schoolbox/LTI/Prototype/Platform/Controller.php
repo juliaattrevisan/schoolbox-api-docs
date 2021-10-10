@@ -103,10 +103,10 @@ class Controller extends Base
 
         // I have a registration: I may now create a message
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#create-the-message
-        $message = (new ResourceLinkRequestFactory($this->userMapper, $registration))
+        $message = (new MessageFactory($this->userMapper, $registration))
             ->build(
                 $this->request->query->get('loginHint'),
-                $registration->getTool()->getLaunchUrl()
+                $this->request->query->get('messageType')
             );
 
         $this->response->content->set(
