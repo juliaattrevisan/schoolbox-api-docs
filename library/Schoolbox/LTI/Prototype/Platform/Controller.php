@@ -14,6 +14,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
+use Schoolbox\LTI\Prototype\Tool\PlatformOriginatingLaunchFactory;
 use Schoolbox\LTI\Prototype\UserAuthenticator;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Role;
@@ -159,7 +160,15 @@ class Controller extends Base
      */
     public function getDeepLinkingResponse(): void
     {
-        var_dump('b');
+        // Validate launch
+        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
+        $result = (new PlatformOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@ltiPrototypePlatform/deepLinkingResponse.twig',
+                ['result' => $result,]
+            )
+        );
     }
 
     /**
