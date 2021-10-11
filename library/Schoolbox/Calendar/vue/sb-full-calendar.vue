@@ -641,8 +641,8 @@ export default {
                 // Register an event listener when update button is clicked.
                 document.querySelector('#update_date_range_button').addEventListener('click', () => {
                     if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
-                        const startDateValue = dayjs(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE);
-                        const endDateValue = dayjs(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
+                        const startDateValue = dayjs(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE, true);
+                        const endDateValue = dayjs(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE, true);
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
                             this.listViewDateRange.start = document.querySelector('#start_date').value;
