@@ -76,7 +76,7 @@ class InstanceIdManager extends CliTool\App
             $this->getLogger()->notice("New instance id == Old instance id ('{$newInstanceId}'), nothing to do.");
         }
 
-        $this->updateConfFile($oldInstanceId, $newInstanceId);
+        $this->updateIniFile($oldInstanceId, $newInstanceId);
         $this->updateRedisKeys($oldInstanceId, $newInstanceId);
         $this->updateEtherpadEnvironments($oldInstanceId, $newInstanceId);
         $this->renameLockFiles($oldInstanceId, $newInstanceId);
@@ -117,27 +117,31 @@ class InstanceIdManager extends CliTool\App
      * @param string $newInstanceId
      * @throws LogicException
      */
-    private function updateConfFile(string $oldInstanceId, string $newInstanceId): void
+    private function updateIniFile(string $oldInstanceId, string $newInstanceId): void
     {
         $this->getLogger()->notice('Updating conf file');
-        $confFile = __DIR__ . '/../../../www/conf/conf.php';
-        $confFile = realpath($confFile);
+        $siteRootParts = explode('/', SITE_root);
+        $package = end($siteRootParts);
+        if($package === 'vagrant'){
+            $package = 'schoolbox';
+        }
+        $iniFile = "/etc/$package/instances.ini";
 
-        $command = "sed -i -E \"s/^\s*define\(['\\\"]INSTANCE_ID['\\\"],\s*['\\\"]{$oldInstanceId}['\\\"]\);/    define('INSTANCE_ID', '$newInstanceId');/g\" $confFile 2>&1";
+        $command = "sed -i -E \"s/\[$oldInstanceId\]/[$newInstanceId]/g\" $iniFile 2>&1";
         exec($command, $output, $returnVar);
         $this->getLogger()->debug("About to execute command:\n$command");
         if ($returnVar) {
-            throw new LogicException("Unable to update INSTANCE_ID in conf file\n" . implode("\n", $output));
+            throw new LogicException("Unable to update INSTANCE_ID in ini file\n" . implode("\n", $output));
         }
 
-        $command = "grep -q \"    define('INSTANCE_ID', '$newInstanceId');\" $confFile";
+        $command = "grep -q \"[$newInstanceId]\" $iniFile";
         $this->getLogger()->debug("About to execute command:\n$command");
         exec($command, $output, $returnVar);
         if ($returnVar) {
-            throw new LogicException("Unable to locate updated INSTANCE_ID in conf file");
+            throw new LogicException("Unable to locate updated INSTANCE_ID in ini file");
         }
 
-        $this->getLogger()->notice("INSTANCE_ID updated in conf file from '$oldInstanceId' to '$newInstanceId'");
+        $this->getLogger()->notice("INSTANCE_ID updated in ini file from '$oldInstanceId' to '$newInstanceId'");
     }
 
 
