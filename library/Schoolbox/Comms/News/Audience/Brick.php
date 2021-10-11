@@ -107,12 +107,18 @@ class Brick
             return false;
         }
 
-        // Does other brick have more relationship modifiers?
-        $relationshipDof = count(array_diff($other->relationships, $this->relationships)) ? 1 : 0;
+        // Does bricks have different relationship modifiers?
+        $relationshipDof = !$this->hasSameRelationships($other);
         $brickDof        = $relationshipDof;
 
         // Strip any 0-DOF dimension pairs from analysis.
         [$thisDimensionsCopy, $otherDimensionsCopy] = $this->remove0DofPairs($this->dimensions, $other->dimensions);
+
+
+        // if dimensions are different, relationships must be exactly the same to be able to combine
+        if ($relationshipDof && !$this->hasSameDimensions($other)) {
+            return false;
+        }
 
         // The 1-DOF dimension pair
         /** @var null|Dimension $thisCandidate */
@@ -198,6 +204,30 @@ class Brick
     public function getRelationships(): array
     {
         return $this->relationships;
+    }
+
+    /**
+     * Checks whether dimensions are exactly the same
+     * @param Brick $other
+     * @return bool
+     */
+    public function hasSameDimensions(Brick $other): bool
+    {
+        return count($this->dimensions) === count($other->dimensions)
+            && (array_diff($this->dimensions, $other->dimensions)
+                === array_diff($other->dimensions, $this->dimensions));
+    }
+
+    /**
+     * Checks whether relationships are exactly the same
+     * @param Brick $other
+     * @return bool
+     */
+    public function hasSameRelationships(Brick $other): bool
+    {
+        return count($this->relationships) === count($other->relationships)
+            && (array_diff($this->relationships, $other->relationships)
+                === array_diff($other->relationships, $this->relationships));
     }
 
 
