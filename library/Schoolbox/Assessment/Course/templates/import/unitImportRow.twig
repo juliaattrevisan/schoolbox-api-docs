@@ -47,6 +47,12 @@
         </label>
         {% endif %}
     </div>
+    {% if not canReadUnitSpec %}
+            <p class="alert-box">
+                This unit is no longer accessible. You can modify the dates on assessments,
+                and remove them from your class, but you can no longer import new assessments.
+            </p>
+    {% endif %}
     <div class="small-12 columns">
         <ul class="action-list">
             <li>
