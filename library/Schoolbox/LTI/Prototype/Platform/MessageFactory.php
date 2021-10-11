@@ -59,13 +59,18 @@ class MessageFactory
     /**
      * Build the message.
      *
-     * @param string $loginHint
-     * @param string $messageType
-     * @param string $returnUrl
+     * @param string      $loginHint   The login hint for the LTI tool to use
+     * @param string      $messageType The type of message: one of:
+     *                                 * `LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST`
+     *                                 * `LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST`
+     * @param string|null $targetUrl   Resource link: the resource to link to
+     *                                 Deep linking: the content picking URL
+     * @param string      $returnUrl   Deep linking only: the URL to return to
+     *                                 once a deep link is retrieved
      * @return LtiMessageInterface
      * @throws LtiExceptionInterface if something goes wrong building message
      */
-    public function build(string $loginHint, string $messageType, string $returnUrl): LtiMessageInterface
+    public function build(string $loginHint, string $messageType, ?string $targetUrl, string $returnUrl): LtiMessageInterface
     {
         // Figure out who's trying to log in: use that to determine their role
         $role = null;
@@ -85,7 +90,7 @@ class MessageFactory
                 return $builder->buildPlatformOriginatingLaunch(
                     $this->registration,
                     $messageType,
-                    $this->registration->getTool()->getLaunchUrl(),
+                    $targetUrl ?? $this->registration->getTool()->getLaunchUrl(),
                     $loginHint,
                     null,
                     [$role],
