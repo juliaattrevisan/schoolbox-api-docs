@@ -232,11 +232,11 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
         // Build a registration out of each tool
         foreach ($this->tools as $toolModel) {
-//            $keychain = $keyChainFactory->create(
-//                '1',
-//                $toolModel->getName(),
-//                $toolModel->getPublicKey()
-//            );
+            $toolKeyChain = $keyChainFactory->create(
+                $toolModel->getName(),
+                $toolModel->getName(),
+                $toolModel->getPublicKey()
+            );
             $tool = new Tool(
                 'schoolbox',
                 $toolModel->getName(),
@@ -253,7 +253,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
                 $tool,
                 ['deploymentId3', 'deploymentId4'],
                 $platformKeyChain,
-                null,
+                $toolKeyChain,
                 null,
                 $toolModel->getJwksUrl()
             );
