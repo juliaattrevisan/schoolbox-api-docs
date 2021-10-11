@@ -28,9 +28,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictTop5Loaded = '5 Heaviest Workloads';
     var dictNoWorkToday = 'Your students have nothing due this day';
     var heatCache = {};
-    var dayjsFormat = pickerOptions.enableTime ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
     // Initial input value as dayjs object
-    var dayjsDate = dayjs(twigVars.date, dayjsFormat);
+    var dayjsDate = dayjs(twigVars.date);
 
     // Timetable picker
     var $byDate      = $('#byDate-' + twigVars.id),
@@ -1221,7 +1220,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         if (isInputValueValid()) {
 
             // Create a dayjs object from the input value
-            var activeDate = dayjs(getInputValue());
+            var activeDate = dayjs(getInputValue(), dateDisplayFormats.dayjsDatetime);
             
             // Set date on flatpickr to the input date
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());

@@ -312,7 +312,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 adtp.convertFormat(options.displayFormatDate)
             );
         }
-
+        
         var $modal = $("#adtp-modal-" + pickerId);
 
         // Only AJAX in the picker if we haven't already
