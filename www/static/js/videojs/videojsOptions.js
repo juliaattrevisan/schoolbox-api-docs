@@ -12,8 +12,9 @@ import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js
 WaveSurfer.microphone = MicrophonePlugin;
 
 
-const RECORDING_LENGTH = 180; //3 minutes
-const IS_DEBUG_MODE = true;
+const VIDEO_RECORDING_LENGTH = 300; //5 minutes
+const AUDIO_ONLY_RECORDING_LENGTH = 900; //15 minutes
+const IS_DEBUG_MODE = false;
 
 
 /**
@@ -71,7 +72,7 @@ export const getAudioOnlyRecordOptions = () => {
 			video: false,
             audioMimeType: 'audio/webm;codecs=opus',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-            maxLength: RECORDING_LENGTH,
+            maxLength: AUDIO_ONLY_RECORDING_LENGTH,
 			debug: IS_DEBUG_MODE,
 		}
 	}
@@ -119,7 +120,7 @@ export const getRecordCameraOptions = () => {
             },
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-            maxLength: RECORDING_LENGTH, 
+            maxLength: VIDEO_RECORDING_LENGTH, 
             debug: IS_DEBUG_MODE,
         }
     }
@@ -143,7 +144,7 @@ export const getRecordScreenOptions = () => {
             screen: true,
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-            maxLength: RECORDING_LENGTH,
+            maxLength: VIDEO_RECORDING_LENGTH,
             debug: IS_DEBUG_MODE,
         }
     }
