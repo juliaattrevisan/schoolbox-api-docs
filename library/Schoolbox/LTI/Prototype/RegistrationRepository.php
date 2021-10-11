@@ -201,8 +201,8 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         // Configure a platform
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-platform
         $platform = new Platform(
-            'schoolboxVagrantPlatform',
-            'Schoolbox [vagrant] Platform',
+            'schoolbox',
+            'Schoolbox Platform',
             $this->baseUrl->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/platform/oidc/authentication')->toString(),
         );
@@ -210,8 +210,8 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         // Configure a tool
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-tool
         $tool = new Tool(
-            'schoolboxVagrantTool',
-            'Schoolbox [vagrant] Tool',
+            'schoolboxTool',
+            'Schoolbox Tool',
             $this->baseUrl->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/oidc/initiation')->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/launch')->toString(),
