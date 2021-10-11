@@ -14,7 +14,6 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
-use Schoolbox\LTI\Prototype\Tool\PlatformOriginatingLaunchFactory;
 use Schoolbox\LTI\Prototype\UserAuthenticator;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Role;
@@ -108,7 +107,11 @@ class Controller extends Base
             ->build(
                 $this->request->query->get('loginHint'),
                 $this->request->query->get('messageType'),
-                (new Factory($this->getConfigLoader()))->buildFullyQualified() . $this->router->generate('ltiPrototypePlatform.getDeepLinkingResponse')
+                (new Factory($this->getConfigLoader()))
+                    ->buildFullyQualified()
+                    ->setScheme('https')
+                    ->setPath($this->router->generate('ltiPrototypePlatform.getDeepLinkingResponse'))
+                    ->toString()
             );
 
         $this->response->content->set(
@@ -162,7 +165,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new PlatformOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
+        $result = (new ToolOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiPrototypePlatform/deepLinkingResponse.twig',
