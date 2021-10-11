@@ -14,18 +14,19 @@
         {% endif %}
     </dd>
 
+    {# From each returned resource link: create a resource link launch request #}
     {% if not result.hasError %}
         <dt>Version</dt>
         <dd>{{ result.payload.version ?? '' }}</dd>
 
-        <dt>User identity</dt>
-        <dd>{{ result.payload.userIdentity.identifier ?? '' }}</dd>
-
-        <dt>User name</dt>
-        <dd>{{ result.payload.userIdentity.name ?? '' }}</dd>
-
-        <dt>User email</dt>
-        <dd>{{ result.payload.userIdentity.email ?? '' }}</dd>
+        <dt>Content Items</dt>
+        <dd>
+            <ul>
+                {% for contentItem in result.payload.deepLinkingContentItems.contentItems %}
+                    <li>{{ contentItem.title }} ({{ contentItem.url }})</li>
+                {% endfor %}
+            </ul>
+        </dd>
     {% endif %}
 </dl>
 
