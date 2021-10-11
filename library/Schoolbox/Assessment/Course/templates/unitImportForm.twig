@@ -133,18 +133,6 @@
                                    data-datesync-startdate="#open_date-{{ loop.index }}"
                                    data-datepicker-buttontext="" />
                         </div>
-
-
-                        {% if not canReadUnitSpec %}
-                            <div class="small-12 columns" data-hide-watch="#import-{{ loop.index }}">
-                                <p class="alert-box warning">
-                                    You don't have read permission on this unit. You can modify the dates on assessments,
-                                    and remove them from your course, but you can't add assessments that aren't already in
-                                    your course.
-                                </p>
-                            </div>
-                        {% endif %}
-
                     </div>
                 </li>
             {% endif %}
