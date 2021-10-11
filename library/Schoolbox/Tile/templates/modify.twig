@@ -64,7 +64,7 @@
                         <label class="text">
                             Text
                             <span class='hint has-tip tip-top' data-tooltip title="Add an optional title to appear above the tile background.">?</span>
-                            <input type="text" name="title_text" value="{{ item.titleText|e('html_attr') }}" placeholder="enter text..." />
+                            <input type="text" name="title_text" maxlength="250"  value="{{ item.titleText|e('html_attr') }}" placeholder="enter text..." />
                         </label>
                     </div>
                 </fieldset>
