@@ -455,6 +455,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $attachment = $pastoralAttachmentMapper->createModel();
                                         $attachment->setPastoral($pastoralRecord);
                                         $attachment->setStorage($storageObject);
+                                        $attachment->setRealname($storageObject->getFilename());
                                         $attachment->setPrivate(true);
                                         $pastoralAttachmentMapper->save($attachment);
 
@@ -468,7 +469,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $log->setResult("OK");
                                         $this->pastoralLogMapper->save($log);
 
-                                        unlink($filename);
+                                        // temp file will be removed by storage manager, but just in case
+                                        if (file_exists($filename)) {
+                                            unlink($filename);
+                                        }
                                     } catch (MapperException $e) {
                                         // Pastoral record for this attachment wasn't found?
                                     }
@@ -1365,12 +1369,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     protected function setPastoralType(Pastoral $pastoral, array $record, User $owner): void
     {
         if (empty($this->typeCache)) {
-            $types = $this->pastoralTypeMapper->findAll();
+            $types              = $this->pastoralTypeMapper->findAll();
+            $this->typeSequence = max($types->getPropertyValues('sequence'));
             foreach ($types as $type) {
                 $this->typeCache[$type->getName()] = $type;
-                $this->typeSequence                = $this->typeSequence < $type->getSequence() ? $type->getSequence() : $this->typeSequence;
                 foreach ($type->getSubTypes() as $subtype) {
-                    $this->subtypeSequence                   = $this->subtypeSequence < $subtype->getSequence() ? $subtype->getSequence() : $this->subtypeSequence;
+                    $this->subtypeSequence                                     = $this->subtypeSequence < $subtype->getSequence() ? $subtype->getSequence() : $this->subtypeSequence;
                     $this->subtypeCache[$type->getName()][$subtype->getName()] = $subtype;
                 }
             }
@@ -1383,13 +1387,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $this->pastoralTypeMapper->save($type);
             }
         } else {
-            $this->typeSequence++;
             // Didn't find a cached record. Try to retrieve an existing pastoral type from Schoolbox
             // The records pastoral type doesn't exist in Schoolbox, create one that matches
             $type = $this->pastoralTypeMapper->createModel();
             $type->setName($record['TypeDescription']);
             $type->setExternalCode($record['TypeCode']);
-            $type->setSequence($this->typeSequence);
+            $type->setSequence(++$this->typeSequence);
             $type->setUpdatedBy($owner->getId());
             $this->pastoralTypeMapper->save($type);
 
