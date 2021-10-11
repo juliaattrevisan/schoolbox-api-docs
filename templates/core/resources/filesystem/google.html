@@ -53,7 +53,7 @@
       $.fn.setupGapi({
           clientId: '{CLIENT_ID}',
           modules: ['client:auth2', 'picker'],
-          scope: ['{SCOPES}'],
+          scope: '{SCOPES}',
           callback: function () {
               $('#content').googlePicker({
                   listener: false,
@@ -61,7 +61,6 @@
                   views: [{VIEWS}],
                   features: [{FEATURES}],
                   authBtn: '#auth-btn',
-                  authNeededClass: 'need-auth',
 
                   onSelect: function (docs, token) {
                       window.top.postMessage(JSON.stringify({text: 'Collecting files from Google, please wait...'}), location.origin);
