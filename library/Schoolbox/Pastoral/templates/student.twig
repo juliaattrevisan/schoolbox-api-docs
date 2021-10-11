@@ -16,8 +16,14 @@
 ) }}
 
 <div class="row">
-    <div class="small-12 columns">
+    <div class="button-action small-12 columns">
         <h1>{{ student.fullName }}</h1>
+        {% if user.role.isStaff %}
+            {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
+
+            {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="button icon-add" title="Create {{ locale.pastoral.proper }} Record">Create {{ locale.pastoral.proper }} Record</a>{% endif %}
+
+        {% endif %}
     </div>
 </div>
 
