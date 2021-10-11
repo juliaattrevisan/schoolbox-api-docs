@@ -22,6 +22,7 @@ use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Schoolbox\File as SchoolboxFile;
+use Schoolbox\Instance;
 use Schoolbox\Mapper as SchoolboxMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Application\CliTool;
@@ -293,7 +294,7 @@ class Worker extends CliTool\App
             if (
                 !$this->suppressSentryReporting &&
                 !($e instanceof LayeredNonGifException) &&
-                !($this->getConfig()->get('site_type') === 'dev' && $e instanceof FileNotFoundException)
+                !($this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING && $e instanceof FileNotFoundException)
             ) {
                 $this->captureException($e);
             }
