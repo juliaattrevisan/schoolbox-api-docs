@@ -238,7 +238,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
                 $toolModel->getPublicKey()
             );
             $tool = new Tool(
-                'schoolbox',
+                $toolModel->getName(),
                 $toolModel->getName(),
                 $toolModel->getAudience(),
                 $toolModel->getOidcInitiationUrl(),
@@ -248,7 +248,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
             $this->registrations[] = new Registration(
                 $toolModel->getAudience(),
-                'schoolbox',
+                $this->baseUrl->toString(),
                 $platform,
                 $tool,
                 ['deploymentId3', 'deploymentId4'],
