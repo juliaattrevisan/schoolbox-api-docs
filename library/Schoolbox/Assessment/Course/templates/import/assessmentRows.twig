@@ -84,7 +84,7 @@
         {% set isImplOnly           = assessmentImpl and not assessmentSpec %}
         {% set isFullPair           = not isSpecOnly and not isImplOnly %}
         {% set assessment           = assessmentImpl ?: assessmentSpec %}
-        {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
+        {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) or assessment is lti %}
         {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
         {% set dueSyncStart         = (acceptingResponses) ? 'open' : 'publish' %}
         {% set dueSyncEnd           = (acceptingResponses) ? 'close' : '' %}

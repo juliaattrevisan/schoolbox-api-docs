@@ -641,7 +641,7 @@ class MapperProxy
      *
      * @param int   $assessmentId
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
@@ -708,7 +708,7 @@ class MapperProxy
      *
      * @param int   $unitSpecId
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws LogicException If cyclic graph detected during translation
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
@@ -732,7 +732,7 @@ class MapperProxy
      *
      * @param int[] $unitImplIds
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws LogicException If cyclic graph detected during translation
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
@@ -757,7 +757,7 @@ class MapperProxy
      * @param int[]     $unitImplIds
      * @param null|User $student If provided, load only this student's participation
      * @param array     $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws DefinitionException If unable to locate a specified mapper join
@@ -829,7 +829,7 @@ class MapperProxy
      *
      * @param int   $folderId
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws LogicException If cyclic graph detected during translation
@@ -856,7 +856,7 @@ class MapperProxy
      *
      * @param int   $folderId
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws LogicException If cyclic graph detected during translation
@@ -881,7 +881,7 @@ class MapperProxy
      *
      * @param int   $projectId The assessment ID of the project (as opposed to the project's internal ID)
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws LogicException If cyclic graph detected during translation
@@ -980,7 +980,7 @@ class MapperProxy
      * @param bool  $usePlanDates Filter by custom plan dates instead of assessment dates?
      * @param Term  $term         Restrict results to this term
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws DefinitionException If unable to locate a specified mapper join
@@ -998,10 +998,10 @@ class MapperProxy
      *
      * @param User                $student
      * @param bool                $usePlanDates Should we filter by assessment dates or plan dates?
-     * @param Alaress_Date_Format $from         If provided, fetch only assessables due on or after this date
-     * @param Alaress_Date_Format $to           If provided, fetch only assessables due on or before this date
+     * @param Alaress_Date_Format|null $from         If provided, fetch only assessables due on or after this date
+     * @param Alaress_Date_Format|null $to           If provided, fetch only assessables due on or before this date
      * @param array               $options      Any other query options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws DefinitionException If specified join mapper unable to not registered
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
@@ -1076,7 +1076,7 @@ class MapperProxy
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @param array               $options      Any other query options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws DefinitionException If specified join mapper not registered
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
@@ -1343,7 +1343,7 @@ class MapperProxy
      * The primary key needs to be set on a sub-object when saving it.
      *
      * @param IAssessableDataModel $subObject
-     * @return int
+     * @return int|null
      */
     protected function getSubObjectPrimaryKeyValue(IAssessableDataModel $subObject)
     {
@@ -1357,6 +1357,8 @@ class MapperProxy
                 $mapper = QuizMapper::getInstance();
             } elseif ($subObject instanceof Project) {
                 $mapper = ProjectMapper::getInstance();
+            } elseif ($subObject instanceof LtiAssessment\Model) {
+                $mapper = LtiAssessment\Mapper::getInstance();
             } else {
                 return null;
             }
@@ -1429,7 +1431,7 @@ class MapperProxy
      * Any broken data models just get skipped.
      *
      * @param Collection|Model[] $dataModels
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected during translation
@@ -1668,7 +1670,7 @@ class MapperProxy
      *                                        to the SIS to determine if $user is actually a participant in the
      *                                        assessment's folder.
      *                                        Only has an effect if $user is set.
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to merge student collections
