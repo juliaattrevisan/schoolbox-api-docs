@@ -277,7 +277,15 @@ class Profile implements IStrategy
             $firstname = trim((string)$student['general_details']['first_name']);
             $form = trim((string)$student['school_details']['form_class']);
             $gender = trim((string)$student['general_details']['gender']);
-            $lastname = trim((string)$student['general_details']['surname']);
+
+            /* Some students have a preference in their surname
+             * If preferred_surname has a meaningful value, use that in preference to the usual
+             */
+            $lastname = (new FirstMeaningfulValue())->find([
+                trim((string)$student['general_details']['preferred_surname']),
+                trim((string)$student['general_details']['surname'])
+            ]);
+
             $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
             $preferredName = trim((string)$student['general_details']['preferred_name']);
