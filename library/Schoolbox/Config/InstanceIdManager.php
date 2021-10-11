@@ -302,7 +302,7 @@ class InstanceIdManager extends CliTool\App
     private function restartDaemons(): void
     {
         $this->getLogger()->notice('Rebuilding + restarting daemons');
-        exec("schoolbox-rebuild-daemons --fetch", $output, $returnCode);
+        exec("schoolbox-rebuild-daemons --conf", $output, $returnCode);
         if ($returnCode) {
             $this->getLogger()->error("Unexpected return code when rebuilding daemons:\n" . implode("\n", $output));
         }
