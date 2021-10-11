@@ -28,8 +28,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictTop5Loaded = '5 Heaviest Workloads';
     var dictNoWorkToday = 'Your students have nothing due this day';
     var heatCache = {};
+    var dayjsFormat = pickerOptions.enableTime ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
     // Initial input value as dayjs object
-    var dayjsDate = dayjs(twigVars.date);
+    var dayjsDate = dayjs(twigVars.date, dayjsFormat);
 
     // Timetable picker
     var $byDate      = $('#byDate-' + twigVars.id),
