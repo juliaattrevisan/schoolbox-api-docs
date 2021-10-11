@@ -73,6 +73,15 @@ class Model implements ISoftDeletable
     private string $ltiVersion;
 
     /**
+     * The tool's deployment ID.
+     *
+     * This will be generated on creation of this tool, and should be considered
+     * unique and immutable: it will be used by Schoolbox to identify its
+     * deployment to this tool when it is invoked.
+     */
+    private string $deploymentId;
+
+    /**
      * LTI 1.3: the audience of this tool.
      *
      * This will be provided by the tool, and will be:
@@ -223,6 +232,24 @@ class Model implements ISoftDeletable
     public function setLtiVersion(string $ltiVersion): self
     {
         $this->ltiVersion = $ltiVersion;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeploymentId(): string
+    {
+        return $this->deploymentId;
+    }
+
+    /**
+     * @param string $deploymentId
+     * @return $this
+     */
+    public function setDeploymentId(string $deploymentId): self
+    {
+        $this->deploymentId = $deploymentId;
         return $this;
     }
 
