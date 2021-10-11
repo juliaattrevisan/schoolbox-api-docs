@@ -17,7 +17,6 @@ $include-html-off-canvas-classes: $include-html-classes !default;
 $tabbar-bg: $navigation-background;
 $tabbar-height: rem-calc(72);
 $tabbar-icon-width: rem-calc(72);
-$tabbar-icon-height: rem-calc(72);
 $tabbar-line-height: $tabbar-height;
 $tabbar-color: $black;
 $tabbar-middle-padding: 0;
@@ -155,7 +154,7 @@ $allow-sidebar-stash: $large-up;
     img {
       align-self: center;
       max-width: $tabbar-icon-width;
-      max-height: $tabbar-icon-height;
+      max-height: $tabbar-icon-width;
     }
   }
 
