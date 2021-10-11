@@ -83,7 +83,6 @@ class InstanceIdManager extends CliTool\App
         $this->renameMessageQueues($oldInstanceId, $newInstanceId);
         $this->rebuildSubscriptionCache($newInstanceId);
         $this->restartDaemons();
-        $this->rebuildSkin();
 
         $this->getLogger()->notice('INSTANCE_ID update successful');
     }
@@ -261,22 +260,6 @@ class InstanceIdManager extends CliTool\App
             $newQueue = sprintf($queue, $newInstanceId);
             $this->getLogger()->debug("TODO - rename MQ '$oldQueue' to '$newQueue'");
             // TODO - For now, just manually run `rabbitmqadmin list queues` and check no messages exist.
-        }
-    }
-
-
-    /**
-     * Rebuild the skin (it's output contains the instance id)
-     */
-    private function rebuildSkin(): void
-    {
-        $this->getLogger()->notice('Rebuilding skin');
-        $skinBuilder = __DIR__ . '/../../../tools/skin/builder.php';
-        $skinBuilder = realpath($skinBuilder);
-        $this->getLogger()->info("Invoking skin builder at: '$skinBuilder'");
-        passthru("php $skinBuilder -f", $returnCode);
-        if ($returnCode) {
-            $this->getLogger()->error("Unexpected return code when running skin builder");
         }
     }
 
