@@ -147,18 +147,18 @@ class DataSource
      *
      * This includes records for responses and feedbacks for every participant in each assessment.
      *
-     * @param Collection|IAssessable[] $assessments
+     * @param GenericCollection|IAssessable[] $assessments
      * @param User|null                $user                If specified, only load this user's interactions
      * @param bool                     $removeExcluded      Set to true to exclude excluded non-member participants
      * @param bool                     $assumeParticipation if true, assume $user is a participant in the assessment
      *                                                      without checking the assessment's folder.
-     * @return Collection|IAssessable[] $assessments, with participation loaded.
+     * @return GenericCollection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to derive project participant collection
      */
     public function loadParticipationIntoAssessmentCollection(
-        Collection $assessments,
+        GenericCollection $assessments,
         User $user = null,
         bool $removeExcluded = false,
         bool $assumeParticipation = false

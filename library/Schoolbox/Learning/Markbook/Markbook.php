@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Markbook;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IAssessableComparator;
@@ -117,11 +118,11 @@ class Markbook
      *
      * This assumes that all participants, responses and feedbacks have been filled out.
      *
-     * @param Collection|IAssessable[] $assessments
+     * @param GenericCollection|IAssessable[] $assessments
      * @param IMarkScheme              $defaultMarkScheme
      * @param User                     $viewingUser
      */
-    public function __construct(Collection $assessments, IMarkScheme $defaultMarkScheme, User $viewingUser)
+    public function __construct(GenericCollection $assessments, IMarkScheme $defaultMarkScheme, User $viewingUser)
     {
         $this->assessments       = $assessments;
         $this->defaultMarkScheme = $defaultMarkScheme;

@@ -5386,26 +5386,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Mapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\MapperProxy\\:\\:findAllBetweenDates\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\Collection\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\MapperProxy\\:\\:findAllByIds\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\MapperProxy\\:\\:findAllByStaffBetweenDates\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\MapperProxy\\:\\:getSubObjectPrimaryKeyValue\\(\\) should return int but returns null\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Model\\:\\:getAssessmentContext\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessmentContextDataModel but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
@@ -6447,11 +6427,6 @@ parameters:
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Grades\\\\Controller\\:\\:buildGraph\\(\\) should return array\\<array\\> but returns array\\<string, string\\|false\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Grades\\\\Controller\\:\\:findByFiltersWithParticipants\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Grades/Controller.php
 
