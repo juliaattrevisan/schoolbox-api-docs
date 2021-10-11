@@ -1343,7 +1343,7 @@ class MapperProxy
      * The primary key needs to be set on a sub-object when saving it.
      *
      * @param IAssessableDataModel $subObject
-     * @return int
+     * @return int|null
      */
     protected function getSubObjectPrimaryKeyValue(IAssessableDataModel $subObject)
     {
@@ -1357,6 +1357,8 @@ class MapperProxy
                 $mapper = QuizMapper::getInstance();
             } elseif ($subObject instanceof Project) {
                 $mapper = ProjectMapper::getInstance();
+            } elseif ($subObject instanceof LtiAssessment\Model) {
+                $mapper = LtiAssessment\Mapper::getInstance();
             } else {
                 return null;
             }

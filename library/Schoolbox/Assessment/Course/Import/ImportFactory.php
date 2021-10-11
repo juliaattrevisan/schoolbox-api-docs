@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessment;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -99,13 +100,14 @@ class ImportFactory
                 sa.default_open_span  AS 'sa.default_open_span',
                 sa.sequence           AS 'sa.sequence',
                 sa.work_type_id       AS 'sa.work_type_id',
-                lwt.name			  AS 'lwt.name',
+                lwt.name              AS 'lwt.name',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
                 sdw.multi_submission  AS 'sdw.multi_submission',
                 sqz.assessment_id     AS 'sqz.id',
                 stk.assessment_id     AS 'stk.id',
-                spr.assessment_id     AS 'spr.id'
+                spr.assessment_id     AS 'spr.id',
+                slt.assessment_id     AS 'slt.id'
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -115,6 +117,7 @@ class ImportFactory
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
             LEFT JOIN project spr ON spr.assessment_id = sa.id
+            LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
         ";
 
         $pb = new Builder($this->database->getQuoter(), '');
@@ -252,6 +255,7 @@ class ImportFactory
                 sqz.assessment_id     AS 'sqz.id',
                 stk.assessment_id     AS 'stk.id',
                 spr.assessment_id     AS 'spr.id',
+                slt.assessment_id     AS 'slt.id',
                 ia.id                 AS 'ia.id',
                 ia.title              AS 'ia.title',
                 ia.publish_date       AS 'ia.publish_date',
@@ -265,7 +269,8 @@ class ImportFactory
                 idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id     AS 'iqz.id',
                 itk.assessment_id     AS 'itk.id',
-                ipr.assessment_id     AS 'ipr.id'
+                ipr.assessment_id     AS 'ipr.id',
+                ilt.assessment_id     AS 'ilt.id'
             FROM course_unit_specification us
             JOIN folder usf                               ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -275,12 +280,14 @@ class ImportFactory
             LEFT JOIN assess sqz                          ON sqz.assessment_id = sa.id
             LEFT JOIN task stk                            ON stk.assessment_id = sa.id
             LEFT JOIN project spr                         ON spr.assessment_id = sa.id
+            LEFT JOIN lti_assessment slt                  ON slt.assessment_id = sa.id
             LEFT JOIN ($innerQuery1) `t1`                 ON `t1`.`sa.id` = sa.id
             LEFT JOIN assessment ia                       ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw                  ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz                          ON iqz.assessment_id = ia.id
             LEFT JOIN task itk                            ON itk.assessment_id = ia.id
             LEFT JOIN project ipr                         ON ipr.assessment_id = ia.id
+            LEFT JOIN lti_assessment ilt                  ON ilt.assessment_id = ia.id
         ";
         $pbOuter1 = new Builder($this->database->getQuoter(), '');
         $pbOuter1->in('us.id', array_keys($unitSpecCache));
@@ -305,6 +312,7 @@ class ImportFactory
                 null              AS 'sqz.id',
                 null              AS 'stk.id',
                 null              AS 'spr.id',
+                null              AS 'slt.id',
                 ia.id             AS 'ia.id',
                 ia.title          AS 'ia.title',
                 ia.publish_date   AS 'ia.publish_date',
@@ -318,7 +326,8 @@ class ImportFactory
                 idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id AS 'iqz.id',
                 itk.assessment_id AS 'itk.id',
-                ipr.assessment_id AS 'ipr.id'
+                ipr.assessment_id AS 'ipr.id',
+                ilt.assessment_id AS 'ilt.id'
             FROM course_unit_implementation ui
             JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
             JOIN folder usf ON usf.id = us.folder_id
@@ -329,6 +338,7 @@ class ImportFactory
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
             LEFT JOIN project ipr ON ipr.assessment_id = ia.id
+            LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
         $pbOuter2 = new Builder($this->database->getQuoter(), '');
@@ -422,13 +432,14 @@ class ImportFactory
                 sa.deleted_at         AS 'sa.deleted_at',
                 sa.sequence           AS 'sa.sequence',
                 sa.work_type_id       AS 'sa.work_type_id',
-                lwt.name			  AS 'lwt.name',
+                lwt.name              AS 'lwt.name',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
                 sdw.multi_submission  AS 'sdw.multi_submission',
                 sqz.assessment_id     AS 'sqz.id',
-                stk.assessment_id     AS 'stk.id'
+                stk.assessment_id     AS 'stk.id',
+                slt.assessment_id     AS 'slt.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment sa           ON sa.id = pa.assessment_id
@@ -436,7 +447,8 @@ class ImportFactory
             LEFT JOIN assessment_course_unit_implementation pui ON pui.assessment_id = p.assessment_id
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz         ON sqz.assessment_id = sa.id
-            LEFT JOIN task stk           ON stk.assessment_id = sa.id";
+            LEFT JOIN task stk           ON stk.assessment_id = sa.id
+            LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id";
         $pb    = new Builder($this->database->getQuoter(), '');
         $pb->in('p.assessment_id', $projectSpecs->keys());
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
@@ -511,7 +523,8 @@ class ImportFactory
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
                 iqz.assessment_id     AS 'iqz.id',
-                itk.assessment_id     AS 'itk.id'
+                itk.assessment_id     AS 'itk.id',
+                ilt.assessment_id     AS 'ilt.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment ia           ON ia.id = pa.assessment_id
@@ -519,7 +532,8 @@ class ImportFactory
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz         ON iqz.assessment_id = ia.id
-            LEFT JOIN task itk           ON itk.assessment_id = ia.id";
+            LEFT JOIN task itk           ON itk.assessment_id = ia.id
+            LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id";
         $pb    = new Builder($this->database->getQuoter(), '');
         $pb->in('p.assessment_id', $projectImpls->keys());
         $pb->isNull('ia.deleted_at');
@@ -730,6 +744,8 @@ class ImportFactory
             $assessmentSpec = new TaskAssessment();
         } elseif ($row['spr.id']) {
             $assessmentSpec = new Project();
+        } elseif ($row['slt.id']) {
+            $assessmentSpec = new LtiAssessment();
         } else {
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['sa.id']}");
         }
@@ -788,6 +804,8 @@ class ImportFactory
             $assessmentImpl = new TaskAssessment();
         } elseif ($row['ipr.id']) {
             $assessmentImpl = new Project();
+        } elseif ($row['ilt.id']) {
+            $assessmentImpl = new LtiAssessment();
         } else {
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['ia.id']}");
         }
