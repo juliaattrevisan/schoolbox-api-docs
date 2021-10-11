@@ -1220,8 +1220,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         if (isInputValueValid()) {
 
             // Create a dayjs object from the input value
-            var activeDate = dayjs(getInputValue(), dateDisplayFormats.dayjsDatetime);
-
+            var activeDate = dayjs(getInputValue());
+            
             // Set date on flatpickr to the input date
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
 
