@@ -274,7 +274,14 @@ class Profile implements IStrategy
             $campusName = trim((string)$student['school_details']['campus']);
             $dob = trim((string)$student['general_details']['date_of_birth']);
             $email = trim((string)$student['school_details']['email_address']);
-            $firstname = trim((string)$student['general_details']['first_name']);
+
+            /* Preferred Name (if it contains a truthy value) takes precedence over First Name
+             */
+            $firstname = (new FirstMeaningfulValue())->find([
+                trim((string)$student['general_details']['preferred_name']),
+                trim((string)$student['general_details']['first_name'])
+            ]);
+
             $form = trim((string)$student['school_details']['form_class']);
             $gender = trim((string)$student['general_details']['gender']);
 
@@ -288,7 +295,6 @@ class Profile implements IStrategy
 
             $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
-            $preferredName = trim((string)$student['general_details']['preferred_name']);
             $specialNeeds = trim($student['other_school_details']['learning_support'] ?? '') === self::SPECIAL_NEEDS;
             $studiesCode = $this->findStudiesCode($student);
             $title = '';
@@ -300,12 +306,6 @@ class Profile implements IStrategy
              */
             $enrolment = $this->findDate(trim((string)$student['general_details']['date_of_entry']));
             $leaving = $this->findDate(trim((string)$student['general_details']['date_of_leaving']));
-
-            /* Preferred Name (if it contains a truthy value) takes precedence over First Name
-             */
-            if ('' !== $preferredName) {
-                $firstname = $preferredName;
-            }
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
