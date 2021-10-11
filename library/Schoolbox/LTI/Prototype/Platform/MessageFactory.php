@@ -12,6 +12,7 @@ namespace Schoolbox\LTI\Prototype\Platform;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
@@ -84,6 +85,17 @@ class MessageFactory
             }
         }
         $role ??= RoleInterface::NAMESPACE_SYSTEM . self::SYSTEM_ROLE_NONE;
+
+        // Claim about the platform instance
+        $platformInstanceClaim = new PlatformInstanceClaim(
+            INSTANCE_ID,
+            null,
+            null,
+            null,
+            null,
+            'schoolbox',
+        );
+
         switch ($messageType) {
             case LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST:
                 $builder = new PlatformOriginatingLaunchBuilder();
@@ -94,7 +106,10 @@ class MessageFactory
                     $loginHint,
                     null,
                     [$role],
-                    [new ResourceLinkClaim('test', 'Test message'),],
+                    [
+                        new ResourceLinkClaim('test', 'Test message'),
+                        $platformInstanceClaim,
+                    ],
                 );
 
             case LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_REQUEST:
@@ -116,7 +131,8 @@ class MessageFactory
                     $loginHint,
                     null,
                     null,
-                    [$role]
+                    [$role],
+                    [$platformInstanceClaim],
                 );
 
             default:
