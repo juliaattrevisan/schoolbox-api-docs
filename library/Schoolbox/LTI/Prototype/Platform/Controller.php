@@ -12,6 +12,8 @@ namespace Schoolbox\LTI\Prototype\Platform;
 use Alaress\Web\Controller\Base;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
+use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
 use Schoolbox\LTI\Prototype\UserAuthenticator;
@@ -56,19 +58,7 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        // Show some users in a dropdown on the generate resource link launch
-        // request form.
-        $excludeCurrentUser = function (User $user) {
-            return $this->getUser()->getId() !== $user->getId();
-        };
-        $staffUsers   = $this->userMapper->findByColumn('g.group_type', Role::STAFF)
-                                         ->filter($excludeCurrentUser)
-                                         ->sortNaturally('username')
-                                         ->slice(0, 5);
-        $studentUsers = $this->userMapper->findByColumn('g.group_type', Role::STUDENT)
-                                         ->filter($excludeCurrentUser)
-                                         ->sortNaturally('username')
-                                         ->slice(0, 5);
+        [$staffUsers, $studentUsers] = $this->buildUserLists();
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiPrototypePlatform/index.twig',
@@ -167,10 +157,22 @@ class Controller extends Base
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
         $result = (new ToolOriginatingLaunchFactory($this->buildRegistrationRepository()))->build($this->request);
+
+        // Each content item should be a link, which may be launched as a resource link launch request.
+        $contentItems  = $result->getPayload()->getDeepLinkingContentItems();
+        $resourceLinks = (new ResourceCollectionFactory())->createFromClaim($contentItems);
+
+        [$staffUsers, $studentUsers] = $this->buildUserLists();
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@ltiPrototypePlatform/deepLinkingResponse.twig',
-                ['result' => $result,]
+                [
+                    'result'        => $result,
+                    'staffUsers'    => $staffUsers,
+                    'studentUsers'  => $studentUsers,
+                    'resourceLinks' => $resourceLinks,
+                    'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+                ],
             )
         );
     }
@@ -194,5 +196,26 @@ class Controller extends Base
     private function buildRegistrationRepository(): RegistrationRepository
     {
         return (new RegistrationRepositoryFactory($this->getConfigLoader(), ToolMapper::getInstance()))->build();
+    }
+
+    /**
+     * Build lists for the user selector dropdowns.
+     *
+     * @return array
+     */
+    private function buildUserLists(): array
+    {
+        $excludeCurrentUser = function (User $user) {
+            return $this->getUser()->getId() !== $user->getId();
+        };
+        $staffUsers   = $this->userMapper->findByColumn('g.group_type', Role::STAFF)
+                                         ->filter($excludeCurrentUser)
+                                         ->sortNaturally('username')
+                                         ->slice(0, 5);
+        $studentUsers = $this->userMapper->findByColumn('g.group_type', Role::STUDENT)
+                                         ->filter($excludeCurrentUser)
+                                         ->sortNaturally('username')
+                                         ->slice(0, 5);
+        return [$staffUsers, $studentUsers];
     }
 }
