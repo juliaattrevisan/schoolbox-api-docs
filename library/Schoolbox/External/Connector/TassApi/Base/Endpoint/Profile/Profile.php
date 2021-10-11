@@ -278,8 +278,8 @@ class Profile implements IStrategy
             /* Preferred Name (if it contains a truthy value) takes precedence over First Name
              */
             $firstname = (new FirstMeaningfulValue())->find([
-                trim((string)$student['general_details']['preferred_name']),
-                trim((string)$student['general_details']['first_name'])
+                $student['general_details']['preferred_name'],
+                $student['general_details']['first_name']
             ]);
 
             $form = trim((string)$student['school_details']['form_class']);
@@ -289,8 +289,8 @@ class Profile implements IStrategy
              * If preferred_surname has a meaningful value, use that in preference to the usual
              */
             $lastname = (new FirstMeaningfulValue())->find([
-                trim((string)$student['general_details']['preferred_surname']),
-                trim((string)$student['general_details']['surname'])
+                $student['general_details']['preferred_surname'],
+                $student['general_details']['surname']
             ]);
 
             $medicalAlert = $this->findMedicalAlert($externalId);
