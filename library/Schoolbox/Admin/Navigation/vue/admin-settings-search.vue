@@ -199,7 +199,9 @@ export default {
                     'ArrowUp': () => this.decrementActiveIndex(),
                     'ArrowDown': () => this.incrementActiveIndex(),
                 }
-                if (keyOptions[keyName]) keyOptions[keyName]();
+                if (keyOptions[keyName] && document.activeElement === this.$refs.queryInput) { //ensure search input has focus
+                    keyOptions[keyName]();
+                }
             });
         },
 
@@ -396,6 +398,7 @@ export default {
             @input="$event.target.composing = false"
             :readonly="!isLoaded"
             :placeholder="inputPlaceholder"
+            ref="queryInput"
             type="text"
             class=""
         />
