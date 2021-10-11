@@ -162,8 +162,8 @@ class DataSource
         User $user = null,
         bool $removeExcluded = false,
         bool $assumeParticipation = false
-    ): Collection {
-        /** @var Collection|IAssessable[] $assessableWithDescendants */
+    ): GenericCollection {
+        /** @var GenericCollection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
