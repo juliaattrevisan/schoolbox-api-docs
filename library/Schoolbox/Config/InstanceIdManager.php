@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Config;
 
-use Alaress\Async\Test\TestCase;
 use Aura\Di\Exception\ServiceNotFound;
 use Etherpad\PadMapper;
 use LogicException;
@@ -17,26 +16,12 @@ use PDOException;
 use Predis;
 use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\MQ;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use UnderflowException;
 use UnexpectedValueException;
 
-use function array_merge;
-use function defined;
-use function exec;
-use function implode;
-use function opendir;
-use function passthru;
-use function preg_match;
-use function preg_replace;
-use function realpath;
-use function rename;
-use function sprintf;
-
-use const INSTANCE_ID;
 
 /**
  * A CLI tool for updating a school's instance ID.
@@ -312,25 +297,10 @@ class InstanceIdManager extends CliTool\App
      */
     private function restartDaemons(): void
     {
-        $this->getLogger()->notice('Restarting daemons');
-        // TODO, this is the only definition of these constants I could find, they should be defined
-        // somewhere more appropriate, but still better than using magic strings.
-        $daemons = [
-            TestCase::DAEMON_BELL,
-            TestCase::DAEMON_DIGEST,
-            TestCase::DAEMON_ROUTE,
-            TestCase::DAEMON_SCHEDULE,
-            TestCase::DAEMON_SOCKET,
-        ];
-
-        foreach ($daemons as $daemon) {
-            $liveOrDev = $this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING ? 'dev' : '';
-            $command   = "service schoolbox$liveOrDev-$daemon restart";
-            $this->getLogger()->debug("Executing:\n    $command");
-            exec($command, $output, $returnCode);
-            if ($returnCode) {
-                $this->getLogger()->error("Unexpected return code when restarting daemon '$daemon':\n" . implode("\n", $output));
-            }
+        $this->getLogger()->notice('Rebuilding + restarting daemons');
+        exec("schoolbox-rebuild-daemons --fetch", $output, $returnCode);
+        if ($returnCode) {
+            $this->getLogger()->error("Unexpected return code when rebuilding daemons:\n" . implode("\n", $output));
         }
     }
 }
