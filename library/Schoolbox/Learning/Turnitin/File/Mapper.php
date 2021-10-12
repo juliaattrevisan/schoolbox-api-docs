@@ -143,6 +143,7 @@ class Mapper extends \Schoolbox\Mapper
                     'inline_grader' => null,
                     'turnitin_report' => null
                 ],
+                'id' => $row['id'],
                 'name' => $row['realname'],
                 'hash' => $row['hash'],
                 'turnitin' => [
