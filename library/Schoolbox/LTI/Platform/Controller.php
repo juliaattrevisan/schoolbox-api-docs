@@ -10,8 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
+use OAT\Library\Lti1p3Core\Resource\Link\LinkInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
+use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
+use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\Repository;
+use Schoolbox\Url\Factory;
 
 /**
  * Controller for LTI platform stuff.
@@ -62,11 +69,55 @@ class Controller extends Base
         // Find the tool in the list of registrations
         $repository = $this->repository->find($tool->getDeploymentId());
 
+        // Return URL:
+        // this is somewhere else
+        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $returnUrl = (clone $baseUrl)
+            ->setPath($this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse'))->toString();
+
+        // Standard deep linking settings
+        $deepLinkingSettings = new DeepLinkingSettings(
+            $returnUrl,
+            [LtiResourceLinkInterface::TYPE, LinkInterface::TYPE,],
+            ['window', 'iframe'],
+            null,
+            false,
+            false,
+        );
+
+        // Figure out who's trying to log in: use that to determine their role
+        $role = $this->getUser()->getRole()->isStaff()
+            ? RoleInterface::NAMESPACE_CONTEXT . 'Instructor'
+            : RoleInterface::NAMESPACE_CONTEXT . 'Learner'
+        ;
+
+        // Claim about the platform instance
+        $platformInstanceClaim = new PlatformInstanceClaim(
+            INSTANCE_ID,
+            null,
+            null,
+            null,
+            null,
+            'schoolbox',
+        );
+
+        $builder = new DeepLinkingLaunchRequestBuilder();
+        $message = $builder->buildDeepLinkingLaunchRequest(
+            $deepLinkingSettings,
+            $repository,
+            $this->getUser()->getUsername(),
+            null,
+            null,
+            [$role],
+            [$platformInstanceClaim],
+        );
+
+
         // Build a DL request to this tool
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/index.twig',
-                [],
+                '@ltiPlatform/generateDeepLinkingRequest.twig',
+                ['message' => $message],
             )
         );
     }

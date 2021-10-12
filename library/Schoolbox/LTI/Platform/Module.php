@@ -51,7 +51,7 @@ class Module extends BaseModule
             }
         );
 
-        // JWKS URL?
+        // TODO add JWKS endpoint?
 
         // OIDC authentication
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
