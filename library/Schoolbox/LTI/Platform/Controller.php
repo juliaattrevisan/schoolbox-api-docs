@@ -107,7 +107,6 @@ class Controller extends Base
             [$platformInstanceClaim],
         );
 
-
         // Build a DL request to this tool
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
@@ -131,36 +130,41 @@ class Controller extends Base
             $this->repository,
             $this->userAuthenticator,
         ))->build($this->request);
+
         $this->response->content->set(
-            $this->buildHtmlOutput(
+            $this->buildUnthemedHtmlOutput(
                 '@ltiPlatform/messageForm.twig',
                 ['message' => $message,]
             )
         );
     }
 
+    /**
+     * Receive a deep linking response from the LTI tool.
+     *
+     * Currently, this assumes it's in an iframe: it will send a message to its
+     * opening window about the content items which were selected.
+     *
+     * @api GET /lti-platform/deep-linking-response
+     * @since 21.1.0
+     */
     public function getReceiveDeepLinkingResponse(): void
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
         $result = (new ToolOriginatingLaunchFactory($this->repository))->build($this->request);
 
-        // Each content item should be a link, which may be launched as a resource link launch request.
-        $contentItems   = $result->getPayload()->getDeepLinkingContentItems();
-        $resourceLinks  = (new ResourceCollectionFactory())->createFromClaim($contentItems);
-
-        $resourceLink = null;
+        // Each content item should be a link, which may be launched as a
+        // resource link launch request.
+        // (Use only the first selected link for now.)
+        $contentItems  = $result->getPayload()->getDeepLinkingContentItems();
+        $resourceLinks = (new ResourceCollectionFactory())->createFromClaim($contentItems);
+        $resourceLink  = null;
         foreach ($resourceLinks as $link) {
             $resourceLink = $link;
             break;
         }
 
-
-        // Send a message to the top-level window, to update the:
-        // * tool's identifier
-        // * URL
-        // * custom fields
-        // * line item, if provided
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
                 '@ltiPlatform/receiveDeepLinkingResponse.twig',
@@ -169,6 +173,13 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Receive a deep linking response from the LTI tool.
+     *
+     * @see getReceiveDeepLinkingResponse
+     * @api POST /lti-platform/deep-linking-response
+     * @since 21.1.0
+     */
     public function postReceiveDeepLinkingResponse(): void
     {
         $this->getReceiveDeepLinkingResponse();
