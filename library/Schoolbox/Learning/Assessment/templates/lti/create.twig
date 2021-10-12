@@ -61,20 +61,63 @@
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
 
+                <div id="resourceLinkMissingUrlModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                    <h2>The selected resource does not have a URL</h2>
+                    <p>This means that it cannot be used in an LTI assessment.</p>
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
+
+                <div id="resourceLinkMissingLineItemModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                    <h2>The selected resource does not seem to be an assessment</h2>
+                    <p>It can still be used in an LTI assessment, but grades will not be synced into Schoolbox.</p>
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
+
                 {% autoescape 'js' %}
                     <script type="text/javascript">
                         $(function () {
-                            let $toolModal        = $('#toolModal'),
-                                $toolModalIframe  = $toolModal.find('#toolModalIframe'),
-                                $ltiAssessmentUrl = $('#lti-assessment-url');
+                            let $toolModal       = $('#toolModal'),
+                                $toolModalIframe = $toolModal.find('#toolModalIframe');
                             $('[data-tool]').click(function (event) {
                                 event.preventDefault();
                                 let $this          = $(this),
                                     messageHandler = (event) => {
                                         // Fill in the form with values from the message data
-                                        let data = JSON.parse(event.data);
-                                        $ltiAssessmentUrl.val(data.url);
-                                        $toolModal.foundation('reveal', 'close');
+                                        let data         = JSON.parse(event.data),
+                                            tool         = data?.tool,
+                                            resourceLink = data?.resourceLinks?.[0];
+
+                                        // Set the tool which was used to select the item
+                                        // TODO figure out if optional chaining is supported in all targeted browsers
+                                        $('#lti-tool-id').val(tool?.id);
+
+                                        // Look at the first resource link, set values based on that
+                                        if (resourceLink) {
+                                            let url = resourceLink?.url;
+                                            if (url) {
+                                                $('#lti-assessment-url').val(resourceLink?.url);
+                                                $('#custom').val(JSON.stringify(resourceLink?.custom ?? {}));
+                                                let lineItem = resourceLink?.lineItem;
+                                                if (lineItem?.resourceId) {
+                                                    // This resource link has a line item, and a resource ID?
+                                                    // Close the modal
+                                                    $('#line-item-score-maximum').val(lineItem?.scoreMaximum);
+                                                    $('#line-item-resource-id').val(lineItem?.resourceId);
+                                                    $toolModal.foundation('reveal', 'close');
+                                                } else {
+                                                    // Raise some warning that this isn't an assessment, and thus can't be graded.
+                                                    // I guess still let it be used though.
+                                                    $('#resourceLinkMissingLineItemModal').foundation('reveal', 'open');
+                                                }
+                                            } else {
+                                                // Raise some warning about what was selected not having a URL.
+                                                // This should never happen, because the resource link must have a URL.
+                                                $('#resourceLinkMissingUrlModal').foundation('reveal', 'open');
+                                            }
+                                        } else {
+                                            // Nothing was selected: just close the modal
+                                            $toolModal.foundation('reveal', 'close');
+                                        }
                                     }
 
                                 // On open of this modal:
@@ -101,6 +144,8 @@
             {% endif %}
         </div>
     {% endif %}
+
+    {# LTI assessment URL + required hidden fields #}
     <input readonly
            required
            id="lti-assessment-url"
@@ -108,6 +153,10 @@
            type="text"
            maxlength="2048"
            value="{{ assessment.ltiAssessmentUrl }}">
+    <input type="hidden" id="tool-id" name="toolId" value="{{ assessment.toolId ?? '' }}" />
+    <input type="hidden" id="custom" name="custom" value="{{ assessment.custom ?? '{}' }}" />
+    <input type="hidden" id="line-item-score-maximum" name="lineItemScoreMaximum" value="{{ assessment.lineItemScoreMaximum ?? '' }}" />
+    <input type="hidden" id="line-item-resource-id" name="lineItemResourceId" value="{{ assessment.lineItemResourceId ?? '' }}" />
 
 
     {# ----------------------------------------------------------- #}
