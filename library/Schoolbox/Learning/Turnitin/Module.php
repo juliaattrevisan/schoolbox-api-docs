@@ -16,10 +16,12 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\IMapper;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Twig\Error\LoaderError;
 
 
@@ -125,7 +127,12 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class)
+            'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class),
+            'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
+                'router'     => $injector->lazyGet('router'),
+                'authorizer' => $injector->lazyGet('authorizer'),
+                'access'     => Access::getInstance(),
+            ]),
         ];
     }
 

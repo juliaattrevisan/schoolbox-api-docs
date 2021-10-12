@@ -1,9 +1,13 @@
 {##
  # Similarity Report
  #
+ # @param array $breadcrumbs       A list of breadcrumb nodes
  # @param IAssessable $assessment  The assessment
  # @param string $payloadUrl       The url to load this assessment's similarity report payload
  #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Similarity Report for {{ assessment.title }}</h1>

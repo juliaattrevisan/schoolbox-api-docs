@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
@@ -70,13 +71,18 @@ class Controller extends Base
     private UserMapper $userMapper;
 
 
+    /** @var BreadcrumbFactory */
+    protected BreadcrumbFactory $bakery;
+
+
     /**
      * Controller constructor.
      */
-    public function __construct(Turnitin\File\Mapper $turnitinFileMapper, UserMapper $userMapper)
+    public function __construct(Turnitin\File\Mapper $turnitinFileMapper, BreadcrumbFactory $bakery, UserMapper $userMapper)
     {
         $this->turnitinFileMapper = $turnitinFileMapper;
         $this->userMapper = $userMapper;
+        $this->bakery = $bakery;
     }
 
 
@@ -315,6 +321,16 @@ class Controller extends Base
     public function getList(IAssessable $assessment)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@turnitin/michael.twig', [
+            'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId()
+                ])
+            ])->add([
+                'Similarity Report',
+                ''
+            ]),
             'assessment' => $assessment,
             'payloadUrl' => $this->router->generate('turnitin.getListPayload', [
                 'assessment' => $assessment,
