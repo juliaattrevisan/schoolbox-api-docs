@@ -338,21 +338,18 @@ class Controller extends Base
          */
         foreach ($partial as $userId => &$data) {
             foreach ($data['files'] as &$file) {
-                $inlineGraderRoute = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
+                $file['_links']['inline_grader'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'studentId' => $userId
                 ]);
 
-                $turnitinReoute = $this->getRouteIfAuthorized('learningDueWorkResponse.getTurnitinReport', [
+                $file['_links']['turnitin_report'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getTurnitinReport', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'responseId' => $data['submission']['id'],
                     'turnitinId' => $file['turnitin']['id']
                 ]);
-
-                $file['_links']['inline_grader'] = $inlineGraderRoute;
-                $file['_links']['turnitin_report'] = $turnitinReoute;
             }
 
             unset($file);
