@@ -11,13 +11,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\UserMapper;
-
 
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps
@@ -66,23 +62,11 @@ class Controller extends Base
 
 
     /**
-     * @var UserMapper
-     */
-    private UserMapper $userMapper;
-
-
-    /** @var BreadcrumbFactory */
-    protected BreadcrumbFactory $bakery;
-
-
-    /**
      * Controller constructor.
      */
-    public function __construct(Turnitin\File\Mapper $turnitinFileMapper, BreadcrumbFactory $bakery, UserMapper $userMapper)
+    public function __construct(Turnitin\File\Mapper $turnitinFileMapper)
     {
         $this->turnitinFileMapper = $turnitinFileMapper;
-        $this->userMapper = $userMapper;
-        $this->bakery = $bakery;
     }
 
 
@@ -309,128 +293,5 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_host'),
             $this->getConfigLoader()->get('turnitin_api_key')
         );
-    }
-
-
-    /**
-     * Index screen
-     *
-     * @param IAssessable $assessment
-     * @throws \Aura\Router\Exception\RouteNotFound
-     */
-    public function getList(IAssessable $assessment)
-    {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@turnitin/michael.twig', [
-            'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
-                $assessment->getTitle(),
-                $this->getRouteIfAuthorized('learningAssessment.getStatus', [
-                    'assessment' => $assessment,
-                    'assessmentId' => $assessment->getId()
-                ])
-            ])->add([
-                'Similarity Report',
-                ''
-            ]),
-            'assessment' => $assessment,
-            'payloadUrl' => $this->router->generate('turnitin.getListPayload', [
-                'assessment' => $assessment,
-                'assessmentId' => $assessment->getId()
-            ])
-        ])->setTitle("{$assessment->getTitle()} Similarity Report"));
-    }
-
-
-    /**
-     * Get a list of all the students' most recent submissions, their files,
-     * and corresponding turnitin reports and assorted metadata. This is used
-     * as the payload endpoint for the Similarity Report report.
-     */
-    public function getListPayload(IAssessable $assessment): void
-    {
-        /* This partial payload is indexed by user ids
-         */
-        $payload = $this->turnitinFileMapper->findMostRecentForAssessment($assessment->getId());
-
-        /* Decorate it with some user metadata
-         */
-        $users = $this->userMapper->findByColumn('id', array_keys($payload))->indexBy('id');
-
-        foreach ($users as $userId => $user) {
-            $payload[$userId]['user'] = [
-                'id' => $userId,
-                'title' => $user->getTitle(),
-                'firstname' => $user->getFirstname(),
-                'lastname' => $user->getLastname(),
-                'fullname' => $user->getFullName(),
-                'role' => $user->getRole()->getName()
-            ];
-        }
-
-        /* Find the routes for each file's Inline Grader and Turnitin Reports
-         */
-        foreach ($payload as $userId => &$data) {
-            $data['submission']['_links']['inline_grader'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
-                'assessmentId' => $assessment->getId(),
-                'assessment' => $assessment,
-                'studentId' => $userId
-            ]);
-
-            foreach ($data['files'] as &$file) {
-                $file['_links']['turnitin_report'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getTurnitinReport', [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                    'responseId' => $data['submission']['id'],
-                    'turnitinId' => $file['turnitin']['id']
-                ]);
-            }
-
-            unset($file);
-        }
-
-        unset($data);
-
-        /* Fish out a user's participation record to determine their response/feedback status (!!)
-         * I really wish I didn't have to use the andy hammer, but oh well. Time to go nuclear
-         */
-        foreach ($assessment->getAllParticipants() as $participant) {
-            /* If this participanty wasn't in the partial payload, they don't have a submission yet
-             * There is no reason to investigate their status any further
-             */
-            if (!isset($payload[$participant->getUser()->getId()])) {
-                continue;
-            }
-
-            /* These status strings are derived from frontend templates
-             * TODO SURELY we have these in backend land somewhere, right
-             */
-            if ($participant->isResponseRequired()) {
-                /* This maps to assessment/templates/status.twig "statusIncomplete"
-                 */
-                $status = 'incomplete';
-            } elseif ($participant->isResubmissionRequired()) {
-                /* This maps to assessment/templates/dueWork/status.twig "statusFailed"
-                 */
-                $status = 'failed';
-            } elseif ($participant->isFeedbackRequired()) {
-                /* This maps to assessment/templates/status.twig "statusPending"
-                 */
-                $status = 'pending';
-            } else {
-                /* This maps to assessment/templates/status.twig "statusReviewed"
-                 */
-                $status = 'reviewed';
-            }
-
-            /* Shank it in
-             * Note that this mirrors the frontend implementation in assessment/templates/dueWork/status.twig
-             * and its superclass template assessment/templates/status.twig
-             */
-            $payload[$participant->getUser()->getId()]['submission']['status'] = $status;
-        }
-
-        /* Ditch the array keys, json it
-         * Over to frontend land
-         */
-        $this->getResponse()->content->set($this->buildJsonOutput(array_values($payload)));
     }
 }

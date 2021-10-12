@@ -181,6 +181,11 @@ class Module extends BaseModule
         $this->register('POST', "$assRoute/$studentParam/ackSelf", 'postSelfAcknowledge', $canAckSubmission, $preloadParticipant); // p
 
         $this->register('POST', "$assRoute/locations", 'getLocationForm', $canModify, $preloadAssessment);
+
+        /* Similarity Report report
+         */
+        $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewStatus, $preloadAssessment);
+        $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewStatus, $preloadAssessment);
     }
 
 
@@ -371,6 +376,7 @@ class Module extends BaseModule
         $dc['kamiConnector'] = $injector->lazyGet('kamiConnector');
         $dc['kamiMapper'] = $this->getMapperFactory()->getLazy(Kami\Mapper::class);
         $dc['pdfGenerator'] = $injector->lazyGet('pdfGenerator');
+        $dc['turnitinFileMapper'] = $this->getMapperFactory()->getLazy(\Schoolbox\Learning\Turnitin\File\Mapper::class);
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];
