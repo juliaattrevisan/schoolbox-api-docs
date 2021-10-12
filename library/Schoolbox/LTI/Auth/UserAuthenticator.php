@@ -19,7 +19,7 @@ use Schoolbox\UserMapper;
 /**
  * User authenticator for the Schoolbox platform.
  *
- * Currently only authenticates whatever user is passed in the constructor: if
+ * Currently only authenticates whatever user is passed in the login hint: if
  * no user was passed, authentication fails.
  */
 class UserAuthenticator implements UserAuthenticatorInterface

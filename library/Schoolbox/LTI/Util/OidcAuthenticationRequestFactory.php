@@ -22,9 +22,14 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 class OidcAuthenticationRequestFactory
 {
     /**
-     * OIDC authenticator, created in constructor.
+     * Repository of LTI registrations.
      */
-    private OidcAuthenticator $oidcAuthenticator;
+    private RegistrationRepositoryInterface $registrationRepository;
+
+    /**
+     * User authenticator.
+     */
+    private UserAuthenticatorInterface $userAuthenticator;
 
     /**
      * Constructor
@@ -36,7 +41,8 @@ class OidcAuthenticationRequestFactory
         RegistrationRepositoryInterface $registrationRepository,
         UserAuthenticatorInterface $userAuthenticator
     ) {
-        $this->oidcAuthenticator = new OidcAuthenticator($registrationRepository, $userAuthenticator);
+        $this->registrationRepository = $registrationRepository;
+        $this->userAuthenticator      = $userAuthenticator;
     }
 
     /**
@@ -48,6 +54,7 @@ class OidcAuthenticationRequestFactory
      */
     public function build(Request $request): LtiMessageInterface
     {
-        return $this->oidcAuthenticator->authenticate((new ServerRequestFactory())->build($request));
+        return (new OidcAuthenticator($this->registrationRepository, $this->userAuthenticator))
+            ->authenticate((new ServerRequestFactory())->build($request));
     }
 }
