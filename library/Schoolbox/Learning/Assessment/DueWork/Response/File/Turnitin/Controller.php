@@ -16,6 +16,8 @@ use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Helper;
+use Schoolbox\UserMapper;
+
 
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps
@@ -64,11 +66,18 @@ class Controller extends Base
 
 
     /**
+     * @var UserMapper
+     */
+    private UserMapper $userMapper;
+
+
+    /**
      * Controller constructor.
      */
-    public function __construct(Turnitin\File\Mapper $turnitinFileMapper)
+    public function __construct(Turnitin\File\Mapper $turnitinFileMapper, UserMapper $userMapper)
     {
         $this->turnitinFileMapper = $turnitinFileMapper;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -303,7 +312,50 @@ class Controller extends Base
      * and corresponding turnitin reports and assorted metadata. This is used
      * as the payload endpoint for the Similarity Report report.
      */
-    public function getList(): void
+    public function getList(int $assessmentId): void
     {
+        /* This partial payload is indexed by user ids
+         */
+        $partial = $this->turnitinFileMapper->findMostRecentForAssessment($assessmentId);
+
+        /* Decorate it with some user metadata
+         */
+        $users = $this->userMapper->findByColumn('id', array_keys($partial))->indexBy('id');
+
+        foreach ($users as $userId => $user) {
+            $partial[$userId]['user'] = [
+                'id' => $userId,
+                'title' => $user->getTitle(),
+                'firstname' => $user->getFirstname(),
+                'lastname' => $user->getLastname(),
+                'role' => $user->getRole()->getName()
+            ];
+        }
+
+        /* Find the routes for each file's Inline Grader and Turnitin Reports
+         */
+        foreach ($partial as $userId => &$data) {
+            foreach ($data['files'] as &$file) {
+                $inlineGraderRoute = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
+                    'assessmentId' => $assessmentId,
+                    'studentId' => $userId
+                ]);
+
+                $turnitinReoute = $this->getRouteIfAuthorized('learningDueWorkResponse.getTurnitinReport', [
+                    'assessmentId' => $assessmentId,
+                    'responseId' => $data['submission']['id'],
+                    'turnitinId' => $file['turnitin']['id']
+                ]);
+
+                $file['_links']['inline_grader'] = $inlineGraderRoute;
+                $file['_links']['turnitin_report'] = $turnitinReoute;
+            }
+
+            unset($file);
+        }
+
+        unset($data);
+
+        new \Alaress_Probe($partial);
     }
 }

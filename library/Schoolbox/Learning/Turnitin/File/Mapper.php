@@ -91,9 +91,11 @@ class Mapper extends \Schoolbox\Mapper
     {
         $query = '
             SELECT 
+                ssf.student_submission_id,
                 ss.submitted_at,
                 ss.owner,
                 ssf.*,
+                tr.id AS turnitinReportId,
                 overall_match_percentage
             FROM assessment a
             INNER JOIN submission_box sb ON a.id = sb.assessment_id
@@ -139,14 +141,18 @@ class Mapper extends \Schoolbox\Mapper
             $models[$userId]['files'][] = [
                 '_links' => [
                     'inline_grader' => null,
-                    'report' => null
+                    'turnitin_report' => null
                 ],
                 'name' => $row['realname'],
                 'hash' => $row['hash'],
-                'percentage' => $row['overall_match_percentage'],
+                'turnitin' => [
+                    'id' => $row['turnitinReportId'],
+                    'percentage' => $row['overall_match_percentage'],
+                ],
             ];
 
             $models[$userId]['submission'] = [
+                'id' => $row['student_submission_id'],
                 'submitted_at' => $row['submitted_at']
             ];
         }

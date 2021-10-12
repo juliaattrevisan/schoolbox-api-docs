@@ -49,7 +49,7 @@ class Module extends BaseModule
 //        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
 //        $this->register('POST', '/report-updated', 'postReportUpdated', $postPerms);
 
-        $this->register('GET', '/list', 'getList', $postPerms);
+        $this->register('GET', '/list/{assessmentId}', 'getList', $postPerms);
     }
 
 
@@ -76,7 +76,8 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class)
+            'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class),
+            'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class)
         ];
     }
 }
