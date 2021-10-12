@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\LTI\Provider;
+use Schoolbox\LTI\Provider as LtiTool;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -31,7 +31,7 @@ class Controller extends Assessment\Controller
     /**
      * Schoolbox's registry of LTI providers (a.k.a. tools).
      */
-    private Provider\Mapper $ltiProviderMapper;
+    private LtiTool\Mapper $ltiToolMapper;
 
     /**
      * Constructor
@@ -48,7 +48,7 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param UnitSpecificationMapper       $unitSpecificationMapper
      * @param Replicator                    $replicator
-     * @param Provider\Mapper               $ltiProviderMapper
+     * @param LtiTool\Mapper                $ltiToolMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -63,7 +63,7 @@ class Controller extends Assessment\Controller
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        Provider\Mapper $ltiProviderMapper
+        LtiTool\Mapper $ltiToolMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -79,7 +79,7 @@ class Controller extends Assessment\Controller
             $unitSpecificationMapper,
             $replicator
         );
-        $this->ltiProviderMapper = $ltiProviderMapper;
+        $this->ltiToolMapper = $ltiToolMapper;
     }
 
     /**
@@ -92,9 +92,9 @@ class Controller extends Assessment\Controller
     {
         return [
             'acceptingResponses' => true,
-            'ltiProviders'       => $this->ltiProviderMapper->findByColumn(
+            'ltiTools'           => $this->ltiToolMapper->findByColumn(
                 'lti_version',
-                Provider\Model::LTI_VERSION_1_3,
+                LtiTool\Model::LTI_VERSION_1_3,
             ),
         ];
     }

@@ -11,8 +11,11 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\UserMapper;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
+use Schoolbox\LTI\Provider\Model as ToolModel;
+use Schoolbox\LTI\Registration;
 
 /**
  * LTI platform module.
@@ -35,6 +38,20 @@ class Module extends BaseModule
         // Build a resource link launch request for the given registration
 
         // Build a deep linking request for the given registration
+        $this->register(
+            self::METHOD_GET,
+            "/deep-linking-request/{toolId}",
+            'getGenerateDeepLinkingRequest',
+            null,
+            function ($params) {
+                $toolMapper = $this->getMapperFactory()->get(ToolMapper::class);
+                return [
+                    'tool' => $toolMapper->findById($params['toolId']),
+                ];
+            }
+        );
+
+        // JWKS URL?
 
         // OIDC authentication
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
@@ -49,11 +66,20 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
+        /** @var Container $injector */
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
-//                ['userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)]
+                [
+                    'repository' => $injector->lazy(function () {
+                        $registrationRepositoryFactory = new Registration\RepositoryFactory($this->getConfig());
+                        return $registrationRepositoryFactory->build(
+                            $this->getMapperFactory()->get(ToolMapper::class)
+                                                     ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3),
+                        );
+                    }),
+                ]
             )
         );
     }
