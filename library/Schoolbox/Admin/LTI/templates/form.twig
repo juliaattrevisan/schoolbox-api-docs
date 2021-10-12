@@ -36,6 +36,17 @@
         {# 1.3 fields #}
         <div {% if not (provider.isLtiVersion13 ?? false) %}class="hide"{% endif %} data-lti-version-section="{{ providerLtiVersion13 }}">
             <div class="small-6 columns">
+                <label for="client_id-{{ identifier }}" class="required">
+                    Client ID
+                </label>
+                <input required
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="client_id-{{ identifier }}"
+                       type="text"
+                       name="client_id"
+                       value="{{ provider.clientId ?? '' }}">
+            </div>
+            <div class="small-6 columns">
                 <label for="audience-{{ identifier }}" class="required">
                     Audience
                 </label>

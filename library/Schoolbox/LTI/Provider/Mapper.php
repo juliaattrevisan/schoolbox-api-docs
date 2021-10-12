@@ -30,6 +30,7 @@ class Mapper extends BaseMapper
         $this->uses('deployment_id', self::TYPE_STRING, self::COLUMN_UUID);
 
         // LTI 1.3 fields
+        $this->uses('client_id', self::TYPE_STRING);
         $this->uses('audience', self::TYPE_STRING);
         $this->uses('oidc_initiation_url', self::TYPE_STRING);
         $this->uses('launch_url', self::TYPE_STRING);

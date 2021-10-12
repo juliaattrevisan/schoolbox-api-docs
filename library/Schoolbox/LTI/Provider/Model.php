@@ -82,11 +82,21 @@ class Model implements ISoftDeletable
     private string $deploymentId = '';
 
     /**
+     * LTI 1.3: the client ID of this tool.
+     *
+     * This will be provided by the tool, and will be:
+     * * the `client_id` claim in any JWTs sent from the tool to Schoolbox
+     *
+     * These claims must match the tool's client ID in order for JWTs to verify.
+     */
+    private ?string $clientId;
+
+    /**
      * LTI 1.3: the audience of this tool.
      *
      * This will be provided by the tool, and will be:
      * * the `iss` claim in any JWTs sent from the tool to Schoolbox
-     * * tge `aud` claim in any JWTs sent from Schoolbox to the tool
+     * * the `aud` claim in any JWTs sent from Schoolbox to the tool
      *
      * These claims must match the tool's issuer in order for JWTs to verify.
      */
@@ -250,6 +260,24 @@ class Model implements ISoftDeletable
     public function setDeploymentId(string $deploymentId): self
     {
         $this->deploymentId = $deploymentId;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getClientId(): ?string
+    {
+        return $this->clientId;
+    }
+
+    /**
+     * @param string|null $clientId
+     * @return $this
+     */
+    public function setClientId(?string $clientId): self
+    {
+        $this->clientId = $clientId;
         return $this;
     }
 
