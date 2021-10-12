@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
-use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Resource\Link\LinkInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
@@ -19,13 +18,11 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
-use Schoolbox\LTI\Auth\UserAuthenticator;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\Repository;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\Url\Factory;
-use Schoolbox\UserMapper;
 
 /**
  * Controller for LTI platform stuff.
@@ -50,26 +47,8 @@ class Controller extends Base
      */
     public function __construct(Repository $repository, UserAuthenticatorInterface $userAuthenticator)
     {
-        $this->repository = $repository;
+        $this->repository        = $repository;
         $this->userAuthenticator = $userAuthenticator;
-    }
-
-    /**
-     * Test endpoint for posting _something_ back to the window which opened
-     * this iframe.
-     *
-     * @api GET /lti-platform/
-     * @since 21.1.0
-     */
-    public function getIndex(): void
-    {
-        // Test posting a message back to the form in an iframe
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/index.twig',
-                [],
-            )
-        );
     }
 
     /**

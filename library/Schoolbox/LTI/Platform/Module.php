@@ -34,12 +34,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        // Test sending a msg back to the main form
-        $this->register(self::METHOD_GET, "", 'getIndex');
+        // TODO build a resource link launch request for the given tool
 
-        // Build a resource link launch request for the given registration
-
-        // Build a deep linking request for the given registration
+        // Build a deep linking request for the given tool
         $this->register(
             self::METHOD_GET,
             "/deep-linking-request/{toolId}",
@@ -58,7 +55,7 @@ class Module extends BaseModule
         // OIDC authentication
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
 
-        // Response to deep linking requests
+        // Receive a response to a deep linking request
         $this->register(self::METHOD_GET, "/deep-linking-response", 'getReceiveDeepLinkingResponse');
         $this->register(self::METHOD_POST, "/deep-linking-response", 'postReceiveDeepLinkingResponse');
     }
