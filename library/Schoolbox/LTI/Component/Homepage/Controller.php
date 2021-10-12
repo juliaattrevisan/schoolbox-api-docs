@@ -13,6 +13,7 @@ namespace Schoolbox\LTI\Component\Homepage;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
+use Schoolbox\LTI\Provider\Model as ProviderModel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
@@ -54,10 +55,15 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         // Retrieve list of all LTI providers from database
+        // (so far, only 1.1 is supported)
 
-        $providers = $this->providerMapper->findAll([
-            'order' => ['name' => 'asc']
-        ]);
+        $providers = $this->providerMapper->findByColumn(
+            'lti_version',
+            ProviderModel::LTI_VERSION_1_1,
+            [
+                'order' => ['name' => 'asc']
+            ]
+        );
 
         // Read-only users see nothing at all if no LTI providers exist,
         // or none is set up for this component.
