@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>LTI Platform: Select Picker</title>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            // Your code to run since DOM is loaded and ready
+            document.getElementById('theButton').addEventListener(
+                'click',
+                function (event) {
+                    event.preventDefault();
+                    let data = {
+                        // Does this need to be identified as coming from here?
+                        url: 'https://something.example.com/page.html',
+                    };
+                    window.top.postMessage(JSON.stringify(data), window.location.origin);
+                }
+            )
+        });
+        // $(function () {
+        //     // Press the button: send a message to the top
+        //     $('#theButton').on('click', function (event) {
+        //         event.preventDefault();
+        //         let data = {
+        //             // Does this need to be identified as coming from here?
+        //             url: 'https://something.example.com/page.html',
+        //         };
+        //         window.top.postMessage(JSON.stringify(data), window.location.origin);
+        //     })
+        // })
+    </script>
+</head>
+<body>
+
+<button id="theButton">Press the button</button>
+</body>
+

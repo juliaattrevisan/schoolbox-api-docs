@@ -44,12 +44,61 @@
     {% if not assessment.ltiAssessmentUrl %}
         <div class="empty-state">
             <i class="icon-lti"></i>
-            <p>Select a third party embedded learning tool to select an assessment from.</p>
-            <p>
-                {% for provider in ltiProviders %}
-                    <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
-                {% endfor %}
-            </p>
+            {% if ltiProviders is empty %}
+                <p>No providers which support selection of assessments have been configured. Please contact your system administrator.</p>
+            {% else %}
+                <p>Select a third party embedded learning tool to select an assessment from.</p>
+                <p>
+                    {% for provider in ltiProviders %}
+                        <button data-provider="{{ provider.id }}"
+                                data-provider-selector-url="{{ routeLookup('ltiPlatform.getIndex') }}"
+                        >{{ provider.name }}</button>
+                    {% endfor %}
+                </p>
+
+                <div id="providerModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                    <iframe id="providerModalIframe"></iframe>
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
+
+                {% autoescape 'js' %}
+                    <script type="text/javascript">
+                        $(function () {
+                            let $providerModal       = $('#providerModal'),
+                                $providerModalIframe = $providerModal.find('#providerModalIframe'),
+                                $ltiAssessmentUrl    = $('#lti-assessment-url');
+                            $('[data-provider]').click(function (event) {
+                                event.preventDefault();
+                                let $this          = $(this),
+                                    messageHandler = (event) => {
+                                        // Fill in the form with values from the message data
+                                        let data = JSON.parse(event.data);
+                                        $ltiAssessmentUrl.val(data.url);
+                                        $providerModal.foundation('reveal', 'close');
+                                    }
+
+                                // On open of this modal:
+                                // * point the iframe to the place which sends messages
+                                // * listen for messages
+                                // On close:
+                                // * point the iframe nowhere
+                                // * stop listening (so that message listeners for other things work)
+                                $providerModal.on('open.fndtn.reveal', function () {
+                                    $providerModalIframe.attr('src', $this.attr('data-provider-selector-url'));
+                                    window.addEventListener('message', messageHandler);
+                                });
+                                $providerModal.on('close.fndtn.reveal', function () {
+                                    $providerModalIframe.removeAttr('src');
+                                    window.removeEventListener('message', messageHandler);
+                                });
+
+                                // And open the modal
+                                $providerModal.foundation('reveal', 'open');
+                            })
+                        });
+                    </script>
+                {% endautoescape %}
+            {% endif %}
         </div>
     {% endif %}
     <input readonly
