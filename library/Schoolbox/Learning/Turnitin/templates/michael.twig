@@ -1,0 +1,52 @@
+{##
+ # Similarity Report
+ #
+ # @param IAssessable $assessment  The assessment
+ # @param string $payloadUrl       The url to load this assessment's similarity report payload
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Similarity Report for {{ assessment.title }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns">
+
+        <script>
+            $(function () {
+                $.getJSON('{{ payloadUrl }}', function (responseText) {
+                    let i, j;
+                    let table = $('<table></table>');
+
+                    for (i = 0; i < responseText.length; i++) {
+                        let data = responseText[i];
+                        let row = $('<tr></tr>');
+
+                        row.append('<td>' + '<img src="/portrait.php?userId=' + data['user']['id'] + '&size=square64" />' + '</td>');
+                        row.append('<td>' + data['user']['fullname'] + '<br />' + data['user']['role'] + '</td>');
+                        row.append('<td>' + data['submission']['submitted_at']['nice'] + '</td>');
+
+                        let files = '';
+
+                        for (j = 0; j < data['files'].length; j++) {
+                            let file = data['files'][j];
+
+                            files += '<span>' + file['turnitin']['percentage'] + '% </span>';
+                            files += '<a href="' + file['_links']['turnitin_report'] + '">' + file['name'] + '</a>' + '<br />';
+                        }
+
+                        row.append($(files));
+                        row.append('<td>' + data['submission']['status'] + '</td>');
+                        row.append('<td>' + '<a href="'+data['submission']['_links']['inline_grader']+'">Review in Inline Grader</a>' + '</td>');
+
+                        table.append(row);
+                    }
+
+                    $('#bleah').append(table);
+                });
+            });
+        </script>
+
+        <div id="bleah"></div>
+    </div>
+</div>

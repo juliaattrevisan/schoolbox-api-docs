@@ -141,7 +141,6 @@ class Mapper extends \Schoolbox\Mapper
 
             $models[$userId]['files'][] = [
                 '_links' => [
-                    'inline_grader' => null,
                     'turnitin_report' => null
                 ],
                 'id' => $row['id'],
@@ -158,6 +157,9 @@ class Mapper extends \Schoolbox\Mapper
             $timestamp = strtotime($row['submitted_at']);
 
             $models[$userId]['submission'] = [
+                '_links' => [
+                    'inline_grader' => null,
+                ],
                 'id' => $row['student_submission_id'],
                 'submitted_at' => [
                     'database' => $row['submitted_at'],

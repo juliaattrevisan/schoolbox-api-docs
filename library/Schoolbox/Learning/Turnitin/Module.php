@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
@@ -19,6 +20,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\Exception as MapperException;
+use Twig\Error\LoaderError;
 
 
 /**
@@ -29,7 +31,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'turnitinWebhook';
+    protected $basename = 'turnitin';
 
 
     /**
@@ -58,7 +60,10 @@ class Module extends BaseModule
 //        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
 //        $this->register('POST', '/report-updated', 'postReportUpdated', $postPerms);
 
+        /* Similarity Report report
+         */
         $this->register('GET', '/list/{assessmentId}', 'getList', $postPerms, $preloadAssessment);
+        $this->register('GET', '/list/payload/{assessmentId}', 'getListPayload', $postPerms, $preloadAssessment);
     }
 
 
@@ -82,6 +87,45 @@ class Module extends BaseModule
 
         return [
             'assessment' => $assessment,
+        ];
+    }
+
+
+    /**
+     * @param IChainLoader $templateLoader
+     * @throws LoaderError
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function initControllers(ContainerInterface $injector): void
+    {
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+    }
+
+
+    /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class),
+            'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class)
         ];
     }
 
@@ -116,34 +160,5 @@ class Module extends BaseModule
     protected function getResponseMapperProxy()
     {
         return $this->injector->get('responseDataSource');
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class)
-        ];
     }
 }

@@ -307,11 +307,29 @@ class Controller extends Base
 
 
     /**
+     * Index screen
+     *
+     * @param IAssessable $assessment
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getList(IAssessable $assessment)
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@turnitin/michael.twig', [
+            'assessment' => $assessment,
+            'payloadUrl' => $this->router->generate('turnitin.getListPayload', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId()
+            ])
+        ])->setTitle("{$assessment->getTitle()} Similarity Report"));
+    }
+
+
+    /**
      * Get a list of all the students' most recent submissions, their files,
      * and corresponding turnitin reports and assorted metadata. This is used
      * as the payload endpoint for the Similarity Report report.
      */
-    public function getList(IAssessable $assessment): void
+    public function getListPayload(IAssessable $assessment): void
     {
         /* This partial payload is indexed by user ids
          */
@@ -335,13 +353,13 @@ class Controller extends Base
         /* Find the routes for each file's Inline Grader and Turnitin Reports
          */
         foreach ($payload as $userId => &$data) {
-            foreach ($data['files'] as &$file) {
-                $file['_links']['inline_grader'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                    'studentId' => $userId
-                ]);
+            $data['submission']['_links']['inline_grader'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
+                'assessmentId' => $assessment->getId(),
+                'assessment' => $assessment,
+                'studentId' => $userId
+            ]);
 
+            foreach ($data['files'] as &$file) {
                 $file['_links']['turnitin_report'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getTurnitinReport', [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
