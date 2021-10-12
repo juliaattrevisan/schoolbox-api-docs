@@ -29,13 +29,21 @@ class RepositoryFactory
     private IConfigLoader $config;
 
     /**
+     * The OIDC authentication path (relative to the Schoolbox instance)
+     * for the Schoolbox platform.
+     */
+    private string $oidcAuthenticationPath;
+
+    /**
      * Constructor
      *
      * @param IConfigLoader $config
+     * @param string        $oidcAuthenticationPath
      */
-    public function __construct(IConfigLoader $config)
+    public function __construct(IConfigLoader $config, string $oidcAuthenticationPath)
     {
-        $this->config = $config;
+        $this->config                 = $config;
+        $this->oidcAuthenticationPath = $oidcAuthenticationPath;
     }
 
     /**
@@ -68,8 +76,7 @@ class RepositoryFactory
             'schoolbox',
             'Schoolbox Platform',
             $baseUrl->toString(),
-            // TODO inject route
-            (clone $baseUrl)->setPath('/lti-platform/oidc/authentication')->toString(),
+            (clone $baseUrl)->setPath($this->oidcAuthenticationPath)->toString(),
         );
 
         // Build a registration out of each tool

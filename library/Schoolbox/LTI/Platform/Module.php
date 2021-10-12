@@ -73,7 +73,10 @@ class Module extends BaseModule
                 Controller::class,
                 [
                     'repository' => $injector->lazy(function () {
-                        $registrationRepositoryFactory = new Registration\RepositoryFactory($this->getConfig());
+                        $registrationRepositoryFactory = new Registration\RepositoryFactory(
+                            $this->getConfig(),
+                            $this->getRouter()->generate($this->basename . '.getOidcAuthenticationRequest'),
+                        );
                         return $registrationRepositoryFactory->build(
                             $this->getMapperFactory()->get(ToolMapper::class)
                                                      ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3),
