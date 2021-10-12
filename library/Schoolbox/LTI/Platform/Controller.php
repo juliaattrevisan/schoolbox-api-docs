@@ -11,7 +11,6 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
-use OAT\Library\Lti1p3Core\Resource\Link\LinkInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
@@ -73,7 +72,7 @@ class Controller extends Base
         // Standard deep linking settings
         $deepLinkingSettings = new DeepLinkingSettings(
             $returnUrl,
-            [LtiResourceLinkInterface::TYPE, LinkInterface::TYPE,],
+            [LtiResourceLinkInterface::TYPE,],
             ['window', 'iframe'],
             null,
             false,
