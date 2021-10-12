@@ -6,14 +6,18 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>LTI Platform: Receive Deep Linking Response</title>
+
+    {% set payload = {
+        tool:          {id: tool.id},
+        resourceLinks: resourceLinks,
+    } %}
+    {% autoescape 'js' %}
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
-            let data = {
-                url: '{{ resourceLink.url }}',
-            };
-            window.top.postMessage(JSON.stringify(data), window.location.origin);
+            window.top.postMessage(JSON.stringify({{ payload | json_encode | raw }}), window.location.origin);
         });
     </script>
+    {% endautoescape %}
 </head>
 <body>
 </body>

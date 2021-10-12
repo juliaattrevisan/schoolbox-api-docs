@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
@@ -57,6 +59,8 @@ class Controller extends Base
      * @since 21.1.0
      *
      * @param ToolModel $tool
+     * @throws LtiExceptionInterface if the linking request couldn't be built
+     * @throws RouteNotFound         if somehow the route was not found
      */
     public function getGenerateDeepLinkingRequest(ToolModel $tool): void
     {
@@ -84,6 +88,7 @@ class Controller extends Base
         );
 
         // Figure out who's trying to log in: use that to determine their role
+        // TODO make this dependent on the context the request is happening within, or pass via query string
         $role = $this->getUser()->getRole()->isStaff()
             ? RoleInterface::NAMESPACE_CONTEXT . 'Instructor'
             : RoleInterface::NAMESPACE_CONTEXT . 'Learner'
@@ -122,8 +127,10 @@ class Controller extends Base
     /**
      * Authenticate an OIDC request
      *
-     * @api GET /lti-platform/oidc/authentication
+     * @api   GET /lti-platform/oidc/authentication
      * @since 21.1.0
+     *
+     * @throws LtiExceptionInterface if the request could not be built
      */
     public function getOidcAuthenticationRequest(): void
     {
@@ -148,10 +155,11 @@ class Controller extends Base
      * Currently, this assumes it's in an iframe: it will send a message to its
      * opening window about the content items which were selected.
      *
-     * @api GET /lti-platform/deep-linking-response/{toolId}
+     * @api   GET /lti-platform/deep-linking-response/{toolId}
      * @since 21.1.0
      *
      * @param ToolModel $tool
+     * @throws LtiExceptionInterface if somehow resource links can't be created
      */
     public function getReceiveDeepLinkingResponse(ToolModel $tool): void
     {
@@ -180,9 +188,12 @@ class Controller extends Base
     /**
      * Receive a deep linking response from the LTI tool.
      *
-     * @see getReceiveDeepLinkingResponse
-     * @api POST /lti-platform/deep-linking-response/{toolId}
+     * @see   getReceiveDeepLinkingResponse
+     * @api   POST /lti-platform/deep-linking-response/{toolId}
      * @since 21.1.0
+     *
+     * @param ToolModel $tool
+     * @throws LtiExceptionInterface if somehow resource links can't be created
      */
     public function postReceiveDeepLinkingResponse(ToolModel $tool): void
     {
