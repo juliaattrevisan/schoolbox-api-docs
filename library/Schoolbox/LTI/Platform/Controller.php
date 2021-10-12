@@ -14,11 +14,15 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Resource\Link\LinkInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
+use Schoolbox\LTI\Auth\UserAuthenticator;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\Repository;
+use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\Url\Factory;
+use Schoolbox\UserMapper;
 
 /**
  * Controller for LTI platform stuff.
@@ -31,13 +35,20 @@ class Controller extends Base
     private Repository $repository;
 
     /**
+     * User authenticator.
+     */
+    private UserAuthenticatorInterface $userAuthenticator;
+
+    /**
      * Constructor
      *
-     * @param Repository $repository
+     * @param Repository                 $repository
+     * @param UserAuthenticatorInterface $userAuthenticator
      */
-    public function __construct(Repository $repository)
+    public function __construct(Repository $repository, UserAuthenticatorInterface $userAuthenticator)
     {
         $this->repository = $repository;
+        $this->userAuthenticator = $userAuthenticator;
     }
 
     /**
@@ -116,15 +127,32 @@ class Controller extends Base
         // Build a DL request to this tool
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/generateDeepLinkingRequest.twig',
+                '@ltiPlatform/messageForm.twig',
                 ['message' => $message],
             )
         );
     }
 
+    /**
+     * Authenticate an OIDC request
+     *
+     * @api GET /lti-platform/oidc/authentication
+     * @since 21.1.0
+     */
     public function getOidcAuthenticationRequest(): void
     {
-        //
+        // Do something with the OIDC request when I receive it
+        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
+        $message = (new OidcAuthenticationRequestFactory(
+            $this->repository,
+            $this->userAuthenticator,
+        ))->build($this->request);
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@ltiPlatform/messageForm.twig',
+                ['message' => $message,]
+            )
+        );
     }
 
     public function getReceiveDeepLinkingResponse(): void

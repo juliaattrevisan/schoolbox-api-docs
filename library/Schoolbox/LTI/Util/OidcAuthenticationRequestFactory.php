@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Prototype\Platform;
+namespace Schoolbox\LTI\Util;
 
 use Aura\Web\Request;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
@@ -15,7 +15,6 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
-use Schoolbox\LTI\Util\ServerRequestFactory;
 
 /**
  * Factory for OIDC authentication requests.
