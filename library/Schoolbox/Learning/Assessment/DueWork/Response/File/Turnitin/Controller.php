@@ -317,14 +317,14 @@ class Controller extends Base
     {
         /* This partial payload is indexed by user ids
          */
-        $partial = $this->turnitinFileMapper->findMostRecentForAssessment($assessment->getId());
+        $payload = $this->turnitinFileMapper->findMostRecentForAssessment($assessment->getId());
 
         /* Decorate it with some user metadata
          */
-        $users = $this->userMapper->findByColumn('id', array_keys($partial))->indexBy('id');
+        $users = $this->userMapper->findByColumn('id', array_keys($payload))->indexBy('id');
 
         foreach ($users as $userId => $user) {
-            $partial[$userId]['user'] = [
+            $payload[$userId]['user'] = [
                 'id' => $userId,
                 'title' => $user->getTitle(),
                 'firstname' => $user->getFirstname(),
@@ -336,7 +336,7 @@ class Controller extends Base
 
         /* Find the routes for each file's Inline Grader and Turnitin Reports
          */
-        foreach ($partial as $userId => &$data) {
+        foreach ($payload as $userId => &$data) {
             foreach ($data['files'] as &$file) {
                 $file['_links']['inline_grader'] = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
                     'assessmentId' => $assessment->getId(),
@@ -364,7 +364,7 @@ class Controller extends Base
             /* If this participanty wasn't in the partial payload, they don't have a submission yet
              * There is no reason to investigate their status any further
              */
-            if (!isset($partial[$participant->getUser()->getId()])) {
+            if (!isset($payload[$participant->getUser()->getId()])) {
                 continue;
             }
 
@@ -393,9 +393,12 @@ class Controller extends Base
              * Note that this mirrors the frontend implementation in assessment/templates/dueWork/status.twig
              * and its superclass template assessment/templates/status.twig
              */
-            $partial[$participant->getUser()->getId()]['submission']['status'] = $status;
+            $payload[$participant->getUser()->getId()]['submission']['status'] = $status;
         }
 
-        new \Alaress_Probe($partial);
+        /* Ditch the array keys, json it
+         * Over to frontend land
+         */
+        $this->getResponse()->content->set($this->buildJsonOutput(array_values($payload)));
     }
 }
