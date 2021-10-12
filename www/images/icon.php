@@ -29,15 +29,8 @@ $kernel->getShutdownHandler()->registerFunction(
 $path = '/static/images/icons/activity-icons-64x64px.png';
 
 $icon = isset($_GET['icon']) ? $_GET['icon'] : '';
-$size = isset($_GET['size']) ? $_GET['size'] : 32;
+$size = isset($_GET['size']) ? (int)$_GET['size'] : 32;
 
-// handle "square32" as well as just `32`
-$size = str_replace('square', '', $size);
-
-//size must be a number, if not redirect to broken
-if (!is_numeric($size)) {
-    SitePage::redirectToBrokenImage();
-}
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
     $iconTransform  = new Image\Transformation\Icon();
