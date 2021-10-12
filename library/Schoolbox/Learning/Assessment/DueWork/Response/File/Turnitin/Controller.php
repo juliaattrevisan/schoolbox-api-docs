@@ -360,6 +360,45 @@ class Controller extends Base
 
         unset($data);
 
+        /* Fish out a user's participation record to determine their response/feedback status (!!)
+         * I really wish I didn't have to use the andy hammer, but oh well. Time to go nuclear
+         */
+        foreach ($assessment->getAllParticipants() as $participant) {
+            /* If this participanty wasn't in the partial payload, they don't have a submission yet
+             * There is no reason to investigate their status any further
+             */
+            if (!isset($partial[$participant->getUser()->getId()])) {
+                continue;
+            }
+
+            /* These status strings are derived from frontend templates
+             * TODO SURELY we have these in backend land somewhere, right
+             */
+            if ($participant->isResponseRequired()) {
+                /* This maps to assessment/templates/status.twig "statusIncomplete"
+                 */
+                $status = 'incomplete';
+            } elseif ($participant->isResubmissionRequired()) {
+                /* This maps to assessment/templates/dueWork/status.twig "statusFailed"
+                 */
+                $status = 'failed';
+            } elseif ($participant->isFeedbackRequired()) {
+                /* This maps to assessment/templates/status.twig "statusPending"
+                 */
+                $status = 'pending';
+            } else {
+                /* This maps to assessment/templates/status.twig "statusReviewed"
+                 */
+                $status = 'reviewed';
+            }
+
+            /* Shank it in
+             * Note that this mirrors the frontend implementation in assessment/templates/dueWork/status.twig
+             * and its superclass template assessment/templates/status.twig
+             */
+            $partial[$participant->getUser()->getId()]['submission']['status'] = $status;
+        }
+
         new \Alaress_Probe($partial);
     }
 }
