@@ -87,7 +87,9 @@ class Controller extends Base
         // this is somewhere else
         $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified();
         $returnUrl = (clone $baseUrl)
-            ->setPath($this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse'))->toString();
+            ->setScheme('https')
+            ->setPath($this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse'))
+            ->toString();
 
         // Standard deep linking settings
         $deepLinkingSettings = new DeepLinkingSettings(
