@@ -55,6 +55,8 @@ class Controller extends Base
      *
      * @api GET /lti-platform/deep-linking-request/{toolId}
      * @since 21.1.0
+     *
+     * @param ToolModel $tool
      */
     public function getGenerateDeepLinkingRequest(ToolModel $tool): void
     {
@@ -66,7 +68,9 @@ class Controller extends Base
         $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified();
         $returnUrl = (clone $baseUrl)
             ->setScheme('https')
-            ->setPath($this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse'))
+            ->setPath(
+                $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
+            )
             ->toString();
 
         // Standard deep linking settings
@@ -144,10 +148,12 @@ class Controller extends Base
      * Currently, this assumes it's in an iframe: it will send a message to its
      * opening window about the content items which were selected.
      *
-     * @api GET /lti-platform/deep-linking-response
+     * @api GET /lti-platform/deep-linking-response/{toolId}
      * @since 21.1.0
+     *
+     * @param ToolModel $tool
      */
-    public function getReceiveDeepLinkingResponse(): void
+    public function getReceiveDeepLinkingResponse(ToolModel $tool): void
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
@@ -155,19 +161,18 @@ class Controller extends Base
 
         // Each content item should be a link, which may be launched as a
         // resource link launch request.
-        // (Use only the first selected link for now.)
         $contentItems  = $result->getPayload()->getDeepLinkingContentItems();
-        $resourceLinks = (new ResourceCollectionFactory())->createFromClaim($contentItems);
-        $resourceLink  = null;
-        foreach ($resourceLinks as $link) {
-            $resourceLink = $link;
-            break;
-        }
+        $resourceLinks = (new ResourceCollectionFactory())->createFromClaim($contentItems)->normalize();
 
+        // The end recipient of the resource link will need to know about the
+        // tool which created the link, so it can launch the link later.
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
                 '@ltiPlatform/receiveDeepLinkingResponse.twig',
-                ['resourceLink' => $resourceLink],
+                [
+                    'tool'          => $tool,
+                    'resourceLinks' => $resourceLinks,
+                ],
             )
         );
     }
@@ -176,11 +181,11 @@ class Controller extends Base
      * Receive a deep linking response from the LTI tool.
      *
      * @see getReceiveDeepLinkingResponse
-     * @api POST /lti-platform/deep-linking-response
+     * @api POST /lti-platform/deep-linking-response/{toolId}
      * @since 21.1.0
      */
-    public function postReceiveDeepLinkingResponse(): void
+    public function postReceiveDeepLinkingResponse(ToolModel $tool): void
     {
-        $this->getReceiveDeepLinkingResponse();
+        $this->getReceiveDeepLinkingResponse($tool);
     }
 }

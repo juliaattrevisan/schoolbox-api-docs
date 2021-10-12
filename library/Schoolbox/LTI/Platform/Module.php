@@ -37,17 +37,18 @@ class Module extends BaseModule
         // TODO build a resource link launch request for the given tool
 
         // Build a deep linking request for the given tool
+        $preloadTool = function ($params) {
+            $toolMapper = $this->getMapperFactory()->get(ToolMapper::class);
+            return [
+                'tool' => $toolMapper->findById($params['toolId']),
+            ];
+        };
         $this->register(
             self::METHOD_GET,
             "/deep-linking-request/{toolId}",
             'getGenerateDeepLinkingRequest',
             null,
-            function ($params) {
-                $toolMapper = $this->getMapperFactory()->get(ToolMapper::class);
-                return [
-                    'tool' => $toolMapper->findById($params['toolId']),
-                ];
-            }
+            $preloadTool,
         );
 
         // TODO add JWKS endpoint?
@@ -56,8 +57,20 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
 
         // Receive a response to a deep linking request
-        $this->register(self::METHOD_GET, "/deep-linking-response", 'getReceiveDeepLinkingResponse');
-        $this->register(self::METHOD_POST, "/deep-linking-response", 'postReceiveDeepLinkingResponse');
+        $this->register(
+            self::METHOD_GET,
+            "/deep-linking-response/{toolId}",
+            'getReceiveDeepLinkingResponse',
+            null,
+            $preloadTool,
+        );
+        $this->register(
+            self::METHOD_POST,
+            "/deep-linking-response/{toolId}",
+            'postReceiveDeepLinkingResponse',
+            null,
+            $preloadTool,
+        );
     }
 
     /**
