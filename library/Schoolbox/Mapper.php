@@ -58,79 +58,80 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Represents a boolean data type.
      */
-    const TYPE_BOOLEAN = 5;
+    public const TYPE_BOOLEAN = 5;
 
     /**
      * Represents an almost-boolean data type: enum('true','false') in the database
      */
-    const TYPE_BOOL_ENUM = 6;
+    public const TYPE_BOOL_ENUM = 6;
 
     /**
      * Represents the SQL SET data type.
      */
-    const TYPE_SET = 7;
+    public const TYPE_SET = 7;
 
     /**
      * Represents the SQL NULL data type.
      */
-    const TYPE_NULL = 0;
+    public const TYPE_NULL = 0;
 
     /**
      * Represents the SQL INTEGER data type.
      */
-    const TYPE_INTEGER = 1;
+    public const TYPE_INTEGER = 1;
 
     /**
      * Represents the SQL CHAR, VARCHAR, or other string data type.
      */
-    const TYPE_STRING = 2;
+    public const TYPE_STRING = 2;
 
     /**
      * Represents the SQL large object data type.
      */
-    const TYPE_LOB = 3;
+    public const TYPE_LOB = 3;
 
-    const TYPE_DATETIME   = 10;
-    const TYPE_DATE       = 11;
-    const TYPE_TIME       = 12;
-    const TYPE_TIMESTAMP  = 13;
-    const TYPE_TIMESPAN   = 14;
-    const TYPE_DECIMAL    = 20;
-    const TYPE_SERIALIZED = 30;
-    const TYPE_JSON       = 31;
-    const TYPE_MODEL      = 40;
-    const TYPE_COLLECTION = 41;
-    const TYPE_COLOR      = 50;
+    public const TYPE_DATETIME   = 10;
+    public const TYPE_DATE       = 11;
+    public const TYPE_TIME       = 12;
+    public const TYPE_TIMESTAMP  = 13;
+    public const TYPE_TIMESPAN   = 14;
+    public const TYPE_DECIMAL    = 20;
+    public const TYPE_SERIALIZED = 30;
+    public const TYPE_JSON       = 31;
+    public const TYPE_MODEL      = 40;
+    public const TYPE_COLLECTION = 41;
+    public const TYPE_COLOR      = 50;
 
-    const METHOD_CREATE = 'create';
-    const METHOD_READ   = 'read';
-    const METHOD_UPDATE = 'update';
-    const METHOD_DELETE = 'delete';
+    public const METHOD_CREATE = 'create';
+    public const METHOD_READ   = 'read';
+    public const METHOD_UPDATE = 'update';
+    public const METHOD_DELETE = 'delete';
 
     // as per http://www.php.net/manual/en/pdostatement.rowcount.php#109891
-    const PDO_RESULT_NOCHANGE = 0;
-    const PDO_RESULT_INSERT = 1;
-    const PDO_RESULT_UPDATE = 2;
+    public const PDO_RESULT_NOCHANGE = 0;
+    public const PDO_RESULT_INSERT = 1;
+    public const PDO_RESULT_UPDATE = 2;
 
     // Valid points are preSave, postSave, preDelete, postDelete
-    const CALLBACK_PRESAVE    = 'preSave';
-    const CALLBACK_POSTSAVE   = 'postSave';
-    const CALLBACK_PREDELETE  = 'preDelete';
-    const CALLBACK_POSTDELETE = 'postDelete';
-    const CALLBACK_PRESOFTDELETE  = 'preSoftDelete';
-    const CALLBACK_POSTSOFTDELETE = 'postSoftDelete';
-    const CALLBACK_PRERESTORE     = 'preSoftDeleteRestore';
-    const CALLBACK_POSTRESTORE    = 'postSoftDeleteRestore';
+    public const CALLBACK_PRESAVE    = 'preSave';
+    public const CALLBACK_POSTSAVE   = 'postSave';
+    public const CALLBACK_PREDELETE  = 'preDelete';
+    public const CALLBACK_POSTDELETE = 'postDelete';
+    public const CALLBACK_PRESOFTDELETE  = 'preSoftDelete';
+    public const CALLBACK_POSTSOFTDELETE = 'postSoftDelete';
+    public const CALLBACK_PRERESTORE     = 'preSoftDeleteRestore';
+    public const CALLBACK_POSTRESTORE    = 'postSoftDeleteRestore';
 
     // options for mapping methods
-    const COLUMN_IDENTIFIER        = 1;
-    const COLUMN_CREATED_TIMESTAMP = 2;
-    const COLUMN_UPDATED_TIMESTAMP = 4;
-    const COLUMN_JOIN_MULTI        = 8;
-    const COLUMN_JOIN_READONLY     = 16;
-    const COLUMN_JOIN_REVERSE      = 32;
-    const COLUMN_SOFTDELETE        = 64;
-    const COLUMN_IDENTIFIER_UUID   = 128;
+    public const COLUMN_IDENTIFIER        = 1;
+    public const COLUMN_CREATED_TIMESTAMP = 2;
+    public const COLUMN_UPDATED_TIMESTAMP = 4;
+    public const COLUMN_JOIN_MULTI        = 8;
+    public const COLUMN_JOIN_READONLY     = 16;
+    public const COLUMN_JOIN_REVERSE      = 32;
+    public const COLUMN_SOFTDELETE        = 64;
+    public const COLUMN_UUID              = 128;
+    public const COLUMN_IDENTIFIER_UUID   = self::COLUMN_IDENTIFIER | self::COLUMN_UUID;
     public const COLUMN_ENUM       = 256;  // May only be persisted as one of a set of declared values
 
     // Sort ordering
@@ -1071,9 +1072,8 @@ abstract class Mapper implements IMapper, Serializable
         if ($options & self::COLUMN_IDENTIFIER) {
             $map['identifier'] = true;
         }
-        if ($options & self::COLUMN_IDENTIFIER_UUID) {
-            $map['identifier'] = true;
-            $map['identifier_uuid'] = true;
+        if ($options & self::COLUMN_UUID) {
+            $map['uuid'] = true;
         }
         if ($options & self::COLUMN_CREATED_TIMESTAMP) {
             $map['created_timestamp'] = true;
@@ -4175,7 +4175,7 @@ abstract class Mapper implements IMapper, Serializable
     protected function populateUuids(Collection $collection): Collection
     {
         $idProperty = $this->getIdentifierProperty();
-        if (empty($this->map[$idProperty]['identifier_uuid'])) {
+        if (empty($this->map[$idProperty]['uuid'])) {
             return $collection;
         }
 

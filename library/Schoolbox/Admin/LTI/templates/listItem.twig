@@ -4,6 +4,9 @@
             <h3>
                 {{ provider.name ?? '' }}
             </h3>
+            {% if provider.deploymentId is not empty %}
+                <p class="meta">Deployment ID: {{ provider.deploymentId }}</p>
+            {% endif %}
             <p class="meta">
                 {% if provider.isLtiVersion13 ?? false %}
                     {{ provider.audience ?? ''}}

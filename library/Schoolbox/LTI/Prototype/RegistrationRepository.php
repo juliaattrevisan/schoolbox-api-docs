@@ -251,7 +251,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
                 $this->baseUrl->toString(),
                 $platform,
                 $tool,
-                ['schoolbox-' . INSTANCE_ID . '-' . $toolModel->getId(),],
+                [$toolModel->getDeploymentId(),],
                 $platformKeyChain,
                 $toolKeyChain,
                 null,

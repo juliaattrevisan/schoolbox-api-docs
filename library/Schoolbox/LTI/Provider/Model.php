@@ -79,7 +79,7 @@ class Model implements ISoftDeletable
      * unique and immutable: it will be used by Schoolbox to identify its
      * deployment to this tool when it is invoked.
      */
-    private string $deploymentId;
+    private string $deploymentId = '';
 
     /**
      * LTI 1.3: the audience of this tool.
