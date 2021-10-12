@@ -94,11 +94,10 @@
                             </div>
                         </div>
                         <!-- END poll_vote -->
-
+                        <!-- BEGIN poll_actions -->
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="poll-options{POLL_ID}" aria-expanded="false" title="Actions"></a>
                         </nav>
-
                         <ul data-dropdown-content class="f-dropdown" id="poll-options{POLL_ID}">
                             <!-- BEGIN show_results -->
                             <li><a href="/homepage/{ID}/pollResults" class="icon-poll">Show Results</a></li>
@@ -108,6 +107,7 @@
                             <li><a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete">Delete</a></li>
                             <!-- END modify_poll -->
                         </ul>
+                        <!-- END poll_actions -->
                     </li>
                     <!-- BEGIN poll_chart -->
                     <li>
