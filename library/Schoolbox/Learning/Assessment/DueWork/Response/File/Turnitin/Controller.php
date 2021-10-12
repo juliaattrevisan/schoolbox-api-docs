@@ -329,6 +329,7 @@ class Controller extends Base
                 'title' => $user->getTitle(),
                 'firstname' => $user->getFirstname(),
                 'lastname' => $user->getLastname(),
+                'fullname' => $user->getFullName(),
                 'role' => $user->getRole()->getName()
             ];
         }

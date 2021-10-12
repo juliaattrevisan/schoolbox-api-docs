@@ -134,6 +134,7 @@ class Mapper extends \Schoolbox\Mapper
                     'title' => null,
                     'firstname' => null,
                     'lastname' => null,
+                    'fullname' => null,
                     'role' => null,
                 ];
             }
@@ -152,9 +153,17 @@ class Mapper extends \Schoolbox\Mapper
                 ],
             ];
 
+            /* Submission timestamp applies to all files in a submission
+             */
+            $timestamp = strtotime($row['submitted_at']);
+
             $models[$userId]['submission'] = [
                 'id' => $row['student_submission_id'],
-                'submitted_at' => $row['submitted_at']
+                'submitted_at' => [
+                    'database' => $row['submitted_at'],
+                    'nice' => \Alaress_Date_Format::newFromTimestamp($timestamp)->getShort(),
+                    'timestamp' => $timestamp
+                ]
             ];
         }
 
