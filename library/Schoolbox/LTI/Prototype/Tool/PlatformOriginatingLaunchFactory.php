@@ -15,7 +15,7 @@ use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResul
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
-use Schoolbox\LTI\Prototype\ServerRequestFactory;
+use Schoolbox\LTI\Util\ServerRequestFactory;
 
 /**
  * Factory for platform originating launches.
