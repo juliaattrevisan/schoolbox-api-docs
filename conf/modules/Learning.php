@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\Calendar\Events\Module as AssessmentCalendarEv
 use Schoolbox\Learning\Assessment\Calendar\Module as AssessmentCalendarModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbackFileModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Module as TurnitinModule;
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
@@ -32,6 +31,7 @@ use Schoolbox\Learning\Moment\Evidence\Module as EvidenceModule;
 use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
+use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
 use Schoolbox\Learning\Upcoming;
 
 class Learning extends ModuleLoader

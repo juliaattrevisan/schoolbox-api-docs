@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
