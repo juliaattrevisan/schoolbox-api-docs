@@ -169,7 +169,12 @@ class Controller extends Base
         // Each content item should be a link, which may be launched as a resource link launch request.
         $contentItems   = $result->getPayload()->getDeepLinkingContentItems();
         $resourceLinks  = (new ResourceCollectionFactory())->createFromClaim($contentItems);
-        [$resourceLink] = $resourceLinks;
+
+        $resourceLink = null;
+        foreach ($resourceLinks as $link) {
+            $resourceLink = $link;
+            break;
+        }
 
 
         // Send a message to the top-level window, to update the:

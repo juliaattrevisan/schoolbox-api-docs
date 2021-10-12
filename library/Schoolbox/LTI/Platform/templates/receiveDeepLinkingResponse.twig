@@ -8,18 +8,10 @@
     <title>LTI Platform: Select Picker</title>
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
-            // Your code to run since DOM is loaded and ready
-            document.getElementById('theButton').addEventListener(
-                'click',
-                function (event) {
-                    event.preventDefault();
-                    let data = {
-                        // Does this need to be identified as coming from here?
-                        url: '{{ resourceLink }}',
-                    };
-                    window.top.postMessage(JSON.stringify(data), window.location.origin);
-                }
-            )
+            let data = {
+                url: '{{ resourceLink.url }}',
+            };
+            window.top.postMessage(JSON.stringify(data), window.location.origin);
         });
     </script>
 </head>
