@@ -296,4 +296,14 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
     }
+
+
+    /**
+     * Get a list of all the students' most recent submissions, their files,
+     * and corresponding turnitin reports and assorted metadata. This is used
+     * as the payload endpoint for the Similarity Report report.
+     */
+    public function getList(): void
+    {
+    }
 }

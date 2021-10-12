@@ -48,6 +48,8 @@ class Module extends BaseModule
 //        $this->register('POST', '/upload-complete', 'postUploadComplete', $postPerms);
 //        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
 //        $this->register('POST', '/report-updated', 'postReportUpdated', $postPerms);
+
+        $this->register('GET', '/list', 'getList', $postPerms);
     }
 
 
