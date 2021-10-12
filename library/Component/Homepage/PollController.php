@@ -36,7 +36,8 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             $this->setBlock('has_poll', "response_count", "response_count_block");
             $this->setBlock('has_poll', 'new_poll', 'new_poll_block');
             $this->setBlock('poll_question', "poll_vote", "poll_vote_block");
-            $this->setBlock('poll_question', "show_results", "show_results_block");
+            $this->setBlock('poll_question', "poll_actions", "poll_actions_block");
+            $this->setBlock('poll_actions', "show_results", "show_results_block");
             $this->setBlock("poll_vote", "poll_options", "poll_options_block");
 
 
@@ -47,7 +48,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
             $this->setBlock('poll_question', 'owner_exists', 'owner_exists_block');
             $this->setBlock('poll_question', 'owner_deleted', 'owner_deleted_block');
-            $this->setBlock('poll_question', "modify_poll", "modify_poll_block");
+            $this->setBlock('poll_actions', "modify_poll", "modify_poll_block");
 
 
             $this->setVar(
@@ -55,6 +56,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                     'empty_state_block'   => '',
                     'poll_question_block' => '',
                     'show_results_block'  => '',
+                    'poll_actions_block'  => '',
                 ]
             );
 
@@ -141,6 +143,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         }
 
                         $this->parse('show_results_block', 'show_results');
+                        $this->parse('poll_actions_block', 'poll_actions');
                     }
                     $this->setVar('poll_chart_block', '');
                     $this->parse('poll_vote_block', 'poll_vote');
@@ -152,6 +155,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 } else {
                     $this->parse("modify_poll_block", "modify_poll");
                     $this->parse('new_poll_block', 'new_poll');
+                    $this->parse('poll_actions_block', 'poll_actions');
                 }
 
                 $this->parse('poll_question_block', 'poll_question');
