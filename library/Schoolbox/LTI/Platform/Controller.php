@@ -10,14 +10,17 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Resource\Link\LinkInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\LTI\Auth\UserAuthenticator;
+use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\Repository;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
@@ -157,11 +160,27 @@ class Controller extends Base
 
     public function getReceiveDeepLinkingResponse(): void
     {
+        // Validate launch
+        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
+        $result = (new ToolOriginatingLaunchFactory($this->repository))->build($this->request);
+
+        // Each content item should be a link, which may be launched as a resource link launch request.
+        $contentItems   = $result->getPayload()->getDeepLinkingContentItems();
+        $resourceLinks  = (new ResourceCollectionFactory())->createFromClaim($contentItems);
+        [$resourceLink] = $resourceLinks;
+
+
         // Send a message to the top-level window, to update the:
         // * tool's identifier
         // * URL
         // * custom fields
         // * line item, if provided
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@ltiPlatform/receiveDeepLinkingResponse.twig',
+                ['resourceLink' => $resourceLink],
+            )
+        );
     }
 
     public function postReceiveDeepLinkingResponse(): void
