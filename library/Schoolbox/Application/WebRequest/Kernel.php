@@ -581,7 +581,8 @@ class Kernel extends WebKernelAbstract
                     '/loginForm.php*',
                     '/liss/liss.php',
                     '/lti-consumer/*',
-                    '/lti-prototype/*'
+                    '/lti-prototype/*',
+                    '/lti-platform/*',
                 ]
             )
         ) {
