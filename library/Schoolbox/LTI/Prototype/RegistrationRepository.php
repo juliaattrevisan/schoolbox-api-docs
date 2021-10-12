@@ -247,8 +247,8 @@ class RegistrationRepository implements RegistrationRepositoryInterface
             );
 
             $this->registrations[] = new Registration(
-                $toolModel->getAudience(),
-                $this->baseUrl->toString(),
+                $toolModel->getDeploymentId(),
+                $toolModel->getClientId(),
                 $platform,
                 $tool,
                 [$toolModel->getDeploymentId(),],

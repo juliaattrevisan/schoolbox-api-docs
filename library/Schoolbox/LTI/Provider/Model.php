@@ -85,7 +85,7 @@ class Model implements ISoftDeletable
      * LTI 1.3: the client ID of this tool.
      *
      * This will be provided by the tool, and will be:
-     * * the `client_id` claim in any JWTs sent from the tool to Schoolbox
+     * * the `aud` claim in any JWTs sent from the tool to Schoolbox
      *
      * These claims must match the tool's client ID in order for JWTs to verify.
      */
@@ -94,11 +94,8 @@ class Model implements ISoftDeletable
     /**
      * LTI 1.3: the audience of this tool.
      *
-     * This will be provided by the tool, and will be:
-     * * the `iss` claim in any JWTs sent from the tool to Schoolbox
-     * * the `aud` claim in any JWTs sent from Schoolbox to the tool
-     *
-     * These claims must match the tool's issuer in order for JWTs to verify.
+     * This will be provided by the tool, but I am not sure what it does yet:
+     * it doesn't appear to ever be validated.
      */
     private ?string $audience;
 
