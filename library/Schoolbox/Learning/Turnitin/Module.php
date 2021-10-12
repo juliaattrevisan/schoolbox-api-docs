@@ -10,20 +10,27 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin;
 
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\IMapper;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
+use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
+use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Twig\Error\LoaderError;
-
 
 /**
  * Turnitin Webhooks route through this controller
@@ -64,8 +71,10 @@ class Module extends BaseModule
 
         /* Similarity Report report
          */
-        $this->register('GET', '/list/{assessmentId}', 'getList', $postPerms, $preloadAssessment);
-        $this->register('GET', '/list/payload/{assessmentId}', 'getListPayload', $postPerms, $preloadAssessment);
+        $canViewStatus = $this->buildAuthRuleCanViewStatus();
+
+        $this->register('GET', '/list/{assessmentId}', 'getList', $canViewStatus, $preloadAssessment);
+        $this->register('GET', '/list/payload/{assessmentId}', 'getListPayload', $canViewStatus, $preloadAssessment);
     }
 
 
@@ -92,6 +101,61 @@ class Module extends BaseModule
         ];
     }
 
+
+    /**
+     * Prevent navigation to non-project assessment spec status pages
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException If unable to locate required object in route params
+     */
+    private function buildAuthRuleCanViewStatus()
+    {
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new AssessmentNotDeleted(),
+            $this->buildAuthRuleHasInstructorAccess(),
+            new Rule\Any(
+                new IsImplementation(),
+                new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
+            )
+        );
+    }
+
+
+    /**
+     * Prevent non-instructors from marking or modifying assessments.
+     *
+     * This uses the `IsInstructor` validator, which is the new standard for
+     * checking if a user has instructor permission over a folder.
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException
+     */
+    private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
+    {
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new IsInstructor(
+                    $this->getAccess(),
+                    static function (array $params): FolderModel {
+                        if (isset($params['assessment'])) {
+                            $ctx = $params['assessment']->getContext()->getFolder();
+                        } elseif (isset($params['participant'])) {
+                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                        } elseif (isset($params['context'])) {
+                            $ctx = $params['context']->getFolder();
+                        } else {
+                            throw new NotFound('No assessment or context preloaded');
+                        }
+
+                        return $ctx;
+                    }
+                )
+            )
+        );
+    }
 
     /**
      * @param IChainLoader $templateLoader
@@ -167,5 +231,16 @@ class Module extends BaseModule
     protected function getResponseMapperProxy()
     {
         return $this->injector->get('responseDataSource');
+    }
+
+
+    /**
+     * @return Access
+     * @throws InvalidArgumentException
+     */
+    protected function getAccess()
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getMapperFactory()->get(Access::class);
     }
 }
