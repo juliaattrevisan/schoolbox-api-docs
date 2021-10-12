@@ -14,7 +14,12 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\IMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Mapper\Exception as MapperException;
+
 
 /**
  * Turnitin Webhooks route through this controller
@@ -41,6 +46,10 @@ class Module extends BaseModule
          */
         $postPerms = null;
 
+        $preloadAssessment = function (array $params) {
+            return $this->preloadAssessment($params);
+        };
+
         $this->register('POST', '/webhook', 'postWebhook', $postPerms);
 
         /* These are the individual controller methods that you can test in isolation
@@ -49,7 +58,64 @@ class Module extends BaseModule
 //        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
 //        $this->register('POST', '/report-updated', 'postReportUpdated', $postPerms);
 
-        $this->register('GET', '/list/{assessmentId}', 'getList', $postPerms);
+        $this->register('GET', '/list/{assessmentId}', 'getList', $postPerms, $preloadAssessment);
+    }
+
+
+    /**
+     * @param array $params
+     * @return array [ assessment, response, turnitin ]
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function preloadAssessment(array $params): array
+    {
+        /* Die early when requested Assessment doesn't exist
+         */
+        try {
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        return [
+            'assessment' => $assessment,
+        ];
+    }
+
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return \Schoolbox\Error\Mapper|IMapper
+     * @throws \InvalidArgumentException If mapper class not found
+     */
+    private function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class);
+    }
+
+
+    /**
+     * @return object|AssessmentMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->injector->get('assessmentDataSource');
+    }
+
+
+    /**
+     * @return object|ResponseMapperProxy
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function getResponseMapperProxy()
+    {
+        return $this->injector->get('responseDataSource');
     }
 
 

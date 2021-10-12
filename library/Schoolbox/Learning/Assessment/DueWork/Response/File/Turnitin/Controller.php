@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
@@ -312,11 +313,11 @@ class Controller extends Base
      * and corresponding turnitin reports and assorted metadata. This is used
      * as the payload endpoint for the Similarity Report report.
      */
-    public function getList(int $assessmentId): void
+    public function getList(IAssessable $assessment): void
     {
         /* This partial payload is indexed by user ids
          */
-        $partial = $this->turnitinFileMapper->findMostRecentForAssessment($assessmentId);
+        $partial = $this->turnitinFileMapper->findMostRecentForAssessment($assessment->getId());
 
         /* Decorate it with some user metadata
          */
@@ -337,12 +338,14 @@ class Controller extends Base
         foreach ($partial as $userId => &$data) {
             foreach ($data['files'] as &$file) {
                 $inlineGraderRoute = $this->getRouteIfAuthorized('learningDueWorkResponse.getParticularResponse', [
-                    'assessmentId' => $assessmentId,
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
                     'studentId' => $userId
                 ]);
 
                 $turnitinReoute = $this->getRouteIfAuthorized('learningDueWorkResponse.getTurnitinReport', [
-                    'assessmentId' => $assessmentId,
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
                     'responseId' => $data['submission']['id'],
                     'turnitinId' => $file['turnitin']['id']
                 ]);
