@@ -228,7 +228,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         onMonthChange: function (selectedDates, dateStr, instance) {
             if (isDueWorkType(twigVars.type)) {
                 var mo = instance.currentMonth + 1,
-                    yr = instance.currentYear;
+                    yr = instance.currentYear;-
 
                 requestHeat(mo, yr, function () {
                     applyHeatEverywhere(instance);
@@ -1220,7 +1220,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         if (isInputValueValid()) {
 
             // Create a dayjs object from the input value
-            var activeDate = dayjs(getInputValue(), dateDisplayFormats.dayjsDatetime);
+            var activeDate = dayjs(getInputValue(), [dateDisplayFormats.dayjsDatetime, dateDisplayFormats.dayjs]);
             
             // Set date on flatpickr to the input date
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());

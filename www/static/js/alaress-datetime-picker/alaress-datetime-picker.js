@@ -292,11 +292,11 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     // Create click event to open the modal for the element
     $datepickerButton.click(function () {
         var originalValue;
-
+        
         if (element.val().length > 0) {
             originalValue = dayjs(
                 element.val(),
-                adtp.convertFormat(options.displayFormat)
+                ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
             );
         }
         // if no value has been passed, use today
@@ -309,7 +309,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         ) {
             originalValue = dayjs(
                 originalValue,
-                adtp.convertFormat(options.displayFormatDate)
+                ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
             );
         }
         
@@ -568,12 +568,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         } else if (element.val() !== undefined && element.val()) {
             value = dayjs(
                 element.val(),
-                adtp.convertFormat(pickerFormats.convertFrom)
+                ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
             );
+            // debugger;
         } else {
             value = dayjs();
         }
-
+        
         // All Day is on
         var v;
         if (state === true) {
@@ -680,7 +681,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         var itemOptions = adtp.getOptions($(item));
                         var itemDate = dayjs(
                             item.val(),
-                            adtp.convertFormat(itemOptions.displayFormat)
+                            ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
                         );
                         var itemState =
                             (itemDate.format("HHmm") == "0000" ||
