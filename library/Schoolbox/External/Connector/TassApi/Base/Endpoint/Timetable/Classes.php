@@ -331,7 +331,10 @@ class Classes implements IStrategy
                     /* Assemble the pieces
                      */
                     $timetableClass = $this->createTimetableClass($class);
-                    $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+
+                    /* Teacher involvement is assigned here, via multiple ClassEntry records
+                     */
+                    $timetableClassPeriod = $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
 
                     /* Process students
                      */
@@ -389,10 +392,12 @@ class Classes implements IStrategy
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
-        }
 
-        if ($this->perform) {
-            $this->classEntryMapper->save($timetableClass);
+            /* Only save this model if you're creating it anew
+             */
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
         }
 
         return $timetableClass;
@@ -422,56 +427,85 @@ class Classes implements IStrategy
          * - period_id is a schoolbox sis_timetable_period via lookup of Day and Period Name
          * - class_id comes from $timetableClass->getId()
          */
+        $user = $users[$class['teachers']['externalId']];
 
-        /* See if one exists already; if so, reuse it
-        */
-        try {
-            $timetableClassPeriod = $this->classPeriodMapper->findOneByColumnList([
-                'class_id' => $timetableClass->getId(),
-                'period_id' => $period->getId()
-            ]);
-
-            $this->log->info(sprintf(
-                'Reusing previously saved class period %s using period_id %s, with id %s',
-                $timetableClass->getName(),
-                $period->getId(),
-                $timetableClassPeriod->getId()
-            ));
-        } catch (Exception $e) {
-            $timetableClassPeriod = $this->classPeriodMapper->createModel()
-                ->setClass($timetableClass)
-                ->setPeriod($period)
-                ->setRoom($class['room']['name']);
-
-            $this->log->info(sprintf(
-                'Creating new class period %s %s',
-                $timetableClass->getName(),
-                $period->getId()
-            ));
-        }
-
-        /* If this class had teachers, process them
-         */
-        if (\count($class['teachers'])) {
-            /* Throw warning, but assign them anyway
+        if (isset($class['teachers']['externalId'])) {
+            /* See if a ClassPeriod exists already for the given teacher; if so, reuse it
+             * Otherwise create a new one
              */
-            if (!isset($users[$class['teachers']['externalId']])) {
-                $this->log->warning(sprintf(
-                    'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
-                    $class['teachers']['externalId'],
+            try {
+                $timetableClassPeriod = $this->classPeriodMapper->findOneByColumnList([
+                    'class_id' => $timetableClass->getId(),
+                    'period_id' => $period->getId(),
+                    'teacher_external_id' => $class['teachers']['externalId']
+                ]);
+
+                $this->log->info(sprintf(
+                    'Reusing previously saved class period %s using period_id %s, taught by %s %s, with id %s',
                     $timetableClass->getName(),
-                    $timetableClass->getCode()
+                    $period->getId(),
+                    $class['teachers']['externalId'],
+                    trim("{$user['firstname']} {$user['lastname']}"),
+                    $timetableClassPeriod->getId()
                 ));
+            } catch (Exception $e) {
+                $timetableClassPeriod = $this->classPeriodMapper->createModel()
+                    ->setClass($timetableClass)
+                    ->setPeriod($period)
+                    ->setRoom($class['room']['name'])
+                    ->setTeacher($class['teachers']['external_id']);
+
+                $this->log->info(sprintf(
+                    'Creating new class period %s %s, taught by %s %s',
+                    $timetableClass->getName(),
+                    $class['teachers']['externalId'],
+                    trim("{$user['firstname']} {$user['lastname']}"),
+                    $period->getId()
+                ));
+
+                /* Only save this model if you're creating it anew
+                 */
+                if ($this->perform) {
+                    $this->classPeriodMapper->save($timetableClassPeriod);
+                }
             }
+        } else {
+            /* This class doesn't have a teacher associated with it
+             * See if a ClassPeriod exists already for the given (class_id, period_id); if so, reuse the first
+             * of its kind since multiple might now exist, due to multiple teachers
+             *
+             * Otherwise create a new one
+             */
+            try {
+                $timetableClassPeriod = $this->classPeriodMapper->findByColumnList([
+                    'class_id' => $timetableClass->getId(),
+                    'period_id' => $period->getId(),
+                ])->first();
 
-            $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
+                $this->log->info(sprintf(
+                    'Reusing previously saved class period %s using period_id %s, with id %s',
+                    $timetableClass->getName(),
+                    $period->getId(),
+                    $timetableClassPeriod->getId()
+                ));
+            } catch (Exception $e) {
+                $timetableClassPeriod = $this->classPeriodMapper->createModel()
+                    ->setClass($timetableClass)
+                    ->setPeriod($period)
+                    ->setRoom($class['room']['name']);
 
-            $this->log->info(sprintf(
-                'Creating class period relation for teacher %s %s in room %s',
-                $class['teachers']['firstname'],
-                $class['teachers']['surname'],
-                $class['room']['name']
-            ));
+                $this->log->info(sprintf(
+                    'Creating new class period %s %s',
+                    $timetableClass->getName(),
+                    $period->getId()
+                ));
+
+                /* Only save this model if you're creating it anew
+                 */
+                if ($this->perform) {
+                    $this->classPeriodMapper->save($timetableClassPeriod);
+                }
+            }
         }
 
         $this->log->info(sprintf(
@@ -482,10 +516,6 @@ class Classes implements IStrategy
             $class['period']['end'],
             $ext
         ));
-
-        if ($this->perform) {
-            $this->classPeriodMapper->save($timetableClassPeriod);
-        }
 
         return $timetableClassPeriod;
     }
