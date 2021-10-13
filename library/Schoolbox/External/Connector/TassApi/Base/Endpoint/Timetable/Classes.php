@@ -449,7 +449,7 @@ class Classes implements IStrategy
                     ->setClass($timetableClass)
                     ->setPeriod($period)
                     ->setRoom($class['room']['name'])
-                    ->setTeacher($class['teachers']['external_id']);
+                    ->setTeacher($class['teachers']['externalId']);
 
                 $this->log->info(sprintf(
                     'Creating new class period %s %s, taught by %s',
