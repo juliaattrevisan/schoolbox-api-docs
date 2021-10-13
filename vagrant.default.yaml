@@ -28,3 +28,5 @@ instance_registry_api_key: ""
 instance_id_env_var: "vagrantx"
 # By default we use git pull to get the latest puppet must be either pull, gitsync, or none
 puppet_sync_type: "pull"
+# By default, prevent upgrading SQL data that is too old for current codebase
+force_upgrade: false

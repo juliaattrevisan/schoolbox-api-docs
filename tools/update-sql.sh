@@ -10,7 +10,9 @@
 # Global constants
 readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200
+readonly L_WARN=300
 readonly L_ERROR=400
+readonly UNSUPPORTED_FROM_MAJOR='20.1' # Require force if upgrading a schema at this version or below
 
 # Global vars
 declare package                  # 'schoolbox'|'schoolboxdev'
@@ -25,6 +27,9 @@ declare error_msg='';            # Overall script error messages
 # Consistently log messages
 log(){
   $LOG $L_INFO "$1"
+}
+warn(){
+  $LOG $L_WARN "$1"
 }
 error(){
   $LOG $L_ERROR "$1"
@@ -85,6 +90,38 @@ check_sql_versions(){
   if [ -z "$sql_ver" ]; then
     error "Unable to collect current database version. Please check your database credentials.";
     exit 1;
+  fi
+
+  # Ensure all required update dirs are present in this package. Never allow this.
+  if [[ ! -e $site_root/updates/"$sql_ver" ]]; then
+    error "Current SQL version update dir not found: '$site_root/updates/$sql_ver'"
+    error "Cannot guarantee all required intervening update dirs are present!"
+    error "You are probably trying to upgrade a dataset that is too old for this code version."
+    error " * Upgrades:        You must only upgrade a single major version at a time."
+    error " * Prd-to-Stg sync: The PRD version is too old, and no longer supported."
+    error " * restore.sh:      Select a newer backup, or deploy older package."
+    error " * Vagrant:         Checkout older codebase, provision, save dataset, checkout desired version, re-provision"
+    exit 1
+  fi
+
+  # Ensure we are not upgrading from a major version where we know there are issues. Allow force override
+  local sql_major
+  sql_major=$(echo "$sql_ver" | grep -Eo '[0-9]+\.[0-9]+')
+
+  if [[ $sql_major > $UNSUPPORTED_FROM_MAJOR ]]; then
+    log "Upgrades supported from major version: '$sql_major'"
+  else
+    if [[ $SB_FORCE_UPGRADE == 1 ]]; then
+      warn "Forcing upgrade from unsafe major version '$sql_major'"
+    else
+      error "Refusing upgrade from unsafe major version '$sql_major' as it is <= '$UNSUPPORTED_FROM_MAJOR'"
+      error "Set environment var SB_FORCE_UPGRADE to 1 to force unsafe upgrade"
+      # Check if this is being invoked by vagrant provision (vagrant-shell > refresh.sh > update-sql.sh)
+      if grep -qE '^vagrant-shell' /proc/"$(ps -o ppid= $PPID | xargs )"/comm ; then
+        error "In vagrant, set 'force_upgrade' to 'true' in your vagrant.yaml to set this env var"
+      fi
+      exit 1
+    fi
   fi
 
   if [ "$sql_ver" == "$new_ver" ]; then
