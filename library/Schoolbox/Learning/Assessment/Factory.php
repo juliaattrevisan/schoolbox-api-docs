@@ -246,6 +246,21 @@ class Factory
 
         // LTI needs this to instantiate correctly
         $this->setLtiAssessmentUrl($post['ltiAssessmentUrl'] ?? null);
+        $this->setToolId(filter_var($post['toolId'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
+
+        // Ensure custom fields is an array if it's set
+        $customFields = $post['customFields'] ?? null;
+        if (isset($customFields)) {
+            $customFields = json_decode($customFields, true);
+            if (!is_array($customFields)) {
+                $customFields = null;
+            }
+        }
+        $this->setCustomFields($customFields);
+        $this->setLineItemResourceId($post['lineItemResourceId'] ?? null);
+        $this->setLineItemScoreMaximum(
+            filter_var($post['lineItemScoreMaximum'] ?? null, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE)
+        );
         $this->original = $original;
     }
 
@@ -378,7 +393,13 @@ class Factory
                 $this->getCompletionMessage()
             );
         } elseif ($assessment instanceof LtiAssessment) {
-            $decorator = new LtiDecorator($this->getLtiAssessmentUrl());
+            $decorator = new LtiDecorator(
+                $this->getLtiAssessmentUrl(),
+                $this->getToolId(),
+                $this->getCustomFields(),
+                $this->getLineItemResourceId(),
+                $this->getLineItemScoreMaximum()
+            );
         } else {
             throw new DomainException('Please select an assessment type');
         }

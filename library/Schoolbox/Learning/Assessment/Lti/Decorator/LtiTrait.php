@@ -17,6 +17,26 @@ trait LtiTrait
     protected ?string $ltiAssessmentUrl = null;
 
     /**
+     * The LTI tool ID
+     */
+    protected ?int $toolId = null;
+
+    /**
+     * Any custom fields which must be passed when linking to the assessment URL
+     */
+    protected ?array $customFields = null;
+
+    /**
+     * The line item resource ID (if any).
+     */
+    protected ?string $lineItemResourceId = null;
+
+    /**
+     * The maximum score for the line item (if any).
+     */
+    protected ?float $lineItemScoreMaximum = null;
+
+    /**
      * @return string|null
      */
     public function getLtiAssessmentUrl(): ?string
@@ -31,6 +51,78 @@ trait LtiTrait
     public function setLtiAssessmentUrl(?string $ltiAssessmentUrl): self
     {
         $this->ltiAssessmentUrl = $ltiAssessmentUrl;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getToolId(): ?int
+    {
+        return $this->toolId;
+    }
+
+    /**
+     * @param int|null $toolId
+     * @return $this
+     */
+    public function setToolId(?int $toolId): self
+    {
+        $this->toolId = $toolId;
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getCustomFields(): ?array
+    {
+        return $this->customFields;
+    }
+
+    /**
+     * @param array|null $customFields
+     * @return $this
+     */
+    public function setCustomFields(?array $customFields): self
+    {
+        $this->customFields = $customFields;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLineItemResourceId(): ?string
+    {
+        return $this->lineItemResourceId;
+    }
+
+    /**
+     * @param string|null $lineItemResourceId
+     * @return $this
+     */
+    public function setLineItemResourceId(?string $lineItemResourceId): self
+    {
+        $this->lineItemResourceId = $lineItemResourceId;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getLineItemScoreMaximum(): ?float
+    {
+        return $this->lineItemScoreMaximum;
+    }
+
+    /**
+     * @param float|null $lineItemScoreMaximum
+     * @return $this
+     */
+    public function setLineItemScoreMaximum(?float $lineItemScoreMaximum): self
+    {
+        $this->lineItemScoreMaximum = $lineItemScoreMaximum;
         return $this;
     }
 }
