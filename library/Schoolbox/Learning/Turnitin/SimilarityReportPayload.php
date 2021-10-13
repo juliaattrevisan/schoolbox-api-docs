@@ -20,6 +20,17 @@ class SimilarityReportPayload
 {
 
     /**
+     * These consts were defined in twig alone; they don't exist in backend as concepts
+     * The implementation here mirrors that which is used in Status screen's jewellery
+     * This is an obscure place for these concepts, but they are purely cosmetic ux things
+     */
+    private const STATUS_INCOMPLETE = 'incomplete';
+    private const STATUS_FAILED = 'failed';
+    private const STATUS_PENDING = 'pending';
+    private const STATUS_REVIEWED = 'reviewed';
+
+
+    /**
      * @var File\Mapper
      */
     private File\Mapper $turnitinFileMapper;
@@ -56,7 +67,7 @@ class SimilarityReportPayload
      *
      * @param IAssessable $assessment
      * @return array
-     * @throws \PDOException
+     * @throws \PDOException|\Aura\Router\Exception\RouteNotFound
      */
     public function generate(IAssessable $assessment): array
     {
@@ -119,19 +130,19 @@ class SimilarityReportPayload
             if ($participant->isResponseRequired()) {
                 /* This maps to assessment/templates/status.twig "statusIncomplete"
                  */
-                $status = 'incomplete';
+                $status = self::STATUS_INCOMPLETE;
             } elseif ($participant->isResubmissionRequired()) {
                 /* This maps to assessment/templates/dueWork/status.twig "statusFailed"
                  */
-                $status = 'failed';
+                $status = self::STATUS_FAILED;
             } elseif ($participant->isFeedbackRequired()) {
                 /* This maps to assessment/templates/status.twig "statusPending"
                  */
-                $status = 'pending';
+                $status = self::STATUS_PENDING;
             } else {
                 /* This maps to assessment/templates/status.twig "statusReviewed"
                  */
-                $status = 'reviewed';
+                $status = self::STATUS_REVIEWED;
             }
 
             /* Shank it in
@@ -141,7 +152,7 @@ class SimilarityReportPayload
             $payload[$participant->getUser()->getId()]['submission']['status'] = $status;
         }
 
-        /* Ditch the array keys, json it
+        /* Ditch the array keys then json it
          * Over to frontend land
          */
         return array_values($payload);
