@@ -79,11 +79,13 @@
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
     {% include '@learningAssessment/fragments/modifyTot.twig' with {
         viewRoute: viewRoute,
         modifyRoute: modifyRoute,
         canShowcase: canShowcase,
-        isShowcased: isShowcased
+        isShowcased: isShowcased,
+        similarityReportReoute: similarityReportRoute
     } %}
 </div>
 
