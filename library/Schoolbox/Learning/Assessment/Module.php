@@ -48,6 +48,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsSafeExamBrowserRequired;
+use Schoolbox\Learning\Authorizer\Rule\IsSimilarityCheckEnabled;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -114,6 +115,7 @@ class Module extends BaseModule
         $canViewSummary           = $this->buildAuthRuleCanViewSummary();
         $canSubmit                = $this->buildAuthRuleCanSubmit();
         $canViewStatus            = $this->buildAuthRuleCanViewStatus();
+        $canViewSimilarityReport  = $this->buildAuthRuleCanViewSimilarityReport();
         $canAckSubmission         = $this->buildAuthRuleCanAcknowledgeSubmission();
 
         $canDelete = new Rule\Any(
@@ -184,8 +186,8 @@ class Module extends BaseModule
 
         /* Similarity Report report
          */
-        $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewStatus, $preloadAssessment);
-        $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewStatus, $preloadAssessment);
+        $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewSimilarityReport, $preloadAssessment);
+        $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewSimilarityReport, $preloadAssessment);
     }
 
 
@@ -620,6 +622,21 @@ class Module extends BaseModule
                 new IsImplementation(),
                 new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
             )
+        );
+    }
+
+
+    /**
+     * Prevent navigation to non-project assessment spec status pages
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException If unable to locate required object in route params
+     */
+    private function buildAuthRuleCanViewSimilarityReport(): Rule\IAuthorizationRule
+    {
+        return new Rule\All(
+            $this->buildAuthRuleCanViewStatus(),
+            new IsSimilarityCheckEnabled()
         );
     }
 
