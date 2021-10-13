@@ -1373,8 +1373,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $this->typeSequence = max($types->getPropertyValues('sequence'));
             foreach ($types as $type) {
                 $this->typeCache[$type->getName()] = $type;
+                $subtypeMaxSequence                = $type->getSubTypes()->count() === 0 ?: max($type->getSubTypes()->getPropertyValues('sequence'));
+                $this->subtypeSequence             = $this->subtypeSequence > $subtypeMaxSequence ?: $subtypeMaxSequence;
                 foreach ($type->getSubTypes() as $subtype) {
-                    $this->subtypeSequence                                     = $this->subtypeSequence < $subtype->getSequence() ? $subtype->getSequence() : $this->subtypeSequence;
                     $this->subtypeCache[$type->getName()][$subtype->getName()] = $subtype;
                 }
             }
@@ -1407,7 +1408,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $this->pastoralSubTypeMapper->save($subtype);
             }
         } elseif (!empty($record['CategoryDescription'])) {
-            $this->subtypeSequence++;
             // Didn't find a cached record. Try to retrieve an existing pastoral type from Schoolbox
             // The records pastoral category doesn't exist in Schoolbox, create one that matches
 
@@ -1416,7 +1416,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $subtype->setName($record["CategoryDescription"]);
             $subtype->setExternalCode($record['CategoryCode']);
             $subtype->setPastoralType($type);
-            $subtype->setSequence($this->subtypeSequence);
+            $subtype->setSequence(++$this->subtypeSequence);
             $subtype->setUpdatedBy($owner->getId());
             $this->pastoralSubTypeMapper->save($subtype);
 
