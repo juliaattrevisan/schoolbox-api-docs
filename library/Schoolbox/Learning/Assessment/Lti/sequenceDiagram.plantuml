@@ -6,38 +6,38 @@ actor Student as ST
 participant "LTI Platform\n(Schoolbox)" as SB
 participant "LTI Tool\n(Google Classroom, MS Teams Classes)" as LTI
 
-group Create LTI assessment
+group Create LTI assessment in Schoolbox
     TC -> SB: visit create assessment page
-    SB -> SB: create assessment
-    SB -> LTI: send request to create LTI assessment
+    SB -> SB: start creating assessment
+    SB -> LTI: send LtiDeepLinkingRequest
+    LTI -> LTI: select an ltiResourceLink
+    LTI -> SB: receive LtiDeepLinkingResponse
+    SB -> SB: extract ltiResourceLink from LtiDeepLinkingResponse
+    SB -> SB: associate ltiResourceLink with LTI assessment
     note right
-    The LTI Platform must pass a resource link
-    to the LTI Tool.
+    When a student attempts an LTI assessment:
 
-    This will probably take the form of a
-    "Resource link launch request message".
+    a LtiResourceLinkRequest for the ltiResourceLink
+    will be sent from Schoolbox to the LTI tool.
     end note
-    LTI -> SB: return link to new LTI assessment
-    SB -> SB: associate new LTI assessment with SB assessment
 end
 
 group Attempt LTI assessment
     ST -> SB: visit assessment summary page
-    SB -> LTI: redirect student to LTI assessment
-    LTI -> LTI: student attempts LTI assessment
-    LTI -> SB: student gets sent back to SB
-    SB -> SB: create response to assessment
+    SB -> LTI: send LtiResourceLinkRequest\nwith assessment's ltiResourceLink\nin Learner context
+    LTI -> LTI: student attempts assessment
+    LTI -> SB: student gets sent back to Schoolbox
 end
 
 group Mark LTI assessment
     TC -> SB: visit assessment status page
-    SB -> LTI: redirect teacher to LTI assessment
-    LTI -> LTI: teacher marks LTI assessment attempts
-    LTI -> SB: teacher gets sent back to SB
+    SB -> LTI: send LtiResourceLinkRequest\nwith assessment's ltiResourceLink\nin Instructor context
+    LTI -> LTI: teacher marks assessment attempts
+    LTI -> SB: teacher gets sent back to Schoolbox
 end
 
 group Mark update
-    LTI -> SB: update mark
+    LTI -> SB: send mark to Score Publish service
     note left
     The LTI Platform must implement the
     Score Publish Service.
