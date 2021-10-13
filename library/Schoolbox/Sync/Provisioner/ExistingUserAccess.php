@@ -68,15 +68,14 @@ class ExistingUserAccess
         foreach ($existingUserAccessList as $userAccess) {
             $folderId = $userAccess->getServiceIdentifier();
 
-            $existingGroups[$folderId] = $userAccess->getAccessLevel();
-
             /* Maybe this folder doesn't actually exist at runtime
              */
             try {
                 $folder = $this->folderMapper->findCheaplyById($folderId);
+                $existingGroups[$folderId] = $userAccess->getAccessLevel();
                 $folderName = $folder->getName();
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $folderName = 'unknown folder';
+                continue;
             }
 
             $this->log(sprintf(
