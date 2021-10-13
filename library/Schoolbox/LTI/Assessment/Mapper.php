@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Assessment;
 
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -36,6 +37,20 @@ class Mapper extends BaseMapper
             'assessmentModel',
             'assessmentModel',
         );
+
+        // LTI tool join.
+        // The column is `lti_provider_id` (mirroring its name in the schema),
+        // but references to it contain the name "tool"
+        // (which is what providers were renamed to in 1.3)
+        $this->joins(
+            'lti_provider_id',
+            ToolMapper::class,
+            'id',
+            null,
+            null,
+            'ltiTool',
+            'ltiTool',
+        );
         $this->hasJoin(
             'scores',
             [
@@ -46,6 +61,9 @@ class Mapper extends BaseMapper
             ],
         );
         $this->uses('lti_assessment_url', self::TYPE_STRING);
+        $this->uses('custom_fields', self::TYPE_JSON);
+        $this->uses('line_item_resource_id', self::TYPE_STRING);
+        $this->uses('line_item_score_maximum', self::TYPE_DECIMAL);
     }
 
     /**
