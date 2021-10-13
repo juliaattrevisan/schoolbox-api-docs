@@ -4174,18 +4174,27 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function populateUuids(Collection $collection): Collection
     {
-        $idProperty = $this->getIdentifierProperty();
-        if (empty($this->map[$idProperty]['uuid'])) {
+        // First figure out which properties are actually UUIDs
+        $uuidProperties = [];
+        foreach ($this->map as $property => $mapping) {
+            if (!empty($mapping['uuid'])) {
+                $uuidProperties[] = $property;
+            }
+        }
+        if (empty($uuidProperties)) {
             return $collection;
         }
 
+        // Set each UUID property
         $query = $this->database->prepare('SELECT UUID()');
         foreach ($collection as $model) {
-            $existingUuid = $this->getModelProperty($model, $idProperty);
-            if (empty($existingUuid)) {
-                $query->execute();
-                $this->setModelProperty($model, $idProperty, $query->fetchColumn());
-                $query->closeCursor();
+            foreach ($uuidProperties as $uuidProperty) {
+                $existingUuid = $this->getModelProperty($model, $uuidProperty);
+                if (empty($existingUuid)) {
+                    $query->execute();
+                    $this->setModelProperty($model, $uuidProperty, $query->fetchColumn());
+                    $query->closeCursor();
+                }
             }
         }
         return $collection;
