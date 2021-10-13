@@ -24,7 +24,7 @@ This is the `iss` (issuer) claim in JWTs sent from the Schoolbox platform
 ### In this integration
 
 This value is the fully-qualified domain name (FQDN) of the Schoolbox instance
-(e.g. https://vagrant.dev.schoolbox.cloud).
+(e.g. `https://vagrant.dev.schoolbox.cloud`).
 
 
 > An alternative considered for this value was to set this as the FQDN of
@@ -32,6 +32,9 @@ This value is the fully-qualified domain name (FQDN) of the Schoolbox instance
 >
 > This alternative was rejected, because the User claim would need to uniquely
 > identify a user across all Schoolbox instances, not just the issuing instance.
+
+> Another alternative is that this is not a FQDN at all (whether it be unique
+> to the Schoolbox instance or not).
 
 
 ## User
