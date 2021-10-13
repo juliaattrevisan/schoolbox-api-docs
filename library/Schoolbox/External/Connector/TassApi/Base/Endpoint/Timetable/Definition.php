@@ -374,7 +374,7 @@ class Definition implements IStrategy
 
         /* Remind people this might take a while
          */
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Preloading timetables for %s students and %s staff - this might take a while',
             \count($students),
             \count($staff)
