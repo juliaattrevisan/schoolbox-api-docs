@@ -153,7 +153,7 @@
            type="text"
            maxlength="2048"
            value="{{ assessment.ltiAssessmentUrl }}">
-    <input type="hidden" id="tool-id" name="toolId" value="{{ assessment.tool.id ?? '' }}" />
+    <input type="hidden" id="lti-tool-id" name="ltiToolId" value="{{ assessment.ltiTool.id ?? '' }}" />
     <input type="hidden" id="custom-fields" name="customFields" value="{{ (assessment.customFields ?? {}) | json_encode }}" />
     <input type="hidden" id="line-item-score-maximum" name="lineItemScoreMaximum" value="{{ assessment.lineItemScoreMaximum ?? '' }}" />
     <input type="hidden" id="line-item-resource-id" name="lineItemResourceId" value="{{ assessment.lineItemResourceId ?? '' }}" />

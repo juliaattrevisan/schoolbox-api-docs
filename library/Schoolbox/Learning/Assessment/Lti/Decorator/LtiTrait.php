@@ -19,7 +19,7 @@ trait LtiTrait
     /**
      * The LTI tool ID
      */
-    protected ?int $toolId = null;
+    protected ?int $ltiToolId = null;
 
     /**
      * Any custom fields which must be passed when linking to the assessment URL
@@ -57,18 +57,18 @@ trait LtiTrait
     /**
      * @return int|null
      */
-    public function getToolId(): ?int
+    public function getLtiToolId(): ?int
     {
-        return $this->toolId;
+        return $this->ltiToolId;
     }
 
     /**
-     * @param int|null $toolId
+     * @param int|null $ltiToolId
      * @return $this
      */
-    public function setToolId(?int $toolId): self
+    public function setLtiToolId(?int $ltiToolId): self
     {
-        $this->toolId = $toolId;
+        $this->ltiToolId = $ltiToolId;
         return $this;
     }
 
