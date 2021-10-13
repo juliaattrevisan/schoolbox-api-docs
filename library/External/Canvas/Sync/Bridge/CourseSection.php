@@ -437,7 +437,7 @@ class CourseSection
             $this->sisSourceIdToYearAndFolderCodeMap[$sisSourceId] = null;
 
             $year        = $noYear ? '' : $this->parseYearFromSisSourceId($sisSourceId, $sisSource['term_name']) ?? '';
-            $subjectCode = $this->parseSubjectCodeFromSisSourceId($sisSourceId);
+            $subjectCode = $this->parseSubjectCodeFromSisSourceId($sisSourceId, $year);
             if ($subjectCode === null) {
                 $regexNotMatch[] = $sisSourceId;
                 continue;
@@ -527,9 +527,10 @@ class CourseSection
      * Attempt to parse a Subject Code from a sisSourceId
      *
      * @param string $sisSourceId
+     * @param string $year
      * @return string|null
      */
-    public function parseSubjectCodeFromSisSourceId(string $sisSourceId): ?string
+    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year): ?string
     {
         return $sisSourceId;
     }
