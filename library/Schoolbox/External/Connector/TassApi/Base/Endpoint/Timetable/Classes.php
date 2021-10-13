@@ -334,7 +334,7 @@ class Classes implements IStrategy
 
                     /* Teacher involvement is assigned here, via multiple ClassEntry records
                      */
-                    $timetableClassPeriod = $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+                    $timetableClassPeriod = $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
 
                     /* Process students
                      */
@@ -407,7 +407,6 @@ class Classes implements IStrategy
     /**
      * Create a Timetable Class Period
      *
-     * @param array           $users
      * @param array           $class
      * @param string          $ext
      * @param TimetablePeriod $period
@@ -417,7 +416,7 @@ class Classes implements IStrategy
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
+    private function createTimetableClassPeriod(array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
@@ -427,8 +426,6 @@ class Classes implements IStrategy
          * - period_id is a schoolbox sis_timetable_period via lookup of Day and Period Name
          * - class_id comes from $timetableClass->getId()
          */
-        $user = $users[$class['teachers']['externalId']];
-
         if (isset($class['teachers']['externalId'])) {
             /* See if a ClassPeriod exists already for the given teacher; if so, reuse it
              * Otherwise create a new one
@@ -441,11 +438,10 @@ class Classes implements IStrategy
                 ]);
 
                 $this->log->info(sprintf(
-                    'Reusing previously saved class period %s using period_id %s, taught by %s %s, with id %s',
+                    'Reusing previously saved class period %s using period_id %s, taught by %s, with id %s',
                     $timetableClass->getName(),
                     $period->getId(),
                     $class['teachers']['externalId'],
-                    trim("{$user['firstname']} {$user['lastname']}"),
                     $timetableClassPeriod->getId()
                 ));
             } catch (Exception $e) {
@@ -456,10 +452,9 @@ class Classes implements IStrategy
                     ->setTeacher($class['teachers']['external_id']);
 
                 $this->log->info(sprintf(
-                    'Creating new class period %s %s, taught by %s %s',
+                    'Creating new class period %s %s, taught by %s',
                     $timetableClass->getName(),
                     $class['teachers']['externalId'],
-                    trim("{$user['firstname']} {$user['lastname']}"),
                     $period->getId()
                 ));
 
