@@ -163,6 +163,7 @@ class Mapper extends \Schoolbox\Mapper
                 'id' => $row['student_submission_id'],
                 'submitted_at' => [
                     'database' => $row['submitted_at'],
+                    'relative' => \Alaress_Date_Format::newFromTimestamp($timestamp)->getRelativeTime(),
                     'nice' => \Alaress_Date_Format::newFromTimestamp($timestamp)->getShort(),
                     'timestamp' => $timestamp
                 ]
