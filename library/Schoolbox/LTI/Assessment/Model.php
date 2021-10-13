@@ -59,10 +59,12 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
     /**
      * @param string|null $ltiAssessmentUrl
+     * @return $this
      */
-    public function setLtiAssessmentUrl(?string $ltiAssessmentUrl): void
+    public function setLtiAssessmentUrl(?string $ltiAssessmentUrl): self
     {
         $this->ltiAssessmentUrl = $ltiAssessmentUrl;
+        return $this;
     }
 
     /**
