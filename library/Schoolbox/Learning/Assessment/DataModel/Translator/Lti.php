@@ -58,7 +58,12 @@ class Lti implements IAssessmentTypeTranslator
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
-        $dataModel->setLtiAssessmentUrl($domainObject->getLtiAssessmentUrl());
+        $dataModel
+            ->setLtiAssessmentUrl($domainObject->getLtiAssessmentUrl())
+            ->setLtiTool($domainObject->getLtiTool())
+            ->setCustomFields($domainObject->getCustomFields())
+            ->setLineItemResourceId($domainObject->getLineItemResourceId())
+            ->setLineItemScoreMaximum($domainObject->getLineItemScoreMaximum());
     }
 
     /**
@@ -70,6 +75,10 @@ class Lti implements IAssessmentTypeTranslator
         // TODO set an actual mark type
         $domainObject
             ->setMarkType((new MarkType())->setId(MarkType::TYPE_NONE))
-            ->setLtiAssessmentUrl($dataModel->getLtiAssessmentUrl());
+            ->setLtiAssessmentUrl($dataModel->getLtiAssessmentUrl())
+            ->setLtiTool($dataModel->getLtiTool())
+            ->setCustomFields($dataModel->getCustomFields())
+            ->setLineItemResourceId($dataModel->getLineItemResourceId())
+            ->setLineItemScoreMaximum($dataModel->getLineItemScoreMaximum());
     }
 }
