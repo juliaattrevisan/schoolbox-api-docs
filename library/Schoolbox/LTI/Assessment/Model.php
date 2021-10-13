@@ -25,23 +25,11 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
     /**
      * The URL of the LTI assessment,
-     *
-     * This value will be fetched from an LTI Resource Link content item
-     * returned as part of a deep linking response message:
-     * @see https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link
-     * @see https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-response-message
-     *
-     * An LTI resource link launch request will be created for this URL when the
-     * student attempts the assessment:
-     * @see https://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message
      */
     private ?string $ltiAssessmentUrl = null;
 
     /**
      * The LTI tool with which the LTI assessment URL was selected.
-     *
-     * An LTI resource link launch request must be associated with an LTI tool
-     * registration in order for the launch to be instigated.
      */
     private ?Tool $ltiTool = null;
 
@@ -52,13 +40,7 @@ class Model implements IAssessableDataModel, ISoftDeletable
     private ?array $customFields = null;
 
     /**
-     * The line item resource ID (if any): assessments passed from the LTI tool
-     * should contain a line item, otherwise Schoolbox won't be able to
-     * recognise that they are assessments.
-     *
-     * AFAICT this will be used to find which LTI assessments will have scores
-     * updated, when the LTI tool posts scores back to Schoolbox:
-     * @see https://www.imsglobal.org/spec/lti-ags/v2p0/#score-publish-service
+     * The line item resource ID (if any).
      */
     private ?string $lineItemResourceId = null;
 
