@@ -43,6 +43,12 @@
                }) }}">Download All</a>
         </li>
     {% endif %}
+
+    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% if similarityReportRoute %}
+        <li><a href="{{ similarityReportRoute }}" class="icon-progress">Similarity Report</a></li>
+    {% endif %}
+
     {% if assessment.useRubric %}
         <li>
             <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
