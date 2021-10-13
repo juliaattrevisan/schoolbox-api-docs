@@ -13,6 +13,14 @@
         <h1>Similarity Report for {{ assessment.title }}</h1>
     </div>
 </div>
+
+<div class="row" id="similarity-report-container">
+    <similarity-report
+        payload-url="{{ payloadUrl }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/similarityReport.js"></script>
+
 <div class="row">
     <div class="small-12 columns">
 
@@ -21,7 +29,7 @@
                 $.getJSON('{{ payloadUrl }}', function (responseText) {
                     let i, j;
                     let table = $('<table></table>');
-
+                    
                     for (i = 0; i < responseText.length; i++) {
                         let data = responseText[i];
                         let row = $('<tr></tr>');
