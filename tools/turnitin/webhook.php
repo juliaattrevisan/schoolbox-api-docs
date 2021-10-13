@@ -10,7 +10,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin\Controller as TurnitinController;
+use Schoolbox\Learning\Turnitin\Controller as TurnitinController;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Url\Factory;
 
