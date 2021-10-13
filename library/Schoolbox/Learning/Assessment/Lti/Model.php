@@ -48,6 +48,9 @@ class Model extends AbstractAssessment
     /**
      * Any custom fields which must be passed as part of the LTI resource link
      * launch request.
+     *
+     * These fields may be subject to parameter substitution:
+     * @see https://www.imsglobal.org/spec/lti/v1p3/#customproperty
      */
     private ?array $customFields = null;
 
