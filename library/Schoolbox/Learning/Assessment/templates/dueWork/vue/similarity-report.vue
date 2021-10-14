@@ -6,6 +6,8 @@
  */
 
 import SimilarityReportFilters from './similarity-report-filters';
+import SimilarityReportRowStudent from './similarity-report-row-student';
+import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
 
 
 export default {
@@ -26,20 +28,24 @@ export default {
       isDataLoaded: false, //show loading display until true
       hasDataLoadError: false, //display load error
       rows: [], //hold all student data
-      // columns: ['id', 'date', 'similarity', 'files', 'status'],
-      columns: ['user.id', 'submission.submitted_at.nice', 'files', 'files.turnitin', 'submission.status'],
+      columns: ['student', 'submission.submitted_at', 'files', 'files.turnitin', 'submission.status'],
       tableOptions: {
         headings: {
-          ['user.id']: 'Student',
-          ['submission.submitted_at.nice']: 'Submission date',
+          student: 'Student',
+          'submission.submitted_at': 'Submission date',
           files: 'Similarity %',
           'files.turnitin': 'File(s)',
-          ['submission.status']: 'Status',
+          'submission.status': 'Status',
         },
-        // orderBy: {
-        //     ascending: false,
-        //     column: 'updated_at' //initial sorting display
-        // },
+        templates: {      
+          student: SimilarityReportRowStudent,
+          'submission.submitted_at': SimilarityReportRowSubmissionDate,
+        },
+        uniqueKey: 'user.id', //the default is id, so need to update
+        orderBy: {
+          ascending: true,
+          column: 'student' //initial sorting display
+        },
         // templates: {
         //     updated_at: (h, row, index) => {
         //         return dayjs(row.updated_at).format(this.dateFormat); //to format date properly
@@ -50,31 +56,38 @@ export default {
         // selectable: {
         //     mode: 'multiple' //to enable multi-select
         // },
-        // resizableColumns: false,
-        // tabbable: false,
+        resizableColumns: false,
+        tabbable: false,
         // texts: {
         //     filterPlaceholder: 'Search for users...',
         //     noResults: 'No matching users...',
         //     count: '{from}-{to} of {count}',
         //     limit: 'Rows per page:'
         // },
-        // sortIcon: {
-        //     is: 'glyphicon-sort',
-        //     base: 'glyphicon',
-        //     up: 'glyphicon-chevron-up',
-        //     down: 'glyphicon-chevron-down'
-        // },
-        // customSorting: {
-        //     year: (ascending) => { //sort year level naturally
-        //         return (a, b) => {
-        //             if (ascending) {
-        //                 return this.collator.compare(a.year, b.year);
-        //             } else {
-        //                 return this.collator.compare(b.year, a.year);
-        //             }
-        //         }
-        //     }
-        // }
+        sortIcon: {
+          is: 'glyphicon-sort',
+          base: 'glyphicon',
+          up: 'glyphicon-chevron-up',
+          down: 'glyphicon-chevron-down'
+        },
+        customSorting: {
+          student: (ascending) => { //sort student by lastname
+            return (a, b) => {
+              if (ascending) {
+                return a.user.lastname >= b.user.lastname ? 1 : -1; 
+              } 
+              return a.user.lastname <= b.user.lastname ? 1 : -1;                         
+            }
+          },
+          'submission.submitted_at.nice': (ascending) => { //sort submission date accurately by the timestamp
+            return (a, b) => {
+              if (ascending) {
+                return a.submission.submited_at.timestamp >= b.submission.submited_at.timestamp ? 1 : -1;
+              }
+              return a.submission.submited_at.timestamp <= b.submission.submited_at.timestamp ? 1 : -1;
+            }                     
+          }
+        }
       },
     }
   },
@@ -93,7 +106,7 @@ export default {
   },
 
   mounted () {
-    this.getData();
+    this.getRows();
   },
 
   methods: {
@@ -101,7 +114,7 @@ export default {
     /**
      * Load the current student data
      */
-    async getData () {
+    async getRows () {
       try {
         const response = await fetch(this.payloadUrl);
         const responseData = await response.json();
@@ -148,7 +161,8 @@ export default {
 
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
+@import '@vue/components/vueTables2/vueTables2';
 
 </style>
