@@ -976,6 +976,7 @@ class Profile implements IStrategy
 
         foreach ($staffs['d'] as $staff) {
             $externalId = $this->findExternalId($staff['importIdentifiers']);
+            $campusName = $this->findCampusName($staff['organisationMilestones']);
 
             /* Prioritise preferred names over official names
              */
@@ -994,7 +995,6 @@ class Profile implements IStrategy
             /* Haven't encountered data this specific
              */
             $building = '';
-            $campusName = '';
 
             /* I guess I just assume this department for now
              * Use it to indicate teaching/non teaching staff, I suppose
