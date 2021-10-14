@@ -8,6 +8,7 @@
 import SimilarityReportFilters from './similarity-report-filters';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
+import SimilarityReportRowSimilarity from './similarity-report-row-similiarity';
 
 
 export default {
@@ -28,7 +29,7 @@ export default {
       isDataLoaded: false, //show loading display until true
       hasDataLoadError: false, //display load error
       data: [], //hold all student data
-      columns: ['student', 'submission.submitted_at', 'files', 'files.turnitin', 'submission.status'],
+      columns: ['student', 'submission.submitted_at', 'similarity', 'files.turnitin', 'submission.status'],
       tableOptions: {
         headings: {
           student: 'Student',
@@ -40,6 +41,7 @@ export default {
         templates: {      
           student: SimilarityReportRowStudent,
           'submission.submitted_at': SimilarityReportRowSubmissionDate,
+          'similarity': SimilarityReportRowSimilarity,
         },
         uniqueKey: 'user.id', //the default is id, so need to update
         // perPage: 50, 
