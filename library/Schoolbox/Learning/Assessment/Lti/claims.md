@@ -1,3 +1,25 @@
+# LTI Domain Model Interpretations and Integration
+
+# About this document
+
+This document is intended to provide a developer-friendly interpretation of the
+LTI Domain Model, and also on whence various pieces of information which
+comprise the domain model are determined.
+
+# Glossary
+
+The following generic terms are used within this document:
+
+* Claim: a single data point within a JWT.
+  From https://jwt.io/introduction:
+  > Claims are statements about an entity (typically, the user) and additional
+  > data.
+* FQDN: Fully Qualified Domain Name; the scheme + host of a domain, e.g.
+  `https://schoolbox.com.au`
+* Instance ID: an immutable unique identifier for a Schoolbox instance
+* JWT: JSON Web Token (see https://jwt.io/)
+
+
 # LTI Domain Model Overview
 
 From https://www.imsglobal.org/spec/lti/v1p3/#lti-domain-model:
@@ -23,18 +45,23 @@ This is the `iss` (issuer) claim in JWTs sent from the Schoolbox platform
 
 ### In this integration
 
-This value is the fully-qualified domain name (FQDN) of the Schoolbox instance
-(e.g. `https://vagrant.dev.schoolbox.cloud`).
+This value is the FQDN of the Schoolbox instance
+(e.g. `https://instance.schoolbox.cloud`). This is of course unique to the
+instance.
 
+#### Possible alternate implementations
 
-> An alternative considered for this value was to set this as the FQDN of
-> Schoolbox itself (`https://schoolbox.com.au`).
->
-> This alternative was rejected, because the User claim would need to uniquely
-> identify a user across all Schoolbox instances, not just the issuing instance.
+One possible alternative for this value is to set this as the FQDN of Schoolbox
+itself (`https://schoolbox.com.au`) for all instances.
 
-> Another alternative is that this is not a FQDN at all (whether it be unique
-> to the Schoolbox instance or not).
+If this alternative was implemented, the User claim would need to uniquely
+identify a user across all Schoolbox instances, not just the issuing instance.
+(In practice, this would mean prefixing the User claim with the Instance ID.)
+
+Another alternative is that this is not a FQDN at all; instead it is a string
+which uniquely identifies either:
+* Schoolbox itself (likely just `schoolbox` or a pre-generated value)
+* the Schoolbox instance (likely the Instance ID)
 
 
 ## User
@@ -128,7 +155,8 @@ It will contain this set of keys/values:
 * `description`: likely blank
 * `name`: blank, or config `title`
 * `url`: the instance's FQDN (in effect, the same as the Platform value)
-* `product_family_code`: likely "schoolbox"
+* `product_family_code`: something which uniquely identifies the Schoolbox
+   platform itself
 * `version`: config `site_version`
 
 
