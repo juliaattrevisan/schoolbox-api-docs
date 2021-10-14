@@ -40,7 +40,7 @@ class Helper
     {
         $orgs = $this->api->retrieveDocument('reference/v1/GetOrganisations', []);
 
-        foreach ($orgs as $org) {
+        foreach ($orgs['d'] as $org) {
             if ($this->matchesHost($org['friendlyOrgId'])) {
                 return $org['orgId'];
             }
