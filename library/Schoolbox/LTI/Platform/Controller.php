@@ -19,6 +19,7 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
+use Schoolbox\Instance;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\Repository;
@@ -41,15 +42,25 @@ class Controller extends Base
     private UserAuthenticatorInterface $userAuthenticator;
 
     /**
+     * Instance data repository
+     */
+    private Instance $instance;
+
+    /**
      * Constructor
      *
      * @param Repository                 $repository
      * @param UserAuthenticatorInterface $userAuthenticator
+     * @param Instance                   $instance
      */
-    public function __construct(Repository $repository, UserAuthenticatorInterface $userAuthenticator)
-    {
+    public function __construct(
+        Repository $repository,
+        UserAuthenticatorInterface $userAuthenticator,
+        Instance $instance
+    ) {
         $this->repository        = $repository;
         $this->userAuthenticator = $userAuthenticator;
+        $this->instance          = $instance;
     }
 
     /**
@@ -69,9 +80,8 @@ class Controller extends Base
 
         // Return URL:
         // this is somewhere else
-        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
         $returnUrl = (clone $baseUrl)
-            ->setScheme('https')
             ->setPath(
                 $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
             )
@@ -96,12 +106,13 @@ class Controller extends Base
 
         // Claim about the platform instance
         $platformInstanceClaim = new PlatformInstanceClaim(
-            INSTANCE_ID,
+            $this->instance->getId(),
             null,
             null,
             null,
-            null,
-            'schoolbox',
+            (clone $baseUrl)->toString(),
+            Instance::APPLICATION_NAME,
+            $this->instance->getVersion(),
         );
 
         $builder = new DeepLinkingLaunchRequestBuilder();

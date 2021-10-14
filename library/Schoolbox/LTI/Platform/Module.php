@@ -100,6 +100,7 @@ class Module extends BaseModule
                             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
                         ]
                     ),
+                    'instance' => $injector->lazyGet('instance'),
                 ]
             )
         );
