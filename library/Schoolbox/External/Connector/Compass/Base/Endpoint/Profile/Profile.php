@@ -540,11 +540,15 @@ class Profile implements IStrategy
      */
     private function findCampusName(array $organisationMilestones): ?string
     {
-        /* TODO homeCampus is just a guid - I don't know where the lookup is located
-         *  so for now, just provide the first active guid corresponding to the current host
-         *  (UPS can assign arbitrarily based on this guid)
+        $campusId = $this->findOrganisationMilestoneField($organisationMilestones, 'homeCampus');
+
+        /* If it exists in the lookup, use its name
          */
-        return $this->findOrganisationMilestoneField($organisationMilestones, 'homeCampus');
+        if (isset($this->campusLookup[$campusId])) {
+            return $this->campusLookup[$campusId]['name'];
+        }
+
+        return '';
     }
 
 
