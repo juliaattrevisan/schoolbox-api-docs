@@ -29,7 +29,10 @@ $kernel->getShutdownHandler()->registerFunction(
 $path = '/static/images/icons/activity-icons-64x64px.png';
 
 $icon = isset($_GET['icon']) ? $_GET['icon'] : '';
-$size = isset($_GET['size']) ? (int)$_GET['size'] : 32;
+$size = isset($_GET['size']) ? $_GET['size'] : 32;
+
+// handle "square32" as well as just `32` then cast to int, to confirm it is in the correct format
+$size = (int)str_replace('square', '', $size);
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
