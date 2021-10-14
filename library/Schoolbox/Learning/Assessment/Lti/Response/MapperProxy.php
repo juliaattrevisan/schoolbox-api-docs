@@ -22,6 +22,7 @@ use Schoolbox\Mapper\AbstractMapperProxy;
  * Mapper proxy for LTI assessment responses.
  *
  * @method Mapper getMapper()
+ * @method DomainObject createModel()
  */
 class MapperProxy extends AbstractMapperProxy
 {
@@ -91,7 +92,7 @@ class MapperProxy extends AbstractMapperProxy
         /** @var GenericCollection|DomainObject[] $domainObjects */
         $domainObjects = new GenericCollection(DomainObject::class);
         foreach ($mapperModels as $model) {
-            $domainObject = (new DomainObject())
+            $domainObject = $this->createModel()
                 ->setId($model->getId())
                 ->setAssessable(
                     (new LtiAssessment())
