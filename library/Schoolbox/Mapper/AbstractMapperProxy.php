@@ -16,29 +16,29 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 
 /**
- * Common logic when we need to wrap a traditional mapper inside an
- * adapter so we can return objects of a different type, or perform
- * some other transformation
+ * Proxy class which wraps around a mapper's data retrieval (`findBy`) and
+ * manipulation (`save`, `delete`) methods.
+ *
+ * The most common use case for this is to create a mapper-like interface which
+ * works with objects whose logic is closer to the business domain (as opposed
+ * to raw mappers, which tend to work with simpler data transfer objects).
+ *
+ * In this case: `findBy` and `save`/`delete` will return and accept objects of
+ * a different class to `Mapper::createModel`.
  */
 abstract class AbstractMapperProxy
 {
     /**
-     * @var IDatabase
+     * The internal mapper used to fetch data models.
      */
-    private $database;
-
-    /**
-     * @var Mapper
-     */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @param Mapper $mapper
      */
     public function __construct(Mapper $mapper)
     {
-        $this->mapper   = $mapper;
-        $this->database = $mapper->getDatabase();
+        $this->mapper = $mapper;
     }
 
     /**
@@ -274,10 +274,10 @@ abstract class AbstractMapperProxy
 
         $query = "
             {$this->getSelectString()}
-            WHERE {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
+            WHERE {$this->mapper->getDatabase()->getQuoter()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
         ";
 
-        $statement = $this->getDatabase()->query($query, Builder::getArrayParameters($externalValues));
+        $statement = $this->mapper->getDatabase()->query($query, Builder::getArrayParameters($externalValues));
         return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
     }
 
@@ -324,19 +324,11 @@ abstract class AbstractMapperProxy
      */
     public function getPredicateBuilder()
     {
-        return new Builder($this->database->getQuoter(), $this->mapper->getTable());
+        return new Builder($this->mapper->getDatabase()->getQuoter(), $this->mapper->getTable());
     }
 
     /* Getters / Setters
      */
-
-    /**
-     * @return IDatabase
-     */
-    protected function getDatabase()
-    {
-        return $this->database;
-    }
 
     /**
      * @return Mapper
