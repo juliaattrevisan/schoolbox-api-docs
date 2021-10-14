@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -116,6 +117,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Helper
+     */
+    private Helper $helper;
+    
+
+    /**
      * Used for api calls
      *
      * @var string
@@ -169,6 +176,10 @@ class Profile implements IStrategy
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
 
+        /* Helper class
+         */
+        $this->helper = new Helper($this->api);
+
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
          * as well remember that
@@ -195,7 +206,8 @@ class Profile implements IStrategy
     {
         $this->log->info('Preloading campus lookup...');
 
-        $this->campusLookup = (new Lookup\Campus($this->api, $this->getOrganisationIdentifier()))->generate();
+        $this->campusLookup = (new Lookup\Campus($this->api, $this->helper->getOrganisationIdentifier()))
+            ->generate();
 
         /* Import students' profile data
          * Import their specific parents' profile data
@@ -209,26 +221,6 @@ class Profile implements IStrategy
         $this->log->info('Processing staff.');
 
         $this->importStaff();
-    }
-
-
-    /**
-     * Find the organisation identifier
-     *
-     * @return string
-     * @throws \InvalidArgumentException
-     */
-    private function getOrganisationIdentifier(): string
-    {
-        $orgs = $this->api->retrieveDocument('reference/v1/GetOrganisations', []);
-
-        foreach ($orgs as $org) {
-            if ($this->matchesHost($org['friendlyOrgId'])) {
-                return $org['orgId'];
-            }
-        }
-
-        throw new \InvalidArgumentException('Unknown organisation id for the api host specified.');
     }
 
 
@@ -505,7 +497,7 @@ class Profile implements IStrategy
          * Commonality:                 wyndhamchristiancollege-integration
          */
         foreach ($importIdentifiers as $importIdentifier) {
-            if ($this->matchesHost($importIdentifier['school'])) {
+            if ($this->helper->matchesHost($importIdentifier['school'])) {
                 return $importIdentifier['importIdentifier'];
             }
         }
@@ -630,21 +622,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Decide if $organisation matches the endpoint host in suds
-     * This is how we identify records shared across multiple schools
-     *
-     * @param string $organisationName
-     * @return bool
-     */
-    private function matchesHost(string $organisationName): bool
-    {
-        $school = explode('.', $organisationName)[0];
-
-        return strpos($this->api->getHost(), $school) > -1;
-    }
-
-
-    /**
      * Decide if one of the records in studentDetails, parentDetails
      * or staffDetails is Active based on its status field and also
      * if it corresponds to the current host
@@ -654,7 +631,7 @@ class Profile implements IStrategy
      */
     private function isActiveDetailsField(array $detail): bool
     {
-        return $this->matchesHost($detail['organisationName']) && self::ACTIVE === $detail['status'];
+        return $this->helper->matchesHost($detail['organisationName']) && self::ACTIVE === $detail['status'];
     }
 
 
@@ -796,7 +773,7 @@ class Profile implements IStrategy
     private function findOrganisationMilestoneField(array $organisationMilestones, string $field): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
-            if ($this->matchesHost($organisationMilestone['organisationName'])) {
+            if ($this->helper->matchesHost($organisationMilestone['organisationName'])) {
                 if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
                     if ('' !== trim((string)$organisationMilestone[$field])) {
                         return $organisationMilestone[$field];
