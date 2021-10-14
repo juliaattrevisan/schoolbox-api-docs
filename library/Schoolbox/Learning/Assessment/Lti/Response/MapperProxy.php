@@ -103,7 +103,9 @@ class MapperProxy extends AbstractMapperProxy
                     (new LtiAssessment())
                         ->setId($model->getLtiAssessment()->getAssessmentModel()->getId())
                 )
-                ->setSubmittedBy($model->getMarkingUser())
+                // Submitted by? Assume it's the student if no marking user is known
+                // TODO should submittedBy be nullable?
+                ->setSubmittedBy($model->getMarkingUser() ?? $model->getStudent())
                 ->setSubmittedOnBehalfOf($model->getStudent())
                 ->setSubmittedAt($model->getSubmittedAt())
                 ->setCreatedAt($model->getCreatedAt())
