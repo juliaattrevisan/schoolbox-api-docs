@@ -132,6 +132,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var array
+     */
+    private array $campusLookup;
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -169,6 +175,10 @@ class Profile implements IStrategy
          */
         $this->lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
         $this->uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
+
+        /* Campus lookup
+         */
+        $this->campusLookup = [];
     }
 
 
@@ -183,6 +193,10 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
+        $this->log->info('Preloading campus lookup...');
+
+        $this->campusLookup = (new Lookup\Campus($this->api, $this->getOrganisationIdentifier()))->generate();
+
         /* Import students' profile data
          * Import their specific parents' profile data
          */
@@ -195,6 +209,26 @@ class Profile implements IStrategy
         $this->log->info('Processing staff.');
 
         $this->importStaff();
+    }
+
+
+    /**
+     * Find the organisation identifier
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    private function getOrganisationIdentifier(): string
+    {
+        $orgs = $this->api->retrieveDocument('reference/v1/GetOrganisations', []);
+
+        foreach ($orgs as $org) {
+            if ($this->matchesHost($org['friendlyOrgId'])) {
+                return $org['orgId'];
+            }
+        }
+
+        throw new \InvalidArgumentException('Unknown organisation id for the api host specified.');
     }
 
 
