@@ -92,6 +92,11 @@ class MapperProxy extends AbstractMapperProxy
         /** @var GenericCollection|DomainObject[] $domainObjects */
         $domainObjects = new GenericCollection(DomainObject::class);
         foreach ($mapperModels as $model) {
+            // If the model isn't marked as a response: skip
+            if (!$model->getIsResponse()) {
+                continue;
+            }
+
             $domainObject = $this->createModel()
                 ->setId($model->getId())
                 ->setAssessable(
