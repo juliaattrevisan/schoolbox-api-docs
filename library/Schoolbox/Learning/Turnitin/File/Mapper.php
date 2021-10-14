@@ -95,6 +95,7 @@ class Mapper extends \Schoolbox\Mapper
                 ss.submitted_at,
                 ss.owner,
                 ssf.*,
+                storage.ext,
                 tr.id AS turnitinReportId,
                 overall_match_percentage
             FROM assessment a
@@ -106,6 +107,7 @@ class Mapper extends \Schoolbox\Mapper
             ) maxdates ON sb.id = maxdates.box_id
             INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
             INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
+            LEFT JOIN storage ON ssf.hash = storage.hash
             LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
             WHERE a.id = :assessmentId
             AND tr.id IS NOT NULL
@@ -145,6 +147,7 @@ class Mapper extends \Schoolbox\Mapper
                 ],
                 'id' => $row['id'],
                 'name' => $row['realname'],
+                'ext' => $row['ext'],
                 'hash' => $row['hash'],
                 'turnitin' => [
                     'id' => $row['turnitinReportId'],

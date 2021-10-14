@@ -44,7 +44,7 @@
                             let file = data['files'][j];
 
                             files += '<span>' + file['turnitin']['percentage'] + '% </span>';
-                            files += '<a href="' + file['_links']['turnitin_report'] + '">' + file['name'] + '</a>' + '<br />';
+                            files += '<a href="' + file['_links']['turnitin_report'] + '">' + file['name'] + '.' + file['ext'] + '</a>' + '<br />';
                         }
 
                         row.append($(files));
