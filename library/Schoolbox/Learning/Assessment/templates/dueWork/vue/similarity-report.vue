@@ -30,11 +30,19 @@ export default {
 
     computed: {
 
+        /**
+         * To show a note showing no students have submitted yet
+         * 
+         * @returns { Boolean }
+         */
+        hasNoSubmissions () {
+            return this.isDataLoaded && this.studentsData.length === 0;
+        }
 
     },
 
     mounted () {
-        getStudentData();
+        this.getStudentData();
     },
 
     methods: {
@@ -46,8 +54,7 @@ export default {
             try {
                 const response = await fetch(this.payloadUrl);
                 const responseData = await response.json();
-                debugger;
-                // this.studentsData = responseData.data;
+                this.studentsData = responseData;
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
@@ -65,6 +72,11 @@ export default {
 
     <div class="row">
         <div class="small-12 columns">
+
+            <div v-if="hasNoSubmissions" class="empty-state">
+                <i class="icon-staff-students"></i>
+                <p>Students have not yet submitted any work. Once submitted you may return to this page to review the similarity results for each submission.</p>
+            </div>
 
         </div>
     </div>
