@@ -1,10 +1,13 @@
-# LTI Domain Model Interpretations and Integration
+# LTI Domain Model - Interpretations and Integration Summary
 
 # About this document
 
 This document is intended to provide a developer-friendly interpretation of the
-LTI Domain Model, and also on whence various pieces of information which
-comprise the domain model are determined.
+LTI Domain Model.
+
+It is also intended to provide a summary of the integration: in particular,
+whence various pieces of information required within the domain model are
+determined, and how they are passed between the LTI tool and platform.
 
 # Glossary
 
