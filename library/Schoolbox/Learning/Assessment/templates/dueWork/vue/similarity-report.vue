@@ -9,6 +9,8 @@ import SimilarityReportFilters from './similarity-report-filters';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
 import SimilarityReportRowSimilarity from './similarity-report-row-similiarity';
+import SimilarityReportRowFiles from './similarity-report-row-files';
+import SimilarityReportRowStatus from './similarity-report-row-status';
 
 
 export default {
@@ -29,19 +31,21 @@ export default {
       isDataLoaded: false, //show loading display until true
       hasDataLoadError: false, //display load error
       data: [], //hold all student data
-      columns: ['student', 'submission.submitted_at', 'similarity', 'files.turnitin', 'submission.status'],
+      columns: ['student', 'submissionDate', 'similarity', 'files', 'status'],
       tableOptions: {
         headings: {
           student: 'Student',
-          'submission.submitted_at': 'Submission date',
-          files: 'Similarity %',
-          'files.turnitin': 'File(s)',
-          'submission.status': 'Status',
+          submissionDate: 'Submission date',
+          similarity: 'Similarity %',
+          files: 'File(s)',
+          status: 'Status',
         },
         templates: {      
           student: SimilarityReportRowStudent,
-          'submission.submitted_at': SimilarityReportRowSubmissionDate,
-          'similarity': SimilarityReportRowSimilarity,
+          submissionDate: SimilarityReportRowSubmissionDate,
+          similarity: SimilarityReportRowSimilarity,
+          files: SimilarityReportRowFiles,
+          status: SimilarityReportRowStatus,
         },
         uniqueKey: 'user.id', //the default is id, so need to update
         // perPage: 50, 
@@ -61,7 +65,7 @@ export default {
           ascending: true,
           column: 'student' //initial sorting display
         },
-        sortable: ['student', 'submission.submitted_at'], //only student and submission date is sortable
+        sortable: ['student', 'submissionDate'], //only student and submission date is sortable
         customSorting: {
           student: (ascending) => { //sort student by lastname
             return (a, b) => {
@@ -71,12 +75,12 @@ export default {
               return a.user.lastname <= b.user.lastname ? 1 : -1;                         
             }
           },
-          'submission.submitted_at.nice': (ascending) => { //sort submission date accurately by the timestamp
+          submissionDate: (ascending) => { //sort submission date accurately by the timestamp
             return (a, b) => {
               if (ascending) {
-                return a.submission.submited_at.timestamp >= b.submission.submited_at.timestamp ? 1 : -1;
+                return a.submission.submitted_at.timestamp >= b.submission.submitted_at.timestamp ? 1 : -1;
               }
-              return a.submission.submited_at.timestamp <= b.submission.submited_at.timestamp ? 1 : -1;
+              return a.submission.submitted_at.timestamp <= b.submission.submitted_at.timestamp ? 1 : -1;
             }                     
           }
         },

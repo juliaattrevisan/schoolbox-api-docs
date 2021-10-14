@@ -29,14 +29,14 @@ export default {
 </script>
 
 <template>
-  <ul class="percentage-list">
+  <ul class="list">
     <li v-for="file in data.files" :key="file.id">{{ getFormattedPercentage(file.turnitin.percentage) }}</li>
   </ul>
 </template>
 
 <style lang="scss" style="scoped">
 
-.percentage-list {
+.list {
   list-style-type: none;
   margin: 0;
   li {
