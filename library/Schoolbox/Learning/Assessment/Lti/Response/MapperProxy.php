@@ -31,7 +31,8 @@ class MapperProxy extends AbstractMapperProxy
      * the matching values of `lti_assessment.id`.
      *
      * TODO figure out if the mapper proxy can search on `lti_assessment.id`
-     *      without translation
+     *      without translation.
+     *      This should be possible now `findByColumnList` can search on joins.
      */
     private const SELECT_STRING   = 'SELECT id FROM lti_assessment';
     private const EXTERNAL_COLUMN = 'assessment_id';
