@@ -220,16 +220,27 @@ abstract class AbstractMapperProxy
     }
 
     /**
+     * Retrieve the externally available column name used when retrieving
+     * records.
+     *
      * @return string
      */
     abstract protected function getExternalColumnName();
 
     /**
+     * Retrieve the internal column name used when retrieving records.
+     *
      * @return string
      */
     abstract protected function getInternalColumnName();
 
     /**
+     * Retrieve the base of the SELECT statement used to find the IDs of the
+     * database rows which match the domain model.
+     *
+     * Used when translating a `findBy` method into something the internal
+     * mapper can understand.
+     *
      * @return string
      */
     abstract protected function getSelectString();
