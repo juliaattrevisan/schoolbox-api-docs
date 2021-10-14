@@ -120,7 +120,7 @@ class Profile implements IStrategy
      * @var Helper
      */
     private Helper $helper;
-    
+
 
     /**
      * Used for api calls
