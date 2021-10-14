@@ -303,20 +303,20 @@ abstract class AbstractMapperProxy
     /**
      * Transforms domain model objects into data model objects.
      *
-     * @param Collection $mapperModels
+     * @param Collection $domainObjects
      * @return GenericCollection
      */
-    abstract protected function transformDomainObjects(Collection $mapperModels);
+    abstract protected function transformDomainObjects(Collection $domainObjects);
 
     /**
      * Converts a single domain model object into a data model.
      *
-     * @param object $mapperModel
+     * @param object $domainObject
      * @return object
      */
-    protected function transformDomainObject($mapperModel)
+    protected function transformDomainObject($domainObject)
     {
-        return $this->transformDomainObjects(new Collection([$mapperModel]))->first();
+        return $this->transformDomainObjects(new Collection([$domainObject]))->first();
     }
 
     /**
