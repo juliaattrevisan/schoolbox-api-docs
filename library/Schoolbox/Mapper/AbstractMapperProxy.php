@@ -9,7 +9,6 @@
 namespace Schoolbox\Mapper;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -23,8 +22,8 @@ use Schoolbox\Mapper;
  * works with objects whose logic is closer to the business domain (as opposed
  * to raw mappers, which tend to work with simpler data transfer objects).
  *
- * In this case: `findBy` and `save`/`delete` will return and accept objects of
- * a different class to `Mapper::createModel`.
+ * In this case: `findBy`/`save`/`delete` will return/accept objects of a
+ * different class to `Mapper::createModel`.
  */
 abstract class AbstractMapperProxy
 {
@@ -42,7 +41,7 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Proxy for $this->mapper->findById().
+     * Proxy for `$this->mapper->findById()`.
      *
      * @param int $id
      * @return object
@@ -63,7 +62,7 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Gets a typed Collection of objects that match the specified column values
+     * Proxy for `$this->mapper->findByColumnList()`.
      *
      * @param array $columnList
      * @param array $options
@@ -81,7 +80,7 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Gets a typed Collection of objects that match the specified predicates
+     * Proxy for `$this->mapper->findByPredicates()`.
      *
      * @param Builder $pb
      * @param array   $options
@@ -102,7 +101,7 @@ abstract class AbstractMapperProxy
 
 
     /**
-     * Saves this object or collection of objects.
+     * Proxy for `$this->mapper->save()`.
      *
      * @param object|Collection $model A model object, or collection thereof
      * @return bool Always true
@@ -126,9 +125,9 @@ abstract class AbstractMapperProxy
         return true;
     }
 
-
     /**
-     * Get the domain model class
+     * Retrieve the class name of the object which this proxy's
+     * `findBy`/`save`/`delete` methods return and accept.
      *
      * @return string
      */
@@ -148,7 +147,7 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Deletes this object or collection of objects.
+     * Proxy for `$this->mapper->delete()`.
      *
      * @param object|Collection $model A model object, or collection thereof
      * @return bool
@@ -174,7 +173,7 @@ abstract class AbstractMapperProxy
 
     /**
      * Determines if the specified column list requires translation before being
-     * submitted to the Mapper
+     * submitted to the internal mapper.
      *
      * @param array $columnList
      * @return bool
@@ -186,7 +185,7 @@ abstract class AbstractMapperProxy
 
     /**
      * Determines if the specified predicates requires translation before being
-     * submitted to the Mapper
+     * submitted to the internal mapper.
      *
      * @param Builder $pb
      * @return bool
@@ -206,7 +205,8 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Converts the query into a logically equivalent query that the internal Mapper can understand
+     * Converts the column list into a logical equivalent that the internal
+     * mapper can understand.
      *
      * @param array $columnList
      * @return array
@@ -254,10 +254,12 @@ abstract class AbstractMapperProxy
     protected function getInternalValue($externalValue)
     {
         $values = $this->getInternalValues([$externalValue]);
-        return isset($values[0]) ? $values[0] : null;
+        return $values[0] ?? null;
     }
 
     /**
+     * Retrieves a list of mappings from external to internal IDs.
+     *
      * @param array $externalValues
      * @return array
      */
@@ -320,10 +322,13 @@ abstract class AbstractMapperProxy
     }
 
     /**
+     * Builds a predicate builder appropriate for the mapper.
+     *
      * @return Builder
      */
     public function getPredicateBuilder()
     {
+        // TODO replace with $this->mapper->getBuilder()?
         return new Builder($this->mapper->getDatabase()->getQuoter(), $this->mapper->getTable());
     }
 
