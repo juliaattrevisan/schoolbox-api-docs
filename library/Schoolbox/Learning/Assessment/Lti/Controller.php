@@ -117,7 +117,10 @@ class Controller extends Assessment\Controller
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/status.twig',
                 [
-                    'assessment' => $assessment,
+                    'type'        => Assessment\AssessmentType::objectToString($assessment),
+                    'assessment'  => $assessment,
+                    'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                                                       ->add([ $assessment->getTitle(), '' ]),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
