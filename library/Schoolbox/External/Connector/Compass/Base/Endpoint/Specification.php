@@ -54,6 +54,20 @@ class Specification
         $paths = [
 
             /**
+             * Shared nodes
+             */
+            [
+                'endpoint' => 'reference/v1/GetOrganisations',
+                'params' => []
+            ],
+            [
+                'endpoint' => 'reference/v1/GetCampuses',
+                'params' => [
+                    'organisationId' => $helper->getOrganisationIdentifier()
+                ]
+            ],
+
+            /**
              * Student Profile nodes
              */
             [
@@ -61,12 +75,6 @@ class Specification
                 'params' => [
                     'lBound' => $lBound,
                     'uBound' => $uBound
-                ]
-            ],
-            [
-                'endpoint' => 'reference/v1/GetCampuses',
-                'params' => [
-                    'organisationId' => $helper->getOrganisationIdentifier()
                 ]
             ],
 
