@@ -84,6 +84,7 @@ class MapperProxy extends AbstractMapperProxy
      */
     protected function transformModels(Collection $mapperModels)
     {
+        /** @var GenericCollection|DomainObject[] $domainObjects */
         $domainObjects = new GenericCollection(DomainObject::class);
         foreach ($mapperModels as $model) {
             $domainObject = (new DomainObject())

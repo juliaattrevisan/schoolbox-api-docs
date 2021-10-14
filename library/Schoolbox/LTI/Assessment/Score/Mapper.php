@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Assessment\Score;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
@@ -17,6 +18,7 @@ use Schoolbox\UserMapper;
  * LTI assessment score mapper.
  *
  * @method Model createModel($idValue = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
  */
 class Mapper extends BaseMapper
 {
