@@ -412,7 +412,7 @@ class Definition implements IStrategy
             $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
                 'teacher_code' => $externalId,
                 'year_num' => $year,
-                'semester' => $semester
+                'semester' => 4
             ]);
 
             $this->preloadTimetable((string)$externalId, $person, $data, 'teacher_timetable');

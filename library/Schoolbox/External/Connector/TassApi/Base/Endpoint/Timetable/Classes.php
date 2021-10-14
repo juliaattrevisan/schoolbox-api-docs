@@ -198,159 +198,153 @@ class Classes implements IStrategy
                 /* For each Period in Day
                  */
                 foreach ($day['PERIODS'] as $periodIndex => $period) {
-                    /* Take the 0th element of the Period's Subject's node
-                     * (Presume a student can only be in one class on a given (day, period)
+                    /* For each Subject in a Period
                      */
-                    $subject = $period['SUBJECTS'][0];
+                    foreach ($period['SUBJECTS'] as $subject) {
+                        /* If the FROM_DATE is not null and the TO_DATE is not null,
+                         * check that the current time is between these two dates
+                         * If we're outside these two dates, skip this subject
+                         *
+                         * FROM_DATE and TO_DATE might not even exist in the API payload
+                         * for some mysterious reason, because TASS reasons I suppose
+                         */
+                        $fromDate = $subject['FROM_DATE'] ?? '';
+                        $toDate = $subject['TO_DATE'] ?? '';
 
-                    /* TODO Shalom is the first usage of having multiple subjects in a day/period tuple
-                     *  We might have to do this instead:
-                     *  foreach($period['SUBJECTS'] as $subject) { ... }
-                     */
+                        $isActive = (new ValidActiveEnrolment())->isSatisfiedBy($fromDate, $toDate);
 
-                    /* If the FROM_DATE is not null and the TO_DATE is not null,
-                     * check that the current time is between these two dates
-                     * If we're outside these two dates, skip this subject
-                     *
-                     * FROM_DATE and TO_DATE might not even exist in the API payload
-                     * for some mysterious reason, because TASS reasons I suppose
-                     */
-                    $fromDate = $subject['FROM_DATE'] ?? '';
-                    $toDate = $subject['TO_DATE'] ?? '';
+                        if (!$isActive) {
+                            $this->log->info(sprintf(
+                                'Skipping class %s - we are outside the bounds of from_date %s and to_date %s',
+                                $subject['SUB_CODE'],
+                                $subject['FROM_DATE'],
+                                $subject['TO_DATE']
+                            ));
 
-                    $isActive = (new ValidActiveEnrolment())->isSatisfiedBy($fromDate, $toDate);
+                            continue;
+                        }
 
-                    if (!$isActive) {
-                        $this->log->info(sprintf(
-                            'Skipping class %s - we are outside the bounds of from_date %s and to_date %s',
-                            $subject['SUB_CODE'],
-                            $subject['FROM_DATE'],
-                            $subject['TO_DATE']
-                        ));
+                        /* Tass doesn't use the date part,
+                         * Tass includes a microseconds part (sigh)
+                         * So we have to ditch these bits and swipe what we need
+                         */
+                        $start = substr($period['PRD_START'], 11, 8);
+                        $finish = substr($period['PRD_END'], 11, 8);
 
-                        continue;
-                    }
+                        /* Construct a data struct that represents a more sane version of $subject
+                         */
+                        $class = [
+                            'period' => [
+                                'day' => (string)$dayIndex,
+                                'name' => $period['PRD_DESC'],
+                                'sequence' => $periodIndex,
+                                'start' => $start,
+                                'end' => $finish
+                            ],
+                            'class' => [
 
-                    /* Tass doesn't use the date part,
-                     * Tass includes a microseconds part (sigh)
-                     * So we have to ditch these bits and swipe what we need
-                     */
-                    $start = substr($period['PRD_START'], 11, 8);
-                    $finish = substr($period['PRD_END'], 11, 8);
+                                /* This format mirrors the implementation in External/Tass/Timetable.php:239
+                                 */
+                                'code' => (new Codec\Code())->encode(
+                                    '' !== (string)$subject['YEAR_GRP'] ? (string)$subject['YEAR_GRP'] : (string)$subject['SUBTAB_YEAR_GRP'],
+                                    (string)$subject['SUB_CODE'],
+                                    (string)$subject['CLASS']
+                                ),
+                                'name' => $subject['SUB_DESC'],
+                            ],
+                            'room' => [
+                                'name' => $subject['ROOM_CODE']
+                            ],
 
-                    /* Construct a data struct that represents a more sane version of $subject
-                     */
-                    $class = [
-                        'period' => [
-                            'day' => (string)$dayIndex,
-                            'name' => $period['PRD_DESC'],
-                            'sequence' => $periodIndex,
-                            'start' => $start,
-                            'end' => $finish
-                        ],
-                        'class' => [
-
-                            /* This format mirrors the implementation in External/Tass/Timetable.php:239
+                            /* Assumption: Only one teacher per subject
+                             * Can there be more than one teacher, maybe comma-separated?
                              */
-                            'code' => (new Codec\Code())->encode(
-                                '' !== (string)$subject['YEAR_GRP'] ? (string)$subject['YEAR_GRP'] : (string)$subject['SUBTAB_YEAR_GRP'],
-                                (string)$subject['SUB_CODE'],
-                                (string)$subject['CLASS']
-                            ),
-                            'name' => $subject['SUB_DESC'],
-                        ],
-                        'room' => [
-                            'name' => $subject['ROOM_CODE']
-                        ],
+                            'teachers' => [
+                            ],
 
-                        /* Assumption: Only one teacher per subject
-                         * Can there be more than one teacher, maybe comma-separated?
+                            'students' => [
+                            ],
+                        ];
+
+                        /* If this $externalId existed in the Staff lookup, put them in the teachers set
+                         * Or, if this $externalId existed in the Student lookup, put them in the students set
                          */
-                        'teachers' => [
-                        ],
+                        if (isset($users[$externalId])) {
+                            if (self::TYPE_STAFF === $type) {
+                                $class['teachers'] = [
+                                    'externalId' => $subject['TCH_CODE'],
+                                    'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                                    'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
+                                ];
 
-                        'students' => [
-                        ],
-                    ];
+                                $this->log->debug(sprintf(
+                                    '%s %s (user %s) is the teacher of subject %s',
+                                    $class['teachers']['firstname'],
+                                    $class['teachers']['surname'],
+                                    $class['teachers']['externalId'],
+                                    $class['class']['code']
+                                ));
+                            } elseif (self::TYPE_STUDENT === $type) {
+                                $class['students'][] = [
+                                    'externalId' => (string)$externalId,
+                                    'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                                    'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
+                                ];
+                            }
 
-                    /* If this $externalId existed in the Staff lookup, put them in the teachers set
-                     * Or, if this $externalId existed in the Student lookup, put them in the students set
-                     */
-                    if (isset($users[$externalId])) {
-                        if (self::TYPE_STAFF === $type) {
-                            $class['teachers'] = [
-                                'externalId' => $subject['TCH_CODE'],
-                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                                'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
-                            ];
-
-                            $this->log->debug(sprintf(
-                                '%s %s (user %s) is the teacher of subject %s',
-                                $class['teachers']['firstname'],
-                                $class['teachers']['surname'],
-                                $class['teachers']['externalId'],
-                                $class['class']['code']
-                            ));
-                        } elseif (self::TYPE_STUDENT === $type) {
-                            $class['students'][] = [
-                                'externalId' => (string)$externalId,
-                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                                'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
-                            ];
+                            /* noop for Parents (they don't have timetables)
+                             */
                         }
 
-                        /* noop for Parents (they don't have timetables)
+                        /* Look up the period instance by (name, day)
+                         *
+                         * If the period doesn't correspond to something in our timetable definition,
+                         * we can't process it anyway, so skip it
                          */
-                    }
+                        $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], (string)$class['period']['name']);
 
-                    /* Look up the period instance by (name, day)
-                     *
-                     * If the period doesn't correspond to something in our timetable definition,
-                     * we can't process it anyway, so skip it
-                     */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], (string)$class['period']['name']);
-
-                    $this->log->info(sprintf(
-                        'Looking for ext_timetable_code %s, day %s, period %s',
-                        $ext,
-                        $class['period']['day'],
-                        $class['period']['name']
-                    ));
-
-                    if (null === $timetablePeriod) {
-                        $this->log->warning(sprintf(
-                            'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
-                            $class['period']['name'],
+                        $this->log->info(sprintf(
+                            'Looking for ext_timetable_code %s, day %s, period %s',
+                            $ext,
                             $class['period']['day'],
-                            $ext
+                            $class['period']['name']
                         ));
 
-                        continue;
-                    }
-
-                    /* Assemble the pieces
-                     */
-                    $timetableClass = $this->createTimetableClass($class);
-
-                    /* Teacher involvement is assigned here, via multiple ClassEntry records
-                     */
-                    $timetableClassPeriod = $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
-
-                    /* Process students
-                     */
-                    foreach ($class['students'] as $student) {
-                        /* Throw warning, but assign them anyway
-                         */
-                        if (!isset($users[$student['externalId']])) {
+                        if (null === $timetablePeriod) {
                             $this->log->warning(sprintf(
-                                'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
-                                $student['externalId'],
-                                $timetableClass->getName(),
-                                $timetableClass->getCode()
+                                'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
+                                $class['period']['name'],
+                                $class['period']['day'],
+                                $ext
                             ));
+
+                            continue;
                         }
 
-                        $this->createTimetableClassInvolvement($student, $timetableClass);
+                        /* Assemble the pieces
+                         */
+                        $timetableClass = $this->createTimetableClass($class);
+
+                        /* Teacher involvement is assigned here, via multiple ClassEntry records
+                         */
+                        $timetableClassPeriod = $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
+
+                        /* Process students
+                         */
+                        foreach ($class['students'] as $student) {
+                            /* Throw warning, but assign them anyway
+                             */
+                            if (!isset($users[$student['externalId']])) {
+                                $this->log->warning(sprintf(
+                                    'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
+                                    $student['externalId'],
+                                    $timetableClass->getName(),
+                                    $timetableClass->getCode()
+                                ));
+                            }
+
+                            $this->createTimetableClassInvolvement($student, $timetableClass);
+                        }
                     }
                 }
             }
