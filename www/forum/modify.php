@@ -82,7 +82,7 @@ if (is_numeric($this->arg[0])) {
 
         /* Check user owns post
          */
-        if (($post->getOwner() && $post->getOwner()->getId() != $_SESSION['id']) && $accessLevel < UserAccess::ACCESS_WRITE) {
+        if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel < UserAccess::ACCESS_WRITE) {
             error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
