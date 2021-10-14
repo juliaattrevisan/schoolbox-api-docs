@@ -203,7 +203,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $platform = new Platform(
             'schoolbox',
             'Schoolbox Platform',
-            $this->baseUrl->toString(),
+            'schoolbox',
             (clone $this->baseUrl)->setPath('/lti-prototype/platform/oidc/authentication')->toString(),
         );
 
@@ -212,7 +212,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $tool = new Tool(
             'schoolboxTool',
             'Schoolbox Tool',
-            $this->baseUrl->toString(),
+            'schoolbox',
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/oidc/initiation')->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/launch')->toString(),
         );
