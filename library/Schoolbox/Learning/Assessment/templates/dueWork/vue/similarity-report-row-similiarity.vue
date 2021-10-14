@@ -31,6 +31,7 @@ export default {
 <template>
   <ul class="list">
     <li v-for="file in data.files" :key="file.id">{{ getFormattedPercentage(file.turnitin.percentage) }}</li>
+    <!-- <li v-for="file in data.files" :key="file.id">{{ file.name }}</li> -->
   </ul>
 </template>
 

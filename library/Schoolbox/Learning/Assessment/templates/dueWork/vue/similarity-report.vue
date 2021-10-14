@@ -9,7 +9,6 @@ import SimilarityReportFilters from './similarity-report-filters';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
 import SimilarityReportRowSimilarity from './similarity-report-row-similiarity';
-import SimilarityReportRowFiles from './similarity-report-row-files';
 import SimilarityReportRowStatus from './similarity-report-row-status';
 
 
@@ -31,20 +30,18 @@ export default {
       isDataLoaded: false, //show loading display until true
       hasDataLoadError: false, //display load error
       data: [], //hold all student data
-      columns: ['student', 'submissionDate', 'similarity', 'files', 'status'],
+      columns: ['student', 'submissionDate', 'similarity',  'status'],
       tableOptions: {
         headings: {
           student: 'Student',
           submissionDate: 'Submission date',
           similarity: 'Similarity %',
-          files: 'File(s)',
           status: 'Status',
         },
         templates: {      
           student: SimilarityReportRowStudent,
           submissionDate: SimilarityReportRowSubmissionDate,
           similarity: SimilarityReportRowSimilarity,
-          files: SimilarityReportRowFiles,
           status: SimilarityReportRowStatus,
         },
         uniqueKey: 'user.id', //the default is id, so need to update
