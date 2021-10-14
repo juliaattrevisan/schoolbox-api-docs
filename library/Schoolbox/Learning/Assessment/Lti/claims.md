@@ -22,11 +22,12 @@ The following generic terms are used within this document:
 
 # LTI Domain Model Overview
 
-From https://www.imsglobal.org/spec/lti/v1p3/#lti-domain-model:
+From https://www.imsglobal.org/spec/lti/v1p3/#lti-domain-model, annotated with
+the source of each claim:
 
-![LTI Domain Model](./lti_domain_model.png)
+![LTI Domain Model](./ltiDomainModelAnnotated.png)
 
-# LTI Domain Model Objects
+# LTI Domain Model Definition and Implementation
 
 ## Platform
 
@@ -259,7 +260,7 @@ Schoolbox):
 
 For resource link launch requests (used to send a student from Schoolbox to the
 assessment within the LTI tool):
-* `id`: the assessment's ID, prefixed to specify that it's an assessment
+* `id`: the assessment's folder's ID, prefixed to specify that it's a folder
 * `type`: unsure; possibly:
     * blank (this field is optional)
     * `http://purl.imsglobal.org/vocab/lis/v2/course#Group`
