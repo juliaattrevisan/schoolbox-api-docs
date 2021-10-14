@@ -94,8 +94,8 @@ class Model implements ISoftDeletable
     /**
      * LTI 1.3: the audience of this tool.
      *
-     * This will be provided by the tool, but I am not sure what it does yet:
-     * it doesn't appear to ever be validated.
+     * This will be provided by the tool, but appears to be unused on the
+     * platform side; it is a candidate for removal.
      */
     private ?string $audience;
 

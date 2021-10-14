@@ -46,6 +46,8 @@
                        name="client_id"
                        value="{{ provider.clientId ?? '' }}">
             </div>
+            {# The tool's audience is not required when the platform is communicating with the tool #}
+            {#
             <div class="small-6 columns">
                 <label for="audience-{{ identifier }}" class="required">
                     Audience
@@ -57,6 +59,7 @@
                        name="audience"
                        value="{{ provider.audience ?? '' }}">
             </div>
+            #}
             <div class="small-6 columns">
                 <label for="oidc_initiation_url-{{ identifier }}" class="required">
                     OIDC Initiation URL

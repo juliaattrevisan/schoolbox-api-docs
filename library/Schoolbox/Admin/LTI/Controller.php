@@ -109,7 +109,8 @@ class Controller extends Base
         // LTI 1.3 fields
         $provider = $provider
             ->setClientId($post['client_id'])
-            ->setAudience($post['audience'])
+            ->setAudience('')
+//            ->setAudience($post['audience'])
             ->setOidcInitiationUrl($post['oidc_initiation_url'])
             ->setLaunchUrl($post['launch_url'])
             ->setDeepLinkingUrl($post['deep_linking_url'])

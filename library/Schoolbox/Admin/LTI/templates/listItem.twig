@@ -8,9 +8,7 @@
                 <p class="meta">Deployment ID: {{ provider.deploymentId }}</p>
             {% endif %}
             <p class="meta">
-                {% if provider.isLtiVersion13 ?? false %}
-                    {{ provider.audience ?? ''}}
-                {% elseif provider.isLtiVersion11 ?? false %}
+                {% if provider.isLtiVersion11 ?? false %}
                     {% if provider.url is empty %}
                         <span class="gradient-0">Provider Disabled - No Launch URL detected</span>
                     {% else %}
