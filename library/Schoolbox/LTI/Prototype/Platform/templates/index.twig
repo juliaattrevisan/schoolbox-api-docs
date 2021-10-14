@@ -8,7 +8,7 @@
         <dd>
             <select id="registration" name="registration">
                 {% for registration in registrations %}
-                    <option value="{{ registration.identifier }}">{{ registration.tool.name }} ({{ registration.tool.audience }})</option>
+                    <option value="{{ registration.identifier }}">{{ registration.tool.name }} ({{ registration.clientId }})</option>
                 {% endfor %}
             </select>
         </dd>

@@ -203,7 +203,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $platform = new Platform(
             'schoolbox',
             'Schoolbox Platform',
-            'schoolbox',
+            (clone $this->baseUrl)->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/platform/oidc/authentication')->toString(),
         );
 
@@ -212,7 +212,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $tool = new Tool(
             'schoolboxTool',
             'Schoolbox Tool',
-            'schoolbox',
+            (clone $this->baseUrl)->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/oidc/initiation')->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/launch')->toString(),
         );
@@ -232,11 +232,6 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
         // Build a registration out of each tool
         foreach ($this->tools as $toolModel) {
-            $toolKeyChain = $keyChainFactory->create(
-                $toolModel->getName(),
-                $toolModel->getName(),
-                $toolModel->getPublicKey()
-            );
             $tool = new Tool(
                 $toolModel->getName(),
                 $toolModel->getName(),
@@ -255,7 +250,11 @@ class RegistrationRepository implements RegistrationRepositoryInterface
                 $tool,
                 [$toolModel->getDeploymentId(),],
                 $platformKeyChain,
-                $toolKeyChain,
+                $keyChainFactory->create(
+                    $toolModel->getName(),
+                    $toolModel->getName(),
+                    $toolModel->getPublicKey()
+                ),
                 null,
                 $toolModel->getJwksUrl()
             );
