@@ -362,11 +362,7 @@ class Module extends BaseModule
         $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(RubricDataSource::class);
         $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(RubricResultSetMapper::class);
 
-        // TODO get this out of DI
-        $dc['dueWorkResponseMapper']    = $injector->lazyNew(
-            DueWorkResponseMapper::class,
-            ['mapper' => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class)]
-        );
+        $dc['dueWorkResponseMapper'] = $injector->lazyGet('submissionDataSource');
         $dc['participantMapper'] = $injector->lazyNew(ParticipantDataSource::class);
         $dc['submissionFileMapper'] = $injector->lazyNew(SingleFile\Mapper::class);
         $dc['kamiConnector'] = $injector->lazyGet('kamiConnector');
