@@ -296,21 +296,21 @@ class Factory
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
             ))
-//            ->add(new Profile(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->spousePrefix,
-//                $this->addnumFather,
-//                $this->addnumMother,
-//                $this->fatherAddressDescription,
-//                $this->motherAddressDescription,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
+            ->add(new Profile(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->spousePrefix,
+                $this->addnumFather,
+                $this->addnumMother,
+                $this->fatherAddressDescription,
+                $this->motherAddressDescription,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,

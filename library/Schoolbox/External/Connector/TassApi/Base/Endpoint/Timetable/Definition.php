@@ -384,17 +384,17 @@ class Definition implements IStrategy
          * This will inform schoolbox's classic idea of a Timetable Definition which must be
          * rectangular; every day will have the maximum number of periods in it, even if the
          * student's timetable doesn't use it
-//         */
-//        foreach ($students as $externalId => $person) {
-//            /* Hit That Api to find every student's timetable and cache it somewhere
-//             * We'll need to operate on it all again later anyway
-//             */
-//            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentTimetable', [
-//                'student_code' => $externalId
-//            ]);
-//
-//            $this->preloadTimetable((string)$externalId, $person, $data, 'student_timetable');
-//        }
+         */
+        foreach ($students as $externalId => $person) {
+            /* Hit That Api to find every student's timetable and cache it somewhere
+             * We'll need to operate on it all again later anyway
+             */
+            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentTimetable', [
+                'student_code' => $externalId
+            ]);
+
+            $this->preloadTimetable((string)$externalId, $person, $data, 'student_timetable');
+        }
 
         /* Make a naive guess as to what year and semester we are in
          * The getTeacherTimetable endpoint is different to students' version
@@ -405,14 +405,10 @@ class Definition implements IStrategy
         /* Inspect every staff's timetable
          */
         foreach ($staff as $externalId => $person) {
-            if ($externalId !== 'RCO') {
-                continue;
-            }
-
             $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
                 'teacher_code' => $externalId,
                 'year_num' => $year,
-                'semester' => 4
+                'semester' => $semester
             ]);
 
             $this->preloadTimetable((string)$externalId, $person, $data, 'teacher_timetable');
