@@ -630,19 +630,30 @@ class Importer
 
             $create = true;
 
-            /* Try to find a baseProfile that matches the externalId
+            /* Try to find an existing staffProfile that matches the externalId
+             * If one already exists, use it; otherwise spawn a new one
              */
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($row['External ID']);
-                $baseProfile = $parentProfile->getBaseProfile();
+                $parentBaseProfile = $parentProfile->getBaseProfile();
 
                 $create = false;
             } catch (Exception $e) {
                 $parentProfile = $this->parentProfileMapper->createModel();
-                $baseProfile = $this->baseProfileMapper->createModel();
+
+                /* Try to find a baseProfile that matches the externalId
+                 * If one already exists, use it; otherwise spawn a new one
+                 */
+                try {
+                    $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $row['External ID']);
+                } catch (Exception $e) {
+                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+                }
+
+                $parentProfile->setBaseProfile($parentBaseProfile);
             }
 
-            $baseProfile
+            $parentBaseProfile
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
@@ -654,7 +665,7 @@ class Importer
                 ->setPhoneWork($row['Work Phone'])
                 ->setUsername($row['Username'])
                 ->setEmail($row['Email'])
-                ->setBaseProfile($baseProfile);
+                ->setBaseProfile($parentBaseProfile);
 
             if ($create) {
                 $this->log("Creating new parent profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
@@ -663,14 +674,14 @@ class Importer
             }
 
             if ($this->perform) {
-                $this->baseProfileMapper->save($baseProfile);
+                $this->baseProfileMapper->save($parentBaseProfile);
                 $this->parentProfileMapper->save($parentProfile);
             }
 
             /* Remember the ids that were affected; we remove everyone that wasn't added/updated
              * Do this outside $this->perform for Dry Run logging purposes
              */
-            $affectedProfileIds[] = $baseProfile->getId();
+            $affectedProfileIds[] = $parentBaseProfile->getId();
         }
 
         /* Delete everyone we didn't created/update
