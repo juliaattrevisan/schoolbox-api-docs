@@ -405,6 +405,10 @@ class Definition implements IStrategy
         /* Inspect every staff's timetable
          */
         foreach ($staff as $externalId => $person) {
+            if ($externalId !== 'RCO') {
+                continue;
+            }
+
             $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
                 'teacher_code' => $externalId,
                 'year_num' => $year,
