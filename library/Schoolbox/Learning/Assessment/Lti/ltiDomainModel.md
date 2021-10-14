@@ -67,6 +67,9 @@ which uniquely identifies either:
 * Schoolbox itself (likely just `schoolbox` or a pre-generated value)
 * the Schoolbox instance (likely the Instance ID)
 
+A third alternative would be to use the same value as Schoolbox's existing JWTs
+use: they simply use the host name of the Schoolbox instance (e.g.
+`instance.schoolbox.cloud`)
 
 ## User
 
