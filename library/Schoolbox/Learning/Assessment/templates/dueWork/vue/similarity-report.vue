@@ -27,7 +27,7 @@ export default {
     return {
       isDataLoaded: false, //show loading display until true
       hasDataLoadError: false, //display load error
-      rows: [], //hold all student data
+      data: [], //hold all student data
       columns: ['student', 'submission.submitted_at', 'files', 'files.turnitin', 'submission.status'],
       tableOptions: {
         headings: {
@@ -42,15 +42,6 @@ export default {
           'submission.submitted_at': SimilarityReportRowSubmissionDate,
         },
         uniqueKey: 'user.id', //the default is id, so need to update
-        orderBy: {
-          ascending: true,
-          column: 'student' //initial sorting display
-        },
-        // templates: {
-        //     updated_at: (h, row, index) => {
-        //         return dayjs(row.updated_at).format(this.dateFormat); //to format date properly
-        //     }
-        // },
         // perPage: 50, 
         // perPageValues: [50, 100, 200],
         // selectable: {
@@ -64,12 +55,11 @@ export default {
         //     count: '{from}-{to} of {count}',
         //     limit: 'Rows per page:'
         // },
-        sortIcon: {
-          is: 'glyphicon-sort',
-          base: 'glyphicon',
-          up: 'glyphicon-chevron-up',
-          down: 'glyphicon-chevron-down'
+        orderBy: {
+          ascending: true,
+          column: 'student' //initial sorting display
         },
+        sortable: ['student', 'submission.submitted_at'], //only student and submission date is sortable
         customSorting: {
           student: (ascending) => { //sort student by lastname
             return (a, b) => {
@@ -87,7 +77,13 @@ export default {
               return a.submission.submited_at.timestamp <= b.submission.submited_at.timestamp ? 1 : -1;
             }                     
           }
-        }
+        },
+        sortIcon: {
+          is: 'glyphicon-sort',
+          base: 'glyphicon',
+          up: 'glyphicon-chevron-up',
+          down: 'glyphicon-chevron-down'
+        },
       },
     }
   },
@@ -100,13 +96,13 @@ export default {
      * @returns { Boolean }
      */
     hasNoSubmissions () {
-      return this.isDataLoaded && this.rows.length === 0;
+      return this.isDataLoaded && this.data.length === 0;
     }
 
   },
 
   mounted () {
-    this.getRows();
+    this.getData();
   },
 
   methods: {
@@ -114,11 +110,11 @@ export default {
     /**
      * Load the current student data
      */
-    async getRows () {
+    async getData () {
       try {
         const response = await fetch(this.payloadUrl);
         const responseData = await response.json();
-        this.rows = responseData;
+        this.data = responseData;
       } catch (error) {
         console.warn(error);
         this.hasDataLoadError = true; //show load error
@@ -147,7 +143,7 @@ export default {
       <v-client-table 
         v-if="isDataLoaded"
         ref="table"
-        :data="rows" 
+        :data="data" 
         :columns="columns" 
         :options="tableOptions" 
       >
