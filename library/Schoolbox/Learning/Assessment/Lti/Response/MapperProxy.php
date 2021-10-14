@@ -26,13 +26,16 @@ use Schoolbox\Mapper\AbstractMapperProxy;
 class MapperProxy extends AbstractMapperProxy
 {
     /**
-     * I guess this is the internal
+     * This mapper proxy converts searches on `assessment_id` to
+     * `lti_assessment.id`, and converts the searched `assessment_id` values to
+     * the matching values of `lti_assessment.id`.
+     *
+     * TODO figure out if the mapper proxy can search on `lti_assessment.id`
+     *      without translation
      */
+    private const SELECT_STRING   = 'SELECT id FROM lti_assessment';
     private const EXTERNAL_COLUMN = 'assessment_id';
-
     private const INTERNAL_COLUMN = 'lti_assessment_id';
-
-    private const SELECT_STRING = 'SELECT id FROM lti_assessment';
 
     /**
      * Constructor

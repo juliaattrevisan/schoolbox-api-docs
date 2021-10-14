@@ -64,6 +64,13 @@ abstract class AbstractMapperProxy
     /**
      * Proxy for `$this->mapper->findByColumnList()`.
      *
+     * If `$columnList` contain `$this->getExternalColumnName()`:
+     * * its values will be translated to internal IDs, using a query:
+     *   * `$this->getSelectString()` as the SELECT statement which retrieves
+     *     internal IDs
+     *   * `$this->getExternalColumnName()` as the WHERE part of the statement
+     * * the actual mapper call will search on `$this->getInternalColumnName()`
+     *
      * @param array $columnList
      * @param array $options
      * @return GenericCollection
