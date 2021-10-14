@@ -87,7 +87,9 @@ class RepositoryFactory
             $tool = new Tool(
                 $toolModel->getName(),
                 $toolModel->getName(),
-                $toolModel->getAudience(),
+                // Tool audience is only required when acting as the tool,
+                // and Schoolbox is acting as the platform
+                '',
                 $toolModel->getOidcInitiationUrl(),
                 $toolModel->getLaunchUrl(),
                 $toolModel->getDeepLinkingUrl()
