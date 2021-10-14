@@ -100,8 +100,8 @@ class Controller extends Base
         // Figure out who's trying to log in: use that to determine their role
         // TODO make this dependent on the context the request is happening within, or pass via query string
         $role = $this->getUser()->getRole()->isStaff()
-            ? RoleInterface::NAMESPACE_CONTEXT . 'Instructor'
-            : RoleInterface::NAMESPACE_CONTEXT . 'Learner'
+            ? RoleInterface::NAMESPACE_CONTEXT . '#Instructor'
+            : RoleInterface::NAMESPACE_CONTEXT . '#Learner'
         ;
 
         // Claim about the platform instance
