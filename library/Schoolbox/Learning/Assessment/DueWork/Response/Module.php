@@ -434,7 +434,7 @@ class Module extends BaseModule
             // Feedback doesn't have response when given from status page
             if (
                 ($feedback->getResponse() === null && $feedback->isPublished())
-                || ($feedback->getResponse()->getID() === $response->getId())
+                || ($feedback->getResponse() && ($feedback->getResponse()->getID() === $response->getId()))
             ) {
                 $response->getAllFeedback()->add($feedback);
             }
