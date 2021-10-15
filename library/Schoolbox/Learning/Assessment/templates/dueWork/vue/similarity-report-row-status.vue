@@ -30,7 +30,12 @@ export default {
 
 <template>
   <div>
-    Status
+    <div class="small-12 medium-6 columns">
+      <span>{{ data.submission.status }}</span>
+    </div>
+    <div class="small-12 medium-6 columns">
+      <a :href="data.submission._links.inline_grader">Review in Inline Grader</a>
+    </div>
   </div>
 </template>
 

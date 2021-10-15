@@ -20,18 +20,17 @@ export default {
 <template>
   <div class="student">
     <div class="student__portrait">
-      <img :src="`/portrait.php?id=${data.user.id}&size=square64`" :alt="`profile photo of ${data.user.fullname}`" class="portrait">
+      <img :src="`/portrait.php?id=${data.user.id}&size=square32`" :alt="`profile photo of ${data.user.fullname}`" class="portrait">
     </div>
-    <div>
+    <div class="student__name">
       <template v-if="data.user.id">
         <a :href="`/search/user/${data.user.id}`" title="View profile" class="name">
-          {{ data.user.lastname + ', ' + data.user.firstname }}
+          <h3>{{ data.user.lastname + ', ' + data.user.firstname }}</h3>
         </a>
       </template>
       <template v-else>
-        <span class="name">{{ data.user.lastname + ', ' + data.user.firstname }}</span>
+        <h3>{{ data.user.lastname + ', ' + data.user.firstname }}</h3>
       </template> 
-      <p v-if="data.user.role" class="meta">{{ data.user.role }}</p>
     </div>
   </div>
 </template>
@@ -43,8 +42,14 @@ export default {
 }
 
   .student__portrait {
-    flex-basis: 0 0 64px;
+    flex-basis: 0 0 32px; //32px is the size of the image, so only need occupy this space
     margin-right: 1rem;
+  }
+
+  .student__name {
+    h3 {
+      margin-bottom: 0rem; //prevent any extra space at the bottom of rows
+    }
   }
 
 </style>

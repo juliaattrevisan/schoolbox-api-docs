@@ -17,10 +17,14 @@ export default {
   methods: {
 
     /**
-     * round it up and add percent
+     * Display the file name with the similairty score added
+     * 
+     * @param { Object }
+     * 
+     * @returns { String }
      */
-    getFormattedPercentage (percentage) {
-      return Math.round(percentage) + '%';
+    getFileTitle (file) {
+      return `${Math.round(file.turnitin.percentage)}% - ${file.name}.${file.ext}`;
     }
 
   },
@@ -30,8 +34,11 @@ export default {
 
 <template>
   <ul class="list">
-    <li v-for="file in data.files" :key="file.id">{{ getFormattedPercentage(file.turnitin.percentage) }}</li>
-    <!-- <li v-for="file in data.files" :key="file.id">{{ file.name }}</li> -->
+    <li v-for="file in data.files" :key="file.id">
+      <a :href="file._links.turnitin_report" title="View similarity report">
+        {{ getFileTitle(file) }}
+      </a>
+    </li>
   </ul>
 </template>
 
