@@ -14,6 +14,8 @@
      - writable:         bool   Whether current user has WRITE+ perm to the assessment's folder
 
 #}
+{% import '@learning/macro/urgency.twig' as urgency %}
+
 {% extends '@learningAssessment/status.twig' %}
 
 {% set labelIncomplete = 'Incomplete' %}
@@ -48,12 +50,12 @@
                 cardSize:    "small-11"
             } only %}
 
-            <div class="small-1">
-                {% include '@learningAssessment/fragments/progressTick.twig' with {
-                    assessment: participant.assessable,
-                    student:    participant.user,
-                } only %}
-            </div>
+            {% if (latestFeedback.humanReadableMark ?? null) is not null %}
+                {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
+                <div class="grade {{ urgencyClass }}-bg">
+                    <span>{{ latestFeedback.humanReadableMark ?? ''}}</span>
+                </div>
+            {% endif %}
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">
             <ul data-responses class="information-list">
