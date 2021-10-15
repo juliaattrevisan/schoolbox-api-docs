@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -116,6 +117,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Helper
+     */
+    private Helper $helper;
+
+
+    /**
      * Used for api calls
      *
      * @var string
@@ -129,6 +136,12 @@ class Profile implements IStrategy
      * @var string
      */
     private string $uBound;
+
+
+    /**
+     * @var array
+     */
+    private array $campusLookup;
 
 
     /**
@@ -163,12 +176,20 @@ class Profile implements IStrategy
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
 
+        /* Helper class
+         */
+        $this->helper = new Helper($this->api);
+
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
          * as well remember that
          */
         $this->lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
         $this->uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
+
+        /* Campus lookup
+         */
+        $this->campusLookup = [];
     }
 
 
@@ -183,6 +204,11 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
+        $this->log->info('Preloading campus lookup...');
+
+        $this->campusLookup = (new Lookup\Campus($this->api, $this->helper->getOrganisationIdentifier()))
+            ->generate();
+
         /* Import students' profile data
          * Import their specific parents' profile data
          */
@@ -471,7 +497,7 @@ class Profile implements IStrategy
          * Commonality:                 wyndhamchristiancollege-integration
          */
         foreach ($importIdentifiers as $importIdentifier) {
-            if ($this->matchesHost($importIdentifier['school'])) {
+            if ($this->helper->matchesHost($importIdentifier['school'])) {
                 return $importIdentifier['importIdentifier'];
             }
         }
@@ -514,11 +540,15 @@ class Profile implements IStrategy
      */
     private function findCampusName(array $organisationMilestones): ?string
     {
-        /* TODO homeCampus is just a guid - I don't know where the lookup is located
-         *  so for now, just provide the first active guid corresponding to the current host
-         *  (UPS can assign arbitrarily based on this guid)
+        $campusId = $this->findOrganisationMilestoneField($organisationMilestones, 'homeCampus');
+
+        /* If it exists in the lookup, use its name
          */
-        return $this->findOrganisationMilestoneField($organisationMilestones, 'homeCampus');
+        if (isset($this->campusLookup[$campusId])) {
+            return $this->campusLookup[$campusId]['name'];
+        }
+
+        return '';
     }
 
 
@@ -596,21 +626,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Decide if $organisation matches the endpoint host in suds
-     * This is how we identify records shared across multiple schools
-     *
-     * @param string $organisationName
-     * @return bool
-     */
-    private function matchesHost(string $organisationName): bool
-    {
-        $school = explode('.', $organisationName)[0];
-
-        return strpos($this->api->getHost(), $school) > -1;
-    }
-
-
-    /**
      * Decide if one of the records in studentDetails, parentDetails
      * or staffDetails is Active based on its status field and also
      * if it corresponds to the current host
@@ -620,7 +635,7 @@ class Profile implements IStrategy
      */
     private function isActiveDetailsField(array $detail): bool
     {
-        return $this->matchesHost($detail['organisationName']) && self::ACTIVE === $detail['status'];
+        return $this->helper->matchesHost($detail['organisationName']) && self::ACTIVE === $detail['status'];
     }
 
 
@@ -762,7 +777,7 @@ class Profile implements IStrategy
     private function findOrganisationMilestoneField(array $organisationMilestones, string $field): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
-            if ($this->matchesHost($organisationMilestone['organisationName'])) {
+            if ($this->helper->matchesHost($organisationMilestone['organisationName'])) {
                 if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
                     if ('' !== trim((string)$organisationMilestone[$field])) {
                         return $organisationMilestone[$field];
@@ -961,6 +976,7 @@ class Profile implements IStrategy
 
         foreach ($staffs['d'] as $staff) {
             $externalId = $this->findExternalId($staff['importIdentifiers']);
+            $campusName = $this->findCampusName($staff['organisationMilestones']);
 
             /* Prioritise preferred names over official names
              */
@@ -979,7 +995,6 @@ class Profile implements IStrategy
             /* Haven't encountered data this specific
              */
             $building = '';
-            $campusName = '';
 
             /* I guess I just assume this department for now
              * Use it to indicate teaching/non teaching staff, I suppose

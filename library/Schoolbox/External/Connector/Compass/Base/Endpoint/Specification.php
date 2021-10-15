@@ -42,13 +42,30 @@ class Specification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
+     * @throws \InvalidArgumentException
      */
     public function check(): array
     {
         $lBound = \Alaress_Date_Format::now()->getUsingFormat('c');
         $uBound = \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c');
 
+        $helper = new Helper($this->api);
+
         $paths = [
+
+            /**
+             * Shared nodes
+             */
+            [
+                'endpoint' => 'reference/v1/GetOrganisations',
+                'params' => []
+            ],
+            [
+                'endpoint' => 'reference/v1/GetCampuses',
+                'params' => [
+                    'organisationId' => $helper->getOrganisationIdentifier()
+                ]
+            ],
 
             /**
              * Student Profile nodes
@@ -60,7 +77,6 @@ class Specification
                     'uBound' => $uBound
                 ]
             ],
-
 
             /**
              * Parent Profile nodes
