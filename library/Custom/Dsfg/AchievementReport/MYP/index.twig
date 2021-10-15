@@ -9,10 +9,16 @@
     elements: navigation
 } %}
 {% for classCode, subjectData in subjects %}
-    {% set colspan = (headings[classCode].shortHeadings | length) + 1 %}
+    <div class="row achievement-report">
+        <div class="small-12 island">
+            <section class="type-blue content"><strong>{{ headings[classCode].subjectName }}</strong></section>
+        </div>
+    </div>
     <div class="row">
         <div class="small-12 island">
-            <strong>{{ headings[classCode].subjectName }}</strong>
+            <section class="content">
+                <p>{{ subjectData.overview }}</p>
+            </section>
         </div>
     </div>
     <div class="row">
@@ -21,7 +27,7 @@
                 <table>
                     <thead>
                     <tr>
-                        <th>Course topics</th>
+                        <th></th>
                         {% for shortHeading in headings[classCode].shortHeadings %}
                             <th class="centered">{{ shortHeading }}</th>
                         {% endfor %}
@@ -36,60 +42,20 @@
                             {% endfor %}
                         </tr>
                     {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <table>
-                    <thead>
                     <tr>
-                        <td colspan="{{ colspan }}">
-                            Mid Year
-                            <p>{{ subjectData.overview }}</p>
-                        </td>
+                        <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}"
+                            style="border-width:10px;line-height:0;padding:0;"></td>
                     </tr>
-                    <tr>
-                        <th></th>
-                        {% for shortHeading in headings[classCode].shortHeadings %}
-                            <th class="centered">{{ shortHeading }}</th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
-                    <tbody>
                     <tr>
                         <th>Interim Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
                             <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
                         {% endfor %}
                     </tr>
-                    </tbody>
-                </table>
-            </section>
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <table>
-                    <thead>
                     <tr>
-                        <td colspan="{{ colspan }}">
-                            End of Year
-                            <p>{{ subjectData.comment }}</p>
-                        </td>
+                        <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}"
+                            style="border-width:10px;line-height:0;padding:0;"></td>
                     </tr>
-                    <tr>
-                        <th></th>
-                        {% for shortHeading in headings[classCode].shortHeadings %}
-                            <th class="centered">{{ shortHeading }}</th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
-                    <tbody>
                     <tr>
                         <th>Final Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
@@ -98,6 +64,13 @@
                     </tr>
                     </tbody>
                 </table>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>{{ subjectData.comment }}</p>
             </section>
         </div>
     </div>
