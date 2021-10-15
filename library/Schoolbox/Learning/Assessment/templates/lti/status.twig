@@ -22,7 +22,7 @@
 {% set labelPending    = 'Self-Assessed' %}
 {% set labelReviewed   = 'Teacher-Assessed' %}
 
-{% set listClass = 'expandable-card' %}
+{#{% set listClass = 'expandable-card' %}#}
 
 {% block participant %}
     {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
@@ -37,11 +37,11 @@
     {% set pStatusText  = pTooltip %}
 
     <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
-        <div>
-            <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}"
-                 data-collapser="user-completions-{{ participant.user.id }}"
-                 {% if not participant.allResponses | length %}style="opacity:0;height:0;cursor:default"{% endif %}
-            ></div>
+        <div class="flex-grade">
+{#            <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}"#}
+{#                 data-collapser="user-completions-{{ participant.user.id }}"#}
+{#                 {% if not participant.allResponses | length %}style="opacity:0;height:0;cursor:default"{% endif %}#}
+{#            ></div>#}
             {% include '@learningAssessment/fragments/lti/participantStatus.twig' with {
                 participant: participant,
                 statusClass: pStatusClass,
@@ -57,20 +57,13 @@
                 </div>
             {% endif %}
         </div>
-        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">
-            <ul data-responses class="information-list">
-                {% for response in participant.allResponses %}
-                    <li>{{ response.submittedAt.local }} - {{ response.submittedBy.fullName }} attempted</li>
-                {% endfor %}
-            </ul>
-        </div>
     </li>
 {% endblock %}
 
-{% block scripts %}
-    <script type="text/javascript">
-        $(function () {
-            $('[data-collapser]').collapsable();
-        });
-    </script>
-{% endblock %}
+{#{% block scripts %}#}
+{#    <script type="text/javascript">#}
+{#        $(function () {#}
+{#            $('[data-collapser]').collapsable();#}
+{#        });#}
+{#    </script>#}
+{#{% endblock %}#}
