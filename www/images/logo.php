@@ -33,7 +33,7 @@ $kernel->getShutdownHandler()->registerFunction(
 
 $logoSizes = [
     'skin_logo_square' => [
-        'normal'   => [80, 80, '/core/m-hercules.png'],
+        'normal'   => [72, 72, '/core/m-hercules.png'],
         'hidpi'    => [160, 160, '/core/m-hercules.png'],
         'favicon'  => [64, 64, '/core/m-hercules.png'],
         'tile70'   => [70, 70, '/core/m-hercules.png'],
