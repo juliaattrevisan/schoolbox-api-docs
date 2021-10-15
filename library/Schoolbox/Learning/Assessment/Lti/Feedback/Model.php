@@ -73,6 +73,7 @@ class Model extends AbstractFeedback
      */
     public function getNormalisedMark()
     {
+        // TODO set this value instead
         if ($this->scoreGiven === null) {
             return null;
         }
@@ -94,6 +95,6 @@ class Model extends AbstractFeedback
         // TODO figure out where mark scheme comes from
 //        $markScheme = $this->getAssessable()->getMarkScheme();
         $markScheme = new TotalMarkFractional($this->scoreMaximum);
-        return $markScheme->getHumanReadableMark($this->normalisedMark);
+        return $markScheme->getHumanReadableMark($this->getNormalisedMark());
     }
 }
