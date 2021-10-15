@@ -35,6 +35,25 @@ class Api implements IApi
 
 
     /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes sentral endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     *
+     * Actual example is curl error 35, something to do with certs
+     */
+    private const NAP_TIMEOUT = 3;
+
+
+    /**
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
+     */
+    private const NUM_RETRY = 3;
+
+
+    /**
      * Request timeout
      */
     private const DEFAULT_TIMEOUT = 300;
@@ -45,19 +64,19 @@ class Api implements IApi
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
      * @var Client
      */
-    private $client;
+    private Client $client;
 
 
     /**
      * @var ApiUsage
      */
-    private $apiUsage;
+    private ApiUsage $apiUsage;
 
 
     /**
@@ -117,9 +136,15 @@ class Api implements IApi
      * @param string $endpoint
      * @return array
      * @throws InvalidArgumentException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function retrieveDocument(string $endpoint): array
     {
+
+        /* Mine out an error message if you try to access a thing that doesn't exist
+         */
+        $lastGuzzleError = '';
+        $fails = 0;
 
         /* Urls come in mixed formats; some have a version number,
          * some have a host in front of it. Accessing endpoints in a
@@ -135,45 +160,69 @@ class Api implements IApi
          */
         $this->apiUsage->record($endpointFiltered);
 
-        $response = $this->client->request('GET', $endpointFiltered);
-
-        try {
-            $decoded = json_decode($response->getBody()->getContents(), true);
-        } catch (\RuntimeException $e) {
-            throw new InvalidArgumentException(sprintf(
-                'Sentral Endpoint error: could not json_decode payload for endpoint %s; did something snap?',
-                $endpoint
-            ));
-        }
-
-        /* When you can't decode the json, sentral's given you something unexpected
-         * like an error string, or lost in transmission, etc.
+        /* Try multiple times in case sentral dies for a random reason
          */
-        if ($decoded === null) {
-            throw new InvalidArgumentException(sprintf(
-                'Sentral Endpoint error: could not json_decode payload for endpoint %s - it is null; did something snap?',
-                $endpoint
-            ));
-        }
+        while ($fails < self::NUM_RETRY) {
+            try {
+                $response = $this->client->request('GET', $endpointFiltered);
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                $fails++;
 
-        /* Check for error payload instead of data payload
-         */
-        if (array_key_exists('errors', $decoded)) {
-            /* Error Handling - sometimes their messages are unhelpful, but at least they return
-             * it in a synonymous data structure. There might be multiple errors (I haven't seen how)
-             * so we'll just return the first one in the list for starters
-             *
-             * Anyway, errors might get thrown if your host, tenant or key is incorrect
-             *   - The host should end with a trailing slash
+                $lastGuzzleError = $e->getMessage();
+
+                sleep(self::NAP_TIMEOUT);
+
+                continue;
+            }
+
+            try {
+                $decoded = json_decode($response->getBody()->getContents(), true);
+            } catch (\RuntimeException $e) {
+                throw new InvalidArgumentException(sprintf(
+                    'Sentral Endpoint error: could not json_decode payload for endpoint %s; did something snap?',
+                    $endpoint
+                ));
+            }
+
+            /* When you can't decode the json, sentral's given you something unexpected
+             * like an error string, or lost in transmission, etc.
              */
-            throw new InvalidArgumentException(sprintf(
-                'Sentral Endpoint error at endpoint %s: %s',
-                $endpoint,
-                "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
-            ));
+            if ($decoded === null) {
+                throw new InvalidArgumentException(sprintf(
+                    'Sentral Endpoint error: could not json_decode payload for endpoint %s - it is null; did something snap?',
+                    $endpoint
+                ));
+            }
+
+            /* Check for error payload instead of data payload
+             */
+            if (array_key_exists('errors', $decoded)) {
+                /* Error Handling - sometimes their messages are unhelpful, but at least they return
+                 * it in a synonymous data structure. There might be multiple errors (I haven't seen how)
+                 * so we'll just return the first one in the list for starters
+                 *
+                 * Anyway, errors might get thrown if your host, tenant or key is incorrect
+                 *   - The host should end with a trailing slash
+                 */
+                throw new InvalidArgumentException(sprintf(
+                    'Sentral Endpoint error at endpoint %s: %s',
+                    $endpoint,
+                    "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
+                ));
+            }
+
+            return $decoded;
         }
 
-        return $decoded;
+        /* We got here because we never returned $decoded
+         * We got here because $fails exceeded a number of retries
+         */
+        throw new InvalidArgumentException(sprintf(
+            'Sentral Endpoint error at endpoint %s: could not establish connection to server after %s retries. %s',
+            $endpoint,
+            self::NUM_RETRY,
+            $lastGuzzleError
+        ));
     }
 
 
