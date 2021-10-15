@@ -118,7 +118,7 @@ class MapperProxy extends AbstractMapperProxy
     }
 
     /**
-     * Transform  domain objects into mapper models.
+     * Transform domain objects into mapper models.
      *
      * @param Collection|DomainObject[] $domainObjects
      * @return GenericCollection|DataObject[]
