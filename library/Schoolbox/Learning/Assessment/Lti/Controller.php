@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Lti;
 
+use Alaress_Date_Format;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
@@ -129,7 +130,7 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * Placeholder for a summary of a student's progress on an LTI assessment.
+     * Display a summary of a student's progress on an LTI assessment.
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @since 21.1.0
@@ -149,11 +150,11 @@ class Controller extends Assessment\Controller
             return;
         }
 
-//        $isAttemptable = false;
-//        $participant   = $assessment->getParticipantIfExtant($student);
-//        if ($student->getId() === $this->getUser()->getId()) {
-//            $isAttemptable = $assessment->isOpen($student, Alaress_Date_Format::now());
-//        }
+        // Assume that a student may only attempt LTI assessments for themselves
+        $canAttempt = false;
+        if ($student->getId() === $this->getUser()->getId()) {
+            $canAttempt = $assessment->isOpen($student, Alaress_Date_Format::now());
+        }
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/summary.twig',
@@ -164,6 +165,7 @@ class Controller extends Assessment\Controller
                     'participant' => $assessment->getParticipantIfExtant($student),
                     'student'     => $student,
                     'returnUrl'   => $this->request->query->get(Assessment\Redirect::RETURN_URL),
+                    'canAttempt'  => $canAttempt,
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
