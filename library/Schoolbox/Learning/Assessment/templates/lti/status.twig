@@ -42,12 +42,12 @@
                  data-collapser="user-completions-{{ participant.user.id }}"
                  {% if not participant.allResponses | length %}style="opacity:0;height:0;cursor:default"{% endif %}
             ></div>
-            {% include '@learningAssessment/fragments/participantStatus.twig' with {
+            {% include '@learningAssessment/fragments/lti/participantStatus.twig' with {
                 participant: participant,
                 statusClass: pStatusClass,
                 statusText:  pStatusText,
                 statusTip:   pTooltip,
-                cardSize:    "small-11"
+                routeArgs:   routeArgs,
             } only %}
 
             {% if (latestFeedback.humanReadableMark ?? null) is not null %}

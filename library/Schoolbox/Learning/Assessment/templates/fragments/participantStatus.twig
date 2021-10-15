@@ -17,9 +17,11 @@
         <h3>{{ participant.user.fullName }}</h3>
     {% endif %}
     <p class="meta">
-        {% include '@learningAssessment/fragments/statusLine.twig' with {
-            assessable: participant.assessable,
-            student:    participant.user
-        } only %}
+        {% block statusLine %}
+            {% include '@learningAssessment/fragments/statusLine.twig' with {
+                assessable: participant.assessable,
+                student:    participant.user
+            } only %}
+        {% endblock statusLine %}
     </p>
 </div>
