@@ -104,6 +104,8 @@ class MapperProxy extends AbstractMapperProxy
                 // TODO should submittedBy be nullable?
                 ->setReviewer($model->getMarkingUser() ?? $model->getStudent())
                 ->setReviewee($model->getStudent())
+                ->setScoreGiven($model->getScoreGiven())
+                ->setScoreMaximum($model->getScoreMaximum())
                 ->setPublishedAt($model->getSubmittedAt())
                 ->setCreatedAt($model->getCreatedAt())
                 ->setUpdatedAt($model->getUpdatedAt())
@@ -131,6 +133,8 @@ class MapperProxy extends AbstractMapperProxy
                 )
                 ->setMarkingUser($domainObject->getReviewer())
                 ->setStudent($domainObject->getReviewee())
+                ->setScoreGiven($domainObject->getScoreGiven())
+                ->setScoreMaximum($domainObject->getScoreMaximum())
                 ->setSubmittedAt($domainObject->getPublishedAt())
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setUpdatedAt($domainObject->getCreatedAt())
