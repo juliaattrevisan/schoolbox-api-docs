@@ -32,12 +32,13 @@ $data = {
                 <div class="card small-12">
                     <img {% if not attachment.isImage %}class="mime"{% endif %} alt="{{ attachment.name }}" src="{{ attachment.preview }}" />
                     <p class="filename" data-dz-name>
-                        <a href="/storage/fetch.php?save=1&hash={{ attachment.hash|split(':')[1] }}">{{ attachment.name }}</a>
+                        <a href="/storage/fetch.php?save=1&hash={{ attachment.hash|split(':')[1] }}" data-plugin="preview">{{ attachment.name }}</a>
                     </p>
                 </div>
             </div>
             {% if not attachzone.readonly %}
             <nav>
+                <a href="/storage/fetch.php?hash={{ attachment.hash|split(':')[1] }}&save=1" class="icon-download" title="Download"></a>
                 <a href="#" data-dz-remove title="Remove" class="icon-delete"></a>
                 <input type="hidden" name="{{ attachzone.fileVar }}" value="{{ attachment.hash }}" data-az-attachment />
             </nav>
@@ -45,6 +46,11 @@ $data = {
         </li>
         {% endfor %}
     </ul>
+    <script type="text/javascript">
+        $(function () {
+            $('[data-plugin="preview"]').preview();
+        });
+    </script>
     {% if not attachzone.readonly %}
     <div class="dzone {% if attachzone.mode == 'button' %}button" title="{{ attachzone.prompt | capitalize }}{% endif %}" id="{{ attachzone.camelId }}Zone">
         <ul data-template class="hide">
