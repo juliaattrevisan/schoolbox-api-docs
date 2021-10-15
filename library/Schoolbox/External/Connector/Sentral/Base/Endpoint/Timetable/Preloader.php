@@ -234,8 +234,25 @@ class Preloader
                     try {
                         $teacherPayload = $this->api->retrieveDocument($endpoint);
 
+                        /* The teacher's staffCode isn't found in this payload; it's found one call deeper
+                         * Only dig further if we haven't dug this far before
+                         */
+                        $this->log->debug(sprintf(
+                            'Digging for teacher external ids via endpoints %s and %s',
+                            $endpoint,
+                            $teacherPayload['data']['links']['staff']
+                        ));
+
+                        $teacherExternalPayload = $this->api->retrieveDocument($teacherPayload['data']['links']['staff']);
+
+                        /* Note:
+                         * staffCode contains a value like "BING" for a teacher
+                         * timetableCode also contains this value; not sure if they could/would be different
+                         */
+                        $teacherExternalId = $teacherExternalPayload['data']['attributes']['staffCode'];
+
                         $teacher = [
-                            'externalId' => $teacherPayload['data']['attributes']['externalId'],
+                            'externalId' => $teacherExternalId,
                             'firstname' => $teacherPayload['data']['attributes']['firstName'],
                             'surname' => $teacherPayload['data']['attributes']['lastName'],
                             'id' => $timetableLesson['attributes']['teacherIds'][0],
