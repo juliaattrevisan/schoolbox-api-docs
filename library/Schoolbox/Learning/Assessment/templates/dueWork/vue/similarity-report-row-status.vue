@@ -17,10 +17,19 @@ export default {
   methods: {
 
     /**
-     * round it up and add percent
+     * 
+     * 
+     * @param { String }
+     * 
+     * @return { String }
      */
-    getFormattedPercentage (percentage) {
-      return Math.round(percentage) + '%';
+    getFormattedStatus (status) {
+      const statusOptions = {
+        'pending': '<span class="submitted label">Marking Required</span>',
+        'failed': '<span class="unsubmitted label">Resubmission Required</span>',
+        'reviewed': '<span class="reviewed label">Reviewed</span>',
+      }
+      return statusOptions[status];
     }
 
   },
@@ -29,17 +38,23 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div class="small-12 medium-6 columns">
-      <span>{{ data.submission.status }}</span>
+  <div class="status">
+    <div class="status__column" v-html="getFormattedStatus(data.submission.status)">
     </div>
-    <div class="small-12 medium-6 columns">
-      <a :href="data.submission._links.inline_grader">Review in Inline Grader</a>
+    <div class="status__column">
+      <a class="button icon-approve" :href="data.submission._links.inline_grader">Review in Inline Grader</a>
     </div>
   </div>
 </template>
 
 <style lang="scss" style="scoped">
 
+.status {
+  display: flex;
+}
+
+  .status__column { 
+    flex: 1 1 0; //keep both sides equal
+  }
 
 </style>
