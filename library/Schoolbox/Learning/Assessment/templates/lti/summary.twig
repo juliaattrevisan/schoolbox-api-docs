@@ -60,7 +60,7 @@
         <div class="small-12 island">
             <h2 class="subheader">{{ locale.attemptHistory.proper }}</h2>
             <section class="submission-history">
-                <ul class="information-list">
+                <ul class="information-list threaded">
                     {% for currentInteraction in timeline %}
                         <li>
                             <div class="list-item flex-grade">
@@ -94,6 +94,14 @@
                                 {% endif %}
                             </div>
                         </li>
+
+                        {% if currentInteraction.comment %}
+                            <li class="child">
+                                <div class="content">
+                                    {{ currentInteraction.comment | nl2br }}
+                                </div>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </section>
