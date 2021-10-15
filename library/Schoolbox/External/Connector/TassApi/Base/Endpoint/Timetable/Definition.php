@@ -367,6 +367,19 @@ class Definition implements IStrategy
          */
         $students = $this->lookup->getStudents();
 
+        /* Staff
+         * Find all the external ids
+         */
+        $staff = $this->lookup->getStaff();
+
+        /* Remind people this might take a while
+         */
+        $this->log->info(sprintf(
+            'Preloading timetables for %s students and %s staff - this might take a while',
+            \count($students),
+            \count($staff)
+        ));
+
         /* Inspect every student's timetable to find the largest quantity of Periods per Day
          * This will inform schoolbox's classic idea of a Timetable Definition which must be
          * rectangular; every day will have the maximum number of periods in it, even if the
@@ -382,11 +395,6 @@ class Definition implements IStrategy
 
             $this->preloadTimetable((string)$externalId, $person, $data, 'student_timetable');
         }
-
-        /* Staff
-         * Find all the external ids
-         */
-        $staff = $this->lookup->getStaff();
 
         /* Make a naive guess as to what year and semester we are in
          * The getTeacherTimetable endpoint is different to students' version
