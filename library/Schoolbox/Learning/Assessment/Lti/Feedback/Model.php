@@ -73,7 +73,9 @@ class Model extends AbstractFeedback
      */
     public function getNormalisedMark()
     {
-        // TODO set this value instead
+        // TODO set normalized mark in \Schoolbox\Learning\Assessment\Lti\Feedback\MapperProxy::transformDomainObjects
+        //      instead, based on a mark scheme created for the score itself.
+        // See \Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy::transformModels
         if ($this->scoreGiven === null) {
             return null;
         }
@@ -88,12 +90,7 @@ class Model extends AbstractFeedback
      */
     public function getHumanReadableMark()
     {
-//        if ($this->scoreMaximum === null) {
-//            return '';
-//        }
-
         // TODO figure out where mark scheme comes from
-//        $markScheme = $this->getAssessable()->getMarkScheme();
         $markScheme = new TotalMarkFractional($this->scoreMaximum);
         return $markScheme->getHumanReadableMark($this->getNormalisedMark());
     }

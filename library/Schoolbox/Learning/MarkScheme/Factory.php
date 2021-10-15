@@ -127,8 +127,7 @@ class Factory
         }
 
         if ($assessable instanceof LtiAssessment) {
-            // TODO replace with a proper mark scheme
-            return new None();
+            return $this->spawnForLtiAssessment($assessable);
         }
 
         if ($assessable instanceof Project) {
@@ -195,6 +194,18 @@ class Factory
         }
     }
 
+    /**
+     * Spawn a mark scheme for an LTI assessment.
+     *
+     * @param LtiAssessment $ltiAssessment
+     * @return IMarkScheme
+     * @throws RangeException
+     * @throws DomainException
+     */
+    protected function spawnForLtiAssessment(LtiAssessment $ltiAssessment)
+    {
+        return new TotalMarkFractional();
+    }
 
     /**
      * Capabilities have their own markscheme. Currently, the type of mark scheme is inferred from the due work they are used on.
