@@ -138,12 +138,32 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+        // Check SEB requirement
+        $sebDownload = $this->getRouteIfAuthorized(
+            'learningAssessment.getSebDownload',
+            ['assessment' => $assessment,
+             'assessmentId' => $assessment->getId()]
+        );
+        if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
+            $this->getResponse()->redirect->to($sebDownload);
+            return;
+        }
+
+//        $isAttemptable = false;
+//        $participant   = $assessment->getParticipantIfExtant($student);
+//        if ($student->getId() === $this->getUser()->getId()) {
+//            $isAttemptable = $assessment->isOpen($student, Alaress_Date_Format::now());
+//        }
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/summary.twig',
                 [
-                    'assessment' => $assessment,
-                    'student'    => $student,
+                    'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                                  ->add([ $assessment->getTitle(), '' ]),
+                    'assessment'  => $assessment,
+                    'participant' => $assessment->getParticipantIfExtant($student),
+                    'student'     => $student,
+                    'returnUrl'   => $this->request->query->get(Assessment\Redirect::RETURN_URL),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
