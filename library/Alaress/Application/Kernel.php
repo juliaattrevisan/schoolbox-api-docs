@@ -77,8 +77,10 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbac
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourceDueWork;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\Lti as FeedbackSubSourceLti;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
+use Schoolbox\Learning\Assessment\Lti\Feedback\MapperProxy as LtiFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Lti\Response\MapperProxy as LtiResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
@@ -1224,6 +1226,13 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(LtiScoreMapper::class)]
             )
         );
+        $di->set(
+            'ltiFeedbackDataSource',
+            $di->lazyNew(
+                LtiFeedbackMapperProxy::class,
+                ['mapper' => $mapperFactory->getLazy(LtiScoreMapper::class)]
+            )
+        );
 
 
         // Register response data source
@@ -1268,10 +1277,14 @@ abstract class Kernel
                     /** @var QuizFeedbackMapperProxy $reviewDataSource */
                     $reviewDataSource = $di->get('reviewDataSource');
 
+                    /** @var LtiFeedbackMapperProxy $ltiFeedbackDataSource */
+                    $ltiFeedbackDataSource = $di->get('ltiFeedbackDataSource');
+
                     return (new AssessmentFeedbackDataSource())
                         ->addSubSource(new FeedbackSubSourceDueWork($returnDataSource))
                         ->addSubSource(new FeedbackSubSourceTask($ratificationDataSource))
-                        ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource));
+                        ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource))
+                        ->addSubSource(new FeedbackSubSourceLti($ltiFeedbackDataSource));
                 }
             )
         );
