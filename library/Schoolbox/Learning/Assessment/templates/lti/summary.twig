@@ -52,3 +52,60 @@
         </div>
     </div>
 {% endif %}
+
+{# Output history here #}
+{% if timeline | length %}
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">{{ locale.attemptHistory.proper }}</h2>
+            <section class="submission-history">
+                <ul class="information-list">
+                    {% for currentInteraction in timeline %}
+                        <li>
+                            <div class="list-item flex-grade">
+                                <div class="card small-12 compact">
+                                    {% if currentInteraction is response %}
+                                        {% set interactionUser = currentInteraction.submittedBy %}
+                                    {% elseif currentInteraction is feedback %}
+                                        {% set interactionUser = currentInteraction.reviewer %}
+                                    {% endif %}
+                                    <a href="/search/user/{{ interactionUser.id }}">
+                                        {% include 'include/portrait.twig' with {user: interactionUser, description: interactionUser.fullName} only %}
+                                        {% if currentInteraction is response %}
+                                            <span>Attempted by {{ interactionUser.fullname }}</span>
+                                            <span class="pipe meta">{{ currentInteraction.submittedAt.short }}</span>
+                                        {% elseif currentInteraction is feedback %}
+                                            {% if interactionUser.id == student.id %}
+                                                <span>Self-reviewed</span>
+                                            {% else %}
+                                                <span>Reviewed by {{ interactionUser.fullname }}</span>
+                                            {% endif %}
+                                            <span class="pipe meta">{{ currentInteraction.publishedAt.short }}</span>
+                                        {% endif %}
+                                    </a>
+                                </div>
+
+                                {% if currentInteraction is feedback and (currentInteraction.humanReadableMark ?? null) is not null %}
+                                    {% set urgencyClass = currentInteraction ? urgency.marks(currentInteraction.normalisedMark) : '' %}
+                                    <div class="grade {{ urgencyClass }}-bg">
+                                        <span>{{ currentInteraction.humanReadableMark ?? ''}}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            <div class="toast" data-alert></div>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-lti"></i>
+                <p>There has not been any activity on this {{ locale.assessment }} yet.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}

@@ -142,12 +142,21 @@ class Controller extends Assessment\Controller
         // Check SEB requirement
         $sebDownload = $this->getRouteIfAuthorized(
             'learningAssessment.getSebDownload',
-            ['assessment' => $assessment,
-             'assessmentId' => $assessment->getId()]
+            [
+                'assessment'   => $assessment,
+                'assessmentId' => $assessment->getId(),
+            ]
         );
         if ($sebDownload && !$this->isSebCheckPasses($assessment)) {
-            $this->getResponse()->redirect->to($sebDownload);
+            $this->response->redirect->to($sebDownload);
             return;
+        }
+
+
+        $participant = $assessment->getParticipantIfExtant($student);
+        $timeline    = null;
+        if ($participant) {
+            $timeline = (new Assessment\Timeline\Generic($participant))->getForUser($this->getUser());
         }
 
         // Assume that a student may only attempt LTI assessments for themselves
@@ -155,15 +164,16 @@ class Controller extends Assessment\Controller
         if ($student->getId() === $this->getUser()->getId()) {
             $canAttempt = $assessment->isOpen($student, Alaress_Date_Format::now());
         }
-        $this->getResponse()->content->set(
+        $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/summary.twig',
                 [
                     'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                                                   ->add([ $assessment->getTitle(), '' ]),
                     'assessment'  => $assessment,
-                    'participant' => $assessment->getParticipantIfExtant($student),
+                    'participant' => $participant,
                     'student'     => $student,
+                    'timeline'    => $timeline,
                     'returnUrl'   => $this->request->query->get(Assessment\Redirect::RETURN_URL),
                     'canAttempt'  => $canAttempt,
                 ],
