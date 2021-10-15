@@ -327,7 +327,7 @@ class Module extends BaseModule
      * which the controller needs, but are too heavy to initialize at module
      * init time.
      *
-     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @param Container&ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
