@@ -285,13 +285,13 @@ function update_directories(){
       log "Updating directory ($data_dir): $dir_path"
       if [[ -n $owner ]] && [[ -n $group ]]; then
         debug "Setting file owner and group to $owner:$group"
-        chown -R "$owner":"$group" "$dir_path"
+        find "$dir_path" -not -user "$owner" -or -not -group "$group" -exec chown "$owner":"$group" {} +
       elif [[ -n $owner ]] && [[ -z $group ]]; then
         debug "Setting file owner to $owner"
-        chown -R "$owner" "$dir_path"
+        find "$dir_path" -not -user "$owner" -exec chown "$owner" {} +
       elif [[ -z $owner ]] && [[ -n $group ]]; then
         debug "Setting file group to $group"
-        chgrp -R "$group" "$dir_path"
+        find "$dir_path" -not -group "$group" -exec chgrp "$group" {} +
       else
         debug "Retaining current owner and group"
       fi
