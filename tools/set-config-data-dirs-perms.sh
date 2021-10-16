@@ -82,19 +82,19 @@ function parse_paths(){
 function parse_cli_args(){
   while [[ $# -gt 0 ]]; do
     case $1 in
-      -$ARG_VERBOSE_SHORT|--$ARG_VERBOSE_LONG)
+      -"$ARG_VERBOSE_SHORT"|--"$ARG_VERBOSE_LONG")
       verbose="1"; shift;
       ;;
-      --$ARG_OWNER)
+      --"$ARG_OWNER")
       owner="$2"; shift; shift;
       ;;
-      --$ARG_GROUP)
+      --"$ARG_GROUP")
       group="$2"; shift; shift;
       ;;
-      --$ARG_DIR)
+      --"$ARG_DIR")
       data_dir_include+=("$2"); shift; shift;
       ;;
-      --$ARG_SKIP_DIR)
+      --"$ARG_SKIP_DIR")
       data_dir_skip+=("$2")
       shift # past argument
       shift # past value
