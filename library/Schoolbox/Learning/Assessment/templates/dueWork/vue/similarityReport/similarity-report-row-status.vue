@@ -17,7 +17,7 @@ export default {
   methods: {
 
     /**
-     * 
+     * Format the submission status
      * 
      * @param { String }
      * 
@@ -41,7 +41,7 @@ export default {
   <div class="status">
     <div class="status__column" v-html="getFormattedStatus(data.submission.status)">
     </div>
-    <div class="status__column">
+    <div class="small-12 medium-6 columns">
       <a class="button icon-approve" :href="data.submission._links.inline_grader">Review in Inline Grader</a>
     </div>
   </div>

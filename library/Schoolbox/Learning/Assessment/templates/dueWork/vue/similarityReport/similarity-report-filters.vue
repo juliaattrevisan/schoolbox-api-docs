@@ -104,5 +104,17 @@ export default {
 
 <style lang="scss" scoped>
 
+.columns { 
+  padding: 2rem 1rem 1rem 1rem; //give it some extra top/bottom padding to sit in the table container
+}
+
+legend { 
+  margin-bottom: 0.5rem; //extra gap between it and the form element
+}
+
+.option-list li {
+  display: inline-block; //rather than block, to line up with similarity score filter better
+  margin-right: 2rem;
+}
 
 </style>

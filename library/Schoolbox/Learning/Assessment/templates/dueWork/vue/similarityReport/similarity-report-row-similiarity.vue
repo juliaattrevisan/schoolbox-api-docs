@@ -37,19 +37,32 @@ export default {
      */
     getFileColour (file) {
       const percentageRounded = Math.round(file.turnitin.percentage);
-      if (percentageRounded < 50) {
+      if (this.isBetween(percentageRounded, 0, 50)) {
         return '#4fa74f';
-      } else if (percentageRounded >= 50 && percentageRounded <= 59) {
+      } else if (this.isBetween(percentageRounded, 50, 59)) {
         return '#7a904d';
-      } else if (percentageRounded >= 60 && percentageRounded <= 69) {
+      } else if (this.isBetween(percentageRounded, 60, 69)) {
         return '#9f7c4b';
-      } else if (percentageRounded >= 70 && percentageRounded <= 79) {
+      } else if (this.isBetween(percentageRounded, 70, 79)) {
         return '#ba6d4a';
-      } else if (percentageRounded >= 80 && percentageRounded <= 89) {  
+      } else if (this.isBetween(percentageRounded, 80, 89)) {  
         return '#da5c49';  
-      } else if (percentageRounded >= 90) {  
+      } else if (this.isBetween(percentageRounded, 90, 100)) {  
         return '#fa4a47';
       }
+    },
+
+    /**
+     * Check if x is between a min and max
+     * 
+     * @param { Number }
+     * @param { Number }
+     * @param { Number }
+     * 
+     * @returns { Boolean }
+     */
+    isBetween (x, min, max) {
+      return x >= min && x <= max;
     },
 
   },
