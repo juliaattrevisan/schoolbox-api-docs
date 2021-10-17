@@ -5,14 +5,14 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Custom\Diocesan\AchievementReport\MYP;
+namespace Custom\Dsfg\AchievementReport\MYP;
 
-use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
+use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
 
 /**
  * Class Base
  *
- * @package Custom\Diocesan\AchievementReport\MYP
+ * @package Custom\Dsfg\AchievementReport\MYP
  */
 class Base extends AchievementReportBase
 {
