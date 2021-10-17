@@ -37,35 +37,21 @@ export default {
       data: [], //hold all student data
       columns: ['student', 'submissionDate', 'similarity',  'status'], //the table columns
       tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-        headings: {
-          student: 'Student',
-          submissionDate: 'Submission date',
-          similarity: 'Similarity %',
-          status: 'Status',
-        },
-        templates: {      
-          student: SimilarityReportRowStudent,
-          submissionDate: SimilarityReportRowSubmissionDate,
-          similarity: SimilarityReportRowSimilarity,
-          status: SimilarityReportRowStatus,
-        },
-        uniqueKey: 'user.id', //the default is id, so need to update
-        perPage: 50, 
-        perPageValues: [50, 100, 200],
-        resizableColumns: false,
-        tabbable: false,
-        filterable: false, 
-        // texts: {
-        //     filterPlaceholder: 'Search for users...',
-        //     noResults: 'No matching users...',
-        //     count: '{from}-{to} of {count}',
-        //     limit: 'Rows per page:'
-        // },
-        orderBy: {
-          ascending: true,
-          column: 'student' //initial sorting display
-        },
-        sortable: ['student', 'submissionDate'], //only student and submission date is sortable
+        customFilters: [
+          {    
+            name: 'HIDE_FAILED',    
+            callback: (row, query) => { 
+              return row.submission.status !== 'failed';    
+            }
+          },
+          {    
+            name: 'SHOW_FAILED',    
+            callback: (row, query) => { 
+              this.$refs.table.setFilter('');
+              return true;    
+            }
+          },
+        ],
         customSorting: {
           student: (ascending) => { //sort student by lastname
             return (a, b) => {
@@ -84,12 +70,41 @@ export default {
             }                     
           }
         },
+        // filterable: false, 
+        headings: {
+          student: 'Student',
+          submissionDate: 'Submission date',
+          similarity: 'Similarity %',
+          status: 'Status',
+        },
+        orderBy: {
+          ascending: true,
+          column: 'student' //initial sorting display
+        },
+        perPage: 50, 
+        perPageValues: [50, 100, 200],
+        resizableColumns: false,
+        sortable: ['student', 'submissionDate'], //only student and submission date is sortable
         sortIcon: {
           is: 'glyphicon-sort',
           base: 'glyphicon',
           up: 'glyphicon-chevron-up',
           down: 'glyphicon-chevron-down'
         },
+        tabbable: false,
+        templates: {      
+          student: SimilarityReportRowStudent,
+          submissionDate: SimilarityReportRowSubmissionDate,
+          similarity: SimilarityReportRowSimilarity,
+          status: SimilarityReportRowStatus,
+        },
+        // texts: {
+        //     filterPlaceholder: 'Search for users...',
+        //     noResults: 'No matching users...',
+        //     count: '{from}-{to} of {count}',
+        //     limit: 'Rows per page:'
+        // },
+        uniqueKey: 'user.id', //the default is id, so need to update
       },
     }
   },

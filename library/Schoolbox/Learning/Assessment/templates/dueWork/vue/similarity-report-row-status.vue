@@ -25,8 +25,8 @@ export default {
      */
     getFormattedStatus (status) {
       const statusOptions = {
-        'pending': '<span class="submitted label">Marking Required</span>',
         'failed': '<span class="unsubmitted label">Resubmission Required</span>',
+        'pending': '<span class="submitted label">Marking Required</span>',
         'reviewed': '<span class="reviewed label">Reviewed</span>',
       }
       return statusOptions[status];
