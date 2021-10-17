@@ -178,7 +178,7 @@ module.exports = {
         badgeReport: './library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js',
         evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js',
         checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
-        similarityReport: './library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport.js',
+        similarityReport: './library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js',
 
         // Textboxes
         textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',

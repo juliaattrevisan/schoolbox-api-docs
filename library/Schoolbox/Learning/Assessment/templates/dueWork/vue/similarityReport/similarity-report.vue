@@ -6,6 +6,7 @@
  */
 
 import SimilarityReportFilters from './similarity-report-filters';
+import FilterEvents from './similarityReportFilterEvents';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
@@ -39,16 +40,21 @@ export default {
       tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
         customFilters: [
           {    
-            name: 'HIDE_FAILED',    
+            name: FilterEvents.RESUBMISSION_REQUIRED,    
             callback: (row, query) => { 
-              return row.submission.status !== 'failed';    
+              return row.submission.status !== query; 
             }
           },
           {    
-            name: 'SHOW_FAILED',    
+            name: FilterEvents.MARKING_REQUIRED,    
             callback: (row, query) => { 
-              this.$refs.table.setFilter('');
-              return true;    
+              return row.submission.status !== query; 
+            }
+          },
+          {    
+            name: FilterEvents.REVIEWED,    
+            callback: (row, query) => { 
+              return row.submission.status !== query; 
             }
           },
         ],

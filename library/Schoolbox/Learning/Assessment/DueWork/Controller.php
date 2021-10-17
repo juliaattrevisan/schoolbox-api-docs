@@ -1618,7 +1618,7 @@ class Controller extends Assessment\Controller
      */
     public function getSimilarityReport(IAssessable $assessment): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/dueWork/michael.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/dueWork/similarityReport.twig', [
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
                 $this->getRouteIfAuthorized('learningAssessment.getStatus', [
