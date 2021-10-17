@@ -40,6 +40,15 @@ export default {
       tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
         customFilters: [
           {    
+            name: FilterEvents.SIMILARITY_SCORE,    
+            callback: (row, filteredPercentage) => { 
+              const hasFilesAboveSimilarity = row.files.some((file) => {
+                return parseInt(file.turnitin.percentage) >= parseInt(filteredPercentage);
+              });
+              return hasFilesAboveSimilarity;
+            }
+          },
+          {    
             name: FilterEvents.RESUBMISSION_REQUIRED,    
             callback: (row, query) => { 
               return row.submission.status !== query; 
@@ -76,7 +85,7 @@ export default {
             }                     
           }
         },
-        // filterable: false, 
+        filterable: false, //this hides the search input field, the custom filters still function as expected
         headings: {
           student: 'Student',
           submissionDate: 'Submission date',
@@ -90,7 +99,7 @@ export default {
         perPage: 50, 
         perPageValues: [50, 100, 200],
         resizableColumns: false,
-        sortable: ['student', 'submissionDate'], //only student and submission date is sortable
+        sortable: ['student', 'submissionDate'], //only student and submission date are sortable
         sortIcon: {
           is: 'glyphicon-sort',
           base: 'glyphicon',
@@ -104,13 +113,12 @@ export default {
           similarity: SimilarityReportRowSimilarity,
           status: SimilarityReportRowStatus,
         },
-        // texts: {
-        //     filterPlaceholder: 'Search for users...',
-        //     noResults: 'No matching users...',
-        //     count: '{from}-{to} of {count}',
-        //     limit: 'Rows per page:'
-        // },
-        uniqueKey: 'user.id', //the default is id, so need to update
+        texts: {
+          noResults: 'No matching students...',
+          count: '{from}-{to} of {count}',
+          limit: 'Rows per page:'
+        },
+        uniqueKey: 'user.id', //the default is 'id', so need to update to point to the user object
       },
     }
   },
@@ -127,7 +135,7 @@ export default {
     },
 
     /**
-     * To show a note showing no students have submitted yet
+     * Can show the table
      * 
      * @returns { Boolean }
      */
@@ -160,7 +168,7 @@ export default {
     },
 
     /**
-     * To update the table to show the UI in the footer
+     * To update the table to show the UI in the footer, the pagination buttons
      */
     onLoaded () {
       this.$nextTick(() => this.footerUI_update());
