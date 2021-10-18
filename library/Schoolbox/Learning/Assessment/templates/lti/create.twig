@@ -67,8 +67,10 @@
         <li class="actions-small-1">
             <div class="list-item">
                 <div class="card wrap-down small-12">
+                    <div class="icon-lti"></div>
                     <h3 id="ltiAssessmentTitleDisplay">{{ assessment.ltiAssessmentTitle ?? '' }}</h3>
-                    <p id="ltiAssessmentTextDisplay">{{ (assessment.ltiAssessmentText ?? '') | nl2br }}</p>
+                    <p class="meta" id="ltiAssessmentUrlDisplay">{{ assessment.ltiAssessmentUrl ?? '' }}</p>
+                    <p id="ltiAssessmentTextDisplay">{{ assessment.ltiAssessmentText ?? '' }}</p>
 
                     {# LTI assessment URL + required hidden fields #}
 {#                    <input readonly#}
@@ -150,6 +152,7 @@
                                 $('#lti-assessment-url').val(url);
                                 $('#lti-assessment-title').val(resourceLink?.title);
                                 $('#lti-assessment-text').val(resourceLink?.text);
+                                $('#ltiAssessmentUrlDisplay').text(resourceLink?.url);
                                 $('#ltiAssessmentTitleDisplay').text(resourceLink?.title);
                                 $('#ltiAssessmentTextDisplay').text(resourceLink?.text);
                                 $('#custom-fields').val(JSON.stringify(resourceLink?.custom ?? {}));
