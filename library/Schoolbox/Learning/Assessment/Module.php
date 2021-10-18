@@ -56,6 +56,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\LTI\Provider\Mapper as LtiToolMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -326,7 +327,7 @@ class Module extends BaseModule
      * which the controller needs, but are too heavy to initialize at module
      * init time.
      *
-     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @param Container&ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
@@ -387,6 +388,10 @@ class Module extends BaseModule
             TaskResponseDataSource::class,
             ['mapper' => $this->getMapperFactory()->getLazy(TaskResponseMapper::class)]
         );
+
+        // LTI assessment specific
+        $lc =& $injector->params[Assessment\Lti\Controller::class];
+        $lc['ltiToolMapper'] = $this->getMapperFactory()->getLazy(LtiToolMapper::class);
     }
 
     /**

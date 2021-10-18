@@ -35,16 +35,228 @@
 
 
     {# ----------------------------------------------------------- #}
-    {# Assessment URL #}
+    {# Learning Tool #}
     {# ----------------------------------------------------------- #}
-    <label>
-        Assessment URL
-        <input name="ltiAssessmentUrl"
-               type="text"
-               maxlength="2048"
-               placeholder="Assessment URL"
-               value="{{ assessment.ltiAssessmentUrl }}">
+    <label for="lti-tool-id" class="required">
+        Learning Tool
     </label>
+
+    {# LTI tool picker: if no assessment has been selected #}
+    <div id="ltiToolPicker" class="{{ assessment.ltiAssessmentUrl is not empty ? 'hide' : '' }}">
+        {% if ltiTools is empty %}
+            <input type="hidden" id="lti-tool-id" name="ltiToolId" value="{{ assessment.ltiTool.id ?? '' }}" />
+            <div class="empty-state">
+                <i class="icon-lti"></i>
+                <p>No providers which support selection of assessments have been configured. Please contact your system administrator.</p>
+            </div>
+        {% else %}
+            <div class="input-group">
+                <select id="lti-tool-id" name="ltiToolId" required>
+                    <option value="">-- Select a Learning Tool --</option>
+                    {% for tool in ltiTools %}
+                        <option value="{{ tool.id }}"
+                                label="{{ tool.name }}"
+                                data-launch-url="{{ tool.launchUrl ?? '' }}"
+                                data-tool-selector-url="{{ tool.deepLinkingUrl
+                                    ? routeLookup('ltiPlatform.getGenerateDeepLinkingRequest', {toolId: tool.id})
+                                    : ''
+                                }}">{{ tool.name }}</option>
+                    {% endfor %}
+                </select>
+                <a href="#" id="ltiToolLaunchPicker" class="button disabled icon-lti">Use Tool</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# LTI assessment URL, if it has been selected #}
+    <ul class="{{ assessment.ltiAssessmentUrl is empty ? 'hide' : '' }} information-list" id="ltiAssessment">
+        <li class="actions-small-1">
+            <div class="list-item">
+                <div class="card wrap-down small-12">
+                    <div class="icon-lti"></div>
+                    <h3 id="ltiAssessmentTitleDisplay">{{ assessment.ltiAssessmentTitle ?? '' }}</h3>
+                    <p class="meta" id="ltiAssessmentUrlDisplay">{{ assessment.ltiAssessmentUrl ?? '' }}</p>
+                    <p id="ltiAssessmentTextDisplay">{{ assessment.ltiAssessmentText ?? '' }}</p>
+
+                    {# LTI assessment URL + required hidden fields #}
+                    <input type="hidden" id="lti-assessment-url" name="ltiAssessmentUrl" value="{{ assessment.ltiAssessmentUrl ?? '' }}" required />
+                    <input type="hidden" id="lti-assessment-title" name="ltiAssessmentTitle" value="{{ assessment.ltiAssessmentTitle ?? '' }}" />
+                    <input type="hidden" id="lti-assessment-text" name="ltiAssessmentText" value="{{ assessment.ltiAssessmentText ?? '' }}" />
+                    <input type="hidden" id="custom-fields" name="customFields" value="{{ (assessment.customFields ?? {}) | json_encode }}" />
+                    <input type="hidden" id="line-item-score-maximum" name="lineItemScoreMaximum" value="{{ assessment.lineItemScoreMaximum ?? '' }}" />
+                    <input type="hidden" id="line-item-resource-id" name="lineItemResourceId" value="{{ assessment.lineItemResourceId ?? '' }}" />
+                </div>
+            </div>
+            <nav>
+                <a href="#" class="icon-delete no-text" id="ltiAssessmentClear" title="Clear"></a>
+            </nav>
+        </li>
+    </ul>
+
+    <div id="toolModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+        <iframe id="toolModalIframe" height="1000"></iframe>
+        <a href="#" class="button submit" data-action="close">Cancel</a>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <div id="resourceLinkMissingUrlModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+        <h2>The selected resource does not have a URL</h2>
+        <p>This means that it cannot be used in an LTI assessment.</p>
+        <a href="#" class="button submit" data-action="close">Close</a>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <div id="resourceLinkMissingLineItemModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+        <h2>The selected resource does not seem to be an assessment</h2>
+        <p>It can still be used in an LTI assessment, but grades will not be synced into Schoolbox.</p>
+        <a href="#" class="button submit" data-action="close">Close</a>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            $(function () {
+                let $ltiToolPicker                    = $('#ltiToolPicker'),
+                    $ltiAssessment                    = $('#ltiAssessment'),
+                    $toolIdSelector                   = $('#lti-tool-id'),
+                    $toolLaunchPicker                 = $('#ltiToolLaunchPicker'),
+                    $resourceLinkMissingLineItemModal = $('#resourceLinkMissingLineItemModal'),
+                    $resourceLinkMissingUrlModal      = $('#resourceLinkMissingUrlModal'),
+                    $toolModal                        = $('#toolModal'),
+                    $toolModalIframe                  = $toolModal.find('#toolModalIframe'),
+                    $modals                           = [$resourceLinkMissingLineItemModal, $resourceLinkMissingUrlModal, $toolModal];
+
+                // Rig close buttons on modals
+                $modals.forEach($modal => {
+                    $modal.on(
+                        'click',
+                        '[data-action=close]',
+                        () => $modal.foundation('reveal', 'close')
+                    );
+                });
+
+                /**
+                 * Message handler for resource link selection from deep linking
+                 * requests.
+                 *
+                 * @param {Event} event
+                 */
+                let messageHandler = (event) => {
+                    // Fill in the form with values from the message data
+                    // TODO figure out if optional chaining is supported in all targeted browsers
+                    let data         = JSON.parse(event.data),
+                        tool         = data?.tool,
+                        resourceLink = data?.resourceLinks?.[0];
+
+                    // Look at the first resource link, set values based on that
+                    if (resourceLink) {
+                        // Use the URL in the resource link? otherwise the tool's default launch URL
+                        let url = resourceLink?.url ?? tool?.launchUrl;
+                        if (url) {
+                            useResourceLink(
+                                url,
+                                resourceLink?.title,
+                                resourceLink?.text,
+                                resourceLink?.custom ?? {},
+                                resourceLink?.lineItem?.resourceId,
+                                resourceLink?.lineItem?.scoreMaximum,
+                            );
+                        } else {
+                            // Raise some warning about what was selected not having a URL.
+                            // This should never happen, because either
+                            // * the resource link will have a URL
+                            // * the tool will have a default URL
+                            $resourceLinkMissingUrlModal.foundation('reveal', 'open');
+                        }
+                    } else {
+                        // Nothing was selected: just close the modal
+                        $toolModal.foundation('reveal', 'close');
+                    }
+                }
+
+                /**
+                 * Use the selected resource link.
+                 *
+                 * @param {String}      url                  The resource link's URL
+                 * @param {String}      title                The resource link's title
+                 * @param {String}      text                 The resource link's text
+                 * @param {Object|null} customFields         Any custom fields the resource link contains
+                 * @param {String|null} lineItemResourceId   The resource link's line item resource ID (for marking)
+                 * @param {Number|null} lineItemScoreMaximum The resource link's line item max score
+                 */
+                let useResourceLink = (url, title, text, customFields, lineItemResourceId, lineItemScoreMaximum) => {
+                    $('#lti-assessment-url').val(url);
+                    $('#lti-assessment-title').val(title);
+                    $('#lti-assessment-text').val(text);
+                    $('#ltiAssessmentUrlDisplay').text(url);
+                    $('#ltiAssessmentTitleDisplay').text(title);
+                    $('#ltiAssessmentTextDisplay').text(text);
+                    $('#custom-fields').val(JSON.stringify(customFields ?? {}));
+                    if (lineItemResourceId) {
+                        // This resource link has a line item, and a resource ID?
+                        // Close the modal
+                        $('#line-item-score-maximum').val(lineItemScoreMaximum);
+                        $('#line-item-resource-id').val(lineItemResourceId);
+                        $toolModal.foundation('reveal', 'close');
+                    } else {
+                        // Raise some warning that this isn't an assessment, and thus can't be graded.
+                        // I guess still let it be used though.
+                        $resourceLinkMissingLineItemModal.foundation('reveal', 'open');
+                    }
+
+                    // Hide the picker, show the LTI assessment
+                    $ltiToolPicker.addClass('hide');
+                    $ltiAssessment.removeClass('hide');
+                }
+
+                // Clear the already selected URL
+                $('#ltiAssessmentClear').on('click', function (event) {
+                    event.preventDefault();
+                    $ltiToolPicker.removeClass('hide');
+                    $ltiAssessment.addClass('hide');
+                })
+
+                // Enable/disable launcher on change of tool ID
+                $toolIdSelector.on('change', function () {
+                    let launchEnabled = $(this).val();
+                    $toolLaunchPicker.toggleClass('disabled', !launchEnabled);
+                });
+
+                // Launch picker
+                $toolLaunchPicker.click(function (event) {
+                    event.preventDefault();
+
+                    // Tool selection and launch URLs
+                    let $selection      = $toolIdSelector.find(':selected'),
+                        toolSelectorUrl = $selection.attr('data-tool-selector-url'),
+                        launchUrl       = $selection.attr('data-launch-url');
+
+                    if (toolSelectorUrl) {
+                        // Use the tool selector URL in the tool modal.
+                        // On open of this modal:
+                        // * point the iframe to the place which sends messages
+                        // * listen for messages
+                        // On close:
+                        // * point the iframe nowhere
+                        // * stop listening (so that message listeners for other things work)
+                        $toolModal.on('open.fndtn.reveal', function () {
+                            $toolModalIframe.attr('src', toolSelectorUrl);
+                            window.addEventListener('message', messageHandler);
+                        });
+                        $toolModal.on('close.fndtn.reveal', function () {
+                            $toolModalIframe.removeAttr('src');
+                            window.removeEventListener('message', messageHandler);
+                        });
+                        $toolModal.foundation('reveal', 'open');
+                    } else if (launchUrl) {
+                        // No tool selector URL? Use the launch URL directly,
+                        // whatever use that might be
+                        useResourceLink(launchUrl, $selection.text(), '', null, null, null);
+                    }
+                });
+            });
+        </script>
+    {% endautoescape %}
 
 
     {# ----------------------------------------------------------- #}

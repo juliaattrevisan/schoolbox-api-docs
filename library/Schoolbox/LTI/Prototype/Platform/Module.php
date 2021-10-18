@@ -31,8 +31,10 @@ class Module extends BaseModule
     public function registerRoutes()
     {
         $this->register(self::METHOD_GET, '', 'getIndex', new IsLoggedIn());
-        $this->register(self::METHOD_GET, '/generate-resource-link-request', 'getGenerateResourceLinkRequest');
+        $this->register(self::METHOD_GET, '/generate-message', 'getGenerateMessage');
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
+        $this->register(self::METHOD_GET, '/deep-linking-response', 'getDeepLinkingResponse');
+        $this->register(self::METHOD_POST, '/deep-linking-response', 'postDeepLinkingResponse');
     }
 
     /**

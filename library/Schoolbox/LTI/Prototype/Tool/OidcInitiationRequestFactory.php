@@ -14,7 +14,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcInitiator;
-use Schoolbox\LTI\Prototype\ServerRequestFactory;
+use Schoolbox\LTI\Util\ServerRequestFactory;
 
 /**
  * Factory for OIDC initiation requests.

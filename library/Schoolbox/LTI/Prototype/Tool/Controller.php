@@ -12,6 +12,7 @@ namespace Schoolbox\LTI\Prototype\Tool;
 use Alaress\Web\Controller\Base;
 use Schoolbox\LTI\Prototype\RegistrationRepository;
 use Schoolbox\LTI\Prototype\RegistrationRepositoryFactory;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 
 /**
  * LTI prototype tool controller
@@ -38,6 +39,17 @@ class Controller extends Base
     }
 
     /**
+     * Handle OIDC initiation request
+     *
+     * @api POST /lti-prototype/tool/oidc/initiation
+     * @since 21.1.0
+     */
+    public function postOidcInitiationRequest()
+    {
+        $this->getOidcInitiationRequest();
+    }
+
+    /**
      * Handle launch request
      *
      * @api GET /lti-prototype/tool/launch
@@ -57,12 +69,23 @@ class Controller extends Base
     }
 
     /**
+     * Handle launch request
+     *
+     * @api POST /lti-prototype/tool/launch
+     * @since 21.1.0
+     */
+    public function postLaunch()
+    {
+        $this->getLaunch();
+    }
+
+    /**
      * Build the registration repository for this platform.
      *
      * @return RegistrationRepository
      */
     private function buildRegistrationRepository(): RegistrationRepository
     {
-        return (new RegistrationRepositoryFactory($this->getConfigLoader()))->build();
+        return (new RegistrationRepositoryFactory($this->getConfigLoader(), ToolMapper::getInstance()))->build();
     }
 }

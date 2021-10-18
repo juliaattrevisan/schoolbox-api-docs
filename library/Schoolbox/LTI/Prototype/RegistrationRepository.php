@@ -16,6 +16,8 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Tool\Tool;
+use Schoolbox\GenericCollection;
+use Schoolbox\LTI\Provider\Model as ToolModel;
 
 /**
  * Registration repository for the prototype platform and tool.
@@ -57,22 +59,37 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
     /**
      * The registration.
+     *
+     * @var array|Registration[]
      */
-    private Registration $registration;
+    private array $registrations;
+
+    /**
+     * Tools which have been set up
+     *
+     * @var GenericCollection|ToolModel[]
+     */
+    private GenericCollection $tools;
 
     /**
      * Constructor
      *
-     * @param UriInterface $baseUrl
-     * @param string       $sharedPublicKey
-     * @param string       $sharedPrivateKey
+     * @param UriInterface                  $baseUrl
+     * @param string                        $sharedPublicKey
+     * @param string                        $sharedPrivateKey
+     * @param GenericCollection|ToolModel[] $tools
      */
-    public function __construct(UriInterface $baseUrl, string $sharedPublicKey, string $sharedPrivateKey)
-    {
+    public function __construct(
+        UriInterface $baseUrl,
+        string $sharedPublicKey,
+        string $sharedPrivateKey,
+        GenericCollection $tools
+    ) {
         $this->baseUrl          = $baseUrl;
         $this->sharedPublicKey  = $sharedPublicKey;
         $this->sharedPrivateKey = $sharedPrivateKey;
-        $this->registration     = $this->buildTestRegistration();
+        $this->tools            = $tools;
+        $this->buildTestRegistrations();
     }
 
     /**
@@ -83,9 +100,12 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function find(string $identifier): ?RegistrationInterface
     {
-        return $this->registration->getIdentifier() === $identifier
-            ? $this->registration
-            : null;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getIdentifier() === $identifier) {
+                return $registration;
+            }
+        }
+        return null;
     }
 
     /**
@@ -95,7 +115,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findAll(): array
     {
-        return [$this->registration];
+        return $this->registrations;
     }
 
     /**
@@ -106,9 +126,12 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findByClientId(string $clientId): ?RegistrationInterface
     {
-        return $this->registration->getClientId() === $clientId
-            ? $this->registration
-            : null;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getClientId() === $clientId) {
+                return $registration;
+            }
+        }
+        return null;
     }
 
     /**
@@ -121,9 +144,11 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findByPlatformIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
     {
-        if ($this->registration->getPlatform()->getAudience() === $issuer) {
-            if (!isset($clientId) || $this->registration->getClientId() === $clientId) {
-                return $this->registration;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getPlatform()->getAudience() === $issuer) {
+                if (!isset($clientId) || $registration->getClientId() === $clientId) {
+                    return $registration;
+                }
             }
         }
         return null;
@@ -139,20 +164,20 @@ class RegistrationRepository implements RegistrationRepositoryInterface
      */
     public function findByToolIssuer(string $issuer, string $clientId = null): ?RegistrationInterface
     {
-        if ($this->registration->getTool()->getAudience() === $issuer) {
-            if (!isset($clientId) || $this->registration->getClientId() === $clientId) {
-                return $this->registration;
+        foreach ($this->registrations as $registration) {
+            if ($registration->getTool()->getAudience() === $issuer) {
+                if (!isset($clientId) || $registration->getClientId() === $clientId) {
+                    return $registration;
+                }
             }
         }
         return null;
     }
 
     /**
-     * Build the registration.
-     *
-     * @return Registration
+     * Build the registrations
      */
-    private function buildTestRegistration(): Registration
+    private function buildTestRegistrations(): void
     {
         // Configure security keys
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-security-keys
@@ -176,24 +201,25 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         // Configure a platform
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-platform
         $platform = new Platform(
-            'schoolboxVagrantPlatform',
-            'Schoolbox [vagrant] Platform',
-            $this->baseUrl->toString(),
+            'schoolbox',
+            'Schoolbox Platform',
+            (clone $this->baseUrl)->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/platform/oidc/authentication')->toString(),
         );
 
         // Configure a tool
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-tool
         $tool = new Tool(
-            'schoolboxVagrantTool',
-            'Schoolbox [vagrant] Tool',
-            $this->baseUrl->toString(),
+            'schoolboxTool',
+            'Schoolbox Tool',
+            (clone $this->baseUrl)->toString(),
             (clone $this->baseUrl)->setPath('/lti-prototype/tool/oidc/initiation')->toString(),
+            (clone $this->baseUrl)->setPath('/lti-prototype/tool/launch')->toString(),
         );
 
         // Configure a registration
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-registration
-        return new Registration(
+        $this->registrations[] = new Registration(
             self::REGISTRATION_IDENTIFIER,
             self::REGISTRATION_CLIENT_ID,
             $platform,
@@ -202,5 +228,36 @@ class RegistrationRepository implements RegistrationRepositoryInterface
             $platformKeyChain,
             $toolKeyChain,
         );
+
+
+        // Build a registration out of each tool
+        foreach ($this->tools as $toolModel) {
+            $tool = new Tool(
+                $toolModel->getName(),
+                $toolModel->getName(),
+                // Tool audience is only required when acting as the tool,
+                // and Schoolbox is acting as the platform
+                '',
+                $toolModel->getOidcInitiationUrl(),
+                $toolModel->getLaunchUrl(),
+                $toolModel->getDeepLinkingUrl()
+            );
+
+            $this->registrations[] = new Registration(
+                $toolModel->getDeploymentId(),
+                $toolModel->getClientId(),
+                $platform,
+                $tool,
+                [$toolModel->getDeploymentId(),],
+                $platformKeyChain,
+                $keyChainFactory->create(
+                    $toolModel->getName(),
+                    $toolModel->getName(),
+                    $toolModel->getPublicKey()
+                ),
+                null,
+                $toolModel->getJwksUrl()
+            );
+        }
     }
 }

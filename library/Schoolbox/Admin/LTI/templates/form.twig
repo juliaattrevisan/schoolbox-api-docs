@@ -1,53 +1,185 @@
-{% if provider.getId() ?? false %}
+{% if provider.id ?? false %}
     {% set saveValue = 'Update Provider' %}
     {% set saveType  = 'update' %}
+    {% set isNew     = false %}
 {% else %}
     {% set saveValue = 'Create Provider' %}
     {% set saveType  = 'create' %}
+    {% set isNew     = true %}
 {% endif %}
 
-<form method="post" action="{{ routeLookup('adminLti.postModify') }}" data-term-form="{{ saveType }}">
+<form method="post" action="{{ routeLookup('adminLti.postModify') }}" data-action="saveProvider">
     <input type="hidden" name="id" value="{{ provider.id ?? '' }}">
 
-    <div class="row" data-mage-wrapper>
+    <div class="row">
         <div class="small-6 columns">
-            <label>
+            <label class="required" for="name-{{ identifier }}">
                 Provider Name
-                <input required type="text" name="name" value="{{ provider.name ?? '' }}">
             </label>
+            <input required id="name-{{ identifier }}" type="text" name="name" value="{{ provider.name ?? '' }}">
         </div>
         <div class="small-6 columns">
-            <label>
-                Configuration XML URL
-                <input required type="text" name="xml" value="{{ provider.xml ?? '' }}">
+            <label {% if isNew %}class="required"{% endif%} for="lti_version-{{ identifier }}">
+                Provider Version
             </label>
+            {% if isNew %}
+                <select required id="lti_version-{{ identifier }}" name="lti_version">
+                    <option value="" readonly>-- select version --</option>
+                    <option value="{{ providerLtiVersion13 }}" {% if (provider.isLtiVersion13 ?? false) %}selected{% endif %}>{{ providerLtiVersion13 }}</option>
+                    <option value="{{ providerLtiVersion11 }}" {% if (provider.isLtiVersion11 ?? false) %}selected{% endif %}>{{ providerLtiVersion11 }}</option>
+                </select>
+            {% else %}
+                <input readonly id="lti_version-{{ identifier }}" type="text" name="lti_version" value="{{ provider.ltiVersion ?? '' }}">
+            {% endif %}
         </div>
-        <div class="small-6 columns">
-            <label>
-                Consumer Key (Optional)
-                <input type="text" name="key" value="{{ provider.key ?? '' }}">
-            </label>
+
+        {# 1.3 fields #}
+        <div {% if not (provider.isLtiVersion13 ?? false) %}class="hide"{% endif %} data-lti-version-section="{{ providerLtiVersion13 }}">
+            <div class="small-6 columns">
+                <label for="client_id-{{ identifier }}" class="required">
+                    Client ID
+                </label>
+                <input required
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="client_id-{{ identifier }}"
+                       type="text"
+                       name="client_id"
+                       value="{{ provider.clientId ?? '' }}">
+            </div>
+            {# The tool's audience is not required when the platform is communicating with the tool #}
+            {#
+            <div class="small-6 columns">
+                <label for="audience-{{ identifier }}" class="required">
+                    Audience
+                </label>
+                <input required
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="audience-{{ identifier }}"
+                       type="text"
+                       name="audience"
+                       value="{{ provider.audience ?? '' }}">
+            </div>
+            #}
+            <div class="small-6 columns">
+                <label for="oidc_initiation_url-{{ identifier }}" class="required">
+                    OIDC Initiation URL
+                </label>
+                <input required
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="oidc_initiation_url-{{ identifier }}"
+                       type="text"
+                       name="oidc_initiation_url"
+                       value="{{ provider.oidcInitiationUrl ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="launch_url-{{ identifier }}">
+                    Launch URL
+                </label>
+                <input data-lti-version="{{ providerLtiVersion13 }}"
+                       id="launch_url-{{ identifier }}"
+                       type="text"
+                       name="launch_url"
+                       value="{{ provider.launchUrl ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="deep_linking_url-{{ identifier }}">
+                    Deep Linking URL
+                </label>
+                <input data-lti-version="{{ providerLtiVersion13 }}"
+                       id="deep_linking_url-{{ identifier }}"
+                       type="text"
+                       name="deep_linking_url"
+                       value="{{ provider.deepLinkingUrl ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="jwks_url-{{ identifier }}">
+                    JSON Web Key Set URL
+                </label>
+                <input data-lti-version="{{ providerLtiVersion13 }}"
+                       id="jwks_url-{{ identifier }}"
+                       type="text"
+                       name="jwks_url"
+                       value="{{ provider.jwksUrl ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="public_key-{{ identifier }}">
+                    Public Key
+                </label>
+                <textarea data-lti-version="{{ providerLtiVersion13 }}"
+                       id="public_key-{{ identifier }}"
+                       type="text"
+                       name="public_key"
+                       rows="10"
+                >{{ provider.publicKey ?? '' }}</textarea>
+            </div>
         </div>
-        <div class="small-6 columns">
-            <label>
-                Consumer Secret (Optional)
-                <input type="text" name="secret" value="{{ provider.secret ?? '' }}">
-            </label>
-        </div>
-        <div class="small-12 columns">
-            <label>
-                LTI Request Type
-                <select name="launch_type">
+
+        {# 1.1 fields #}
+        <div {% if not (provider.isLtiVersion11 ?? false) %}class="hide"{% endif %} data-lti-version-section="{{ providerLtiVersion11 }}">
+            <div class="small-6 columns">
+                <label for="xml-{{ identifier }}">
+                    Configuration XML URL
+                    <span data-tooltip class="has-tip tip-top hint" title="If provided, Launch and Icon URL will be extracted from this configuration.">?</span>
+                </label>
+                <input data-lti-version="{{ providerLtiVersion11 }}"
+                       id="xml-{{ identifier }}"
+                       type="text"
+                       name="xml"
+                       value="{{ provider.xml ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="url-{{ identifier }}">
+                    Launch URL
+                </label>
+                <input data-lti-version="{{ providerLtiVersion11 }}"
+                       id="url-{{ identifier }}"
+                       type="text"
+                       name="url"
+                       value="{{ provider.url ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="icon-{{ identifier }}">
+                    Icon URL
+                </label>
+                <input data-lti-version="{{ providerLtiVersion11 }}"
+                       id="icon-{{ identifier }}"
+                       type="text"
+                       name="icon"
+                       value="{{ provider.icon ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="key-{{ identifier }}">
+                    Consumer Key
+                </label>
+                <input data-lti-version="{{ providerLtiVersion11 }}"
+                       id="key-{{ identifier }}"
+                       type="text"
+                       name="key"
+                       value="{{ provider.key ?? '' }}">
+            </div>
+            <div class="small-6 columns">
+                <label for="secret-{{ identifier }}">
+                    Consumer Secret
+                </label>
+                <input data-lti-version="{{ providerLtiVersion11 }}"
+                       id="secret-{{ identifier }}"
+                       type="text"
+                       name="secret"
+                       value="{{ provider.secret ?? '' }}">
+            </div>
+            <div class="small-12 columns">
+                <label for="launch_type-{{ identifier }}">
+                    LTI Request Type
+                </label>
+                <select data-lti-version="{{ providerLtiVersion11 }}"
+                        id="launch_type-{{ identifier }}"
+                        name="launch_type">
                     <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_BASIC' %}selected{% endif %} value="LTI_LAUNCH_TYPE_BASIC">Basic Launch</option>
                     <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_PICKER' %}selected{% endif %} value="LTI_LAUNCH_TYPE_PICKER">Picker</option>
                 </select>
-            </label>
+            </div>
         </div>
-
-        <!-- Don't delete the inline style, it's needed -->
-        <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
-        <p data-mage-custom-error class="hide alert alert-box icon-alert"></p>
     </div>
 
-    <input type="submit" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
+    <input type="submit" value="{{ saveValue }}" />
 </form>

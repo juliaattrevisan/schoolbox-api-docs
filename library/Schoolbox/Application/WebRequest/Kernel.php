@@ -576,11 +576,13 @@ class Kernel extends WebKernelAbstract
                 $_SERVER,
                 ['*/dav/index.php'],
                 [
-                '/saml/consume.php*',
-                '/api/*',
-                '/loginForm.php*',
-                '/liss/liss.php',
-                '/lti-consumer/*',
+                    '/saml/consume.php*',
+                    '/api/*',
+                    '/loginForm.php*',
+                    '/liss/liss.php',
+                    '/lti-consumer/*',
+                    '/lti-prototype/*',
+                    '/lti-platform/*',
                 ]
             )
         ) {

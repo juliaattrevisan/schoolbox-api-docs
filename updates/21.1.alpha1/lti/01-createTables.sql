@@ -1,10 +1,18 @@
 CREATE TABLE lti_assessment
 (
-    id                 INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    assessment_id      INT UNSIGNED NOT NULL,
-    lti_assessment_url VARCHAR(2048)    NULL,
+    id                      INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    assessment_id           INT UNSIGNED NOT NULL,
+    lti_provider_id         INT NULL,
+    lti_assessment_url      VARCHAR(2048) NULL,
+    lti_assessment_title    VARCHAR(2048) NULL,
+    lti_assessment_text     VARCHAR(2048) NULL,
+    custom_fields           JSON NULL,
+    line_item_resource_id   VARCHAR(2048) NULL,
+    line_item_score_maximum FLOAT NULL,
     CONSTRAINT lti_assessment_assessment_id_fk
-        FOREIGN KEY (assessment_id) REFERENCES assessment (id)
+        FOREIGN KEY (assessment_id) REFERENCES assessment (id),
+    CONSTRAINT lti_assessment_lti_provider_id_fk
+        FOREIGN KEY (lti_provider_id) REFERENCES lti_provider (id)
 );
 CREATE TABLE lti_assessment_score
 (

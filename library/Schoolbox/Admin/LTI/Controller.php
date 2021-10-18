@@ -12,12 +12,16 @@ namespace Schoolbox\Admin\LTI;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 
 class Controller extends Base
 {
+    /**
+     * Provider mapper, for fetching and saving LTI providers.
+     */
+    private ProviderMapper $providerMapper;
+
     /**
      * Controller constructor.
      * @param ProviderMapper $providerMapper
@@ -55,15 +59,15 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => $this->router->generate('adminLti.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
-                'providers' => $this->providerMapper->findAll()
+                'providers' => $this->providerMapper->findAll(),
+                'providerLtiVersion11' => Provider::LTI_VERSION_1_1,
+                'providerLtiVersion13' => Provider::LTI_VERSION_1_3,
             ],
         ]);
     }
 
     /**
      * Modify an existing LTI provider
-     *
-     * TODO: But I think this is never used?
      *
      * @param Provider $provider
      */
@@ -82,9 +86,6 @@ class Controller extends Base
 
     public function postDelete($provider)
     {
-        $post = $this->getRequest()->post;
-
-
         if (!empty($provider)) {
             $this->providerMapper->delete($provider);
         }
@@ -94,23 +95,38 @@ class Controller extends Base
 
     public function postModify()
     {
-        $post = $this->getRequest()->post;
+        $post = $this->request->post;
 
-        try {
-            if (!empty($post['id'])) {
-                $provider = $this->providerMapper->findById($post['id']);
-            } else {
-                $provider = new Provider();
-            }
+        if (!empty($post['id'])) {
+            $provider = $this->providerMapper->findById($post['id']);
+        } else {
+            $provider = new Provider();
+        }
 
-            $provider->setName($post['name']);
-            $provider->setKey($post['key']);
-            $provider->setSecret($post['secret']);
-            $provider->setXml($post['xml']);
-            $provider->setLaunchType($post['launch_type']);
-            $provider->setIcon(null);
-            $provider->setUrl(null);
+        $provider->setName($post['name']);
+        $provider->setLtiVersion($post['lti_version']);
 
+        // LTI 1.3 fields
+        $provider = $provider
+            ->setClientId($post['client_id'])
+            ->setAudience('')
+//            ->setAudience($post['audience'])
+            ->setOidcInitiationUrl($post['oidc_initiation_url'])
+            ->setLaunchUrl($post['launch_url'])
+            ->setDeepLinkingUrl($post['deep_linking_url'])
+            ->setJwksUrl($post['jwks_url'])
+            ->setPublicKey($post['public_key']);
+
+        // LTI 1.1 fields, including XML
+        $provider = $provider
+            ->setCustom(null)
+            ->setKey($post['key'])
+            ->setSecret($post['secret'])
+            ->setXml($post['xml'])
+            ->setLaunchType($post['launch_type'])
+            ->setIcon($post['icon'])
+            ->setUrl($post['url']);
+        if ($post['xml']) {
             try {
                 $xmlContent = @file_get_contents($post['xml']);
 
@@ -145,14 +161,10 @@ class Controller extends Base
             } catch (\Exception $e) {
                 // Noop
             }
-
-            $this->providerMapper->save($provider);
-        } catch (MapperException $e) {
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLti.getIndex'));
-    }
+        $this->providerMapper->save($provider);
 
-    /** @var ProviderMapper */
-    private $providerMapper;
+        $this->response->redirect->afterPost($this->router->generate('adminLti.getIndex'));
+    }
 }

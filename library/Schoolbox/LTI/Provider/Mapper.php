@@ -26,6 +26,19 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('lti_version', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::LTI_VERSIONS);
+        $this->uses('deployment_id', self::TYPE_STRING, self::COLUMN_UUID);
+
+        // LTI 1.3 fields
+        $this->uses('client_id', self::TYPE_STRING);
+        $this->uses('audience', self::TYPE_STRING);
+        $this->uses('oidc_initiation_url', self::TYPE_STRING);
+        $this->uses('launch_url', self::TYPE_STRING);
+        $this->uses('deep_linking_url', self::TYPE_STRING);
+        $this->uses('jwks_url', self::TYPE_STRING);
+        $this->uses('public_key', self::TYPE_STRING);
+
+        // LTI 1.1 fields
         $this->uses('key', self::TYPE_STRING);
         $this->uses('secret', self::TYPE_STRING);
         $this->uses('xml', self::TYPE_STRING);
@@ -33,6 +46,7 @@ class Mapper extends BaseMapper
         $this->uses('url', self::TYPE_STRING);
         $this->uses('custom', self::TYPE_STRING);
         $this->uses('launch_type', self::TYPE_STRING);
+
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

@@ -2,23 +2,32 @@
     <div class="list-item">
         <div class="card small-12" data-provider-infocard>
             <h3>
-                {{ provider.name }}
+                {{ provider.name ?? '' }}
             </h3>
-            <p class="meta">
-                {{ provider.xml }}
-            </p>
-            {% if provider.url is empty %}
-            <p class="meta">
-                <span class="gradient-0">Provider Disabled - Invalid XML Configuration</span>
-            </p>
+            {% if provider.deploymentId is not empty %}
+                <p class="meta">Deployment ID: {{ provider.deploymentId }}</p>
             {% endif %}
+            <p class="meta">
+                {% if provider.isLtiVersion11 ?? false %}
+                    {% if provider.url is empty %}
+                        <span class="gradient-0">Provider Disabled - No Launch URL detected</span>
+                    {% else %}
+                        {{ provider.url ?? ''}}
+                    {% endif %}
+                {% endif %}
+            </p>
         </div>
     </div>
-    <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="provider-{{ provider.id }}">
-        {% include '@adminLti/form.twig' with {provider: provider} %}
+    <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="provider-{{ identifier }}">
+        {% include '@adminLti/form.twig' with {
+            provider: provider,
+            providerLtiVersion11: providerLtiVersion11,
+            providerLtiVersion13: providerLtiVersion13,
+            identifier: identifier,
+        } only %}
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="provider-{{ provider.id }}"></a>
+        <a href="#" class="icon-down-arrow" data-collapser="provider-{{ identifier }}"></a>
         <a href="#" class="icon-delete" data-provider-action="delete" data-post-action="{{ routeLookup('adminLti.postDelete', {providerId: provider.id}) }}"></a>
     </nav>
 </div>

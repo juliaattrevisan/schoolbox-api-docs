@@ -21,7 +21,12 @@
             </div>
             {% for provider in providers %}
             <section>
-                {% include '@adminLti/listItem.twig' with {provider: provider} %}
+                {% include '@adminLti/listItem.twig' with {
+                    provider: provider,
+                    providerLtiVersion11: providerLtiVersion11,
+                    providerLtiVersion13: providerLtiVersion13,
+                    identifier: loop.index0,
+                } only %}
             </section>
             {% endfor %}
 
@@ -37,7 +42,11 @@
 
 <div id="addProviderModal" class="reveal-modal" data-reveal aria-labelledby="addProviderModalTitle" aria-hidden="true" role="dialog">
     <h2 id="addProviderModalTitle">Add Provider</h2>
-    {% include '@adminLti/form.twig' %}
+    {% include '@adminLti/form.twig' with {
+        providerLtiVersion11: providerLtiVersion11,
+        providerLtiVersion13: providerLtiVersion13,
+        identifier: providers|length,
+    } only %}
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
@@ -51,6 +60,32 @@
     $(function(){
 
         $('[data-collapser]').collapsable();
+
+        // Set up forms: show/hide LTI inputs conditionally
+        $('form[data-action="saveProvider"]').each(function () {
+            let $form = $(this);
+            $form.alaressValidate({
+                ignore: function () {
+                    // Any field for a different LTI version is ignored
+                    let fieldLtiVersion = $(this).attr('data-lti-version');
+                    if (fieldLtiVersion) {
+                        let selectedLtiVersion = $form.find(':input[name="lti_version"]').val();
+                        if (selectedLtiVersion !== fieldLtiVersion) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+            $form.on('change', ':input[name="lti_version"]', function () {
+                let selectedLtiVersion = this.value;
+                $form.find('[data-lti-version-section]').each(function () {
+                    let segmentLtiVersion = $(this).attr('data-lti-version-section');
+                    $(this).toggleClass('hide', segmentLtiVersion !== selectedLtiVersion);
+                })
+            })
+        });
+
 
         // Jellytot actions
         $('#content').on('click', 'a[data-provider-action]', function(event) {

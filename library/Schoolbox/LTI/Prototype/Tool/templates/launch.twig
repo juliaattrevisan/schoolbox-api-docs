@@ -7,21 +7,30 @@
 
     <h3>About the launch request</h3>
     <dl>
-        <dt>Valid?</dt>
-        <dd>{{ result.hasError ? 'N' : 'Y' }}</dd>
+        <dt>Result</dt>
+        <dd>
+            {% for success in (result.successes ?? []) %}
+                <div>✅ {{ success }}</div>
+            {% endfor %}
+            {% if result.hasError %}
+                <div>❌ {{ result.error ?? '' }}</div>
+            {% endif %}
+        </dd>
 
-        <dt>Version</dt>
-        <dd>{{ result.payload.version ?? '' }}</dd>
+        {% if not result.hasError %}
+            <dt>Version</dt>
+            <dd>{{ result.payload.version ?? '' }}</dd>
 
-        <dt>User identity</dt>
-        <dd>{{ result.payload.userIdentity.identifier ?? '' }}</dd>
+            <dt>User identity</dt>
+            <dd>{{ result.payload.userIdentity.identifier ?? '' }}</dd>
 
-        <dt>User name</dt>
-        <dd>{{ result.payload.userIdentity.name ?? '' }}</dd>
+            <dt>User name</dt>
+            <dd>{{ result.payload.userIdentity.name ?? '' }}</dd>
 
-        <dt>User email</dt>
-        <dd>{{ result.payload.userIdentity.email ?? '' }}</dd>
+            <dt>User email</dt>
+            <dd>{{ result.payload.userIdentity.email ?? '' }}</dd>
+        {% endif %}
     </dl>
 
-    <a href="{{ routeLookup('ltiPrototypePlatform.getIndex') }}">Return to platform</a>
+    <a href="#" onclick="window.close()">Close</a>
 {% endblock content %}
