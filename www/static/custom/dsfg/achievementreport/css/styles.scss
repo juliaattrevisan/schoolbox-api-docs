@@ -220,4 +220,20 @@ into their skin config textarea
             margin-bottom: 2rem;
         }
     }
+
+    /* MYP
+     */
+    &.myp {
+        table {
+            margin-bottom: 0;
+        }
+
+        th.fixed {
+            width: 20%;
+        }
+
+        td.spacer {
+            line-height: 0;padding: 0;border-bottom-width:5px;
+        }
+    }
 }
