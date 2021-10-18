@@ -42,13 +42,13 @@ if (is_numeric($this->arg[0])) {
     }
 }
 
-if (!isset($thread['threadID'])) {
+if ($thread->getId() === null) {
     error(2);
 }
 
 $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 try {
-    $category = $categoryMapper->findById($thread['categoryID']);
+    $category = $categoryMapper->findById($thread->getCategory()->getId());
 } catch (DeletedException $e) {
     error(ErrorMapper::ERROR_FOLDER_DELETED);
 }
@@ -65,17 +65,17 @@ if ($groupHandler->getPermission($category->getId()) < UserAccess::ACCESS_READ) 
     error(19);
 }
 
-$this->setTitle(Scrub::text($thread['title']));
+$this->setTitle(Scrub::text($thread->getTitle()));
 
-$threadLocked = $thread['locked'] == 'true' ? true : false;
+$threadLocked = $thread->isLocked() ? true : false;
 
 /* output breadcrumbs
  */
 $output = array(
     'CATEGORY' => Scrub::text($category->getName()),
     'CATEGORY_ID' => $category->getId(),
-    'THREAD_ID' => $thread['threadID'],
-    'THREAD_TITLE' => Scrub::text($thread['title']),
+    'THREAD_ID' => $thread->getId(),
+    'THREAD_TITLE' => Scrub::text($thread->getTitle()),
     'LOCK_UNLOCK' => $threadLocked ? 'Unlock' : 'Lock',
     'LOCKED' => $threadLocked ? '(Locked)' : '',
 );
@@ -105,11 +105,11 @@ if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= UserAc
 
 /* record view
  */
-$forumHandler->uniqueView($thread['threadID']);
+$forumHandler->uniqueView($thread->getId());
 
 /* output pagination
  */
-$postList = $forumHandler->getPostList($thread['threadID']);
+$postList = $forumHandler->getPostList($thread->getId());
 $pageNum = $this->arg[1];
 
 if (!$pageNum) {
@@ -153,7 +153,7 @@ $outputPagination = array('PREVIOUS_PAGE' => $pageNum - 1,
 $this->setVar($outputPagination);
 
 /* output posts */
-$postList = $forumHandler->getPostList($thread['threadID'], $postIndex, $postPerPage);
+$postList = $forumHandler->getPostList($thread->getId(), $postIndex, $postPerPage);
 if (is_array($postList)) {
     $userHandler = new User();
     $j = 0;
@@ -249,7 +249,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => '',
     ],
     [
-        'text' => $thread['title'],
+        'text' => $thread->getTitle(),
         'href' => '',
         'class' => 'active',
     ]
