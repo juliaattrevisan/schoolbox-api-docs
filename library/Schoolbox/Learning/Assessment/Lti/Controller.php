@@ -95,7 +95,11 @@ class Controller extends Assessment\Controller
             'ltiTools'           => $this->ltiToolMapper->findByColumn(
                 'lti_version',
                 LtiTool\Model::LTI_VERSION_1_3,
-            ),
+            )->filter(function (LtiTool\Model $model) {
+                // Only LTI tools with a deep linking or launch URL are supported,
+                // otherwise there's no way to select content for them.
+                return $model->getDeepLinkingUrl() || $model->getLaunchUrl();
+            }),
         ];
     }
 
