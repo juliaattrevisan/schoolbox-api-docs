@@ -8,7 +8,10 @@
     <title>LTI Platform: Receive Deep Linking Response</title>
 
     {% set payload = {
-        tool:          {id: tool.id},
+        tool:          {
+            id: tool.id,
+            launchUrl: tool.launchUrl,
+        },
         resourceLinks: resourceLinks,
     } %}
     {% autoescape 'js' %}
