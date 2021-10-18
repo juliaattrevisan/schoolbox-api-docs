@@ -8,79 +8,80 @@
 {% include '@achievementreport/Navigation.twig' with {
     elements: navigation
 } %}
-{% for classCode, subjectData in subjects %}
-    <div class="row achievement-report">
-        <div class="small-12 island">
-            <section class="type-blue content"><strong>{{ headings[classCode].subjectName }}</strong></section>
+<div class="row achievement-report">
+    {% for classCode, subjectData in subjects %}
+        <div class="row">
+            <div class="small-12 island">
+                <section class="type-blue content"><strong>{{ headings[classCode].subjectName }}</strong></section>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="small-12 island">
-            <section class="content">
-                <p>{{ subjectData.overview }}</p>
-            </section>
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    <p>{{ subjectData.overview }}</p>
+                </section>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <table>
-                    <thead>
-                    <tr>
-                        <th></th>
-                        {% for shortHeading in headings[classCode].shortHeadings %}
-                            <th class="centered">{{ shortHeading }}</th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for topicHeading in headings[classCode].topicHeadings %}
+        <div class="row">
+            <div class="small-12 island">
+                <section>
+                    <table style="margin-bottom:0;">
+                        <thead>
                         <tr>
-                            <th>{{ topicHeading }}</th>
-                            {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                                <td class="centered">{{ subjectData.topics[topicHeading][shortCode] ?? '' }}</td>
+                            <th style="width:20%"></th>
+                            {% for shortHeading in headings[classCode].shortHeadings %}
+                                <th class="centered" style="width:20%">{{ shortHeading }}</th>
                             {% endfor %}
                         </tr>
-                    {% endfor %}
-                    <tr>
-                        <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}"
-                            style="border-width:10px;line-height:0;padding:0;"></td>
-                    </tr>
-                    <tr>
-                        <th>Interim Achievement Level</th>
-                        {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
+                        </thead>
+                        <tbody>
+                        {% for topicHeading in headings[classCode].topicHeadings %}
+                            <tr>
+                                <th>{{ topicHeading }}</th>
+                                {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                                    <td class="centered">{{ subjectData.topics[topicHeading][shortCode] ?? '' }}</td>
+                                {% endfor %}
+                            </tr>
                         {% endfor %}
-                    </tr>
-                    <tr>
-                        <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}"
-                            style="border-width:10px;line-height:0;padding:0;"></td>
-                    </tr>
-                    <tr>
-                        <th>Final Achievement Level</th>
-                        {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
-                        {% endfor %}
-                    </tr>
-                    </tbody>
-                </table>
-            </section>
+                        <tr>
+                            <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}"
+                                style="line-height: 0;padding: 0;border-bottom-width:5px;"></td>
+                        </tr>
+                        <tr>
+                            <th>Interim Achievement Level</th>
+                            {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                                <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}"
+                                style="line-height: 0;padding: 0;border-bottom-width:5px;"></td>
+                        </tr>
+                        <tr>
+                            <th>Final Achievement Level</th>
+                            {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                                <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
         </div>
-    </div>
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    <p>{{ subjectData.comment }}</p>
+                </section>
+            </div>
+        </div>
+    {% endfor %}
     <div class="row">
         <div class="small-12 island">
+            <h2 class="subheader">Further Information</h2>
             <section class="content">
-                <p>{{ subjectData.comment }}</p>
+                {{ (config.dio_achievement_report_myp_footer ?? '')|purify }}
             </section>
         </div>
-    </div>
-{% endfor %}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Further Information</h2>
-
-        <section class="content">
-            {{ (config.dio_achievement_report_myp_footer ?? '')|purify }}
-        </section>
     </div>
 </div>
