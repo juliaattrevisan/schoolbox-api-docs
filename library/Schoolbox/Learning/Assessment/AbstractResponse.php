@@ -140,7 +140,7 @@ abstract class AbstractResponse implements IResponse
     /**
      * @return User|null
      */
-    public function getSubmittedBy()
+    public function getSubmittedBy(): ?User
     {
         return $this->submittedBy;
     }
@@ -240,7 +240,7 @@ abstract class AbstractResponse implements IResponse
     /**
      * @return User
      */
-    public function getSubmittedOnBehalfOf()
+    public function getSubmittedOnBehalfOf(): User
     {
         return $this->submittedOnBehalfOf;
     }
@@ -249,7 +249,7 @@ abstract class AbstractResponse implements IResponse
      * @param User $submittedOnBehalfOf
      * @return $this
      */
-    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf)
+    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf): self
     {
         $this->submittedOnBehalfOf = $submittedOnBehalfOf;
         return $this;

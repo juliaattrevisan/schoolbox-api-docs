@@ -96,7 +96,7 @@ interface IResponse
      *
      * @return User|null
      */
-    public function getSubmittedBy();
+    public function getSubmittedBy(): ?User;
 
     /**
      * Set the person who created this IResponse (typically a student).
@@ -117,7 +117,7 @@ interface IResponse
      *
      * @return User
      */
-    public function getSubmittedOnBehalfOf();
+    public function getSubmittedOnBehalfOf(): User;
 
     /**
      * Set the person for whom the IResponse was created
@@ -125,7 +125,7 @@ interface IResponse
      * @param User $submittedOnBehalfOf
      * @return $this
      */
-    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf);
+    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf): self;
 
     /**
      * Get the datetime at which this response was submitted.

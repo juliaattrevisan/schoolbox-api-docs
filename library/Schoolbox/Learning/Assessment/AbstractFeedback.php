@@ -62,15 +62,15 @@ abstract class AbstractFeedback implements IFeedback
      *
      * @var User
      */
-    protected $reviewee;
+    protected User $reviewee;
 
     /**
      * The person who reviewed (created) this Feedback
      * Typically a Teacher
      *
-     * @var User
+     * @var User|null
      */
-    protected $reviewer;
+    protected ?User $reviewer;
 
     /**
      * The datetime at which this Feedback was made visible to Students
@@ -175,7 +175,7 @@ abstract class AbstractFeedback implements IFeedback
     /**
      * @return User
      */
-    public function getReviewee()
+    public function getReviewee(): User
     {
         return $this->reviewee;
     }
@@ -184,25 +184,25 @@ abstract class AbstractFeedback implements IFeedback
      * @param User $reviewee
      * @return static
      */
-    public function setReviewee($reviewee)
+    public function setReviewee(User $reviewee): self
     {
         $this->reviewee = $reviewee;
         return $this;
     }
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getReviewer()
+    public function getReviewer(): ?User
     {
         return $this->reviewer;
     }
 
     /**
-     * @param User $reviewer
+     * @param User|null $reviewer
      * @return $this
      */
-    public function setReviewer($reviewer)
+    public function setReviewer(?User $reviewer): self
     {
         $this->reviewer = $reviewer;
         return $this;

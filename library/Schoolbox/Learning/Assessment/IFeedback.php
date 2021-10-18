@@ -104,7 +104,7 @@ interface IFeedback
      *
      * @return User
      */
-    public function getReviewee();
+    public function getReviewee(): User;
 
     /**
      * Set the person for whom this IFeedback was created
@@ -112,24 +112,26 @@ interface IFeedback
      * @param User $reviewee
      * @return $this
      */
-    public function setReviewee($reviewee);
+    public function setReviewee(User $reviewee): self;
 
     /**
      * Get the person who created this IFeedback
      *
-     * Typically a teacher
+     * Typically a teacher, but may be null if the creator is unknown.
      *
-     * @return User
+     * @return User|null
      */
-    public function getReviewer();
+    public function getReviewer(): ?User;
 
     /**
      * Set the person who created this IFeedback
      *
-     * @param User $reviewer
+     * Typically a teacher, but may be null if the creator is unknown.
+     *
+     * @param User|null $reviewer
      * @return $this
      */
-    public function setReviewer($reviewer);
+    public function setReviewer(?User $reviewer): self;
 
     /**
      * Get the IAssessable to which this IResponse belongs
