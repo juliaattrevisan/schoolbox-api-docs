@@ -79,7 +79,7 @@
                     <p id="ltiAssessmentTextDisplay">{{ assessment.ltiAssessmentText ?? '' }}</p>
 
                     {# LTI assessment URL + required hidden fields #}
-                    <input type="hidden" id="lti-assessment-url" name="ltiAssessmentUrl" value="{{ assessment.ltiAssessmentUrl ?? '' }}" />
+                    <input type="hidden" id="lti-assessment-url" name="ltiAssessmentUrl" value="{{ assessment.ltiAssessmentUrl ?? '' }}" required />
                     <input type="hidden" id="lti-assessment-title" name="ltiAssessmentTitle" value="{{ assessment.ltiAssessmentTitle ?? '' }}" />
                     <input type="hidden" id="lti-assessment-text" name="ltiAssessmentText" value="{{ assessment.ltiAssessmentText ?? '' }}" />
                     <input type="hidden" id="custom-fields" name="customFields" value="{{ (assessment.customFields ?? {}) | json_encode }}" />
