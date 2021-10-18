@@ -84,7 +84,7 @@
                             <p class="subheading">Comments</p>
 
                             {% for term, commentData in areaData.comments %}
-                                {% if commentData.comment|length %}
+                                {% if (commentData.comment ?? '')|length %}
                                 <p>
                                     Term {{ term }} - {{ commentData.comment }}&mdash;
                                     {{ macro.renderTeachers(commentData.teachers) }}
