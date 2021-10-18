@@ -13,6 +13,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Lti\Response\MapperProxy;
 
+/**
+ * Sub-source for LTI responses.
+ */
 class Lti extends AbstractSubSource
 {
     /**

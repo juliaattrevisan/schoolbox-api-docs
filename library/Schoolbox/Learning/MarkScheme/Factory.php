@@ -204,6 +204,7 @@ class Factory
      */
     protected function spawnForLtiAssessment(LtiAssessment $ltiAssessment)
     {
+        // TODO use LTI assessment's scoreMaximum once SA-12630 is merged
         return new TotalMarkFractional();
     }
 

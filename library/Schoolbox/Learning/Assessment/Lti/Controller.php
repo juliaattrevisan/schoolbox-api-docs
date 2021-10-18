@@ -152,7 +152,7 @@ class Controller extends Assessment\Controller
             return;
         }
 
-
+        // Display a timeline for the student's participation
         $participant = $assessment->getParticipantIfExtant($student);
         $timeline    = null;
         if ($participant) {
