@@ -84,15 +84,19 @@ class RepositoryFactory
         foreach ($tools as $toolModel) {
             // Configure a tool
             // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-tool
+            $oidcInitiationUrl = $toolModel->getOidcInitiationUrl();
+            if ($oidcInitiationUrl === null) {
+                continue;
+            }
             $tool = new Tool(
                 $toolModel->getName(),
                 $toolModel->getName(),
                 // Tool audience is only required when acting as the tool,
                 // and Schoolbox is acting as the platform
                 '',
-                $toolModel->getOidcInitiationUrl(),
-                $toolModel->getLaunchUrl(),
-                $toolModel->getDeepLinkingUrl()
+                trim($oidcInitiationUrl),
+                $toolModel->getLaunchUrl() === null ? null : trim($toolModel->getLaunchUrl()),
+                $toolModel->getDeepLinkingUrl() === null ? null : trim($toolModel->getDeepLinkingUrl()),
             );
 
             // Configure a registration
@@ -107,10 +111,10 @@ class RepositoryFactory
                 $keyChainFactory->create(
                     $toolModel->getName(),
                     $toolModel->getName(),
-                    $toolModel->getPublicKey()
+                    $toolModel->getPublicKey() === null ? null : trim($toolModel->getPublicKey()),
                 ),
                 null,
-                $toolModel->getJwksUrl()
+                $toolModel->getJwksUrl() === null ? null : trim($toolModel->getJwksUrl()),
             );
         }
         return new Repository(...$registrations);
