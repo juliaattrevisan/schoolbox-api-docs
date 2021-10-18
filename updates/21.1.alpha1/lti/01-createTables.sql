@@ -5,7 +5,7 @@ CREATE TABLE lti_assessment
     lti_provider_id         INT NULL,
     lti_assessment_url      VARCHAR(2048) NULL,
     lti_assessment_title    VARCHAR(2048) NULL,
-    lti_assessment_text     TEXT NULL,
+    lti_assessment_text     VARCHAR(2048) NULL,
     custom_fields           JSON NULL,
     line_item_resource_id   VARCHAR(2048) NULL,
     line_item_score_maximum FLOAT NULL,
