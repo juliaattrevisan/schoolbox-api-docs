@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -31,7 +32,14 @@ $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 /* thread exists
  */
 if (is_numeric($this->arg[0])) {
-    $thread = $forumHandler->getThread($this->arg[0]);
+    try {
+        /** @var \Schoolbox\Forum\Thread $thread */
+        $thread = ThreadMapper::getInstance()->findById($this->arg[0]);
+    } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
+    } catch (Exception $e) {
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    }
 }
 
 if (!isset($thread['threadID'])) {

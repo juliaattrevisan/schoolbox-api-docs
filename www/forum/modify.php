@@ -75,7 +75,7 @@ if (is_numeric($this->arg[0])) {
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-            //There is cases where you need to edit deleted stuff so letting this go through..
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
         } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -132,7 +132,7 @@ if (is_numeric($this->arg[0])) {
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-            //There is cases where you need to edit deleted stuff so letting this go through..
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
         } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
