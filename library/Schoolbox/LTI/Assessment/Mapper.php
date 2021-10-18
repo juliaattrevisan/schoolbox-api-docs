@@ -61,6 +61,8 @@ class Mapper extends BaseMapper
             ],
         );
         $this->uses('lti_assessment_url', self::TYPE_STRING);
+        $this->uses('lti_assessment_title', self::TYPE_STRING);
+        $this->uses('lti_assessment_text', self::TYPE_STRING);
         $this->uses('custom_fields', self::TYPE_JSON);
         $this->uses('line_item_resource_id', self::TYPE_STRING);
         $this->uses('line_item_score_maximum', self::TYPE_DECIMAL);

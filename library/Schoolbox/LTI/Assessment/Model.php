@@ -24,9 +24,28 @@ class Model implements IAssessableDataModel, ISoftDeletable
     use AssessmentModelTrait;
 
     /**
-     * The URL of the LTI assessment,
+     * The URL of the LTI assessment.
+     *
+     * This will be used as the URL for the resource link launch request when
+     * launching this assessment.
      */
     private ?string $ltiAssessmentUrl = null;
+
+    /**
+     * The title of the LTI assessment, as retrieved from the LTI tool.
+     *
+     * This is currently only used when displaying a card for the resource link
+     * launch request.
+     */
+    private ?string $ltiAssessmentTitle = null;
+
+    /**
+     * The text of the LTI assessment, as retrieved from the LTI tool.
+     *
+     * This is currently only used when displaying a card for the resource link
+     * launch request.
+     */
+    private ?string $ltiAssessmentText = null;
 
     /**
      * The LTI tool with which the LTI assessment URL was selected.
@@ -64,6 +83,42 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setLtiAssessmentUrl(?string $ltiAssessmentUrl): self
     {
         $this->ltiAssessmentUrl = $ltiAssessmentUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLtiAssessmentTitle(): ?string
+    {
+        return $this->ltiAssessmentTitle;
+    }
+
+    /**
+     * @param string|null $ltiAssessmentTitle
+     * @return $this
+     */
+    public function setLtiAssessmentTitle(?string $ltiAssessmentTitle): self
+    {
+        $this->ltiAssessmentTitle = $ltiAssessmentTitle;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLtiAssessmentText(): ?string
+    {
+        return $this->ltiAssessmentText;
+    }
+
+    /**
+     * @param string|null $ltiAssessmentText
+     * @return $this
+     */
+    public function setLtiAssessmentText(?string $ltiAssessmentText): self
+    {
+        $this->ltiAssessmentText = $ltiAssessmentText;
         return $this;
     }
 
