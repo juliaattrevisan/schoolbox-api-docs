@@ -34,16 +34,23 @@ class Model implements IAssessableDataModel, ISoftDeletable
     /**
      * The title of the LTI assessment, as retrieved from the LTI tool.
      *
-     * This is currently only used when displaying a card for the resource link
-     * launch request.
+     * This is distinct from the base `title` field:
+     * * this comes directly from the LTI tool, instead of being input by the
+     *   user
+     * * this is currently only used when displaying a card for the resource
+     *   link launch request
      */
     private ?string $ltiAssessmentTitle = null;
 
     /**
      * The text of the LTI assessment, as retrieved from the LTI tool.
      *
-     * This is currently only used when displaying a card for the resource link
-     * launch request.
+     * This is distinct from the base `description` field:
+     * * this comes directly from the LTI tool, instead of being input by the
+     *   user
+     * * this is currently only used when displaying a card for the resource
+     *   link launch request
+     * * this is plain text, not HTML
      */
     private ?string $ltiAssessmentText = null;
 

@@ -26,8 +26,9 @@ class Model extends AbstractAssessment
     /**
      * The LTI assessment's URL, if there is one.
      *
-     * This value will be fetched from an LTI Resource Link content item
-     * returned as part of a deep linking response message:
+     * This value will be fetched from the "url" field of an LTI Resource Link
+     * content item returned as part of a deep linking response message
+     * (or the tool's link launch URL, if not present):
      * @see https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link
      * @see https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-response-message
      *
@@ -36,6 +37,36 @@ class Model extends AbstractAssessment
      * @see https://www.imsglobal.org/spec/lti/v1p3/#resource-link-launch-request-message
      */
     private ?string $ltiAssessmentUrl = null;
+
+    /**
+     * The title of the LTI assessment, as retrieved from the LTI tool.
+     *
+     * This value will be fetched from the "title" field of an LTI Resource Link
+     * content item returned as part of a deep linking response message:
+     * @see https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link
+     * @see https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-response-message
+     *
+     * This is distinct from the base `title` field in that:
+     * * this is currently only used when displaying a card for the resource
+     *   link launch request
+     */
+    private ?string $ltiAssessmentTitle = null;
+
+    /**
+     * The text of the LTI assessment, as retrieved from the LTI tool.
+     *
+     * This value will be fetched from the "text" field of an LTI Resource Link
+     * content item returned as part of a deep linking response message:
+     * @see https://www.imsglobal.org/spec/lti-dl/v2p0#lti-resource-link
+     * @see https://www.imsglobal.org/spec/lti-dl/v2p0#deep-linking-response-message
+     *
+     * This is distinct from the base `description` field in that:
+     * * this is currently only used when displaying a card for the resource
+     *   link launch request
+     * * this is plain text, not HTML
+     * * this is not subject to Custom Assessment Participation
+     */
+    private ?string $ltiAssessmentText = null;
 
     /**
      * The LTI tool with which the LTI assessment URL was selected.
@@ -197,6 +228,42 @@ class Model extends AbstractAssessment
     public function setLtiAssessmentUrl(?string $ltiAssessmentUrl): self
     {
         $this->ltiAssessmentUrl = $ltiAssessmentUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLtiAssessmentTitle(): ?string
+    {
+        return $this->ltiAssessmentTitle;
+    }
+
+    /**
+     * @param string|null $ltiAssessmentTitle
+     * @return static
+     */
+    public function setLtiAssessmentTitle(?string $ltiAssessmentTitle): self
+    {
+        $this->ltiAssessmentTitle = $ltiAssessmentTitle;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLtiAssessmentText(): ?string
+    {
+        return $this->ltiAssessmentText;
+    }
+
+    /**
+     * @param string|null $ltiAssessmentText
+     * @return static
+     */
+    public function setLtiAssessmentText(?string $ltiAssessmentText): self
+    {
+        $this->ltiAssessmentText = $ltiAssessmentText;
         return $this;
     }
 
