@@ -50,15 +50,17 @@
                 <p>No providers which support selection of assessments have been configured. Please contact your system administrator.</p>
             </div>
         {% else %}
-            <select id="lti-tool-id" name="ltiToolId">
-                <option value="">-- Select a Learning Tool Provider</option>
-                {% for tool in ltiTools %}
-                    <option value="{{ tool.id }}"
-                            label="{{ tool.name }}"
-                            data-tool-selector-url="{{ routeLookup('ltiPlatform.getGenerateDeepLinkingRequest', {toolId: tool.id}) }}">{{ tool.name }}</option>
-                {% endfor %}
-            </select>
-            <a href="#" id="ltiToolLaunchPicker" class="button disabled">Launch Picker</a>
+            <div class="input-group">
+                <select id="lti-tool-id" name="ltiToolId">
+                    <option value="">-- Select a Learning Tool Provider</option>
+                    {% for tool in ltiTools %}
+                        <option value="{{ tool.id }}"
+                                label="{{ tool.name }}"
+                                data-tool-selector-url="{{ routeLookup('ltiPlatform.getGenerateDeepLinkingRequest', {toolId: tool.id}) }}">{{ tool.name }}</option>
+                    {% endfor %}
+                </select>
+                <a href="#" id="ltiToolLaunchPicker" class="button disabled icon-lti">Launch Picker</a>
+            </div>
         {% endif %}
     </div>
 
@@ -73,13 +75,6 @@
                     <p id="ltiAssessmentTextDisplay">{{ assessment.ltiAssessmentText ?? '' }}</p>
 
                     {# LTI assessment URL + required hidden fields #}
-{#                    <input readonly#}
-{#                           required#}
-{#                           id="lti-assessment-url"#}
-{#                           name="ltiAssessmentUrl"#}
-{#                           type="text"#}
-{#                           maxlength="2048"#}
-{#                           value="{{ assessment.ltiAssessmentUrl }}">#}
                     <input type="hidden" id="lti-assessment-url" name="ltiAssessmentUrl" value="{{ assessment.ltiAssessmentUrl ?? '' }}" />
                     <input type="hidden" id="lti-assessment-title" name="ltiAssessmentTitle" value="{{ assessment.ltiAssessmentTitle ?? '' }}" />
                     <input type="hidden" id="lti-assessment-text" name="ltiAssessmentText" value="{{ assessment.ltiAssessmentText ?? '' }}" />
