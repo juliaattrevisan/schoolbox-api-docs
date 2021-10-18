@@ -148,7 +148,7 @@ class Mapper extends Schoolbox\Mapper
                     ->setUsersCreated(0)
                     ->setUsersUpdated(0)
                     ->setUsersSkipped(0)
-                    ->setRoleType('unknown')
+                    ->setRoleType(null)
                     ->setStorage($file)
                     ->setDry(true);
 
