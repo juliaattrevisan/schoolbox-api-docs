@@ -177,7 +177,7 @@ class Profile implements IStrategy
          */
         $this->log->info('Processing students and their parents.');
 
-        $this->importStudents();
+//        $this->importStudents();
 
         /* Import staff profile data
          */

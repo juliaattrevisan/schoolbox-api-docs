@@ -29,7 +29,7 @@ class Preloader
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -37,19 +37,19 @@ class Preloader
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Api
      */
-    private $api;
+    private Api $api;
 
 
     /**
      * @var Registry
      */
-    private $registry;
+    private Registry $registry;
 
 
     /**
@@ -57,7 +57,7 @@ class Preloader
      *
      * @var string
      */
-    private $fromDate;
+    private string $fromDate;
 
 
     /**
@@ -65,7 +65,7 @@ class Preloader
      *
      * @var string
      */
-    private $toDate;
+    private string $toDate;
 
 
     /**
@@ -102,6 +102,7 @@ class Preloader
      *
      * @param string $externalId
      * @return array|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function compile(string $externalId): ?array
     {
@@ -197,13 +198,6 @@ class Preloader
          */
         $timetable = [];
 
-        /* A temporary cache for teacher id endpoints
-         * because sentral is so damn slow
-         *
-         * Trade space for time
-         */
-        $teacherCache = [];
-
         foreach ($payload['data'] as $timetableLesson) {
             $teacher = [
                 'externalId' => '',
@@ -212,17 +206,11 @@ class Preloader
                 'id' => '',
             ];
 
-            /* Go digging in another endpoint for names and identifier
+            /* Make a massive assumption here that their list of teachers is correct
+             * Previously, went digging in another endpoint for names and identifier
              */
             if (isset($timetableLesson['attributes']['teacherIds'][0]) && '' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
-                $endpoint = "enrolments/staff/{$timetableLesson['attributes']['teacherIds'][0]}/person";
-
-                /* Load it from the cache, if we have it;
-                 * Otherwise just hit that api
-                 */
-                if (isset($teacherCache[$endpoint])) {
-                    $teacher = $teacherCache[$endpoint];
-
+                if ($timetableLesson['attributes']['teacherIds'][0] === $data['person']['id']) {
                     $this->log->debug(sprintf(
                         'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
                         $teacher['firstname'],
@@ -230,51 +218,22 @@ class Preloader
                         $teacher['externalId'],
                         $teacher['id']
                     ));
-                } else {
-                    try {
-                        $teacherPayload = $this->api->retrieveDocument($endpoint);
 
-                        /* The teacher's staffCode isn't found in this payload; it's found one call deeper
-                         * Only dig further if we haven't dug this far before
-                         */
-                        $this->log->debug(sprintf(
-                            'Digging for teacher external ids via endpoints %s and %s',
-                            $endpoint,
-                            $teacherPayload['data']['links']['staff']
-                        ));
-
-                        $teacherExternalPayload = $this->api->retrieveDocument($teacherPayload['data']['links']['staff']);
-
-                        /* Note:
-                         * staffCode contains a value like "BING" for a teacher
-                         * timetableCode also contains this value; not sure if they could/would be different
-                         */
-                        $teacherExternalId = $teacherExternalPayload['data']['attributes']['staffCode'];
-
-                        $teacher = [
-                            'externalId' => $teacherExternalId,
-                            'firstname' => $teacherPayload['data']['attributes']['firstName'],
-                            'surname' => $teacherPayload['data']['attributes']['lastName'],
-                            'id' => $timetableLesson['attributes']['teacherIds'][0],
-                        ];
-                    } catch (\InvalidArgumentException $e) {
-                        $this->log->warning(sprintf(
-                            'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
-                            $timetableLesson['attributes']['teacherIds'][0],
-                            $timetableLesson['attributes']['teacherName']
-                        ));
-
-                        $teacher = [
-                            'externalId' => '',
-                            'firstname' => '',
-                            'surname' => '',
-                            'id' => $timetableLesson['attributes']['teacherIds'][0],
-                        ];
-                    }
-
-                    /* Remember this for later
+                    /* Directly reuse the data we collated from Profile lookup
+                     * It happens to be synonymous...
                      */
-                    $teacherCache[$endpoint] = $teacher;
+                    $teacher = $data['person'];
+                } else {
+                    /* The first element of [attributes][teacherIds] was not the staff member we're currently
+                     * looking at; could be multiple teachers of this class...
+                     */
+                    $this->log->warning(sprintf(
+                        'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
+                        $timetableLesson['attributes']['teacherIds'][0],
+                        $timetableLesson['attributes']['teacherName']
+                    ));
+
+                    $teacher['id'] = $timetableLesson['attributes']['teacherIds'][0];
                 }
             } else {
                 $this->log->warning(sprintf(
