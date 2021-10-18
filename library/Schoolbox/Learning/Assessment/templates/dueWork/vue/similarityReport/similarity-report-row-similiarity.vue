@@ -1,9 +1,11 @@
 <script>
 
 /**
- * The similarity of files
- * 
+ * The similarity of files, displays the list of files in a submission
+ * and links to the report for each
  */
+
+import FilterEvents from './similarityReportFilterEvents';
 
 export default {
 
@@ -14,7 +16,42 @@ export default {
     },
   },
 
+  data () {
+    return {
+      currentSimilartyScoreSelection: 0 //to be able to show only those files above the currently selected similarity score
+    }
+  },
+
+  computed: {
+
+    /**
+     * Only show those files that are above the currently selected
+     * similarity score
+     * 
+     * @returns { Array }
+     */
+    matchedFiles () {
+      return this.data.files.filter((file) => {
+        return parseInt(file.turnitin.percentage) >= parseInt(this.currentSimilartyScoreSelection);
+      });
+    }
+
+  },
+
+  mounted () {
+    this.initSimilartyScoreChangedListener();
+  },
+
   methods: {
+
+    /**
+     * To update the files shown
+     */
+    initSimilartyScoreChangedListener () {
+      document.addEventListener(FilterEvents.SIMILARITY_SCORE, (event) => {
+        this.currentSimilartyScoreSelection = parseInt(event.detail.score);
+      });
+    },
 
     /**
      * Display the file name with the similairty score prepended
@@ -71,16 +108,20 @@ export default {
 </script>
 
 <template>
-  <ul class="list">
-    <li v-for="file in data.files" :key="file.id">
-      <a :href="file._links.turnitin_report" :style="{ color: getFileColour(file) }" title="View similarity report">
-        {{ getFileTitle(file) }}
-      </a>
-    </li>
-  </ul>
+  <div class="title-on-single-column" data-title="Similarity %"> 
+    <ul class="list">
+      <li v-for="file in matchedFiles" :key="file.id">
+        <a :href="file._links.turnitin_report" :style="{ color: getFileColour(file) }" title="View similarity report">
+          {{ getFileTitle(file) }}
+        </a>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <style lang="scss" style="scoped">
+
+@import './similarity-report';
 
 .list {
   list-style-type: none;

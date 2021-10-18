@@ -11,7 +11,7 @@ export default {
 
   data () {
     return {
-      similarityScoreSelection: '',
+      similarityScoreSelection: 0,
       isResubmissionRequiredChecked: true,
       isMarkingRequiredChecked: true,
       isReviewedChecked: true,
@@ -27,6 +27,9 @@ export default {
      */
     onSimilarityScoreChange () {
       Event.$emit(`vue-tables.filter::${FilterEvents.SIMILARITY_SCORE}`, this.similarityScoreSelection); //picked up by similarity-report.vue 
+      this.$nextTick(() => { //to ensure the latest filtered rows are available
+        document.dispatchEvent(new CustomEvent(FilterEvents.SIMILARITY_SCORE, { detail: { score: this.similarityScoreSelection } } ) );
+      });
     },
 
     /**
@@ -66,11 +69,11 @@ export default {
 
 <template>
 
-  <div class="content">
-    <div class="small-12 medium-6 columns">
+  <div class="filters">
+    <div class="filters__column">
       <legend>Similarity score</legend>
         <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange($event.target.value)">
-          <option value="">-</option>
+          <option value="0">-</option>
           <option value="40">Above 40%</option>
           <option value="50">Above 50%</option>
           <option value="60">Above 60%</option>
@@ -79,7 +82,7 @@ export default {
           <option value="90">Above 90%</option>
         </select>
     </div>
-    <div class="small-12 medium-6 columns">
+    <div class="filters__column">
       <div class="checklist">
         <legend>Status</legend>
         <ul class="option-list">
@@ -104,17 +107,32 @@ export default {
 
 <style lang="scss" scoped>
 
-.columns { 
-  padding: 2rem 1rem 1rem 1rem; //give it some extra top/bottom padding to sit in the table container
+@import './similarity-report';
+
+.filters {
+  background: white;
+  display: flex;
+  padding: 1rem 0;
+  @media (max-width: $tableToSingleColumn) {
+    flex-direction: column;
+  }
 }
 
+  .filters__column { 
+    flex: 1 1 0; //keep both sides equal
+    margin: 0 1rem;
+  }
+
 legend { 
-  margin-bottom: 0.5rem; //extra gap between it and the form element
+  margin-bottom: 0.5rem; //extra gap between it and the form element below
 }
 
 .option-list li {
   display: inline-block; //rather than block, to line up with similarity score filter better
   margin-right: 2rem;
+  @media (max-width: $tableToSingleColumn) {
+    display: block;
+  }
 }
 
 </style>

@@ -9,14 +9,14 @@
 {{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row">
-    <div class="small-12 columns">
-        <h1>Similarity Report for {{ assessment.title }}</h1>
-    </div>
+  <div class="small-12 columns">
+    <h1>Similarity Report for {{ assessment.title }}</h1>
+  </div>
 </div>
 
 <div id="similarity-report-container">
-    <similarity-report
-        payload-url="{{ payloadUrl }}"
-    />
+  <similarity-report
+    payload-url="{{ payloadUrl }}"
+  />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/similarityReport.js"></script>

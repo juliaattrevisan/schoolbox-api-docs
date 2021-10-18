@@ -25,7 +25,7 @@ export default {
   ],
   
   props: {
-    payloadUrl: { //where to get the data from
+    payloadUrl: { //where to get the tableData from
       type: String,
       required: true
     },
@@ -35,10 +35,10 @@ export default {
     return {
       isDataLoaded: false, //show loading display until true
       hasDataLoadError: false, //display load error
-      data: [], //hold all student data
-      columns: ['student', 'submissionDate', 'similarity',  'status'], //the table columns
+      tableData: [], //hold all student tableData
+      tableColumns: ['student', 'submissionDate', 'similarity',  'status'], //the table tableColumns
       tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-        customFilters: [
+        customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info 
           {    
             name: FilterEvents.SIMILARITY_SCORE,    
             callback: (row, filteredPercentage) => { 
@@ -92,9 +92,9 @@ export default {
           similarity: 'Similarity %',
           status: 'Status',
         },
-        orderBy: {
+        orderBy: { //initial sorting display
           ascending: true,
-          column: 'student' //initial sorting display
+          column: 'student' 
         },
         perPage: 50, 
         perPageValues: [50, 100, 200],
@@ -107,7 +107,7 @@ export default {
           down: 'glyphicon-chevron-down'
         },
         tabbable: false,
-        templates: {      
+        templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info        
           student: SimilarityReportRowStudent,
           submissionDate: SimilarityReportRowSubmissionDate,
           similarity: SimilarityReportRowSimilarity,
@@ -131,7 +131,7 @@ export default {
      * @returns { Boolean }
      */
     hasNoSubmissions () {
-      return this.isDataLoaded && !this.hasDataLoadError && this.data.length === 0;
+      return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length === 0;
     },
 
     /**
@@ -140,25 +140,25 @@ export default {
      * @returns { Boolean }
      */
     hasSubmissions () {
-      return this.isDataLoaded && !this.hasDataLoadError && this.data.length > 0;
+      return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length > 0;
     },
 
   },
 
   mounted () {
-    this.getData();
+    this.getTableData();
   },
 
   methods: {
 
     /**
-     * Load the current student data
+     * Load the current student tableData
      */
-    async getData () {
+    async getTableData () {
       try {
         const response = await fetch(this.payloadUrl);
         const responseData = await response.json();
-        this.data = responseData;
+        this.tableData = responseData;
       } catch (error) {
         console.warn(error);
         this.hasDataLoadError = true; //show load error
@@ -188,8 +188,8 @@ export default {
       <v-client-table 
         v-if="hasSubmissions"
         ref="table"
-        :data="data" 
-        :columns="columns" 
+        :data="tableData" 
+        :columns="tableColumns" 
         :options="tableOptions" 
         @loaded="onLoaded" 
       >
@@ -208,7 +208,7 @@ export default {
 
       <div v-else-if="hasDataLoadError">
         <section class="content">
-          <div data-alert class="alert-box alert">
+          <div tableData-alert class="alert-box alert">
             Sorry, we are currently unable to load the Similarity Report. Please contact Schoolbox Support it the problem persists. 
           </div>
         </section>
@@ -241,5 +241,17 @@ export default {
 <style lang="scss">
 
 @import '@vue/components/vueTables2/vueTables2';
+@import './similarity-report';
+
+@media (max-width: $tableToSingleColumn) { //display everything in one column
+  .VueTables thead {
+    display: none;
+  }
+  .VueTables .VueTables__row td {
+    display: block;
+    padding: 0.5rem 0;
+    width: 100%;
+  }  
+}
 
 </style>
