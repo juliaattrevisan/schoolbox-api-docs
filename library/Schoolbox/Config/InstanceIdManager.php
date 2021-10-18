@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Config;
 
-use Alaress\Async\Test\TestCase;
 use Aura\Di\Exception\ServiceNotFound;
 use Etherpad\PadMapper;
 use LogicException;
@@ -17,26 +16,12 @@ use PDOException;
 use Predis;
 use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\MQ;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use UnderflowException;
 use UnexpectedValueException;
 
-use function array_merge;
-use function defined;
-use function exec;
-use function implode;
-use function opendir;
-use function passthru;
-use function preg_match;
-use function preg_replace;
-use function realpath;
-use function rename;
-use function sprintf;
-
-use const INSTANCE_ID;
 
 /**
  * A CLI tool for updating a school's instance ID.
@@ -91,14 +76,13 @@ class InstanceIdManager extends CliTool\App
             $this->getLogger()->notice("New instance id == Old instance id ('{$newInstanceId}'), nothing to do.");
         }
 
-        $this->updateConfFile($oldInstanceId, $newInstanceId);
+        $this->updateIniFile($oldInstanceId, $newInstanceId);
         $this->updateRedisKeys($oldInstanceId, $newInstanceId);
         $this->updateEtherpadEnvironments($oldInstanceId, $newInstanceId);
         $this->renameLockFiles($oldInstanceId, $newInstanceId);
         $this->renameMessageQueues($oldInstanceId, $newInstanceId);
         $this->rebuildSubscriptionCache($newInstanceId);
         $this->restartDaemons();
-        $this->rebuildSkin();
 
         $this->getLogger()->notice('INSTANCE_ID update successful');
     }
@@ -132,27 +116,31 @@ class InstanceIdManager extends CliTool\App
      * @param string $newInstanceId
      * @throws LogicException
      */
-    private function updateConfFile(string $oldInstanceId, string $newInstanceId): void
+    private function updateIniFile(string $oldInstanceId, string $newInstanceId): void
     {
         $this->getLogger()->notice('Updating conf file');
-        $confFile = __DIR__ . '/../../../www/conf/conf.php';
-        $confFile = realpath($confFile);
+        $siteRootParts = explode('/', SITE_root);
+        $package = end($siteRootParts);
+        if($package === 'vagrant'){
+            $package = 'schoolbox';
+        }
+        $iniFile = "/etc/$package/instances.ini";
 
-        $command = "sed -i -E \"s/^\s*define\(['\\\"]INSTANCE_ID['\\\"],\s*['\\\"]{$oldInstanceId}['\\\"]\);/    define('INSTANCE_ID', '$newInstanceId');/g\" $confFile 2>&1";
+        $command = "sed -i -E \"s/\[$oldInstanceId\]/[$newInstanceId]/g\" $iniFile 2>&1";
         exec($command, $output, $returnVar);
         $this->getLogger()->debug("About to execute command:\n$command");
         if ($returnVar) {
-            throw new LogicException("Unable to update INSTANCE_ID in conf file\n" . implode("\n", $output));
+            throw new LogicException("Unable to update INSTANCE_ID in ini file\n" . implode("\n", $output));
         }
 
-        $command = "grep -q \"    define('INSTANCE_ID', '$newInstanceId');\" $confFile";
+        $command = "grep -q \"[$newInstanceId]\" $iniFile";
         $this->getLogger()->debug("About to execute command:\n$command");
         exec($command, $output, $returnVar);
         if ($returnVar) {
-            throw new LogicException("Unable to locate updated INSTANCE_ID in conf file");
+            throw new LogicException("Unable to locate updated INSTANCE_ID in ini file");
         }
 
-        $this->getLogger()->notice("INSTANCE_ID updated in conf file from '$oldInstanceId' to '$newInstanceId'");
+        $this->getLogger()->notice("INSTANCE_ID updated in ini file from '$oldInstanceId' to '$newInstanceId'");
     }
 
 
@@ -277,22 +265,6 @@ class InstanceIdManager extends CliTool\App
 
 
     /**
-     * Rebuild the skin (it's output contains the instance id)
-     */
-    private function rebuildSkin(): void
-    {
-        $this->getLogger()->notice('Rebuilding skin');
-        $skinBuilder = __DIR__ . '/../../../tools/skin/builder.php';
-        $skinBuilder = realpath($skinBuilder);
-        $this->getLogger()->info("Invoking skin builder at: '$skinBuilder'");
-        passthru("php $skinBuilder -f", $returnCode);
-        if ($returnCode) {
-            $this->getLogger()->error("Unexpected return code when running skin builder");
-        }
-    }
-
-
-    /**
      * Rebuild subscripts so users are bound to correct channels
      * @param string $newInstanceId
      * @throws ServiceNotFound
@@ -312,25 +284,10 @@ class InstanceIdManager extends CliTool\App
      */
     private function restartDaemons(): void
     {
-        $this->getLogger()->notice('Restarting daemons');
-        // TODO, this is the only definition of these constants I could find, they should be defined
-        // somewhere more appropriate, but still better than using magic strings.
-        $daemons = [
-            TestCase::DAEMON_BELL,
-            TestCase::DAEMON_DIGEST,
-            TestCase::DAEMON_ROUTE,
-            TestCase::DAEMON_SCHEDULE,
-            TestCase::DAEMON_SOCKET,
-        ];
-
-        foreach ($daemons as $daemon) {
-            $liveOrDev = $this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING ? 'dev' : '';
-            $command   = "service schoolbox$liveOrDev-$daemon restart";
-            $this->getLogger()->debug("Executing:\n    $command");
-            exec($command, $output, $returnCode);
-            if ($returnCode) {
-                $this->getLogger()->error("Unexpected return code when restarting daemon '$daemon':\n" . implode("\n", $output));
-            }
+        $this->getLogger()->notice('Rebuilding + restarting daemons');
+        exec("schoolbox-rebuild-daemons --conf", $output, $returnCode);
+        if ($returnCode) {
+            $this->getLogger()->error("Unexpected return code when rebuilding daemons:\n" . implode("\n", $output));
         }
     }
 }
