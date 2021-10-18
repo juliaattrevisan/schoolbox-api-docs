@@ -365,7 +365,7 @@
             }).alaressValidate({
                 onfocusout: false,
                 submitHandler: function() {
-                    
+
                     var theForm = $(config.element);
 
                     theForm.find('input[type="submit"]').prop('disabled', true); //prevent multiple submissions
@@ -563,11 +563,9 @@
                     {name: 'basicstyles', groups: ['cleanup']}
                 ],
 
-                allowedContent: {
-                    span: {
-                        classes: 'selected-word'
-                    }
-                },
+                allowedContent:
+                    'img[!src,data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source];' +
+                    'span(selected-word)',
 
                 /* Words to "make blank" in fillgap
                  */
