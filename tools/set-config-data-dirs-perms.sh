@@ -16,6 +16,7 @@ readonly L_DEBUG=100
 readonly L_INFO=200
 readonly L_WARN=300
 readonly L_ERROR=400
+readonly ARG_HELP='help'
 readonly ARG_OWNER='owner'
 readonly ARG_GROUP='group'
 readonly ARG_DIR='dir'
@@ -77,24 +78,63 @@ function parse_paths(){
   site_root=$(readlink -f "$this_file_dir"/../);
 }
 
+# Display help message
+help(){
+  echo "NAME"
+  echo "  $(basename "$0")"
+  echo ""
+  echo "DESCRIPTION"
+  echo "  Fix data dir ownership + permissions."
+  echo "  Data dirs are specified using their config_name, eg 'storage_dir', and the file system path"
+  echo "  is looked up in the instance's database."
+  echo "  Can fix just permissions, or permissions + ownership"
+  echo ""
+  echo "SYNOPSIS"
+  echo "  --$ARG_HELP        Display this help message and exit"
+  echo "  -$ARG_VERBOSE_SHORT|--$ARG_VERBOSE_LONG  Display extra verbosity during processing"
+  echo "  --$ARG_OWNER       Change file/dir owner to this user"
+  echo "  --$ARG_GROUP       Change file/dir group to this user"
+  echo "  --$ARG_DIR         The name of a data dir to process, eg 'storage_dir'."
+  echo "                If not specified, target all data dirs. Can be specified multiple times"
+  echo "  --$ARG_SKIP_DIR        The name of a data dir to skip, eg 'storage_dir'."
+  echo "                Only makes sense when no data dirs specified using --$ARG_DIR"
+  echo ""
+  echo "EXAMPLES"
+  echo "  # Fix all file/dir permissions"
+  echo "  $(basename "$0")"
+  echo ""
+  echo "  # Fix file/dir permissions on all except 'storage_dir'"
+  echo "  $(basename "$0") --skip storage_dir"
+  echo ""
+  echo "  # Fix file/dir permissions + ownership permissions on all"
+  echo "  $(basename "$0") --owner www-data --group www-data"
+  echo ""
+  echo "  # Fix file/dir permissions + ownership permissions on twig + purifier caches"
+  echo "  $(basename "$0") --owner www-data --group www-data --dir twig_cache_dir --dir purifier_cache_dir"
+}
+
 
 # Parse CLI args
 function parse_cli_args(){
   while [[ $# -gt 0 ]]; do
     case $1 in
-      -$ARG_VERBOSE_SHORT|--$ARG_VERBOSE_LONG)
+      --"$ARG_HELP")
+        help
+        exit
+      ;;
+      -"$ARG_VERBOSE_SHORT"|--"$ARG_VERBOSE_LONG")
       verbose="1"; shift;
       ;;
-      --$ARG_OWNER)
+      --"$ARG_OWNER")
       owner="$2"; shift; shift;
       ;;
-      --$ARG_GROUP)
+      --"$ARG_GROUP")
       group="$2"; shift; shift;
       ;;
-      --$ARG_DIR)
+      --"$ARG_DIR")
       data_dir_include+=("$2"); shift; shift;
       ;;
-      --$ARG_SKIP_DIR)
+      --"$ARG_SKIP_DIR")
       data_dir_skip+=("$2")
       shift # past argument
       shift # past value
@@ -108,6 +148,7 @@ function parse_cli_args(){
   done
 
   if [[ $errors == '1' ]]; then
+    error "Use --$ARG_HELP to display valid syntax"
     exit 1
   fi
 }
@@ -244,13 +285,13 @@ function update_directories(){
       log "Updating directory ($data_dir): $dir_path"
       if [[ -n $owner ]] && [[ -n $group ]]; then
         debug "Setting file owner and group to $owner:$group"
-        chown -R "$owner":"$group" "$dir_path"
+        find "$dir_path" -not -user "$owner" -or -not -group "$group" -exec chown "$owner":"$group" {} +
       elif [[ -n $owner ]] && [[ -z $group ]]; then
         debug "Setting file owner to $owner"
-        chown -R "$owner" "$dir_path"
+        find "$dir_path" -not -user "$owner" -exec chown "$owner" {} +
       elif [[ -z $owner ]] && [[ -n $group ]]; then
         debug "Setting file group to $group"
-        chgrp -R "$group" "$dir_path"
+        find "$dir_path" -not -group "$group" -exec chgrp "$group" {} +
       else
         debug "Retaining current owner and group"
       fi
@@ -265,11 +306,11 @@ function update_directories(){
 
 
 function main(){
-  log "Updating data directory permissions";
   check_run_as_root
   set_up_env
   parse_paths
   parse_cli_args "$@"
+  log "Updating data directory permissions";
   parse_sql_credentials
   parse_available_data_dirs
   derive_data_dirs
