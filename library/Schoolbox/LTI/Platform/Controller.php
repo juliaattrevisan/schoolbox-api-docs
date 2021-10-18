@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
@@ -170,6 +171,7 @@ class Controller extends Base
      * @since 21.1.0
      *
      * @param ToolModel $tool
+     * @throws LtiExceptionInterface if the result contains an error
      * @throws LtiExceptionInterface if somehow resource links can't be created
      */
     public function getReceiveDeepLinkingResponse(ToolModel $tool): void
@@ -177,6 +179,9 @@ class Controller extends Base
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
         $result = (new ToolOriginatingLaunchFactory($this->repository))->build($this->request);
+        if ($result->hasError()) {
+            throw new LtiException($result->getError());
+        }
 
         // Each content item should be a link, which may be launched as a
         // resource link launch request.
