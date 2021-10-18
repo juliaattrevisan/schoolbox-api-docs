@@ -58,7 +58,7 @@
                             data-tool-selector-url="{{ routeLookup('ltiPlatform.getGenerateDeepLinkingRequest', {toolId: tool.id}) }}">{{ tool.name }}</option>
                 {% endfor %}
             </select>
-            <a href="#" data-action="selectTool" class="button">Launch Picker</a>
+            <a href="#" id="ltiToolLaunchPicker" class="button">Launch Picker</a>
         {% endif %}
     </div>
 
@@ -66,6 +66,7 @@
     <div id="ltiAssessment" class="{{ assessment.ltiAssessmentUrl is empty ? 'hide' : '' }}">
         <h3 id="ltiAssessmentTitleDisplay">{{ assessment.ltiAssessmentTitle ?? '' }}</h3>
         <div id="ltiAssessmentTextDisplay">{{ (assessment.ltiAssessmentText ?? '') | nl2br }}</div>
+        <a href="#" id="ltiAssessmentClear" class="button">Clear</a>
     </div>
 
     <div id="toolModal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
@@ -91,47 +92,46 @@
                 let $toolModal       = $('#toolModal'),
                     $toolIdSelector  = $('#lti-tool-id'),
                     $toolModalIframe = $toolModal.find('#toolModalIframe');
-                $('[data-action="selectTool"]').click(function (event) {
+                $('#ltiToolLaunchPicker').click(function (event) {
                     event.preventDefault();
-                    let $this          = $(this),
-                        messageHandler = (event) => {
-                            // Fill in the form with values from the message data
-                            let data         = JSON.parse(event.data),
-                                tool         = data?.tool,
-                                resourceLink = data?.resourceLinks?.[0];
+                    let messageHandler = (event) => {
+                        // Fill in the form with values from the message data
+                        // TODO figure out if optional chaining is supported in all targeted browsers
+                        let data         = JSON.parse(event.data),
+                            tool         = data?.tool,
+                            resourceLink = data?.resourceLinks?.[0];
 
-                            // // Set the tool which was used to select the item
-                            // // TODO figure out if optional chaining is supported in all targeted browsers
-                            // $('#lti-tool-id').val(tool?.id);
-
-                            // Look at the first resource link, set values based on that
-                            if (resourceLink) {
-                                let url = resourceLink?.url;
-                                if (url) {
-                                    $('#lti-assessment-url').val(resourceLink?.url);
-                                    $('#custom-fields').val(JSON.stringify(resourceLink?.custom ?? {}));
-                                    let lineItem = resourceLink?.lineItem;
-                                    if (lineItem?.resourceId) {
-                                        // This resource link has a line item, and a resource ID?
-                                        // Close the modal
-                                        $('#line-item-score-maximum').val(lineItem?.scoreMaximum);
-                                        $('#line-item-resource-id').val(lineItem?.resourceId);
-                                        $toolModal.foundation('reveal', 'close');
-                                    } else {
-                                        // Raise some warning that this isn't an assessment, and thus can't be graded.
-                                        // I guess still let it be used though.
-                                        $('#resourceLinkMissingLineItemModal').foundation('reveal', 'open');
-                                    }
+                        // Look at the first resource link, set values based on that
+                        if (resourceLink) {
+                            // Use the URL in the resource link? otherwise the tool's default launch URL
+                            let url = resourceLink?.url ?? tool?.launchUrl;
+                            if (url) {
+                                $('#lti-assessment-url').val(url);
+                                $('#custom-fields').val(JSON.stringify(resourceLink?.custom ?? {}));
+                                let lineItem = resourceLink?.lineItem;
+                                if (lineItem?.resourceId) {
+                                    // This resource link has a line item, and a resource ID?
+                                    // Close the modal
+                                    $('#line-item-score-maximum').val(lineItem?.scoreMaximum);
+                                    $('#line-item-resource-id').val(lineItem?.resourceId);
+                                    $toolModal.foundation('reveal', 'close');
                                 } else {
-                                    // Raise some warning about what was selected not having a URL.
-                                    // This should never happen, because the resource link must have a URL.
-                                    $('#resourceLinkMissingUrlModal').foundation('reveal', 'open');
+                                    // Raise some warning that this isn't an assessment, and thus can't be graded.
+                                    // I guess still let it be used though.
+                                    $('#resourceLinkMissingLineItemModal').foundation('reveal', 'open');
                                 }
                             } else {
-                                // Nothing was selected: just close the modal
-                                $toolModal.foundation('reveal', 'close');
+                                // Raise some warning about what was selected not having a URL.
+                                // This should never happen, because either
+                                // * the resource link will have a URL
+                                // * the tool will have a default URL
+                                $('#resourceLinkMissingUrlModal').foundation('reveal', 'open');
                             }
+                        } else {
+                            // Nothing was selected: just close the modal
+                            $toolModal.foundation('reveal', 'close');
                         }
+                    }
 
                     // On open of this modal:
                     // * point the iframe to the place which sends messages
