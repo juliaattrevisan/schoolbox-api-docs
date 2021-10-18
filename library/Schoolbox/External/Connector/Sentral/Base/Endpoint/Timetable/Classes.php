@@ -324,10 +324,10 @@ class Classes implements IStrategy
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
-        }
 
-        if ($this->perform) {
-            $this->classEntryMapper->save($timetableClass);
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
         }
 
         return $timetableClass;
@@ -435,8 +435,8 @@ class Classes implements IStrategy
         /* Create new relation
          */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-                                                                  ->setExternalId($person['externalId'])
-                                                                  ->setClass($timetableClass);
+            ->setExternalId($person['externalId'])
+            ->setClass($timetableClass);
 
         $this->log->info(sprintf(
             'Creating class involvement %s %s for %s (user %s)',

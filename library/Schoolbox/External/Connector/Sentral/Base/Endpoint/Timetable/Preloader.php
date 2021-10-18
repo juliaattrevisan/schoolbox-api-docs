@@ -208,13 +208,17 @@ class Preloader
 
             /* Make a massive assumption here that their list of teachers is correct
              * Previously, went digging in another endpoint for names and identifier
+             *
+             * TODO could be multiple teachers of this class...in that case, foreach() over this
              */
             if (isset($timetableLesson['attributes']['teacherIds'][0]) && '' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
-                if ((int)$timetableLesson['attributes']['teacherIds'][0] === (int)$data['person']['id']) {
+                $teacherData = $this->registry->findById((int)$timetableLesson['attributes']['teacherIds'][0], Profile::TYPE_STAFF);
+
+                if ($teacherData) {
                     /* Directly reuse the data we collated from Profile lookup
                      * It happens to be synonymous...
                      */
-                    $teacher = $data['person'];
+                    $teacher = $teacherData['person'];
 
                     $this->log->debug(sprintf(
                         'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
@@ -224,8 +228,7 @@ class Preloader
                         $teacher['id']
                     ));
                 } else {
-                    /* The first element of [attributes][teacherIds] was not the staff member we're currently
-                     * looking at; could be multiple teachers of this class...
+                    /* Could not find someone in the lookup registry containing this id
                      */
                     $this->log->warning(sprintf(
                         'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
