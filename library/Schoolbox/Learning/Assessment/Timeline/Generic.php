@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Closure;
+use Schoolbox\Collection;
 
 /**
  * Generic timeline builder.
@@ -40,17 +41,24 @@ class Generic extends Full
         $includeDraftResponses,
         $minimumVisibility
     ) {
+        $responses = $includeDraftResponses
+            ? $this->participant->getSubmittedResponses()
+            : $this->participant->getAllResponses();
+
+        // Can feedbacks be seen due to minumum visibility?
+        // If the assessment doesn't support mark visibility, then assume that
+        // feedbacks are always visible.
+        $isFeedbackVisible = $this->participant->getAssessable()->getMarkVisibility() >= $minimumVisibility;
+        if ($isFeedbackVisible) {
+            $feedbacks = $includeUnpublishedInstructorFeedback
+                ? $this->participant->getPublishedFeedbacks()
+                : $this->participant->getAllFeedbacks();
+        } else {
+            $feedbacks = new Collection();
+        }
         $this->recombined = $this->recombined
-            ->merge(
-                $includeDraftResponses
-                    ? $this->participant->getSubmittedResponses()
-                    : $this->participant->getAllResponses()
-            )
-            ->merge(
-                $includeUnpublishedInstructorFeedback
-                    ? $this->participant->getPublishedFeedbacks()
-                    : $this->participant->getAllFeedbacks()
-            )
+            ->merge($feedbacks)
+            ->merge($responses)
             ->sortByCallback(Closure::fromCallable([$this, 'sortRecombined']));
     }
 }
