@@ -99,7 +99,7 @@ class Controller extends Assessment\Controller
                 // Only LTI tools with a deep linking or launch URL are supported,
                 // otherwise there's no way to select content for them.
                 return $model->getDeepLinkingUrl() || $model->getLaunchUrl();
-            }),
+            })->sortNaturally('name'),
         ];
     }
 
