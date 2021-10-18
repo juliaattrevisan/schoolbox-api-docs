@@ -21,6 +21,8 @@ class Decorator implements DecoratorInterface
      * Constructor
      *
      * @param string|null $url
+     * @param string|null $ltiAssessmentTitle
+     * @param string|null $ltiAssessmentText
      * @param int|null    $toolId
      * @param array|null  $customFields
      * @param string|null $lineItemResourceId
@@ -28,12 +30,16 @@ class Decorator implements DecoratorInterface
      */
     public function __construct(
         ?string $url,
+        ?string $ltiAssessmentTitle,
+        ?string $ltiAssessmentText,
         ?int $toolId,
         ?array $customFields,
         ?string $lineItemResourceId,
         ?float $lineItemScoreMaximum
     ) {
         $this->setLtiAssessmentUrl($url);
+        $this->setLtiAssessmentTitle($ltiAssessmentTitle);
+        $this->setLtiAssessmentText($ltiAssessmentText);
         $this->setLtiToolId($toolId);
         $this->setCustomFields($customFields);
         $this->setLineItemResourceId($lineItemResourceId);
@@ -47,6 +53,8 @@ class Decorator implements DecoratorInterface
     {
         $assessment
             ->setLtiAssessmentUrl($this->ltiAssessmentUrl)
+            ->setLtiAssessmentTitle($this->ltiAssessmentTitle)
+            ->setLtiAssessmentText($this->ltiAssessmentText)
             ->setLtiTool((new LtiTool())->setId($this->ltiToolId))
             ->setCustomFields($this->customFields)
             ->setLineItemResourceId($this->lineItemResourceId)

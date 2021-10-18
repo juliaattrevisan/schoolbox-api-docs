@@ -17,6 +17,16 @@ trait LtiTrait
     protected ?string $ltiAssessmentUrl = null;
 
     /**
+     * The assessment title (from the tool, not the form input)
+     */
+    protected ?string $ltiAssessmentTitle = null;
+
+    /**
+     * The assessment text (from the tool, not the form input)
+     */
+    protected ?string $ltiAssessmentText = null;
+
+    /**
      * The LTI tool ID
      */
     protected ?int $ltiToolId = null;
@@ -51,6 +61,42 @@ trait LtiTrait
     public function setLtiAssessmentUrl(?string $ltiAssessmentUrl): self
     {
         $this->ltiAssessmentUrl = $ltiAssessmentUrl;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLtiAssessmentTitle(): ?string
+    {
+        return $this->ltiAssessmentTitle;
+    }
+
+    /**
+     * @param string|null $ltiAssessmentTitle
+     * @return $this
+     */
+    public function setLtiAssessmentTitle(?string $ltiAssessmentTitle): self
+    {
+        $this->ltiAssessmentTitle = $ltiAssessmentTitle;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLtiAssessmentText(): ?string
+    {
+        return $this->ltiAssessmentText;
+    }
+
+    /**
+     * @param string|null $ltiAssessmentText
+     * @return $this
+     */
+    public function setLtiAssessmentText(?string $ltiAssessmentText): self
+    {
+        $this->ltiAssessmentText = $ltiAssessmentText;
         return $this;
     }
 

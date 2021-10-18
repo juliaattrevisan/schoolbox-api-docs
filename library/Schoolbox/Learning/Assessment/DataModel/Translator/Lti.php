@@ -60,6 +60,8 @@ class Lti implements IAssessmentTypeTranslator
     {
         $dataModel
             ->setLtiAssessmentUrl($domainObject->getLtiAssessmentUrl())
+            ->setLtiAssessmentText($domainObject->getLtiAssessmentText())
+            ->setLtiAssessmentTitle($domainObject->getLtiAssessmentTitle())
             ->setLtiTool($domainObject->getLtiTool())
             ->setCustomFields($domainObject->getCustomFields())
             ->setLineItemResourceId($domainObject->getLineItemResourceId())
@@ -76,6 +78,8 @@ class Lti implements IAssessmentTypeTranslator
         $domainObject
             ->setMarkType((new MarkType())->setId(MarkType::TYPE_NONE))
             ->setLtiAssessmentUrl($dataModel->getLtiAssessmentUrl())
+            ->setLtiAssessmentText($dataModel->getLtiAssessmentText())
+            ->setLtiAssessmentTitle($dataModel->getLtiAssessmentTitle())
             ->setLtiTool($dataModel->getLtiTool())
             ->setCustomFields($dataModel->getCustomFields())
             ->setLineItemResourceId($dataModel->getLineItemResourceId())

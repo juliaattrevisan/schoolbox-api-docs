@@ -246,6 +246,8 @@ class Factory
 
         // LTI needs this to instantiate correctly
         $this->setLtiAssessmentUrl($post['ltiAssessmentUrl'] ?? null);
+        $this->setLtiAssessmentTitle($post['ltiAssessmentTitle'] ?? null);
+        $this->setLtiAssessmentText($post['ltiAssessmentText'] ?? null);
         $this->setLtiToolId(filter_var($post['ltiToolId'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
 
         // Ensure custom fields is an array if it's set
@@ -395,6 +397,8 @@ class Factory
         } elseif ($assessment instanceof LtiAssessment) {
             $decorator = new LtiDecorator(
                 $this->getLtiAssessmentUrl(),
+                $this->getLtiAssessmentTitle(),
+                $this->getLtiAssessmentText(),
                 $this->getLtiToolId(),
                 $this->getCustomFields(),
                 $this->getLineItemResourceId(),
