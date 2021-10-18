@@ -89,21 +89,25 @@ interface IResponse
     public function setAllFeedback(Collection $allFeedback);
 
     /**
-     * Get the person who created this IResponse (typically a student)
-     * This -can- be the teacher if they submit on behalf of a student
+     * Get the person who created this IResponse (typically a student).
      *
-     * @return User
+     * This -can- be the teacher if they submit on behalf of a student, or it
+     * could be unknown.
+     *
+     * @return User|null
      */
     public function getSubmittedBy();
 
     /**
-     * Set the person who created this IResponse (typically a student)
-     * This -can- be the teacher if they submit on behalf of a student
+     * Set the person who created this IResponse (typically a student).
      *
-     * @param User $submittedBy
+     * This -can- be the teacher if they submit on behalf of a student, or it
+     * could be unknown.
+     *
+     * @param User|null $submittedBy
      * @return $this
      */
-    public function setSubmittedBy(User $submittedBy);
+    public function setSubmittedBy(?User $submittedBy);
 
     /**
      * Get the person for whom the IResponse was created. This is used when
