@@ -202,7 +202,7 @@ class Preloader
             $teacher = [
                 'externalId' => '',
                 'firstname' => '',
-                'surname' => '',
+                'lastname' => '',
                 'id' => '',
             ];
 
@@ -210,19 +210,19 @@ class Preloader
              * Previously, went digging in another endpoint for names and identifier
              */
             if (isset($timetableLesson['attributes']['teacherIds'][0]) && '' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
-                if ($timetableLesson['attributes']['teacherIds'][0] === $data['person']['id']) {
-                    $this->log->debug(sprintf(
-                        'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
-                        $teacher['firstname'],
-                        $teacher['surname'],
-                        $teacher['externalId'],
-                        $teacher['id']
-                    ));
-
+                if ((int)$timetableLesson['attributes']['teacherIds'][0] === (int)$data['person']['id']) {
                     /* Directly reuse the data we collated from Profile lookup
                      * It happens to be synonymous...
                      */
                     $teacher = $data['person'];
+
+                    $this->log->debug(sprintf(
+                        'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
+                        $teacher['firstname'],
+                        $teacher['lastname'],
+                        $teacher['externalId'],
+                        $teacher['id']
+                    ));
                 } else {
                     /* The first element of [attributes][teacherIds] was not the staff member we're currently
                      * looking at; could be multiple teachers of this class...
