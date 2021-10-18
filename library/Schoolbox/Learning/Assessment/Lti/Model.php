@@ -214,6 +214,31 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * LTI assessment marks are currently always visible to all users which have
+     * permission to view the assessment.
+     *
+     * TODO add mark visibility as an actual field
+     *
+     * @return int
+     */
+    public function getMarkVisibility(): int
+    {
+        return self::MARK_VISIBILITY_PARENT_STUDENT;
+    }
+
+    /**
+     * LTI assessment marks are currently always visible to all users which have
+     * permission to view the assessment.
+     *
+     * @param int $markVisibility
+     * @return static
+     */
+    public function setMarkVisibility($markVisibility): self
+    {
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
     public function getLtiAssessmentUrl(): ?string
