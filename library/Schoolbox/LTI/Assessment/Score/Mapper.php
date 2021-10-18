@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Assessment\Score;
 
+use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
+use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 
@@ -80,5 +82,56 @@ class Mapper extends BaseMapper
         );
         $this->uses('is_response', self::TYPE_BOOLEAN);
         $this->uses('is_feedback', self::TYPE_BOOLEAN);
+    }
+
+    /**
+     * Include the LTI assessment itself in scores: required so that queries may
+     * work against the LTI assessment's assessment ID.
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('lti_assessment', 'lti_assessment')}
+        ";
+    }
+
+    /**
+     * Include the LTI assessment itself in scores: required so that queries may
+     * work against the LTI assessment's assessment ID.
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM        {$this->getTable()}
+            INNER JOIN  {$this->getJoinSql('lti_assessment', '', 'lti_assessment')}
+        ";
+    }
+
+    /**
+     * Include the LTI assessment itself in scores: required so that queries may
+     * work against the LTI assessment's assessment ID.
+     *
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model         = $this->hydrate($row);
+            $ltiAssessment = $this->hydrateJoin($row, 'lti_assessment', 'lti_assessment');
+            if ($ltiAssessment instanceof LTIAssessment) {
+                $model->setLtiAssessment($ltiAssessment);
+            }
+            $collection->add($model);
+        }
+        return $collection;
     }
 }
