@@ -149,7 +149,7 @@ abstract class AbstractResponse implements IResponse
      * @param User|null $submittedBy
      * @return $this
      */
-    public function setSubmittedBy(?User $submittedBy)
+    public function setSubmittedBy(?User $submittedBy): self
     {
         $this->submittedBy = $submittedBy;
         return $this;

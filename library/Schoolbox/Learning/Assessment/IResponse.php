@@ -107,7 +107,7 @@ interface IResponse
      * @param User|null $submittedBy
      * @return $this
      */
-    public function setSubmittedBy(?User $submittedBy);
+    public function setSubmittedBy(?User $submittedBy): self;
 
     /**
      * Get the person for whom the IResponse was created. This is used when
