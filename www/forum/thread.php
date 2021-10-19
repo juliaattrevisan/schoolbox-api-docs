@@ -2,7 +2,9 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Forum\ThreadMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -14,6 +16,7 @@ if (!isset($this)) {
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
+$access = Access::getInstance();
 
 $this->setFile(TEMPLATE_content, 'forum/thread.html');
 $this->setBlock(TEMPLATE_content, 'post', 'post_block');
@@ -46,28 +49,28 @@ if ($thread->getId() === null) {
     error(2);
 }
 
-$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-try {
-    $category = $categoryMapper->findById($thread->getCategory()->getId());
-} catch (DeletedException $e) {
-    error(ErrorMapper::ERROR_FOLDER_DELETED);
+if ($thread->getCategory() === false ||  $thread->getCategory()->isDeleted() === true) {
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FOLDER_DELETED);
+} else {
+    /** @var  FolderMapper $category */
+    $category = FolderMapper::getInstance()->findById($thread->getCategory()->getId());
 }
 
 /* forum exists
  */
+// TODO: ThreadMapper->hasForum
 if (!$forumHandler->hasForum($category->getId())) {
     SitePage::localRedir('/homepage/' . $category->getId());
 }
 
 /* check permissions
  */
-if ($groupHandler->getPermission($category->getId()) < UserAccess::ACCESS_READ) {
-    error(19);
+$accessLevel = $access->getFolderAccess($_SESSION['user'], $category->getId());
+if ($accessLevel < UserAccess::ACCESS_READ) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setTitle(Scrub::text($thread->getTitle()));
-
-$threadLocked = $thread->isLocked() ? true : false;
 
 /* output breadcrumbs
  */
@@ -77,7 +80,7 @@ $output = array(
     'THREAD_ID' => $thread->getId(),
     'THREAD_TITLE' => Scrub::text($thread->getTitle()),
     'LOCK_UNLOCK' => $threadLocked ? 'Unlock' : 'Lock',
-    'LOCKED' => $threadLocked ? '(Locked)' : '',
+    'LOCKED' => $thread->isLocked() ? '(Locked)' : '',
 );
 
 $this->setVar($output);
@@ -85,7 +88,9 @@ $this->setVar($output);
 $this->setVar('modify_thread_block', '');
 
 
-if ($groupHandler->getPermission($category->getId()) >= UserAccess::ACCESS_WRITE) {
+
+$accessLevel = $access->getFolderAccess($_SESSION['user'], $category->getId());
+if ($accessLevel <= UserAccess::ACCESS_WRITE) {
     $this->parse('modify_thread_block', 'modify_thread');
 }
 
@@ -105,11 +110,12 @@ if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= UserAc
 
 /* record view
  */
+//TODO: ThreadMapper->uniqueView
 $forumHandler->uniqueView($thread->getId());
 
 /* output pagination
  */
-$postList = $forumHandler->getPostList($thread->getId());
+$postList = $thread->getPosts();
 $pageNum = $this->arg[1];
 
 if (!$pageNum) {
@@ -153,6 +159,7 @@ $outputPagination = array('PREVIOUS_PAGE' => $pageNum - 1,
 $this->setVar($outputPagination);
 
 /* output posts */
+//TODO: ThreadMapper->getPostList($threadID, $index = 0, $limit = 0)
 $postList = $forumHandler->getPostList($thread->getId(), $postIndex, $postPerPage);
 if (is_array($postList)) {
     $userHandler = new User();
