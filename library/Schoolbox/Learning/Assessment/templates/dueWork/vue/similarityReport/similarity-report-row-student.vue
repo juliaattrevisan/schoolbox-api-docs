@@ -40,21 +40,22 @@ export default {
 @import './similarity-report';
 
 .student {
-  display: flex; 
-  @media (max-width: $tableToSingleColumn) {
-    flex-wrap: wrap; //so .title-on-single-column can be on its own row
-  }
+    display: flex;
+    @media (max-width: $tableToSingleColumn) {
+        flex-wrap: wrap; //so .title-on-single-column can be on its own row
+    }
 }
 
-  .student__portrait {
+.student__portrait {
     flex-basis: 0 0 32px; //32px is the size of the image, so only need occupy this space
     margin: 0 1rem 0.5rem 0;
-  }
+}
 
-  .student__name {
+.student__name {
     h3 {
-      margin-bottom: 0rem; //prevent any extra space at the bottom of rows
+        margin-top: 0.25rem;
+        margin-bottom: 0rem; //prevent any extra space at the bottom of rows
     }
-  }
+}
 
 </style>
