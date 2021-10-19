@@ -100,7 +100,7 @@ export default {
   <div class="title-on-single-column" data-title="Similarity %"> 
     <ul class="list">
       <li v-for="file in matchedFiles" :key="file.id">
-        <span :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage) }}%</span>  - 
+        <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage) }}%</span>
         <a :href="file._links.turnitin_report"  title="View similarity report">
           {{ file.name + '.' + file.ext }}
         </a>
@@ -119,6 +119,11 @@ export default {
   li {
     margin-bottom: 0.25rem;
   }
+}
+
+.percentage { //block percentages so files names line up
+  display: inline-block;
+  width: 40px;
 }
 
 </style>
