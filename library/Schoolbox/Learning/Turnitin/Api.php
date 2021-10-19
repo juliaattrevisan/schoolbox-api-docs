@@ -86,6 +86,9 @@ class Api
     /**
      * Constructor.
      *
+     * Check that $version $host $apiKey were properly provided by using
+     * Helper's isConfigured() check prior to instantiating.
+     *
      * @param string $version
      * @param string $host
      * @param string $apiKey
