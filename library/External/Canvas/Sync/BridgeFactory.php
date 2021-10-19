@@ -23,15 +23,31 @@ use Schoolbox\Resource\Folder;
 class BridgeFactory
 {
     /** @var string */
-    private string $siteSchoolCode;
+    private $siteLocation;
+
+    private const BASE = "External\\Canvas\\Sync\\Bridge\\";
 
     /**
      * Constructor
-     * @param string $siteSchoolCode
+     * @param string $siteLocation
      */
-    public function __construct(string $siteSchoolCode)
+    public function __construct(string $siteLocation)
     {
-        $this->siteSchoolCode = ucfirst(strtolower($siteSchoolCode));
+        $this->siteLocation = ucfirst($siteLocation);
+    }
+
+    /**
+     * Generates class name depending on the site location
+     * @param string $filename
+     * @return string
+     */
+    private function getClassName(string $filename): string
+    {
+        $className = self::BASE . $this->siteLocation . '\\' . $filename;
+        if (!class_exists($className)) {
+            $className = self::BASE . $filename;
+        }
+        return $className;
     }
 
     /**
@@ -42,11 +58,8 @@ class BridgeFactory
      */
     public function getAssignment(GenericCollection $markTypes, GenericCollection $workTypes): Assignment
     {
-        $class = sprintf('External\Canvas\Sync\Bridge\%s\Assignment', ucfirst($this->siteSchoolCode));
-        if (class_exists($class)) {
-            return new $class($markTypes, $workTypes);
-        }
-        return new Bridge\Assignment($markTypes, $workTypes);
+        $className = $this->getClassName('Assignment');
+        return new $className($markTypes, $workTypes);
     }
 
     /**
@@ -57,11 +70,8 @@ class BridgeFactory
      */
     public function getCourse(IConnector $canvasDb, IConnector $schoolboxDb): Course
     {
-        $class = sprintf('External\Canvas\Sync\Bridge\%s\Course', ucfirst($this->siteSchoolCode));
-        if (class_exists($class)) {
-            return new $class($canvasDb, $schoolboxDb);
-        }
-        return new Bridge\Course($canvasDb, $schoolboxDb);
+        $className = $this->getClassName('Course');
+        return new $className($canvasDb, $schoolboxDb);
     }
 
     /**
@@ -80,10 +90,7 @@ class BridgeFactory
         Course $courseBridge,
         LoggerInterface $log
     ): CourseSection {
-        $class = sprintf('External\Canvas\Sync\Bridge\%s\CourseSection', ucfirst($this->siteSchoolCode));
-        if (class_exists($class)) {
-            return new $class($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
-        }
-        return new Bridge\CourseSection($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
+        $className = $this->getClassName('CourseSection');
+        return new $className($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
     }
 }
