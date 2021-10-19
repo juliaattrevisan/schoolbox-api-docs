@@ -27,7 +27,7 @@ export default {
     /**
      * Only show those files that are above the currently selected
      * similarity score
-     * 
+     *
      * @returns { Array }
      */
     matchedFiles () {
@@ -55,10 +55,10 @@ export default {
 
     /**
      * Add a colour to represent the similarity score
-     * A low score starting with green to high score red is used 
-     * 
+     * A low score starting with green to high score red is used
+     *
      * @param { Object }
-     * 
+     *
      * @returns { String }
      */
     getFileColour (file) {
@@ -71,20 +71,20 @@ export default {
         return '#9f7c4b';
       } else if (this.isBetween(percentageRounded, 70, 79)) {
         return '#ba6d4a';
-      } else if (this.isBetween(percentageRounded, 80, 89)) {  
-        return '#da5c49';  
-      } else if (this.isBetween(percentageRounded, 90, 100)) {  
+      } else if (this.isBetween(percentageRounded, 80, 89)) {
+        return '#da5c49';
+      } else if (this.isBetween(percentageRounded, 90, 100)) {
         return '#fa4a47';
       }
     },
 
     /**
      * Check if x is between a min and max
-     * 
+     *
      * @param { Number }
      * @param { Number }
      * @param { Number }
-     * 
+     *
      * @returns { Boolean }
      */
     isBetween (x, min, max) {
@@ -97,12 +97,12 @@ export default {
 </script>
 
 <template>
-  <div class="title-on-single-column" data-title="Similarity %"> 
+  <div class="title-on-single-column" data-title="Similarity %">
     <ul class="list">
       <li v-for="file in matchedFiles" :key="file.id">
-        <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage) }}%</span>
-        <a :href="file._links.turnitin_report"  title="View similarity report">
-          {{ file.name + '.' + file.ext }}
+          <a :href="file._links.turnitin_report"  title="View similarity report">
+            <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage) }}%</span>
+            {{ file.name + '.' + file.ext }}
         </a>
       </li>
     </ul>
