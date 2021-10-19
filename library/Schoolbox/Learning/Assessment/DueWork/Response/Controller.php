@@ -39,7 +39,6 @@ use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Helper;
-use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
@@ -184,7 +183,7 @@ class Controller extends Base
             /* Similarity Check status
              */
             'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled' => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => (new Turnitin\Helper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             'interactionLocked' => $isInteractionLocked,
             'reviewRoute'       => $reviewRoute,
@@ -375,7 +374,7 @@ class Controller extends Base
             /* Similarity Check status
              */
             'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled' => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => (new Turnitin\Helper($this->getConfigLoader()))->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'studentView' => false,
             'selfAssess' => false,
