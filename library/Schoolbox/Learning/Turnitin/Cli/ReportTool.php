@@ -13,6 +13,7 @@ use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Helper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
@@ -100,6 +101,13 @@ Usage: report.php [--instance=INSTANCE_ID] [--report=1234]
 
 
 HELP;
+            exit;
+        }
+
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfig()))->isConfigured()) {
+            $this->getLogger()->info('Turnitin configuration invalid.');
             exit;
         }
 

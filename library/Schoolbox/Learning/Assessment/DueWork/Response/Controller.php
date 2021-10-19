@@ -38,6 +38,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
@@ -594,6 +595,12 @@ class Controller extends Base
      */
     public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin\File\Model $turnitin, Participant $participant): void
     {
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
+            throw new \DomainException('Turnitin configuration invalid.');
+        }
+
         /* We need this api
          */
         $api = new TurnitinApi(

@@ -14,6 +14,7 @@ use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\UserMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -139,6 +140,13 @@ Usage: transmit.php [--instance=INSTANCE_ID] [--report=1234] [--force]
 
 
 HELP;
+            exit;
+        }
+
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfig()))->isConfigured()) {
+            $this->getLogger()->info('Turnitin configuration invalid.');
             exit;
         }
 
