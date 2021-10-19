@@ -19,7 +19,7 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 medium-6 island">
+        <div class="small-12 island">
             <section class="content">
                 <h3>Creating {{ locale.grades.properPlural }}</h3>
                 <p>
@@ -31,18 +31,13 @@
                     they can be renamed, but ensure that if you do that you rename them to something semantically
                     equivalent, since it will affect all marks already given.
                 </p>
-            </section>
-        </div>
-        <div class="small-12 medium-6 island">
-            <h2 class="subheader">Glossary</h2>
-            <section class="content">
-                <h3>Lower Bound</h3>
+                <h3>Glossary</h3>
+                <label>Lower Bound</label>
                 <p>
                     This value is used for the purpose of displaying a {{ locale.grades }} average for a student or assessment.
                     The caption with the highest lower bound above the average {{ locale.grades }} will be displayed.
                 </p>
-
-                <h3>Normalised {{ locale.grades.proper }}</h3>
+                <label>Normalised {{ locale.grades.proper }}</label>
                 <p>
                     The value (out of 100) that will be used for {{ locale.grades }} average calculations
                     for an assessment that you give this {{ locale.grades }}.

@@ -214,6 +214,7 @@ export default {
                     <div class="list-item">
                         <input :name="'group.' + String(groupIndex) + '.name'"
                                type="text"
+                               maxlength="100"
                                required
                                :disabled="saveInProgress"
                                :id="'groupName-' + String(groupIndex)"
@@ -268,6 +269,7 @@ export default {
                             <div class="list-item">
                                 <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.caption'"
                                        type="text"
+                                       maxlength="64"
                                        required
                                        :disabled="saveInProgress"
                                        v-model="level.caption"
