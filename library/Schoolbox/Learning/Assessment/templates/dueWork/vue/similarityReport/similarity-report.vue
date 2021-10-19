@@ -91,8 +91,7 @@ export default {
           ascending: true,
           column: 'student' 
         },
-        perPage: 50, 
-        perPageValues: [50, 100, 200],
+        perPage: 9999, //absurdly large value to avoid pagination
         resizableColumns: false,
         sortable: ['student', 'submissionDate'], //only student and submission date are sortable
         sortIcon: {

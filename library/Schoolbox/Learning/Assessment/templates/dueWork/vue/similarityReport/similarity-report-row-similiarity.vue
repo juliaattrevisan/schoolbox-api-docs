@@ -54,17 +54,6 @@ export default {
     },
 
     /**
-     * Display the file name with the similairty score prepended
-     * 
-     * @param { Object }
-     * 
-     * @returns { String }
-     */
-    getFileTitle (file) {
-      return `${Math.round(file.turnitin.percentage)}% - ${file.name}.${file.ext}`;
-    },
-
-    /**
      * Add a colour to represent the similarity score
      * A low score starting with green to high score red is used 
      * 
@@ -111,8 +100,9 @@ export default {
   <div class="title-on-single-column" data-title="Similarity %"> 
     <ul class="list">
       <li v-for="file in matchedFiles" :key="file.id">
-        <a :href="file._links.turnitin_report" :style="{ color: getFileColour(file) }" title="View similarity report">
-          {{ getFileTitle(file) }}
+        <span :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage) }}%</span>  - 
+        <a :href="file._links.turnitin_report"  title="View similarity report">
+          {{ file.name + '.' + file.ext }}
         </a>
       </li>
     </ul>
