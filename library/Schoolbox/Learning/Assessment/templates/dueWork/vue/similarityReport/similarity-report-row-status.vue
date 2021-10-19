@@ -2,7 +2,7 @@
 
 /**
  * The status of the submission and a link to the inline grader
- * 
+ *
  */
 
 export default {
@@ -17,15 +17,15 @@ export default {
   methods: {
 
     /**
-     * Format the submission status display label 
-     * 
+     * Format the submission status display label
+     *
      * @param { String }
-     * 
+     *
      * @return { String }
      */
     getFormattedStatus (status) {
       const statusOptions = {
-        'failed': '<span class="progress-tick no-text tiny failed" title="Resubmission Required"></span><span>Resubmission Required</span>',
+        'failed': '<span class="progress-tick no-text tiny failed" title="Resubmission required"></span><span>Resubmission required</span>',
         'pending': '<span class="progress-tick no-text tiny pending" title="Mark required"></span><span>Marking required</span>',
         'reviewed': '<span class="progress-tick no-text tiny reviewed" title="Reviewed"></span><span>Reviewed</span>',
       }
@@ -60,7 +60,7 @@ export default {
   }
 }
 
-  .status__column { 
+  .status__column {
     @media (max-width: $tableToSingleColumn) {
       margin-bottom: 0.5rem; //so there's a gap to .button
     }
