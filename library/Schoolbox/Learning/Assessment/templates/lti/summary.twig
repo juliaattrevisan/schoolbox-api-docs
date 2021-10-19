@@ -65,33 +65,63 @@
                         <li>
                             <div class="list-item flex-grade">
                                 <div class="card small-12 compact">
+                                    {% set interactionUser = null %}
+                                    {% set dateMeta = '' %}
+                                    {% set statusMeta = '' %}
+                                    {% set markOutput = '' %}
                                     {% if currentInteraction is response %}
                                         {% set interactionUser = currentInteraction.submittedBy %}
+                                        {% set statusMeta %}
+                                            {% if not interactionUser %}
+                                                <span>Attempted</span>
+                                            {% elseif interactionUser.id == student.id%}
+                                                <span>Attempted</span>
+                                            {% else %}
+                                                <span>Attempted by {{ interactionUser.fullname }}</span>
+                                            {% endif %}
+                                        {% endset %}
+                                        {% set dateMeta %}
+                                            <span class="pipe meta">{{ currentInteraction.submittedAt.short }}</span>
+                                        {% endset %}
                                     {% elseif currentInteraction is feedback %}
                                         {% set interactionUser = currentInteraction.reviewer %}
-                                    {% endif %}
-                                    <a href="/search/user/{{ interactionUser.id }}">
-                                        {% include 'include/portrait.twig' with {user: interactionUser, description: interactionUser.fullName} only %}
-                                        {% if currentInteraction is response %}
-                                            <span>Attempted by {{ interactionUser.fullname }}</span>
-                                            <span class="pipe meta">{{ currentInteraction.submittedAt.short }}</span>
-                                        {% elseif currentInteraction is feedback %}
-                                            {% if interactionUser.id == student.id %}
+                                        {% set statusMeta %}
+                                            {% if not interactionUser %}
+                                                <span>Reviewed</span>
+                                            {% elseif interactionUser.id == student.id%}
                                                 <span>Self-reviewed</span>
                                             {% else %}
                                                 <span>Reviewed by {{ interactionUser.fullname }}</span>
                                             {% endif %}
+                                        {% endset %}
+                                        {% set dateMeta %}
                                             <span class="pipe meta">{{ currentInteraction.publishedAt.short }}</span>
-                                        {% endif %}
-                                    </a>
-                                </div>
+                                        {% endset %}
 
-                                {% if currentInteraction is feedback and (currentInteraction.humanReadableMark ?? null) is not null %}
-                                    {% set urgencyClass = currentInteraction ? urgency.marks(currentInteraction.normalisedMark) : '' %}
-                                    <div class="grade {{ urgencyClass }}-bg">
-                                        <span>{{ currentInteraction.humanReadableMark ?? ''}}</span>
-                                    </div>
-                                {% endif %}
+                                        {% set markOutput %}
+                                            {% if (currentInteraction.humanReadableMark ?? null) is not null %}
+                                                {% set urgencyClass = currentInteraction ? urgency.marks(currentInteraction.normalisedMark) : '' %}
+                                                <div class="grade {{ urgencyClass }}-bg">
+                                                    <span>{{ currentInteraction.humanReadableMark ?? ''}}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endset %}
+                                    {% endif %}
+
+                                    {% if interactionUser %}
+                                        <a href="/search/user/{{ interactionUser.id }}">
+                                            {% include 'include/portrait.twig' with {user: interactionUser, description: interactionUser.fullName} only %}
+                                            {{ statusMeta | raw }}
+                                            {{ dateMeta | raw }}
+                                        </a>
+                                    {% else %}
+                                        <span>
+                                            {{ statusMeta | raw }}
+                                            {{ dateMeta | raw }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {{ markOutput | raw }}
                             </div>
                         </li>
 
