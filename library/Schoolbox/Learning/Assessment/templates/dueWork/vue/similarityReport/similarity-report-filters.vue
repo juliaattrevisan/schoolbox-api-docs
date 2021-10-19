@@ -68,10 +68,9 @@ export default {
 </script>
 
 <template>
-
   <div class="filters">
     <div class="filters__column">
-      <legend>Similarity score</legend>
+      <label>Similarity score</label>
         <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange($event.target.value)">
           <option value="0">-</option>
           <option value="40">Above 40%</option>
@@ -84,7 +83,7 @@ export default {
     </div>
     <div class="filters__column">
       <div class="checklist">
-        <legend>Status</legend>
+        <label>Status</label>
         <ul class="option-list">
           <li>
             <input type="checkbox" id="resubmission-required" v-model="isResubmissionRequiredChecked" @change="onResubmissionRequiredChange()">
@@ -102,7 +101,6 @@ export default {
       </div>
     </div>
   </div>
-
 </template>
 
 <style lang="scss" scoped>
