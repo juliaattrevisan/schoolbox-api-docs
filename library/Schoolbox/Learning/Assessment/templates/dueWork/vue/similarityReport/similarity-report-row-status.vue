@@ -25,9 +25,9 @@ export default {
      */
     getFormattedStatus (status) {
       const statusOptions = {
-        'failed': '<span class="unsubmitted label">Resubmission Required</span>',
-        'pending': '<span class="submitted label">Marking Required</span>',
-        'reviewed': '<span class="reviewed label">Reviewed</span>',
+        'failed': '<span class="progress-tick no-text tiny failed" title="Resubmission Required"></span><span>Resubmission Required</span>',
+        'pending': '<span class="progress-tick no-text tiny pending" title="Mark required"></span><span>Marking required</span>',
+        'reviewed': '<span class="progress-tick no-text tiny reviewed" title="Reviewed"></span><span>Reviewed</span>',
       }
       return statusOptions[status];
     }
@@ -39,10 +39,11 @@ export default {
 
 <template>
   <div class="status title-on-single-column" data-title="Status">
-    <div class="status__column" v-html="getFormattedStatus(data.submission.status)">
+    <div class="status__column">
+      <p class="meta" v-html="getFormattedStatus(data.submission.status)"></p>
     </div>
     <div class="status__column">
-      <a class="button icon-approve" :href="data.submission._links.inline_grader">Review in Inline Grader</a>
+      <a class="button icon-approve" :href="data.submission._links.inline_grader" title="Review Submission">Review Submission</a>
     </div>
   </div>
 </template>
@@ -53,16 +54,20 @@ export default {
 
 .status {
   display: flex;
+  justify-content: space-between; //the status and review buttons on either ends of column
   @media (max-width: $tableToSingleColumn) {
     flex-direction: column;
   }
 }
 
   .status__column { 
-    flex: 1 1 0; //keep both sides equal
     @media (max-width: $tableToSingleColumn) {
       margin-bottom: 0.5rem; //so there's a gap to .button
     }
+  }
+
+  .meta .progress-tick {
+    margin-right: 0.5rem; //bit of extra gap
   }
 
   .button {
