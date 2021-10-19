@@ -139,7 +139,7 @@ HELP;
 
             /* We need this api
              */
-            $api = new Turnitin\Api(
+            $api = new Api(
                 $this->getConfig()->get('site_version'),
                 $this->getConfig()->get('turnitin_api_host'),
                 $this->getConfig()->get('turnitin_api_key')

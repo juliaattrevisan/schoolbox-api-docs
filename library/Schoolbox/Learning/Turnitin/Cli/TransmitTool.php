@@ -14,7 +14,6 @@ use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component;
 use Schoolbox\Learning\Turnitin;
-use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\UserMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -219,7 +218,7 @@ HELP;
 
             /* We need this api
              */
-            $api = new Api(
+            $api = new Turnitin\Api(
                 $this->getConfig()->get('site_version'),
                 $this->getConfig()->get('turnitin_api_host'),
                 $this->getConfig()->get('turnitin_api_key')
