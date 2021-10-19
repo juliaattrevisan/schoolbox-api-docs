@@ -203,13 +203,7 @@ class Controller extends Base
             }
         )->indexBy('id');
 
-        $terms = $this->termMapper->findAllNonExtraordinary();
-        $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
-        if ($currentTerm->getExtraordinary()) {
-            /* Prepend it to the list of Terms, because it's special
-             */
-            $terms->prepend($currentTerm);
-        }
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         /* If the term we're looking at is an Extraordinary Term, limit the list of $folders to those which occur
          * as being related to the Extraordinary Term.
@@ -222,11 +216,6 @@ class Controller extends Base
                     return isset($extraordinaryFolders[$folder->getId()]);
                 }
             );
-        }
-
-        $extraordinaryTerms = $this->termMapper->findExtraordinaryWithInteractions($viewee, $currentTerm);
-        if ($extraordinaryTerms->count()) {
-            $terms = $terms->merge($extraordinaryTerms)->sortBy('start', 'desc');
         }
 
         // Load Teachers
