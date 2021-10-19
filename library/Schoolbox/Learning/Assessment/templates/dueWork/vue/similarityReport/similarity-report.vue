@@ -203,7 +203,7 @@ export default {
 
       <div v-else-if="hasNoSubmissions" class="empty-state">
         <i class="icon-staff-students"></i>
-        <p>Students have not yet submitted any work. Once submitted you may return to this page to review the similarity results for each submission.</p>
+        <p>Students have either not yet submitted any work or any similarity results are yet to be generated.<br>Once work is submitted and results generated, you may return to this page to review the similarity results for each submission.</p>
       </div>
 
       <div v-else-if="hasDataLoadError">
