@@ -86,16 +86,16 @@ class Api
     /**
      * Constructor.
      *
-     * @param string|null $version
-     * @param string|null $host
-     * @param string|null $apiKey
+     * @param string $version
+     * @param string $host
+     * @param string $apiKey
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(?string $version, ?string $host, ?string $apiKey)
+    public function __construct(string $version, string $host, string $apiKey)
     {
-        $this->host = (string)$host;
-        $this->apiKey = (string)$apiKey;
-        $this->version = (string)$version;
+        $this->host = $host;
+        $this->apiKey = $apiKey;
+        $this->version = $version;
 
         /* Set up guzzle client
          */
