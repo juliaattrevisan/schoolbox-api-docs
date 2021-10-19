@@ -46,7 +46,7 @@
 
     {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
     {% if similarityReportRoute %}
-        <li><a href="{{ similarityReportRoute }}" class="icon-progress">Similarity Report</a></li>
+        <li><a href="{{ similarityReportRoute }}" class="icon-due-work">Similarity Report</a></li>
     {% endif %}
 
     {% if assessment.useRubric %}
