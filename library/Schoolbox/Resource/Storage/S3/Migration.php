@@ -413,7 +413,6 @@ class Migration extends CliTool\App
                     catch (S3Exception $e) {
                         $sleep = 2 ** $countUploadAttempts;
                         $countUploadAttempts++;
-                        $this->failedPaths[] = $relativeLocalPath;
                         $this->getLogger()->error("Cannot write file to S3. Attempt {$countUploadAttempts}/{$this->maxUploadAttempts}: '{$e->getMessage()}'");
                         $this->getLogger()->debug("Sleeping {$sleep}s ...");
                         sleep($sleep);
