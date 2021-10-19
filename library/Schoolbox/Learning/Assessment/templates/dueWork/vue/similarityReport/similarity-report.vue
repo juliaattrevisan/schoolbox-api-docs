@@ -7,7 +7,6 @@
 
 import SimilarityReportFilters from './similarity-report-filters';
 import FilterEvents from './similarityReportFilterEvents';
-import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
 import SimilarityReportRowSimilarity from './similarity-report-row-similiarity';
@@ -19,10 +18,6 @@ export default {
   components: {
     SimilarityReportFilters
   },
-
-  mixins: [
-    footerUI //to place and keep the tables UI in the footer
-  ],
   
   props: {
     payloadUrl: { //where to get the tableData from
@@ -167,13 +162,6 @@ export default {
       }
     },
 
-    /**
-     * To update the table to show the UI in the footer, the pagination buttons
-     */
-    onLoaded () {
-      this.$nextTick(() => this.footerUI_update());
-    },
-
   }
 
 }
@@ -187,17 +175,12 @@ export default {
 
       <v-client-table 
         v-if="hasSubmissions"
-        ref="table"
         :data="tableData" 
         :columns="tableColumns" 
         :options="tableOptions" 
-        @loaded="onLoaded" 
       >
         <div slot="beforeTable">
           <similarity-report-filters />
-        </div>
-        <div slot="afterTable">
-          <div class="VueTables__table-footer" ref="tableFooter"></div>
         </div>
       </v-client-table>
 
@@ -242,6 +225,10 @@ export default {
 
 @import '@vue/components/vueTables2/vueTables2';
 @import './similarity-report';
+
+.VuePagination {
+  display: none; //there's no footer, so no count/pagination/next/prev etc for this report
+}
 
 @media (max-width: $tableToSingleColumn) { //display everything in one column
   .VueTables thead {
