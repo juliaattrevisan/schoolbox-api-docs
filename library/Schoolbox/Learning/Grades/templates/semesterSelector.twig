@@ -73,7 +73,7 @@ Usage: include 'sub/semesterSelector.twig
         <a data-semester-switch="next" href="#"></a>
     {% else %}
         {% if terms and terms|length %}
-            <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
+            <a data-semester-switch="next" href="#" {% if currentTerm.code == (terms|first).code %}disabled{% endif %}></a>
         {% endif %}
     {% endif %}
 </nav>

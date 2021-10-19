@@ -2240,10 +2240,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     private function buildWhereParamsForTerm(Term $term)
     {
         $whereParams = [
-            ':startDate' => $term->getStart(),
+            ':startDate' => $term->getStart()->getDatabase(),
         ];
         if (!$term->getActualFinish()->isNull()) {
-            $whereParams[':endDate'] = $term->getActualFinish();
+            $whereParams[':endDate'] = $term->getActualFinish()->endOfDay()->getDatabase();
         }
         return $whereParams;
     }

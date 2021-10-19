@@ -15,7 +15,8 @@ use RangeException;
 use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 use Schoolbox\YearLevel;
 use UnexpectedValueException;
 
@@ -109,7 +110,7 @@ class Mapper extends BaseMapper
      * @param PDOStatement $statement
      * @return GenericCollection|void
      * @throws BaseMapper\DefinitionException
-     * @throws Exception
+     * @throws MapperException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -160,7 +161,7 @@ class Mapper extends BaseMapper
      * @param YearLevel\Model|null $yearLevel
      * @return Model
      * @throws BaseMapper\DefinitionException
-     * @throws Exception
+     * @throws MapperException
      * @throws PDOException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
@@ -247,6 +248,44 @@ class Mapper extends BaseMapper
         return $folderIds;
     }
 
+    /**
+     * Find all extra ordinary terms with interactions
+     * @param User       $user
+     * @param Model|null $excludeTerm
+     * @return GenericCollection
+     * @throws MapperException
+     */
+    public function findExtraordinaryWithInteractions(User $user, ?Model $excludeTerm = null): GenericCollection
+    {
+        $query = "
+              SELECT DISTINCT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('term_year_level', 'lyl')}
+            FROM {$this->getTable()}
+                  JOIN {$this->getJoinSql('term_year_level', '', 'lyl')}
+                  JOIN folder_year_level fyl     ON fyl.year_level_id = lyl.id
+                  JOIN folder                    ON folder.id = fyl.folder_id AND folder.deleted_at IS NULL
+                  JOIN v_assessment_relation var ON var.folder_id = folder.id
+                  JOIN assessment a              ON a.id = var.assessment_id AND a.deleted_at IS NULL
+                  JOIN participant_plan pp       ON pp.assessment_id = a.id AND pp.deleted_at IS NULL
+                  JOIN participant p             ON p.participant_plan_id = pp.id AND p.excluded_at IS NULL
+              WHERE
+                  p.user_id = :userId
+                  AND a.due_date BETWEEN term.start AND term.actual_finish
+        ";
+
+        $params = ['userId' => $user->getId()];
+
+        if ($excludeTerm) {
+            $query    .= ' AND term.id != :excludeTerm';
+            $params['excludeTerm'] = $excludeTerm->getId();
+        }
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        return $this->hydrateSelect($statement);
+    }
 
     /**
      * A list of Terms to choose from
@@ -254,24 +293,23 @@ class Mapper extends BaseMapper
      * If we're in an extraordinary Term right now, provide that as an option in
      * addition to the ordinary Terms by prepending it to the returned collection
      *
-     * @param YearLevel\Model|null $yearLevel
+     * @param User $user
      * @return GenericCollection
      * @throws BaseMapper\DefinitionException
-     * @throws Exception
+     * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findAllWithExtraordinary(?\Schoolbox\YearLevel\Model $yearLevel): GenericCollection
+    public function findAllWithExtraordinary(User $user): GenericCollection
     {
         $terms = $this->findAllNonExtraordinary();
-        $extraordinaryTerm = $this->findForDateAndYearLevel(\Alaress_Date_Format::now(), $yearLevel);
-
-        if ($extraordinaryTerm->getExtraordinary()) {
-            $terms->prepend($extraordinaryTerm);
+        $currentTerm = $this->findForDateAndYearLevel(\Alaress_Date_Format::now(), $user->getYear());
+        if ($currentTerm->getExtraordinary()) {
+            $terms->prepend($currentTerm);
         }
-
-        return $terms;
+        $extraordinaryTerms = $this->findExtraordinaryWithInteractions($user, $currentTerm);
+        return $terms->merge($extraordinaryTerms)->sortBy('start', 'desc');
     }
 
 

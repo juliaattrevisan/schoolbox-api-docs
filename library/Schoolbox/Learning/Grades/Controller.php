@@ -203,24 +203,30 @@ class Controller extends Base
             }
         )->indexBy('id');
 
-        /* If we're in an Extraordinary Term, limit the list of $folders to those which occur
+        $terms = $this->termMapper->findAllNonExtraordinary();
+        $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
+        if ($currentTerm->getExtraordinary()) {
+            /* Prepend it to the list of Terms, because it's special
+             */
+            $terms->prepend($currentTerm);
+        }
+
+        /* If the term we're looking at is an Extraordinary Term, limit the list of $folders to those which occur
          * as being related to the Extraordinary Term.
          */
-        $terms = $this->termMapper->findAllNonExtraordinary();
-        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
-
-        if ($extraordinaryTerm->getExtraordinary()) {
-            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($extraordinaryTerm);
+        if ($term->getExtraordinary()) {
+            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($term);
 
             $folders = $folders->filter(
                 static function (Folder\Model $folder) use ($extraordinaryFolders) {
                     return isset($extraordinaryFolders[$folder->getId()]);
                 }
             );
+        }
 
-            /* Prepend it to the list of Terms, because it's special
-             */
-            $terms->prepend($extraordinaryTerm);
+        $extraordinaryTerms = $this->termMapper->findExtraordinaryWithInteractions($viewee, $currentTerm);
+        if ($extraordinaryTerms->count()) {
+            $terms = $terms->merge($extraordinaryTerms)->sortBy('start', 'desc');
         }
 
         // Load Teachers
@@ -349,7 +355,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'         => $viewee,
@@ -438,7 +444,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
