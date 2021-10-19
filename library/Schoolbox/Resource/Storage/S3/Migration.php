@@ -100,7 +100,7 @@ class Migration extends CliTool\App
     private int $maxUploadAttempts = 10; // TODO expose as CLI option
 
     /** @var array */
-    private array $failedHashes = [];
+    private array $failedPaths = [];
 
 
     /** @inheritDoc */
@@ -145,7 +145,7 @@ class Migration extends CliTool\App
         $this->fileSystemAwsS3 = $this->buildAwsS3FileSystemAndFetchS3Files();
 
         $this->migrateFiles();
-        $this->listFailedMigrationHashes();
+        $this->listFailedMigrationPaths();
     }
 
     /**
@@ -356,7 +356,7 @@ class Migration extends CliTool\App
             }
         } elseif (!$foundInS3) {
             $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
-            if ($this->moveFileToS3($filepath, $hash)) {
+            if ($this->moveFileToS3($filepath)) {
                 $foundInS3 = true;
                 $this->countStorageFilesUploaded++;
             } else {
@@ -380,28 +380,28 @@ class Migration extends CliTool\App
      * Moves file from local to S3 filesystem, deleting local copy
      *
      * @param string $filepathLocalAbsolute
-     * @param string $hash
      * @return bool Whether the move was successful
      * @throws Flysystem\FileExistsException
      */
-    private function moveFileToS3(string $filepathLocalAbsolute, string $hash): bool
+    private function moveFileToS3(string $filepathLocalAbsolute): bool
     {
+        $relativeLocalPath = $this->getRelativeLocalPath($filepathLocalAbsolute);
+
         try {
             $fp = fopen($filepathLocalAbsolute, 'rb');
         } catch (\Exception $e) {
-            $this->failedHashes[] = $hash;
+            $this->failedPaths[] = $relativeLocalPath;
             $this->getLogger()->error($e->getMessage());
 
             return false;
         }
 
         if (!is_resource($fp)) {
-            $this->failedHashes[] = $hash;
+            $this->failedPaths[] = $relativeLocalPath;
             $this->getLogger()->error("Cannot open file for reading, skipping");
             return false;
         }
 
-        $relativeLocalPath = $this->getRelativeLocalPath($filepathLocalAbsolute);
         if ($this->perform()) {
             $writeSucceeded = false;
             try {
@@ -413,14 +413,14 @@ class Migration extends CliTool\App
                     catch (S3Exception $e) {
                         $sleep = 2 ** $countUploadAttempts;
                         $countUploadAttempts++;
-                        $this->failedHashes[] = $hash;
+                        $this->failedPaths[] = $relativeLocalPath;
                         $this->getLogger()->error("Cannot write file to S3. Attempt {$countUploadAttempts}/{$this->maxUploadAttempts}: '{$e->getMessage()}'");
                         $this->getLogger()->debug("Sleeping {$sleep}s ...");
                         sleep($sleep);
                     }
                 }
             } catch (InvalidArgumentException $e) {
-                $this->failedHashes[] = $hash;
+                $this->failedPaths[] = $relativeLocalPath;
                 $this->getLogger()->error("Cannot write file to S3, skipping: '{$e->getMessage()}'");
                 return false;
             }
@@ -433,7 +433,7 @@ class Migration extends CliTool\App
             $this->getLogger()->debug("Upload completed");
             $this->countBytesUploaded += filesize($filepathLocalAbsolute);
         } else {
-            $this->failedHashes[] = $hash;
+            $this->failedPaths[] = $relativeLocalPath;
             $this->getLogger()->warning("Upload failed");
             return false;
         }
@@ -501,7 +501,7 @@ class Migration extends CliTool\App
                 continue;
             }
             $this->getLogger()->info("Transcode file '$entry' found locally but not in S3, uploading...");
-            if ($this->moveFileToS3($transcodeFilePath, $entry)) {
+            if ($this->moveFileToS3($transcodeFilePath)) {
                 $this->countTranscodeFilesUploaded++;
             } else {
                 $this->countUploadsFailed++;
@@ -564,12 +564,12 @@ class Migration extends CliTool\App
     }
 
     /**
-     * Returns a list of hashes where migration failed.
+     * Logs a list of relative paths where migration failed.
      */
-    private function listFailedMigrationHashes()
+    private function listFailedMigrationPaths(): void
     {
-        if (!empty($this->failedHashes)) {
-            $this->getLogger()->alert("List of hashes that failed during miration:\n" . implode("\n", $this->failedHashes));
+        if (!empty($this->failedPaths)) {
+            $this->getLogger()->error("List of paths that failed during migration:\n" . implode("\n", $this->failedPaths));
         }
     }
 
