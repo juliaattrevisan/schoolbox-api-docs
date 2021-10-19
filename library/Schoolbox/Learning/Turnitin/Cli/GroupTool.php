@@ -15,7 +15,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Helper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
@@ -125,6 +125,13 @@ HELP;
             exit;
         }
 
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfig()))->isConfigured()) {
+            $this->getLogger()->info('Turnitin configuration invalid.');
+            exit;
+        }
+
         /* Check that this isn't currently running
          */
 
@@ -201,7 +208,7 @@ HELP;
 
             /* We need this api
              */
-            $api = new Api(
+            $api = new Turnitin\Api(
                 $this->getConfig()->get('site_version'),
                 $this->getConfig()->get('turnitin_api_host'),
                 $this->getConfig()->get('turnitin_api_key')

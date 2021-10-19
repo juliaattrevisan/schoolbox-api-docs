@@ -12,6 +12,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin\Controller as TurnitinController;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Url\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -99,6 +100,13 @@ Forcibly register all webhooks again:
     
 
 HELP;
+            exit;
+        }
+
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfig()))->isConfigured()) {
+            $this->getLogger()->info('Turnitin configuration invalid.');
             exit;
         }
 

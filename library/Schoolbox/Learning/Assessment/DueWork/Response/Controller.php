@@ -38,7 +38,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
+use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
@@ -183,7 +183,7 @@ class Controller extends Base
             /* Similarity Check status
              */
             'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled' => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => (new Turnitin\Helper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             'interactionLocked' => $isInteractionLocked,
             'reviewRoute'       => $reviewRoute,
@@ -374,7 +374,7 @@ class Controller extends Base
             /* Similarity Check status
              */
             'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-            'turnitinApiEnabled' => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
+            'turnitinApiEnabled' => (new Turnitin\Helper($this->getConfigLoader()))->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'studentView' => false,
             'selfAssess' => false,
@@ -594,6 +594,12 @@ class Controller extends Base
      */
     public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin\File\Model $turnitin, Participant $participant): void
     {
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
+            throw new \DomainException('Turnitin configuration invalid.');
+        }
+
         /* We need this api
          */
         $api = new TurnitinApi(
