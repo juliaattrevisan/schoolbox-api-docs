@@ -386,10 +386,10 @@ class Submission extends SectionAssignment
      * 2. if 1 failed, try matching Canvas unique_name and SB email address
      * 3. if 2 failed, return schoolbox admin
      * @param string|null $canvasUserId
-     * @return User|null
+     * @return User
      * @throws Mapper\Exception
      */
-    private function findUserByCanvasUserId(?string $canvasUserId): ?User
+    private function findUserByCanvasUserId(?string $canvasUserId): User
     {
         if (key_exists($canvasUserId, $this->canvasUserIdUserMap)) {
             return $this->canvasUserIdUserMap[$canvasUserId];

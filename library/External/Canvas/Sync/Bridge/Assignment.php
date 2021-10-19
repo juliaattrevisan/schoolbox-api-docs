@@ -48,7 +48,7 @@ class Assignment
     public function __construct(GenericCollection $markTypes, GenericCollection $workTypes)
     {
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
-        $this->workTypes    = $workTypes->shallowClone()->indexBy('id');
+        $this->workTypes    = $workTypes->shallowClone()->indexBy('name');
     }
 
     /**
@@ -114,14 +114,13 @@ class Assignment
 
 
     /**
-     * Returns the work type to assign to imported Canvas Assignments
-     *
+     * Returns work type with the given name, if exists
      * @param string $workTypeName
-     * @return null|WorkType\Model
+     * @return WorkType\Model|null
      */
     public function getSubmissionBoxWorkType(string $workTypeName): ?WorkType\Model
     {
-        return null;
+        return $this->workTypes->offsetGet($workTypeName);
     }
 
 
@@ -202,7 +201,7 @@ class Assignment
                 return $this->markTypes[SubmissionBox\MarkType::SLUG_PERCENT];
             case 'not_graded':
             case null:
-            default;
+            default:
                 return $this->markTypes[SubmissionBox\MarkType::SLUG_NONE];
         }
     }
