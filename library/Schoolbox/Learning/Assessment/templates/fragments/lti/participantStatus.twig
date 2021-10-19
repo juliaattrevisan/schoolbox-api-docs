@@ -3,8 +3,7 @@
 {% block statusLine %}
     {{ parent() }}
 
-    {% set latestResponse = participant.findMostRecentResponse %}
-    {% set pActionSummary = latestResponse
+    {% set pActionSummary = participant.hasPublishedFeedback or participant.hasSubmittedResponse
         ? routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs)
         : null
     %}
