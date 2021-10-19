@@ -214,6 +214,7 @@ export default {
                     <div class="list-item">
                         <input :name="'group.' + String(groupIndex) + '.name'"
                                type="text"
+                               maxlength="100"
                                required
                                :disabled="saveInProgress"
                                :id="'groupName-' + String(groupIndex)"
