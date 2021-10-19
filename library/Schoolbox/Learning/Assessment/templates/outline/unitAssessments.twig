@@ -41,7 +41,8 @@
                 {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
             {% endif %}
             {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
-            {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
+            {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
+            {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
         {% endif %}
 
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
@@ -102,6 +103,7 @@
                 {% if isActionRoutes %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
                         {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                        {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
                         {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
                         {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
                     </ul>

@@ -8,13 +8,15 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Learning\Turnitin;
+use Twig\Error\LoaderError;
 
 /**
  * Turnitin Webhooks route through this controller
@@ -24,7 +26,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'turnitinWebhook';
+    protected $basename = 'turnitin';
 
 
     /**
@@ -52,6 +54,16 @@ class Module extends BaseModule
 
 
     /**
+     * @param IChainLoader $templateLoader
+     * @throws LoaderError
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector): void
@@ -74,7 +86,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class)
+            'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class),
         ];
     }
 }

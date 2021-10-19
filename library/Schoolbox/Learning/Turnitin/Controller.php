@@ -8,14 +8,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Turnitin;
+namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Turnitin;
-use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\Learning\Turnitin\Helper;
 
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps

@@ -14,7 +14,8 @@
         {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
     {% endif %}
     {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
-    {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute %}
+    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
+    {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
 {% endif %}
 
 <li
@@ -43,6 +44,7 @@
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% apply spaceless %}
                 {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}">View Status</a></li>{% endif %}
+                {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
                 {% if modifyRoute %}<li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>{% endif %}
                 {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>{% endif %}
             {% endapply %}

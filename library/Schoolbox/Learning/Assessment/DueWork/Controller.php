@@ -110,6 +110,15 @@ class Controller extends Assessment\Controller
      */
     private Gotenberg\Client $pdfGenerator;
 
+
+    /**
+     * Turnitin File Mapper, for generating the Similarity Report
+     *
+     * @var Turnitin\File\Mapper
+     */
+    private \Schoolbox\Learning\Turnitin\File\Mapper $turnitinFileMapper;
+
+
     /**
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
@@ -131,6 +140,7 @@ class Controller extends Assessment\Controller
      * @param UnitSpecificationMapper       $unitSpecificationMapper
      * @param Replicator                    $replicator
      * @param Gotenberg\Client              $pdfGenerator
+     * @param Turnitin\File\Mapper          $turnitinFileMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -152,7 +162,8 @@ class Controller extends Assessment\Controller
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        Gotenberg\Client $pdfGenerator
+        Gotenberg\Client $pdfGenerator,
+        \Schoolbox\Learning\Turnitin\File\Mapper $turnitinFileMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -176,6 +187,7 @@ class Controller extends Assessment\Controller
         $this->kamiConnector         = $kamiConnector;
         $this->kamiMapper            = $kamiMapper;
         $this->pdfGenerator          = $pdfGenerator;
+        $this->turnitinFileMapper    = $turnitinFileMapper;
     }
 
 
@@ -1595,5 +1607,47 @@ class Controller extends Assessment\Controller
             // Clean up once finished
             unlink($tempfile);
         }
+    }
+
+
+    /**
+     * Index screen
+     *
+     * @param IAssessable $assessment
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getSimilarityReport(IAssessable $assessment): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/dueWork/similarityReport.twig', [
+            'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId()
+                ])
+            ])->add([
+                'Similarity Report',
+                ''
+            ]),
+            'assessment' => $assessment,
+            'payloadUrl' => $this->router->generate('learningAssessment.getSimilarityReportPayload', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId()
+            ])
+        ])->setTitle("{$assessment->getTitle()} Similarity Report"));
+    }
+
+
+    /**
+     * Get a list of all the students' most recent submissions, their files,
+     * and corresponding turnitin reports and assorted metadata. This is used
+     * as the payload endpoint for the Similarity Report report.
+     */
+    public function getSimilarityReportPayload(IAssessable $assessment): void
+    {
+        $payload = (new Turnitin\SimilarityReportPayload($this->turnitinFileMapper, $this->getUserMapper(), $this->router))
+            ->generate($assessment);
+
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 }

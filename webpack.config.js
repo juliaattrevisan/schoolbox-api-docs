@@ -178,6 +178,7 @@ module.exports = {
         badgeReport: './library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js',
         evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js',
         checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
+        similarityReport: './library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js',
 
         // Textboxes
         textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
@@ -202,7 +203,7 @@ module.exports = {
         //Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',
 
-        // Class List
+        // Class
         classList: './library/Schoolbox/Learning/vue/classList.js',
 
         // Pastoral Count Badge
