@@ -14,6 +14,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -95,7 +96,9 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('lti_assessment', 'lti_assessment')}
+                {$this->getJoinColumnString('lti_assessment', 'lti_assessment')},
+                {$this->getJoinColumnString('student', 'student')},
+                {$this->getJoinColumnString('marking_user', 'marking_user')}
         ";
     }
 
@@ -109,7 +112,9 @@ class Mapper extends BaseMapper
     {
         return "
             FROM        {$this->getTable()}
-            INNER JOIN  {$this->getJoinSql('lti_assessment', '', 'lti_assessment')}
+            INNER JOIN  {$this->getJoinSql('lti_assessment', '', 'lti_assessment', true)}
+            INNER JOIN  {$this->getJoinSql('student', '', 'student', true)}
+            LEFT  JOIN  {$this->getJoinSql('marking_user', '', 'marking_user', true)}
         ";
     }
 
@@ -128,7 +133,15 @@ class Mapper extends BaseMapper
             $model         = $this->hydrate($row);
             $ltiAssessment = $this->hydrateJoin($row, 'lti_assessment', 'lti_assessment');
             if ($ltiAssessment instanceof LTIAssessment) {
-                $model->setLtiAssessment($ltiAssessment);
+                $model = $model->setLtiAssessment($ltiAssessment);
+            }
+            $student = $this->hydrateJoin($row, 'student', 'student');
+            if ($student instanceof User) {
+                $model = $model->setStudent($student);
+            }
+            $markingUser = $this->hydrateJoin($row, 'marking_user', 'marking_user');
+            if ($markingUser instanceof User) {
+                $model = $model->setMarkingUser($markingUser);
             }
             $collection->add($model);
         }
