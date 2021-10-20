@@ -1181,16 +1181,6 @@ parameters:
 			path: library/Custom/Dsfg/AchievementReport/Module.php
 
 		-
-			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept array\\<string, string\\>\\.$#"
-			count: 3
-			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
-
-		-
-			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept string\\.$#"
-			count: 5
-			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
-
-		-
 			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\StandardisedTest\\\\PAT\\\\ValidPAT\\:\\:\\$year \\(string\\) does not accept default value of type int\\.$#"
 			count: 1
 			path: library/Custom/Dsfg/AchievementReport/StandardisedTest/PAT/ValidPAT.php
