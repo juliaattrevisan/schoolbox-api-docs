@@ -1,15 +1,13 @@
 <script>
 
-/**
- * To display content that appears when requested from the bottom of the window
- * Usually contains actions in response to selections on the page, for example choosing some users to edit
- * Once +1 users is selected the drawer will slide in from the bottom of the window
- */
-
 import { ResizeObserver } from 'vue-resize';
 import 'vue-resize/dist/vue-resize.css';
 
-
+/**
+ * To display content that appears when requested from the bottom of the window.
+ * Usually contains actions in response to selections on the page, for example choosing some users to edit.
+ * Once +1 users is selected the drawer will slide in from the bottom of the window.
+ */
 export default {
 
   components: {
@@ -17,7 +15,10 @@ export default {
   },
 
   props: {
-    showDrawer: { //when true will slide in the drawer from the bottom of the window
+    /**
+     * When true will slide in the drawer from the bottom of the window
+     */
+    showDrawer: {
       type: Boolean,
       required: true,
       default: false,
@@ -64,6 +65,7 @@ export default {
     <resize-observer @notify="onContainerResize"/>
     <transition name="slide">
       <div v-show="showDrawer" class="bottom-drawer-container" :style="{ width: width, left: left }">
+        <!-- @slot Default slot, put whatever HTML markup you like in here -->
         <slot></slot>
       </div>
     </transition>
