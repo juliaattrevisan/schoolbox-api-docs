@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
@@ -103,7 +103,6 @@ class Cleanup implements IStrategy
      */
     public function import(): void
     {
-
         /* Only remove profiles if we're performing
          */
         if ($this->perform) {

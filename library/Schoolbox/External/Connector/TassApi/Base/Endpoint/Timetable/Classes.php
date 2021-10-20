@@ -231,6 +231,21 @@ class Classes implements IStrategy
                         $start = substr($period['PRD_START'], 11, 8);
                         $finish = substr($period['PRD_END'], 11, 8);
 
+                        /* This is the current teacher of the subject
+                         * Multiple teachers are coming through as comma-separated
+                         */
+                        $allTeacherCodes = explode(',', $subject['TCH_CODE']);
+
+                        $teacherStack = [];
+
+                        foreach ($allTeacherCodes as $currentTeacherCode) {
+                            $teacherStack[] = [
+                                'externalId' => $currentTeacherCode,
+                                'firstname' => $users[$currentTeacherCode]['firstname'] ?? 'Unknown',
+                                'surname' => $users[$currentTeacherCode]['lastname'] ?? "Unknown ({$currentTeacherCode})",
+                            ];
+                        }
+
                         /* Construct a data struct that represents a more sane version of $subject
                          */
                         $class = [
@@ -256,45 +271,29 @@ class Classes implements IStrategy
                                 'name' => $subject['ROOM_CODE']
                             ],
 
-                            /* Assumption: Only one teacher per subject
-                             * Can there be more than one teacher, maybe comma-separated?
+                            /* Always assign $subject['TCH_CODE'] to be the teacher of a class
+                             *
+                             * But what happens when staff are in classes taught by other staff...?
+                             * Is that even possible?
                              */
-                            'teachers' => [
-                            ],
+                            'teachers' => $teacherStack,
 
                             'students' => [
                             ],
                         ];
 
-                        /* If this $externalId existed in the Staff lookup, put them in the teachers set
-                         * Or, if this $externalId existed in the Student lookup, put them in the students set
+                        /* If the current person is a student, put them in the students list
                          */
-                        if (isset($users[$externalId])) {
-                            if (self::TYPE_STAFF === $type) {
-                                $class['teachers'] = [
-                                    'externalId' => $subject['TCH_CODE'],
-                                    'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                                    'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
-                                ];
-
-                                $this->log->debug(sprintf(
-                                    '%s %s (user %s) is the teacher of subject %s',
-                                    $class['teachers']['firstname'],
-                                    $class['teachers']['surname'],
-                                    $class['teachers']['externalId'],
-                                    $class['class']['code']
-                                ));
-                            } elseif (self::TYPE_STUDENT === $type) {
-                                $class['students'][] = [
-                                    'externalId' => (string)$externalId,
-                                    'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                                    'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
-                                ];
-                            }
-
-                            /* noop for Parents (they don't have timetables)
-                             */
+                        if (self::TYPE_STUDENT === $type) {
+                            $class['students'][] = [
+                                'externalId' => (string)$externalId,
+                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                                'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
+                            ];
                         }
+
+                        /* noop for Parents (they don't have timetables)
+                         */
 
                         /* Look up the period instance by (name, day)
                          *
@@ -327,7 +326,7 @@ class Classes implements IStrategy
 
                         /* Teacher involvement is assigned here, via multiple ClassEntry records
                          */
-                        $timetableClassPeriod = $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
+                        $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
 
                         /* Process students
                          */
@@ -405,12 +404,12 @@ class Classes implements IStrategy
      * @param string          $ext
      * @param TimetablePeriod $period
      * @param ClassEntry      $timetableClass
-     * @return ClassPeriod
+     * @return void
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassPeriod(array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
+    private function createTimetableClassPeriod(array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): void
     {
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
@@ -420,43 +419,56 @@ class Classes implements IStrategy
          * - period_id is a schoolbox sis_timetable_period via lookup of Day and Period Name
          * - class_id comes from $timetableClass->getId()
          */
-        if (isset($class['teachers']['externalId'])) {
-            /* See if a ClassPeriod exists already for the given teacher; if so, reuse it
-             * Otherwise create a new one
-             */
-            try {
-                $timetableClassPeriod = $this->classPeriodMapper->findOneByColumnList([
-                    'class_id' => $timetableClass->getId(),
-                    'period_id' => $period->getId(),
-                    'teacher_external_id' => $class['teachers']['externalId']
-                ]);
 
-                $this->log->info(sprintf(
-                    'Reusing previously saved class period %s using period_id %s, taught by %s, with id %s',
-                    $timetableClass->getName(),
-                    $period->getId(),
-                    $class['teachers']['externalId'],
-                    $timetableClassPeriod->getId()
-                ));
-            } catch (Exception $e) {
-                $timetableClassPeriod = $this->classPeriodMapper->createModel()
-                    ->setClass($timetableClass)
-                    ->setPeriod($period)
-                    ->setRoom($class['room']['name'])
-                    ->setTeacher($class['teachers']['externalId']);
-
-                $this->log->info(sprintf(
-                    'Creating new class period %s %s, taught by %s',
-                    $timetableClass->getName(),
-                    $class['teachers']['externalId'],
-                    $period->getId()
-                ));
-
-                /* Only save this model if you're creating it anew
+        /* Process multiple teachers into multiple timetableClassPeriod instances
+         */
+        if (\count($class['teachers'])) {
+            foreach ($class['teachers'] as $teacher) {
+                /* See if a ClassPeriod exists already for the given teacher; if so, reuse it
+                 * Otherwise create a new one
                  */
-                if ($this->perform) {
-                    $this->classPeriodMapper->save($timetableClassPeriod);
+                try {
+                    $timetableClassPeriod = $this->classPeriodMapper->findOneByColumnList([
+                        'class_id' => $timetableClass->getId(),
+                        'period_id' => $period->getId(),
+                        'teacher_external_id' => $teacher['externalId']
+                    ]);
+
+                    $this->log->info(sprintf(
+                        'Reusing previously saved class period %s using period_id %s, taught by %s, with id %s',
+                        $timetableClass->getName(),
+                        $period->getId(),
+                        $teacher['externalId'],
+                        $timetableClassPeriod->getId()
+                    ));
+                } catch (Exception $e) {
+                    $timetableClassPeriod = $this->classPeriodMapper->createModel()
+                        ->setClass($timetableClass)
+                        ->setPeriod($period)
+                        ->setRoom($class['room']['name'])
+                        ->setTeacher($teacher['externalId']);
+
+                    $this->log->info(sprintf(
+                        'Creating new class period %s %s, taught by %s',
+                        $timetableClass->getName(),
+                        $period->getId(),
+                        $teacher['externalId']
+                    ));
+
+                    /* Only save this model if you're creating it anew
+                     */
+                    if ($this->perform) {
+                        $this->classPeriodMapper->save($timetableClassPeriod);
+                    }
                 }
+
+                $this->log->debug(sprintf(
+                    '%s %s (user %s) is a teacher of subject %s',
+                    $teacher['firstname'],
+                    $teacher['surname'],
+                    $teacher['externalId'],
+                    $class['class']['code']
+                ));
             }
         } else {
             /* This class doesn't have a teacher associated with it
@@ -469,6 +481,8 @@ class Classes implements IStrategy
                 'class_id' => $timetableClass->getId(),
                 'period_id' => $period->getId(),
             ])->first();
+
+            // check here to see whether the ->first() is the one without teachers
 
             if (null !== $timetableClassPeriod) {
                 $this->log->info(sprintf(
@@ -505,8 +519,6 @@ class Classes implements IStrategy
             $class['period']['end'],
             $ext
         ));
-
-        return $timetableClassPeriod;
     }
 
 
