@@ -122,8 +122,10 @@ export default {
 }
 
 .percentage { //block percentages so files names line up
-  display: inline-block;
-  width: 40px;
+    display: inline-block;
+    padding-right: 0.25rem;
+    text-align: right;
+    width: 40px;
 }
 
 </style>
