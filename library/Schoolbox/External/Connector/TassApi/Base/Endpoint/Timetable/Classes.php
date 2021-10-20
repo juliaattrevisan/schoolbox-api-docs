@@ -326,7 +326,7 @@ class Classes implements IStrategy
 
                         /* Teacher involvement is assigned here, via multiple ClassEntry records
                          */
-                        $timetableClassPeriod = $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
+                        $this->createTimetableClassPeriod($class, $ext, $timetablePeriod, $timetableClass);
 
                         /* Process students
                          */
@@ -404,12 +404,12 @@ class Classes implements IStrategy
      * @param string          $ext
      * @param TimetablePeriod $period
      * @param ClassEntry      $timetableClass
-     * @return ClassPeriod
+     * @return void
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function createTimetableClassPeriod(array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
+    private function createTimetableClassPeriod(array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): void
     {
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
@@ -519,8 +519,6 @@ class Classes implements IStrategy
             $class['period']['end'],
             $ext
         ));
-
-        return $timetableClassPeriod;
     }
 
 
