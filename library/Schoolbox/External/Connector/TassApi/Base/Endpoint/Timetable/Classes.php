@@ -231,6 +231,17 @@ class Classes implements IStrategy
                         $start = substr($period['PRD_START'], 11, 8);
                         $finish = substr($period['PRD_END'], 11, 8);
 
+                        /* This is the current teacher of the subject
+                         *
+                         * Assumption: Only one teacher per subject
+                         * Can there be more than one teacher, maybe comma-separated?
+                         */
+                        $currentTeacher = [
+                            'externalId' => $subject['TCH_CODE'],
+                            'firstname' => $users[$subject['TCH_CODE']]['firstname'] ?? 'Unknown',
+                            'surname' => $users[$subject['TCH_CODE']]['lastname'] ?? "Unknown ({$subject['TCH_CODE']})",
+                        ];
+
                         /* Construct a data struct that represents a more sane version of $subject
                          */
                         $class = [
@@ -256,45 +267,37 @@ class Classes implements IStrategy
                                 'name' => $subject['ROOM_CODE']
                             ],
 
-                            /* Assumption: Only one teacher per subject
-                             * Can there be more than one teacher, maybe comma-separated?
+                            /* Always assign $subject['TCH_CODE'] to be the teacher of a class
+                             *
+                             * But what happens when staff are in classes taught by other staff...?
+                             * Is that even possible?
                              */
-                            'teachers' => [
-                            ],
+                            'teachers' => $currentTeacher,
 
                             'students' => [
                             ],
                         ];
 
-                        /* If this $externalId existed in the Staff lookup, put them in the teachers set
-                         * Or, if this $externalId existed in the Student lookup, put them in the students set
+                        $this->log->debug(sprintf(
+                            '%s %s (user %s) is the teacher of subject %s',
+                            $class['teachers']['firstname'],
+                            $class['teachers']['surname'],
+                            $class['teachers']['externalId'],
+                            $class['class']['code']
+                        ));
+
+                        /* If the current person is a student, put them in the students list
                          */
-                        if (isset($users[$externalId])) {
-                            if (self::TYPE_STAFF === $type) {
-                                $class['teachers'] = [
-                                    'externalId' => $subject['TCH_CODE'],
-                                    'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                                    'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
-                                ];
-
-                                $this->log->debug(sprintf(
-                                    '%s %s (user %s) is the teacher of subject %s',
-                                    $class['teachers']['firstname'],
-                                    $class['teachers']['surname'],
-                                    $class['teachers']['externalId'],
-                                    $class['class']['code']
-                                ));
-                            } elseif (self::TYPE_STUDENT === $type) {
-                                $class['students'][] = [
-                                    'externalId' => (string)$externalId,
-                                    'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                                    'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
-                                ];
-                            }
-
-                            /* noop for Parents (they don't have timetables)
-                             */
+                        if (self::TYPE_STUDENT === $type) {
+                            $class['students'][] = [
+                                'externalId' => (string)$externalId,
+                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                                'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
+                            ];
                         }
+
+                        /* noop for Parents (they don't have timetables)
+                         */
 
                         /* Look up the period instance by (name, day)
                          *
@@ -420,6 +423,10 @@ class Classes implements IStrategy
          * - period_id is a schoolbox sis_timetable_period via lookup of Day and Period Name
          * - class_id comes from $timetableClass->getId()
          */
+        if ($class['class']['code'] == '12-2026-2') {
+            print_r($class);
+        }
+
         if (isset($class['teachers']['externalId'])) {
             /* See if a ClassPeriod exists already for the given teacher; if so, reuse it
              * Otherwise create a new one
@@ -448,8 +455,8 @@ class Classes implements IStrategy
                 $this->log->info(sprintf(
                     'Creating new class period %s %s, taught by %s',
                     $timetableClass->getName(),
-                    $class['teachers']['externalId'],
-                    $period->getId()
+                    $period->getId(),
+                    $class['teachers']['externalId']
                 ));
 
                 /* Only save this model if you're creating it anew
@@ -469,6 +476,8 @@ class Classes implements IStrategy
                 'class_id' => $timetableClass->getId(),
                 'period_id' => $period->getId(),
             ])->first();
+
+            // check here to see whether the ->first() is the one without teachers
 
             if (null !== $timetableClassPeriod) {
                 $this->log->info(sprintf(
