@@ -7,22 +7,18 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetablePeriodMapper;
 
 /**
  * Class Prepare
  *
  * Clears data from a db in preparation for a Tass API import
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Profile
  */
 class Prepare implements IStrategy
 {
@@ -70,30 +66,6 @@ class Prepare implements IStrategy
 
 
     /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $periodMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var ClassPeriodMapper
-     */
-    private ClassPeriodMapper $classPeriodMapper;
-
-
-    /**
      * Prepare constructor.
      *
      * @param LoggerInterface                 $log
@@ -103,10 +75,6 @@ class Prepare implements IStrategy
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param TimetablePeriodMapper           $periodMapper
-     * @param ClassEntryMapper                $classEntryMapper
-     * @param ClassInvolvementMapper          $classInvolvementMapper
-     * @param ClassPeriodMapper               $classPeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -115,11 +83,7 @@ class Prepare implements IStrategy
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
-        TimetablePeriodMapper $periodMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        UserProfile\Relationship\Mapper $relationshipMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -129,11 +93,6 @@ class Prepare implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
-
-        $this->periodMapper = $periodMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->classPeriodMapper = $classPeriodMapper;
     }
 
 
@@ -153,13 +112,9 @@ class Prepare implements IStrategy
 
             /* Truncate other data entirely
              */
-//            $this->relationshipMapper->truncate();
-            $this->classEntryMapper->truncate();
-            $this->classInvolvementMapper->truncate();
-            $this->classPeriodMapper->truncate();
-            $this->periodMapper->truncate();
+            $this->relationshipMapper->truncate();
 
-            $this->log->info('Purged existing profile relations and timetable-related data');
+            $this->log->info('Purged existing profile relations');
         }
     }
 }
