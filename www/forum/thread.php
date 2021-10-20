@@ -166,21 +166,9 @@ $this->setVar($outputPagination);
 $postList = $thread->getPosts();
 
 if ($postList !== null) {
-    $userHandler = new User();
     $j = 0;
 
-// Assign first array element to variable
-    $first = reset($postList);
-
     foreach ($postList as $post) {
-//        $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($post['userID']);
-//        $user = $post->getOwner();
-
-//        $postTime = new Alaress_Date_Format($post['date'], 'Y-m-d H:i:s');
-        // This should be a null date, it will currently parse as now.
-        // Doesn't matter much here, because this block won't be shown
-        // if it is null.
-//        $modifiedTime = new Alaress_Date_Format($post['modified'], 'Y-m-d H:i:s');
 
         $output = array('POST_ID' => $post->getId(),
 //                        'POST_TITLE' => Scrub::text($post->getTitle()),
@@ -191,19 +179,19 @@ if ($postList !== null) {
                         'POST_BODY' => Scrub::html($post->getBody()),
                         'POST_MODIFIED' => $post->getModified()->getRelativeTime(),
                         'POST_CENSORED' => $post->getCensored() == 'true' ? '(Administrator)' : '',
-//                        'POST_AUTHOR_EXTERNAL_ID' => $post->get['synergy_id'],
+                        'POST_AUTHOR_EXTERNAL_ID' => $post->getOwner()->getExternalId(),
                         'POST_AUTHOR_NAME' => $post->getOwner()->getFullName(),
                         'ON_OFF'          => ++$j % 2 ? 'dark' : '',
         );
         $this->setVar($output);
 
         //Remove link for deleted user
-        if ($post->getOwner()->getDeletedAt()) {
-            $this->setVar('link_start_block', '');
-            $this->setVar('link_end_block', '');
-        } else {
+        if ($post->getOwner()->getEnabled()) {
             $this->parse('link_start_block', 'link_start');
             $this->parse('link_end_block', 'link_end');
+        } else {
+            $this->setVar('link_start_block', '');
+            $this->setVar('link_end_block', '');
         }
 
         // edit post
