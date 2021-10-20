@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge\Staloy;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 
 class Assignment extends \External\Canvas\Sync\Bridge\Assignment
@@ -17,9 +18,30 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
     /**
      * @inheritDoc
      */
+    public function __construct(GenericCollection $markTypes, GenericCollection $workTypes)
+    {
+        parent::__construct($markTypes, $workTypes);
+        // reorder $workTypes
+        $this->workTypes->indexBy('id');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function syncCanvasQuizzes(): bool
     {
         return false;
+    }
+
+    /**
+     * Returns the work type to assign to imported Canvas Assignments
+     *
+     * @param string $workTypeName
+     * @return null|WorkType\Model
+     */
+    public function getSubmissionBoxWorkType(string $workTypeName): ?WorkType\Model
+    {
+        return null;
     }
 
     /**

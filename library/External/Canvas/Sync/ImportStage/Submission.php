@@ -211,6 +211,9 @@ class Submission extends SectionAssignment
                                     $markScheme,
                                     $feedbackTime
                                 );
+                                if (!$feedback) {
+                                    continue;
+                                }
                                 $syncedFeedbackIds[] = $feedback->getId();
                                 $this->syncMarkCount++;
                                 $hasMarkToSync = true;
@@ -237,7 +240,7 @@ class Submission extends SectionAssignment
      * @param GenericCollection $existingFeedbacks
      * @param IMarkScheme       $markScheme
      * @param string            $feedbackTime
-     * @return SubmissionBox\ReturnedWork
+     * @return SubmissionBox\ReturnedWork|null
      * @throws Mapper\Exception
      */
     private function syncFeedback(
@@ -248,7 +251,7 @@ class Submission extends SectionAssignment
         GenericCollection $existingFeedbacks,
         IMarkScheme $markScheme,
         string $feedbackTime
-    ): SubmissionBox\ReturnedWork {
+    ): ?SubmissionBox\ReturnedWork {
         $normMark = $canvasSubmission['norm_mark'];
         if ($submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
@@ -291,7 +294,12 @@ class Submission extends SectionAssignment
          * 1. We want to preserve Canvas create/update timestamps (alt. method would be to save via mapper, then raw query to override)
          * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
          */
-        return $this->saveModel($this->returnedWorkMapper, $feedback, false, false);
+        try {
+            return $this->saveModel($this->returnedWorkMapper, $feedback, false, false);
+        } catch (\Exception $e) {
+            $this->log->error($e->getMessage());
+            return null;
+        }
     }
 
 
@@ -378,10 +386,10 @@ class Submission extends SectionAssignment
      * 2. if 1 failed, try matching Canvas unique_name and SB email address
      * 3. if 2 failed, return schoolbox admin
      * @param string|null $canvasUserId
-     * @return User|null
+     * @return User
      * @throws Mapper\Exception
      */
-    private function findUserByCanvasUserId(?string $canvasUserId): ?User
+    private function findUserByCanvasUserId(?string $canvasUserId): User
     {
         if (key_exists($canvasUserId, $this->canvasUserIdUserMap)) {
             return $this->canvasUserIdUserMap[$canvasUserId];

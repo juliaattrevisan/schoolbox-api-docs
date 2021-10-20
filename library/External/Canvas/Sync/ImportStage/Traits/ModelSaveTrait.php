@@ -64,7 +64,7 @@ trait ModelSaveTrait
         try {
             $statement->execute($mapper->dehydrate($model));
         } catch (PDOException $e) {
-            throw new Database\Exception("Could not save model", 0, $e);
+            throw new Database\Exception("Could not save model: " . $e->getMessage(), 0, $e);
         }
 
         if ($hasId && $currentId === null) {
