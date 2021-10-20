@@ -136,17 +136,19 @@ abstract class AbstractCsvImporterFactory
         $capabilities    = [];
         $isLastRowNewCap = false;
         $levelCount      = count($levels);
+        $isPreviousEmpty = false;
         while ($row = $this->readCsvLine($fp, $maxLevels)) {
-            /* If the $row is just a bunch of zero-length strings, there's no meaningful data here
-             * Just skip it, instead of trying to process empty rows somehow "intuitively"
-             */
+            // Empty $row may be empty descriptors
+            // Removing empty rows only when the previous row is empty
             $trimmedRow = array_filter($row, static function ($element) {
                 return '' !== (string)$element;
             });
 
-            if (!\count($trimmedRow)) {
+            $currentEmpty = \count($trimmedRow) === 0;
+            if ($isPreviousEmpty && $currentEmpty) {
                 continue;
             }
+            $isPreviousEmpty = $currentEmpty;
 
             if ($isLastRowNewCap) {
                 $capMaxValue     = $row[0];
@@ -182,6 +184,11 @@ abstract class AbstractCsvImporterFactory
             $rowDescriptorCount = count($row) - 2;
             $levelCount         = max($levelCount, $rowDescriptorCount);
             $square[]           = $row;
+        }
+
+        // if the last line was empty, remove it to avoid duplicating the previous capability
+        if ($isPreviousEmpty) {
+            array_pop($square);
         }
 
         // The square may have more columns than there are levels.
