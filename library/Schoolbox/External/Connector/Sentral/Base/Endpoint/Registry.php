@@ -22,7 +22,7 @@ class Registry
     /**
      * @var array
      */
-    private $registry = [];
+    private array $registry = [];
 
 
     /**
@@ -68,5 +68,27 @@ class Registry
     public function keys(): array
     {
         return array_keys($this->registry);
+    }
+
+
+    /**
+     * Find a staff member in the registry whose person id === $id
+     * (Used as a reverse lookup)
+     *
+     * @param int    $id
+     * @param string $type
+     * @return array|null
+     */
+    public function findById(int $id, string $type): ?array
+    {
+        /* Note that $data['person']['id'] might not have been an int when it went in here
+         */
+        foreach ($this->registry as $key => $data) {
+            if ((int)$data['person']['id'] === $id && $data['person']['type'] === $type) {
+                return $data;
+            }
+        }
+
+        return null;
     }
 }

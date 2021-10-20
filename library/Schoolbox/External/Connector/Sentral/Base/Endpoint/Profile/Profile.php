@@ -359,28 +359,28 @@ class Profile implements IStrategy
                  */
                 $studentProfile
                     ->setUsername($username)
-                    ->setAlertComment($alertComments)
-                    ->setAlertLegal($alertLegal)
+                    ->setAlertComment($alertComments ?? null)
+                    ->setAlertLegal($alertLegal ?? null)
                     ->setAlertMessage($messages)
                     ->setCampusName($campusName)
                     ->setEmail($email)
                     ->setEnrolmentDate($enrolment)
                     ->setFormName($form)
-                    ->setFormTeacherId($formTeacher['id'])
-                    ->setFormTeacherName($formTeacher['name'])
+                    ->setFormTeacherId($formTeacher['id'] ?? null)
+                    ->setFormTeacherName($formTeacher['name'] ?? null)
                     ->setGender($gender)
-                    ->setHeadOfHouseId($housemaster['id'])
-                    ->setHeadOfHouseName($housemaster['name'])
-                    ->setHouseName($academicHouse)
+                    ->setHeadOfHouseId($housemaster['id'] ?? null)
+                    ->setHeadOfHouseName($housemaster['name'] ?? null)
+                    ->setHouseName($academicHouse ?? null)
                     ->setLeavingDate($leaving)
                     ->setMobile($mobile)
                     ->setStudiesCode($studiesCode)
                     ->setTutorGroup($tutorGroup)
-                    ->setTutorTeacherId($tutor['id'])
-                    ->setTutorTeacherName($tutor['name'])
+                    ->setTutorTeacherId($tutor['id'] ?? null)
+                    ->setTutorTeacherName($tutor['name'] ?? null)
                     ->setYearLevel($yearLevel)
-                    ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
-                    ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+                    ->setYearLevelCoordinatorId($yearLevelCoordinator['id'] ?? null)
+                    ->setYearLevelCoordinatorName($yearLevelCoordinator['name'] ?? null)
 
                     /**
                      * Flags
@@ -402,7 +402,7 @@ class Profile implements IStrategy
                  * Emergency Contacts
                  * ...because we didn't normalise it, I'm hardcoding these
                  */
-                if (\count($emergencyContacts)) {
+                if (isset($emergencyContacts) && \count($emergencyContacts)) {
                     if (isset($emergencyContacts[0])) {
                         $studentProfile
                             ->setEmergencyContactName1($emergencyContacts[0]['name'])
@@ -1184,7 +1184,7 @@ class Profile implements IStrategy
                 }
 
                 /* Remember that we saw a particular staff id
-                 * (-not- their externalId, the primary key in sentral for this student)
+                 * (-not- their externalId, the primary key in sentral for this staff)
                  *
                  * We need to get each dude's timetable separately via some other api endpoint
                  * and we won't encounter this id again unless we remember it here

@@ -209,13 +209,13 @@ class Classes implements IStrategy
                         'teachers' => [
                             'externalId' => $period['subject']['teachers']['externalId'],
                             'firstname' => $period['subject']['teachers']['firstname'],
-                            'surname' => $period['subject']['teachers']['surname'],
+                            'lastname' => $period['subject']['teachers']['lastname'],
                         ],
                         'students' => [
                             [
                                 'externalId' => $data['person']['externalId'],
                                 'firstname' => $data['person']['firstname'],
-                                'surname' => $data['person']['lastname'],
+                                'lastname' => $data['person']['lastname'],
                             ]
                         ]
                     ];
@@ -324,10 +324,10 @@ class Classes implements IStrategy
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
-        }
 
-        if ($this->perform) {
-            $this->classEntryMapper->save($timetableClass);
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
         }
 
         return $timetableClass;
@@ -380,7 +380,7 @@ class Classes implements IStrategy
         $this->log->info(sprintf(
             'Creating class period relation for teacher %s %s in room %s',
             $class['teachers']['firstname'],
-            $class['teachers']['surname'],
+            $class['teachers']['lastname'],
             $class['room']['name']
         ));
 
@@ -425,7 +425,7 @@ class Classes implements IStrategy
                 'Reusing class involvement %s %s for %s (user %s)',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
-                "{$person['firstname']} {$person['surname']}",
+                "{$person['firstname']} {$person['lastname']}",
                 $person['externalId']
             ));
 
@@ -435,14 +435,14 @@ class Classes implements IStrategy
         /* Create new relation
          */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-                                                                  ->setExternalId($person['externalId'])
-                                                                  ->setClass($timetableClass);
+            ->setExternalId($person['externalId'])
+            ->setClass($timetableClass);
 
         $this->log->info(sprintf(
             'Creating class involvement %s %s for %s (user %s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
-            "{$person['firstname']} {$person['surname']}",
+            "{$person['firstname']} {$person['lastname']}",
             $timetableClassInvolvement->getExternalId()
         ));
 

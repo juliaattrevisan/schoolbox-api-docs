@@ -29,7 +29,7 @@ class Preloader
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -37,19 +37,19 @@ class Preloader
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Api
      */
-    private $api;
+    private Api $api;
 
 
     /**
      * @var Registry
      */
-    private $registry;
+    private Registry $registry;
 
 
     /**
@@ -57,7 +57,7 @@ class Preloader
      *
      * @var string
      */
-    private $fromDate;
+    private string $fromDate;
 
 
     /**
@@ -65,7 +65,7 @@ class Preloader
      *
      * @var string
      */
-    private $toDate;
+    private string $toDate;
 
 
     /**
@@ -102,6 +102,7 @@ class Preloader
      *
      * @param string $externalId
      * @return array|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function compile(string $externalId): ?array
     {
@@ -197,67 +198,45 @@ class Preloader
          */
         $timetable = [];
 
-        /* A temporary cache for teacher id endpoints
-         * because sentral is so damn slow
-         *
-         * Trade space for time
-         */
-        $teacherCache = [];
-
         foreach ($payload['data'] as $timetableLesson) {
             $teacher = [
                 'externalId' => '',
                 'firstname' => '',
-                'surname' => '',
+                'lastname' => '',
                 'id' => '',
             ];
 
-            /* Go digging in another endpoint for names and identifier
+            /* Make a massive assumption here that their list of teachers is correct
+             * Previously, went digging in another endpoint for names and identifier
+             *
+             * TODO could be multiple teachers of this class...in that case, foreach() over this
              */
             if (isset($timetableLesson['attributes']['teacherIds'][0]) && '' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
-                $endpoint = "enrolments/staff/{$timetableLesson['attributes']['teacherIds'][0]}/person";
+                $teacherData = $this->registry->findById((int)$timetableLesson['attributes']['teacherIds'][0], Profile::TYPE_STAFF);
 
-                /* Load it from the cache, if we have it;
-                 * Otherwise just hit that api
-                 */
-                if (isset($teacherCache[$endpoint])) {
-                    $teacher = $teacherCache[$endpoint];
+                if ($teacherData) {
+                    /* Directly reuse the data we collated from Profile lookup
+                     * It happens to be synonymous...
+                     */
+                    $teacher = $teacherData['person'];
 
                     $this->log->debug(sprintf(
                         'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
                         $teacher['firstname'],
-                        $teacher['surname'],
+                        $teacher['lastname'],
                         $teacher['externalId'],
                         $teacher['id']
                     ));
                 } else {
-                    try {
-                        $teacherPayload = $this->api->retrieveDocument($endpoint);
-
-                        $teacher = [
-                            'externalId' => $teacherPayload['data']['attributes']['externalId'],
-                            'firstname' => $teacherPayload['data']['attributes']['firstName'],
-                            'surname' => $teacherPayload['data']['attributes']['lastName'],
-                            'id' => $timetableLesson['attributes']['teacherIds'][0],
-                        ];
-                    } catch (\InvalidArgumentException $e) {
-                        $this->log->warning(sprintf(
-                            'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
-                            $timetableLesson['attributes']['teacherIds'][0],
-                            $timetableLesson['attributes']['teacherName']
-                        ));
-
-                        $teacher = [
-                            'externalId' => '',
-                            'firstname' => '',
-                            'surname' => '',
-                            'id' => $timetableLesson['attributes']['teacherIds'][0],
-                        ];
-                    }
-
-                    /* Remember this for later
+                    /* Could not find someone in the lookup registry containing this id
                      */
-                    $teacherCache[$endpoint] = $teacher;
+                    $this->log->warning(sprintf(
+                        'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
+                        $timetableLesson['attributes']['teacherIds'][0],
+                        $timetableLesson['attributes']['teacherName']
+                    ));
+
+                    $teacher['id'] = $timetableLesson['attributes']['teacherIds'][0];
                 }
             } else {
                 $this->log->warning(sprintf(
