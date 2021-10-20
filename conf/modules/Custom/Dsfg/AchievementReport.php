@@ -26,6 +26,6 @@ class AchievementReport implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
         $module = new Module($di);
-        $module->init('/modules/custom/dsfg/achievementreport');
+        $module->init('/modules/custom/diocesan/achievementreport');
     }
 }
