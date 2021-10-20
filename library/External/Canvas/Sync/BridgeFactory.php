@@ -23,17 +23,17 @@ use Schoolbox\Resource\Folder;
 class BridgeFactory
 {
     /** @var string */
-    private $siteLocation;
+    private string $siteSchoolCode;
 
     private const BASE = "External\\Canvas\\Sync\\Bridge\\";
 
     /**
      * Constructor
-     * @param string $siteLocation
+     * @param string $siteSchoolCode
      */
-    public function __construct(string $siteLocation)
+    public function __construct(string $siteSchoolCode)
     {
-        $this->siteLocation = ucfirst($siteLocation);
+        $this->siteSchoolCode = ucfirst($siteSchoolCode);
     }
 
     /**
@@ -43,7 +43,7 @@ class BridgeFactory
      */
     private function getClassName(string $filename): string
     {
-        $className = self::BASE . $this->siteLocation . '\\' . $filename;
+        $className = self::BASE . $this->siteSchoolCode . '\\' . $filename;
         if (!class_exists($className)) {
             $className = self::BASE . $filename;
         }
