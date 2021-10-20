@@ -424,6 +424,7 @@ class Definition implements IStrategy
      */
     private function getCurrentSemester(): int
     {
+        return 4;
         return (int)date('n') <= 6 ? 1 : 2;
     }
 
