@@ -86,7 +86,7 @@ $app = new class extends CliTool\App
      * These column data types have a collation/charset combo to worry about
      * Everything else is a datetime/int/enum/etc. which don't have this issue
      */
-    private const TEXT_DATA_TYPES = ['varchar', 'text', 'mediumtext', 'longtext'];
+    private const TEXT_DATA_TYPES = ['varchar', 'text', 'mediumtext', 'longtext', 'enum'];
 
 
     /**
