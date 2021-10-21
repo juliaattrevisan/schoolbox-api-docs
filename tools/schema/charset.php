@@ -36,6 +36,14 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --strategic
+     *
+     * Get a list of columns and their metadata so you can see what's going on
+     */
+    private const OPT_LONG_STRATEGIC = 'strategic';
+
+
+    /**
      * --tablesql
      *
      * Dump a list of sql statements grouped by table name
@@ -97,6 +105,7 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_STRATEGIC,
             self::OPT_LONG_TABLESQL,
             self::OPT_LONG_INPUT
         ];
@@ -159,10 +168,6 @@ HELP;
         $this->getLogger()->info('Scouring the universe');
 
         $manifest = $this->getManifest();
-
-        /* Generate a human readable strategic overview
-         */
-        echo "\n\n";
 
         /* A set of sql statements which execute changes on tables and columns
          */
@@ -306,7 +311,9 @@ HELP;
                     $allSql[$tableName] = implode(",\n ", $sql);
                 }
 
-                echo "\n";
+                if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
+                    echo "\n";
+                }
             }
         }
 
@@ -315,6 +322,8 @@ HELP;
         /* Show sql statements grouped by table name
          */
         if ($this->getOpt(self::OPT_LONG_TABLESQL)) {
+            echo "\n";
+
             foreach ($allSql as $tableName => $sql) {
                 echo "{$white}{$tableName}\n";
                 echo "    {$grey}{$sql}\n\n";
@@ -402,7 +411,9 @@ HELP;
      */
     private function renderTableName(string $colour, string $tableName, string $val): void
     {
-        echo "\n{$colour}{$tableName} ({$val})\n";
+        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
+            echo "\n{$colour}{$tableName} ({$val})\n";
+        }
     }
 
 
@@ -414,7 +425,9 @@ HELP;
      */
     private function renderColumn(string $colour, string $columnName): void
     {
-        echo str_pad("    {$colour}{$columnName}", 50);
+        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
+            echo str_pad("    {$colour}{$columnName}", 50);
+        }
     }
 
 
@@ -427,7 +440,9 @@ HELP;
      */
     private function renderCell(string $colour, string $val): void
     {
-        echo str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
+        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
+            echo str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
+        }
     }
 
 
