@@ -201,7 +201,7 @@ HELP;
                 /* This table collation is unspecified (empty string)
                  * Is that something that needs to change?
                  */
-                $strategic[] = $this->renderTableName($yellow, $tableName, " . self::EMPTY_DATA . ");
+                $strategic[] = $this->renderTableName($yellow, $tableName, self::EMPTY_DATA);
             } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                 /* This table collation isutf8-ish, sort of
                  * They need correction
