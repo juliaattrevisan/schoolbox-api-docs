@@ -121,6 +121,7 @@ $app = new class extends CliTool\App
          */
         $desiredTableCollation = self::DESIRED_TABLE_COLLATION;
         $desiredColumnCollation = self::DESIRED_COLUMN_COLLATION;
+        $desiredColumnCharset = self::DESIRED_COLUMN_CHARSET;
 
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
@@ -134,14 +135,16 @@ update them by using Perform
 
 Legend:
     {$green}This collation is correct
-    {$yellow}This collation is null or empty, but maybe that's okay
+    {$yellow}This collation is null or empty, but maybe it needs changing
     {$red}This collation is sort of utf8-ish, looks like it needs fixing
-    {$grey}This collation remains unchanged
+    {$white}This collation remains unchanged
+    {$darkGrey}This collation is null or empty, but it's supposed to be that way
 
 {$white}All table collations are supposed to be {$green}{$desiredTableCollation}
 {$white}All column collations are supposed to be {$green}{$desiredColumnCollation}
+{$white}All column charsets are supposed to be {$green}{$desiredColumnCharset}
 {$white}
-Usage: php charset.php [--perform]
+Usage: php charset.php [--strategic]
   
 
 HELP;
@@ -178,7 +181,7 @@ HELP;
                     /* This table collation is something else entirely
                      * Leave it be
                      */
-                    echo "{$grey}{$tableName} ({$tableData['collation']})\n";
+                    echo "{$white}{$tableName} ({$tableData['collation']})\n";
                 }
 
                 /* Investigate the column's settings
