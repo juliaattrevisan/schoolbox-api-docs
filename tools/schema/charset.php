@@ -373,7 +373,11 @@ HELP;
             foreach ($allSql as $tableName => $sql) {
                 $this->getLogger()->debug($sql);
 
-                $this->getDatabaseInternal()->executeQuery($sql, []);
+                try {
+                    $this->getDatabaseInternal()->executeQuery($sql, []);
+                } catch (\Throwable $e) {
+                    $this->getLogger()->warning($e->getMessage());
+                }
             }
         }
 
