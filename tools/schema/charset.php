@@ -239,6 +239,10 @@ HELP;
                             echo $this->renderCell($grey, $columnData['charset']);
                         }
                     } else {
+                        /* Other data types like int/datetime/decimal etc. come out here
+                         * They don't have character encodings/charsets so they will be
+                         * grey or dark grey (when null/empty)
+                         */
                         if ('' === (string)$columnData['collation']) {
                             echo $this->renderCell($darkGrey, self::EMPTY_DATA);
                         } else {
