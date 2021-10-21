@@ -65,6 +65,12 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Columns are meant to have this charset
+     */
+    private const DESIRED_COLUMN_CHARSET = 'utf8mb4';
+
+
+    /**
      * Any collations containing this needle will flag as needing fixing
      */
     private const BROKEN_COLUMN_COLLATION_SUBSTR = 'utf8';
@@ -135,6 +141,8 @@ HELP;
         /* Generate a human readable strategic overview
          */
         if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
+            echo "\n\n";
+
             foreach ($manifest as $tableName => $tableData) {
                 /* Investigate the table settings
                  */
@@ -159,31 +167,58 @@ HELP;
                     echo "{$grey}{$tableName} ({$tableData['collation']})\n";
                 }
 
-                /* Investigate the column settings
+                /* Investigate the column's settings
                  */
-                foreach ($tableData['columns'] as $columnName => $columnCollation) {
-                    echo "    ";
+                foreach ($tableData['columns'] as $columnName => $columnData) {
+                    echo str_pad("    {$white}{$columnName}", 50);
 
-                    if ($columnCollation === self::DESIRED_COLUMN_COLLATION) {
+                    /* Investigate the column's collation settings
+                     */
+                    if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
                         /* This column collation is correct
                          */
-                        echo "{$green}{$columnName} ({$columnCollation})\n";
-                    } elseif ('' === (string)$columnCollation) {
-                        /* This table collation is unspecified (empty string)
+                        echo $this->renderCell($green, $columnData['collation']);
+                    } elseif ('' === (string)$columnData['collation']) {
+                        /* This column collation is unspecified (empty string)
                          * Is that something that needs to change?
                          */
-                        echo "{$yellow}{$columnName} (null/empty)\n";
-                    } elseif (strpos($columnCollation, self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                        /* This table collation isutf8-ish, sort of
+                        echo $this->renderCell($yellow, '(null/empty)');
+                    } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                        /* This column collation isutf8-ish, sort of
                          * They need correction
                          */
-                        echo "{$red}{$columnName} ({$columnCollation})\n";
+                        echo $this->renderCell($red, $columnData['collation']);
                     } else {
                         /* This column collation is something else entirely
                          * Leave it be
                          */
-                        echo "{$grey}{$columnName} ({$columnCollation})\n";
+                        echo $this->renderCell($grey, $columnData['collation']);
                     }
+
+                    /* Investigate the column's charset settings
+                     */
+                    if ($columnData['charset'] === self::DESIRED_COLUMN_CHARSET) {
+                        /* This column charset is correct
+                         */
+                        echo $this->renderCell($green, $columnData['charset']);
+                    } elseif ('' === (string)$columnData['charset']) {
+                        /* This column charset is unspecified (empty string)
+                         * Is that something that needs to change?
+                         */
+                        echo $this->renderCell($yellow, '(null/empty)');
+                    } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                        /* This column charset isutf8-ish, sort of
+                         * They need correction
+                         */
+                        echo $this->renderCell($red, $columnData['charset']);
+                    } else {
+                        /* This column charset is something else entirely
+                         * Leave it be
+                         */
+                        echo $this->renderCell($grey, $columnData['charset']);
+                    }
+
+                    echo "\n";
                 }
 
                 echo "\n";
@@ -211,6 +246,7 @@ HELP;
             SELECT TABLE_NAME, TABLE_COLLATION
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = 'schoolbox'
+            ORDER BY TABLE_NAME            
         ";
 
         $tables = $this->getDatabaseInternal()->executeQuery($tablesQuery, [])->fetchAll();
@@ -226,9 +262,10 @@ HELP;
             /* Every table should get its columns inspected too
              */
             $columnsQuery = "
-                SELECT COLUMN_NAME, COLLATION_NAME
+                SELECT COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
                 FROM INFORMATION_SCHEMA.COLUMNS
                 WHERE table_name = :table
+                ORDER BY COLUMN_NAME
             ";
 
             $columns = $this->getDatabaseInternal()->executeQuery($columnsQuery, [
@@ -236,11 +273,26 @@ HELP;
             ])->fetchAll();
 
             foreach ($columns as $column) {
-                $stack[$table['TABLE_NAME']]['columns'][$column['COLUMN_NAME']] = $column['COLLATION_NAME'];
+                $stack[$table['TABLE_NAME']]['columns'][$column['COLUMN_NAME']] = [
+                    'collation' => $column['COLLATION_NAME'],
+                    'charset' => $column['CHARACTER_SET_NAME']
+                ];
             }
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Return a colour-coded string for the collation and charset columns
+     * @param string $colour
+     * @param string $val
+     * @return string
+     */
+    private function renderCell(string $colour, string $val): string
+    {
+        return str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
     }
 
 
