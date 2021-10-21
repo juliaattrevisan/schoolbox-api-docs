@@ -1,3 +1,6 @@
+-- Insert new config field 'date'
+INSERT INTO lu_config_field (field) VALUES ('date');
+
 INSERT INTO config (`name`, `title`, `description`, `editable`, `hidden`, `required`, `module`, `field_id`, `type_id`)
 VALUES (
         'date_increment_epoch',
