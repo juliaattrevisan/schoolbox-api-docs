@@ -172,50 +172,61 @@ HELP;
                 foreach ($tableData['columns'] as $columnName => $columnData) {
                     echo str_pad("    {$white}{$columnName}", 50);
 
-                    /* Investigate the column's collation settings
+                    /* Investigate the data type
                      */
-                    if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
-                        /* This column collation is correct
-                         */
-                        echo $this->renderCell($green, $columnData['collation']);
-                    } elseif ('' === (string)$columnData['collation']) {
-                        /* This column collation is unspecified (empty string)
-                         * Is that something that needs to change?
-                         */
-                        echo $this->renderCell($yellow, '(null/empty)');
-                    } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                        /* This column collation isutf8-ish, sort of
-                         * They need correction
-                         */
-                        echo $this->renderCell($red, $columnData['collation']);
-                    } else {
-                        /* This column collation is something else entirely
-                         * Leave it be
-                         */
-                        echo $this->renderCell($grey, $columnData['collation']);
-                    }
+                    echo $this->renderCell($white, $columnData['dataType']);
 
-                    /* Investigate the column's charset settings
+                    /* Only textual ones matter
                      */
-                    if ($columnData['charset'] === self::DESIRED_COLUMN_CHARSET) {
-                        /* This column charset is correct
+                    if (in_array($columnData['dataType'], ['varchar', 'text', 'mediumtext', 'longtext'])) {
+                        /* Investigate the column's collation settings
                          */
-                        echo $this->renderCell($green, $columnData['charset']);
-                    } elseif ('' === (string)$columnData['charset']) {
-                        /* This column charset is unspecified (empty string)
-                         * Is that something that needs to change?
+                        if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
+                            /* This column collation is correct
+                             */
+                            echo $this->renderCell($green, $columnData['collation']);
+                        } elseif ('' === (string)$columnData['collation']) {
+                            /* This column collation is unspecified (empty string)
+                             * Is that something that needs to change?
+                             */
+                            echo $this->renderCell($yellow, 'null/empty');
+                        } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                            /* This column collation isutf8-ish, sort of
+                             * They need correction
+                             */
+                            echo $this->renderCell($red, $columnData['collation']);
+                        } else {
+                            /* This column collation is something else entirely
+                             * Leave it be
+                             */
+                            echo $this->renderCell($grey, $columnData['collation']);
+                        }
+
+                        /* Investigate the column's charset settings
                          */
-                        echo $this->renderCell($yellow, '(null/empty)');
-                    } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                        /* This column charset isutf8-ish, sort of
-                         * They need correction
-                         */
-                        echo $this->renderCell($red, $columnData['charset']);
+                        if ($columnData['charset'] === self::DESIRED_COLUMN_CHARSET) {
+                            /* This column charset is correct
+                             */
+                            echo $this->renderCell($green, $columnData['charset']);
+                        } elseif ('' === (string)$columnData['charset']) {
+                            /* This column charset is unspecified (empty string)
+                             * Is that something that needs to change?
+                             */
+                            echo $this->renderCell($yellow, 'null/empty');
+                        } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                            /* This column charset isutf8-ish, sort of
+                             * They need correction
+                             */
+                            echo $this->renderCell($red, $columnData['charset']);
+                        } else {
+                            /* This column charset is something else entirely
+                             * Leave it be
+                             */
+                            echo $this->renderCell($grey, $columnData['charset']);
+                        }
                     } else {
-                        /* This column charset is something else entirely
-                         * Leave it be
-                         */
-                        echo $this->renderCell($grey, $columnData['charset']);
+                        echo $this->renderCell($grey, $columnData['collation'] ?? 'null/empty');
+                        echo $this->renderCell($grey, $columnData['charset'] ?? 'null/empty');
                     }
 
                     echo "\n";
@@ -262,7 +273,7 @@ HELP;
             /* Every table should get its columns inspected too
              */
             $columnsQuery = "
-                SELECT COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
+                SELECT DATA_TYPE, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
                 FROM INFORMATION_SCHEMA.COLUMNS
                 WHERE table_name = :table
                 ORDER BY COLUMN_NAME
@@ -274,6 +285,7 @@ HELP;
 
             foreach ($columns as $column) {
                 $stack[$table['TABLE_NAME']]['columns'][$column['COLUMN_NAME']] = [
+                    'dataType' => $column['DATA_TYPE'],
                     'collation' => $column['COLLATION_NAME'],
                     'charset' => $column['CHARACTER_SET_NAME']
                 ];
