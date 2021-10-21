@@ -13,6 +13,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import isBetween from 'dayjs/plugin/isBetween';
 import arraySupport from 'dayjs/plugin/arraySupport';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 //AdvancedFormat extends dayjs().format API to supply more format options: https://day.js.org/docs/en/plugin/advanced-format
 dayjs.extend(advancedFormat); 
@@ -28,3 +29,5 @@ dayjs.extend(isBetween);
 dayjs.extend(arraySupport); 
 //WeekOfYear adds .week() API to returns a number indicating the Dayjs's week of the year: https://day.js.org/docs/en/plugin/week-of-year
 dayjs.extend(weekOfYear); 
+//IsSameOrAfter adds .isSameOrAfter() API to return a boolean indicating if a date is the same or after another date: https://day.js.org/docs/en/plugin/is-same-or-after
+dayjs.extend(isSameOrAfter); 

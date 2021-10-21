@@ -121,7 +121,7 @@
             return true;
         }
 
-        return date.isValid() && date.isAfter(other_date);
+        return date.isValid() && date.isSameOrAfter(other_date);
 
     }, 'Please enter a date that is <i>after</i> the previous date');
 
