@@ -115,6 +115,7 @@ $app = new class extends CliTool\App
         $red = self::COLOUR_RED;
         $grey = self::COLOUR_GREY;
         $white = self::COLOUR_WHITE;
+        $darkGrey = self::COLOUR_DARK_GREY;
 
         /* Aliases for the heredoc
          */
@@ -238,8 +239,17 @@ HELP;
                             echo $this->renderCell($grey, $columnData['charset']);
                         }
                     } else {
-                        echo $this->renderCell($grey, $columnData['collation'] ?? self::EMPTY_DATA);
-                        echo $this->renderCell($grey, $columnData['charset'] ?? self::EMPTY_DATA);
+                        if ('' === (string)$columnData['collation']) {
+                            echo $this->renderCell($darkGrey, self::EMPTY_DATA);
+                        } else {
+                            echo $this->renderCell($grey, $columnData['collation']);
+                        }
+
+                        if ('' === (string)$columnData['charset']) {
+                            echo $this->renderCell($darkGrey, self::EMPTY_DATA);
+                        } else {
+                            echo $this->renderCell($grey, $columnData['charset']);
+                        }
                     }
 
                     echo "\n";
