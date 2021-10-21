@@ -36,11 +36,12 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --flag
+     * --tablesql
      *
-     * An example arg that's a boolean on/off
+     * Dump a list of sql statements grouped by table name
+     * Used to try changes on a per-table basis
      */
-    private const OPT_LONG_STRATEGIC = 'strategic';
+    private const OPT_LONG_TABLESQL = 'tablesql';
 
 
     /**
@@ -96,7 +97,7 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_STRATEGIC,
+            self::OPT_LONG_TABLESQL,
             self::OPT_LONG_INPUT
         ];
     }
@@ -144,7 +145,11 @@ Legend:
 {$white}All column collations are supposed to be {$green}{$desiredColumnCollation}
 {$white}All column charsets are supposed to be {$green}{$desiredColumnCharset}
 {$white}
-Usage: php charset.php [--strategic]
+Usage: php charset.php 
+
+If you want a set of sql to inflict changes, you can get it grouped by table name.
+
+Usage: php charset.php --tablesql
   
 
 HELP;
@@ -157,158 +162,163 @@ HELP;
 
         /* Generate a human readable strategic overview
          */
-        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
-            echo "\n\n";
+        echo "\n\n";
 
-            /* A set of sql statements which execute changes on tables and columns
+        /* A set of sql statements which execute changes on tables and columns
+         */
+        $allSql = [];
+
+        foreach ($manifest as $tableName => $tableData) {
+            $sql = [];
+
+            /* This is an sql that updates table collation
              */
-            $allSql = [];
+            $sql[] = "ALTER TABLE `{$tableName}` COLLATE=" . self::DESIRED_TABLE_COLLATION;
 
-            foreach ($manifest as $tableName => $tableData) {
-                $sql = [];
-
-                /* This is an sql that updates table collation
+            /* Investigate the table settings
+             */
+            if ($tableData['collation'] === self::DESIRED_TABLE_COLLATION) {
+                /* This table collation is correct
                  */
-                $sql[] = "ALTER TABLE `{$tableName}` COLLATE=" . self::DESIRED_TABLE_COLLATION;
-
-                /* Investigate the table settings
+                echo "{$green}{$tableName} ({$tableData['collation']})\n";
+            } elseif ('' === (string)$tableData['collation']) {
+                /* This table collation is unspecified (empty string)
+                 * Is that something that needs to change?
                  */
-                if ($tableData['collation'] === self::DESIRED_TABLE_COLLATION) {
-                    /* This table collation is correct
+                echo "{$yellow}{$tableName} (" . self::EMPTY_DATA . ")\n";
+            } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                /* This table collation isutf8-ish, sort of
+                 * They need correction
+                 */
+                echo "{$red}{$tableName} ({$tableData['collation']})\n";
+            } else {
+                /* This table collation is something else entirely
+                 * Leave it be
+                 */
+                echo "{$white}{$tableName} ({$tableData['collation']})\n";
+            }
+
+            /* Investigate the column's settings
+             */
+            foreach ($tableData['columns'] as $columnName => $columnData) {
+                /* Decide if this column needs to be rebuilt or not
+                 */
+                $rebuildColumn = false;
+
+                echo str_pad("    {$white}{$columnName}", 50);
+
+                /* Only textual ones matter
+                 */
+                if (in_array($columnData['dataType'], self::TEXT_DATA_TYPES, true)) {
+                    /* Investigate the column's collation settings
                      */
-                    echo "{$green}{$tableName} ({$tableData['collation']})\n";
-                } elseif ('' === (string)$tableData['collation']) {
-                    /* This table collation is unspecified (empty string)
-                     * Is that something that needs to change?
+                    if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
+                        /* This column collation is correct
+                         */
+                        echo $this->renderCell($green, $columnData['collation']);
+                    } elseif ('' === (string)$columnData['collation']) {
+                        /* This column collation is unspecified (empty string)
+                         * Is that something that needs to change?
+                         */
+                        echo $this->renderCell($yellow, self::EMPTY_DATA);
+                    } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                        /* This column collation isutf8-ish, sort of
+                         * They need correction
+                         */
+                        echo $this->renderCell($red, $columnData['collation']);
+
+                        /* This column needs to be rebuilt
+                         */
+                        $rebuildColumn = true;
+                    } else {
+                        /* This column collation is something else entirely
+                         * Leave it be
+                         */
+                        echo $this->renderCell($grey, $columnData['collation']);
+                    }
+
+                    /* Investigate the column's charset settings
                      */
-                    echo "{$yellow}{$tableName} (" . self::EMPTY_DATA . ")\n";
-                } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                    /* This table collation isutf8-ish, sort of
-                     * They need correction
-                     */
-                    echo "{$red}{$tableName} ({$tableData['collation']})\n";
+                    if ($columnData['charset'] === self::DESIRED_COLUMN_CHARSET) {
+                        /* This column charset is correct
+                         */
+                        echo $this->renderCell($green, $columnData['charset']);
+                    } elseif ('' === (string)$columnData['charset']) {
+                        /* This column charset is unspecified (empty string)
+                         * Is that something that needs to change?
+                         */
+                        echo $this->renderCell($yellow, self::EMPTY_DATA);
+                    } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                        /* This column charset isutf8-ish, sort of
+                         * They need correction
+                         */
+                        echo $this->renderCell($red, $columnData['charset']);
+
+                        /* This column needs to be rebuilt
+                         */
+                        $rebuildColumn = true;
+                    } else {
+                        /* This column charset is something else entirely
+                         * Leave it be
+                         */
+                        echo $this->renderCell($grey, $columnData['charset']);
+                    }
                 } else {
-                    /* This table collation is something else entirely
-                     * Leave it be
+                    /* Other data types like int/datetime/decimal etc. come out here
+                     * They don't have character encodings/charsets so they will be
+                     * grey or dark grey (when null/empty)
                      */
-                    echo "{$white}{$tableName} ({$tableData['collation']})\n";
+                    if ('' === (string)$columnData['collation']) {
+                        echo $this->renderCell($darkGrey, self::EMPTY_DATA);
+                    } else {
+                        echo $this->renderCell($grey, $columnData['collation']);
+                    }
+
+                    if ('' === (string)$columnData['charset']) {
+                        echo $this->renderCell($darkGrey, self::EMPTY_DATA);
+                    } else {
+                        echo $this->renderCell($grey, $columnData['charset']);
+                    }
                 }
 
-                /* Investigate the column's settings
+                /* Show the actual sql specification too, because these can be very long
+                 * chuck it at the last column
                  */
-                foreach ($tableData['columns'] as $columnName => $columnData) {
-                    /* Decide if this column needs to be rebuilt or not
+                echo $this->renderCell($white, $columnData['columnType']);
+
+                /* If there was a problem with the column, just rebuild it
+                 * with the correct collation and charset
+                 */
+                if ($rebuildColumn) {
+                    /* Switch based on column type: enum, varchar, etc.
                      */
-                    $rebuildColumn = false;
+                    $sql[] = sprintf(
+                        "CHANGE COLUMN `%s` `%s` %s CHARACTER SET '%s' COLLATE '%s' %s DEFAULT %s",
+                        $columnName,
+                        $columnName,
+                        $columnData['columnType'],
+                        self::DESIRED_COLUMN_CHARSET,
+                        self::DESIRED_COLUMN_COLLATION,
+                        $columnData['nullable'],
+                        $columnData['default']
+                    );
 
-                    echo str_pad("    {$white}{$columnName}", 50);
-
-                    /* Investigate the data type
-                     */
-                    echo $this->renderCell($white, $columnData['dataType']);
-
-                    /* Only textual ones matter
-                     */
-                    if (in_array($columnData['dataType'], self::TEXT_DATA_TYPES, true)) {
-                        /* Investigate the column's collation settings
-                         */
-                        if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
-                            /* This column collation is correct
-                             */
-                            echo $this->renderCell($green, $columnData['collation']);
-                        } elseif ('' === (string)$columnData['collation']) {
-                            /* This column collation is unspecified (empty string)
-                             * Is that something that needs to change?
-                             */
-                            echo $this->renderCell($yellow, self::EMPTY_DATA);
-                        } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                            /* This column collation isutf8-ish, sort of
-                             * They need correction
-                             */
-                            echo $this->renderCell($red, $columnData['collation']);
-
-                            /* This column needs to be rebuilt
-                             */
-                            $rebuildColumn = true;
-                        } else {
-                            /* This column collation is something else entirely
-                             * Leave it be
-                             */
-                            echo $this->renderCell($grey, $columnData['collation']);
-                        }
-
-                        /* Investigate the column's charset settings
-                         */
-                        if ($columnData['charset'] === self::DESIRED_COLUMN_CHARSET) {
-                            /* This column charset is correct
-                             */
-                            echo $this->renderCell($green, $columnData['charset']);
-                        } elseif ('' === (string)$columnData['charset']) {
-                            /* This column charset is unspecified (empty string)
-                             * Is that something that needs to change?
-                             */
-                            echo $this->renderCell($yellow, self::EMPTY_DATA);
-                        } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                            /* This column charset isutf8-ish, sort of
-                             * They need correction
-                             */
-                            echo $this->renderCell($red, $columnData['charset']);
-
-                            /* This column needs to be rebuilt
-                             */
-                            $rebuildColumn = true;
-                        } else {
-                            /* This column charset is something else entirely
-                             * Leave it be
-                             */
-                            echo $this->renderCell($grey, $columnData['charset']);
-                        }
-                    } else {
-                        /* Other data types like int/datetime/decimal etc. come out here
-                         * They don't have character encodings/charsets so they will be
-                         * grey or dark grey (when null/empty)
-                         */
-                        if ('' === (string)$columnData['collation']) {
-                            echo $this->renderCell($darkGrey, self::EMPTY_DATA);
-                        } else {
-                            echo $this->renderCell($grey, $columnData['collation']);
-                        }
-
-                        if ('' === (string)$columnData['charset']) {
-                            echo $this->renderCell($darkGrey, self::EMPTY_DATA);
-                        } else {
-                            echo $this->renderCell($grey, $columnData['charset']);
-                        }
-                    }
-
-                    /* If there was a problem with the column, just rebuild it
-                     * with the correct collation and charset
-                     */
-                    if ($rebuildColumn) {
-                        /* Switch based on column type: enum, varchar, etc.
-                         */
-                        $sql[] = sprintf(
-                            "CHANGE COLUMN `%s` `%s` %s(%s) CHARACTER SET '%s' COLLATE '%s' %s DEFAULT %s",
-                            $columnName,
-                            $columnName,
-                            $columnData['dataType'],
-                            $columnData['maximumLength'],
-                            self::DESIRED_COLUMN_CHARSET,
-                            self::DESIRED_COLUMN_COLLATION,
-                            $columnData['nullable'],
-                            $columnData['default']
-                        );
-
-                        $allSql[$tableName] = implode(', ', $sql);
-                    }
-
-                    echo "\n";
+                    $allSql[$tableName] = implode(",\n ", $sql);
                 }
 
                 echo "\n";
             }
+        }
 
-            print_r($allSql);
+        echo "\n";
+
+        /* Show sql statements grouped by table name
+         */
+        if ($this->getOpt(self::OPT_LONG_TABLESQL)) {
+            foreach ($allSql as $tableName => $sql) {
+                echo "{$white}{$tableName}\n";
+                echo "    {$grey}{$sql}\n\n";
+            }
         }
 
         if (!$this->perform()) {
@@ -353,6 +363,7 @@ HELP;
                     COLUMN_DEFAULT,
                     IS_NULLABLE,
                     DATA_TYPE,
+                    COLUMN_TYPE,
                     CHARACTER_MAXIMUM_LENGTH,
                     CHARACTER_SET_NAME, 
                     COLLATION_NAME
@@ -373,6 +384,7 @@ HELP;
                     'maximumLength' => $column['CHARACTER_MAXIMUM_LENGTH'],
                     'collation' => $column['COLLATION_NAME'],
                     'charset' => $column['CHARACTER_SET_NAME'],
+                    'columnType' => $column['COLUMN_TYPE']
                 ];
             }
         }
