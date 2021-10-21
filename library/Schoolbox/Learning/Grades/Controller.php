@@ -193,7 +193,7 @@ class Controller extends Base
          * It's kind of inefficient because we just hydrated a bunch of interactions + folders
          * which might potentially be discarded entirely
          */
-        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'), $term);
 
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = $folders->filter(
@@ -204,19 +204,6 @@ class Controller extends Base
         )->indexBy('id');
 
         $terms = $this->termMapper->findAllWithExtraordinary($viewee);
-
-        /* If the term we're looking at is an Extraordinary Term, limit the list of $folders to those which occur
-         * as being related to the Extraordinary Term.
-         */
-        if ($term->getExtraordinary()) {
-            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($term);
-
-            $folders = $folders->filter(
-                static function (Folder\Model $folder) use ($extraordinaryFolders) {
-                    return isset($extraordinaryFolders[$folder->getId()]);
-                }
-            );
-        }
 
         // Load Teachers
         foreach ($folders as $folder) {
@@ -421,7 +408,7 @@ class Controller extends Base
 
         // Get folders for drop-down.
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
-        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'), $term);
         $folders = $folders->filter(
             static function (Folder\Model $folder) use ($displayFolderIds) {
                 return in_array($folder->getId(), $displayFolderIds);

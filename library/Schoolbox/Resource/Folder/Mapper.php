@@ -2181,27 +2181,51 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Removes folder ids which are disabled on Grade Page
+     * and not in the year level, if the term is extraordinary
      * @param array $folderIds
+     * @param Term  $term
      * @return array
      */
-    public function filterIdsForGradePage(array $folderIds): array
+    public function filterIdsForGradePage(array $folderIds, Term $term): array
     {
         if (empty($folderIds)) {
             return [];
         }
 
+        $termWhere         = '';
+        $termJoin          = '';
+        $termParam         = [];
+        $withYearLevelOnly = false;
+        if ($term->getExtraordinary()) {
+            $termJoin          = '
+            INNER JOIN term_year_level tyl ON fyl.year_level_id = tyl.year_level_id
+            INNER JOIN term t ON tyl.term_id = t.id
+            ';
+            $termWhere         = ' AND t.id = :termId ';
+            $termParam         = ['termId' => $term->getId()];
+            $withYearLevelOnly = true;
+        }
+
         // find disabled folder ids
-        $bindings = $this->getPredicateBuilder()::getArrayBindings($folderIds);
-        $query = "SELECT folder_id, MAX(yl.display_grade_page) AS disp
+        $bindings  = $this->getPredicateBuilder()::getArrayBindings($folderIds, 'f');
+        $query     = "SELECT folder_id, MAX(yl.display_grade_page) AS disp
                 FROM folder_year_level fyl JOIN lu_year_level yl ON fyl.year_level_id = yl.id
+                {$termJoin}
                 WHERE yl.deleted_at IS NULL
                 AND folder_id IN ({$bindings['placeholders']})
-                GROUP BY folder_id HAVING disp = 0";
+                {$termWhere}
+                GROUP BY folder_id HAVING disp = :disp";
         $statement = $this->database->prepare($query);
-        $statement->execute($bindings['bindings']);
+        $statement->execute(array_merge($bindings['bindings'], $termParam, ['disp' => (int)$withYearLevelOnly]));
 
-        $disabledIds = array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'folder_id');
-        return array_diff($folderIds, $disabledIds);
+        $fetchedIds = array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'folder_id');
+
+        // if extraordinary term is provided, returning folders with year level only
+        if ($withYearLevelOnly) {
+            return $fetchedIds;
+        }
+        // if not, fetched folders are disabled. Exclude them from the original folder ids.
+        return array_diff($folderIds, $fetchedIds);
     }
 
 
