@@ -180,22 +180,22 @@ HELP;
             if ($tableData['collation'] === self::DESIRED_TABLE_COLLATION) {
                 /* This table collation is correct
                  */
-                echo "{$green}{$tableName} ({$tableData['collation']})\n";
+                $this->renderTableName($green, $tableName, $tableData['collation']);
             } elseif ('' === (string)$tableData['collation']) {
                 /* This table collation is unspecified (empty string)
                  * Is that something that needs to change?
                  */
-                echo "{$yellow}{$tableName} (" . self::EMPTY_DATA . ")\n";
+                $this->renderTableName($yellow, $tableName, " . self::EMPTY_DATA . ");
             } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                 /* This table collation isutf8-ish, sort of
                  * They need correction
                  */
-                echo "{$red}{$tableName} ({$tableData['collation']})\n";
+                $this->renderTableName($red, $tableName, $tableData['collation']);
             } else {
                 /* This table collation is something else entirely
                  * Leave it be
                  */
-                echo "{$white}{$tableName} ({$tableData['collation']})\n";
+                $this->renderTableName($white, $tableName, $tableData['collation']);
             }
 
             /* Investigate the column's settings
@@ -205,7 +205,7 @@ HELP;
                  */
                 $rebuildColumn = false;
 
-                echo str_pad("    {$white}{$columnName}", 50);
+                $this->renderColumn($white, $columnName);
 
                 /* Only textual ones matter
                  */
@@ -215,17 +215,17 @@ HELP;
                     if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
                         /* This column collation is correct
                          */
-                        echo $this->renderCell($green, $columnData['collation']);
+                        $this->renderCell($green, $columnData['collation']);
                     } elseif ('' === (string)$columnData['collation']) {
                         /* This column collation is unspecified (empty string)
                          * Is that something that needs to change?
                          */
-                        echo $this->renderCell($yellow, self::EMPTY_DATA);
+                        $this->renderCell($yellow, self::EMPTY_DATA);
                     } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                         /* This column collation isutf8-ish, sort of
                          * They need correction
                          */
-                        echo $this->renderCell($red, $columnData['collation']);
+                        $this->renderCell($red, $columnData['collation']);
 
                         /* This column needs to be rebuilt
                          */
@@ -234,7 +234,7 @@ HELP;
                         /* This column collation is something else entirely
                          * Leave it be
                          */
-                        echo $this->renderCell($grey, $columnData['collation']);
+                        $this->renderCell($grey, $columnData['collation']);
                     }
 
                     /* Investigate the column's charset settings
@@ -242,17 +242,17 @@ HELP;
                     if ($columnData['charset'] === self::DESIRED_COLUMN_CHARSET) {
                         /* This column charset is correct
                          */
-                        echo $this->renderCell($green, $columnData['charset']);
+                        $this->renderCell($green, $columnData['charset']);
                     } elseif ('' === (string)$columnData['charset']) {
                         /* This column charset is unspecified (empty string)
                          * Is that something that needs to change?
                          */
-                        echo $this->renderCell($yellow, self::EMPTY_DATA);
+                        $this->renderCell($yellow, self::EMPTY_DATA);
                     } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                         /* This column charset isutf8-ish, sort of
                          * They need correction
                          */
-                        echo $this->renderCell($red, $columnData['charset']);
+                        $this->renderCell($red, $columnData['charset']);
 
                         /* This column needs to be rebuilt
                          */
@@ -261,7 +261,7 @@ HELP;
                         /* This column charset is something else entirely
                          * Leave it be
                          */
-                        echo $this->renderCell($grey, $columnData['charset']);
+                        $this->renderCell($grey, $columnData['charset']);
                     }
                 } else {
                     /* Other data types like int/datetime/decimal etc. come out here
@@ -269,22 +269,22 @@ HELP;
                      * grey or dark grey (when null/empty)
                      */
                     if ('' === (string)$columnData['collation']) {
-                        echo $this->renderCell($darkGrey, self::EMPTY_DATA);
+                        $this->renderCell($darkGrey, self::EMPTY_DATA);
                     } else {
-                        echo $this->renderCell($grey, $columnData['collation']);
+                        $this->renderCell($grey, $columnData['collation']);
                     }
 
                     if ('' === (string)$columnData['charset']) {
-                        echo $this->renderCell($darkGrey, self::EMPTY_DATA);
+                        $this->renderCell($darkGrey, self::EMPTY_DATA);
                     } else {
-                        echo $this->renderCell($grey, $columnData['charset']);
+                        $this->renderCell($grey, $columnData['charset']);
                     }
                 }
 
                 /* Show the actual sql specification too, because these can be very long
                  * chuck it at the last column
                  */
-                echo $this->renderCell($white, $columnData['columnType']);
+                $this->renderCell($white, $columnData['columnType']);
 
                 /* If there was a problem with the column, just rebuild it
                  * with the correct collation and charset
@@ -394,14 +394,40 @@ HELP;
 
 
     /**
+     * Render a colour-coded string for the table collation
+     *
+     * @param string $colour
+     * @param string $tableName
+     * @param string $val
+     */
+    private function renderTableName(string $colour, string $tableName, string $val): void
+    {
+        echo "\n{$colour}{$tableName} ({$val})\n";
+    }
+
+
+    /**
+     * Render an indented column name
+     *
+     * @param string $colour
+     * @param string $columnName
+     */
+    private function renderColumn(string $colour, string $columnName): void
+    {
+        echo str_pad("    {$colour}{$columnName}", 50);
+    }
+
+
+    /**
      * Return a colour-coded string for the collation and charset columns
+     *
      * @param string $colour
      * @param string $val
-     * @return string
+     * @return void
      */
-    private function renderCell(string $colour, string $val): string
+    private function renderCell(string $colour, string $val): void
     {
-        return str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
+        echo str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
     }
 
 
