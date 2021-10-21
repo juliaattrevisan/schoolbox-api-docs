@@ -160,7 +160,17 @@ HELP;
         if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
             echo "\n\n";
 
+            /* A set of sql statements which execute changes on tables and columns
+             */
+            $allSql = [];
+
             foreach ($manifest as $tableName => $tableData) {
+                $sql = [];
+
+                /* This is an sql that updates table collation
+                 */
+                $sql[] = "ALTER TABLE `{$tableName}` COLLATE=" . self::DESIRED_TABLE_COLLATION;
+
                 /* Investigate the table settings
                  */
                 if ($tableData['collation'] === self::DESIRED_TABLE_COLLATION) {
@@ -187,6 +197,10 @@ HELP;
                 /* Investigate the column's settings
                  */
                 foreach ($tableData['columns'] as $columnName => $columnData) {
+                    /* Decide if this column needs to be rebuilt or not
+                     */
+                    $rebuildColumn = false;
+
                     echo str_pad("    {$white}{$columnName}", 50);
 
                     /* Investigate the data type
@@ -212,6 +226,10 @@ HELP;
                              * They need correction
                              */
                             echo $this->renderCell($red, $columnData['collation']);
+
+                            /* This column needs to be rebuilt
+                             */
+                            $rebuildColumn = true;
                         } else {
                             /* This column collation is something else entirely
                              * Leave it be
@@ -235,6 +253,10 @@ HELP;
                              * They need correction
                              */
                             echo $this->renderCell($red, $columnData['charset']);
+
+                            /* This column needs to be rebuilt
+                             */
+                            $rebuildColumn = true;
                         } else {
                             /* This column charset is something else entirely
                              * Leave it be
@@ -259,11 +281,34 @@ HELP;
                         }
                     }
 
+                    /* If there was a problem with the column, just rebuild it
+                     * with the correct collation and charset
+                     */
+                    if ($rebuildColumn) {
+                        /* Switch based on column type: enum, varchar, etc.
+                         */
+                        $sql[] = sprintf(
+                            "CHANGE COLUMN `%s` `%s` %s(%s) CHARACTER SET '%s' COLLATE '%s' %s DEFAULT %s",
+                            $columnName,
+                            $columnName,
+                            $columnData['dataType'],
+                            $columnData['maximumLength'],
+                            self::DESIRED_COLUMN_CHARSET,
+                            self::DESIRED_COLUMN_COLLATION,
+                            $columnData['nullable'],
+                            $columnData['default']
+                        );
+
+                        $allSql[$tableName] = implode(', ', $sql);
+                    }
+
                     echo "\n";
                 }
 
                 echo "\n";
             }
+
+            print_r($allSql);
         }
 
         if (!$this->perform()) {
@@ -303,9 +348,16 @@ HELP;
             /* Every table should get its columns inspected too
              */
             $columnsQuery = "
-                SELECT DATA_TYPE, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
+                SELECT
+                    COLUMN_NAME, 
+                    COLUMN_DEFAULT,
+                    IS_NULLABLE,
+                    DATA_TYPE,
+                    CHARACTER_MAXIMUM_LENGTH,
+                    CHARACTER_SET_NAME, 
+                    COLLATION_NAME
                 FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE table_name = :table
+                WHERE TABLE_NAME = :table
                 ORDER BY COLUMN_NAME
             ";
 
@@ -315,9 +367,12 @@ HELP;
 
             foreach ($columns as $column) {
                 $stack[$table['TABLE_NAME']]['columns'][$column['COLUMN_NAME']] = [
+                    'default' => $column['COLUMN_DEFAULT'],
+                    'nullable' => $column['IS_NULLABLE'] === 'YES' ? 'NULL' : 'NOT NULL',
                     'dataType' => $column['DATA_TYPE'],
+                    'maximumLength' => $column['CHARACTER_MAXIMUM_LENGTH'],
                     'collation' => $column['COLLATION_NAME'],
-                    'charset' => $column['CHARACTER_SET_NAME']
+                    'charset' => $column['CHARACTER_SET_NAME'],
                 ];
             }
         }
