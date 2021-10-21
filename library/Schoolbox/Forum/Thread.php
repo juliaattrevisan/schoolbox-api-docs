@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Schoolbox\Forum\ThreadMapper as ThreadMapper;
 
 class Thread implements ISoftDeletable
 {
@@ -209,6 +210,18 @@ class Thread implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * @return bool|self
+     */
+    public function recordView()
+    {
+        //record unique views, and persist to db, I can put the save function in www/forum/thread.php:115 just after this call
+        $this->views++;
+        if (ThreadMapper::getInstance()->save($this)) {
+            return $this;
+        }
+        return false;
+    }
 
     /**
      * @return int

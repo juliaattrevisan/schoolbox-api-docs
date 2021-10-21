@@ -1,8 +1,11 @@
 <?php
 
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Forum\ThreadMapper;
+use Schoolbox\Forum\PostMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -14,8 +17,7 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 
-$forumHandler = new Forum();
-$groupHandler = new Group();
+$groupHandler = new Group(); //only single call, still working out how to do the hasChildAccessOnly
 $access = Access::getInstance();
 
 $this->setFile(TEMPLATE_content, 'forum/thread.html');
@@ -38,30 +40,28 @@ if (is_numeric($this->arg[0])) {
     try {
         /** @var \Schoolbox\Forum\Thread $thread */
         $thread = ThreadMapper::getInstance()->findById($this->arg[0]);
-    } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    } catch (DeletedException $e) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
     } catch (Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 }
 
 if ($thread->getId() === null) {
-    error(2);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 if ($thread->getCategory() === false ||  $thread->getCategory()->isDeleted() === true) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FOLDER_DELETED);
 } else {
     //$folder is (old)$category
-    /** @var  FolderMapper $folder */
+    /** @var  FolderModel $folder */
     $folder = FolderMapper::getInstance()->findById($thread->getCategory()->getId());
 }
 
 /* forum exists
  */
-// TODO: ThreadMapper->hasForum
-//if (!$thread->hasForum($folder->getId())) {
-if (!$forumHandler->hasForum($folder->getId())) {
+if (!ThreadMapper::getInstance()->isComponent($folder->getId())) {
     SitePage::localRedir('/homepage/' . $folder->getId());
 }
 
@@ -69,7 +69,7 @@ if (!$forumHandler->hasForum($folder->getId())) {
  */
 $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
 if ($accessLevel < UserAccess::ACCESS_READ) {
-    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setTitle(Scrub::text($thread->getTitle()));
@@ -81,7 +81,7 @@ $output = array(
     'CATEGORY_ID' => $folder->getId(),
     'THREAD_ID' => $thread->getId(),
     'THREAD_TITLE' => Scrub::text($thread->getTitle()),
-    'LOCK_UNLOCK' => $threadLocked ? 'Unlock' : 'Lock',
+    'LOCK_UNLOCK' => $thread->isLocked() ? 'Unlock' : 'Lock',
     'LOCKED' => $thread->isLocked() ? '(Locked)' : '',
 );
 
@@ -100,11 +100,12 @@ if ($accessLevel <= UserAccess::ACCESS_WRITE) {
  */
 $this->setVar('reply_block', '');
 
+//TODO: replace $groupHandler
 $is_post_allowed = !$groupHandler->hasChildAccessOnly($folder->getId());
-if (!$is_post_allowed && Config::get('restrict_parent_forum_access')) {
-    error(19);
+if (!$is_post_allowed && ConfigLoader::getInstance()->get('restrict_parent_forum_access')) {
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
-if (!$threadLocked || $groupHandler->getPermission($folder->getId()) >= UserAccess::ACCESS_WRITE) {
+if (!$thread->isLocked() || $access->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_WRITE) {
     if ($is_post_allowed) {
         $this->parse('reply_block', 'reply');
     }
@@ -112,8 +113,7 @@ if (!$threadLocked || $groupHandler->getPermission($folder->getId()) >= UserAcce
 
 /* record view
  */
-//TODO: ThreadMapper->uniqueView
-$forumHandler->uniqueView($thread->getId());
+$thread->recordView();
 
 /* output pagination
  */
@@ -124,7 +124,8 @@ if (!$pageNum) {
     $pageNum = 1;
 }
 
-$postPerPage = FORUM_POSTS_PER_PAGE;
+//dragged across from Forum.php what is the better way for this? put in db config table?
+$postPerPage = 15;
 $totalPages = ceil(count($postList) / $postPerPage);
 $postIndex = max(0, $postPerPage * ($pageNum - 1));
 
@@ -161,19 +162,22 @@ $outputPagination = array('PREVIOUS_PAGE' => $pageNum - 1,
 $this->setVar($outputPagination);
 
 /* output posts */
-//TODO: ThreadMapper->getPostList($threadID, $index = 0, $limit = 0)
-//$postList = $forumHandler->getPostList($thread->getId(), $postIndex, $postPerPage);
-$postList = $thread->getPosts();
+$postList = $postList->slice($postIndex, $postPerPage);
 
 if ($postList !== null) {
+    $first = $postList->first();
     $j = 0;
 
-    foreach ($postList as $post) {
+    foreach ($postList as $postObj) {
+        /**  hydrate the posts. need to do some further investigating into where this could be added to the initial call of get thread.
+         *
+         * when I just use $postObj and attempt to grab the owner name those fields default to null (some of the time)
+         * so it looks like it has hydrated the forum, post, owner.ID and that is all, but I need the owner full name also.
+        */
+        $post = PostMapper::getInstance()->findById($postObj->getId());
 
         $output = array('POST_ID' => $post->getId(),
-//                        'POST_TITLE' => Scrub::text($post->getTitle()),
                         'POST_AUTHOR' => Scrub::text($post->getOwner()->getFullName()),
-//                        'POST_GROUP' => Scrub::text($post['userGroup']),
                         'POST_TIME' => $post->getDate()->getRelativeTime(),
                         'POST_USER_ID' => $post->getOwner()->getId(),
                         'POST_BODY' => Scrub::html($post->getBody()),
@@ -202,9 +206,7 @@ if ($postList !== null) {
         $this->setVar('delete_block', '');
 
         if (
-            (!$threadLocked && $post->getOwner()->getId() == $_SESSION['id']) || $groupHandler->getPermission(
-                $folder->getId()
-            ) >= UserAccess::ACCESS_WRITE
+            (!$thread->isLocked() && $post->getOwner()->getId() == $_SESSION['id']) || ($access->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_WRITE)
         ) {
             $this->parse('modify_block', 'modify');
 
@@ -222,7 +224,7 @@ if ($postList !== null) {
 
         // reply to this post
         $this->setVar('reply_post_block', '');
-        if (!$threadLocked || $groupHandler->getPermission($folder->getId()) >= UserAccess::ACCESS_WRITE) {
+        if (!$thread->isLocked() || ($access->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_WRITE)) {
             if ($is_post_allowed) {
                 $this->parse('reply_post_block', 'reply_post');
             }
