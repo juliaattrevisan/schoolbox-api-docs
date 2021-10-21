@@ -185,6 +185,7 @@ HELP;
         $allSql = [];
 
         foreach ($manifest as $tableName => $tableData) {
+            $rebuildTable = false;
             $sql = [];
 
             /* This is an sql that updates table collation
@@ -207,6 +208,8 @@ HELP;
                  * They need correction
                  */
                 $strategic[] = $this->renderTableName($red, $tableName, $tableData['collation']);
+
+                $rebuildTable = true;
             } else {
                 /* This table collation is something else entirely
                  * Leave it be
@@ -341,6 +344,14 @@ HELP;
                 /* Stack it up
                  */
                 $strategic[] = $strategicRow;
+            }
+
+            /* Sometimes the table needs updating, but none of its columns changed
+             * You might inadvertently end up changing a table collation twice but
+             * it really doesn't matter - this is a once-off mutation afaict
+             */
+            if ($rebuildTable) {
+                $allSql[] = $sql[0];
             }
         }
 
