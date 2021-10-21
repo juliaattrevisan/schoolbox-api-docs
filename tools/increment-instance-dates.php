@@ -20,8 +20,8 @@ $app = new class extends CliTool\App
     public function run(): void
     {
         $blackListedColumns = [
-//            'user' => [
-//                'deleted_at',
+//            'table_name' => [
+//                'datetime_column',
 //            ]
         ];
 
@@ -59,6 +59,7 @@ $app = new class extends CliTool\App
                     }
                     $field = $column['Field'];
 
+                    $this->getLogger()->info("Incrementing dates for: " . $tableName . "." . $field);
                     $updateQuery = $db->prepareQuery("UPDATE " . $tableName . " SET " . $field . " = DATE_ADD(" . $field . ", INTERVAL :diff SECOND)");
                     $updateQuery->execute([':diff' => $diff]);
                 }
