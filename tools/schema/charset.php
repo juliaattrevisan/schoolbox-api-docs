@@ -310,16 +310,28 @@ HELP;
                 if ($rebuildColumn) {
                     /* Switch based on column type: enum, varchar, etc.
                      */
-                    $sql[] = sprintf(
-                        "CHANGE COLUMN `%s` `%s` %s CHARACTER SET '%s' COLLATE '%s' %s DEFAULT %s",
-                        $columnName,
-                        $columnName,
-                        $columnData['columnType'],
-                        self::DESIRED_COLUMN_CHARSET,
-                        self::DESIRED_COLUMN_COLLATION,
-                        $columnData['nullable'],
-                        $columnData['default']
-                    );
+                    if ('NOT NULL' === $columnData['nullable']) {
+                        $sql[] = sprintf(
+                            "CHANGE COLUMN `%s` `%s` %s CHARACTER SET '%s' COLLATE '%s' %s",
+                            $columnName,
+                            $columnName,
+                            $columnData['columnType'],
+                            self::DESIRED_COLUMN_CHARSET,
+                            self::DESIRED_COLUMN_COLLATION,
+                            $columnData['nullable'],
+                        );
+                    } else {
+                        $sql[] = sprintf(
+                            "CHANGE COLUMN `%s` `%s` %s CHARACTER SET '%s' COLLATE '%s' %s DEFAULT %s",
+                            $columnName,
+                            $columnName,
+                            $columnData['columnType'],
+                            self::DESIRED_COLUMN_CHARSET,
+                            self::DESIRED_COLUMN_COLLATION,
+                            $columnData['nullable'],
+                            $columnData['default']
+                        );
+                    }
 
                     $allSql[$tableName] = implode(",\n ", $sql);
                 }
@@ -359,6 +371,8 @@ HELP;
          */
         if ($this->perform()) {
             foreach ($allSql as $tableName => $sql) {
+                $this->getLogger()->debug($sql);
+
                 $this->getDatabaseInternal()->executeQuery($sql, []);
             }
         }
@@ -419,6 +433,11 @@ HELP;
             ])->fetchAll();
 
             foreach ($columns as $column) {
+//                if ($column['COLUMN_NAME'] === 'title') {
+//                    if ($table['TABLE_NAME'] === 'comms_news_article') {
+//                        var_dump($column);
+//                    }
+//                }
                 $stack[$table['TABLE_NAME']]['columns'][$column['COLUMN_NAME']] = [
                     'default' => $column['COLUMN_DEFAULT'],
                     'nullable' => $column['IS_NULLABLE'] === 'YES' ? 'NULL' : 'NOT NULL',
