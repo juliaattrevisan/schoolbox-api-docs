@@ -6127,7 +6127,7 @@ parameters:
 
 		-
 			message: "#^Left side of && is always true\\.$#"
-			count: 1
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-

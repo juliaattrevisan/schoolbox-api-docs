@@ -28,6 +28,22 @@ class Model extends AbstractResponse
     private Alaress_Date_Format $submittedAt;
 
     /**
+     * The score which was given to the student, if any.
+     */
+    private ?float $scoreGiven = null;
+
+    /**
+     * The maximum possible score available for the assessment at time of
+     * scoring, if provided.
+     */
+    private ?float $scoreMaximum = null;
+
+    /**
+     * A comment given on the response, if any.
+     */
+    private ?string $comment = null;
+
+    /**
      * The response's creation date is its submit date.
      */
     public function getSubmittedAt()
@@ -42,6 +58,60 @@ class Model extends AbstractResponse
     public function setSubmittedAt(Alaress_Date_Format $submittedAt): self
     {
         $this->submittedAt = $submittedAt;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getScoreGiven(): ?float
+    {
+        return $this->scoreGiven;
+    }
+
+    /**
+     * @param float|null $scoreGiven
+     * @return self
+     */
+    public function setScoreGiven(?float $scoreGiven): self
+    {
+        $this->scoreGiven = $scoreGiven;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getScoreMaximum(): ?float
+    {
+        return $this->scoreMaximum;
+    }
+
+    /**
+     * @param float|null $scoreMaximum
+     * @return self
+     */
+    public function setScoreMaximum(?float $scoreMaximum): self
+    {
+        $this->scoreMaximum = $scoreMaximum;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @param string|null $comment
+     * @return self
+     */
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
         return $this;
     }
 }

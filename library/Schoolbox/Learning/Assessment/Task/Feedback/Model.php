@@ -181,7 +181,7 @@ class Model extends AbstractFeedback
      *
      * @return User
      */
-    public function getReviewee()
+    public function getReviewee(): User
     {
         return $this->getResponse()->getSubmittedOnBehalfOf();
     }
@@ -193,7 +193,7 @@ class Model extends AbstractFeedback
      * @param User $reviewee
      * @return $this
      */
-    public function setReviewee($reviewee)
+    public function setReviewee(User $reviewee): self
     {
         $this->getResponse()->setSubmittedOnBehalfOf($reviewee);
         return $this;
@@ -205,9 +205,9 @@ class Model extends AbstractFeedback
      *
      * Typically a teacher
      *
-     * @return User
+     * @return User|null
      */
-    public function getReviewer()
+    public function getReviewer(): ?User
     {
         return $this->getResponse()->getSubmittedBy();
     }
@@ -216,10 +216,10 @@ class Model extends AbstractFeedback
     /**
      * Set the person who created this IFeedback
      *
-     * @param User $reviewer
+     * @param User|null $reviewer
      * @return $this
      */
-    public function setReviewer($reviewer)
+    public function setReviewer(?User $reviewer): self
     {
         $this->getResponse()->setSubmittedBy($reviewer);
         return $this;

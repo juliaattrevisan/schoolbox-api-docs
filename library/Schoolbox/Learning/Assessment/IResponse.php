@@ -89,21 +89,25 @@ interface IResponse
     public function setAllFeedback(Collection $allFeedback);
 
     /**
-     * Get the person who created this IResponse (typically a student)
-     * This -can- be the teacher if they submit on behalf of a student
+     * Get the person who created this IResponse (typically a student).
      *
-     * @return User
+     * This -can- be the teacher if they submit on behalf of a student, or it
+     * could be unknown.
+     *
+     * @return User|null
      */
-    public function getSubmittedBy();
+    public function getSubmittedBy(): ?User;
 
     /**
-     * Set the person who created this IResponse (typically a student)
-     * This -can- be the teacher if they submit on behalf of a student
+     * Set the person who created this IResponse (typically a student).
      *
-     * @param User $submittedBy
+     * This -can- be the teacher if they submit on behalf of a student, or it
+     * could be unknown.
+     *
+     * @param User|null $submittedBy
      * @return $this
      */
-    public function setSubmittedBy(User $submittedBy);
+    public function setSubmittedBy(?User $submittedBy): self;
 
     /**
      * Get the person for whom the IResponse was created. This is used when
@@ -113,7 +117,7 @@ interface IResponse
      *
      * @return User
      */
-    public function getSubmittedOnBehalfOf();
+    public function getSubmittedOnBehalfOf(): User;
 
     /**
      * Set the person for whom the IResponse was created
@@ -121,7 +125,7 @@ interface IResponse
      * @param User $submittedOnBehalfOf
      * @return $this
      */
-    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf);
+    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf): self;
 
     /**
      * Get the datetime at which this response was submitted.

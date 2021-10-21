@@ -674,6 +674,17 @@ class Participant
         return $this->allFeedbacks;
     }
 
+    /**
+     * @return GenericCollection|IFeedback[]
+     */
+    public function getPublishedFeedbacks()
+    {
+        return $this->allFeedbacks->filter(
+            function (IFeedback $feedback) {
+                return $feedback->getPublishedAt() && !$feedback->getPublishedAt()->isNull();
+            }
+        );
+    }
 
     /**
      * @param GenericCollection|IFeedback[] $allFeedbacks

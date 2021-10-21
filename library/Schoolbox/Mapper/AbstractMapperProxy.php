@@ -9,40 +9,39 @@
 namespace Schoolbox\Mapper;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 
 /**
- * Common logic when we need to wrap a traditional mapper inside an
- * adapter so we can return objects of a different type, or perform
- * some other transformation
+ * Proxy class which wraps around a mapper's data retrieval (`findBy`) and
+ * manipulation (`save`, `delete`) methods.
+ *
+ * The most common use case for this is to create a mapper-like interface which
+ * works with objects whose logic is closer to the business domain (as opposed
+ * to raw mappers, which tend to work with simpler data transfer objects).
+ *
+ * In this case: `findBy`/`save`/`delete` will return/accept objects of a
+ * different class to `Mapper::createModel`.
  */
 abstract class AbstractMapperProxy
 {
     /**
-     * @var IDatabase
+     * The internal mapper used to fetch data models.
      */
-    private $database;
-
-    /**
-     * @var Mapper
-     */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @param Mapper $mapper
      */
     public function __construct(Mapper $mapper)
     {
-        $this->mapper   = $mapper;
-        $this->database = $mapper->getDatabase();
+        $this->mapper = $mapper;
     }
 
     /**
-     * Proxy for $this->mapper->findById().
+     * Proxy for `$this->mapper->findById()`.
      *
      * @param int $id
      * @return object
@@ -63,7 +62,14 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Gets a typed Collection of objects that match the specified column values
+     * Proxy for `$this->mapper->findByColumnList()`.
+     *
+     * If `$columnList` contain `$this->getExternalColumnName()`:
+     * * its values will be translated to internal IDs, using a query:
+     *   * `$this->getSelectString()` as the SELECT statement which retrieves
+     *     internal IDs
+     *   * `$this->getExternalColumnName()` as the WHERE part of the statement
+     * * the actual mapper call will search on `$this->getInternalColumnName()`
      *
      * @param array $columnList
      * @param array $options
@@ -81,7 +87,7 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Gets a typed Collection of objects that match the specified predicates
+     * Proxy for `$this->mapper->findByPredicates()`.
      *
      * @param Builder $pb
      * @param array   $options
@@ -102,7 +108,7 @@ abstract class AbstractMapperProxy
 
 
     /**
-     * Saves this object or collection of objects.
+     * Proxy for `$this->mapper->save()`.
      *
      * @param object|Collection $model A model object, or collection thereof
      * @return bool Always true
@@ -126,9 +132,9 @@ abstract class AbstractMapperProxy
         return true;
     }
 
-
     /**
-     * Get the domain model class
+     * Retrieve the class name of the object which this proxy's
+     * `findBy`/`save`/`delete` methods return and accept.
      *
      * @return string
      */
@@ -148,7 +154,7 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Deletes this object or collection of objects.
+     * Proxy for `$this->mapper->delete()`.
      *
      * @param object|Collection $model A model object, or collection thereof
      * @return bool
@@ -174,7 +180,7 @@ abstract class AbstractMapperProxy
 
     /**
      * Determines if the specified column list requires translation before being
-     * submitted to the Mapper
+     * submitted to the internal mapper.
      *
      * @param array $columnList
      * @return bool
@@ -186,7 +192,7 @@ abstract class AbstractMapperProxy
 
     /**
      * Determines if the specified predicates requires translation before being
-     * submitted to the Mapper
+     * submitted to the internal mapper.
      *
      * @param Builder $pb
      * @return bool
@@ -206,7 +212,8 @@ abstract class AbstractMapperProxy
     }
 
     /**
-     * Converts the query into a logically equivalent query that the internal Mapper can understand
+     * Converts the column list into a logical equivalent that the internal
+     * mapper can understand.
      *
      * @param array $columnList
      * @return array
@@ -220,16 +227,27 @@ abstract class AbstractMapperProxy
     }
 
     /**
+     * Retrieve the externally available column name used when retrieving
+     * records.
+     *
      * @return string
      */
     abstract protected function getExternalColumnName();
 
     /**
+     * Retrieve the internal column name used when retrieving records.
+     *
      * @return string
      */
     abstract protected function getInternalColumnName();
 
     /**
+     * Retrieve the base of the SELECT statement used to find the IDs of the
+     * database rows which match the domain model.
+     *
+     * Used when translating a `findBy` method into something the internal
+     * mapper can understand.
+     *
      * @return string
      */
     abstract protected function getSelectString();
@@ -243,10 +261,12 @@ abstract class AbstractMapperProxy
     protected function getInternalValue($externalValue)
     {
         $values = $this->getInternalValues([$externalValue]);
-        return isset($values[0]) ? $values[0] : null;
+        return $values[0] ?? null;
     }
 
     /**
+     * Retrieves a list of mappings from external to internal IDs.
+     *
      * @param array $externalValues
      * @return array
      */
@@ -263,10 +283,10 @@ abstract class AbstractMapperProxy
 
         $query = "
             {$this->getSelectString()}
-            WHERE {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
+            WHERE {$this->mapper->getDatabase()->getQuoter()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
         ";
 
-        $statement = $this->getDatabase()->query($query, Builder::getArrayParameters($externalValues));
+        $statement = $this->mapper->getDatabase()->query($query, Builder::getArrayParameters($externalValues));
         return $statement->fetchAll(\PDO::FETCH_COLUMN) ?: [];
     }
 
@@ -292,40 +312,35 @@ abstract class AbstractMapperProxy
     /**
      * Transforms domain model objects into data model objects.
      *
-     * @param Collection $mapperModels
+     * @param Collection $domainObjects
      * @return GenericCollection
      */
-    abstract protected function transformDomainObjects(Collection $mapperModels);
+    abstract protected function transformDomainObjects(Collection $domainObjects);
 
     /**
      * Converts a single domain model object into a data model.
      *
-     * @param object $mapperModel
+     * @param object $domainObject
      * @return object
      */
-    protected function transformDomainObject($mapperModel)
+    protected function transformDomainObject($domainObject)
     {
-        return $this->transformDomainObjects(new Collection([$mapperModel]))->first();
+        return $this->transformDomainObjects(new Collection([$domainObject]))->first();
     }
 
     /**
+     * Builds a predicate builder appropriate for the mapper.
+     *
      * @return Builder
      */
     public function getPredicateBuilder()
     {
-        return new Builder($this->database->getQuoter(), $this->mapper->getTable());
+        // TODO replace with $this->mapper->getBuilder()?
+        return new Builder($this->mapper->getDatabase()->getQuoter(), $this->mapper->getTable());
     }
 
     /* Getters / Setters
      */
-
-    /**
-     * @return IDatabase
-     */
-    protected function getDatabase()
-    {
-        return $this->database;
-    }
 
     /**
      * @return Mapper

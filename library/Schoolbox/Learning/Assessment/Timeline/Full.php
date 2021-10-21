@@ -15,6 +15,7 @@
 namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Alaress_Date_Format;
+use Closure;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -312,25 +313,31 @@ class Full
          *
          * Since both have different date fields to compare against
          */
-        $this->getRecombined()->sortByCallback(function ($a, $b) {
-            $date1 = null;
-            $date2 = null;
-
-            /* Compare dates
-             */
-            $date1 = $this->getDate($a);
-            $date2 = $this->getDate($b);
-
-            /* Chooze wisely
-             */
-            if ($date1 && $date2) {
-                return $date2->compare($date1);
-            }
-
-            throw new \InvalidArgumentException('Null date provided');
-        });
+        $this->getRecombined()->sortByCallback(Closure::fromCallable([$this, 'sortRecombined']));
     }
 
+    /**
+     * Sort callback for recombined responses+feedback.
+     *
+     * @param IResponse|IFeedback $a
+     * @param IResponse|IFeedback $b
+     * @return int
+     */
+    protected function sortRecombined($a, $b): int
+    {
+        /* Compare dates
+         */
+        $date1 = $this->getDate($a);
+        $date2 = $this->getDate($b);
+
+        /* Chooze wisely
+         */
+        if ($date1 && $date2) {
+            return $date2->compare($date1);
+        }
+
+        throw new \InvalidArgumentException('Null date provided');
+    }
 
     /**
      * @param IResponse|IFeedback $interaction

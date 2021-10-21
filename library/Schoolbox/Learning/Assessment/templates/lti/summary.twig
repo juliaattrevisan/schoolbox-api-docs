@@ -1,1 +1,151 @@
-<h1>LTI Assessment Summary</h1>
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+        {% include '@learningAssessment/meta.twig' with {
+            assessment: assessment,
+            student: student,
+            submissionsBlocked: false,
+            icon: 'icon-lti',
+            canShowcase: false,
+            isShowcased: false,
+        } only %}
+    </div>
+    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        viewRoute: viewRoute,
+        modifyRoute: modifyRoute,
+        canShowcase: false,
+        isShowcased: false,
+    } %}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
+            {% if description|length %}
+                {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
+                    <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js" type="text/javascript"></script>
+                    <script type="text/javascript">
+                        $(function () {
+                            $('[data-immersive-reader]').immersiveReader({title: '{{ assessment.title | escape('js') }}'});
+                        });
+                    </script>
+                    <div class='immersive-reader-button' id="ir-button" data-immersive-reader="button"></div>
+                {% endif %}
+                <article class="content" id="ir-content" >
+                    {{ description | purify }}
+                </article>
+            {% endif %}
+        </section>
+    </div>
+</div>
+
+{% if canAttempt %}
+    <div class="row">
+        <div class="small-12 column">
+            <a href="#" class="button submit">Begin Assessment</a>
+        </div>
+    </div>
+{% endif %}
+
+{# Output history here #}
+{% if timeline | length %}
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">{{ locale.attemptHistory.proper }}</h2>
+            <section class="submission-history">
+                <ul class="information-list threaded">
+                    {% for currentInteraction in timeline %}
+                        <li>
+                            <div class="list-item flex-grade">
+                                <div class="card small-12 compact">
+                                    {% set interactionUser = null %}
+                                    {% set dateMeta = '' %}
+                                    {% set statusMeta = '' %}
+                                    {% set markOutput = '' %}
+                                    {% if currentInteraction is response %}
+                                        {% set interactionUser = currentInteraction.submittedBy %}
+                                        {% set statusMeta %}
+                                            {% if not interactionUser %}
+                                                <span>Attempted</span>
+                                            {% elseif interactionUser.id == student.id%}
+                                                <span>Attempted</span>
+                                            {% else %}
+                                                <span>Attempted by {{ interactionUser.fullname }}</span>
+                                            {% endif %}
+                                        {% endset %}
+                                        {% set dateMeta %}
+                                            <span class="pipe meta">{{ currentInteraction.submittedAt.short }}</span>
+                                        {% endset %}
+                                    {% elseif currentInteraction is feedback %}
+                                        {% set interactionUser = currentInteraction.reviewer %}
+                                        {% set statusMeta %}
+                                            {% if not interactionUser %}
+                                                <span>Reviewed</span>
+                                            {% elseif interactionUser.id == student.id%}
+                                                <span>Self-reviewed</span>
+                                            {% else %}
+                                                <span>Reviewed by {{ interactionUser.fullname }}</span>
+                                            {% endif %}
+                                        {% endset %}
+                                        {% set dateMeta %}
+                                            <span class="pipe meta">{{ currentInteraction.publishedAt.short }}</span>
+                                        {% endset %}
+
+                                        {% set markOutput %}
+                                            {% if (currentInteraction.humanReadableMark ?? null) is not null %}
+                                                {% set urgencyClass = currentInteraction ? urgency.marks(currentInteraction.normalisedMark) : '' %}
+                                                <div class="grade {{ urgencyClass }}-bg">
+                                                    <span>{{ currentInteraction.humanReadableMark ?? ''}}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endset %}
+                                    {% endif %}
+
+                                    {% if interactionUser %}
+                                        <a href="/search/user/{{ interactionUser.id }}">
+                                            {% include 'include/portrait.twig' with {user: interactionUser, description: interactionUser.fullName} only %}
+                                            {{ statusMeta | raw }}
+                                            {{ dateMeta | raw }}
+                                        </a>
+                                    {% else %}
+                                        <span>
+                                            <span class="icon-lti"></span>
+                                            {{ statusMeta | raw }}
+                                            {{ dateMeta | raw }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {{ markOutput | raw }}
+                            </div>
+                        </li>
+
+                        {% if currentInteraction.comment %}
+                            <li class="child">
+                                <div class="content">
+                                    {{ currentInteraction.comment | nl2br }}
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </section>
+            <div class="toast" data-alert></div>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-lti"></i>
+                <p>There has not been any activity on this {{ locale.assessment }} yet.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}

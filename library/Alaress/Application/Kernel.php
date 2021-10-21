@@ -77,14 +77,18 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbac
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourceDueWork;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\Lti as FeedbackSubSourceLti;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
+use Schoolbox\Learning\Assessment\Lti\Feedback\MapperProxy as LtiFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\Lti\Response\MapperProxy as LtiResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
 use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
+use Schoolbox\Learning\Assessment\Response\SubSource\Lti as ResponseSubSourceLti;
 use Schoolbox\Learning\Assessment\Response\SubSource\Quiz as ResponseSubSourceQuiz;
 use Schoolbox\Learning\Assessment\Response\SubSource\Task as ResponseSubSourceTask;
 use Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy as TaskFeedbackMapperProxy;
@@ -94,6 +98,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
+use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
@@ -1213,6 +1218,23 @@ abstract class Kernel
         $di->params[TaskFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(TaskCompletionMapper::class);
 
 
+        // LTI sources, without funny names
+        $di->set(
+            'ltiResponseDataSource',
+            $di->lazyNew(
+                LtiResponseMapperProxy::class,
+                ['mapper' => $mapperFactory->getLazy(LtiScoreMapper::class)]
+            )
+        );
+        $di->set(
+            'ltiFeedbackDataSource',
+            $di->lazyNew(
+                LtiFeedbackMapperProxy::class,
+                ['mapper' => $mapperFactory->getLazy(LtiScoreMapper::class)]
+            )
+        );
+
+
         // Register response data source
         $di->set(
             'responseDataSource',
@@ -1228,10 +1250,14 @@ abstract class Kernel
                     /** @var QuizAttemptMapperProxy $attemptDataSource */
                     $attemptDataSource = $di->get('attemptDataSource');
 
+                    /** @var LtiResponseMapperProxy $ltiResponseDataSource */
+                    $ltiResponseDataSource = $di->get('ltiResponseDataSource');
+
                     return (new AssessmentResponseDataSource())
                         ->addSubSource(new ResponseSubSourceDueWork($submissionDataSource))
                         ->addSubSource(new ResponseSubSourceTask($completionDataSource))
-                        ->addSubSource(new ResponseSubSourceQuiz($attemptDataSource));
+                        ->addSubSource(new ResponseSubSourceQuiz($attemptDataSource))
+                        ->addSubSource(new ResponseSubSourceLti($ltiResponseDataSource));
                 }
             )
         );
@@ -1251,10 +1277,14 @@ abstract class Kernel
                     /** @var QuizFeedbackMapperProxy $reviewDataSource */
                     $reviewDataSource = $di->get('reviewDataSource');
 
+                    /** @var LtiFeedbackMapperProxy $ltiFeedbackDataSource */
+                    $ltiFeedbackDataSource = $di->get('ltiFeedbackDataSource');
+
                     return (new AssessmentFeedbackDataSource())
                         ->addSubSource(new FeedbackSubSourceDueWork($returnDataSource))
                         ->addSubSource(new FeedbackSubSourceTask($ratificationDataSource))
-                        ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource));
+                        ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource))
+                        ->addSubSource(new FeedbackSubSourceLti($ltiFeedbackDataSource));
                 }
             )
         );

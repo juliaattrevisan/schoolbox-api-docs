@@ -44,9 +44,11 @@ abstract class AbstractResponse implements IResponse
      * The person who created this Submission
      *
      * Teachers can submit on behalf of a Student - the Teacher
-     * is the User instance here
+     * is the User instance here.
      *
-     * @var User
+     * Alternately, this can be null if the creating user is unknown.
+     *
+     * @var User|null
      */
     protected $submittedBy;
 
@@ -136,18 +138,18 @@ abstract class AbstractResponse implements IResponse
     }
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getSubmittedBy()
+    public function getSubmittedBy(): ?User
     {
         return $this->submittedBy;
     }
 
     /**
-     * @param User $submittedBy
+     * @param User|null $submittedBy
      * @return $this
      */
-    public function setSubmittedBy(User $submittedBy)
+    public function setSubmittedBy(?User $submittedBy): self
     {
         $this->submittedBy = $submittedBy;
         return $this;
@@ -238,7 +240,7 @@ abstract class AbstractResponse implements IResponse
     /**
      * @return User
      */
-    public function getSubmittedOnBehalfOf()
+    public function getSubmittedOnBehalfOf(): User
     {
         return $this->submittedOnBehalfOf;
     }
@@ -247,7 +249,7 @@ abstract class AbstractResponse implements IResponse
      * @param User $submittedOnBehalfOf
      * @return $this
      */
-    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf)
+    public function setSubmittedOnBehalfOf(User $submittedOnBehalfOf): self
     {
         $this->submittedOnBehalfOf = $submittedOnBehalfOf;
         return $this;

@@ -1,0 +1,15 @@
+{% extends '@learningAssessment/fragments/participantStatus.twig' %}
+
+{% block statusLine %}
+    {{ parent() }}
+
+    {% set pActionSummary = participant.hasPublishedFeedback or participant.hasSubmittedResponse
+        ? routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs)
+        : null
+    %}
+    {% if pActionSummary %}
+        <span class="pipe meta">
+            <a href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">View {{ locale.attemptHistory.proper }}</a>
+        </span>
+    {% endif %}
+{% endblock statusLine %}
