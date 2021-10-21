@@ -169,6 +169,10 @@ HELP;
 
         $manifest = $this->getManifest();
 
+        /* A set of reporting info
+         */
+        $strategic = [];
+
         /* A set of sql statements which execute changes on tables and columns
          */
         $allSql = [];
@@ -185,32 +189,34 @@ HELP;
             if ($tableData['collation'] === self::DESIRED_TABLE_COLLATION) {
                 /* This table collation is correct
                  */
-                $this->renderTableName($green, $tableName, $tableData['collation']);
+                $strategic[] = $this->renderTableName($green, $tableName, $tableData['collation']);
             } elseif ('' === (string)$tableData['collation']) {
                 /* This table collation is unspecified (empty string)
                  * Is that something that needs to change?
                  */
-                $this->renderTableName($yellow, $tableName, " . self::EMPTY_DATA . ");
+                $strategic[] = $this->renderTableName($yellow, $tableName, " . self::EMPTY_DATA . ");
             } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                 /* This table collation isutf8-ish, sort of
                  * They need correction
                  */
-                $this->renderTableName($red, $tableName, $tableData['collation']);
+                $strategic[] = $this->renderTableName($red, $tableName, $tableData['collation']);
             } else {
                 /* This table collation is something else entirely
                  * Leave it be
                  */
-                $this->renderTableName($white, $tableName, $tableData['collation']);
+                $strategic[] = $this->renderTableName($white, $tableName, $tableData['collation']);
             }
 
             /* Investigate the column's settings
              */
             foreach ($tableData['columns'] as $columnName => $columnData) {
+                $strategicRow = '';
+
                 /* Decide if this column needs to be rebuilt or not
                  */
                 $rebuildColumn = false;
 
-                $this->renderColumn($white, $columnName);
+                $strategicRow .= $this->renderColumn($white, $columnName);
 
                 /* Only textual ones matter
                  */
@@ -220,17 +226,17 @@ HELP;
                     if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
                         /* This column collation is correct
                          */
-                        $this->renderCell($green, $columnData['collation']);
+                        $strategicRow .= $this->renderCell($green, $columnData['collation']);
                     } elseif ('' === (string)$columnData['collation']) {
                         /* This column collation is unspecified (empty string)
                          * Is that something that needs to change?
                          */
-                        $this->renderCell($yellow, self::EMPTY_DATA);
+                        $strategicRow .= $this->renderCell($yellow, self::EMPTY_DATA);
                     } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                         /* This column collation isutf8-ish, sort of
                          * They need correction
                          */
-                        $this->renderCell($red, $columnData['collation']);
+                        $strategicRow .= $this->renderCell($red, $columnData['collation']);
 
                         /* This column needs to be rebuilt
                          */
@@ -239,7 +245,7 @@ HELP;
                         /* This column collation is something else entirely
                          * Leave it be
                          */
-                        $this->renderCell($grey, $columnData['collation']);
+                        $strategicRow .= $this->renderCell($grey, $columnData['collation']);
                     }
 
                     /* Investigate the column's charset settings
@@ -247,17 +253,17 @@ HELP;
                     if ($columnData['charset'] === self::DESIRED_COLUMN_CHARSET) {
                         /* This column charset is correct
                          */
-                        $this->renderCell($green, $columnData['charset']);
+                        $strategicRow .= $this->renderCell($green, $columnData['charset']);
                     } elseif ('' === (string)$columnData['charset']) {
                         /* This column charset is unspecified (empty string)
                          * Is that something that needs to change?
                          */
-                        $this->renderCell($yellow, self::EMPTY_DATA);
+                        $strategicRow .= $this->renderCell($yellow, self::EMPTY_DATA);
                     } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                         /* This column charset isutf8-ish, sort of
                          * They need correction
                          */
-                        $this->renderCell($red, $columnData['charset']);
+                        $strategicRow .= $this->renderCell($red, $columnData['charset']);
 
                         /* This column needs to be rebuilt
                          */
@@ -266,7 +272,7 @@ HELP;
                         /* This column charset is something else entirely
                          * Leave it be
                          */
-                        $this->renderCell($grey, $columnData['charset']);
+                        $strategicRow .= $this->renderCell($grey, $columnData['charset']);
                     }
                 } else {
                     /* Other data types like int/datetime/decimal etc. come out here
@@ -274,22 +280,22 @@ HELP;
                      * grey or dark grey (when null/empty)
                      */
                     if ('' === (string)$columnData['collation']) {
-                        $this->renderCell($darkGrey, self::EMPTY_DATA);
+                        $strategicRow .= $this->renderCell($darkGrey, self::EMPTY_DATA);
                     } else {
-                        $this->renderCell($grey, $columnData['collation']);
+                        $strategicRow .= $this->renderCell($grey, $columnData['collation']);
                     }
 
                     if ('' === (string)$columnData['charset']) {
-                        $this->renderCell($darkGrey, self::EMPTY_DATA);
+                        $strategicRow .= $this->renderCell($darkGrey, self::EMPTY_DATA);
                     } else {
-                        $this->renderCell($grey, $columnData['charset']);
+                        $strategicRow .= $this->renderCell($grey, $columnData['charset']);
                     }
                 }
 
                 /* Show the actual sql specification too, because these can be very long
                  * chuck it at the last column
                  */
-                $this->renderCell($white, $columnData['columnType']);
+                $strategicRow .= $this->renderCell($grey, $columnData['columnType']);
 
                 /* If there was a problem with the column, just rebuild it
                  * with the correct collation and charset
@@ -311,13 +317,25 @@ HELP;
                     $allSql[$tableName] = implode(",\n ", $sql);
                 }
 
-                if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
-                    echo "\n";
-                }
+                $strategicRow .= "\n";
+
+                /* Stack it up
+                 */
+                $strategic[] = $strategicRow;
             }
         }
 
         echo "\n";
+
+        /* Show the report
+         */
+        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
+            echo "\n";
+
+            foreach ($strategic as $row) {
+                echo $row;
+            }
+        }
 
         /* Show sql statements grouped by table name
          */
@@ -408,12 +426,11 @@ HELP;
      * @param string $colour
      * @param string $tableName
      * @param string $val
+     * @return string
      */
-    private function renderTableName(string $colour, string $tableName, string $val): void
+    private function renderTableName(string $colour, string $tableName, string $val): string
     {
-        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
-            echo "\n{$colour}{$tableName} ({$val})\n";
-        }
+        return "\n{$colour}{$tableName} ({$val})\n";
     }
 
 
@@ -422,12 +439,11 @@ HELP;
      *
      * @param string $colour
      * @param string $columnName
+     * @return string
      */
-    private function renderColumn(string $colour, string $columnName): void
+    private function renderColumn(string $colour, string $columnName): string
     {
-        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
-            echo str_pad("    {$colour}{$columnName}", 50);
-        }
+        return str_pad("    {$colour}{$columnName}", 50);
     }
 
 
@@ -436,13 +452,11 @@ HELP;
      *
      * @param string $colour
      * @param string $val
-     * @return void
+     * @return string
      */
-    private function renderCell(string $colour, string $val): void
+    private function renderCell(string $colour, string $val): string
     {
-        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
-            echo str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
-        }
+        return str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
     }
 
 
