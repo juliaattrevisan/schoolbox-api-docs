@@ -77,6 +77,19 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Used when the collation or charset is null/empty string for whatever reason
+     */
+    private const EMPTY_DATA = 'null/empty';
+
+
+    /**
+     * These column data types have a collation/charset combo to worry about
+     * Everything else is a datetime/int/enum/etc. which don't have this issue
+     */
+    private const TEXT_DATA_TYPES = ['varchar', 'text', 'mediumtext', 'longtext'];
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -154,7 +167,7 @@ HELP;
                     /* This table collation is unspecified (empty string)
                      * Is that something that needs to change?
                      */
-                    echo "{$yellow}{$tableName} (null/empty)\n";
+                    echo "{$yellow}{$tableName} (" . self::EMPTY_DATA . ")\n";
                 } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                     /* This table collation isutf8-ish, sort of
                      * They need correction
@@ -178,7 +191,7 @@ HELP;
 
                     /* Only textual ones matter
                      */
-                    if (in_array($columnData['dataType'], ['varchar', 'text', 'mediumtext', 'longtext'])) {
+                    if (in_array($columnData['dataType'], self::TEXT_DATA_TYPES, true)) {
                         /* Investigate the column's collation settings
                          */
                         if ($columnData['collation'] === self::DESIRED_COLUMN_COLLATION) {
@@ -189,7 +202,7 @@ HELP;
                             /* This column collation is unspecified (empty string)
                              * Is that something that needs to change?
                              */
-                            echo $this->renderCell($yellow, 'null/empty');
+                            echo $this->renderCell($yellow, self::EMPTY_DATA);
                         } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                             /* This column collation isutf8-ish, sort of
                              * They need correction
@@ -212,7 +225,7 @@ HELP;
                             /* This column charset is unspecified (empty string)
                              * Is that something that needs to change?
                              */
-                            echo $this->renderCell($yellow, 'null/empty');
+                            echo $this->renderCell($yellow, self::EMPTY_DATA);
                         } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
                             /* This column charset isutf8-ish, sort of
                              * They need correction
@@ -225,8 +238,8 @@ HELP;
                             echo $this->renderCell($grey, $columnData['charset']);
                         }
                     } else {
-                        echo $this->renderCell($grey, $columnData['collation'] ?? 'null/empty');
-                        echo $this->renderCell($grey, $columnData['charset'] ?? 'null/empty');
+                        echo $this->renderCell($grey, $columnData['collation'] ?? self::EMPTY_DATA);
+                        echo $this->renderCell($grey, $columnData['charset'] ?? self::EMPTY_DATA);
                     }
 
                     echo "\n";
