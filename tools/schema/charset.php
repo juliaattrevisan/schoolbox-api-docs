@@ -140,10 +140,11 @@ Finds all the tables (and their columns) and assign their charset to be utf8mb4 
 were previously utf8. This schema drift is likely caused by failed updates somewhere in an
 instance's distant past. 
 
-Get a list of tables and their columns which aren't utf8mb4 by using the planning mode;
-update them by using Perform
+1. Strategic View
+Get a list of tables and their columns which aren't utf8mb4. Gives a broad overview of the
+table collation, column collation + charset, column specification
 
-Legend:
+Legend for the middle two columns in Strategic View:
     {$green}This collation is correct
     {$yellow}This collation is null or empty, but maybe it needs changing
     {$red}This collation is sort of utf8-ish, looks like it needs fixing
@@ -154,11 +155,17 @@ Legend:
 {$white}All column collations are supposed to be {$green}{$desiredColumnCollation}
 {$white}All column charsets are supposed to be {$green}{$desiredColumnCharset}
 {$white}
-Usage: php charset.php 
+Usage: php charset.php --strategic
 
+2. Planning View
 If you want a set of sql to inflict changes, you can get it grouped by table name.
 
 Usage: php charset.php --tablesql
+
+3. Perform
+Inflict all sql statements upon the db.
+
+Usage: php charset.php --perform
   
 
 HELP;
@@ -345,6 +352,14 @@ HELP;
             foreach ($allSql as $tableName => $sql) {
                 echo "{$white}{$tableName}\n";
                 echo "    {$grey}{$sql}\n\n";
+            }
+        }
+
+        /* Do it (good luck)
+         */
+        if ($this->perform()) {
+            foreach ($allSql as $tableName => $sql) {
+                $this->getDatabaseInternal()->executeQuery($sql, []);
             }
         }
 
