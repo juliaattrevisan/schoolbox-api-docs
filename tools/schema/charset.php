@@ -40,7 +40,7 @@ $app = new class extends CliTool\App
      *
      * An example arg that's a boolean on/off
      */
-    private const OPT_LONG_FLAG = 'flag';
+    private const OPT_LONG_STRATEGIC = 'strategic';
 
 
     /**
@@ -52,13 +52,32 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Tables seem to have collation utf8mb4_unicode_ci
+     */
+    private const DESIRED_TABLE_COLLATION = 'utf8mb4_unicode_ci';
+
+
+    /**
+     * Columns generally seem to have collation utf8mb4_unicode_ci
+     * But some have utf8mb4_general_ci
+     */
+    private const DESIRED_COLUMN_COLLATION = 'utf8mb4_unicode_ci';
+
+
+    /**
+     * Any collations containing this needle will flag as needing fixing
+     */
+    private const BROKEN_COLUMN_COLLATION_SUBSTR = 'utf8';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_FLAG,
+            self::OPT_LONG_STRATEGIC,
             self::OPT_LONG_INPUT
         ];
     }
@@ -69,6 +88,20 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
+
+        /* Some nice colours for diversity
+         */
+        $green = self::COLOUR_GREEN;
+        $yellow = self::COLOUR_YELLOW;
+        $red = self::COLOUR_RED;
+        $grey = self::COLOUR_GREY;
+        $white = self::COLOUR_WHITE;
+
+        /* Aliases for the heredoc
+         */
+        $desiredTableCollation = self::DESIRED_TABLE_COLLATION;
+        $desiredColumnCollation = self::DESIRED_COLUMN_COLLATION;
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -79,7 +112,17 @@ instance's distant past.
 Get a list of tables and their columns which aren't utf8mb4 by using the planning mode;
 update them by using Perform
 
+Legend:
+    {$green}This collation is correct
+    {$yellow}This collation is null or empty, but maybe that's okay
+    {$red}This collation is sort of utf8-ish, looks like it needs fixing
+    {$grey}This collation remains unchanged
+
+{$white}All table collations are supposed to be {$green}{$desiredTableCollation}
+{$white}All column collations are supposed to be {$green}{$desiredColumnCollation}
+{$white}
 Usage: php charset.php [--perform]
+  
 
 HELP;
             exit;
@@ -89,7 +132,63 @@ HELP;
 
         $manifest = $this->getManifest();
 
-        print_r($manifest);
+        /* Generate a human readable strategic overview
+         */
+        if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
+            foreach ($manifest as $tableName => $tableData) {
+                /* Investigate the table settings
+                 */
+                if ($tableData['collation'] === self::DESIRED_TABLE_COLLATION) {
+                    /* This table collation is correct
+                     */
+                    echo "{$green}{$tableName} ({$tableData['collation']})\n";
+                } elseif ('' === (string)$tableData['collation']) {
+                    /* This table collation is unspecified (empty string)
+                     * Is that something that needs to change?
+                     */
+                    echo "{$yellow}{$tableName} (null/empty)\n";
+                } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                    /* This table collation isutf8-ish, sort of
+                     * They need correction
+                     */
+                    echo "{$red}{$tableName} ({$tableData['collation']})\n";
+                } else {
+                    /* This table collation is something else entirely
+                     * Leave it be
+                     */
+                    echo "{$grey}{$tableName} ({$tableData['collation']})\n";
+                }
+
+                /* Investigate the column settings
+                 */
+                foreach ($tableData['columns'] as $columnName => $columnCollation) {
+                    echo "    ";
+
+                    if ($columnCollation === self::DESIRED_COLUMN_COLLATION) {
+                        /* This column collation is correct
+                         */
+                        echo "{$green}{$columnName} ({$columnCollation})\n";
+                    } elseif ('' === (string)$columnCollation) {
+                        /* This table collation is unspecified (empty string)
+                         * Is that something that needs to change?
+                         */
+                        echo "{$yellow}{$columnName} (null/empty)\n";
+                    } elseif (strpos($columnCollation, self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                        /* This table collation isutf8-ish, sort of
+                         * They need correction
+                         */
+                        echo "{$red}{$columnName} ({$columnCollation})\n";
+                    } else {
+                        /* This column collation is something else entirely
+                         * Leave it be
+                         */
+                        echo "{$grey}{$columnName} ({$columnCollation})\n";
+                    }
+                }
+
+                echo "\n";
+            }
+        }
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
