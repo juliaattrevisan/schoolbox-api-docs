@@ -120,6 +120,8 @@ class FieldStrategyFactory
                 return new FieldType\Number\Renderer();
             case ConfigMapper::FIELD_SELECT_MULTI:
                 return new FieldType\SelectMulti\Renderer();
+            case ConfigMapper::FIELD_SELECT_DATE:
+                return new FieldType\Date\Renderer();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$fieldId}'");
     }
@@ -151,6 +153,7 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_PASSWORD:
             case ConfigMapper::FIELD_TIME_PICKER:
             case ConfigMapper::FIELD_NUMBER:
+            case ConfigMapper::FIELD_SELECT_DATE:
                 return new FieldValueSerializerBase();
             case ConfigMapper::FIELD_SELECT_MULTI:
                 return new FieldType\SelectMulti\ValueSerializer();

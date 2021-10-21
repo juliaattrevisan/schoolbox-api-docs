@@ -1,8 +1,8 @@
 -- Insert new config field 'date'
-INSERT INTO lu_config_field (field) VALUES ('date');
+INSERT INTO lu_config_field (id, field) VALUES (18, 'date');
 
 -- Add new config
-INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`)
+INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
     'date_increment_epoch',
     'Dataset is up to date indicator',
@@ -12,5 +12,6 @@ VALUES (
     'false',
     'true',
     'false',
-    'settings'
+    'settings',
+    (SELECT * FROM (SELECT MAX(sequence)+1 FROM config WHERE type_id = ((SELECT id FROM lu_config_type WHERE type = 'Resources'))) t1)
 );
