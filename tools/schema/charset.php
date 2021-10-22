@@ -213,7 +213,7 @@ HELP;
                  * Is that something that needs to change?
                  */
                 $strategic[] = $this->renderTableName($yellow, $tableName, self::EMPTY_DATA);
-            } elseif (strpos($tableData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+            } elseif ($this->hasWrongCollation($tableData['collation'])) {
                 /* This table collation isutf8-ish, sort of
                  * They need correction
                  */
@@ -254,7 +254,7 @@ HELP;
                          * Is that something that needs to change?
                          */
                         $strategicRow .= $this->renderCell($yellow, self::EMPTY_DATA);
-                    } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                    } elseif ($this->hasWrongCollation($columnData['collation'])) {
                         /* This column collation is utf8-ish, sort of
                          * They need correction
                          */
@@ -282,7 +282,7 @@ HELP;
                          * Is that something that needs to change?
                          */
                         $strategicRow .= $this->renderCell($yellow, self::EMPTY_DATA);
-                    } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+                    } elseif ($this->hasWrongCharset($columnData['charset'])) {
                         /* This column charset is utf8-ish, sort of
                          * They need correction
                          */
@@ -544,6 +544,58 @@ HELP;
     private function renderCell(string $colour, string $val): string
     {
         return str_pad("{$colour}{$val}" . self::COLOUR_WHITE, 32);
+    }
+
+
+    /**
+     * Decide if a collation was wrong
+     *
+     * @param string $collation
+     * @return bool
+     */
+    private function hasWrongCollation(string $collation): bool
+    {
+        /* If the $collation was utf8-ish, but not utf8mb4
+         * Then the collation needs fixing
+         */
+        if (strpos($collation, self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+            return true;
+        }
+
+        /* If the collation was an edgelord case, latin1_swedish_ci
+         * This occurs in exactly one place: event_source
+         */
+        if ('latin1_swedish_ci' === $collation) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Decide if a charset was wrong
+     *
+     * @param string $charset
+     * @return bool
+     */
+    private function hasWrongCharset(string $charset): bool
+    {
+        /* If the $collation was utf8-ish, but not utf8mb4
+         * Then the collation needs fixing
+         */
+        if (strpos($charset, self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
+            return true;
+        }
+
+        /* If the collation was an edgelord case, latin1_swedish_ci
+         * This occurs in exactly one place: event_source
+         */
+        if ('latin1' === $charset) {
+            return true;
+        }
+
+        return false;
     }
 
 
