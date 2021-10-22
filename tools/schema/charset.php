@@ -591,7 +591,7 @@ HELP;
     private function hasWrongCharset(string $charset): bool
     {
         /* If the $charset was utf8-ish, but not utf8mb4
-         * Then the collation needs fixing
+         * Then the charset needs fixing
          */
         if (strpos($charset, self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
             return true;
