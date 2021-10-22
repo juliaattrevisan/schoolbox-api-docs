@@ -381,6 +381,10 @@ HELP;
         /* Do it (good luck)
          */
         if ($this->perform()) {
+            /* Turn off the foreigner key stuff
+             */
+            $this->getDatabaseInternal()->executeQuery('SET foreign_key_checks = 0', []);
+
             foreach ($allSql as $tableName => $sql) {
                 $this->getLogger()->debug($sql);
 
@@ -390,6 +394,10 @@ HELP;
                     $this->getLogger()->warning($e->getMessage());
                 }
             }
+
+            /* Turn on the foreigner key stuff
+             */
+            $this->getDatabaseInternal()->executeQuery('SET foreign_key_checks = 1', []);
         }
 
         exit;
