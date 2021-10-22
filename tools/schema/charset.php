@@ -423,10 +423,14 @@ HELP;
      */
     private function getManifest(): array
     {
+        /* Only get the BASE TABLE tables in the 'schoolbox' db
+         * (Ignore views and other table types like views)
+         */
         $tablesQuery = "
             SELECT TABLE_NAME, TABLE_COLLATION
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = 'schoolbox'
+            AND TABLE_TYPE = 'BASE TABLE'
             ORDER BY TABLE_NAME            
         ";
 
