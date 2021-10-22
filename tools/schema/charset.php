@@ -229,7 +229,7 @@ HELP;
 
             /* Investigate the column's settings
              */
-            $rebuildColumn = false;
+            $rebuildTableAlready = false;
 
             foreach ($tableData['columns'] as $columnName => $columnData) {
                 $strategicRow = '';
@@ -263,6 +263,7 @@ HELP;
                         /* This column needs to be rebuilt
                          */
                         $rebuildColumn = true;
+                        $rebuildTableAlready = true;
                     } else {
                         /* This column collation is something else entirely
                          * Leave it be
@@ -290,6 +291,7 @@ HELP;
                         /* This column needs to be rebuilt
                          */
                         $rebuildColumn = true;
+                        $rebuildTableAlready = true;
                     } else {
                         /* This column charset is something else entirely
                          * Leave it be
@@ -370,7 +372,7 @@ HELP;
              * in this explicit manner, when the table collation needed changing
              * but none of its columns changed.
              */
-            if ($rebuildTable && !$rebuildColumn) {
+            if ($rebuildTable && !$rebuildTableAlready) {
                 $allSql[$tableName] = $sql[0];
             }
         }
