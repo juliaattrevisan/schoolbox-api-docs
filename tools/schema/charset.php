@@ -219,6 +219,8 @@ HELP;
 
             /* Investigate the column's settings
              */
+            $rebuildColumn = false;
+
             foreach ($tableData['columns'] as $columnName => $columnData) {
                 $strategicRow = '';
 
@@ -349,8 +351,16 @@ HELP;
             /* Sometimes the table needs updating, but none of its columns changed
              * You might inadvertently end up changing a table collation twice but
              * it really doesn't matter - this is a once-off mutation afaict
+             *
+             * Anyway. If you $rebuildColumn, then the table collation will already
+             * have changed as part of the column update queries. In that case you
+             * don't need to $rebuildTable as well, again.
+             *
+             * That means you only need to update the table collation specially,
+             * in this explicit manner, when the table collation needed changing
+             * but none of its columns changed.
              */
-            if ($rebuildTable) {
+            if ($rebuildTable && !$rebuildColumn) {
                 $allSql[] = $sql[0];
             }
         }
