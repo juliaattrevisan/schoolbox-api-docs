@@ -99,6 +99,14 @@ $app = new class extends CliTool\App
 
 
     /**
+     * sql uses these strings to denote null/not null in column schema
+     * Tripped over it a bit, because you need to specify DEFAULT specially
+     */
+    private const SQL_NULL = 'NULL';
+    private const SQL_NOT_NULL = 'NOT NULL';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -215,11 +223,16 @@ HELP;
                  */
                 $strategic[] = $this->renderTableName($yellow, $tableName, self::EMPTY_DATA);
             } elseif ($this->hasWrongCollation($tableData['collation'])) {
-                /* This table collation isutf8-ish, sort of
+                /* This table collation is utf8-ish, sort of
                  * They need correction
                  */
                 $strategic[] = $this->renderTableName($red, $tableName, $tableData['collation']);
 
+                /* The table needed its collation changed, but this will already occur
+                 * if any of its columns needs changing. Sometimes columns don't need changing
+                 * but the table does. We need to remember this special circumstance and use
+                 * this var in conjunction with $rebuildTableAlready
+                 */
                 $rebuildTable = true;
             } else {
                 /* This table collation is something else entirely
@@ -328,7 +341,7 @@ HELP;
                 if ($rebuildColumn) {
                     /* Switch based on column type: enum, varchar, etc.
                      */
-                    if ('NOT NULL' === $columnData['nullable']) {
+                    if (self::SQL_NOT_NULL === $columnData['nullable']) {
                         $sql[] = sprintf(
                             "CHANGE COLUMN `%s` `%s` %s CHARACTER SET '%s' COLLATE '%s' %s",
                             $columnName,
@@ -487,14 +500,9 @@ HELP;
             ])->fetchAll();
 
             foreach ($columns as $column) {
-//                if ($column['COLUMN_NAME'] === 'title') {
-//                    if ($table['TABLE_NAME'] === 'comms_news_article') {
-//                        var_dump($column);
-//                    }
-//                }
                 $stack[$table['TABLE_NAME']]['columns'][$column['COLUMN_NAME']] = [
                     'default' => $column['COLUMN_DEFAULT'],
-                    'nullable' => $column['IS_NULLABLE'] === 'YES' ? 'NULL' : 'NOT NULL',
+                    'nullable' => $column['IS_NULLABLE'] === 'YES' ? self::SQL_NULL : self::SQL_NOT_NULL,
                     'dataType' => $column['DATA_TYPE'],
                     'maximumLength' => $column['CHARACTER_MAXIMUM_LENGTH'],
                     'collation' => $column['COLLATION_NAME'],
@@ -582,14 +590,14 @@ HELP;
      */
     private function hasWrongCharset(string $charset): bool
     {
-        /* If the $collation was utf8-ish, but not utf8mb4
+        /* If the $charset was utf8-ish, but not utf8mb4
          * Then the collation needs fixing
          */
         if (strpos($charset, self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
             return true;
         }
 
-        /* If the collation was an edgelord case, latin1_swedish_ci
+        /* If the $charset was an edgelord case, latin1
          * This occurs in exactly one place: event_source
          */
         if ('latin1' === $charset) {
