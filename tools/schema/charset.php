@@ -138,7 +138,8 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP) || !\count(array_filter([
             $this->getOpt(self::OPT_LONG_HELP),
             $this->getOpt(self::OPT_LONG_STRATEGIC),
-            $this->getOpt(self::OPT_LONG_TABLESQL)
+            $this->getOpt(self::OPT_LONG_TABLESQL),
+            $this->perform()
         ]))) {
 
             echo <<<HELP
