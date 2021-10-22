@@ -19,6 +19,7 @@ if (!isset($this)) {
 
 $groupHandler = new Group(); //only single call, still working out how to do the hasChildAccessOnly
 $access = Access::getInstance();
+$threadMapper = ThreadMapper::getInstance();
 
 $this->setFile(TEMPLATE_content, 'forum/thread.html');
 $this->setBlock(TEMPLATE_content, 'post', 'post_block');
@@ -39,7 +40,7 @@ $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 if (is_numeric($this->arg[0])) {
     try {
         /** @var \Schoolbox\Forum\Thread $thread */
-        $thread = ThreadMapper::getInstance()->findById($this->arg[0]);
+        $thread = $threadMapper->findById($this->arg[0]);
     } catch (DeletedException $e) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
     } catch (Exception $e) {
@@ -61,7 +62,7 @@ if ($thread->getCategory() === false ||  $thread->getCategory()->isDeleted() ===
 
 /* forum exists
  */
-if (!ThreadMapper::getInstance()->isComponent($folder->getId())) {
+if (!$threadMapper->isComponent($folder->getId())) {
     SitePage::localRedir('/homepage/' . $folder->getId());
 }
 
@@ -114,6 +115,7 @@ if (!$thread->isLocked() || $access->getFolderAccess($_SESSION['user'], $folder-
 /* record view
  */
 $thread->recordView();
+$threadMapper->save($thread);
 
 /* output pagination
  */

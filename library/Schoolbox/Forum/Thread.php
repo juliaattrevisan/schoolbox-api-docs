@@ -215,12 +215,8 @@ class Thread implements ISoftDeletable
      */
     public function recordView()
     {
-        //record unique views, and persist to db, I can put the save function in www/forum/thread.php:115 just after this call
         $this->views++;
-        if (ThreadMapper::getInstance()->save($this)) {
-            return $this;
-        }
-        return false;
+        return $this;
     }
 
     /**
