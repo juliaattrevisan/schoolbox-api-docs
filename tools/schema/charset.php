@@ -133,7 +133,14 @@ $app = new class extends CliTool\App
         $desiredColumnCollation = self::DESIRED_COLUMN_COLLATION;
         $desiredColumnCharset = self::DESIRED_COLUMN_CHARSET;
 
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
+        /* At least one of the options must be provided for this to mean anything
+         */
+        if ($this->getOpt(self::OPT_LONG_HELP) || !\count(array_filter([
+            $this->getOpt(self::OPT_LONG_HELP),
+            $this->getOpt(self::OPT_LONG_STRATEGIC),
+            $this->getOpt(self::OPT_LONG_TABLESQL)
+        ]))) {
+
             echo <<<HELP
 
 Finds all the tables (and their columns) and assign their charset to be utf8mb4 where they
@@ -365,8 +372,6 @@ HELP;
             }
         }
 
-        echo "\n";
-
         /* Show the report
          */
         if ($this->getOpt(self::OPT_LONG_STRATEGIC)) {
@@ -375,39 +380,49 @@ HELP;
             foreach ($strategic as $row) {
                 echo $row;
             }
+
+            echo "\n";
         }
 
         /* Show sql statements grouped by table name
          */
         if ($this->getOpt(self::OPT_LONG_TABLESQL)) {
-            echo "\n";
+            if (\count($allSql)) {
+                echo "\n";
 
-            foreach ($allSql as $tableName => $sql) {
-                echo "{$white}{$tableName}\n";
-                echo "    {$grey}{$sql}\n\n";
+                foreach ($allSql as $tableName => $sql) {
+                    echo "{$white}{$tableName}\n";
+                    echo "    {$grey}{$sql}\n\n";
+                }
+            } else {
+                $this->getLogger()->info('No sql changes required.');
             }
         }
 
         /* Do it (good luck)
          */
         if ($this->perform()) {
-            /* Turn off the foreigner key stuff
-             */
-            $this->getDatabaseInternal()->executeQuery('SET foreign_key_checks = 0', []);
+            if (\count($allSql)) {
+                /* Turn off the foreigner key stuff
+                 */
+                $this->getDatabaseInternal()->executeQuery('SET foreign_key_checks = 0', []);
 
-            foreach ($allSql as $tableName => $sql) {
-                $this->getLogger()->debug($sql);
+                foreach ($allSql as $tableName => $sql) {
+                    $this->getLogger()->debug($sql);
 
-                try {
-                    $this->getDatabaseInternal()->executeQuery($sql, []);
-                } catch (\Throwable $e) {
-                    $this->getLogger()->warning($e->getMessage());
+                    try {
+                        $this->getDatabaseInternal()->executeQuery($sql, []);
+                    } catch (\Throwable $e) {
+                        $this->getLogger()->warning($e->getMessage());
+                    }
                 }
-            }
 
-            /* Turn on the foreigner key stuff
-             */
-            $this->getDatabaseInternal()->executeQuery('SET foreign_key_checks = 1', []);
+                /* Turn on the foreigner key stuff
+                 */
+                $this->getDatabaseInternal()->executeQuery('SET foreign_key_checks = 1', []);
+            } else {
+                $this->getLogger()->info('No sql changes required; none performed');
+            }
         }
 
         exit;
