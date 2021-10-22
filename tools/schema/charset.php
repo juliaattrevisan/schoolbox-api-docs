@@ -135,13 +135,14 @@ $app = new class extends CliTool\App
 
         /* At least one of the options must be provided for this to mean anything
          */
-        if ($this->getOpt(self::OPT_LONG_HELP) || !\count(array_filter([
+        $optionSelected = !\count(array_filter([
             $this->getOpt(self::OPT_LONG_HELP),
             $this->getOpt(self::OPT_LONG_STRATEGIC),
             $this->getOpt(self::OPT_LONG_TABLESQL),
             $this->perform()
-        ]))) {
+        ]));
 
+        if ($optionSelected || $this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
 Finds all the tables (and their columns) and assign their charset to be utf8mb4 where they
