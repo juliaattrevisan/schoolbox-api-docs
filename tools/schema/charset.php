@@ -147,6 +147,8 @@ Finds all the tables (and their columns) and assign their charset to be utf8mb4 
 were previously utf8. This schema drift is likely caused by failed updates somewhere in an
 instance's distant past. 
 
+Usage: php charset.php [--strategic] [--tablesql] [--perform]
+ 
 1. Strategic View
 Get a list of tables and their columns which aren't utf8mb4. Gives a broad overview of the
 table collation, column collation + charset, column specification
