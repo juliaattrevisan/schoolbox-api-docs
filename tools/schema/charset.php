@@ -243,7 +243,7 @@ HELP;
                          */
                         $strategicRow .= $this->renderCell($yellow, self::EMPTY_DATA);
                     } elseif (strpos($columnData['collation'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                        /* This column collation isutf8-ish, sort of
+                        /* This column collation is utf8-ish, sort of
                          * They need correction
                          */
                         $strategicRow .= $this->renderCell($red, $columnData['collation']);
@@ -270,7 +270,7 @@ HELP;
                          */
                         $strategicRow .= $this->renderCell($yellow, self::EMPTY_DATA);
                     } elseif (strpos($columnData['charset'], self::BROKEN_COLUMN_COLLATION_SUBSTR) > -1) {
-                        /* This column charset isutf8-ish, sort of
+                        /* This column charset is utf8-ish, sort of
                          * They need correction
                          */
                         $strategicRow .= $this->renderCell($red, $columnData['charset']);
