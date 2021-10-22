@@ -370,7 +370,7 @@ HELP;
              * but none of its columns changed.
              */
             if ($rebuildTable && !$rebuildColumn) {
-                $allSql[] = $sql[0];
+                $allSql[$tableName] = $sql[0];
             }
         }
 
