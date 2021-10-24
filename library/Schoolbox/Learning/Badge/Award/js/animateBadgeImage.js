@@ -92,20 +92,6 @@ const swingDown = (badgeImage) => {
 }
 
 /**
- * Slowly spin a scaled up badge
- * 
- * @param { DOMElement }
- * 
- * @returns { Timeline }
- */
- const scaleUpAndRotateSlowly = (badgeImage) => {
-    const scaleUpAndRotateSlowlyTL = gsap.timeline( { paused: true, repeat: -1 } ); 
-    scaleUpAndRotateSlowlyTL.set(badgeImage, { opacity: 0.1, scale: 4 } );
-    scaleUpAndRotateSlowlyTL.to(badgeImage, { rotationZ: 360, y: 0, duration: 15, ease: 'none' } );
-    return scaleUpAndRotateSlowlyTL;
-}
-
-/**
  * Play a random animation
  * 
  * @param { DOMElement }

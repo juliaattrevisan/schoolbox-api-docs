@@ -129,6 +129,7 @@ export default {
          * @returns { Boolean }
          */
         canAnimateBadgeImage () {
+            return true;
             return this.award.viewedOn === null //hasn't been looked at before
                 && this.award.recipient.id === window.schoolboxUser.id //is the awarded user
                 && this.award.isGoal === false; //has been awarded
