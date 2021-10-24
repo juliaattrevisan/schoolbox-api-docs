@@ -161,6 +161,12 @@ class ConfigMapper extends Mapper
 
     public const NAME_LMS_SEB_ENABLED = 'lms_seb_enable';
 
+    public const NAME_INTELLISCHOOL_JWT_PRIVATE_KEY                   = 'intellischool_jwt_private_key';
+    public const NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM = 'intellischool_jwt_private_key_signing_algorithm';
+    public const NAME_INTELLISCHOOL_DEPLOYMENT_ID                     = 'intellischool_deployment_id';
+    public const NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL        = 'intellischool_learner_dashboard_base_url';
+    public const NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL         = 'intellischool_cohort_dashboard_base_url';
+
     /**
      * @throws \InvalidArgumentException
      */
