@@ -59,12 +59,6 @@ CHANGE COLUMN `top_hover` `top_hover` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 
 ALTER TABLE `luEventType`
 CHANGE COLUMN `eventColour` `eventColour` VARCHAR(10) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
 
-ALTER TABLE `lu_pastoral_type`
-CHANGE COLUMN `color` `color` VARCHAR(32) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
-
-ALTER TABLE `lu_pastoral_subtype`
-CHANGE COLUMN `color` `color` VARCHAR(32) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
-
 ALTER TABLE `storage_transform`
 CHANGE COLUMN `transform` `transform` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ;
 
@@ -140,15 +134,5 @@ ALTER TABLE `tour_trigger`
 ADD CONSTRAINT `tour_trigger_tour_uuid_fk`
   FOREIGN KEY (`tour_uuid`)
   REFERENCES `tour` (`uuid`);
-
-ALTER TABLE `turnitin_group`
-CHANGE COLUMN `group_id` `group_id` VARCHAR(255) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
-
-ALTER TABLE `turnitin_group_attachment`
-CHANGE COLUMN `turnitin_group_id` `turnitin_group_id` VARCHAR(255) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
-CHANGE COLUMN `turnitin_group_attachment_id` `turnitin_group_attachment_id` VARCHAR(255) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
-
-ALTER TABLE `turnitin_report`
-CHANGE COLUMN `turnitin_submission_id` `turnitin_submission_id` VARCHAR(255) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
 
 SET foreign_key_checks = 1;
