@@ -159,6 +159,7 @@ class JwtFactory
     private function buildBaseClaims(User $currentUser): array
     {
         $userClaims = [
+            // TODO is this the correct sub claim?
             'sub'                                             => $currentUser->getEmail(),
             'name'                                            => $currentUser->getFullName(),
             'given_name'                                      => $currentUser->getFirstname(),
