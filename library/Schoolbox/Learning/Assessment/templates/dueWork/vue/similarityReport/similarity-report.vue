@@ -279,9 +279,9 @@ export default {
         getFormData () {
             const formData = new FormData();
             formData.append('responseId', '');
-            // formData.append('resubmissionRequired', '1');
+            formData.append('resubmissionRequired', '1');
             formData.append('comment', this.comment);
-            // formData.append('publish', '1');
+            formData.append('publish', '1');
             return formData;
         },
 
