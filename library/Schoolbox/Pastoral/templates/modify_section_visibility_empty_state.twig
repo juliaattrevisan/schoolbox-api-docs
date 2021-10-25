@@ -10,11 +10,11 @@
 {% endset %}
 <span id="visibility_empty_state">
 {% if name is not null %}
-    <p>There are no visibility rules on this record, it will only be visible by {{ name }} and the {{ locale.pastoral }} moderators.</p>
+    <p>There is no visibility set for this record. It will only be visible to {{ name }} and {{ locale.pastoral }} moderators.</p>
     <p>
         To grant access to other users add a
         {{ links }}
-        visibility rule to this record.
+        to this record.
     </p>
 {% else %}
     <p>There are no visibility rules set on this record type.</p>
