@@ -158,16 +158,6 @@ class JwtFactory
      */
     private function buildBaseClaims(User $currentUser): array
     {
-        // Test user claims: will eventually be removed
-        $testUserClaims = [
-            'sub'                                             => 'jane@school.edu',
-            'name'                                            => 'Ms Jane Marie Doe',
-            'given_name'                                      => 'Jane',
-            'middle_name'                                     => 'Marie',
-            'family_name'                                     => 'Doe',
-            'email'                                           => 'jane@school.edu',
-            'https://purl.imsglobal.org/spec/lti/claim/roles' => [self::ROLE_NAMESPACE . '#Staff',],
-        ];
         $userClaims = [
             'sub'                                             => $currentUser->getEmail(),
             'name'                                            => $currentUser->getFullName(),
@@ -211,6 +201,6 @@ class JwtFactory
             'iat' => $now->getUnixTimeStamp(),
             'exp' => (clone $now)->addSeconds(300)->getUnixTimeStamp(),
         ];
-        return array_merge($testUserClaims, $timeClaims, $defaultClaims);
+        return array_merge($userClaims, $timeClaims, $defaultClaims);
     }
 }
