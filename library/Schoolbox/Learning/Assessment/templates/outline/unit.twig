@@ -33,6 +33,7 @@
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-add-button data-form_class="for-due-work">{{ locale.dueWork.proper }}</a></li>
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task">Task</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">LTI Assessment</a></li>
                     {% endif %}
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}

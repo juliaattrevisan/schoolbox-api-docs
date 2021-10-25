@@ -435,7 +435,7 @@ class ListController extends Web\Controller\Base
      */
     public function updateVisibility(IAssessable $assessment): void
     {
-        $visibility            = $this->getRequest()->post['visibility'];
+        $visibility            = (int)$this->getRequest()->post['visibility'];
         $availableVisibilities = FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max'));
         if (!in_array($visibility, $availableVisibilities)) {
             $this->getResponse()->status->setCode(500);

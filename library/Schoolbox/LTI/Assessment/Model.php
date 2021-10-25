@@ -76,6 +76,11 @@ class Model implements IAssessableDataModel, ISoftDeletable
     private ?float $lineItemScoreMaximum = null;
 
     /**
+     * Mark visibility
+     */
+    private ?int $markVisibility = null;
+
+    /**
      * @return string|null
      */
     public function getLtiAssessmentUrl(): ?string
@@ -198,6 +203,24 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setLineItemScoreMaximum(?float $lineItemScoreMaximum): self
     {
         $this->lineItemScoreMaximum = $lineItemScoreMaximum;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getMarkVisibility(): ?int
+    {
+        return $this->markVisibility;
+    }
+
+    /**
+     * @param int|null $markVisibility
+     * @return $this
+     */
+    public function setMarkVisibility(?int $markVisibility): self
+    {
+        $this->markVisibility = $markVisibility;
         return $this;
     }
 

@@ -297,6 +297,9 @@
     {% include '@learningAssessment/fragments/weight.twig' with {
         assessment: assessment,
     } only %}
+
+    {% import 'sub/visibility.twig' as visibility %}
+    {{ visibility.dropdown(markVisibility, availableVisibilities) }}
 </fieldset>
 
 
