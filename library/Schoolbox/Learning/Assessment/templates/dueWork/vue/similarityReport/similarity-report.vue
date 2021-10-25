@@ -242,15 +242,13 @@ export default {
             this.$refs.toast.activate('Updating...');
             try {
                 await Promise.all(this.getFetches());
-                this.isProcessing = false;
-                this.comment = '';
-                this.markAsRequiringResubmission();
-                this.clearRows();
+                this.onFeedbackPublished();
                 this.$refs.toast.timeout('Feedback published', true, 2000);
             } catch (error) {
-                this.isProcessing = false;
                 console.warn(error);
                 this.$refs.toast.timeout('Unable to update', false, 3000);
+            } finally {
+                this.isProcessing = false;
             }
         },
 
@@ -286,9 +284,18 @@ export default {
         },
 
         /**
+         * Set up for another possible update
+         */
+        onFeedbackPublished () {
+            this.comment = ''; //clear the comment for another possible entry
+            this.markRowsAsRequiringResubmission();
+            this.clearRows();
+        },
+
+        /**
          * Loop through and update the submissions
          */
-        markAsRequiringResubmission () {
+        markRowsAsRequiringResubmission () {
             this.selectedRows.forEach((selectedRow) => { //directly edit the original data to update the display
                 const rowData = this.tableData.find((row) => selectedRow.user.id === row.user.id);
                 rowData.submission.status = 'failed';
@@ -300,7 +307,7 @@ export default {
          */
         clearRows () {
             this.selectedRows = [];
-            this.$refs.table.resetSelectedRows();
+            this.$refs.table.resetSelectedRows(); //ensure vue-tables-2 updates
         },
 
         /**

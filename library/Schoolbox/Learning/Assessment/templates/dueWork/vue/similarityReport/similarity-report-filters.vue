@@ -71,18 +71,18 @@ export default {
     <div class="filters">
         <div class="filters__column">
             <label>Similarity score</label>
-                <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange($event.target.value)">
-                    <option value="0">-</option>
-                    <option value="90">Above 90%</option>
-                    <option value="80">Above 80%</option>
-                    <option value="70">Above 70%</option>
-                    <option value="60">Above 60%</option>
-                    <option value="50">Above 50%</option>
-                    <option value="40">Above 40%</option>
-                    <option value="30">Above 30%</option>
-                    <option value="20">Above 20%</option>
-                    <option value="10">Above 10%</option>
-                </select>
+            <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange($event.target.value)">
+                <option value="0">-</option>
+                <option value="90">Above 90%</option>
+                <option value="80">Above 80%</option>
+                <option value="70">Above 70%</option>
+                <option value="60">Above 60%</option>
+                <option value="50">Above 50%</option>
+                <option value="40">Above 40%</option>
+                <option value="30">Above 30%</option>
+                <option value="20">Above 20%</option>
+                <option value="10">Above 10%</option>
+            </select>
         </div>
         <div class="filters__column">
             <div class="checklist">
