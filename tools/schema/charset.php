@@ -564,6 +564,12 @@ HELP;
      */
     private function hasWrongCollation(string $collation): bool
     {
+        /* utf8mb4_bin should stay the way it is
+         */
+        if ('utf8mb4_bin' === $collation) {
+            return false;
+        }
+
         /* If the $collation was utf8-ish, but not utf8mb4
          * Then the collation needs fixing
          */
