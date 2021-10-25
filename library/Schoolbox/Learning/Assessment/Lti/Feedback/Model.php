@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti\Feedback;
 
 use Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\MarkScheme\AbstractMarkScheme;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
 /**
  * Domain model for LTI assessment feedback.
@@ -73,13 +73,7 @@ class Model extends AbstractFeedback
      */
     public function getNormalisedMark()
     {
-        // TODO set normalized mark in \Schoolbox\Learning\Assessment\Lti\Feedback\MapperProxy::transformDomainObjects
-        //      instead, based on a mark scheme created for the score itself.
-        // See \Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy::transformModels
-        if ($this->scoreGiven === null) {
-            return null;
-        }
-        if ($this->scoreMaximum === null || $this->scoreMaximum <= 0) {
+        if (!$this->hasValidMark()) {
             return null;
         }
         return floatval(IMarkScheme::NORMALISED_MARK_MAX * $this->scoreGiven / $this->scoreMaximum);
@@ -90,8 +84,38 @@ class Model extends AbstractFeedback
      */
     public function getHumanReadableMark()
     {
-        // TODO figure out where mark scheme comes from
-        $markScheme = new TotalMarkFractional($this->scoreMaximum);
-        return $markScheme->getHumanReadableMark($this->getNormalisedMark());
+        if (!$this->hasValidMark()) {
+            return '';
+        }
+
+        // Ensure trailing zeroes are trimmed after rounding
+        return sprintf(
+            '%s / %s',
+            round($this->scoreGiven, AbstractMarkScheme::PRECISION) + 0,
+            round($this->scoreMaximum, AbstractMarkScheme::PRECISION) + 0
+        );
+    }
+
+    /**
+     * Does this feedback have a valid mark?
+     *
+     * It does if it has:
+     * * a non-null score given
+     * * a non-null score maximum > 0
+     *
+     * This feedback won't have a human-readable or normalised mark if it
+     * doesn't have a valid mark.
+     *
+     * @return bool
+     */
+    private function hasValidMark(): bool
+    {
+        if ($this->scoreGiven === null) {
+            return false;
+        }
+        if ($this->scoreMaximum === null || $this->scoreMaximum <= 0) {
+            return false;
+        }
+        return true;
     }
 }

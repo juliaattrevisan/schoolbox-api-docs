@@ -131,7 +131,10 @@
                     $modal.on(
                         'click',
                         '[data-action=close]',
-                        () => $modal.foundation('reveal', 'close')
+                        event => {
+                            event.preventDefault();
+                            $modal.foundation('reveal', 'close')
+                        }
                     );
                 });
 

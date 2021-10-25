@@ -149,14 +149,14 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
             throw new InvalidArgumentException("Unable to parse numerator: $formInput");
         }
 
-        $denominator = round($this->deriveDenominator(), 2);
+        $denominator = round($this->deriveDenominator(), AbstractMarkScheme::PRECISION);
 
         // Prevent divide by 0 Errors
         if (0 === (int)$denominator) {
             return null;
         }
 
-        $floatVal = round(floatval($matches[1]), 2);
+        $floatVal = round(floatval($matches[1]), AbstractMarkScheme::PRECISION);
         return sprintf("%s / %s", $floatVal, $denominator);
     }
 

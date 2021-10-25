@@ -76,6 +76,17 @@ class Factory
 
 
     /**
+     * MarkTypes available for LTI assessments: only the Total Mark type is
+     * available.
+     *
+     * @var string[]
+     */
+    private static $markTypesLtiAssessment = [
+        MarkType::TYPE_TOTAL => TotalMarkFractional::TITLE,
+    ];
+
+
+    /**
      * @var Group\Mapper
      */
     private $gradeLevelGroupMapper;
@@ -204,8 +215,7 @@ class Factory
      */
     protected function spawnForLtiAssessment(LtiAssessment $ltiAssessment)
     {
-        // TODO use LTI assessment's scoreMaximum once SA-12630 is merged
-        return new TotalMarkFractional();
+        return new TotalMarkFractional($ltiAssessment->getLineItemScoreMaximum());
     }
 
     /**
@@ -304,10 +314,7 @@ class Factory
         }
 
         if ($assessable instanceof LtiAssessment) {
-            // TODO replace with a proper mark scheme
-            return [
-                MarkType::TYPE_NONE => None::TITLE,
-            ];
+            return self::$markTypesLtiAssessment;
         }
 
         throw new UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));
