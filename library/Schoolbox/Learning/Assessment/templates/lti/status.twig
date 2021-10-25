@@ -30,9 +30,10 @@
     {% set isPublished  = latestFeedback and latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed) %}
-    {% set pTooltip     = participant.responseRequired ? labelIncomplete : (participant.feedbackRequired ? labelPending : labelReviewed) %}
-    {% set pStatusText  = pTooltip %}
+    {% set pStatusClass   = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed) %}
+    {% set pTooltip       = participant.responseRequired ? labelIncomplete : (participant.feedbackRequired ? labelPending : labelReviewed) %}
+    {% set pStatusText    = pTooltip %}
+    {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
 
     <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}" class="actions-small-1">
         <div class="flex-grade list-item">
@@ -54,8 +55,18 @@
 
         {% set createAttemptIdBase = "createAttempt-" ~ participant.user.id %}
         <nav>
-            <a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work no-text" title="Create Score"></a>
+            <a class="icon-more" title="" data-dropdown="feedbackOptions-{{ participant.user.id }}"></a>
         </nav>
+
+        <ul id="feedbackOptions-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+            {%- apply spaceless %}
+                {% if pActionSummary %}
+                    <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s attempt history">Attempt History</a></li>
+                {% endif %}
+                <li><a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work" title="Create score for {{ participant.user.firstName }}">Create Score...</a></li>
+            {% endapply -%}
+        </ul>
+
         <div id="{{ createAttemptIdBase }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
             <h2>Create score for {{ participant.user.fullname }}</h2>
             <div data-alert="" class="alert-box highlight">
