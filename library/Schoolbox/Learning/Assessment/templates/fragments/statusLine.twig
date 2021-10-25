@@ -16,7 +16,7 @@
                 {% set pStatusClass = 'pending' %}
                 {% set pTooltip = 'Mark required' %}
                 {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
-                {% set multipleResponses = participant.allResponses | length > 1 %}
+                {% set multipleResponses = participant.submittedResponses | length > 1 %}
                 {% if assessable is task %}
                     Self-Assessed
                 {% elseif assessable is quiz %}
