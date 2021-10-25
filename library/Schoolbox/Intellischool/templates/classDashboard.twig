@@ -1,7 +1,7 @@
 {% extends '@intellischool/base.twig' %}
 
 {% block header %}
-    <h1>Intellischool Class Dashboard - {{ folder.name }} ({{ classCode }})</h1>
+    <h1>Class Analytics - {{ folder.name }} ({{ classCode }})</h1>
 
     {# Selector for each class code (if there are multiples) #}
     {% if folder.codes | length > 1 %}
