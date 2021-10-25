@@ -95,8 +95,11 @@ export default {
                 },
                 perPage: 9999, //absurdly large value to avoid pagination as there's no footer
                 resizableColumns: false,
-                selectable: {
-                    mode: 'multiple' //to enable multi-select
+                selectable: { //to enable row selection
+                    mode: 'multiple',
+                    only: function (row) {
+                        return row.submission.status !== 'failed'; //can't mark as resubmission required those rows that are already marked as so
+                    },
                 },
                 sortable: ['student', 'submissionDate'], //only student and submission date are sortable
                 sortIcon: {
@@ -202,6 +205,39 @@ export default {
             }
         },
 
+        /**
+         * Delete the selected users, informing of deletion and clearing them from the table list as well
+         *
+         */
+        async onRequiringResubmissionSelected () {
+            // this.$refs.toast.activate('Deleting...');
+            // try {
+            //     await axios.post(this.action, this.getFormData());
+            //     this.$refs.toast.timeout('Deleted', true, 2000);
+            //     this.$refs.deleteModal.close();
+            //     this.rows = this.getUpdatedRowsAfterUserDeletion();
+            //     this.clearRows();
+            //     this.$refs.table.resetSelectedRows();
+            // } catch (error) {
+            //     this.$refs.toast.timeout('Unable to delete', false, 2000);
+            // }
+        },
+
+        /**
+         * clear the selection
+         */
+        clearRows () {
+            this.selectedRows = [];
+        },
+
+        /**
+         * To clear selected users
+         */
+        onClearSelected () {
+            this.clearRows();
+            this.$refs.table.resetSelectedRows();
+        },
+
     }
 
 }
@@ -215,6 +251,7 @@ export default {
 
             <v-client-table
                 v-if="hasSubmissions"
+                ref="table"
                 :data="tableData"
                 :columns="tableColumns"
                 :options="tableOptions"
@@ -258,8 +295,10 @@ export default {
 
             <bottom-drawer :showDrawer="selectedRowsCount > 0">
                 <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
-                <!-- <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button> -->
-                <!-- <button @click.prevent="onDeleteUsersSelected" class="button submit button-delete">Delete Users</button> -->
+                <button @click.prevent="onClearSelected" @keydown.enter="onClearSelected" class="button-clear">Clear selection</button>
+                <label>Comment</label>
+                <textarea class="comment-field"></textarea>
+                <button @click.prevent="onRequiringResubmissionSelected" @keydown.enter="onRequiringResubmissionSelected" class="button submit button-delete">Mark as resubmission required</button>
             </bottom-drawer>
 
         </div>
@@ -286,6 +325,25 @@ export default {
         padding: 0.5rem 0;
         width: 100%;
     }
+}
+
+.selected-count {
+    display: inline-block; //so .button-clear can sit on the same line
+    margin-right: 1rem;
+}
+
+.button-clear {
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
+    &:hover {
+        background: none;
+    }
+}
+
+.comment-field {
+    min-height: 4rem;
 }
 
 </style>
