@@ -14,6 +14,12 @@ $table-cell-highlight-background: $content-ui-selected;
     @extend .gradient-0;
 }
 
+/* Always hide the broken modal overlay
+ */
+.joyride-modal-bg {
+    display: none !important;
+}
+
 table.rubric {
     th[colspan] {
         background-color: $body-bg;

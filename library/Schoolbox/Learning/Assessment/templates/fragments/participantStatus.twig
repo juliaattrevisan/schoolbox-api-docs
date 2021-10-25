@@ -47,7 +47,7 @@
         </script>
         <div id="similarity-preview-set-{{ latestResponse.id }}">
             <ol class="joyride-list" data-joyride>
-                <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="tip_location: top; next_button: false; prev_button: false">
+                <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="modal: false; tip_location: top; next_button: false; prev_button: false">
                     <strong>Submitted {{ latestResponse.submittedAt.local }}</strong>
                     {% for file in latestResponse.allFiles %}
                         <ul class='information-list'>
