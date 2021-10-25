@@ -107,7 +107,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
-        $this->setBlock($templateHandle, 'cohort_profile_link', 'cohort_profile_link_block');
+        $this->setBlock($templateHandle, 'class_analytics_link', 'class_analytics_link_block');
 
         // Determine the term for the grades link
         $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
@@ -277,8 +277,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('course_link_block', '');
         }
 
-        // Cohort profile link
-        $this->setVar('cohort_profile_link_block', '');
+        // Class analytics link
+        $this->setVar('class_analytics_link_block', '');
         if ($isClassPage) {
             $cohortProfileRoute = 'intellischool.getBaseClassDashboard';
             $params             = [
@@ -286,8 +286,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                 'folderId' => $this->getContext()->getId(),
             ];
             if ($this->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $this->getUser())) {
-                $this->setVar('COHORT_PROFILE_LINK', $this->getRouter()->generate($cohortProfileRoute, $params));
-                $this->parse('cohort_profile_link_block', 'cohort_profile_link');
+                $this->setVar('CLASS_ANALYTICS_LINK', $this->getRouter()->generate($cohortProfileRoute, $params));
+                $this->parse('class_analytics_link_block', 'class_analytics_link');
             }
         }
 
