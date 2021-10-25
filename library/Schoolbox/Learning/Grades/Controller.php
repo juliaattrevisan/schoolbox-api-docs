@@ -193,7 +193,7 @@ class Controller extends Base
          * It's kind of inefficient because we just hydrated a bunch of interactions + folders
          * which might potentially be discarded entirely
          */
-        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'), $term);
 
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = $folders->filter(
@@ -203,25 +203,7 @@ class Controller extends Base
             }
         )->indexBy('id');
 
-        /* If we're in an Extraordinary Term, limit the list of $folders to those which occur
-         * as being related to the Extraordinary Term.
-         */
-        $terms = $this->termMapper->findAllNonExtraordinary();
-        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
-
-        if ($extraordinaryTerm->getExtraordinary()) {
-            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($extraordinaryTerm);
-
-            $folders = $folders->filter(
-                static function (Folder\Model $folder) use ($extraordinaryFolders) {
-                    return isset($extraordinaryFolders[$folder->getId()]);
-                }
-            );
-
-            /* Prepend it to the list of Terms, because it's special
-             */
-            $terms->prepend($extraordinaryTerm);
-        }
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         // Load Teachers
         foreach ($folders as $folder) {
@@ -349,7 +331,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'         => $viewee,
@@ -426,7 +408,7 @@ class Controller extends Base
 
         // Get folders for drop-down.
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
-        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'), $term);
         $folders = $folders->filter(
             static function (Folder\Model $folder) use ($displayFolderIds) {
                 return in_array($folder->getId(), $displayFolderIds);
@@ -438,7 +420,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
 
         $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
