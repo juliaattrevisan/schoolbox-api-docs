@@ -49,6 +49,8 @@ module.exports = {
             './www/static/js/foundation/foundation.tab.js',
             './www/static/js/foundation/foundation.tooltip.js',
             './www/static/js/foundation/foundation.dropdown.js',
+            './www/static/js/foundation/foundation.joyride.js',
+            './www/static/js/foundation/jquery.cookie.js',
             './www/static/js/foundation/jquery.tab-activator.js',
             './www/static/js/foundation/jquery.collapsable.js',
 

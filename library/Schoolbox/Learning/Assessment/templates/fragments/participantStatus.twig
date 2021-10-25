@@ -36,22 +36,33 @@
 
         {# Only show some turnitin details if present #}
         {% if latestResponse is defined and latestResponse and latestResponse.allFiles|length %}
-        <span class="pipe meta">
-            Similarity Report Summary <span class="hint has-tip tip-bottom" data-tooltip title="
-                <strong>Submitted {{ latestResponse.submittedAt.local }}</strong>
-                {% for file in latestResponse.allFiles %}
-                <ul class='information-list'>
-                    {% if file.turnitin %}
-                    <li>
-                        <strong>{{ file.turnitin.overallMatchPercentage }}%</strong> {{ file.basename }}
-                    </li>
-                    {% endif %}
-                </ul>
-                {% endfor %}
+        <span class="pipe meta"><a id="similarity-preview-{{ latestResponse.id }}">Similarity</a></span>
 
-                Review Submission
-            ">?</span>
-        </span>
+        <script>
+            $(function() {
+                $('#similarity-preview-{{ latestResponse.id }}').click(function() {
+                    $('#similarity-preview-set-{{ latestResponse.id }}').foundation('joyride', 'start');
+                });
+            });
+        </script>
+        <div id="similarity-preview-set-{{ latestResponse.id }}">
+            <ol class="joyride-list" data-joyride>
+                <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="tip_location: top; next_button: false; prev_button: false">
+                    <strong>Submitted {{ latestResponse.submittedAt.local }}</strong>
+                    {% for file in latestResponse.allFiles %}
+                        <ul class='information-list'>
+                            {% if file.turnitin %}
+                                <li>
+                                    <strong>{{ file.turnitin.overallMatchPercentage }}%</strong> {{ file.basename }}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endfor %}
+
+                    Review Submission
+                </li>
+            </ol>
+        </div>
         {% endif %}
     </p>
 </div>
