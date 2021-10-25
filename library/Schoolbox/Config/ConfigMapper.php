@@ -63,6 +63,7 @@ class ConfigMapper extends Mapper
     public const FIELD_TIME_PICKER   = 15;
     public const FIELD_NUMBER        = 16;
     public const FIELD_SELECT_MULTI  = 17;
+    public const FIELD_SELECT_DATE   = 18;
 
     // Type enum
     public const TYPE_SITE          =  1;
