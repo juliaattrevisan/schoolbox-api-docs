@@ -555,11 +555,11 @@ class Profile implements IStrategy
     /**
      * Convert a date from possibly null/empty value
      *
-     * @param string $date
+     * @param string|null $date
      * @return Alaress_Date_Format|null
      * @throws \InvalidArgumentException
      */
-    public function findDate(string $date): ?Alaress_Date_Format
+    public function findDate(?string $date): ?Alaress_Date_Format
     {
         if ($date) {
             return new \Alaress_Date_Format($date, 'd/m/Y');
