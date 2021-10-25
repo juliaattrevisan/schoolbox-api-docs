@@ -36,20 +36,30 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+
+        // Various permissions
         $basePermission = new Rule\All(
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL, $this->getConfig()),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
-            )
         );
-        $studentPreload = function ($params) {
+        $staffPermission = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+        );
+        $parentPermission = new Rule\LazyCallback(function () use ($userMapper) {
+            return new Rule\IsParentOfUser($this->getExternalUser(), $userMapper, 'studentId');
+        });
+        $studentPermission = new Rule\IsUser('studentId');
+
+        // Various preloads
+        $studentPreload = function ($params) use ($userMapper) {
             return [
-                'student' => $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']),
+                'student' => $userMapper->findById($params['studentId']),
             ];
         };
         $folderPreload = function ($params) {
@@ -69,25 +79,30 @@ class Module extends BaseModule
             }
             throw new NotFound();
         };
+
+        // Routes
         $this->register(
             'GET',
             "/student/{studentId}",
             'getStudentDashboard',
-            $basePermission,
+            new Rule\All(
+                $basePermission,
+                new Rule\Any($staffPermission, $parentPermission, $studentPermission)
+            ),
             $studentPreload,
         );
         $this->register(
             BaseModule::METHOD_GET,
             "/class/{folderId}",
             'getBaseClassDashboard',
-            $basePermission,
+            new Rule\All($basePermission, $staffPermission),
             $folderPreload,
         );
         $this->register(
             BaseModule::METHOD_GET,
             "/class/{folderId}/code/{classCode}",
             'getClassDashboard',
-            $basePermission,
+            new Rule\All($basePermission, $staffPermission),
             $classCodePreload,
         );
     }
