@@ -280,7 +280,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         // Class analytics link
         $this->setVar('class_analytics_link_block', '');
         if ($isClassPage) {
-            $cohortProfileRoute = 'intellischool.getBaseClassDashboard';
+            $cohortProfileRoute = 'intellischool.getClassAnalytics';
             $params             = [
                 'folder'   => $this->getContext(),
                 'folderId' => $this->getContext()->getId(),

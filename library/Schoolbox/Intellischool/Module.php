@@ -84,7 +84,7 @@ class Module extends BaseModule
         $this->register(
             'GET',
             "/student/{studentId}",
-            'getStudentDashboard',
+            'getStudentAnalytics',
             new Rule\All(
                 $basePermission,
                 new Rule\Any($staffPermission, $parentPermission, $studentPermission)
@@ -94,14 +94,14 @@ class Module extends BaseModule
         $this->register(
             BaseModule::METHOD_GET,
             "/class/{folderId}",
-            'getBaseClassDashboard',
+            'getClassAnalytics',
             new Rule\All($basePermission, $staffPermission),
             $folderPreload,
         );
         $this->register(
             BaseModule::METHOD_GET,
             "/class/{folderId}/code/{classCode}",
-            'getClassDashboard',
+            'getClassCodeAnalytics',
             new Rule\All($basePermission, $staffPermission),
             $classCodePreload,
         );

@@ -8,7 +8,7 @@
         <dl class="tabs">
             {% for code in folder.codes %}
                 <dd class="{% if code.code == classCode %}active{% endif %}">
-                    <a href="{{ routeLookup('intellischool.getClassDashboard', {folderId: folder.id, classCode: code.code}) }}">{{ code.code }}</a>
+                    <a href="{{ routeLookup('intellischool.getClassCodeAnalytics', {folderId: folder.id, classCode: code.code}) }}">{{ code.code }}</a>
                 </dd>
             {% endfor %}
         </dl>

@@ -453,7 +453,7 @@
 
                             {% block buttons_student_analytics %}
                                 {% set studentAnalyticsLink = routeLookupIfAuthorized(
-                                    'intellischool.getStudentDashboard',
+                                    'intellischool.getStudentAnalytics',
                                     {student: user, studentId: user.id}
                                 ) %}
                                 {% if studentAnalyticsLink %}

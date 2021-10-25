@@ -43,7 +43,7 @@ class Controller extends Base
      *
      * @param User $student
      */
-    public function getStudentDashboard(User $student): void
+    public function getStudentAnalytics(User $student): void
     {
         $this->response->content->set(
             $this->buildHtmlOutput(
@@ -67,7 +67,7 @@ class Controller extends Base
      * @param Model $folder
      * @throws NotFound if `$folder` has no class codes
      */
-    public function getBaseClassDashboard(Model $folder): void
+    public function getClassAnalytics(Model $folder): void
     {
         $classCodes = $folder->getCodes();
         if (!$classCodes) {
@@ -79,7 +79,7 @@ class Controller extends Base
         }
         $this->response->redirect->to(
             $this->router->generate(
-                'intellischool.getClassDashboard',
+                'intellischool.getClassCodeAnalytics',
                 ['folderId' => $folder->getId(), 'classCode' => $firstClassCode->getCode()],
             )
         );
@@ -95,7 +95,7 @@ class Controller extends Base
      * @param string $classCode
      * @throws NotFound if `$classCode` isn't a class code in `$folder`
      */
-    public function getClassDashboard(Model $folder, string $classCode): void
+    public function getClassCodeAnalytics(Model $folder, string $classCode): void
     {
         // Verify this class code actually belongs to the folder
         $classCodes = $folder->getCodes();
