@@ -36,6 +36,8 @@
 
         {# Only show some turnitin details if present #}
         {% if latestResponse is defined and latestResponse and latestResponse.allFiles|length %}
+        {% import '@learning/macro/urgency.twig' as urgency %}
+
         <span class="pipe meta"><a id="similarity-preview-{{ latestResponse.id }}">Similarity</a></span>
 
         <script>
@@ -48,13 +50,13 @@
         <div id="similarity-preview-set-{{ latestResponse.id }}">
             <ol class="joyride-list" data-joyride>
                 <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="modal: false; tip_location: top; next_button: false; prev_button: false">
-                    <h4>Submitted {{ latestResponse.submittedAt.local }}</h4>
+                    <h5>Submitted {{ latestResponse.submittedAt.local }}</h5>
 
                     <ul class='information-list similarity-preview'>
                         {% for file in latestResponse.allFiles %}
                         {% if file.turnitin %}
                             <li>
-                                <strong>{{ file.turnitin.overallMatchPercentage }}%</strong> {{ file.basename }}
+                                <span class="{{ urgency.similarity(file.turnitin.overallMatchPercentage) }}">{{ file.turnitin.overallMatchPercentage }}%</span> {{ file.basename }}
                             </li>
                         {% endif %}
                         {% endfor %}
