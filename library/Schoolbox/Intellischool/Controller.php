@@ -36,9 +36,9 @@ class Controller extends Base
     }
 
     /**
-     * Intellischool student dashboard.
+     * Intellischool student analytics.
      *
-     * @api GET /intellischool/student/{studentId}
+     * @api GET /modules/intellischool/student/{studentId}
      * @since 21.1.0
      *
      * @param User $student
@@ -52,16 +52,16 @@ class Controller extends Base
                     'student' => $student,
                     'jwt'     => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
                 ],
-                'Intellischool Student Dashboard - ' . $student->getFullName(),
+                'Student Analytics - ' . $student->getFullName(),
             )
         );
     }
 
     /**
-     * Intellischool default class dashboard: redirects to the first class code
+     * Intellischool default class analytics: redirects to the first class code
      * for this folder, or 404s if the folder has no class code.
      *
-     * @api GET /intellischool/class/{folderId}
+     * @api GET /modules/intellischool/class/{folderId}
      * @since 21.1.0
      *
      * @param Model $folder
@@ -86,9 +86,9 @@ class Controller extends Base
     }
 
     /**
-     * Intellischool class dashboard.
+     * Intellischool class analytics.
      *
-     * @api GET /intellischool/class/{folderId}/code/{classCode}
+     * @api GET /modules/intellischool/class/{folderId}/code/{classCode}
      * @since 21.1.0
      *
      * @param Model $folder
@@ -117,7 +117,7 @@ class Controller extends Base
                     'classCode' => $classCode,
                     'jwt'       => $this->jwtFactory->buildForClass($this->getUser(), $classCode),
                 ],
-                sprintf('Intellischool Class Dashboard - %s (%s)', $folder->getName(), $classCode),
+                sprintf('Class Analytics - %s', $folder->getTitle()),
             )
         );
     }
