@@ -1,3 +1,9 @@
+-- These should disappear now, I guess
+DROP TABLE `_deleted_component_config_definition`;
+DROP TABLE `_deleted_component_config_instance`;
+DROP TABLE `_pastoral_report_groups`;
+
+-- Unlock Tour tables' columns so we can update their stuff
 SET foreign_key_checks = 0;
 
 ALTER TABLE `comms_news_audience_complex`
