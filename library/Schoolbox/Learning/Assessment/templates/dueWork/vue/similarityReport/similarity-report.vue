@@ -1,7 +1,7 @@
 <script>
 
 /**
- * Show a smiliarity report for a due work, showing a list of students latest submissions. 
+ * Show a smiliarity report for a due work, showing a list of students latest submissions.
  * The list can be filtered by similarity score and submission status
  */
 
@@ -18,14 +18,14 @@ export default {
   components: {
     SimilarityReportFilters
   },
-  
+
   props: {
     payloadUrl: { //where to get the tableData from
       type: String,
       required: true
     },
   },
-  
+
   data () {
     return {
       isDataLoaded: false, //show loading display until true
@@ -33,32 +33,32 @@ export default {
       tableData: [], //hold all student tableData
       tableColumns: ['student', 'submissionDate', 'similarity',  'status'], //the table tableColumns
       tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-        customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info 
-          {    
-            name: FilterEvents.SIMILARITY_SCORE,    
-            callback: (row, filteredPercentage) => { 
+        customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+          {
+            name: FilterEvents.SIMILARITY_SCORE,
+            callback: (row, filteredPercentage) => {
               const hasFilesAboveSimilarity = row.files.some((file) => {
                 return parseInt(file.turnitin.percentage.overall) >= parseInt(filteredPercentage.overall);
               });
               return hasFilesAboveSimilarity;
             }
           },
-          {    
-            name: FilterEvents.RESUBMISSION_REQUIRED,    
-            callback: (row, query) => { 
-              return row.submission.status !== query; 
+          {
+            name: FilterEvents.RESUBMISSION_REQUIRED,
+            callback: (row, query) => {
+              return row.submission.status !== query;
             }
           },
-          {    
-            name: FilterEvents.MARKING_REQUIRED,    
-            callback: (row, query) => { 
-              return row.submission.status !== query; 
+          {
+            name: FilterEvents.MARKING_REQUIRED,
+            callback: (row, query) => {
+              return row.submission.status !== query;
             }
           },
-          {    
-            name: FilterEvents.REVIEWED,    
-            callback: (row, query) => { 
-              return row.submission.status !== query; 
+          {
+            name: FilterEvents.REVIEWED,
+            callback: (row, query) => {
+              return row.submission.status !== query;
             }
           },
         ],
@@ -66,9 +66,9 @@ export default {
           student: (ascending) => { //sort student by lastname
             return (a, b) => {
               if (ascending) {
-                return a.user.lastname >= b.user.lastname ? 1 : -1; 
-              } 
-              return a.user.lastname <= b.user.lastname ? 1 : -1;                         
+                return a.user.lastname >= b.user.lastname ? 1 : -1;
+              }
+              return a.user.lastname <= b.user.lastname ? 1 : -1;
             }
           },
           submissionDate: (ascending) => { //sort submission date accurately by the timestamp
@@ -77,7 +77,7 @@ export default {
                 return a.submission.submitted_at.timestamp >= b.submission.submitted_at.timestamp ? 1 : -1;
               }
               return a.submission.submitted_at.timestamp <= b.submission.submitted_at.timestamp ? 1 : -1;
-            }                     
+            }
           }
         },
         filterable: false, //this hides the search input field, the custom filters still function as expected
@@ -89,7 +89,7 @@ export default {
         },
         orderBy: { //initial sorting display
           ascending: true,
-          column: 'student' 
+          column: 'student'
         },
         perPage: 9999, //absurdly large value to avoid pagination as there's no footer
         resizableColumns: false,
@@ -101,7 +101,7 @@ export default {
           down: 'glyphicon-chevron-down'
         },
         tabbable: false,
-        templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info        
+        templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
           student: SimilarityReportRowStudent,
           submissionDate: SimilarityReportRowSubmissionDate,
           similarity: SimilarityReportRowSimilarity,
@@ -121,7 +121,7 @@ export default {
 
     /**
      * To show a note showing no students have submitted yet
-     * 
+     *
      * @returns { Boolean }
      */
     hasNoSubmissions () {
@@ -130,7 +130,7 @@ export default {
 
     /**
      * Can show the table
-     * 
+     *
      * @returns { Boolean }
      */
     hasSubmissions () {
@@ -169,14 +169,14 @@ export default {
 <template>
 
   <div class="row">
-    
+
     <div class="small-12 island">
 
-      <v-client-table 
+      <v-client-table
         v-if="hasSubmissions"
-        :data="tableData" 
-        :columns="tableColumns" 
-        :options="tableOptions" 
+        :data="tableData"
+        :columns="tableColumns"
+        :options="tableOptions"
       >
         <div slot="beforeTable">
           <similarity-report-filters />
@@ -191,7 +191,7 @@ export default {
       <div v-else-if="hasDataLoadError">
         <section class="content">
           <div tableData-alert class="alert-box alert">
-            Sorry, we are currently unable to load the Similarity Report. Please contact Schoolbox Support it the problem persists. 
+            Sorry, we are currently unable to load the similarity report. Please contact your support it the problem persists.
           </div>
         </section>
       </div>
@@ -237,7 +237,7 @@ export default {
     display: block;
     padding: 0.5rem 0;
     width: 100%;
-  }  
+  }
 }
 
 </style>

@@ -5,8 +5,8 @@ import SimilarityReport from './similarity-report';
 Vue.use(ClientTable);
 
 new Vue({
-  el: '#similarity-report-container',
-  components: {
-    SimilarityReport
-  }
+    el: '#similarity-report-container',
+    components: {
+        SimilarityReport
+    }
 });

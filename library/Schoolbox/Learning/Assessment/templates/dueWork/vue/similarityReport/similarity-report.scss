@@ -2,18 +2,18 @@
 $tableToSingleColumn: 750px;
 
 .title-on-single-column { //to show the row title when at single column, ie <div class="title-on-single-column" data-title="Submission date"> 
-  position: relative;
-  &:before {
-    content: attr(data-title); //will just be blank if no data-title is set
-    display: none;
-    font-size: 0.8rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    width: 100%;
-  }
-  @media (max-width: $tableToSingleColumn) {
+    position: relative;
     &:before {
-      display: block;
+        content: attr(data-title); //will just be blank if no data-title is set
+        display: none;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        width: 100%;
     }
-  }
+    @media (max-width: $tableToSingleColumn) {
+        &:before {
+            display: block;
+        }
+    }
 }
