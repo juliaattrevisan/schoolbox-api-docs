@@ -1,6 +1,9 @@
+{% block header %}
+{% endblock header %}
+
 <div class="scroll-wrapper">
     <form id="iframeForm" method="post" action="https://core.intellischool.net/auth/lti" target="iframe">
-        <input type="hidden" name="id_token" value="{{ idToken }}">
+        <input type="hidden" name="id_token" value="{{ jwt }}">
     </form>
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {

@@ -47,10 +47,12 @@ class Controller extends Base
     {
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@intellischool/index.twig',
+                '@intellischool/studentDashboard.twig',
                 [
-                    'idToken' => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
+                    'student' => $student,
+                    'jwt'     => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
                 ],
+                'Intellischool Student Dashboard - ' . $student->getFullName(),
             )
         );
     }
@@ -78,7 +80,7 @@ class Controller extends Base
         $this->response->redirect->to(
             $this->router->generate(
                 'intellischool.getClassDashboard',
-                ['folderId' => $folder->getId(), 'classCode' => $firstClassCode->getCode()]
+                ['folderId' => $folder->getId(), 'classCode' => $firstClassCode->getCode()],
             )
         );
     }
@@ -109,10 +111,13 @@ class Controller extends Base
         // Output the class code
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@intellischool/index.twig',
+                '@intellischool/classDashboard.twig',
                 [
-                    'idToken' => $this->jwtFactory->buildForClass($this->getUser(), $classCode),
+                    'folder'    => $folder,
+                    'classCode' => $classCode,
+                    'jwt'       => $this->jwtFactory->buildForClass($this->getUser(), $classCode),
                 ],
+                sprintf('Intellischool Class Dashboard - %s (%s)', $folder->getName(), $classCode),
             )
         );
     }
