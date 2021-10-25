@@ -38,6 +38,9 @@ class Registry
     /** @var Alaress_Date_Format */
     protected $touchedAt;
 
+    /** @var Alaress_Date_Format */
+    protected $deletedAt;
+
 
     /**
      * @return User
