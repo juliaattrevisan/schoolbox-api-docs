@@ -121,6 +121,16 @@ ADD CONSTRAINT `tour_step_event_tour_step_uuid_fk`
   FOREIGN KEY (`tour_step_uuid`)
   REFERENCES `tour_step` (`uuid`);
 
+ALTER TABLE `tour_step_modal`
+DROP FOREIGN KEY `tour_step_modal_tour_step_uuid_fk`;
+ALTER TABLE `tour_step_modal`
+CHANGE COLUMN `uuid` `uuid` VARCHAR(36) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ,
+CHANGE COLUMN `tour_step_uuid` `tour_step_uuid` VARCHAR(36) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ;
+ALTER TABLE `tour_step_modal`
+ADD CONSTRAINT `tour_step_modal_tour_step_uuid_fk`
+  FOREIGN KEY (`tour_step_uuid`)
+  REFERENCES `tour_step` (`uuid`);
+
 ALTER TABLE `tour_step_tooltip`
 DROP FOREIGN KEY `tour_step_tooltip_tour_step_uuid_fk`;
 ALTER TABLE `tour_step_tooltip`
