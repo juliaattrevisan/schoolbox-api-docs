@@ -12,6 +12,7 @@ import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
 import SimilarityReportRowSimilarity from './similarity-report-row-similiarity';
 import SimilarityReportRowStatus from './similarity-report-row-status';
+import { timeout } from '@js/util/jsUtils';
 
 
 export default {
@@ -101,9 +102,9 @@ export default {
                 resizableColumns: false,
                 selectable: { //to enable row selection
                     mode: 'multiple',
-                    only: function (row) {
-                        return row.submission.status !== 'failed'; //can't mark as resubmission required those rows that are already marked as so
-                    },
+                    // only: function (row) {
+                    //     return row.submission.status !== 'failed'; //can't mark as resubmission required those rows that are already marked as so
+                    // },
                 },
                 sortable: ['student', 'submissionDate'], //only student and submission date are sortable
                 sortIcon: {
@@ -129,6 +130,7 @@ export default {
             singleRowName: 'submission',
             pluralRowName: 'submissions',
             selectedRows: [], //keep track of which rows could be deleted
+            isProcessing: false,
         }
     },
 
@@ -155,7 +157,7 @@ export default {
         /**
          * To track how many are selected
          *
-         * @returns {Number}
+         * @returns { Number }
          */
         selectedRowsCount () {
             return this.selectedRows.length;
@@ -164,7 +166,7 @@ export default {
         /**
          * For proper count display, eg: '1 user' / '4 users'
          *
-         * @returns {String}
+         * @returns { String }
          */
         selectedRowsCountWithRowName () {
             if (this.selectedRowsCount === 0) {
@@ -174,6 +176,28 @@ export default {
             } else {
                 return this.selectedRowsCount + ' ' + this.pluralRowName;
             }
+        },
+
+        /**
+         * To update when processing/updated the form
+         *
+         * @returns { String }
+         */
+        submitButtonText () {
+            if (this.isProcessing) {
+                return 'Processing, please wait...';
+            } else {
+                return 'Mark as resubmission required';
+            }
+        },
+
+        /**
+         *  Prevent further selection when already processing
+         *
+         * @returns { Boolean }
+         */
+        isSubmitDisabled () {
+            return this.isProcessing;
         },
 
     },
@@ -202,12 +226,11 @@ export default {
 
         /**
          * to keep track of selected rows
+         *
+         * @param { Object }
          */
-        onRowSelected (event) {
-            this.selectedRows = event;
-            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
-                this.hasSelectedShiftKey = true;
-            }
+        onRowSelected (selectedRows) {
+            this.selectedRows = selectedRows;
         },
 
         /**
@@ -215,17 +238,22 @@ export default {
          *
          */
         async onRequiringResubmissionSelected () {
-            // this.$refs.toast.activate('Deleting...');
+            this.isProcessing = true;
             try {
-
-                const response = await fetch(`/learning/assessments/${this.assessmentId}/17/feedback`, {
-                    method: 'POST',
-                    body: this.getFormData(),
+                const promises = [];
+                this.selectedRows.forEach((row) => {
+                    promises.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
+                        method: 'POST',
+                        body: this.getFormData(),
+                    }));
                 });
-                // this.$refs.toast.timeout('Deleted', true, 2000);
-                // mark the elements
+                await Promise.all(promises);
+                this.isProcessing = false;
+                this.comment = '';
                 this.clearRows();
             } catch (error) {
+                this.isProcessing = false;
+                console.warn(error);
                 // this.$refs.toast.timeout('Unable to delete', false, 2000);
             }
         },
@@ -238,9 +266,9 @@ export default {
          */
         getFormData () {
             const formData = new FormData();
-            formData.append('resubmissionRequired', '1');
-            formData.append('publish', '1');
+            // formData.append('resubmissionRequired', '1');
             formData.append('comment', this.comment);
+            // formData.append('publish', '1');
             return formData;
         },
 
@@ -319,7 +347,7 @@ export default {
                 <button @click.prevent="onClearSelected" @keydown.enter="onClearSelected" class="button-clear">Clear selection</button>
                 <label>Comment</label>
                 <textarea class="comment-field" v-model="comment"></textarea>
-                <button @click.prevent="onRequiringResubmissionSelected" @keydown.enter="onRequiringResubmissionSelected" class="button submit button-delete">Mark as resubmission required</button>
+                <button @click.prevent="onRequiringResubmissionSelected" @keydown.enter="onRequiringResubmissionSelected" class="button submit button-delete" :disabled="isSubmitDisabled">{{ submitButtonText }}</button>
             </bottom-drawer>
 
         </div>
