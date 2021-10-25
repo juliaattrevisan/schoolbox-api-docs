@@ -37,20 +37,9 @@
 
         {# Only show some turnitin details if present #}
         {% if latestResponse is defined and latestResponse and latestResponse.allFiles|length %}
-            {# Lookahead in the list of files to see if there is anything to show
-             # Response can consist of files that turnitin won't accept
-             #}
-            {% set hasAtLeastOneTurnitin = false %}
 
-            {% for file in latestResponse.allFiles %}
-                {% if file.turnitin and file.turnitin.isComplete %}
-                    {% set hasAtLeastOneTurnitin = true %}
-                {% endif %}
-            {% endfor %}
-
-            {% if hasAtLeastOneTurnitin %}
                 {% import '@learning/macro/urgency.twig' as urgency %}
-                <span class="pipe meta"><a id="similarity-preview-{{ latestResponse.id }}">Similarity</a></span>
+                <span class="pipe meta"><a id="similarity-preview-{{ latestResponse.id }}">Preview Submission</a></span>
 
                 <script>
                     $(function() {
@@ -69,23 +58,30 @@
                     <ol class="joyride-list" data-joyride>
                         <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="modal: false; tip_location: bottom; next_button: false; prev_button: false">
                             <h5>Submitted {{ latestResponse.submittedAt.short }}</h5>
-
-                            <ul class='information-list similarity-preview'>
+                            <ul class='information-list'>
                                 {% for file in latestResponse.allFiles %}
-                                    {% if file.turnitin and file.turnitin.isComplete %}
-                                        {% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
-                                            assessmentId: participant.assessable.id,
-                                            assessment:   participant.assessable,
-                                            responseId:   latestResponse.id,
-                                            response:     latestResponse,
-                                            participant:  participant,
-                                            turnitinId:   file.turnitin.id })
-                                        %}
                                         <li>
-                                            <a href="{{ reportRoute }}">
-                                            <span class="percentage {{ urgency.similarity(file.turnitin.overallMatchPercentage) }}">{{ file.turnitin.overallMatchPercentage }}%</span> {{ file.basename }}</a>
+                                            <div class="list-item">
+                                                <div class="card small-12">
+                                                    {% set responseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: latestResponse.assessable.id, studentId: latestResponse.submittedOnBehalfOf.id, responseId: latestResponse.id, response: latestResponse}) %}
+
+                                                    <a href="{{ responseRoute }}?hash={{ file.hash }}" title="{{ file.filename }}">
+                                                        <img src="/ajax/mime/{{ file.mime }}" alt="Download" class="mime" height="60" width="60"/>
+                                                        <h3>{{ file.filename }}</h3>
+                                                    </a>
+                                                     {% if file.turnitin and file.turnitin.isComplete %}
+                                                        {# Similarity Check #}
+                                                        {% include '@learning/dueWork/turnitin/status.twig' with {
+                                                            assessment: latestResponse.assessable,
+                                                            response: latestResponse,
+                                                            currentFile: file
+                                                        } %}
+                                                         {% else %}
+                                                             <p class="meta">{{ file.size|bytes }}</p>
+                                                     {% endif %}
+                                                </div>
+                                            </div>
                                         </li>
-                                    {% endif %}
                                 {% endfor %}
                             </ul>
 
@@ -93,7 +89,6 @@
                         </li>
                     </ol>
                 </div>
-            {% endif %}
         {% endif %}
     </p>
 </div>

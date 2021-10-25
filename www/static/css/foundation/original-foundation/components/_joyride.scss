@@ -11,7 +11,7 @@ $include-html-joyride-classes: $include-html-classes !default;
 
 // Controlling default Joyride styles
 $joyride-tip-bg: $oil !default;
-$joyride-tip-default-width: 300px !default;
+$joyride-tip-default-width: 350px !default;
 $joyride-tip-padding: rem-calc(18 20 24) !default;
 $joyride-tip-border: solid 1px $charcoal !default;
 $joyride-tip-radius: 4px !default;
@@ -19,8 +19,8 @@ $joyride-tip-position-offset: 22px !default;
 
 // Here, we're setting the tip font styles
 $joyride-tip-font-color: $white !default;
-$joyride-tip-font-size: rem-calc(14) !default;
-$joyride-tip-header-weight: $font-weight-bold !default;
+$joyride-tip-font-size: rem-calc(13) !default;
+$joyride-tip-header-weight: $font-weight-normal !default;
 
 // This changes the nub size
 $joyride-tip-nub-size: 10px !default;
