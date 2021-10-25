@@ -6,6 +6,7 @@
  */
 
 import SimilarityReportFilters from './similarity-report-filters';
+import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
 import FilterEvents from './similarityReportFilterEvents';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
@@ -15,208 +16,256 @@ import SimilarityReportRowStatus from './similarity-report-row-status';
 
 export default {
 
-  components: {
-    SimilarityReportFilters
-  },
-
-  props: {
-    payloadUrl: { //where to get the tableData from
-      type: String,
-      required: true
+    components: {
+        SimilarityReportFilters,
+        BottomDrawer,
     },
-  },
 
-  data () {
-    return {
-      isDataLoaded: false, //show loading display until true
-      hasDataLoadError: false, //display load error
-      tableData: [], //hold all student tableData
-      tableColumns: ['student', 'submissionDate', 'similarity',  'status'], //the table tableColumns
-      tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-        customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
-          {
-            name: FilterEvents.SIMILARITY_SCORE,
-            callback: (row, filteredPercentage) => {
-              const hasFilesAboveSimilarity = row.files.some((file) => {
-                return parseInt(file.turnitin.percentage.overall) >= parseInt(filteredPercentage.overall);
-              });
-              return hasFilesAboveSimilarity;
-            }
-          },
-          {
-            name: FilterEvents.RESUBMISSION_REQUIRED,
-            callback: (row, query) => {
-              return row.submission.status !== query;
-            }
-          },
-          {
-            name: FilterEvents.MARKING_REQUIRED,
-            callback: (row, query) => {
-              return row.submission.status !== query;
-            }
-          },
-          {
-            name: FilterEvents.REVIEWED,
-            callback: (row, query) => {
-              return row.submission.status !== query;
-            }
-          },
-        ],
-        customSorting: {
-          student: (ascending) => { //sort student by lastname
-            return (a, b) => {
-              if (ascending) {
-                return a.user.lastname >= b.user.lastname ? 1 : -1;
-              }
-              return a.user.lastname <= b.user.lastname ? 1 : -1;
-            }
-          },
-          submissionDate: (ascending) => { //sort submission date accurately by the timestamp
-            return (a, b) => {
-              if (ascending) {
-                return a.submission.submitted_at.timestamp >= b.submission.submitted_at.timestamp ? 1 : -1;
-              }
-              return a.submission.submitted_at.timestamp <= b.submission.submitted_at.timestamp ? 1 : -1;
-            }
-          }
+    props: {
+        payloadUrl: { //where to get the tableData from
+            type: String,
+            required: true
         },
-        filterable: false, //this hides the search input field, the custom filters still function as expected
-        headings: {
-          student: 'Student',
-          submissionDate: 'Submission date',
-          similarity: 'Similarity %',
-          status: 'Status',
+    },
+
+    data () {
+        return {
+            isDataLoaded: false, //show loading display until true
+            hasDataLoadError: false, //display load error
+            tableData: [], //hold all student tableData
+            tableColumns: ['student', 'submissionDate', 'similarity',    'status'], //the table tableColumns
+            tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+                    {
+                        name: FilterEvents.SIMILARITY_SCORE,
+                        callback: (row, filteredPercentage) => {
+                            const hasFilesAboveSimilarity = row.files.some((file) => {
+                                return parseInt(file.turnitin.percentage.overall) >= parseInt(filteredPercentage.overall);
+                            });
+                            return hasFilesAboveSimilarity;
+                        }
+                    },
+                    {
+                        name: FilterEvents.RESUBMISSION_REQUIRED,
+                        callback: (row, query) => {
+                            return row.submission.status !== query;
+                        }
+                    },
+                    {
+                        name: FilterEvents.MARKING_REQUIRED,
+                        callback: (row, query) => {
+                            return row.submission.status !== query;
+                        }
+                    },
+                    {
+                        name: FilterEvents.REVIEWED,
+                        callback: (row, query) => {
+                            return row.submission.status !== query;
+                        }
+                    },
+                ],
+                customSorting: {
+                    student: (ascending) => { //sort student by lastname
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.user.lastname >= b.user.lastname ? 1 : -1;
+                            }
+                            return a.user.lastname <= b.user.lastname ? 1 : -1;
+                        }
+                    },
+                    submissionDate: (ascending) => { //sort submission date accurately by the timestamp
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.submission.submitted_at.timestamp >= b.submission.submitted_at.timestamp ? 1 : -1;
+                            }
+                            return a.submission.submitted_at.timestamp <= b.submission.submitted_at.timestamp ? 1 : -1;
+                        }
+                    }
+                },
+                filterable: false, //this hides the search input field, the custom filters still function as expected
+                headings: {
+                    student: 'Student',
+                    submissionDate: 'Submission date',
+                    similarity: 'Similarity %',
+                    status: 'Status',
+                },
+                orderBy: { //initial sorting display
+                    ascending: true,
+                    column: 'student'
+                },
+                perPage: 9999, //absurdly large value to avoid pagination as there's no footer
+                resizableColumns: false,
+                selectable: {
+                    mode: 'multiple' //to enable multi-select
+                },
+                sortable: ['student', 'submissionDate'], //only student and submission date are sortable
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
+                },
+                tabbable: false,
+                templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
+                    student: SimilarityReportRowStudent,
+                    submissionDate: SimilarityReportRowSubmissionDate,
+                    similarity: SimilarityReportRowSimilarity,
+                    status: SimilarityReportRowStatus,
+                },
+                texts: {
+                    noResults: 'No matching students...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
+                },
+                uniqueKey: 'user.id', //the default is 'id', so need to update to point to the user object
+            },
+            singleRowName: 'submission',
+            pluralRowName: 'submissions',
+            selectedRows: [], //keep track of which rows could be deleted
+        }
+    },
+
+    computed: {
+
+        /**
+         * To show a note showing no students have submitted yet
+         *
+         * @returns { Boolean }
+         */
+        hasNoSubmissions () {
+            return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length === 0;
         },
-        orderBy: { //initial sorting display
-          ascending: true,
-          column: 'student'
+
+        /**
+         * Can show the table
+         *
+         * @returns { Boolean }
+         */
+        hasSubmissions () {
+            return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length > 0;
         },
-        perPage: 9999, //absurdly large value to avoid pagination as there's no footer
-        resizableColumns: false,
-        sortable: ['student', 'submissionDate'], //only student and submission date are sortable
-        sortIcon: {
-          is: 'glyphicon-sort',
-          base: 'glyphicon',
-          up: 'glyphicon-chevron-up',
-          down: 'glyphicon-chevron-down'
+
+        /**
+         * To track how many are selected
+         *
+         * @returns {Number}
+         */
+        selectedRowsCount () {
+            return this.selectedRows.length;
         },
-        tabbable: false,
-        templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
-          student: SimilarityReportRowStudent,
-          submissionDate: SimilarityReportRowSubmissionDate,
-          similarity: SimilarityReportRowSimilarity,
-          status: SimilarityReportRowStatus,
+
+        /**
+         * For proper count display, eg: '1 user' / '4 users'
+         *
+         * @returns {String}
+         */
+        selectedRowsCountWithRowName () {
+            if (this.selectedRowsCount === 0) {
+                return 'No ' + this.singleRowName;
+            } else if (this.selectedRowsCount === 1) {
+                return this.selectedRowsCount + ' ' + this.singleRowName;
+            } else {
+                return this.selectedRowsCount + ' ' + this.pluralRowName;
+            }
         },
-        texts: {
-          noResults: 'No matching students...',
-          count: '{from}-{to} of {count}',
-          limit: 'Rows per page:'
+
+    },
+
+    mounted () {
+        this.getTableData();
+    },
+
+    methods: {
+
+        /**
+         * Load the current student tableData
+         */
+        async getTableData () {
+            try {
+                const response = await fetch(this.payloadUrl);
+                const responseData = await response.json();
+                this.tableData = responseData;
+            } catch (error) {
+                console.warn(error);
+                this.hasDataLoadError = true; //show load error
+            } finally {
+                this.isDataLoaded = true; //update the display to show the list
+            }
         },
-        uniqueKey: 'user.id', //the default is 'id', so need to update to point to the user object
-      },
+
+        /**
+         * to keep track of selected rows
+         */
+        onRowSelected (event) {
+            this.selectedRows = event;
+            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+                this.hasSelectedShiftKey = true;
+            }
+        },
+
     }
-  },
-
-  computed: {
-
-    /**
-     * To show a note showing no students have submitted yet
-     *
-     * @returns { Boolean }
-     */
-    hasNoSubmissions () {
-      return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length === 0;
-    },
-
-    /**
-     * Can show the table
-     *
-     * @returns { Boolean }
-     */
-    hasSubmissions () {
-      return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length > 0;
-    },
-
-  },
-
-  mounted () {
-    this.getTableData();
-  },
-
-  methods: {
-
-    /**
-     * Load the current student tableData
-     */
-    async getTableData () {
-      try {
-        const response = await fetch(this.payloadUrl);
-        const responseData = await response.json();
-        this.tableData = responseData;
-      } catch (error) {
-        console.warn(error);
-        this.hasDataLoadError = true; //show load error
-      } finally {
-        this.isDataLoaded = true; //update the display to show the list
-      }
-    },
-
-  }
 
 }
 </script>
 
 <template>
 
-  <div class="row">
+    <div class="row">
 
-    <div class="small-12 island">
+        <div class="small-12 island">
 
-      <v-client-table
-        v-if="hasSubmissions"
-        :data="tableData"
-        :columns="tableColumns"
-        :options="tableOptions"
-      >
-        <div slot="beforeTable">
-          <similarity-report-filters />
+            <v-client-table
+                v-if="hasSubmissions"
+                :data="tableData"
+                :columns="tableColumns"
+                :options="tableOptions"
+                @select="onRowSelected"
+            >
+                <div slot="beforeTable">
+                    <similarity-report-filters />
+                </div>
+            </v-client-table>
+
+            <div v-else-if="hasNoSubmissions" class="empty-state">
+                <i class="icon-staff-students"></i>
+                <p>Students have either not yet submitted any work or any similarity results are yet to be generated.<br>Once work is submitted and results generated, you may return to this page to review the similarity results for each submission.</p>
+            </div>
+
+            <div v-else-if="hasDataLoadError">
+                <section class="content">
+                    <div tableData-alert class="alert-box alert">
+                        Sorry, we are currently unable to load the similarity report. Please contact your support it the problem persists.
+                    </div>
+                </section>
+            </div>
+
+            <div v-else>
+                <table class="skeleton">
+                    <thead>
+                        <tr>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <bottom-drawer :showDrawer="selectedRowsCount > 0">
+                <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
+                <!-- <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button> -->
+                <!-- <button @click.prevent="onDeleteUsersSelected" class="button submit button-delete">Delete Users</button> -->
+            </bottom-drawer>
+
         </div>
-      </v-client-table>
-
-      <div v-else-if="hasNoSubmissions" class="empty-state">
-        <i class="icon-staff-students"></i>
-        <p>Students have either not yet submitted any work or any similarity results are yet to be generated.<br>Once work is submitted and results generated, you may return to this page to review the similarity results for each submission.</p>
-      </div>
-
-      <div v-else-if="hasDataLoadError">
-        <section class="content">
-          <div tableData-alert class="alert-box alert">
-            Sorry, we are currently unable to load the similarity report. Please contact your support it the problem persists.
-          </div>
-        </section>
-      </div>
-
-      <div v-else>
-        <table class="skeleton">
-          <thead>
-            <tr>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
     </div>
-
-  </div>
 
 </template>
 
@@ -226,18 +275,18 @@ export default {
 @import './similarity-report';
 
 .VuePagination {
-  display: none; //there's no footer, so no count/pagination/next/prev etc for this report
+    display: none; //there's no footer, so no count/pagination/next/prev etc for this report
 }
 
 @media (max-width: $tableToSingleColumn) { //display everything in one column
-  .VueTables thead {
-    display: none;
-  }
-  .VueTables .VueTables__row td {
-    display: block;
-    padding: 0.5rem 0;
-    width: 100%;
-  }
+    .VueTables thead {
+        display: none;
+    }
+    .VueTables .VueTables__row td {
+        display: block;
+        padding: 0.5rem 0;
+        width: 100%;
+    }
 }
 
 </style>
