@@ -9,6 +9,7 @@
  # @param Participant $participant        The student currently being processed
  # @param string $cardSize                sizing for foundation
  # @param IResponse|null $latestResponse  The most recent response provided by this student
+ # @param string $pActionResponses        A disgustingly-named variable circumstantially representing Inline Grader url
  #}
 <div class="{{ cardSize ?? 'small-12' }} card">
     <a href="/search/user/{{ participant.user.id }}" title="View Profile">
@@ -62,7 +63,7 @@
                         {% endfor %}
                     </ul>
 
-                    <a href="#" class="button full-width">Review Submission</a>
+                    <a href="{{ pActionResponses }}" class="button full-width">Review Submission</a>
                 </li>
             </ol>
         </div>

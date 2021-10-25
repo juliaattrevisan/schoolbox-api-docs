@@ -120,7 +120,8 @@
                 <div class="list-item">
                     {% include '@learningAssessment/fragments/participantStatus.twig' with {
                         participant: participant,
-                        latestResponse: latestResponse
+                        latestResponse: latestResponse,
+                        pActionResponses: pActionResponses
                     } only %}
                 </div>
                 {% if pActionCount %}
