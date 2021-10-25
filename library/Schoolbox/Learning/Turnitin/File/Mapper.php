@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin\File;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Learning\Turnitin\File\Process\Report;
 use Schoolbox\Learning\Turnitin\ValidFile;
 
 /**
@@ -38,6 +37,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('student_submission_file_id', self::TYPE_INTEGER);
         $this->uses('turnitin_submission_id', self::TYPE_STRING);
         $this->uses('overall_match_percentage', self::TYPE_DECIMAL);
+        $this->uses('internet_match_percentage', self::TYPE_DECIMAL);
+        $this->uses('publication_match_percentage', self::TYPE_DECIMAL);
+        $this->uses('submitted_works_match_percentage', self::TYPE_DECIMAL);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -97,7 +99,10 @@ class Mapper extends \Schoolbox\Mapper
                 ssf.*,
                 storage.ext,
                 tr.id AS turnitinReportId,
-                overall_match_percentage
+                overall_match_percentage,
+                internet_match_percentage,
+                publication_match_percentage,
+                submitted_works_match_percentage
             FROM assessment a
             INNER JOIN submission_box sb ON a.id = sb.assessment_id
             INNER JOIN (
@@ -151,7 +156,12 @@ class Mapper extends \Schoolbox\Mapper
                 'hash' => $row['hash'],
                 'turnitin' => [
                     'id' => $row['turnitinReportId'],
-                    'percentage' => $row['overall_match_percentage'],
+                    'percentage' => [
+                        'overall' => $row['overall_match_percentage'],
+                        'internet' => $row['internet_match_percentage'],
+                        'publication' => $row['publication_match_percentage'],
+                        'submitted_works' => $row['submitted_works_match_percentage']
+                    ],
                 ],
             ];
 

@@ -49,6 +49,7 @@ module.exports = {
             './www/static/js/foundation/foundation.tab.js',
             './www/static/js/foundation/foundation.tooltip.js',
             './www/static/js/foundation/foundation.dropdown.js',
+            './www/static/js/foundation/foundation.joyride.js',
             './www/static/js/foundation/jquery.tab-activator.js',
             './www/static/js/foundation/jquery.collapsable.js',
 
@@ -147,7 +148,7 @@ module.exports = {
         strtotime: './www/static/js/alaress-datetime-picker/strtotime.js',
         highcharts: './www/static/js/vendors/highcharts/highcharts.js',
         highchartsMore: './www/static/js/vendors/highcharts/highchartsMore.js',
-        
+
         //Search Bar
         searchBar: './vue/components/searchBar/searchBar.js',
 

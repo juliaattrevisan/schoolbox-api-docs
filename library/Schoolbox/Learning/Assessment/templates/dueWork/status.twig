@@ -119,7 +119,9 @@
             <div class="row actions-small-{{ pActionCount }}">
                 <div class="list-item">
                     {% include '@learningAssessment/fragments/participantStatus.twig' with {
-                        participant: participant
+                        participant: participant,
+                        latestResponse: latestResponse,
+                        pActionResponses: pActionResponses
                     } only %}
                 </div>
                 {% if pActionCount %}

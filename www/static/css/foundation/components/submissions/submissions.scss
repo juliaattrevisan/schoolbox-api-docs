@@ -14,6 +14,42 @@ $table-cell-highlight-background: $content-ui-selected;
     @extend .gradient-0;
 }
 
+/* Hijack this unused feature
+ */
+$joyride-tip-bg: $white;
+$joyride-tip-font-color: $oil;
+
+body {
+    .joyride-tip-guide {
+        border: 1px solid $body-bg !important;
+        box-shadow: -2px 2px 4px rgb(0 0 0 / 15%);
+
+        .joyride-nub {
+            display: none;
+        }
+    }
+}
+
+.similarity-preview {
+    &.information-list {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .percentage {
+        display: inline-block;
+        margin-right: 0.25rem;
+        text-align: right;
+        width: 2rem;
+    }
+}
+
+/* Always hide the broken modal overlay
+ */
+.joyride-modal-bg {
+    display: none !important;
+}
+
 table.rubric {
     th[colspan] {
         background-color: $body-bg;

@@ -32,7 +32,7 @@ export default {
      */
     matchedFiles () {
       return this.data.files.filter((file) => {
-        return parseInt(file.turnitin.percentage) >= parseInt(this.currentSimilartyScoreSelection);
+        return parseInt(file.turnitin.percentage.overall) >= parseInt(this.currentSimilartyScoreSelection);
       });
     }
 
@@ -62,7 +62,7 @@ export default {
      * @returns { String }
      */
     getFileColour (file) {
-      const percentageRounded = Math.round(file.turnitin.percentage);
+      const percentageRounded = Math.round(file.turnitin.percentage.overall);
       if (this.isBetween(percentageRounded, 0, 50)) {
         return '#4fa74f';
       } else if (this.isBetween(percentageRounded, 50, 59)) {
@@ -101,7 +101,7 @@ export default {
     <ul class="list">
       <li v-for="file in matchedFiles" :key="file.id">
           <a :href="file._links.turnitin_report"  title="View similarity report">
-            <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage) }}%</span>
+            <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage.overall) }}%</span>
             {{ file.name + '.' + file.ext }}
         </a>
       </li>

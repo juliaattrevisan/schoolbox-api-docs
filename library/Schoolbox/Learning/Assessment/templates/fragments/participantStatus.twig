@@ -1,6 +1,15 @@
-{# usage:
-    - participant: (Participant) object
-    - cardSize:    (string)      sizing for foundation
+{##
+ # Participant Status Card
+ #
+ # Shows the student's name and a little submission status jewellery underneath
+ #
+ # If the Response has a turnitin report, show some data about that too
+ # (Requires a Response object to do that; only supplied in Due Work status context)
+ #
+ # @param Participant $participant        The student currently being processed
+ # @param string $cardSize                sizing for foundation
+ # @param IResponse|null $latestResponse  The most recent response provided by this student
+ # @param string $pActionResponses        A disgustingly-named variable circumstantially representing Inline Grader url
  #}
 <div class="{{ cardSize ?? 'small-12' }} card">
     <a href="/search/user/{{ participant.user.id }}" title="View Profile">
@@ -16,12 +25,70 @@
     {% else %}
         <h3>{{ participant.user.fullName }}</h3>
     {% endif %}
-    <p class="meta">
+    <p>
+        <span class="meta">
         {% block statusLine %}
             {% include '@learningAssessment/fragments/statusLine.twig' with {
                 assessable: participant.assessable,
                 student:    participant.user
             } only %}
         {% endblock statusLine %}
+        </span>
+
+        {# Only show some turnitin details if present #}
+        {% if latestResponse is defined and latestResponse and latestResponse.allFiles|length %}
+
+                {% import '@learning/macro/urgency.twig' as urgency %}
+                <span class="pipe meta"><a id="similarity-preview-{{ latestResponse.id }}">Preview Submission</a></span>
+
+                <script>
+                    $(function() {
+                        $('#similarity-preview-{{ latestResponse.id }}').click(function() {
+                            /* Close all other joyrides before starting the next one
+                             * because foundation is buggy
+                             */
+                             $('.joyride-close-tip').click();
+
+                            $('#similarity-preview-set-{{ latestResponse.id }}').foundation('joyride', 'start');
+                        });
+                    });
+                </script>
+
+                <div id="similarity-preview-set-{{ latestResponse.id }}">
+                    <ol class="joyride-list" data-joyride>
+                        <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="modal: false; tip_location: bottom; next_button: false; prev_button: false">
+                            <h5>Submitted {{ latestResponse.submittedAt.short }}</h5>
+                            <ul class='information-list'>
+                                {% for file in latestResponse.allFiles %}
+                                        <li>
+                                            <div class="list-item">
+                                                <div class="card small-12">
+                                                    {% set responseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: latestResponse.assessable.id, studentId: latestResponse.submittedOnBehalfOf.id, responseId: latestResponse.id, response: latestResponse}) %}
+
+                                                    <a href="{{ responseRoute }}?hash={{ file.hash }}" title="{{ file.filename }}">
+                                                        <img src="/ajax/mime/{{ file.mime }}" alt="Download" class="mime" height="60" width="60"/>
+                                                        <h3>{{ file.filename }}</h3>
+                                                    </a>
+                                                     {% if file.turnitin and file.turnitin.isComplete %}
+                                                        {# Similarity Check #}
+                                                        {% include '@learning/dueWork/turnitin/status.twig' with {
+                                                            assessment: latestResponse.assessable,
+                                                            response: latestResponse,
+                                                            currentFile: file
+                                                        } %}
+                                                         {% else %}
+                                                             <p class="meta">{{ file.size|bytes }}</p>
+                                                     {% endif %}
+                                                </div>
+                                            </div>
+                                        </li>
+                                {% endfor %}
+                            </ul>
+
+                            <a href="{{ pActionResponses }}" class="button full-width">Review Submission</a>
+                        </li>
+                    </ol>
+                </div>
+        {% endif %}
     </p>
 </div>

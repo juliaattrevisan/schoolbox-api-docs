@@ -38,7 +38,7 @@ export default {
             name: FilterEvents.SIMILARITY_SCORE,    
             callback: (row, filteredPercentage) => { 
               const hasFilesAboveSimilarity = row.files.some((file) => {
-                return parseInt(file.turnitin.percentage) >= parseInt(filteredPercentage);
+                return parseInt(file.turnitin.percentage.overall) >= parseInt(filteredPercentage.overall);
               });
               return hasFilesAboveSimilarity;
             }
