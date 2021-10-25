@@ -23,6 +23,6 @@ class Intellischool extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, Module::class, "/intellischool");
+        $this->loadModule($kernel, Module::class, "/modules/intellischool");
     }
 }
