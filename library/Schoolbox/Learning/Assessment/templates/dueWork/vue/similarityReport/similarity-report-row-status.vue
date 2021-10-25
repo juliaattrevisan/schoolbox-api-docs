@@ -14,7 +14,7 @@ export default {
         },
     },
 
-    methods: {
+    computed: {
 
         /**
          * Format the submission status display label
@@ -23,13 +23,13 @@ export default {
          *
          * @return { String }
          */
-        getFormattedStatus (status) {
+        getFormattedStatus () {
             const statusOptions = {
                 'failed': '<span class="progress-tick no-text tiny failed" title="Resubmission required"></span><span>Resubmission required</span>',
                 'pending': '<span class="progress-tick no-text tiny pending" title="Mark required"></span><span>Marking required</span>',
                 'reviewed': '<span class="progress-tick no-text tiny reviewed" title="Reviewed"></span><span>Reviewed</span>',
             }
-            return statusOptions[status];
+            return statusOptions[this.data.submission.status];
         }
 
     },
@@ -40,7 +40,7 @@ export default {
 <template>
     <div class="status title-on-single-column" data-title="Status">
         <div class="status__column">
-            <p class="meta" v-html="getFormattedStatus(data.submission.status)"></p>
+            <p class="meta" v-html="getFormattedStatus"></p>
         </div>
         <div class="status__column">
             <a class="button icon-approve" :href="data.submission._links.inline_grader" title="Review Submission">Review Submission</a>

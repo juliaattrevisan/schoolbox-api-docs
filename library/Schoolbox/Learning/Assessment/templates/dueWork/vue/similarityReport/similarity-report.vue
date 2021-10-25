@@ -7,12 +7,12 @@
 
 import SimilarityReportFilters from './similarity-report-filters';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+import Toast from '@vue/components/toast';
 import FilterEvents from './similarityReportFilterEvents';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
 import SimilarityReportRowSimilarity from './similarity-report-row-similiarity';
 import SimilarityReportRowStatus from './similarity-report-row-status';
-import { timeout } from '@js/util/jsUtils';
 
 
 export default {
@@ -20,6 +20,7 @@ export default {
     components: {
         SimilarityReportFilters,
         BottomDrawer,
+        Toast,
     },
 
     props: {
@@ -102,9 +103,9 @@ export default {
                 resizableColumns: false,
                 selectable: { //to enable row selection
                     mode: 'multiple',
-                    // only: function (row) {
-                    //     return row.submission.status !== 'failed'; //can't mark as resubmission required those rows that are already marked as so
-                    // },
+                    only: function (row) {
+                        return row.submission.status !== 'failed'; //can't mark as resubmission required those rows that are already marked as so
+                    },
                 },
                 sortable: ['student', 'submissionDate'], //only student and submission date are sortable
                 sortIcon: {
@@ -185,7 +186,7 @@ export default {
          */
         submitButtonText () {
             if (this.isProcessing) {
-                return 'Processing, please wait...';
+                return 'Submitting, please wait...';
             } else {
                 return 'Mark as resubmission required';
             }
@@ -234,30 +235,41 @@ export default {
         },
 
         /**
-         * Delete the selected users, informing of deletion and clearing them from the table list as well
-         *
+         * Mark the selected submissions as requiring resubmission
          */
         async onRequiringResubmissionSelected () {
             this.isProcessing = true;
+            this.$refs.toast.activate('Updating...');
             try {
-                const promises = [];
-                this.selectedRows.forEach((row) => {
-                    promises.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
-                        method: 'POST',
-                        body: this.getFormData(),
-                    }));
-                });
-                await Promise.all(promises);
+                await Promise.all(this.getFetches());
                 this.isProcessing = false;
                 this.comment = '';
+                this.markAsRequiringResubmission();
                 this.clearRows();
+                this.$refs.toast.timeout('Feedback published', true, 2000);
             } catch (error) {
                 this.isProcessing = false;
                 console.warn(error);
-                // this.$refs.toast.timeout('Unable to delete', false, 2000);
+                this.$refs.toast.timeout('Unable to update', false, 3000);
             }
         },
 
+        /**
+         * To update all the marked submissions in parallel
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+         *
+         * @returns { Array }
+         */
+        getFetches () {
+            const fetchList = [];
+            this.selectedRows.forEach((row) => {
+                fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
+                    method: 'POST',
+                    body: this.getFormData(),
+                }));
+            });
+            return fetchList;
+        },
 
         /**
          * Send through the data to delete the row
@@ -266,6 +278,7 @@ export default {
          */
         getFormData () {
             const formData = new FormData();
+            formData.append('responseId', '');
             // formData.append('resubmissionRequired', '1');
             formData.append('comment', this.comment);
             // formData.append('publish', '1');
@@ -273,7 +286,17 @@ export default {
         },
 
         /**
-         * clear the selection
+         * Loop through and update the submissions
+         */
+        markAsRequiringResubmission () {
+            this.selectedRows.forEach((selectedRow) => { //directly edit the original data to update the display
+                const rowData = this.tableData.find((row) => selectedRow.user.id === row.user.id);
+                rowData.submission.status = 'failed';
+            });
+        },
+
+        /**
+         * Clear the selection
          */
         clearRows () {
             this.selectedRows = [];
@@ -349,6 +372,8 @@ export default {
                 <textarea class="comment-field" v-model="comment"></textarea>
                 <button @click.prevent="onRequiringResubmissionSelected" @keydown.enter="onRequiringResubmissionSelected" class="button submit button-delete" :disabled="isSubmitDisabled">{{ submitButtonText }}</button>
             </bottom-drawer>
+
+            <toast ref="toast"></toast>
 
         </div>
 
