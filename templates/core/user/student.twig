@@ -451,6 +451,16 @@
                                 {% endif %}
                             {% endblock buttons_email_parents %}
 
+                            {% block buttons_student_analytics %}
+                                {% set studentAnalyticsLink = routeLookupIfAuthorized(
+                                    'intellischool.getStudentDashboard',
+                                    {student: user, studentId: user.id}
+                                ) %}
+                                {% if studentAnalyticsLink %}
+                                    <li><a href="{{ studentAnalyticsLink }}" class="icon-poll">Student Analytics</a></li>
+                                {% endif %}
+                            {% endblock buttons_student_analytics %}
+
                             {% block buttons_geosnapshots %}
                                 {% if isGeosnapshotAvailable %}
                                     {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id})  %}
