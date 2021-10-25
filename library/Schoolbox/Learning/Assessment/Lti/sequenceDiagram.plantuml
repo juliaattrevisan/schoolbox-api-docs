@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor Teacher as TC
+actor Student as ST
+participant "LTI Platform\n(Schoolbox)" as SB
+participant "LTI Tool\n(Google Classroom, MS Teams Classes)" as LTI
+
+group Create LTI assessment in Schoolbox
+    TC -> SB: visit create assessment page
+    SB -> SB: start creating assessment
+    SB -> LTI: send LtiDeepLinkingRequest
+    LTI -> LTI: select an ltiResourceLink
+    LTI -> SB: receive LtiDeepLinkingResponse
+    SB -> SB: extract ltiResourceLink from LtiDeepLinkingResponse
+    SB -> SB: associate ltiResourceLink with LTI assessment
+    note right
+    When a student attempts an LTI assessment:
+
+    a LtiResourceLinkRequest for the ltiResourceLink
+    will be sent from Schoolbox to the LTI tool.
+    end note
+end
+
+group Attempt LTI assessment
+    ST -> SB: visit assessment summary page
+    SB -> LTI: send LtiResourceLinkRequest\nwith assessment's ltiResourceLink\nin Learner context
+    LTI -> LTI: student attempts assessment
+    LTI -> SB: student gets sent back to Schoolbox
+end
+
+group Mark LTI assessment
+    TC -> SB: visit assessment status page
+    SB -> LTI: send LtiResourceLinkRequest\nwith assessment's ltiResourceLink\nin Instructor context
+    LTI -> LTI: teacher marks assessment attempts
+    LTI -> SB: teacher gets sent back to Schoolbox
+end
+
+group Mark update
+    LTI -> SB: send mark to Score Publish service
+    note left
+    The LTI Platform must implement the
+    Score Publish Service.
+    end note
+    SB -> SB: write mark
+end
+
+@enduml

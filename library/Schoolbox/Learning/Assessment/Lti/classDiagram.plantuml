@@ -1,0 +1,64 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface IAssessable
+interface IResponse
+interface IFeedback
+
+hide empty members
+
+class LtiTool {
+    - string clientId
+    - uuid deploymentId
+}
+note bottom of LtiTool
+    This class represents a deployment of
+    an LTI tool within Schoolbox.
+
+    The tool's clientId and deploymentId
+    are used when the student attempts
+    the assessment.
+end note
+
+class LtiAssessment {
+    - string assessmentUrl
+    - array customFields
+    - ?string lineItemResourceId
+    - ?float lineItemMaximumScore
+}
+note bottom of LtiAssessment
+    assessmentUrl, customFields, lineItemResourceId
+    and lineItemMaximumScore are populated when the
+    selected assessment is returned from the LTI tool.
+
+    These fields will be used to generate the request
+    which sends the student to the LTI tool's assessment.
+end note
+
+class LtiResponse {}
+
+class LtiFeedback {
+    - string normalisedMark
+    - string humanReadableMark
+}
+note bottom of LtiFeedback
+    Normalised and HR mark are populated
+    from result of GET results request.
+end note
+
+IAssessable --|> LtiAssessment
+LtiTool -o LtiAssessment
+IResponse --|> LtiResponse
+IFeedback --|> LtiFeedback
+
+note bottom of LtiResponse
+    LTI results don't contain a completion
+    state, thus there's no data beyond the
+    fields IResponse already prescribes.
+
+    This is still required so that there's a
+    record that the student has responded to
+    the assessment.
+end note
+
+@enduml
