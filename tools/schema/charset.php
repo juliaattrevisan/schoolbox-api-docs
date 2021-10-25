@@ -457,13 +457,19 @@ HELP;
      */
     private function getManifest(): array
     {
+        /* Toggles between schoolbox and schoolboxdev db schemas
+         * depending on live/dev instance - it's controlled by
+         * something in the Instance Registry
+         */
+        $db = SQL_db;
+
         /* Only get the BASE TABLE tables in the 'schoolbox' db
          * (Ignore views and other table types like views)
          */
         $tablesQuery = "
             SELECT TABLE_NAME, TABLE_COLLATION
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = 'schoolbox'
+            WHERE TABLE_SCHEMA = '{$db}'
             AND TABLE_TYPE = 'BASE TABLE'
             ORDER BY TABLE_NAME            
         ";
