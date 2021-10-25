@@ -1,5 +1,14 @@
 {% extends '@intellischool/base.twig' %}
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{% block breadcrumbs %}
+    {{ bread.crumbs(
+        [ folder.title, '/homepage/' ~ folder.id ],
+        ['Class Analytics']
+    ) }}
+{% endblock breadcrumbs %}
+
 {% block header %}
     <h1>Class Analytics - {{ folder.title }}</h1>
 

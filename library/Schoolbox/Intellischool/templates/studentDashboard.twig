@@ -1,5 +1,14 @@
 {% extends '@intellischool/base.twig' %}
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{% block breadcrumbs %}
+    {{ bread.crumbs(
+        [ student.fullName, routeLookup('searchUser.getProfile', {userId: student.id}) ],
+        ['Student Analytics']
+    ) }}
+{% endblock breadcrumbs %}
+
 {% block header %}
     <h1>Student Analytics - {{ student.fullName }}</h1>
 {% endblock header %}
