@@ -43,7 +43,7 @@
             {% set hasAtLeastOneTurnitin = false %}
 
             {% for file in latestResponse.allFiles %}
-                {% if file.turnitin %}
+                {% if file.turnitin and file.turnitin.isComplete %}
                     {% set hasAtLeastOneTurnitin = true %}
                 {% endif %}
             {% endfor %}
@@ -72,7 +72,7 @@
 
                             <ul class='information-list similarity-preview'>
                                 {% for file in latestResponse.allFiles %}
-                                    {% if file.turnitin %}
+                                    {% if file.turnitin and file.turnitin.isComplete %}
                                         <li>
                                             <span class="percentage {{ urgency.similarity(file.turnitin.overallMatchPercentage) }}">{{ file.turnitin.overallMatchPercentage }}%</span> {{ file.basename }}
                                         </li>
