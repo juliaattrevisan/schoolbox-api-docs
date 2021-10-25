@@ -7,7 +7,7 @@
         {% endblock header %}
 
         <div class="scroll-wrapper">
-            <form id="iframeForm" method="post" action="https://core.intellischool.net/auth/lti" target="iframe">
+            <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="iframe">
                 <input type="hidden" name="id_token" value="{{ jwt }}">
             </form>
             <script type="text/javascript">

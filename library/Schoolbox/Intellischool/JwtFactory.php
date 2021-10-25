@@ -15,10 +15,16 @@ use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
- *
+ * Factory for JWTs for authenticating with Intellischool.
  */
 class JwtFactory
 {
+    /**
+     * LTI endpoint for Intellischool services: this remains constant for all
+     * Schoolbox instances.
+     */
+    public const LTI_ENDPOINT = 'https://core.intellischool.net/auth/lti';
+
     private const COHORT_PREFIX_CLASS = 'class';
     private const COHORT_PREFIX_SUBJECT = 'subject';
     private const COHORT_PREFIX_YEARLEVEL = 'year_level';

@@ -49,8 +49,9 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@intellischool/studentDashboard.twig',
                 [
-                    'student' => $student,
-                    'jwt'     => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
+                    'student'     => $student,
+                    'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
+                    'jwt'         => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
                 ],
                 'Student Analytics - ' . $student->getFullName(),
             )
@@ -113,9 +114,10 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@intellischool/classDashboard.twig',
                 [
-                    'folder'    => $folder,
-                    'classCode' => $classCode,
-                    'jwt'       => $this->jwtFactory->buildForClass($this->getUser(), $classCode),
+                    'folder'      => $folder,
+                    'classCode'   => $classCode,
+                    'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
+                    'jwt'         => $this->jwtFactory->buildForClass($this->getUser(), $classCode),
                 ],
                 sprintf('Class Analytics - %s', $folder->getTitle()),
             )
