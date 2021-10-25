@@ -168,6 +168,9 @@ class Report
         );
 
         $model->setOverallMatchPercentage((float)$reportInfo['overall_match_percentage'])
+            ->setInternetMatchPercentage((float)$reportInfo['internet_match_percentage'])
+            ->setPublicationMatchPercentage((float)$reportInfo['publication_match_percentage'])
+            ->setSubmittedWorksMatchPercentage((float)$reportInfo['submitted_works_match_percentage'])
             ->setStatus(Turnitin\File\Model::STATUS_COMPLETE)
             ->setErrorCode(null)
             ->setErrorMessage(null);

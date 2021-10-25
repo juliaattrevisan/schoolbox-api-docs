@@ -131,6 +131,24 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var float|null
+     */
+    private ?float $internetMatchPercentage = null;
+
+
+    /**
+     * @var float|null
+     */
+    private ?float $publicationMatchPercentage = null;
+
+
+    /**
+     * @var float|null
+     */
+    private ?float $submittedWorksMatchPercentage = null;
+
+
+    /**
      * Turnitin report finished processing
      *
      * @return bool
@@ -300,6 +318,66 @@ class Model implements ISoftDeletable
     public function setOverallMatchPercentage(?float $overallMatchPercentage): self
     {
         $this->overallMatchPercentage = $overallMatchPercentage;
+        return $this;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getInternetMatchPercentage(): ?float
+    {
+        return $this->internetMatchPercentage;
+    }
+
+
+    /**
+     * @param float|null $internetMatchPercentage
+     * @return Model
+     */
+    public function setInternetMatchPercentage(?float $internetMatchPercentage): self
+    {
+        $this->internetMatchPercentage = $internetMatchPercentage;
+        return $this;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getPublicationMatchPercentage(): ?float
+    {
+        return $this->publicationMatchPercentage;
+    }
+
+
+    /**
+     * @param float|null $publicationMatchPercentage
+     * @return Model
+     */
+    public function setPublicationMatchPercentage(?float $publicationMatchPercentage): self
+    {
+        $this->publicationMatchPercentage = $publicationMatchPercentage;
+        return $this;
+    }
+
+
+    /**
+     * @return float|null
+     */
+    public function getSubmittedWorksMatchPercentage(): ?float
+    {
+        return $this->submittedWorksMatchPercentage;
+    }
+
+
+    /**
+     * @param float|null $submittedWorksMatchPercentage
+     * @return Model
+     */
+    public function setSubmittedWorksMatchPercentage(?float $submittedWorksMatchPercentage): self
+    {
+        $this->submittedWorksMatchPercentage = $submittedWorksMatchPercentage;
         return $this;
     }
 }
