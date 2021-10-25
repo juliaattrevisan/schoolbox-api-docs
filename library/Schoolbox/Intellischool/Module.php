@@ -36,9 +36,16 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        $basePermission = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+        $basePermission = new Rule\All(
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL, $this->getConfig()),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
+            )
         );
         $studentPreload = function ($params) {
             return [
