@@ -22,6 +22,10 @@ export default {
     },
 
     props: {
+        assessmentId: { //to mark submissions as requiring resubmission
+            type: Number,
+            required: true
+        },
         payloadUrl: { //where to get the tableData from
             type: String,
             required: true
@@ -174,6 +178,7 @@ export default {
     },
 
     mounted () {
+        debugger;
         this.getTableData();
     },
 
