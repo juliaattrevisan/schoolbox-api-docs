@@ -125,6 +125,7 @@ export default {
                     limit: 'Rows per page:'
                 },
             },
+            comment: '', //the message coupled with the mark as requiring resubmission
             singleRowName: 'submission',
             pluralRowName: 'submissions',
             selectedRows: [], //keep track of which rows could be deleted
@@ -178,7 +179,6 @@ export default {
     },
 
     mounted () {
-        debugger;
         this.getTableData();
     },
 
@@ -216,16 +216,32 @@ export default {
          */
         async onRequiringResubmissionSelected () {
             // this.$refs.toast.activate('Deleting...');
-            // try {
-            //     await axios.post(this.action, this.getFormData());
-            //     this.$refs.toast.timeout('Deleted', true, 2000);
-            //     this.$refs.deleteModal.close();
-            //     this.rows = this.getUpdatedRowsAfterUserDeletion();
-            //     this.clearRows();
-            //     this.$refs.table.resetSelectedRows();
-            // } catch (error) {
-            //     this.$refs.toast.timeout('Unable to delete', false, 2000);
-            // }
+            try {
+
+                const response = await fetch(`/learning/assessments/${this.assessmentId}/17/feedback`, {
+                    method: 'POST',
+                    body: this.getFormData(),
+                });
+                // this.$refs.toast.timeout('Deleted', true, 2000);
+                // mark the elements
+                this.clearRows();
+            } catch (error) {
+                // this.$refs.toast.timeout('Unable to delete', false, 2000);
+            }
+        },
+
+
+        /**
+         * Send through the data to delete the row
+         *
+         * @returns { FormData }
+         */
+        getFormData () {
+            const formData = new FormData();
+            formData.append('resubmissionRequired', '1');
+            formData.append('publish', '1');
+            formData.append('comment', this.comment);
+            return formData;
         },
 
         /**
@@ -233,6 +249,7 @@ export default {
          */
         clearRows () {
             this.selectedRows = [];
+            this.$refs.table.resetSelectedRows();
         },
 
         /**
@@ -240,7 +257,6 @@ export default {
          */
         onClearSelected () {
             this.clearRows();
-            this.$refs.table.resetSelectedRows();
         },
 
     }
@@ -302,7 +318,7 @@ export default {
                 <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
                 <button @click.prevent="onClearSelected" @keydown.enter="onClearSelected" class="button-clear">Clear selection</button>
                 <label>Comment</label>
-                <textarea class="comment-field"></textarea>
+                <textarea class="comment-field" v-model="comment"></textarea>
                 <button @click.prevent="onRequiringResubmissionSelected" @keydown.enter="onRequiringResubmissionSelected" class="button submit button-delete">Mark as resubmission required</button>
             </bottom-drawer>
 
