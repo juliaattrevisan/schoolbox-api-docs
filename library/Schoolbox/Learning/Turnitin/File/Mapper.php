@@ -136,6 +136,7 @@ class Mapper extends \Schoolbox\Mapper
              * hydrate here explicitly; plus I need a router later anyway
              */
             if (!isset($models[$userId]['user'])) {
+                $models[$userId]['id'] = $userId;
                 $models[$userId]['user'] = [
                     'id' => $userId,
                     'title' => null,

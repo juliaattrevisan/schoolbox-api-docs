@@ -117,7 +117,6 @@ export default {
                     count: '{from}-{to} of {count}',
                     limit: 'Rows per page:'
                 },
-                uniqueKey: 'user.id', //the default is 'id', so need to update to point to the user object
             },
             singleRowName: 'submission',
             pluralRowName: 'submissions',
