@@ -1,6 +1,14 @@
-{# usage:
-    - participant: (Participant) object
-    - cardSize:    (string)      sizing for foundation
+{##
+ # Participant Status Card
+ #
+ # Shows the student's name and a little submission status jewellery underneath
+ #
+ # If the Response has a turnitin report, show some data about that too
+ # (Requires a Response object to do that; only supplied in Due Work status context)
+ #
+ # @param Participant $participant        The student currently being processed
+ # @param string $cardSize                sizing for foundation
+ # @param IResponse|null $latestResponse  The most recent response provided by this student
  #}
 <div class="{{ cardSize ?? 'small-12' }} card">
     <a href="/search/user/{{ participant.user.id }}" title="View Profile">
@@ -16,12 +24,38 @@
     {% else %}
         <h3>{{ participant.user.fullName }}</h3>
     {% endif %}
-    <p class="meta">
+    <p>
+        <span class="meta">
         {% block statusLine %}
             {% include '@learningAssessment/fragments/statusLine.twig' with {
                 assessable: participant.assessable,
                 student:    participant.user
             } only %}
         {% endblock statusLine %}
+        </span>
+
+        {# Only show some turnitin details if present #}
+        {% if latestResponse is defined and latestResponse and latestResponse.allFiles|length %}
+        <span class="pipe meta">
+            Similarity Report Summary <span class="hint has-tip tip-bottom" data-tooltip title="
+                {% for file in latestResponse.allFiles %}
+                <ul class='information-list'>
+                    <li>
+                        <strong>{{ file.basename }}</strong>
+
+                        {% if file.turnitin %}
+                        <ul>
+                            <li>Overall: {{ file.turnitin.overallMatchPercentage }}%</li>
+                            <li>Internet: {{ file.turnitin.internetMatchPercentage }}%</li>
+                            <li>Publication: {{ file.turnitin.publicationMatchPercentage }}%</li>
+                            <li>Submitted Works: {{ file.turnitin.submittedWorksMatchPercentage }}%</li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                </ul>
+                {% endfor %}
+            ">?</span>
+        </span>
+        {% endif %}
     </p>
 </div>
