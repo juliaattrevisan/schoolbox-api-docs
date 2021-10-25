@@ -33,6 +33,29 @@ CHANGE COLUMN `guid` `guid` VARCHAR(255) CHARACTER SET 'ascii' COLLATE 'ascii_ge
 ALTER TABLE `filter`
 CHANGE COLUMN `entity` `entity` VARCHAR(127) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ;
 
+ALTER TABLE `homepage_config`
+CHANGE COLUMN `left_head_font` `left_head_font` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `left_head_bg` `left_head_bg` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `left_font` `left_font` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `left_bg_primary` `left_bg_primary` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `left_bg_secondary` `left_bg_secondary` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `left_link` `left_link` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `left_hover` `left_hover` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `right_head_font` `right_head_font` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `right_head_bg` `right_head_bg` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `right_font` `right_font` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `right_bg_primary` `right_bg_primary` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `right_bg_secondary` `right_bg_secondary` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `right_link` `right_link` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `right_hover` `right_hover` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `top_head_font` `top_head_font` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `top_head_bg` `top_head_bg` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `top_font` `top_font` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `top_bg_primary` `top_bg_primary` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `top_bg_secondary` `top_bg_secondary` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `top_link` `top_link` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ,
+CHANGE COLUMN `top_hover` `top_hover` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
+
 ALTER TABLE `luEventType`
 CHANGE COLUMN `eventColour` `eventColour` VARCHAR(10) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
 
