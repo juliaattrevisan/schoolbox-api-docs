@@ -56,7 +56,7 @@
                         {% for file in latestResponse.allFiles %}
                         {% if file.turnitin %}
                             <li>
-                                <span class="{{ urgency.similarity(file.turnitin.overallMatchPercentage) }}">{{ file.turnitin.overallMatchPercentage }}%</span> {{ file.basename }}
+                                <span class="percentage {{ urgency.similarity(file.turnitin.overallMatchPercentage) }}">{{ file.turnitin.overallMatchPercentage }}%</span> {{ file.basename }}
                             </li>
                         {% endif %}
                         {% endfor %}

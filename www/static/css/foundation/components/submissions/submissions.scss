@@ -29,9 +29,18 @@ body {
     }
 }
 
-.similarity-preview.information-list {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+.similarity-preview {
+    &.information-list {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .percentage {
+        display: inline-block;
+        margin-right: 0.25rem;
+        text-align: right;
+        width: 2rem;
+    }
 }
 
 /* Always hide the broken modal overlay
