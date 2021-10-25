@@ -78,18 +78,18 @@ export default {
       }
     },
 
-    /**
-     * Check if x is between a min and max
-     *
-     * @param { Number }
-     * @param { Number }
-     * @param { Number }
-     *
-     * @returns { Boolean }
-     */
-    isBetween (x, min, max) {
-      return x >= min && x <= max;
-    },
+        /**
+         * Check if x is between a min and max
+         *
+         * @param { Number }
+         * @param { Number }
+         * @param { Number }
+         *
+         * @returns { Boolean }
+         */
+        isBetween (x, min, max) {
+            return x >= min && x <= max;
+        },
 
   },
 
