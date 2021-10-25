@@ -67,14 +67,23 @@
 
                 <div id="similarity-preview-set-{{ latestResponse.id }}">
                     <ol class="joyride-list" data-joyride>
-                        <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="modal: false; tip_location: top; next_button: false; prev_button: false">
+                        <li data-id="similarity-preview-{{ latestResponse.id }}" data-options="modal: false; tip_location: bottom; next_button: false; prev_button: false">
                             <h5>Submitted {{ latestResponse.submittedAt.short }}</h5>
 
                             <ul class='information-list similarity-preview'>
                                 {% for file in latestResponse.allFiles %}
                                     {% if file.turnitin and file.turnitin.isComplete %}
+                                        {% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
+                                            assessmentId: participant.assessable.id,
+                                            assessment:   participant.assessable,
+                                            responseId:   latestResponse.id,
+                                            response:     latestResponse,
+                                            participant:  participant,
+                                            turnitinId:   file.turnitin.id })
+                                        %}
                                         <li>
-                                            <span class="percentage {{ urgency.similarity(file.turnitin.overallMatchPercentage) }}">{{ file.turnitin.overallMatchPercentage }}%</span> {{ file.basename }}
+                                            <a href="{{ reportRoute }}">
+                                            <span class="percentage {{ urgency.similarity(file.turnitin.overallMatchPercentage) }}">{{ file.turnitin.overallMatchPercentage }}%</span> {{ file.basename }}</a>
                                         </li>
                                     {% endif %}
                                 {% endfor %}

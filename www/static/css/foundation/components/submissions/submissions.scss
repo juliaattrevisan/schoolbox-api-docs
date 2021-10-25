@@ -22,8 +22,9 @@ $joyride-tip-font-color: $oil;
 body {
     .joyride-tip-guide {
         border: 1px solid $body-bg !important;
+        box-shadow: -2px 2px 4px rgb(0 0 0 / 15%);
 
-        .joyride-nub.bottom {
+        .joyride-nub {
             display: none;
         }
     }
