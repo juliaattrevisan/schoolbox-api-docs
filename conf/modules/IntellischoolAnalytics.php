@@ -13,7 +13,10 @@ use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox\Intellischool\Module;
 
-class Intellischool extends ModuleLoader
+/**
+ * Module configuration for Intellischool student and class analytics.
+ */
+class IntellischoolAnalytics extends ModuleLoader
 {
     /**
      * Run configuration for the given module
@@ -23,6 +26,6 @@ class Intellischool extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, Module::class, "/modules/intellischool");
+        $this->loadModule($kernel, Module::class, "/modules/analytics");
     }
 }
