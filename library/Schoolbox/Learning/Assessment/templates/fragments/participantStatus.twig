@@ -38,22 +38,18 @@
         {% if latestResponse is defined and latestResponse and latestResponse.allFiles|length %}
         <span class="pipe meta">
             Similarity Report Summary <span class="hint has-tip tip-bottom" data-tooltip title="
+                <strong>Submitted {{ latestResponse.submittedAt.local }}</strong>
                 {% for file in latestResponse.allFiles %}
                 <ul class='information-list'>
+                    {% if file.turnitin %}
                     <li>
-                        <strong>{{ file.basename }}</strong>
-
-                        {% if file.turnitin %}
-                        <ul>
-                            <li>Overall: {{ file.turnitin.overallMatchPercentage }}%</li>
-                            <li>Internet: {{ file.turnitin.internetMatchPercentage }}%</li>
-                            <li>Publication: {{ file.turnitin.publicationMatchPercentage }}%</li>
-                            <li>Submitted Works: {{ file.turnitin.submittedWorksMatchPercentage }}%</li>
-                        </ul>
-                        {% endif %}
+                        <strong>{{ file.turnitin.overallMatchPercentage }}%</strong> {{ file.basename }}
                     </li>
+                    {% endif %}
                 </ul>
                 {% endfor %}
+
+                Review Submission
             ">?</span>
         </span>
         {% endif %}
