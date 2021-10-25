@@ -1,15 +1,19 @@
-{% block header %}
-{% endblock header %}
+<div class="row">
+    <div class="small-12 island">
+        {% block header %}
+        {% endblock header %}
 
-<div class="scroll-wrapper">
-    <form id="iframeForm" method="post" action="https://core.intellischool.net/auth/lti" target="iframe">
-        <input type="hidden" name="id_token" value="{{ jwt }}">
-    </form>
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById('iframeForm').submit();
-        });
-    </script>
-    <iframe class="fullscreen" name="iframe" id="iframe">
-    </iframe>
+        <div class="scroll-wrapper">
+            <form id="iframeForm" method="post" action="https://core.intellischool.net/auth/lti" target="iframe">
+                <input type="hidden" name="id_token" value="{{ jwt }}">
+            </form>
+            <script type="text/javascript">
+                document.addEventListener("DOMContentLoaded", function() {
+                    document.getElementById('iframeForm').submit();
+                });
+            </script>
+            <iframe class="fullscreen" name="iframe" id="iframe">
+            </iframe>
+        </div>
+    </div>
 </div>
