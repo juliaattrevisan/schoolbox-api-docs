@@ -12,8 +12,9 @@ namespace Schoolbox\Intellischool;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\UserMapper;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * Module for the Intellischool integration.
@@ -38,11 +39,22 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
+        /** @var Container $injector */
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)]
+                [
+                    'jwtFactory' => $injector->lazy(function () {
+                        return new JwtFactory(
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY),
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM),
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
+                        );
+                    }),
+                ]
             )
         );
     }

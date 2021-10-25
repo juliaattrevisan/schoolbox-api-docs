@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Intellischool;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 
 /**
@@ -19,6 +18,21 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
+     * Factory for creating JWTs for sending to Intellischool.
+     */
+    private JwtFactory $jwtFactory;
+
+    /**
+     * Constructor
+     *
+     * @param JwtFactory $jwtFactory
+     */
+    public function __construct(JwtFactory $jwtFactory)
+    {
+        $this->jwtFactory = $jwtFactory;
+    }
+
+    /**
      * Index page for the Intellischool integration.
      *
      * @api GET /intellischool
@@ -26,20 +40,11 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        // Build the JWT, put it in the form
-        $jwtFactory = new JwtFactory(
-            $this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
-        );
-
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@intellischool/index.twig',
                 [
-                    'idToken' => $jwtFactory->buildForLearnerProfile(
+                    'idToken' => $this->jwtFactory->buildForLearnerProfile(
                         $this->getUser(),
                         (new User())->setExternalId('1014'),
                     )
