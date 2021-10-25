@@ -3,7 +3,6 @@
 import RevealModal from '@vue/components/reveal-modal'
 import axios       from 'axios'
 import {ENDPOINTS} from '@schoolboxCalendarEvent/endpoints';
-import dayjs from 'dayjs';
 
 /* Vue select
     */

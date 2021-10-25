@@ -16,8 +16,6 @@ import qs                         from "qs";
 import fullCalendarHelper         from "@vue/components/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
-import dayjs                      from 'dayjs';
-import duration                   from 'dayjs/plugin/duration';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -118,7 +116,6 @@ export default {
     },
 
     beforeMount () {
-        dayjs.extend(duration); //to use dayjs.duration
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
@@ -126,7 +123,7 @@ export default {
                 day: {
                     dayHeaders: false,
                     titleFormat: (date) => {
-                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
                     } 
                 },
                 week: {
@@ -141,7 +138,7 @@ export default {
                     buttonText: 'List',
                     duration: this.duration,
                     listDayFormat: (date) => {
-                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong);
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong);
                     }
                 }
             },
@@ -644,8 +641,8 @@ export default {
                 // Register an event listener when update button is clicked.
                 document.querySelector('#update_date_range_button').addEventListener('click', () => {
                     if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
-                        const startDateValue = dayjs(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE);
-                        const endDateValue = dayjs(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
+                        const startDateValue = dayjs(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE, true);
+                        const endDateValue = dayjs(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE, true);
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
                             this.listViewDateRange.start = document.querySelector('#start_date').value;

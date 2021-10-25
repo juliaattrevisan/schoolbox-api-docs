@@ -7,7 +7,6 @@ import toastMixin from '@vue/components/toast-mixin';
 import userProfileMixin from '../../../vue/user-profile/mixin';
 import axios from 'axios';
 import { animateBadgeImage } from '../js/animateBadgeImage'
-import dayjs from 'dayjs';
 
 /**
  * Award detail modal.

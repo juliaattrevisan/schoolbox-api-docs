@@ -82,14 +82,14 @@
 
         var visibleTermDates = [];
 
-        var now = moment('{{ termDates ? termDates[0] : date }}');
+        var now = dayjs('{{ termDates ? termDates[0] : date }}');
         defaultDate = now;
 
         /**
          * How to fetch the assessments for the current view
          *
-         * @param {Moment} start
-         * @param {Moment} end
+         * @param {Dayjs} start
+         * @param {Dayjs} end
          * @param timezone
          * @param {Function} callback
          */
@@ -117,11 +117,11 @@
         var redrawWeekNumbers = function () {
             $('.fc-scroller-canvas .fc-content tr').eq(2).find('th[data-date]').each(function () {
                 var disp = '';
-                var mom  = moment($(this).data('date'));
+                var mom  = dayjs($(this).data('date'));
 
                 if (visibleTermDates.length) {
                     if (mom.isBefore(visibleTermDates[3]) && mom.isAfter(visibleTermDates[0])) {
-                        disp = mom.diff(visibleTermDates[0], 'weeks');
+                        disp = mom.diff(visibleTermDates[0], 'week');
                     }
                 }
 
@@ -133,8 +133,8 @@
         /**
          * How to fetch the terms for the current view
          *
-         * @param {Moment} start
-         * @param {Moment} end
+         * @param {Dayjs} start
+         * @param {Dayjs} end
          * @param timezone
          * @param {Function} callback
          */
@@ -149,8 +149,8 @@
                     // install background events
                     // find the weeks between terms
                     var shade = {
-                        start: moment(termDates[1]).add({ days: 5 }),
-                        end: moment(termDates[2]).add({days: -1})
+                        start: dayjs(termDates[1]).add(dayjs.duration({ days: 5 })),
+                        end: dayjs(termDates[2]).add(dayjs.duration({days: -1}))
                     };
 
                     $cal.find('[data-resource-id]').each(function () {
@@ -347,7 +347,7 @@
                         editable: false,
                         resourceId: resourceId,
                         title: calEvents.length,
-                        start: moment(wk),
+                        start: dayjs(wk),
                         end: null,
                         data: {
                             placeholder: true,
@@ -489,8 +489,8 @@
                     }
 
                     var format = adtp.convertFormat('{{ config.date_local }}'),
-                        open   = moment(eventData.bounds.open),
-                        due    = moment(eventData.bounds.due);
+                        open   = dayjs(eventData.bounds.open),
+                        due    = dayjs(eventData.bounds.due);
 
                     this.dom.find('[data-event-modal-field="bounds.open"]').text(open.format(format));
                     this.dom.find('[data-event-modal-field="bounds.due"]').text(due.format(format));
@@ -582,7 +582,7 @@
             var dateField = $modalForm.find('.date'),
                 prevDate  = dateField.text(),
                 eventData = $modalForm.data('eventData'),
-                newDate   = moment($(this).val(), adtp.convertFormat('{{ config.date_local }}')),
+                newDate   = dayjs($(this).val(), adtp.convertFormat('{{ config.date_local }}')),
                 assessId  = eventData.assessmentId,
                 eventData = {
                     className: [],
@@ -639,7 +639,7 @@
             var data = {
                 assessmentId: calEvent.data.meta.assessmentId,
                 openDate: calEvent.start.format(format),
-                dueDate: calEvent.start.clone().add({days: 1, minutes: -1}).format(format)
+                dueDate: calEvent.start.clone().add(dayjs.duration({days: 1, minutes: -1})).format(format)
             };
 
             calEvent.className.push('loading');
@@ -740,7 +740,7 @@
             } else {
                 var bounds        = event.data.meta.bounds,
                     insideOpen    = target.isSameOrAfter(bounds.open),
-                    insideClose   = target.isSameOrBefore(moment(bounds.due + ' 23:59:59'));
+                    insideClose   = target.isSameOrBefore(dayjs(bounds.due + ' 23:59:59'));
 
                 isInsideDates = insideOpen && insideClose;
             }

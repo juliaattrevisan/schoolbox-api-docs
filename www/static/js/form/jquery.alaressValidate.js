@@ -4,17 +4,17 @@
     $.alaressValidate = {};
 
     /**
-     * Gets a momentJS date given a format and date.
+     * Gets a dayjs date given a format and date.
      *
      * @param format the MomentJS format to get this date in.
      * @param date   the date string
      * @param hour   the hour to set
      * @param minute the minute to set
      * @param second the second to set
-     * @returns {moment}
+     * @returns {dayjs}
      */
     var getDateFromString = function(format, date, hour, minute, second) {
-        return moment(date, format)
+        return dayjs(date, format)
             .hour(hour)
             .minute(minute)
             .second(second)
@@ -27,7 +27,7 @@
      *
      * @param date_field
      * @param form
-     * @returns {moment}
+     * @returns {dayjs}
      */
     var getNormalizedDate = function(date_field, form) {
         var field_name = date_field;
@@ -83,7 +83,7 @@
             }
         }
 
-        return getDateFromString(dateDisplayFormats.momentJs, date, hour, minute, 0)
+        return getDateFromString(dateDisplayFormats.dayjs, date, hour, minute, 0)
     };
 
 
@@ -97,10 +97,10 @@
         if (typeof $(element).attr('data-datepicker-time') == 'undefined' ||
             $('#'+$(element).attr('data-datepicker-alldayinput')).val() == 1
         ) {
-            datepickerMoment = moment(value, dateDisplayFormats.momentJs, true); // Date
+            datepickerMoment = dayjs(value, dateDisplayFormats.dayjs, true); // Date
         }
         else {
-            datepickerMoment = moment(value, dateDisplayFormats.momentJsDatetime, true); // Datetime
+            datepickerMoment = dayjs(value, dateDisplayFormats.dayjsDatetime, true); // Datetime
         }
 
         return datepickerMoment.isValid();
@@ -112,8 +112,8 @@
      * than another element's date.
      */
     $.validator.addMethod('datepickerDateNotBefore', function(value, element, other_element_selector) {
-        var date       = getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0);
-        var other_date = getDateFromString(dateDisplayFormats.momentJs, other_element_selector.val(), 0, 0, 0);
+        var date       = getDateFromString(dateDisplayFormats.dayjs, value, 0, 0, 0);
+        var other_date = getDateFromString(dateDisplayFormats.dayjs, other_element_selector.val(), 0, 0, 0);
 
         // If the other date is empty or not valid, return valid for this and leave the error for that field for now
         // Otherwise we end up with an error message on this field when the user is still working on the other one
@@ -121,7 +121,7 @@
             return true;
         }
 
-        return date.isValid() && date.valueOf() >= other_date.valueOf();
+        return date.isValid() && date.isSameOrAfter(other_date);
 
     }, 'Please enter a date that is <i>after</i> the previous date');
 
@@ -130,7 +130,7 @@
      * Validator for a timepicker (format: h:mma)
      */
     $.validator.addMethod('timepickerTime', function(value, element) {
-        return moment(value, 'h:mma', true).isValid();
+        return dayjs(value, 'h:mma', true).isValid();
     }, 'Please enter a valid time');
 
 
@@ -139,9 +139,9 @@
      * than another one.
      */
     $.validator.addMethod('timepickerNotBefore', function(value, element, other_element_selector) {
-        var time = moment(value, 'h:mma', true);
-        var otherTime = moment(other_element_selector.val(), 'h:mma', true);
-        return time.valueOf() >= otherTime.valueOf();
+        var time = dayjs(value, 'h:mma', true);
+        var otherTime = dayjs(other_element_selector.val(), 'h:mma', true);
+        return time.isAfter(otherTime);
     }, 'Please enter a valid time');
 
 
@@ -162,7 +162,7 @@
      */
     $.validator.addMethod('dateNotBefore', function(value, element, other_date_field) {
         var form = $(element).closest('form');
-        return getNormalizedDate(element).valueOf() >= getNormalizedDate(other_date_field, form).valueOf();
+        return getNormalizedDate(element).isAfter(getNormalizedDate(other_date_field, form));
     }, 'Please enter a date that is after');
 
 

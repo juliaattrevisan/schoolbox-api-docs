@@ -1,7 +1,4 @@
 <script>
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import duration from 'dayjs/plugin/duration';
 
 export default {
 
@@ -73,8 +70,6 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        dayjs.extend(relativeTime); //to use humanize()
-        dayjs.extend(duration); //to use .duration
         this.formattedDate = this.renderFormattedDatetimes(this.datetime);
     },
 
@@ -104,8 +99,8 @@ export default {
                 date = dayjs(datetime),
                 dayDiff = date.diff(now, 'd'),
                 dateFormat = this.dateOnly
-                    ? this.dateDisplayFormats.momentJs
-                    : this.dateDisplayFormats.momentJsDatetime;
+                    ? this.dateDisplayFormats.dayjs
+                    : this.dateDisplayFormats.dayjsDatetime;
 
             let struct = {
                 'absolute': date.format(dateFormat),

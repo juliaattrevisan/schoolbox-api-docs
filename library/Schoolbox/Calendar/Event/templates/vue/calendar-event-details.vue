@@ -1,5 +1,4 @@
 <script>
-    import dayjs            from 'dayjs';
     import AudiencesModal   from './audiences-modal';
     import qs               from 'qs';
     import axios            from "axios";

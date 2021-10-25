@@ -1,8 +1,6 @@
 <script>
 
 import axios  from 'axios';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import duration from 'dayjs/plugin/duration';
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
@@ -45,10 +43,6 @@ export default {
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
         }
-    },
-    created() {
-        dayjs.extend(relativeTime); //to use humanize()
-        dayjs.extend(duration); //to use .duration
     },
     computed: {
         jQuery: () => window.jQuery,
@@ -276,7 +270,7 @@ export default {
               </div>
                 <h2 class="subheader no-margin">
                     <time :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
-                          :title="formatDate(evidenceGroup.date, dateDisplayFormats.momentJsDateLong)"
+                          :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
                     >{{ renderCreatedAt(evidenceGroup.date) }}</time>
                 </h2>
                 <ul class="information-list">
@@ -290,8 +284,8 @@ export default {
                                         <p>{{ evidence.object.creator.fullName }}</p>
                                         <time class="pipe meta"
                                               :datetime="formatDate(evidence.object.createdAt)"
-                                              :title="formatDate(evidence.object.createdAt, dateDisplayFormats.momentJsDatetime)"
-                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.momentJsTime) }}</time>
+                                              :title="formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime)"
+                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsTime) }}</time>
                                     </a>
                                 </div>
                                 <nav v-if="hasMenu(evidence.object)">
@@ -354,8 +348,8 @@ export default {
                                         by {{ evidence.object.awardedBy.fullName }}
                                         |
                                         <time class="meta" :datetime="formatDate(evidence.object.awardedAt)"
-                                              :title="formatDate(evidence.object.awardedAt, dateDisplayFormats.momentJsDatetime)">
-                                        {{ formatDate(evidence.object.awardedAt, dateDisplayFormats.momentJsTime) }}
+                                              :title="formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsDatetime)">
+                                        {{ formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsTime) }}
                                         </time>
                                     </p>
                                 </a>

@@ -12,7 +12,7 @@
 
 <script type="text/javascript">
     var calendarView = {{ calendar.view|json_encode|raw }};
-    var calendarDate = moment({{ calendar.date|json_encode|raw }});
+    var calendarDate = dayjs({{ calendar.date|json_encode|raw }});
 
     if (calendarDate.isValid()) {
         calendarDate = calendarDate.toDate();

@@ -2,6 +2,7 @@ const path = require('path');
 const {VueLoaderPlugin} = require('vue-loader');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
+
 module.exports = {
     entry: { //https://webpack.js.org/configuration/entry-context/
 
@@ -66,7 +67,7 @@ module.exports = {
             './node_modules/mediaelement/build/mediaelement-and-player.min.js',
 
             // DateTime
-            './node_modules/moment/moment.js',
+            './www/static/js/vendors/dayjs/dayjsWithPlugins.js',
 
             // Files And Resource Browser
             './www/static/js/socialstream/browser/browser.js',
@@ -153,18 +154,18 @@ module.exports = {
         searchBar: './vue/components/searchBar/searchBar.js',
 
         //Calendars
-        sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
-        assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
-        upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js',
-        resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js',
-        resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js',
-        calendarComponent: './library/Schoolbox/Calendar/vue/calendarComponent.js',
-        calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js',
+        sbFullCalendar: { import: './library/Schoolbox/Calendar/vue/sbFullCalendar.js', dependOn: 'main' },
+        assessmentCalendar: { import: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js', dependOn: 'main' },
+        upcomingDueWorkCalendar: { import: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js', dependOn: 'main' },
+        resourceBookingItemCalendar: { import: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js', dependOn: 'main' },
+        resourceBookingCategoryCalendar: { import: './library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js', dependOn: 'main' },
+        calendarComponent: { import: './library/Schoolbox/Calendar/vue/calendarComponent.js', dependOn: 'main' },
+        calendarEventDetails: { import: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js', dependOn: 'main' },
 
         //News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
-        articleList: './library/Schoolbox/Comms/News/templates/vue/articleList.js',
-        articleThreads: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js',
+        articleList: { import: './library/Schoolbox/Comms/News/templates/vue/articleList.js', dependOn: 'main' },
+        articleThreads: { import: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js', dependOn: 'main' },
         newsAuthored: './library/Schoolbox/Comms/News/vue/newsAuthored.js',
         newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/newsItemAudienceSelect.js',
         newsItemAudienceInfo: './library/Schoolbox/Comms/News/vue/newsItemAudienceInfo.js',
@@ -172,10 +173,10 @@ module.exports = {
         newsRssLink: './library/Schoolbox/Comms/News/vue/newsRssLink.js',
 
         //Learning
-        learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js',
-        userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js',
-        badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.js',
-        badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js',
+        learningMomentsEvidenceDetail: { import: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js', dependOn: 'main' },
+        userProfileFeeds: { import: './library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js', dependOn: 'main' },
+        badgeList: { import: './library/Schoolbox/Learning/Badge/vue/badgeList.js', dependOn: 'main' },
+        badgeListForm: { import: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js', dependOn: 'main' },
         badgeReport: './library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js',
         evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js',
         checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
@@ -187,7 +188,7 @@ module.exports = {
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
-        staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
+        staleUsersReport: { import: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js', dependOn: 'main' },
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
 
         usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
@@ -233,8 +234,8 @@ module.exports = {
                 loader: 'expose-loader', //see https://webpack.js.org/loaders/expose-loader/ - expose these to the glocal scope, allowing access to the properties in twig / other JS files
                 options: {
                     exposes: [
-                        {globalName: '$', override: true},
-                        {globalName: 'jQuery', override: true}
+                        { globalName: '$', override: true },
+                        { globalName: 'jQuery', override: true }
                     ],
                 },
             },
@@ -242,35 +243,35 @@ module.exports = {
                 test: require.resolve('dropzone'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'Dropzone', override: true}
+                    exposes: { globalName: 'Dropzone', override: true }
                 },
             },
             {
-                test: require.resolve('moment'),
+                test: require.resolve('dayjs'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'moment', override: true}
+                    exposes: { globalName: 'dayjs', override: true }
                 },
             },
             {
                 test: require.resolve('lodash'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: '_', override: true}
+                    exposes: { globalName: '_', override: true }
                 },
             },
             {
                 test: require.resolve('intro.js'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'IntroJs', moduleLocalName: 'introJs', override: true}
+                    exposes: { globalName: 'IntroJs', moduleLocalName: 'introJs', override: true }
                 },
             },
             {
                 test: require.resolve('highcharts'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: {globalName: 'Highcharts', override: true}
+                    exposes: { globalName: 'Highcharts', override: true }
                 },
             },
             {
@@ -366,12 +367,11 @@ module.exports = {
             '@vue': path.resolve(__dirname, 'vue'),
             '@js': path.resolve(__dirname, 'www/static/js'),
             '@css': path.resolve(__dirname, 'www/static/css'),
-            '@vue': path.resolve(__dirname, 'vue')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [ //https://webpack.js.org/configuration/plugins/
         new VueLoaderPlugin(),
-        new RemoveEmptyScriptsPlugin()
+        new RemoveEmptyScriptsPlugin(),
     ]
 };

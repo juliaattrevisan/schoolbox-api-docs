@@ -47,15 +47,15 @@ class Alaress_Date_Format_Converter
     }
 
     /**
-     * Convert a date() format string to a MomentJS format string.
+     * Convert a date() format string to a dayjs format string.
      *
-     * @see http://momentjs.com/docs/#/displaying/format/
+     * @see https://day.js.org/docs/en/display/format
      *
      * @param string $format
      *
      * @return string
      */
-    public static function toMomentJs($format)
+    public static function toDayjs($format)
     {
         return strtr(
             $format,
@@ -71,7 +71,7 @@ class Alaress_Date_Format_Converter
                 's' => 'ss',
                 // day formats
                 'j' => 'D',
-                'S' => 'o',
+                'jS' => 'Do',
                 'd' => 'DD',
                 'D' => 'ddd',
                 'l' => 'dddd',

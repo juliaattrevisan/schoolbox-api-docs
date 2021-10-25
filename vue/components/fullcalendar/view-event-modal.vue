@@ -6,7 +6,6 @@ import MetaItem           from '@vue/components/meta/item'
 import axios              from 'axios';
 import qs                 from 'qs';
 import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
-import dayjs              from 'dayjs';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
  */

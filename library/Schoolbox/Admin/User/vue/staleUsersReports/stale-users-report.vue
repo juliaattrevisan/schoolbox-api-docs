@@ -10,7 +10,6 @@ import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
 import axios from 'axios';
-import dayjs from 'dayjs';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {

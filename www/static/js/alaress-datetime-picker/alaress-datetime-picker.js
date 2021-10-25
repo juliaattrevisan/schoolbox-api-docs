@@ -2,7 +2,7 @@
     // -----------------------------------------------------------------------
     // Public vars & methods
     // -----------------------------------------------------------------------
-    adtp.momentFormats = {
+    adtp.dayjsFormats = {
         database: "YYYY-MM-DD HH:mm:ss",
         databaseShort: "YYYY-MM-DD",
         nice: "dddd, MMM D, Y"
@@ -16,7 +16,7 @@
     };
 
     /**
-     * To keep the date format string the same between the flatpickr format string, and MomentJS need to create a mapping function
+     * To keep the date format string the same between the flatpickr format string, and dayjs need to create a mapping function
      *
      * @param format
      */
@@ -27,7 +27,6 @@
                 j: "D",
                 J: "Do",
                 l: "dddd",
-                N: "E",
                 K: "A",
                 S: "SS",
                 w: "d",
@@ -46,7 +45,6 @@
                 h: "hh",
                 H: "HH",
                 i: "mm",
-                s: "ss",
                 O: "ZZ",
                 P: "Z"
             },
@@ -126,8 +124,8 @@
      */
     adtp.syncDatesOnElement = function ($element, options, from) {
         var dateFormat = fieldHasTime(options)
-            ? dateDisplayFormats.momentJsDatetime
-            : dateDisplayFormats.momentJs;
+            ? dateDisplayFormats.dayjsDatetime
+            : dateDisplayFormats.dayjs;
 
         var syncOptions = {
             dateFormat: dateFormat
@@ -294,22 +292,22 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var originalValue;
 
         if (element.val().length > 0) {
-            originalValue = moment(
+            originalValue = dayjs(
                 element.val(),
-                adtp.convertFormat(options.displayFormat)
+                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
             );
         }
         // if no value has been passed, use today
         else {
-            originalValue = moment();
+            originalValue = dayjs();
         }
         if (
             options.allDayInput !== false &&
             $("#" + options.allDayInput).val() == 1
         ) {
-            originalValue = moment(
+            originalValue = dayjs(
                 originalValue,
-                adtp.convertFormat(options.displayFormatDate)
+                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
             );
         }
 
@@ -337,7 +335,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 "/id/" +
                 pickerId +
                 "/value/" +
-                encodeURIComponent(originalValue.format(adtp.momentFormats.database)),
+                encodeURIComponent(originalValue.format(adtp.dayjsFormats.database)),
                 function () {
                     // Capture closure of modal
                     $(document).on(
@@ -400,7 +398,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     });
 
                     $timetablePicker.find("[data-adtp-tt-submit]").click(function () {
-                        var newDate = moment($(this).attr("data-timetable-value"));
+                        var newDate = dayjs($(this).attr("data-timetable-value"));
                         var selectedCampus = $timetablePicker
                             .find("[data-adtp-tt-campus]")
                             .val();
@@ -424,7 +422,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                 var periodTime = $timetablePicker
                                     .find('[name*="periodTime' + pickerId + '"]:checked')
                                     .val();
-                                var newTime = moment(
+                                var newTime = dayjs(
                                     $timetablePicker
                                         .find(
                                             "[data-adtp-tt-period][data-campus=" +
@@ -435,8 +433,8 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                     "h:mma"
                                 );
                                 newDate = newDate
-                                    .hours(newTime.hours())
-                                    .minutes(newTime.minutes())
+                                    .hour(newTime.hour())
+                                    .minute(newTime.minute())
                                     .seconds(0);
                             }
                         }
@@ -559,19 +557,20 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var value;
 
         if (date !== undefined) {
-            value = moment(date);
+            value = dayjs(date);
         } else if (
             window.pickerInstance[pId] !== undefined &&
             window.pickerInstance[pId].input.value
         ) {
-            value = moment(window.pickerInstance[pId].input.value);
+            value = dayjs(window.pickerInstance[pId].input.value);
         } else if (element.val() !== undefined && element.val()) {
-            value = moment(
+            value = dayjs(
                 element.val(),
-                adtp.convertFormat(pickerFormats.convertFrom)
+                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
             );
+            // debugger;
         } else {
-            value = moment();
+            value = dayjs();
         }
 
         // All Day is on
@@ -592,7 +591,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             }
             element.val(v);
         } else {
-            v = moment(value).format(adtp.convertFormat(pickerFormats.convertTo));
+            v = dayjs(value).format(adtp.convertFormat(pickerFormats.convertTo));
             if (window.pickerInstance[pId] !== undefined) {
                 window.pickerInstance[pId].setDate(v.toISOString);
             }
@@ -664,7 +663,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     $fieldError.show();
                 }
             } else {
-                var newDate = moment.unix(timestamp);
+                var newDate = dayjs.unix(timestamp);
 
                 // If field has all day switch data param and is end or start of day - make all day
                 var state =
@@ -678,9 +677,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     linkedElements.forEach(function (item) {
                         var itemOptions = adtp.getOptions($(item));
-                        var itemDate = moment(
+                        var itemDate = dayjs(
                             item.val(),
-                            adtp.convertFormat(itemOptions.displayFormat)
+                            [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
                         );
                         var itemState =
                             (itemDate.format("HHmm") == "0000" ||

@@ -3,7 +3,6 @@
 import RevealModal from '@vue/components/reveal-modal'
 import MetaList    from '@vue/components/meta/list'
 import MetaItem    from '@vue/components/meta/item'
-import dayjs       from 'dayjs';
 
 const EVENT_VIEW_WEEK = 'eventViewWeek';
 

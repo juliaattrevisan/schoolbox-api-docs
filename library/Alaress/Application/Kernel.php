@@ -878,8 +878,8 @@ abstract class Kernel
                     // MomentJsFormat filter
                     $twig->addFilter(
                         new TwigFilter(
-                            'momentJsFormat',
-                            [\Alaress_Date_Format_Converter::class, 'toMomentJs']
+                            'dayjsFormat',
+                            [\Alaress_Date_Format_Converter::class, 'toDayjs']
                         )
                     );
 

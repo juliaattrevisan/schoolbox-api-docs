@@ -177,9 +177,9 @@
                 calendarDate;
             if (hashParts) {
                 viewAlias      = hashParts[1];
-                var momentDate = moment(hashParts[2], dateDisplayFormats.momentJs);
-                if (momentDate.isValid()) {
-                    calendarDate = momentDate.toDate();
+                var dayjsDate = dayjs(hashParts[2], dateDisplayFormats.dayjs);
+                if (dayjsDate.isValid()) {
+                    calendarDate = dayjsDate.toDate();
                 } else {
                     calendarDate = new Date();
                 }
@@ -205,19 +205,19 @@
             switch (view.type) {
                 case 'timelineTerm':
                     return {
-                        unit:    'months',
+                        unit:    'month',
                         quantity: 6
                     };
 
                 case 'timelineTwoMonth':
                     return {
-                        unit:    'months',
+                        unit:    'month',
                         quantity: 1
                     };
 
                 case 'timelineTwoWeek':
                     return {
-                        unit:    'weeks',
+                        unit:    'week',
                         quantity: 1
                     };
             }
@@ -263,7 +263,7 @@
                 assessmentId: calEvent.meta.assessmentId,
                 openDate: calEvent.start.format(format),
                 dueDate: calEvent.allDay
-                    ? calEvent.end.clone().subtract({days: 1}).format(format)
+                    ? calEvent.end.clone().subtract(dayjs.duration({days: 1})).format(format)
                     : calEvent.end.format(format)
             };
 
@@ -291,7 +291,7 @@
             try {
                 var unit = getViewAlias(calendar.fullCalendar('getView'));
                 var date = calendar.fullCalendar('getDate');
-                window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.momentJs)));
+                window.history.pushState({}, '', ('#'+unit+'/'+date.format(dateDisplayFormats.dayjs)));
             } catch (e) {
                 // Can't recognize view - ignore
             }
@@ -300,8 +300,8 @@
         /**
          * Builds a date span text and datetime tag value.
          *
-         * @param start  A moment object
-         * @param end    A moment object
+         * @param start  A dayjs object
+         * @param end    A dayjs object
          * @param allDay Is this an all day event?
          * @returns {Object} text: a text representation, datetime: an ISO8601 time interval
          */
@@ -310,7 +310,7 @@
                 datetime = '';
             if (allDay) {
                 // All day offset -_- FC is exclusive end, we want inclusive
-                end = end.clone().subtract({days: 1});
+                end = end.clone().subtract(dayjs.duration({days: 1}));
                 datetime = start.format('YYYY-MM-DD') + '/' + end.format('YYYY-MM-DD');
             } else {
                 format = format + ', h:mm a';
@@ -489,10 +489,10 @@
 
                         // Build date spans
                         var eventEnd = calEvent.end,
-                            assessmentEnd = moment(calEvent.meta.assessmentEnd);
+                            assessmentEnd = dayjs(calEvent.meta.assessmentEnd);
                         if (calEvent.allDay) {
-                            eventEnd      = eventEnd.clone().subtract({days: 1});
-                            assessmentEnd = assessmentEnd.clone().subtract({days: 1});
+                            eventEnd      = eventEnd.clone().subtract(dayjs.duration({days: 1}));
+                            assessmentEnd = assessmentEnd.clone().subtract(dayjs.duration({days: 1}));
                         }
                         var eventSpan = $.fullCalendar.formatRange(calEvent.start, eventEnd, 'Do MMMM YYYY'),
                             assessmentSpan = $.fullCalendar.formatRange(calEvent.meta.assessmentStart, assessmentEnd, 'Do MMMM YYYY');
@@ -524,8 +524,8 @@
 
                                 case 'assessmentSpan':
                                     var assessmentSpan = buildDateSpan(
-                                        moment(calEvent.meta.assessmentStart),
-                                        moment(calEvent.meta.assessmentEnd),
+                                        dayjs(calEvent.meta.assessmentStart),
+                                        dayjs(calEvent.meta.assessmentEnd),
                                         calEvent.allDay
                                     );
                                     $this
@@ -619,7 +619,7 @@
                     // First: starts on start of span, until Sunday
                     // Each one after: renders Monday
                     if (isTermView) {
-                        var now         = moment();
+                        var now         = dayjs();
                         var anotherDate = currentView.start.clone();
                         var datePiles   = {};
                         while (anotherDate.isBefore(currentView.end)) {
@@ -629,7 +629,7 @@
                                 datePiles[key] = [];
                             }
                             datePiles[key].push(anotherDate);
-                            anotherDate = anotherDate.clone().add({days: 1});
+                            anotherDate = anotherDate.clone().add(dayjs.duration({days: 1}));
                         }
 
                         var columns = $();
@@ -711,8 +711,8 @@
                             var mostRecent = calendar.find('.fc-chrono .fc-widget-header.fc-past').last();
                             if (mostRecent.length > 0) {
                                 // If I add one week to its date: is it still less than today?
-                                var mostRecentDate = moment(mostRecent.data('date'), 'YYYY-MM-DD');
-                                if (moment().isBefore(mostRecentDate.add({weeks: 1}))) {
+                                var mostRecentDate = dayjs(mostRecent.data('date'), 'YYYY-MM-DD');
+                                if (dayjs().isBefore(mostRecentDate.add(dayjs.duration({weeks: 1})))) {
                                     mostRecent.removeClass('fc-past').addClass('fc-today');
                                 }
                             }

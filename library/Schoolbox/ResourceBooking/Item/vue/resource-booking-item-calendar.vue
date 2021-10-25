@@ -13,7 +13,6 @@ import FilterModal                from '@vue/components/fullcalendar/resourceBoo
 import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
 import fullCalendarHelper         from '@vue/components/fullcalendar/mixinFullCalendarHelper';
-import dayjs                      from 'dayjs';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -83,7 +82,7 @@ export default {
                     dayHeaders: false,
                     allDaySlot: false,
                     titleFormat: (date) => {
-                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.momentJsDateLong); // will produce something like "Tuesday July 16th 2021"
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
                     } 
                 },
                 week: {
