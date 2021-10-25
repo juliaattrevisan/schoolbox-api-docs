@@ -28,7 +28,7 @@
                 J: "Do",
                 l: "dddd",
                 K: "A",
-                S: "SS", 
+                S: "SS",
                 w: "d",
                 W: "W",
                 F: "MMMM",
@@ -290,11 +290,11 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     // Create click event to open the modal for the element
     $datepickerButton.click(function () {
         var originalValue;
-        
+
         if (element.val().length > 0) {
             originalValue = dayjs(
                 element.val(),
-                ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
+                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
             );
         }
         // if no value has been passed, use today
@@ -307,10 +307,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         ) {
             originalValue = dayjs(
                 originalValue,
-                ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
+                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
             );
         }
-        
+
         var $modal = $("#adtp-modal-" + pickerId);
 
         // Only AJAX in the picker if we haven't already
@@ -566,13 +566,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         } else if (element.val() !== undefined && element.val()) {
             value = dayjs(
                 element.val(),
-                ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
+                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
             );
             // debugger;
         } else {
             value = dayjs();
         }
-        
+
         // All Day is on
         var v;
         if (state === true) {
@@ -679,7 +679,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         var itemOptions = adtp.getOptions($(item));
                         var itemDate = dayjs(
                             item.val(),
-                            ['DD/MM/YYYY h:mma', 'DD/MM/YYYY']
+                            [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
                         );
                         var itemState =
                             (itemDate.format("HHmm") == "0000" ||
