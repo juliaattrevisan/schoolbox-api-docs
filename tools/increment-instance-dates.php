@@ -65,7 +65,8 @@ $app = new class extends CliTool\App {
     private function incrementDates(int $diffDays): void
     {
         // Fetch all tables
-        $query = $this->getDatabaseInternal()->executeQuery("
+        $query = $this->getDatabaseInternal()->executeQuery(
+            "
                 SELECT c.TABLE_NAME, c.COLUMN_NAME
                 FROM INFORMATION_SCHEMA.TABLES t
                 JOIN INFORMATION_SCHEMA.COLUMNS c ON c.TABLE_NAME = t.TABLE_NAME
