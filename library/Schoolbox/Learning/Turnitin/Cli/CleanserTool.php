@@ -110,7 +110,7 @@ just...delete Turnitin Group Attachments from them, so you can test freshly.
 
 This is a dev tool and should not be used in the normal scheme of things
 
-Usage: group.php --start=300 --end=400 [--instance=INSTANCE_ID] 
+Usage: cleanser.php --start=300 --end=400 [--instance=INSTANCE_ID] 
 
 
 HELP;
