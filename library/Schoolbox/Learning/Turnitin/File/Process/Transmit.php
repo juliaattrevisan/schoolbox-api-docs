@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin\File\Process;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Turnitin;
@@ -209,14 +210,28 @@ class Transmit
              * if you repeatedly a group, it just updates it)
              */
 
+
+            /* The box has to exist (i.e. not deleted)
+             */
+            try {
+                $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->turnitinMapper->save($model
+                    ->setStatus(Turnitin\File\Model::STATUS_ERROR)
+                    ->setErrorCode('Submission Box Not Found')
+                    ->setErrorMessage('Submission Box not found; maybe its record was deleted'));
+
+                return;
+            }
+
             /* Create a Turnitin Group
              */
-            $group = $this->createGroup($model, $ssf);
+            $group = $this->createGroup($model, $box, $ssf);
 
             /* Create a Turnitin Submission
              */
             if (null !== $group) {
-                $submission = $this->createSubmission($model, $ssf, $group);
+                $submission = $this->createSubmission($model, $box, $ssf, $group);
 
                 /* Upload a Student Submission File's contents to the Turnitin Submission
                  */
@@ -300,7 +315,8 @@ class Transmit
      * manage these. Since our Box Ids are guaranteed to be unique, in it goes
      *
      * @param Turnitin\File\Model $model
-     * @param SingleFile\Model     $ssf
+     * @param SubmissionBox       $box
+     * @param SingleFile\Model    $ssf
      * @return array|null
      * @throws BadEndpoint
      * @throws Credentials
@@ -312,7 +328,7 @@ class Transmit
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createGroup(Turnitin\File\Model $model, SingleFile\Model $ssf): ?array
+    private function createGroup(Turnitin\File\Model $model, SubmissionBox $box, SingleFile\Model $ssf): ?array
     {
         /* Log the state change
          */
@@ -327,19 +343,6 @@ class Transmit
             ),
             Turnitin\File\Model::STATUS_TRANSMIT_GROUP
         );
-
-        /* The box has to exist (i.e. not deleted)
-         */
-        try {
-            $box = $this->boxMapper->findById($ssf->getSubmission()->getSubmissionBox()->getId());
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->turnitinMapper->save($model
-                ->setStatus(Turnitin\File\Model::STATUS_ERROR)
-                ->setErrorCode('Submission Box Not Found')
-                ->setErrorMessage('Submission Box not found; maybe its record was deleted'));
-
-            return null;
-        }
 
         /* See if there's a Turnitin Group already associated with the submission box
          * If it already exists, just get its payload instead
@@ -418,7 +421,7 @@ class Transmit
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createSubmission(Turnitin\File\Model $model, SingleFile\Model $ssf, array $group): ?array
+    private function createSubmission(Turnitin\File\Model $model, SubmissionBox $box, SingleFile\Model $ssf, array $group): ?array
     {
 
         /* Log the state change
@@ -447,6 +450,22 @@ class Transmit
                 ->setStatus(Turnitin\File\Model::STATUS_ERROR)
                 ->setErrorCode('Student Submission File Owner Not Found')
                 ->setErrorMessage('Student Submission File owner not found; maybe their record was deleted'));
+
+            return null;
+        }
+
+        /* Try to get the info for Group Context
+         *
+         * Owners aren't hydrated out of the boxMapper but I don't think they were supposed to
+         * be hydrated like that; something to do with swamp
+         */
+        try {
+            $boxOwner = $this->userMapper->findById($box->getOwner()->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->turnitinMapper->save($model
+                ->setStatus(Turnitin\File\Model::STATUS_ERROR)
+                ->setErrorCode('Submission Box Owner Not Found')
+                ->setErrorMessage('Submission Box owner not found; maybe their record was deleted'));
 
             return null;
         }
@@ -488,7 +507,19 @@ class Transmit
                         'email' => $owner->getEmail()
                     ]
                 ],
-                'group' => $group
+                'group' => $group,
+                'group_context' => [
+                    'id' => $box->getAssessmentModel()->getContextFolder()->getId(),
+                    'name' => $box->getAssessmentModel()->getContextFolder()->getNameWithCodes(),
+                    'owners' => [
+                        [
+                            'id' => $boxOwner->getId(),
+                            'given_name' => $boxOwner->getFirstname(),
+                            'family_name' => $boxOwner->getLastname(),
+                            'email' => $boxOwner->getEmail()
+                        ]
+                    ]
+                ]
             ]
         ];
 
