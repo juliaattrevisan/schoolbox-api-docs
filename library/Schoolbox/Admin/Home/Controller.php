@@ -334,6 +334,10 @@ class Controller extends Base
                     'kamiEnabled' => $this->kamiConnector->isEnabled(),
                     'kamiOnline' => $this->kamiConnector->isOnline(),
                     'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
+
+                    /* Turnitin status indicator
+                     */
+                    'turnitin' => (new \Schoolbox\Learning\Turnitin\Admin\Status($this->getConfigLoader()))->generate(),
                 ),
             )
         );

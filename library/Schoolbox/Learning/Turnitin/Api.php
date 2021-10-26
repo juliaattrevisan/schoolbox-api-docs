@@ -110,29 +110,19 @@ class Api
      * Use the Get Features Enabled endpoint to see if we connect, as per
      * https://developers.turnitin.com/turnitin-core-api/best-practice/exposing-tca-settings
      *
-     * @return bool
+     * @return array|null
+     * @throws Exception\BadEndpoint
+     * @throws Exception\Credentials
+     * @throws GuzzleException
      * @throws \DomainException
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function test(): bool
+    public function test(): ?array
     {
         /* Send it to the endpoint and see what comes back
          */
-        try {
-            $this->retrieve('GET', self::TEST_ENDPOINT, []);
-
-            /* Throws exceptions if something went wrong, normally...
-             * but how do you make this endpoint fail?
-             */
-            return true;
-        } catch (Exception\BadEndpoint | Exception\Credentials | GuzzleException $e) {
-            // noop: all errors return false
-        }
-
-        /* You Failed
-         */
-        return false;
+        return $this->retrieve('GET', self::TEST_ENDPOINT, []);
     }
 
 
