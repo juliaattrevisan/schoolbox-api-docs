@@ -14,6 +14,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\LTI\Claim\CustomClaim;
 use Schoolbox\User;
 
 /**
@@ -122,27 +123,31 @@ class CustomClaimFactory
     }
 
     /**
-     * Build custom fields
+     * Build custom claim from the given set of custom fields.
      *
      * @param array|null $customFields
-     * @return array|null
+     * @return CustomClaim|null
      */
-    public function build(?array $customFields): ?array
+    public function build(?array $customFields): ?CustomClaim
     {
         if (!isset($customFields)) {
             return null;
         }
-        return array_map(
-            Closure::fromCallable([$this, 'translate']),
-            $customFields,
+        return new CustomClaim(
+            array_map(
+                Closure::fromCallable([$this, 'translate']),
+                $customFields,
+            )
         );
     }
 
     /**
+     * Build custom claim from the assessment's custom fields.
+     *
      * @param LtiAssessment $assessment
-     * @return array|null
+     * @return CustomClaim|null
      */
-    public function buildForAssessment(LtiAssessment $assessment): ?array
+    public function buildForAssessment(LtiAssessment $assessment): ?CustomClaim
     {
         return $this->build($assessment->getCustomFields());
     }

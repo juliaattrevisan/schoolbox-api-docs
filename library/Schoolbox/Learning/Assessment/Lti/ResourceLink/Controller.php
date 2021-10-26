@@ -122,15 +122,15 @@ class Controller extends Base
         // LIS claim: I don't think we support this yet
 
         // Custom claims, with whatever was passed from the product
-        $translatedCustomClaims = (new CustomClaimFactory())
+        $customClaim = (new CustomClaimFactory())
             ->withUser($this->getUser())
             ->withActualUser($this->getUser())
             ->withResourceLink($resourceLinkClaim)
             ->withContext($contextClaim)
             ->withPlatformInstance($platformInstanceClaim)
             ->buildForAssessment($assessment);
-        if (isset($translatedCustomClaims)) {
-            $additionalClaims += $translatedCustomClaims;
+        if ($customClaim) {
+            $additionalClaims[] = $customClaim;
         }
 
         // AGS claims:
