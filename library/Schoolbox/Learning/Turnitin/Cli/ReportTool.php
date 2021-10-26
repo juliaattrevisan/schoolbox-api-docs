@@ -17,6 +17,7 @@ use Schoolbox\Learning\Turnitin\Helper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\RedisStore;
 
 /**
@@ -54,9 +55,12 @@ class ReportTool extends CliTool\App
 
 
     /**
-     * Lock ttl
+     * Lock ttl (seconds)
+     *
+     * Reserves this amount for every iteration,
+     * refreshing at the start of every iteration
      */
-    private const LOCK_TTL = 10 * 60;
+    private const LOCK_TTL = 60;
 
 
     /**
@@ -153,8 +157,8 @@ HELP;
              * so we have to ask it to finish both stages independently
              * of each other
              */
-            $this->processLoadedReports($processor);
-            $this->processPreparedReports($processor);
+            $this->processLoadedReports($processor, $lock);
+            $this->processPreparedReports($processor, $lock);
 
             $this->getLogger()->info('Done.');
 
@@ -173,8 +177,9 @@ HELP;
      * we have told turnitin to schedule a report generation
      *
      * @param Turnitin\File\Process\Report $processor
+     * @param LockInterface                $lock
      */
-    private function processLoadedReports(Turnitin\File\Process\Report $processor): void
+    private function processLoadedReports(Turnitin\File\Process\Report $processor, LockInterface $lock): void
     {
         /* Find all the records to process in a synonymous data struct
          */
@@ -204,6 +209,13 @@ HELP;
         /* Shank them all down
          */
         foreach ($models as $model) {
+            $this->getLogger()->debug(sprintf(
+                'Refreshing lock for another %s seconds',
+                self::LOCK_TTL
+            ));
+
+            $lock->refresh();
+
             $processor->processLoadedReports($model);
         }
     }
@@ -215,8 +227,9 @@ HELP;
      * the answers
      *
      * @param Turnitin\File\Process\Report $processor
+     * @param LockInterface                $lock
      */
-    private function processPreparedReports(Turnitin\File\Process\Report $processor): void
+    private function processPreparedReports(Turnitin\File\Process\Report $processor, LockInterface $lock): void
     {
         /* Find all the records to process in a synonymous data struct
          */
@@ -252,6 +265,13 @@ HELP;
         /* Shank them all down
          */
         foreach ($models as $model) {
+            $this->getLogger()->debug(sprintf(
+                'Refreshing lock for another %s seconds',
+                self::LOCK_TTL
+            ));
+
+            $lock->refresh();
+
             $processor->processPreparedReports($model);
         }
     }
