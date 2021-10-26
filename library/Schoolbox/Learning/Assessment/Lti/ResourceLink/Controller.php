@@ -21,6 +21,8 @@ use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Registration\Repository;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Util\RoleClaimFactory;
+use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\Permission\Access\Access;
 
 class Controller extends Base
@@ -70,41 +72,11 @@ class Controller extends Base
         $registration = $this->repository->find($assessment->getLtiTool()->getDeploymentId());
 
         // Roles: dependent on whether user is a participant or instructor
-        $roles = [];
-
-        // Institution roles
-        if ($this->getUser()->getRole()->isStaff()) {
-            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Staff';
-        } elseif ($this->getUser()->getRole()->isStudent()) {
-            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Student';
-        } elseif ($this->getUser()->getRole()->isParent()) {
-            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Other';
-        } elseif ($this->getUser()->getRole()->isGuest()) {
-            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Guest';
-        }
-
-        // Contextual roles + role scope mentors
-        $mentoredUserIds = [];
-        if ($this->access->isInstructor($this->getUser(), $assessmentContext)) {
-            $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Instructor';
-            $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Mentor';
-            foreach ($assessment->getAllParticipants() as $participant) {
-                if (!$participant->isExcluded()) {
-                    $mentoredUserIds[] = $participant->getUser()->getId();
-                }
-            }
-        } elseif ($assessment->isParticipant($this->getUser())) {
-            $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Learner';
-        } elseif ($this->getUser()->getRole()->isParent()) {
-            // they're probably a parent of a student?
-            foreach ($this->getUser()->getChildren() as $child) {
-                if ($assessment->isParticipant($child)) {
-                    $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Mentor';
-                    $mentoredUserIds[] = $child->getId();
-                }
-            }
-        }
-
+        $roleClaimFactory = new RoleClaimFactory($this->access);
+        $roles            = array_merge(
+            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
+            $roleClaimFactory->buildContextRolesForAssessment($this->getUser(), $assessment),
+        );
 
 
         // Additional claims:
@@ -134,7 +106,11 @@ class Controller extends Base
         // for parents, this might be their kids
         // for kids, this won't be anyone
         // for teachers, this will be all participants in the assessment
-        $additionalClaims[LtiMessagePayloadInterface::CLAIM_LTI_ROLE_SCOPE_MENTOR] = $mentoredUserIds;
+        $roleScopeMentorClaim = (new RoleScopeMentorClaimFactory($this->access))
+            ->buildForAssessment($this->getUser(), $assessment);
+        if ($roleScopeMentorClaim) {
+            $additionalClaims[] = $roleScopeMentorClaim;
+        }
 
         // Launch presentation:
         // should come from assessment, but doesn't yet
