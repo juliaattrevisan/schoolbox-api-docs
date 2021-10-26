@@ -576,7 +576,7 @@ class Controller extends BaseController
 
         $serviceMapper = MobileApp\ServiceMapper::getInstance();
         $registryMapper = MobileApp\RegistryMapper::getInstance();
-
+        $service = false;
         $id = trim($post->get('id', null));
         if ($id) {
             $service = $serviceMapper->findById($id);
@@ -586,7 +586,7 @@ class Controller extends BaseController
         $date = new Alaress_Date_Format();
 
         //user shouldn't be calling the path twice, but just check
-        if ($service->isDeleted() === false) {
+        if ($service && $service->isDeleted() === false) {
             //set deleted id in service / mobile_app table
             $serviceMapper->save(
                 $service
@@ -601,17 +601,13 @@ class Controller extends BaseController
                 $this->getResponse()->content->set($this->buildJsonOutput(array('message' => 'Success')));
                 return;
             }
-
-            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
-
         } else {
             if ($this->getRequest()->isXhr()) {
                 // respond with an empty 200 OK
                 $this->getResponse()->content->set($this->buildJsonOutput(array('message' => 'Provider was already deleted')));
                 return;
             }
-
-            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
         }
+        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
     }
 }

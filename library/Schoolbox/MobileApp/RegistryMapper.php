@@ -175,7 +175,8 @@ class RegistryMapper extends Mapper
      * @param \Alaress_Date_Format $date
      * @return void
      */
-    public function deleteForProvider(int $appId, \Alaress_Date_Format $date) {
+    public function deleteForProvider(int $appId, \Alaress_Date_Format $date)
+    {
         $predicatePb = $this->getPredicateBuilder()
                             ->in('app_id', array($appId));
         $this->deleteByPredicates($predicatePb);
