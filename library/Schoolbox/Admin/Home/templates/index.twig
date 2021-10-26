@@ -206,6 +206,22 @@
                                 </div>
                             </li>
                         {% endif %}
+
+                        {# Optionally show turnitin status #}
+                        {% if turnitin.show %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    {{ turnitin.name }}
+                                </div>
+                                <div class="small-7 columns content">
+                                    {% if turnitin.available %}
+                                        <span class="full-width success label">{{ turnitin.message }}</span>
+                                    {% else %}
+                                        <span class="full-width alert label">{{ turnitin.message }}</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endif %}
                     </ul>
                 </section>
 
