@@ -41,8 +41,7 @@ export default {
 
 .student {
     display: flex;
-    min-width: 150px;
-    @media (max-width: $tableToSingleColumn) {
+    @media (max-width: $tableToDoubleColumn) {
         flex-wrap: wrap; //so .title-on-single-column can be on its own row
     }
 }

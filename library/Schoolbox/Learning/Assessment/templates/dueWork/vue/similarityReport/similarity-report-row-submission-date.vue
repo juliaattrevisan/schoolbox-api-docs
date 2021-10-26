@@ -24,11 +24,5 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 @import './similarity-report';
-
-.submission-date {
-    min-width: 100px;
-}
-
 </style>

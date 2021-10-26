@@ -1,5 +1,6 @@
 
-$tableToSingleColumn: 800px;
+$tableToDoubleColumn: 1200px;
+$tableToSingleColumn: 700px;
 
 .title-on-single-column { //to show the row title when at single column, ie <div class="title-on-single-column" data-title="Submission date"> 
     position: relative;
@@ -11,7 +12,7 @@ $tableToSingleColumn: 800px;
         margin-bottom: 0.5rem;
         width: 100%;
     }
-    @media (max-width: $tableToSingleColumn) {
+    @media (max-width: $tableToDoubleColumn) {
         &:before {
             display: block;
         }

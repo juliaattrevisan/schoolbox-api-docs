@@ -55,14 +55,13 @@ export default {
 .status {
     display: flex;
     justify-content: space-between; //the status and review buttons on either ends of column
-    min-width: 400px;
-    @media (max-width: $tableToSingleColumn) {
+    @media (max-width: $tableToDoubleColumn) {
         flex-direction: column;
     }
 }
 
     .status__column {
-        @media (max-width: $tableToSingleColumn) {
+        @media (max-width: $tableToDoubleColumn) {
             margin-bottom: 0.5rem; //so there's a gap to .button
         }
     }

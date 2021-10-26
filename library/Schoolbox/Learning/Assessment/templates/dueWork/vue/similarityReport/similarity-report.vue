@@ -392,13 +392,27 @@ export default {
     display: none; //there's no footer, so no count/pagination/next/prev etc for this report
 }
 
-@media (max-width: $tableToSingleColumn) { //display everything in one column
+@media (max-width: $tableToDoubleColumn) { //display everything in two columns
     .VueTables thead {
         display: none;
     }
-    .VueTables .VueTables__row td {
+    .VueTables__row td:not(.VueTables__select-row) {
+        border-bottom: none;
+        border-top: 1px solid var(--body-background);
+        display: inline-block;
+        width: 50%;
+    }
+    .VueTables__row td.VueTables__select-row {
+        border-bottom: none;
+        border-top: 2px solid var(--body-background);
         display: block;
-        padding: 0.5rem 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: $tableToSingleColumn) { //display everything in one column
+    .VueTables__row td:not(.VueTables__select-row) {
+        display: block;
         width: 100%;
     }
 }

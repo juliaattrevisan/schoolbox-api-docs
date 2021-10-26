@@ -113,10 +113,6 @@ export default {
 
 @import './similarity-report';
 
-.similarity {
-    min-width: 200px;
-}
-
 .list {
     list-style-type: none;
     margin: 0;
