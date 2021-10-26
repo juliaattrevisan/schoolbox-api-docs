@@ -144,8 +144,8 @@ class PreSignedUrlService
         if ($this->fileExists($dataObject)) {
             // Instruct browser to cache redirect to presigned URL.
             // Browser will request a new presigned URL when old one expires.
-            header('HTTP/1.1 301 Moved Permanently');
-            header('Location: ' . $dataObject->getUrl(), true, 301);
+            header('HTTP/1.1 302 Moved Temporarily');
+            header('Location: ' . $dataObject->getUrl(), true, 302);
             header('Cache-Control: ' . $dataObject->getCacheControl());
             header('Expires: ' . $dataObject->getExpires());
             header_remove('pragma');
