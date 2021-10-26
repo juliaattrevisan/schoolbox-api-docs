@@ -363,6 +363,7 @@ class Controller extends BaseController
             'fixtures'         => [NSMapper::NS_SPORTS_FIXTURES, NSMapper::NS_SPORTS_FIXTURES_IMPORT],
             'lms'              => [NSMapper::NS_DUEWORK, NSMapper::NS_ONLINE_ASSESS, NSMapper::NS_REPORT_CARD],
             'badges'           => [NSMapper::NS_BADGE],
+            'eportfolio'       => [NSMapper::NS_EPORTFOLIO_BLOG],
             'learning_moments' => [NSMapper::NS_EVIDENCE, NSMapper::NS_EVIDENCE_COMMENT]
         ];
 
