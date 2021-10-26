@@ -33,6 +33,7 @@ class Module extends BaseModule
         $this->register('GET', '/apps', 'getApps');
         $this->register('GET', '/apps/new', 'getCreateAppForm');
         $this->register('POST', '/apps', 'postModifyApp');
+        $this->register('POST', '/apps/delete', 'postDeleteApp');
     }
 
 

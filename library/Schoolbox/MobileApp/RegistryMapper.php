@@ -167,4 +167,17 @@ class RegistryMapper extends Mapper
             ->equals('user_id', $user->getId());
         $this->deleteByPredicates($predicatePb);
     }
+
+    /**
+     * Soft delete all mobile app registrations
+     *
+     * @param int $appId
+     * @param \Alaress_Date_Format $date
+     * @return void
+     */
+    public function deleteForProvider(int $appId, \Alaress_Date_Format $date) {
+        $predicatePb = $this->getPredicateBuilder()
+                            ->in('app_id', array($appId));
+        $this->deleteByPredicates($predicatePb);
+    }
 }

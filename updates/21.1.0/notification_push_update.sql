@@ -1,8 +1,7 @@
-alter table mobile_app
-    add deleted_at datetime null;
+ALTER TABLE mobile_app
+     ADD deleted_at DATETIME NULL;
 
-alter table mobile_app_registry
-    add deleted_at datetime null;
+ALTER TABLE mobile_app_registry
+    ADD deleted_at DATETIME NULL;
 
-alter table mobile_app_registry_backup
-    add deleted_at datetime null;
+DROP TABLE mobile_app_registry_backup;

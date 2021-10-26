@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Realtime\Admin;
 
+use Alaress_Date_Format;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
@@ -558,5 +559,59 @@ class Controller extends BaseController
         $content['data']['logs'] = array_filter(explode("\n", trim(stream_get_contents($write))));
 
         $this->getResponse()->content->set($content);
+    }
+
+    /**
+     * Deletes notification provider, and user registrations for that provider.
+     *
+     * @api POST /adminv2/messages/apps/delete
+     *
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postDeleteApp()
+    {
+        //get the ID to remove
+        $rq   = $this->getRequest();
+        $post = $rq->post;
+
+        $serviceMapper = MobileApp\ServiceMapper::getInstance();
+        $registryMapper = MobileApp\RegistryMapper::getInstance();
+
+        $id = trim($post->get('id', null));
+        if ($id) {
+            $service = $serviceMapper->findById($id);
+        }
+
+        //get date
+        $date = new Alaress_Date_Format();
+
+        //user shouldn't be calling the path twice, but just check
+        if ($service->isDeleted() === false) {
+            //set deleted id in service / mobile_app table
+            $serviceMapper->save(
+                $service
+                    ->setDeleted($date)
+            );
+
+            //set deleted in app registries
+            $registryMapper->deleteForProvider($service->getId(), $date);
+
+            if ($this->getRequest()->isXhr()) {
+                // respond with an empty 200 OK
+                $this->getResponse()->content->set($this->buildJsonOutput(array('message' => 'Success')));
+                return;
+            }
+
+            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
+            
+        } else {
+            if ($this->getRequest()->isXhr()) {
+                // respond with an empty 200 OK
+                $this->getResponse()->content->set($this->buildJsonOutput(array('message' => 'Provider was already deleted')));
+                return;
+            }
+
+            $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
+        }
     }
 }
