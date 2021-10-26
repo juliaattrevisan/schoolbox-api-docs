@@ -141,6 +141,15 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
+    public function getHumanReadableMark(Participant $participant, $publishedOnly)
+    {
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getHumanReadableMark() : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
     {
         $this->assertSameAssessment($participant);

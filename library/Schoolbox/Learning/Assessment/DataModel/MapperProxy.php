@@ -403,6 +403,7 @@ class MapperProxy
         $assessmentIdBindings  = Builder::getArrayBindings($assessmentIds, 'a1');
         $assessmentIdBindings2 = Builder::getArrayBindings($assessmentIds, 'a2');
         $assessmentIdBindings3 = Builder::getArrayBindings($assessmentIds, 'a3');
+        $assessmentIdBindings4 = Builder::getArrayBindings($assessmentIds, 'a4');
 
         // not querying task as it's not quantitative
         $markQuery = $this->baseMapper->getDatabase()->prepare(
@@ -470,6 +471,26 @@ class MapperProxy
                 AND a.assessment_id IN ({$assessmentIdBindings3['placeholders']})
                 AND aa.reviewed_at IS NULL
 
+           UNION
+
+           -- lti assessments
+           SELECT
+                'ltiAssessment' AS assessment_type,
+                la.assessment_id AS assessment_id,
+                a.weight AS weight,
+                null AS mark_type,
+                sc.student_id AS user_id,
+                sc.score_given AS mark,
+                sc.score_maximum AS max_mark,
+                sc.created_at AS published_at
+           FROM lti_assessment la
+                JOIN assessment a ON a.id = la.assessment_id
+                JOIN participant_plan pp ON pp.assessment_id = la.assessment_id AND pp.deleted_at IS NULL
+                LEFT JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
+                LEFT JOIN lti_assessment_score sc ON la.id = sc.lti_assessment_id AND pc.user_id = sc.student_id AND sc.deleted_at IS NULL AND sc.is_feedback = 1
+           WHERE
+                la.assessment_id IN ({$assessmentIdBindings4['placeholders']})
+
         ORDER BY assessment_id, user_id, published_at DESC
         "
         );
@@ -480,7 +501,8 @@ class MapperProxy
                 $markTypeBindings['bindings'],
                 $assessmentIdBindings['bindings'],
                 $assessmentIdBindings2['bindings'],
-                $assessmentIdBindings3['bindings']
+                $assessmentIdBindings3['bindings'],
+                $assessmentIdBindings4['bindings']
             )
         );
 
@@ -496,7 +518,7 @@ class MapperProxy
             }
             if ($row['mark'] === null) {
                 $normMark = null;
-            } elseif ($row['assessment_type'] === 'quiz') {
+            } elseif ($row['assessment_type'] === 'quiz' || $row['assessment_type'] === 'ltiAssessment') {
                 $normMark = IMarkScheme::NORMALISED_MARK_MAX * (float)$row['mark'] / (float)$row['max_mark'];
             } else {
                 $normMark = (float)$row['mark'];

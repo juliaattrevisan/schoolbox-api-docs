@@ -16,6 +16,7 @@ use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Participant;
 
 /**
  * LTI assessment score mapper.
@@ -25,6 +26,23 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * @var Participant\Plan\InteractionIntegrityChecker
+     */
+    private Participant\Plan\InteractionIntegrityChecker $interactionChecker;
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
+            Participant\Plan\Mapper::getInstance(),
+            Participant\Mapper::getInstance()
+        );
+    }
+
     /**
      * @inheritdoc
      */
@@ -83,6 +101,8 @@ class Mapper extends BaseMapper
         );
         $this->uses('is_response', self::TYPE_BOOLEAN);
         $this->uses('is_feedback', self::TYPE_BOOLEAN);
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
     }
 
     /**
@@ -146,5 +166,21 @@ class Mapper extends BaseMapper
             $collection->add($model);
         }
         return $collection;
+    }
+
+    /**
+     * @param Model      $object
+     * @param Model|null $previous
+     * @return bool
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
+     */
+    public function insertParticipation(Model $object, ?Model $previous = null): bool
+    {
+        $assessment = $this->getJoinMapper('lti_assessment')->findById($object->getLtiAssessment()->getId())->getAssessmentModel();
+        if (!$previous) {
+            $this->interactionChecker->insertParticipationOnFirstInteraction($object->getStudent(), $assessment);
+        }
+        return true;
     }
 }

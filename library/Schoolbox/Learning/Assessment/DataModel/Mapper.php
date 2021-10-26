@@ -346,6 +346,11 @@ class Mapper extends BaseMapper
             $ltiAssessmentMapper = $this->getJoinMapper('ltiAssessment');
             $ltiAssessments      = $ltiAssessmentMapper->findByColumn('assessment_id', $assessment->getId());
             $ltiAssessmentMapper->softDelete($ltiAssessments);
+
+            // Soft deleting scores here instead of LTI/Assessment/Mapper, which doesn't have deleted_at field
+            /** @var LtiAssessment\Score\Mapper $scoreMapper */
+            $scoreMapper = $ltiAssessmentMapper->getJoinMapper('scores');
+            $scoreMapper->deleteByColumn('lti_assessment_id', $ltiAssessments->getPropertyValues('id'));
         }
         return true;
     }

@@ -36,6 +36,7 @@ class Definition extends Filter\AbstractDefinition
     public const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
     public const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
     public const KEY_TASK = AssessmentType::TYPE_TASK;
+    public const KEY_LTI_ASSESSMENT = AssessmentType::TYPE_LTI_ASSESSMENT;
 
     /** @var Collection|string[] */
     private $assessmentTypes;
@@ -79,17 +80,17 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        if (self::KEY_PROJECT === $key) {
-            return 'Project';
-        }
-        if (self::KEY_QUIZ === $key) {
-            return 'Quiz';
-        }
-        if (self::KEY_DUE_WORK === $key) {
-            return 'Due Work';
-        }
-        if (self::KEY_TASK) {
-            return 'Task';
+        switch ($key) {
+            case self::KEY_PROJECT:
+                return 'Project';
+            case self::KEY_QUIZ:
+                return 'Quiz';
+            case self::KEY_DUE_WORK:
+                return 'Due Work';
+            case self::KEY_TASK:
+                return 'Task';
+            case self::KEY_LTI_ASSESSMENT:
+                return 'LTI Assessment';
         }
         throw new InvalidArgumentException("Unknown AssessmentType key: $key");
     }

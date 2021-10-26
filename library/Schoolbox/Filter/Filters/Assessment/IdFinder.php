@@ -595,6 +595,16 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
 
+        // LTI assessments
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_LTI_ASSESSMENT)) {
+            $joinClause .= "
+                $joinType JOIN lti_assessment la ON la.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull('la.id');
+            }
+        }
+
         // Project
         if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
             $joinClause .= "
