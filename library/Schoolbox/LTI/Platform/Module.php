@@ -13,11 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\LTI\Auth\UserAuthenticator;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
-use Schoolbox\LTI\Provider\Model as ToolModel;
-use Schoolbox\LTI\Registration;
-use Schoolbox\UserMapper;
 
 /**
  * LTI platform module.
@@ -84,23 +80,9 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'repository'        => $injector->lazy(function () {
-                        $registrationRepositoryFactory = new Registration\RepositoryFactory(
-                            $this->getConfig(),
-                            $this->getRouter()->generate($this->basename . '.getOidcAuthenticationRequest'),
-                        );
-                        return $registrationRepositoryFactory->build(
-                            $this->getMapperFactory()->get(ToolMapper::class)
-                                                     ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3),
-                        );
-                    }),
-                    'userAuthenticator' => $injector->lazyNew(
-                        UserAuthenticator::class,
-                        [
-                            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-                        ]
-                    ),
-                    'instance' => $injector->lazyGet('instance'),
+                    'repository'        => $injector->lazyGet('lti.repository'),
+                    'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
+                    'instance'          => $injector->lazyGet('instance'),
                 ]
             )
         );
