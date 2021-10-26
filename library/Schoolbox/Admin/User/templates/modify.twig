@@ -7,744 +7,732 @@
     {{ renderAdminNavigation(pageCurrent, method == 'Create' ? 'Create User' : 'Modify User') }}
 
     <div class="admin-content">
-{% if method=='Update' %}
 
-    {# Display modify user header with drop-down #}
-
-    <div class="actions-small-2 row">
-        <div class="list-item">
-            <div class="small-12 columns">
+        {% if method=='Update' %}
+        <div class="actions-small-1">
+            <div class="list-item">
                 <h2 class="subheader">{{ user.fullName }}</h2>
             </div>
-        </div>
-        <nav>
-            <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            <li>
-                {% if user.enabled %}
-                    <a href="{{ routeLookup('user.impersonate', {userId: user.id}) }}" class="icon-staff-students" title="Login as user">Impersonate</a>
-                {% else %}
-                    <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
-                {% endif %}
-            </li>
-            <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
-            {# There is no user token icon: use LTI because it sort of implies third-party integrations #}
-            {% if token is defined %}
-            <li><a href="#" class="icon-lti" data-reveal-id="userToken">Generate User Token</a></li>
-            {% endif %}
-            <li>
-                {% if isSchoolboxAdmin %}
-                    <a class="icon-delete menu_disabled"
-                       title="This user may not be deleted">Delete User</a>
-                {% else %}
-                    <a class="icon-delete"
-                       title="Delete User"
-                       data-delete
-                       data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a>
-                {% endif %}
-            </li>
-        </ul>
-    </div>
-
-{% else %}
-
-    {% set method = 'Create' %}
-
-{% endif %}
-
-
-{# User detail section #}
-
-<div class="row">
-    <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
-    <div class="small-12 island">
-        <section>
-            <fieldset>
-                <div class="row content">
-                    <input type="hidden" name="type" value="modify"/>
-                    <input type="hidden" name="userID" value="{{ user.id }}"/>
-
-                    <div class="small-12 medium-4 island">
-                        <label>Portrait Image</label>
-
-                        {# If the user has a picture, show it
-                         #}
-                        {% if user.portrait %}
-                            <div id="portraitImage">
-                                {% include 'include/portrait.twig' with {user: user, render: 'large', appendQueryParam: '&cb=' ~ date().timestamp} only %}
-                            </div>
-                        {% endif %}
-
-                        {# If you can change the picture manually, show attachzone
-                         # This depends on the config setting "Load From SIS"
-                         # If it's on, you -cannot- change pictures manually
-                         #}
-                        {% if portraitZone %}
-                            {% include 'sub/attachzone.twig' with {
-                                attachzone: portraitZone,
-                                onDetach: "function() {
-                                    $('#portraitImage').fadeOut();
-                                }"
-                            } %}
-
-                            {# Cachebuster
-                             # Get the latest version for instant gratification while on this screen
-                             #}
-                            <script>
-                                $(function() {
-                                    var img = $('#profile-drop').find('img');
-
-                                    img.attr('src', img.attr('src') + '&cb={{ date().timestamp }}');
-                                });
-                            </script>
-                        {% endif %}
-
-                        {# If user never had a picture and you can't add one manually because of config setting
-                         # then display a generic empty state thing explaining what's going on
-                         #}
-                        {% if not user.portrait and not portraitZone %}
-                            <div class="empty-state">
-                                {% include 'include/portrait.twig' with {user: user, render: 'large'} only %}
-                                <p>We were unable to find a portrait for this user in {{ config.external_type|capitalize }}.</p>
-                                <p>You can disable auto loading portraits <a href="/adminv2/setting/External+DB#photo_sis_import">via this setting.</a></p>
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="small-12 medium-4 island">
-                        <div>
-                            <label for="title">Title</label>
-                            <select id="title" name="title">
-                                <option value="" {% if user.title == "" %}selected{% endif %}></option>
-                                {% for title in titles %}
-                                    {% if title.title %}
-                                    <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="firstname" class="required">First Name</label>
-                            <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
-                        </div>
-                        <div>
-                            <label for="lastname">Surname</label>
-                            <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
-                        </div>
-                        <div>
-                            <label for="position_title">Position Title</label>
-                            <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
-                        </div>
-
-                        {% if user %}
-                            <div>
-                                {# Can't display a schoolbox user ID on insert screen #}
-                                <label for="userId">Schoolbox User ID</label>
-                                <input id="userId" type="text" disabled value="{{ user.id }}"/>
-                            </div>
-                        {% endif %}
-
-                        <div>
-                            <label for="database">{{ externalDatabase }} ID</label>
-                            <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
-                        </div>
-                    </div>
-
-                    <div class="small-12 medium-4 island">
-                        <div>
-                            <label for="username" class="required">Username</label>
-                            <input id="username"
-                                   type="text"
-                                   class="required"
-                                   name="modusername"
-                                   {% if isSchoolboxAdmin %}readonly title="This user's username may not be changed"{% endif %}
-                                   value="{{ user.username }}" />
-                        </div>
-
-                        <div>
-                            <label for="password">Password</label>
-                            <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
-                        </div>
-
-                        <div>
-                            <label for="group">Role</label>
-                            <select id="group" name="group">
-                                {% for role in roles %}
-                                    <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="alt_email">Alternate Email</label>
-                            <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
-                        </div>
-
-                        <div>
-                            <label for="year">Year</label>
-                            <select name="year_id">
-                                <option value="" selected="selected">Not Set</option>
-                                {% for yearLevel in yearLevels %}
-                                    {% set selected = '' %}
-
-                                    {% if user.year is not null and yearLevel.id == user.year.id %}
-                                        {% set selected = 'selected="selected"' %}
-                                    {% endif %}
-
-                                    <option value="{{ yearLevel.id }}" {{ selected }}>{{ yearLevel.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="house">House</label>
-                            <select id="house" name="house">
-                                <option value="">Not Set</option>
-                                {% for house in houses %}
-                                    <option value="{{ house.id }}" {% if user.schoolHouse.id ?? 0 == house.id %}selected{% endif %}>{{ house.house }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="residential_house">Residential House</label>
-                            <select id="residential_house" name="residential_house">
-                                <option value="">Not Set</option>
-                                {% for residentialHouse in residentialHouses %}
-                                    <option value="{{ residentialHouse.id }}"
-                                            {% if user.residentialHouse.id ?? 0 == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            {# Render roughly-equal column lengths #}
-            <fieldset>
-                <label class="content required">Campus Involvement</label>
-
-                <div class="row content">
-                    {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
-
-                    {# Work out if the user is in this campus- really need to write a collection.contains() method #}
-                    {% for campus in campuses %}
-                        {% if numPerColumn == 1 or loop.index % numPerColumn == 1 %}
-                        <div class="small-12 medium-4 columns">
-                        {% endif %}
-
-                        {% set campusChecked = false %}
-                        {% for userCampus in user.campusCollection %}
-                            {% if userCampus.id == campus.id %}
-                                {% set campusChecked = true %}
-                            {% endif %}
-                        {% endfor %}
-                        <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                        <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
-
-                        {% if loop.last or loop.index % numPerColumn == 0 %}
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-
-                    {# Special case for two campuses
-                     # Render an empty nbsp; div otherwise it looks like a 2-column layout
-                     #}
-                    {% if campuses|length == 2 %}
-                        <div class="small-12 medium-4 columns">&nbsp;</div>
+            <nav>
+                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+            </nav>
+            <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                <li>
+                    {% if user.enabled %}
+                        <a href="{{ routeLookup('user.impersonate', {userId: user.id}) }}" class="icon-staff-students" title="Login as user">Impersonate</a>
+                    {% else %}
+                        <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
                     {% endif %}
-                </div>
-            </fieldset>
-            <fieldset>
-                <label class="content">Options</label>
-                <div class="row content">
-                    <div class="small-12 medium-4 columns">
-                        <ul class="option-list">
-                            <li>
-                                <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %}{% if not config.eportfolio_enabled %} disabled {% endif %}/>
-                                <label for="eportfolio" class="checkbox-label">Enable E-Portfolio</label>
-                            </li>
-                            <li>
-                                <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
-                                <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
-                            </li>
-                            <li>
-                                <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
-                                <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="small-12 medium-4 columns">
-                        <ul class="option-list">
-                            <li>
-                                <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
-                                <label for="local_email" class="checkbox-label">Email Address from Username</label>
-                            </li>
-                            <li>
-                                <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.useInternalMail %}checked{% endif %}/>
-                                <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
-                            </li>
-                            <li>
-                                <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
-                                <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
-                            </li>
-                        </ul>
-                    </div>
+                </li>
+                <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
+                {# There is no user token icon: use LTI because it sort of implies third-party integrations #}
+                {% if token is defined %}
+                    <li><a href="#" class="icon-lti" data-reveal-id="userToken">Generate User Token</a></li>
+                {% endif %}
+                <li>
+                    {% if isSchoolboxAdmin %}
+                        <a class="icon-delete menu_disabled"
+                           title="This user may not be deleted">Delete User</a>
+                    {% else %}
+                        <a class="icon-delete"
+                           title="Delete User"
+                           data-delete
+                           data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+        {% endif %}
 
-                    <div class="small-12 medium-4 columns">
-                        <ul class="option-list">
-                            <li>
-                                <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
-                                <label for="display_grade_graph" class="checkbox-label">Display Comparative Graph on Grades</label>
-                            </li>
-
-                        {% if isSchoolboxAdmin %}
-                            {% if user.isSuperuser %}
-                                <input type="hidden" name="superuser" value="1" />
-                            {% endif %}
-                            <li>
-                                <input id="superuser"
-                                    type="checkbox"
-                                    name="superuser"
-                                    value="1"
-                                    disabled
-                                    {% if user.isSuperuser %}checked{% endif %}
-                                />
-                                <label for="superuser"
-                                    class="checkbox-label"
-                                    title="This user's superuser status may not be changed"
-                                >Superuser</label>
-                            </li>
-                        {% else %}
-                            <li>
-                                <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
-                                <label for="superuser" class="checkbox-label">Superuser</label>
-                            </li>
-                        {% endif %}
-
-                        {% if method=='Update' %}
-                            {# Only modify user screen has the enabled checkbox #}
-                            {% if isSchoolboxAdmin %}
-                                {% if user.enabled %}
-                                    <input type="hidden" name="account_enabled" value="1" />
-                                {% endif %}
-                                <li>
-                                    <input id="account_enabled"
-                                        type="checkbox"
-                                        name="account_enabled"
-                                        value="1"
-                                        disabled
-                                        {% if user.enabled %}checked{% endif %} />
-                                    <label for="account_enabled"
-                                        class="checkbox-label"
-                                        title="This user's account must always be enabled"
-                                    >Account Enabled</label>
-                                </li>
-                            {% else %}
-                                <li>
-                                    <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
-                                           {% if user.enabled %}checked{% endif %} />
-                                    <label for="account_enabled" class="checkbox-label">Account Enabled</label>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            </fieldset>
-        </section>
-    </div>
-    <div class="small-12 columns">
-        <input type="submit" value="{{ method }} User"/>
-    </div>
-</form>
-</div>
-
-{% if method=='Update' %}
-
-    {# Synergetic file year and semester #}
-
-    {% if (externalDatabase | lower) == 'synergetic' %}
         <div class="row">
-            <div class="small-12 island">
-                <h3 class="subheader">Synergetic Info</h3>
-                <section class="profile content">
-                    <dl>
-                        <dt class="small-12 medium-3 no-pad">Year:</dt>
-                        <dd class="small-12 medium-9 no-pad">{{ fileYear }}</dd>
-                        <dt class="small-12 medium-3 no-pad">Semester:</dt>
-                        <dd class="small-12 medium-9 no-pad">{{ fileSemester }}</dd>
-                    </dl>
-                </section>
-            </div>
-        </div>
-    {% endif %}
+            <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
+                <div class="small-12 island">
+                    <section>
+                        <fieldset>
+                            <div class="row content">
+                                <input type="hidden" name="type" value="modify"/>
+                                <input type="hidden" name="userID" value="{{ user.id }}"/>
 
-    {# Group Access #}
+                                <div class="small-12 medium-4 island">
+                                    <label>Portrait Image</label>
 
-    <div class="row">
-        <div class="small-12 island">
-            <h3 class="subheader" id="groups">Groups</h3>
-            <section>
-                <ul class="action-list">
-                    <li class="actions-small-1 row-header">
-                        <div class="list-item">
-                            <div class="small-7 columns">Group Name</div>
-                            <div class="small-5 columns">Access</div>
-                        </div>
-                    </li>
+                                    {# If the user has a picture, show it
+                                     #}
+                                    {% if user.portrait %}
+                                        <div id="portraitImage">
+                                            {% include 'include/portrait.twig' with {user: user, render: 'large', appendQueryParam: '&cb=' ~ date().timestamp} only %}
+                                        </div>
+                                    {% endif %}
 
-                    {# Show all groups the user is a member of #}
-                    {% for folder in userGroups %}
-                        <li class="actions-small-1" data-group>
-                            <div class="list-item">
-                                <div class="card small-7">
-                                    <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
-                                </div>
-                                <div class="card small-5">
-                                    <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: folder.id}) }}" method="post">
-                                        {% set perm = userGroupPermissions[folder.id].accessLevel %}
+                                    {# If you can change the picture manually, show attachzone
+                                     # This depends on the config setting "Load From SIS"
+                                     # If it's on, you -cannot- change pictures manually
+                                     #}
+                                    {% if portraitZone %}
+                                        {% include 'sub/attachzone.twig' with {
+                                            attachzone: portraitZone,
+                                            onDetach: "function() {
+                                                $('#portraitImage').fadeOut();
+                                            }"
+                                        } %}
 
-                                        <select name="type" data-autosubmit-group data-folder="{{ folder.id }}" title="Access">
-                                            <option value="{{ accessLevel.read }}" {% if perm == accessLevel.read %}selected{% endif %}>Read</option>
-                                            <option value="{{ accessLevel.write }}" {% if perm == accessLevel.write %}selected{% endif %}>Write</option>
-                                            <option value="{{ accessLevel.moderate }}" {% if perm == accessLevel.moderate %}selected{% endif %}>Group Admin</option>
-                                        </select>
-                                    </form>
-                                </div>
-                            </div>
-                            <nav>
-                                <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
-                            </nav>
-                        </li>
-                    {% endfor %}
+                                        {# Cachebuster
+                                         # Get the latest version for instant gratification while on this screen
+                                         #}
+                                        <script>
+                                            $(function() {
+                                                var img = $('#profile-drop').find('img');
 
-                    <li class="actions-small-1">
-                        <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
-                            <div class="card small-7">
-                                <select required name="sid" id="groupSelect" form="groupAdd" class="required" title="Group">
-                                    <option value="" disabled selected>Select Group</option>
-                                    {% for folder in allGroups %}
-                                        <option value="{{ folder.id }}">{{ folder.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="card small-5">
-                                <select required name="type" form="groupAdd" title="Access">
-                                    <option value="{{ accessLevel.read }}">Read</option>
-                                    <option value="{{ accessLevel.write }}">Write</option>
-                                    <option value="{{ accessLevel.moderate }}">Group Admin</option>
-                                </select>
-                            </div>
-                            <div class="card small-12">
-                                <p><input type="submit" value="Add" disabled/></p>
-                            </div>
-                        </form>
-                    </li>
-                </ul>
-            </section>
-        </div>
-    </div>
+                                                img.attr('src', img.attr('src') + '&cb={{ date().timestamp }}');
+                                            });
+                                        </script>
+                                    {% endif %}
 
-    {# Service permissions #}
-
-    <div class="row">
-        <div class="small-12 island">
-            <h3 class="subheader" id="permissions">Permissions</h3>
-            <section>
-                <ul class="action-list">
-                    <li class="actions-small-1 row-header">
-                        <div class="list-item">
-                            <div class="small-4 columns">Service</div>
-                            <div class="small-4 columns">Service Identifier</div>
-                            <div class="small-4 columns">Access</div>
-                        </div>
-                    </li>
-
-                    {% for permission in userPermissions %}
-
-                        {% if serviceMapping[permission.service] is defined %}
-                        <li class="actions-small-1" data-permission>
-                            <div class="list-item">
-                                <div class="small-4 card">
-                                    {{ serviceMapping[permission.service].name }}
-                                </div>
-                                <div class="small-4 card">
-                                    {% if serviceMapping[permission.service].identifier == identifiers.campus %}
-                                        Campus:
-                                        {% for campus in campuses |filter(campus => campus.id == permission.serviceIdentifier) %}
-                                            {{ campus.name }}
-                                        {% endfor %}
-                                    {% elseif serviceMapping[permission.service].identifier ==  identifiers.residentialHouse %}
-                                        House:
-                                        {% for residentialHouse in residentialHouses | filter( residentialHouse => residentialHouse.id == permission.serviceIdentifier) %}
-                                            {{ residentialHouse.house }}
-                                        {% endfor %}
+                                    {# If user never had a picture and you can't add one manually because of config setting
+                                     # then display a generic empty state thing explaining what's going on
+                                     #}
+                                    {% if not user.portrait and not portraitZone %}
+                                        <div class="empty-state">
+                                            {% include 'include/portrait.twig' with {user: user, render: 'large'} only %}
+                                            <p>We were unable to find a portrait for this user in {{ config.external_type|capitalize }}.</p>
+                                            <p>You can disable auto loading portraits <a href="/adminv2/setting/External+DB#photo_sis_import">via this setting.</a></p>
+                                        </div>
                                     {% endif %}
                                 </div>
-                                <div class="small-4 card">
-                                    <form action="{{ routeLookup('adminUser.postUpdateService', {userId: user.id, service: permission.service, sid: permission.serviceIdentifier}) }}" method="post" class="updateServicesForm">
-                                        <input type="hidden" name="sid" value="{{ permission.serviceIdentifier }}"/>
-                                        <input type="hidden" name="service" value="{{ permission.service }}"/>
-                                        <input type="hidden" name="updateServices" value="1"/>
 
-                                        <select name="type" data-autosubmit-service data-service="{{ permission.service }}" data-sid="{{ permission.serviceIdentifier }}">
-                                            {% for level, available in serviceMapping[permission.service].availability %}
-                                                {% if available %}
-                                                    <option value="{{ accessLevel[level] }}" {% if permission.accessLevel == accessLevel[level] %}selected{% endif %}>{{ level|capitalize }}</option>
+                                <div class="small-12 medium-4 island">
+                                    <div>
+                                        <label for="title">Title</label>
+                                        <select id="title" name="title">
+                                            <option value="" {% if user.title == "" %}selected{% endif %}></option>
+                                            {% for title in titles %}
+                                                {% if title.title %}
+                                                    <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
                                                 {% endif %}
                                             {% endfor %}
                                         </select>
-                                    </form>
+                                    </div>
+
+                                    <div>
+                                        <label for="firstname" class="required">First Name</label>
+                                        <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
+                                    </div>
+                                    <div>
+                                        <label for="lastname">Surname</label>
+                                        <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
+                                    </div>
+                                    <div>
+                                        <label for="position_title">Position Title</label>
+                                        <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
+                                    </div>
+
+                                    {% if user %}
+                                        <div>
+                                            {# Can't display a schoolbox user ID on insert screen #}
+                                            <label for="userId">Schoolbox User ID</label>
+                                            <input id="userId" type="text" disabled value="{{ user.id }}"/>
+                                        </div>
+                                    {% endif %}
+
+                                    <div>
+                                        <label for="database">{{ externalDatabase }} ID</label>
+                                        <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
+                                    </div>
+                                </div>
+
+                                <div class="small-12 medium-4 island">
+                                    <div>
+                                        <label for="username" class="required">Username</label>
+                                        <input id="username"
+                                               type="text"
+                                               class="required"
+                                               name="modusername"
+                                               {% if isSchoolboxAdmin %}readonly title="This user's username may not be changed"{% endif %}
+                                               value="{{ user.username }}" />
+                                    </div>
+
+                                    <div>
+                                        <label for="password">Password</label>
+                                        <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+                                    </div>
+
+                                    <div>
+                                        <label for="group">Role</label>
+                                        <select id="group" name="group">
+                                            {% for role in roles %}
+                                                <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="alt_email">Alternate Email</label>
+                                        <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
+                                    </div>
+
+                                    <div>
+                                        <label for="year">Year</label>
+                                        <select name="year_id">
+                                            <option value="" selected="selected">Not Set</option>
+                                            {% for yearLevel in yearLevels %}
+                                                {% set selected = '' %}
+
+                                                {% if user.year is not null and yearLevel.id == user.year.id %}
+                                                    {% set selected = 'selected="selected"' %}
+                                                {% endif %}
+
+                                                <option value="{{ yearLevel.id }}" {{ selected }}>{{ yearLevel.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="house">House</label>
+                                        <select id="house" name="house">
+                                            <option value="">Not Set</option>
+                                            {% for house in houses %}
+                                                <option value="{{ house.id }}" {% if user.schoolHouse.id ?? 0 == house.id %}selected{% endif %}>{{ house.house }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="residential_house">Residential House</label>
+                                        <select id="residential_house" name="residential_house">
+                                            <option value="">Not Set</option>
+                                            {% for residentialHouse in residentialHouses %}
+                                                <option value="{{ residentialHouse.id }}"
+                                                        {% if user.residentialHouse.id ?? 0 == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <nav>
-                                <a href="#" data-delete-permission="{{ permission.serviceIdentifier }}" data-service="{{ permission.service}}" class="icon-delete" title="Remove"></a>
-                            </nav>
-                        </li>
-                        {% endif %}
-                    {% endfor %}
+                        </fieldset>
 
-                    <li class="actions-small-1">
-                        <form id="serviceCloneForm" action="{{ routeLookup('adminUser.postInsertPermission', {userId: user.id}) }}" method="post" data-validatable-as="addService"
-                              data-action="addService" class="list-item">
-                            <div class="small-4 card">
-                                <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
-                                    <option value="" data-identifier="{{ identifiers.none }}" disabled selected>Select Service</option>
+                        {# Render roughly-equal column lengths #}
+                        <fieldset>
+                            <label class="content required">Campus Involvement</label>
 
-                                    {% for serviceIdentifier, serviceData in serviceMapping %}
-                                        <option value="{{ serviceIdentifier }}" data-identifier="{{ serviceData.identifier }}">{{ serviceData.name }}</option>
+                            <div class="row content">
+                                {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
+
+                                {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+                                {% for campus in campuses %}
+                                    {% if numPerColumn == 1 or loop.index % numPerColumn == 1 %}
+                                        <div class="small-12 medium-4 columns">
+                                    {% endif %}
+
+                                    {% set campusChecked = false %}
+                                    {% for userCampus in user.campusCollection %}
+                                        {% if userCampus.id == campus.id %}
+                                            {% set campusChecked = true %}
+                                        {% endif %}
                                     {% endfor %}
-                                </select>
-                            </div>
-                            <div class="small-4 card">
-                                <select data-service-type="{{ identifiers.campus }}" name="sid" id="campusSelect" class="hide" disabled required>
-                                    <option value="" disabled selected>Select Campus</option>
-                                    {% for campus in campuses %}
-                                        <option value="{{ campus.id }}">{{ campus.name }}</option>
-                                    {% endfor %}
-                                </select>
-                                <select data-service-type="{{ identifiers.residentialHouse }}" name="sid" id="residentialHouseSelect" class="hide" disabled required>
-                                    <option value="" disabled selected>Select Residential House</option>
-                                    {% for residentialHouse in residentialHouses %}
-                                        <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
-                                    {% endfor %}
-                                </select>
-                                <select data-service-type="{{ identifiers.none }}" name="sid" id="serviceIdentifierSelect" style="display:none">
-                                    <option value="" disabled>--</option>
-                                </select>
-                            </div>
-                            <div class="small-4 card">
-                                <select name="type" id="accessLevelSelect" form="serviceCloneForm" required style="display:none">
-                                    <option id="read" value="{{ accessLevel.read }}">Read</option>
-                                    <option id="write" value="{{ accessLevel.write }}">Write</option>
-                                    <option id="moderate" value="{{ accessLevel.moderate }}">Moderate</option>
-                                </select>
-                            </div>
-                            <div class="small-12 card">
-                                <p><input type="submit" value="Add" name="serviceSubmit" disabled></p>
-                            </div>
-                        </form>
-                    </li>
-                </ul>
-            </section>
-        </div>
-    </div>
+                                    <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                                    <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
 
-    {# Linked user accounts #}
+                                    {% if loop.last or loop.index % numPerColumn == 0 %}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
 
-    <div class="row">
-        <div class="small-12 island">
-            <h3 class="subheader" id="linked">Linked Accounts</h3>
-            <section>
-                <ul class="action-list">
-                    <li class="actions-small-1 row-header">
-                        <div class="list-item">
-                            <div class="small-12 columns">User</div>
-                        </div>
-                    </li>
+                                {# Special case for two campuses
+                     # Render an empty nbsp; div otherwise it looks like a 2-column layout
+                                #}
+                                {% if campuses|length == 2 %}
+                                    <div class="small-12 medium-4 columns">&nbsp;</div>
+                                {% endif %}
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <label class="content">Options</label>
+                            <div class="row content">
+                                <div class="small-12 medium-4 columns">
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %}{% if not config.eportfolio_enabled %} disabled {% endif %}/>
+                                            <label for="eportfolio" class="checkbox-label">Enable E-Portfolio</label>
+                                        </li>
+                                        <li>
+                                            <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
+                                            <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
+                                        </li>
+                                        <li>
+                                            <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
+                                            <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="small-12 medium-4 columns">
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
+                                            <label for="local_email" class="checkbox-label">Email Address from Username</label>
+                                        </li>
+                                        <li>
+                                            <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.useInternalMail %}checked{% endif %}/>
+                                            <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
+                                        </li>
+                                        <li>
+                                            <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
+                                            <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+                                        </li>
+                                    </ul>
+                                </div>
 
-                    {% for linkedUser in user.linkedUser %}
-                        <li class="actions-small-1" data-linked-user>
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <a href="/adminv2/user/{{ linkedUser.id }}/modify">{{ linkedUser.fullName }}</a>
+                                <div class="small-12 medium-4 columns">
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
+                                            <label for="display_grade_graph" class="checkbox-label">Display Comparative Graph on Grades</label>
+                                        </li>
+
+                                        {% if isSchoolboxAdmin %}
+                                            {% if user.isSuperuser %}
+                                                <input type="hidden" name="superuser" value="1" />
+                                            {% endif %}
+                                            <li>
+                                                <input id="superuser"
+                                                       type="checkbox"
+                                                       name="superuser"
+                                                       value="1"
+                                                       disabled
+                                                       {% if user.isSuperuser %}checked{% endif %}
+                                                />
+                                                <label for="superuser"
+                                                       class="checkbox-label"
+                                                       title="This user's superuser status may not be changed"
+                                                >Superuser</label>
+                                            </li>
+                                        {% else %}
+                                            <li>
+                                                <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
+                                                <label for="superuser" class="checkbox-label">Superuser</label>
+                                            </li>
+                                        {% endif %}
+
+                                        {% if method=='Update' %}
+                                            {# Only modify user screen has the enabled checkbox #}
+                                            {% if isSchoolboxAdmin %}
+                                                {% if user.enabled %}
+                                                    <input type="hidden" name="account_enabled" value="1" />
+                                                {% endif %}
+                                                <li>
+                                                    <input id="account_enabled"
+                                                           type="checkbox"
+                                                           name="account_enabled"
+                                                           value="1"
+                                                           disabled
+                                                           {% if user.enabled %}checked{% endif %} />
+                                                    <label for="account_enabled"
+                                                           class="checkbox-label"
+                                                           title="This user's account must always be enabled"
+                                                    >Account Enabled</label>
+                                                </li>
+                                            {% else %}
+                                                <li>
+                                                    <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
+                                                           {% if user.enabled %}checked{% endif %} />
+                                                    <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                                                </li>
+                                            {% endif %}
+                                        {% endif %}
+                                    </ul>
                                 </div>
                             </div>
-                            <nav>
-                                <a href="#" data-delete-linked="{{ linkedUser.id }}" class="icon-delete" title="Remove"></a>
-                            </nav>
-                        </li>
-                    {% endfor %}
-
-                    <li class="actions-small-1">
-                        <form action="{{ routeLookup('adminUser.postInsertLinked', {userId: user.id}) }}" method="post" id="linkedUserAdd" class="list-item">
-                            <div class="small-12 card">
-                                <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
-                            </div>
-                            <div class="small-12 card">
-                                <p><input type="submit" value="Add" disabled /></p>
-                            </div>
-                        </form>
-                    </li>
-                </ul>
-            </section>
-        </div>
-    </div>
-
-    {# Recent activity log #}
-
-    <div class="row">
-        <div class="small-12 columns">
-            <h3 class="subheader">Recent Activity Logs</h3>
-        </div>
-        <div class="small-12 medium-6 island">
-            <section>
-                {% if (userLog | length) > 0 %}
-                    <div class="actions-small-1">
-                        <div class="list-item">
-                            <div class="small-12 columns">
-                                <h4 class="subheader">Logins</h4>
-                            </div>
-                        </div>
-                        <nav>
-                            <a class="icon-view" href="/adminv2/reports/login/user={{ user.username }}" title="See All"></a>
-                        </nav>
-                    </div>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>IP</th>
-                            <th>Result</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for log in userLog %}
-                            <tr>
-                                <td>{{ log.date.getLocal }}</td>
-                                <td>{{ log.ip }}</td>
-                                <td>
-                                    {% if log.login == 1 %}
-                                        Success
-                                    {% elseif log.login == 0 %}
-                                        Failed
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <p class="content">No recorded logins</p>
-                {% endif %}
-            </section>
-        </div>
-
-        <div class="small-12 medium-6 island">
-            <section>
-                {% if (cmsLog | length) > 0 %}
-                    <div class="actions-small-1">
-                        <div class="list-item">
-                            <div class="small-12 columns">
-                                <h4 class="subheader">Activity</h4>
-                            </div>
-                        </div>
-                        <nav>
-                            <a class="icon-view" href="/adminv2/reports/activity/user={{ user.username }}" title="See All"></a>
-                        </nav>
-                    </div>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for log in cmsLog %}
-                            <tr>
-                                <td>{{ log.time.getLocal }}</td>
-                                <td>
-                                    {{ log.action | capitalize }}
-                                    {% if log.folder %}
-                                        '{{ log.folder.name }}'
-                                    {% elseif log.file %}
-                                        '{{ log.file.filename }}'
-                                    {% elseif log.link %}
-                                        '{{ log.link.description }}'
-                                    {% elseif log.textbox %}
-                                        textbox {% if log.textbox.heading %}'{{ log.textbox.heading }}'{% endif %}
-                                    {% elseif log.myFile %}
-                                        {{ log.myFile.filename }}
-                                    {% elseif log.myFolder %}
-                                        {{ log.myFolder.name }}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <p class="content">No recent activity</p>
-                {% endif %}
-            </section>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="small-12 island">
-            <h3 class="subheader">Send Message to {{ user.fullName }}</h3>
-
-            <div class="alert-box">
-                <p class="no-margin">{{ user.firstName }} must be signed in to receive a popup alert.</p>
-            </div>
-
-            <form action="{{ routeLookup('adminUser.postAlert', {userId: user.id}) }}" method="POST" id="sendAlertForm">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                Message from {{ USER.fullName }}
-                                <input type="text" value="" name="body"/>
-                            </label>
-                        </div>
-                    </fieldset>
-                </section>
-                <div class="row">
-                    <div class="small-12 columns">
-                        <input type="submit" value="Send"/>
-                    </div>
+                        </fieldset>
+                    </section>
+                </div>
+                <div class="small-12 columns">
+                    <input type="submit" value="{{ method }} User"/>
                 </div>
             </form>
         </div>
-    </div>
-{% endif %}
+
+        {# User detail section #}
+        {% if method=='Update' %}
+
+            {# Synergetic file year and semester #}
+            {% if (externalDatabase | lower) == 'synergetic' %}
+                <div class="row">
+                    <div class="small-12 island">
+                        <h3 class="subheader">Synergetic Info</h3>
+                        <section class="profile content">
+                            <dl>
+                                <dt class="small-12 medium-3 no-pad">Year:</dt>
+                                <dd class="small-12 medium-9 no-pad">{{ fileYear }}</dd>
+                                <dt class="small-12 medium-3 no-pad">Semester:</dt>
+                                <dd class="small-12 medium-9 no-pad">{{ fileSemester }}</dd>
+                            </dl>
+                        </section>
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Group Access #}
+
+            <div class="row">
+                <div class="small-12 island">
+                    <h3 class="subheader" id="groups">Groups</h3>
+                    <section>
+                        <ul class="action-list">
+                            <li class="actions-small-1 row-header">
+                                <div class="list-item">
+                                    <div class="small-7 columns">Group Name</div>
+                                    <div class="small-5 columns">Access</div>
+                                </div>
+                            </li>
+
+                            {# Show all groups the user is a member of #}
+                            {% for folder in userGroups %}
+                                <li class="actions-small-1" data-group>
+                                    <div class="list-item">
+                                        <div class="card small-7">
+                                            <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
+                                        </div>
+                                        <div class="card small-5">
+                                            <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: folder.id}) }}" method="post">
+                                                {% set perm = userGroupPermissions[folder.id].accessLevel %}
+
+                                                <select name="type" data-autosubmit-group data-folder="{{ folder.id }}" title="Access">
+                                                    <option value="{{ accessLevel.read }}" {% if perm == accessLevel.read %}selected{% endif %}>Read</option>
+                                                    <option value="{{ accessLevel.write }}" {% if perm == accessLevel.write %}selected{% endif %}>Write</option>
+                                                    <option value="{{ accessLevel.moderate }}" {% if perm == accessLevel.moderate %}selected{% endif %}>Group Admin</option>
+                                                </select>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
+                                    </nav>
+                                </li>
+                            {% endfor %}
+
+                            <li class="actions-small-1">
+                                <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
+                                    <div class="card small-7">
+                                        <select required name="sid" id="groupSelect" form="groupAdd" class="required" title="Group">
+                                            <option value="" disabled selected>Select Group</option>
+                                            {% for folder in allGroups %}
+                                                <option value="{{ folder.id }}">{{ folder.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="card small-5">
+                                        <select required name="type" form="groupAdd" title="Access">
+                                            <option value="{{ accessLevel.read }}">Read</option>
+                                            <option value="{{ accessLevel.write }}">Write</option>
+                                            <option value="{{ accessLevel.moderate }}">Group Admin</option>
+                                        </select>
+                                    </div>
+                                    <div class="card small-12">
+                                        <p><input type="submit" value="Add" disabled/></p>
+                                    </div>
+                                </form>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+            {# Service permissions #}
+
+            <div class="row">
+                <div class="small-12 island">
+                    <h3 class="subheader" id="permissions">Permissions</h3>
+                    <section>
+                        <ul class="action-list">
+                            <li class="actions-small-1 row-header">
+                                <div class="list-item">
+                                    <div class="small-4 columns">Service</div>
+                                    <div class="small-4 columns">Service Identifier</div>
+                                    <div class="small-4 columns">Access</div>
+                                </div>
+                            </li>
+
+                            {% for permission in userPermissions %}
+
+                                {% if serviceMapping[permission.service] is defined %}
+                                    <li class="actions-small-1" data-permission>
+                                        <div class="list-item">
+                                            <div class="small-4 card">
+                                                {{ serviceMapping[permission.service].name }}
+                                            </div>
+                                            <div class="small-4 card">
+                                                {% if serviceMapping[permission.service].identifier == identifiers.campus %}
+                                                    Campus:
+                                                    {% for campus in campuses |filter(campus => campus.id == permission.serviceIdentifier) %}
+                                                        {{ campus.name }}
+                                                    {% endfor %}
+                                                {% elseif serviceMapping[permission.service].identifier ==  identifiers.residentialHouse %}
+                                                    House:
+                                                    {% for residentialHouse in residentialHouses | filter( residentialHouse => residentialHouse.id == permission.serviceIdentifier) %}
+                                                        {{ residentialHouse.house }}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                            <div class="small-4 card">
+                                                <form action="{{ routeLookup('adminUser.postUpdateService', {userId: user.id, service: permission.service, sid: permission.serviceIdentifier}) }}" method="post" class="updateServicesForm">
+                                                    <input type="hidden" name="sid" value="{{ permission.serviceIdentifier }}"/>
+                                                    <input type="hidden" name="service" value="{{ permission.service }}"/>
+                                                    <input type="hidden" name="updateServices" value="1"/>
+
+                                                    <select name="type" data-autosubmit-service data-service="{{ permission.service }}" data-sid="{{ permission.serviceIdentifier }}">
+                                                        {% for level, available in serviceMapping[permission.service].availability %}
+                                                            {% if available %}
+                                                                <option value="{{ accessLevel[level] }}" {% if permission.accessLevel == accessLevel[level] %}selected{% endif %}>{{ level|capitalize }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a href="#" data-delete-permission="{{ permission.serviceIdentifier }}" data-service="{{ permission.service}}" class="icon-delete" title="Remove"></a>
+                                        </nav>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <li class="actions-small-1">
+                                <form id="serviceCloneForm" action="{{ routeLookup('adminUser.postInsertPermission', {userId: user.id}) }}" method="post" data-validatable-as="addService"
+                                      data-action="addService" class="list-item">
+                                    <div class="small-4 card">
+                                        <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
+                                            <option value="" data-identifier="{{ identifiers.none }}" disabled selected>Select Service</option>
+
+                                            {% for serviceIdentifier, serviceData in serviceMapping %}
+                                                <option value="{{ serviceIdentifier }}" data-identifier="{{ serviceData.identifier }}">{{ serviceData.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="small-4 card">
+                                        <select data-service-type="{{ identifiers.campus }}" name="sid" id="campusSelect" class="hide" disabled required>
+                                            <option value="" disabled selected>Select Campus</option>
+                                            {% for campus in campuses %}
+                                                <option value="{{ campus.id }}">{{ campus.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select data-service-type="{{ identifiers.residentialHouse }}" name="sid" id="residentialHouseSelect" class="hide" disabled required>
+                                            <option value="" disabled selected>Select Residential House</option>
+                                            {% for residentialHouse in residentialHouses %}
+                                                <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select data-service-type="{{ identifiers.none }}" name="sid" id="serviceIdentifierSelect" style="display:none">
+                                            <option value="" disabled>--</option>
+                                        </select>
+                                    </div>
+                                    <div class="small-4 card">
+                                        <select name="type" id="accessLevelSelect" form="serviceCloneForm" required style="display:none">
+                                            <option id="read" value="{{ accessLevel.read }}">Read</option>
+                                            <option id="write" value="{{ accessLevel.write }}">Write</option>
+                                            <option id="moderate" value="{{ accessLevel.moderate }}">Moderate</option>
+                                        </select>
+                                    </div>
+                                    <div class="small-12 card">
+                                        <p><input type="submit" value="Add" name="serviceSubmit" disabled></p>
+                                    </div>
+                                </form>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+            {# Linked user accounts #}
+
+            <div class="row">
+                <div class="small-12 island">
+                    <h3 class="subheader" id="linked">Linked Accounts</h3>
+                    <section>
+                        <ul class="action-list">
+                            <li class="actions-small-1 row-header">
+                                <div class="list-item">
+                                    <div class="small-12 columns">User</div>
+                                </div>
+                            </li>
+
+                            {% for linkedUser in user.linkedUser %}
+                                <li class="actions-small-1" data-linked-user>
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            <a href="/adminv2/user/{{ linkedUser.id }}/modify">{{ linkedUser.fullName }}</a>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a href="#" data-delete-linked="{{ linkedUser.id }}" class="icon-delete" title="Remove"></a>
+                                    </nav>
+                                </li>
+                            {% endfor %}
+
+                            <li class="actions-small-1">
+                                <form action="{{ routeLookup('adminUser.postInsertLinked', {userId: user.id}) }}" method="post" id="linkedUserAdd" class="list-item">
+                                    <div class="small-12 card">
+                                        <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
+                                    </div>
+                                    <div class="small-12 card">
+                                        <p><input type="submit" value="Add" disabled /></p>
+                                    </div>
+                                </form>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+            {# Recent activity log #}
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <h3 class="subheader">Recent Activity Logs</h3>
+                </div>
+                <div class="small-12 medium-6 island">
+                    <section>
+                        {% if (userLog | length) > 0 %}
+                            <div class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 columns">
+                                        <h4 class="subheader">Logins</h4>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-view" href="/adminv2/reports/login/user={{ user.username }}" title="See All"></a>
+                                </nav>
+                            </div>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>IP</th>
+                                    <th>Result</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for log in userLog %}
+                                    <tr>
+                                        <td>{{ log.date.getLocal }}</td>
+                                        <td>{{ log.ip }}</td>
+                                        <td>
+                                            {% if log.login == 1 %}
+                                                Success
+                                            {% elseif log.login == 0 %}
+                                                Failed
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="content">No recorded logins</p>
+                        {% endif %}
+                    </section>
+                </div>
+
+                <div class="small-12 medium-6 island">
+                    <section>
+                        {% if (cmsLog | length) > 0 %}
+                            <div class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 columns">
+                                        <h4 class="subheader">Activity</h4>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-view" href="/adminv2/reports/activity/user={{ user.username }}" title="See All"></a>
+                                </nav>
+                            </div>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for log in cmsLog %}
+                                    <tr>
+                                        <td>{{ log.time.getLocal }}</td>
+                                        <td>
+                                            {{ log.action | capitalize }}
+                                            {% if log.folder %}
+                                                '{{ log.folder.name }}'
+                                            {% elseif log.file %}
+                                                '{{ log.file.filename }}'
+                                            {% elseif log.link %}
+                                                '{{ log.link.description }}'
+                                            {% elseif log.textbox %}
+                                                textbox {% if log.textbox.heading %}'{{ log.textbox.heading }}'{% endif %}
+                                            {% elseif log.myFile %}
+                                                {{ log.myFile.filename }}
+                                            {% elseif log.myFolder %}
+                                                {{ log.myFolder.name }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="content">No recent activity</p>
+                        {% endif %}
+                    </section>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="small-12 island">
+                    <h3 class="subheader">Send Message to {{ user.fullName }}</h3>
+
+                    <div class="alert-box">
+                        <p class="no-margin">{{ user.firstName }} must be signed in to receive a popup alert.</p>
+                    </div>
+
+                    <form action="{{ routeLookup('adminUser.postAlert', {userId: user.id}) }}" method="POST" id="sendAlertForm">
+                        <section>
+                            <fieldset class="content">
+                                <div class="small-12 columns">
+                                    <label>
+                                        Message from {{ USER.fullName }}
+                                        <input type="text" value="" name="body"/>
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </section>
+                        <div class="row">
+                            <div class="small-12 columns">
+                                <input type="submit" value="Send"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <div id="saveLabel" class="toast"></div>
 
 {% if token is defined %}
-<div data-reveal id="userToken" class="reveal-modal">
-    <p>
-        Use this token within the "Authorization" header of requests to the Schoolbox
-        API, to perform requests as this user. Use the "Bearer" auth type.
-    </p>
-    <p>
-        The Schoolbox API is documented at
-        <a href="https://api.schoolbox.com.au/" target="_blank">https://api.schoolbox.com.au/</a>.
-    </p>
-    <textarea readonly id="userToken-text" rows="6">{{ token }}</textarea>
-    <div class="component-action">
-        <section>
-            <button id="copy-button" data-clipboard-target="#userToken-text">Copy to Clipboard</button>
-        </section>
+    <div data-reveal id="userToken" class="reveal-modal">
+        <p>
+            Use this token within the "Authorization" header of requests to the Schoolbox
+            API, to perform requests as this user. Use the "Bearer" auth type.
+        </p>
+        <p>
+            The Schoolbox API is documented at
+            <a href="https://api.schoolbox.com.au/" target="_blank">https://api.schoolbox.com.au/</a>.
+        </p>
+        <textarea readonly id="userToken-text" rows="6">{{ token }}</textarea>
+        <div class="component-action">
+            <section>
+                <button id="copy-button" data-clipboard-target="#userToken-text">Copy to Clipboard</button>
+            </section>
+        </div>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
 {% endif %}
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
@@ -766,7 +754,7 @@
 
             {# Validator does not have a functioniong reset-all-errors mechanism
              # https://stackoverflow.com/questions/2086287/how-to-clear-jquery-validation-error-messages
-             #}
+            #}
             $('label.error').hide();
             $('.error').removeClass('error');
 
@@ -777,7 +765,7 @@
 
             {# Hide the Service Identifier dropdown when it's not required
              # Service Identifiers are only made visible when a non-disabled Service is selected
-             #}
+            #}
             if (serviceMapping[selectedServiceId].identifier == '{{ identifiers.none }}') {
                 serviceIdentifierDropdown.hide();
             } else {
@@ -796,7 +784,7 @@
 
                     {# Select first available option
                      # Tried to find a shorter way to do this with option:visible:first but it didn't work; idk why
-                     #}
+                    #}
                     if (!preselected) {
                         option.attr('selected', 'selected');
                         preselected = true;
@@ -843,174 +831,174 @@
 
         {% if method=='Update' %}
 
-            {# Confirm change of enabled flag#}
+        {# Confirm change of enabled flag#}
 
-            $('input[data-role="enabled"]').click(function (event) {
-                event.preventDefault();
-                $(this).confirmDialog({
-                    text: 'Change this user\'s account status?',
-                    confirmEvent: function (element) {
-                        element.prop('checked', !(element.prop('checked')));
-                    }
-                });
+        $('input[data-role="enabled"]').click(function (event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Change this user\'s account status?',
+                confirmEvent: function (element) {
+                    element.prop('checked', !(element.prop('checked')));
+                }
+            });
+        });
+
+        {# Delete user #}
+
+        $('[data-delete]').click(function (event) {
+            event.preventDefault();
+
+            var action = $(this).data('action');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this user?',
+                confirmLabel: 'Delete',
+                confirmEvent: function () {
+                    $.post(action).done(function() {
+                        window.location = '/adminv2/user'
+                    });
+                }
+            });
+        });
+
+        {# Delete linked user #}
+
+        $('[data-delete-linked]').click(function (event) {
+            event.preventDefault();
+
+            var linkedId = $(this).data('delete-linked');
+            var linkedUserRow = $(this).closest('[data-linked-user]');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this linked user?',
+                confirmLabel: 'Delete',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('adminUser.postDeleteLinked', {userId: user.id, linkedId: 'linkedId'}) }}'.replace(/linkedId/g, linkedId)).done(function() {
+                        linkedUserRow.remove();
+                    });
+                }
+            });
+        });
+
+        {# Delete group #}
+
+        $('[data-delete-group]').click(function (event) {
+            event.preventDefault();
+
+            var folderId = $(this).data('delete-group');
+            var groupRow = $(this).closest('[data-group]');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this group?',
+                confirmLabel: 'Delete',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('adminUser.postDeleteGroup', {userId: user.id, folderId: 'folderId'}) }}'.replace(/folderId/g, folderId)).done(function() {
+                        groupRow.remove();
+                    });
+                }
+            });
+        });
+
+        {# Delete permission #}
+
+        $('[data-delete-permission]').click(function (event) {
+            event.preventDefault();
+
+            var sid = $(this).data('delete-permission');
+            var service = $(this).data('service');
+            var permissionRow = $(this).closest('[data-permission]');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this permission?',
+                confirmLabel: 'Delete',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('adminUser.postDeletePermission', {userId: user.id, service: 'service', sid: 'sid'}) }}'
+                        .replace(/service/g, service)
+                        .replace(/sid/g, sid)
+                    ).done(function() {
+                        permissionRow.remove();
+                    });
+                }
+            });
+        });
+
+        {# Setup service and group form validation #}
+
+        $('form[data-validatable-as="addService"]').alaressValidate();
+        $('form[data-validatable-as="addGroup"]').alaressValidate();
+
+        {# Selectize user picker #}
+
+        var addUserSelector = $(':input[data-selectizeuser="addUser"]');
+        var addUserButton = $(addUserSelector.prop('form')).find(':submit');
+
+        addUserSelector
+            .selectizeSelector({
+                multiple: true,
+                ajax: {
+                    url: '/ajax/user.php',
+                    type: 'GET',
+                    data: {groupID: 0},
+                    dataType: 'json'
+                }
+            })
+            .on('selectize.item_add', function () {
+                addUserButton.prop('disabled', false);
+            })
+            .on('selectize.item_remove', function () {
+                {# Disable only if empty #}
+                if ($(this).data('selectize').items.length === 0) {
+                    addUserButton.prop('disabled', true);
+                }
             });
 
-            {# Delete user #}
+        {# AJAX submission of groups #}
+        $(':input[data-autosubmit-group]').on('change', function(event) {
+            event.preventDefault();
+            var label = $('#saveLabel');
+            var form = $(this).parents('form:first');
 
-            $('[data-delete]').click(function (event) {
-                event.preventDefault();
+            label.toastActivate({text: 'Updating Group Access Level...'});
 
-                var action = $(this).data('action');
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this user?',
-                    confirmLabel: 'Delete',
-                    confirmEvent: function () {
-                        $.post(action).done(function() {
-                            window.location = '/adminv2/user'
-                        });
-                    }
-                });
-            });
-
-            {# Delete linked user #}
-
-            $('[data-delete-linked]').click(function (event) {
-                event.preventDefault();
-
-                var linkedId = $(this).data('delete-linked');
-                var linkedUserRow = $(this).closest('[data-linked-user]');
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this linked user?',
-                    confirmLabel: 'Delete',
-                    confirmEvent: function () {
-                        $.post('{{ routeLookup('adminUser.postDeleteLinked', {userId: user.id, linkedId: 'linkedId'}) }}'.replace(/linkedId/g, linkedId)).done(function() {
-                            linkedUserRow.remove();
-                        });
-                    }
-                });
-            });
-
-            {# Delete group #}
-
-            $('[data-delete-group]').click(function (event) {
-                event.preventDefault();
-
-                var folderId = $(this).data('delete-group');
-                var groupRow = $(this).closest('[data-group]');
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this group?',
-                    confirmLabel: 'Delete',
-                    confirmEvent: function () {
-                        $.post('{{ routeLookup('adminUser.postDeleteGroup', {userId: user.id, folderId: 'folderId'}) }}'.replace(/folderId/g, folderId)).done(function() {
-                            groupRow.remove();
-                        });
-                    }
-                });
-            });
-
-            {# Delete permission #}
-
-            $('[data-delete-permission]').click(function (event) {
-                event.preventDefault();
-
-                var sid = $(this).data('delete-permission');
-                var service = $(this).data('service');
-                var permissionRow = $(this).closest('[data-permission]');
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this permission?',
-                    confirmLabel: 'Delete',
-                    confirmEvent: function () {
-                        $.post('{{ routeLookup('adminUser.postDeletePermission', {userId: user.id, service: 'service', sid: 'sid'}) }}'
-                                .replace(/service/g, service)
-                                .replace(/sid/g, sid)
-                        ).done(function() {
-                            permissionRow.remove();
-                        });
-                    }
-                });
-            });
-
-            {# Setup service and group form validation #}
-
-            $('form[data-validatable-as="addService"]').alaressValidate();
-            $('form[data-validatable-as="addGroup"]').alaressValidate();
-
-            {# Selectize user picker #}
-
-            var addUserSelector = $(':input[data-selectizeuser="addUser"]');
-            var addUserButton = $(addUserSelector.prop('form')).find(':submit');
-
-            addUserSelector
-                .selectizeSelector({
-                    multiple: true,
-                    ajax: {
-                        url: '/ajax/user.php',
-                        type: 'GET',
-                        data: {groupID: 0},
-                        dataType: 'json'
-                    }
-                })
-                .on('selectize.item_add', function () {
-                    addUserButton.prop('disabled', false);
-                })
-                .on('selectize.item_remove', function () {
-                    {# Disable only if empty #}
-                    if ($(this).data('selectize').items.length === 0) {
-                        addUserButton.prop('disabled', true);
-                    }
-                });
-
-            {# AJAX submission of groups #}
-            $(':input[data-autosubmit-group]').on('change', function(event) {
-                event.preventDefault();
-                var label = $('#saveLabel');
-                var form = $(this).parents('form:first');
-
-                label.toastActivate({text: 'Updating Group Access Level...'});
-
-                $.post(form.attr('action'), form.serializeArray(), function() {
-                    label.toastTimeout({text: 'Group Access Level updated.', css: 'success'});
-                })
+            $.post(form.attr('action'), form.serializeArray(), function() {
+                label.toastTimeout({text: 'Group Access Level updated.', css: 'success'});
+            })
                 .fail(function(){
                     label.toastTimeout({text: 'Could not update Group Access Level.', css: 'alert'});
                 });
-            });
+        });
 
-            {# AJAX submission of services #}
-            $(':input[data-autosubmit-service]').on('change', function(event) {
-                event.preventDefault();
-                var label = $('#saveLabel');
-                var form = $(this).parents('form:first');
+        {# AJAX submission of services #}
+        $(':input[data-autosubmit-service]').on('change', function(event) {
+            event.preventDefault();
+            var label = $('#saveLabel');
+            var form = $(this).parents('form:first');
 
-                label.toastActivate({text: 'Updating Service Access Level...'});
+            label.toastActivate({text: 'Updating Service Access Level...'});
 
-                $.post(form.attr('action'), form.serializeArray(), function() {
-                    label.toastTimeout({text: 'Service Access Level updated.', css: 'success'});
-                })
+            $.post(form.attr('action'), form.serializeArray(), function() {
+                label.toastTimeout({text: 'Service Access Level updated.', css: 'success'});
+            })
                 .fail(function(){
                     label.toastTimeout({text: 'Could not update Service Access Level.', css: 'alert'});
                 });
-            });
+        });
 
-            {# Hide campus selector if user selected a service that doesn't use them #}
+        {# Hide campus selector if user selected a service that doesn't use them #}
 
-            var addServiceForm = $('form[data-action="addService"]');
+        var addServiceForm = $('form[data-action="addService"]');
 
-            addServiceForm.on(
-                'change',
-                ':input[data-role="serviceSelector"]',
-                function () {
-                    {# Search for this item, disable others #}
-                    var currentService = $(this).find(':selected').data('identifier');
-                    var selectors = addServiceForm.find(':input[data-service-type]');
-                    selectors.addClass('hide').prop('disabled', true);
-                    selectors.filter('[data-service-type="' + currentService + '"]').removeClass('hide').prop('disabled', false);
-                }
-            );
+        addServiceForm.on(
+            'change',
+            ':input[data-role="serviceSelector"]',
+            function () {
+                {# Search for this item, disable others #}
+                var currentService = $(this).find(':selected').data('identifier');
+                var selectors = addServiceForm.find(':input[data-service-type]');
+                selectors.addClass('hide').prop('disabled', true);
+                selectors.filter('[data-service-type="' + currentService + '"]').removeClass('hide').prop('disabled', false);
+            }
+        );
 
         {% endif %}
 

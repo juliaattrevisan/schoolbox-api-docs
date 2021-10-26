@@ -85,5 +85,18 @@
                 }
             }
         }
+
+        /* h2 headers with a list action have an incompatible line-height value
+         * which causes the tot to misalign with the heading and other elements
+         *
+         * afaict this only seems to happen in admin; but it might occur elsewhere
+         */
+        h2 {
+            &.subheader {
+                line-height: 2.625rem;
+                margin: 0;
+                padding: 0;
+            }
+        }
     }
 }
