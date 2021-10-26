@@ -10,8 +10,6 @@
 {% endblock breadcrumbs %}
 
 {% block header %}
-    <h1>Class Analytics - {{ folder.title }}</h1>
-
     {# Selector for each class code (if there are multiples) #}
     {% if folder.codes | length > 1 %}
         <dl class="tabs">
