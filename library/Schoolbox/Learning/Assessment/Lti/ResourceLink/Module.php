@@ -34,6 +34,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
+        // TODO add proper permissions
         $permission = new Rule\Any(
             new Rule\IsSuperuser(),
             new IsInstructor(Access::getInstance()),
@@ -68,6 +69,7 @@ class Module extends BaseModule
                 [
                     'repository' => $injector->lazyGet('lti.repository'),
                     'instance'   => $injector->lazyGet('instance'),
+                    'access'     => $this->getMapperFactory()->getLazy(Access::class),
                 ]
             )
         );

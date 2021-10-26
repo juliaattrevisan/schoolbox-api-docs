@@ -14,12 +14,14 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuild
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Registration\Repository;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
+use Schoolbox\Permission\Access\Access;
 
 class Controller extends Base
 {
@@ -34,15 +36,22 @@ class Controller extends Base
     private Instance $instance;
 
     /**
+     * Access permission checker.
+     */
+    private Access $access;
+
+    /**
      * Constructor
      *
      * @param Repository $repository
      * @param Instance   $instance
+     * @param Access     $access
      */
-    public function __construct(Repository $repository, Instance $instance)
+    public function __construct(Repository $repository, Instance $instance, Access $access)
     {
         $this->repository = $repository;
         $this->instance   = $instance;
+        $this->access     = $access;
     }
 
     /**
@@ -55,15 +64,48 @@ class Controller extends Base
      */
     public function getLaunchAssessment(LtiAssessment $assessment): void
     {
+        $assessmentContext = $assessment->getBaseContext()->getFolder();
+
         // Create an LTI resource link launch, send it to the iframe
         $registration = $this->repository->find($assessment->getLtiTool()->getDeploymentId());
 
         // Roles: dependent on whether user is a participant or instructor
-        $roles = [
-            $this->getUser()->getRole()->isStaff()
-                ? RoleInterface::NAMESPACE_CONTEXT . '#Instructor'
-                : RoleInterface::NAMESPACE_CONTEXT . '#Learner'
-        ];
+        $roles = [];
+
+        // Institution roles
+        if ($this->getUser()->getRole()->isStaff()) {
+            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Staff';
+        } elseif ($this->getUser()->getRole()->isStudent()) {
+            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Student';
+        } elseif ($this->getUser()->getRole()->isParent()) {
+            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Other';
+        } elseif ($this->getUser()->getRole()->isGuest()) {
+            $roles[] = RoleInterface::NAMESPACE_INSTITUTION . '#Guest';
+        }
+
+        // Contextual roles + role scope mentors
+        $mentoredUserIds = [];
+        if ($this->access->isInstructor($this->getUser(), $assessmentContext)) {
+            $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Instructor';
+            $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Mentor';
+            foreach ($assessment->getAllParticipants() as $participant) {
+                if (!$participant->isExcluded()) {
+                    $mentoredUserIds[] = $participant->getUser()->getId();
+                }
+            }
+        } elseif ($assessment->isParticipant($this->getUser())) {
+            $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Learner';
+        } elseif ($this->getUser()->getRole()->isParent()) {
+            // they're probably a parent of a student?
+            foreach ($this->getUser()->getChildren() as $child) {
+                if ($assessment->isParticipant($child)) {
+                    $roles[] = RoleInterface::NAMESPACE_CONTEXT . '#Mentor';
+                    $mentoredUserIds[] = $child->getId();
+                }
+            }
+        }
+
+
 
         // Additional claims:
         $additionalClaims = [];
@@ -78,7 +120,6 @@ class Controller extends Base
         // Context claim: talk about the folder
         // I have seen no explanation for what context type actually is,
         // thus I will make something up.
-        $assessmentContext  = $assessment->getBaseContext()->getFolder();
         $additionalClaims[] = new ContextClaim(
             (string)$assessmentContext->getId(),
             [ContextClaim::TYPE_COURSE_SECTION],
@@ -92,7 +133,8 @@ class Controller extends Base
         // Role-scope mentor claims:
         // for parents, this might be their kids
         // for kids, this won't be anyone
-        // for teachers, this will probably be all participants in the assessment
+        // for teachers, this will be all participants in the assessment
+        $additionalClaims[LtiMessagePayloadInterface::CLAIM_LTI_ROLE_SCOPE_MENTOR] = $mentoredUserIds;
 
         // Launch presentation:
         // should come from assessment, but doesn't yet
@@ -105,6 +147,8 @@ class Controller extends Base
             $additionalClaims[$key] = $value;
         }
 
+        // AGS claims:
+        // if a line item is provided, send that
 
         // Resource link request
         $builder = new PlatformOriginatingLaunchBuilder();
@@ -114,7 +158,7 @@ class Controller extends Base
             $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
             $this->getUser()->getUsername(),
             null,
-            $roles,
+            array_unique($roles),
             $additionalClaims,
         );
 
