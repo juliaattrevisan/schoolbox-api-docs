@@ -161,6 +161,7 @@
                                 <span class="full-width {{ email_light }} label">{{ email_status }}</span>
                             </div>
                         </li>
+                        {% if ldap_status != 'Disabled' %}
                         <li>
                             <div class="small-5 columns content">
                                 LDAP Primary
@@ -169,6 +170,8 @@
                                 <span class="full-width {{ ldap_light }} label">{{ ldap_status }}</span>
                             </div>
                         </li>
+                        {% endif %}
+                        {% if ldap_alt_status != 'Disabled' %}
                         <li>
                             <div class="small-5 columns content">
                                 LDAP Secondary
@@ -177,6 +180,7 @@
                                 <span class="full-width {{ ldap_alt_light }} label">{{ ldap_alt_status }}</span>
                             </div>
                         </li>
+                        {% endif %}
                         <li>
                             <div class="small-5 columns content">
                                 WWW
@@ -189,7 +193,7 @@
                             {% set kamiStatus = kamiOnline ? 'success' : 'alert' %}
                             {% set kamiLabel = kamiOnline ? 'Online' : 'Offline' %}
                             <li>
-                                <div class="small-5 columns content">Kami</div>
+                                <div class="small-5 columns content"><a href="https://status.kamihq.com/" target="_blank">Kami</a></div>
                                 <div class="small-7 columns content">
                                     <span class="full-width {{ kamiStatus }} label">{{ kamiLabel }}</span>
                                 </div>
@@ -211,7 +215,7 @@
                         {% if turnitin.show %}
                             <li>
                                 <div class="small-5 columns content">
-                                    {{ turnitin.name }}
+                                    <a href="{{ turnitin.url }}" target="_blank">{{ turnitin.name }}</a>
                                 </div>
                                 <div class="small-7 columns content">
                                     {% if turnitin.available %}

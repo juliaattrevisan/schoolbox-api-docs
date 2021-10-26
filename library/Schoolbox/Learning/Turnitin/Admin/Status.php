@@ -52,6 +52,7 @@ class Status
          */
         $payload = [
             'name' => 'Turnitin',
+            'url'  => 'https://turnitin.statuspage.io/',
             'show' => false,
             'available' => false,
             'message' => 'Offline'
@@ -80,8 +81,9 @@ class Status
 
                 /* Otherwise something to look at
                  */
+                $payload['name'] = $result['product_name'];
                 $payload['available'] = true;
-                $payload['message']   = "{$result['product_name']} Online";
+                $payload['message']   = 'Online';
 
                 return $payload;
             } catch (Credentials $e) {
