@@ -12,6 +12,11 @@ namespace Schoolbox\LTI\Claim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
 
+/**
+ * Representation of the role-scope mentor claim in an LTI message.
+ *
+ * @see https://www.imsglobal.org/spec/lti/v1p3/#role-scope-mentor-claims
+ */
 class RoleScopeMentorClaim implements MessagePayloadClaimInterface
 {
     /**
