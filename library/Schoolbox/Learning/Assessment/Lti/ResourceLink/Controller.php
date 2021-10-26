@@ -20,6 +20,7 @@ use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Registration\Repository;
+use Schoolbox\LTI\Util\CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
@@ -83,24 +84,27 @@ class Controller extends Base
         $additionalClaims = [];
 
         // Resource link claim: talk about the assessment
-        $additionalClaims[] = new ResourceLinkClaim(
+        $resourceLinkClaim = new ResourceLinkClaim(
             (string)$assessment->getId(),
             $assessment->getLtiAssessmentTitle(),
             $assessment->getLtiAssessmentText(),
         );
+        $additionalClaims[] = $resourceLinkClaim;
 
         // Context claim: talk about the folder
         // I have seen no explanation for what context type actually is,
         // thus I will make something up.
-        $additionalClaims[] = new ContextClaim(
+        $contextClaim = new ContextClaim(
             (string)$assessmentContext->getId(),
             [ContextClaim::TYPE_COURSE_SECTION],
             $assessmentContext->getCodeString(),
             $assessmentContext->getTitle(),
         );
+        $additionalClaims[] = $contextClaim;
 
         // PlatformInstanceClaim: talk about the Schoolbox instance
-        $additionalClaims[] = (new PlatformInstanceClaimFactory($this->instance))->build();
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
+        $additionalClaims[]    = $platformInstanceClaim;
 
         // Role-scope mentor claims:
         // for parents, this might be their kids
@@ -118,9 +122,15 @@ class Controller extends Base
         // LIS claim: I don't think we support this yet
 
         // Custom claims, with whatever was passed from the product
-        foreach (($assessment->getCustomFields() ?? []) as $key => $value) {
-            // TODO apply substitutions to value
-            $additionalClaims[$key] = $value;
+        $translatedCustomClaims = (new CustomClaimFactory())
+            ->withUser($this->getUser())
+            ->withActualUser($this->getUser())
+            ->withResourceLink($resourceLinkClaim)
+            ->withContext($contextClaim)
+            ->withPlatformInstance($platformInstanceClaim)
+            ->buildForAssessment($assessment);
+        if (isset($translatedCustomClaims)) {
+            $additionalClaims += $translatedCustomClaims;
         }
 
         // AGS claims:
