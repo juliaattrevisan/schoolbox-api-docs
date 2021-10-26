@@ -83,9 +83,12 @@ class TransmitTool extends CliTool\App
 
 
     /**
-     * Lock ttl
+     * Lock ttl (seconds)
+     *
+     * Reserves this amount for every iteration,
+     * refreshing at the start of every iteration
      */
-    private const LOCK_TTL = 10 * 60;
+    private const LOCK_TTL = 60;
 
 
     /**
@@ -248,6 +251,13 @@ HELP;
             /* Shank them all up
              */
             foreach ($models as $model) {
+                $this->getLogger()->debug(sprintf(
+                    'Refreshing lock for another %s seconds',
+                    self::LOCK_TTL
+                ));
+
+                $lock->refresh();
+
                 $processor->process($model);
             }
 

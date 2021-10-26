@@ -69,9 +69,12 @@ class CleanserTool extends CliTool\App
 
 
     /**
-     * Lock ttl
+     * Lock ttl (seconds)
+     *
+     * Reserves this amount for every iteration,
+     * refreshing at the start of every iteration
      */
-    private const LOCK_TTL = 10 * 60;
+    private const LOCK_TTL = 60;
 
 
     /**
@@ -107,7 +110,7 @@ just...delete Turnitin Group Attachments from them, so you can test freshly.
 
 This is a dev tool and should not be used in the normal scheme of things
 
-Usage: group.php --start=300 --end=400 [--instance=INSTANCE_ID] 
+Usage: cleanser.php --start=300 --end=400 [--instance=INSTANCE_ID] 
 
 
 HELP;
@@ -168,6 +171,13 @@ HELP;
             /* Now find out what Turnitin knows
              */
             foreach ($groupIds as $groupId) {
+                $this->getLogger()->debug(sprintf(
+                    'Refreshing lock for another %s seconds',
+                    self::LOCK_TTL
+                ));
+
+                $lock->refresh();
+
                 /* Get the group
                  * If it doesn't exist, don't worry about it and continue
                  */
@@ -197,6 +207,13 @@ HELP;
                             $groupId,
                             $attachment['id']
                         ));
+
+                        $this->getLogger()->debug(sprintf(
+                            'Refreshing lock for another %s seconds',
+                            self::LOCK_TTL
+                        ));
+
+                        $lock->refresh();
 
                         try {
                             $api->retrieve('DELETE', "/api/v1/groups/{$groupId}/attachments/{$attachment['id']}", []);
