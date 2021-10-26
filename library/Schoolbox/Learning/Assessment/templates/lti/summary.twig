@@ -47,14 +47,6 @@
     </div>
 </div>
 
-{% if canAttempt %}
-    <div class="row">
-        <div class="small-12 column">
-            <a href="#" class="button submit">Begin Assessment</a>
-        </div>
-    </div>
-{% endif %}
-
 {# Output history here #}
 {% if timeline | length %}
     <div class="row">
@@ -147,6 +139,16 @@
                 <i class="icon-lti"></i>
                 <p>There has not been any activity on this {{ locale.assessment }} yet.</p>
             </div>
+        </div>
+    </div>
+{% endif %}
+
+{% if canAttempt %}
+    <div class="row">
+        <div class="small-12 column">
+            <a class="button submit"
+               target="_blank"
+               href="{{ routeLookup('learningLtiResourceLink.getLaunchAssessment', {assessmentId: assessment.id}) }}">Begin Assessment</a>
         </div>
     </div>
 {% endif %}
