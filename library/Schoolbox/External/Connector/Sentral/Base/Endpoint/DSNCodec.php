@@ -48,13 +48,6 @@ class DSNCodec
             throw new DomainException('Sentral DSN: could not decode; check key and tenant format');
         }
 
-//        /* Check trailing slash in the host
-//         * Without it you just get Generic Error in a valid payload struct
-//         */
-//        if ('/' !== substr($matches[1], -1)) {
-//            throw new DomainException('Sentral DSN: host does not end with a forward slash /');
-//        }
-
         return [
             'key' => $matches[1],
             'tenant' => $matches[2]
