@@ -13,13 +13,13 @@ use Alaress\Web\Controller\Base;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
-use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Url\Factory;
+use Schoolbox\LTI\Registration\Repository;
+use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 
 class Controller extends Base
 {
@@ -29,9 +29,21 @@ class Controller extends Base
     private RegistrationRepositoryInterface $repository;
 
     /**
-     * Instance data repository
+     * Instance data repository.
      */
     private Instance $instance;
+
+    /**
+     * Constructor
+     *
+     * @param Repository $repository
+     * @param Instance   $instance
+     */
+    public function __construct(Repository $repository, Instance $instance)
+    {
+        $this->repository = $repository;
+        $this->instance   = $instance;
+    }
 
     /**
      * Launch a resource link for the given assessment, as the current user.
@@ -46,19 +58,12 @@ class Controller extends Base
         // Create an LTI resource link launch, send it to the iframe
         $registration = $this->repository->find($assessment->getLtiTool()->getDeploymentId());
 
-
-        // Return URL
-        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
-        $returnUrl = (clone $baseUrl)
-            ->setPath(
-                Redirect::decode($this->request->query->get(Redirect::RETURN_URL))
-            )
-            ->toString();
-
-
         // Roles: dependent on whether user is a participant or instructor
-        $roles = [];
-
+        $roles = [
+            $this->getUser()->getRole()->isStaff()
+                ? RoleInterface::NAMESPACE_CONTEXT . '#Instructor'
+                : RoleInterface::NAMESPACE_CONTEXT . '#Learner'
+        ];
 
         // Additional claims:
         $additionalClaims = [];
@@ -82,16 +87,7 @@ class Controller extends Base
         );
 
         // PlatformInstanceClaim: talk about the Schoolbox instance
-        // TODO this should be factoryized
-        $additionalClaims[] = new PlatformInstanceClaim(
-            $this->instance->getId(),
-            null,
-            null,
-            null,
-            (clone $baseUrl)->toString(),
-            Instance::APPLICATION_NAME,
-            $this->instance->getVersion(),
-        );
+        $additionalClaims[] = (new PlatformInstanceClaimFactory($this->instance))->build();
 
         // Role-scope mentor claims:
         // for parents, this might be their kids
@@ -123,5 +119,11 @@ class Controller extends Base
         );
 
         // And send message to template, where it's POSTed
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@learningLtiResourceLink/messageForm.twig',
+                ['message' => $message]
+            )
+        );
     }
 }

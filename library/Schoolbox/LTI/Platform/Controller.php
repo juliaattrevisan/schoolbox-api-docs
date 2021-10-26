@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
@@ -25,6 +24,7 @@ use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\Repository;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
+use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\Url\Factory;
 
 /**
@@ -106,15 +106,7 @@ class Controller extends Base
         ;
 
         // Claim about the platform instance
-        $platformInstanceClaim = new PlatformInstanceClaim(
-            $this->instance->getId(),
-            null,
-            null,
-            null,
-            (clone $baseUrl)->toString(),
-            Instance::APPLICATION_NAME,
-            $this->instance->getVersion(),
-        );
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
 
         $builder = new DeepLinkingLaunchRequestBuilder();
         $message = $builder->buildDeepLinkingLaunchRequest(
