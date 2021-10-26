@@ -17,15 +17,11 @@ use Alaress_Rss_Stream;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use GuzzleHttp;
-use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Psr\Log\AbstractLogger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
-use Schoolbox\Learning\Turnitin\Api;
-use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\LogMapper;
 use Proxy\Server as ProxyServer;
@@ -341,8 +337,7 @@ class Controller extends Base
 
                     /* Turnitin status indicator
                      */
-                    'turnitin' => $this->getTurnitinStatus(),
-
+                    'turnitin' => (new \Schoolbox\Learning\Turnitin\Admin\Status($this->getConfigLoader()))->generate(),
                 ),
             )
         );
@@ -395,70 +390,6 @@ class Controller extends Base
                 )
             )
         );
-    }
-
-
-    /**
-     * Determine the status of the Turnitin integration (if configured)
-     *
-     * @return array
-     * @throws \DomainException
-     * @throws \JsonException
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Learning\Turnitin\Exception\BadEndpoint
-     */
-    public function getTurnitinStatus(): array
-    {
-
-        /* Default payload
-         * Turnitin has to be configured, otherwise it won't appear in the list
-         */
-        $payload = [
-            'name' => 'Turnitin',
-            'show' => false,
-            'available' => false,
-            'message' => 'Offline'
-        ];
-
-        /* This was configured with enough data to make an attempt to connect
-         * There's something to show
-         */
-        if ((new Helper($this->getConfigLoader()))->isConfigured()) {
-            $payload['show'] = true;
-
-            try {
-                $api = new Api(
-                    $this->getConfigLoader()->get('site_version'),
-                    $this->getConfigLoader()->get('turnitin_api_host'),
-                    $this->getConfigLoader()->get('turnitin_api_key')
-                );
-
-                $result = $api->test();
-
-                /* We tried to make a connection, but something went wrong
-                 */
-                if (null === $result) {
-                    return $payload;
-                }
-
-                /* Otherwise something to look at
-                 */
-                $payload['available'] = true;
-                $payload['message']   = "{$result['product_name']} Online";
-
-                return $payload;
-            } catch (Credentials $e) {
-                /* Bad credentials will stop you from making a proper connection
-                 */
-                $payload['message'] =  'Auth failed';
-            } catch (GuzzleException $e) {
-                /* Some kind of networky issue; noop
-                 */
-            }
-
-        }
-
-        return $payload;
     }
 
 
