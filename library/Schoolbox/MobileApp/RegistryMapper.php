@@ -45,7 +45,7 @@ class RegistryMapper extends Mapper
 
         $this->joins('app_id', ServiceMapper::class, 'id', null, null, 'service', 'service');
 
-        $this->uses('deletedAt', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
     }
 
 

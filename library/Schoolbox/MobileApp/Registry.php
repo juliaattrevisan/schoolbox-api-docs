@@ -160,4 +160,33 @@ class Registry
         $this->createdAt = $createdAt;
         return $this;
     }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDeleted()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param  Alaress_Date_Format $deletedAt
+     * @return $this
+     */
+    public function setDeleted($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    /**
+     * Is this deleted? (added so there's a consistent method for determining if
+     * a model is deleted)
+     *
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return ($this->getDeleted() instanceof \Alaress_Date_Format && !$this->getDeleted()->isNull());
+    }
 }
