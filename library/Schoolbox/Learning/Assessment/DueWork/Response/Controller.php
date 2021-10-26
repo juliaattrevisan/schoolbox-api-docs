@@ -608,6 +608,11 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
 
+        /* A specially-hardcoded value to have programmatically accepted the eula
+         * It's part of our T&C with turnitin
+         */
+        $eulaAcceptance = '2021-01-01T00:00:00.000Z';
+
         /* Choose a viewer permission set based on your role
          * Staff members get a different set than students or parents
          *
@@ -616,7 +621,12 @@ class Controller extends Base
         $payload = [
             'viewer_user_id' => $this->getUser()->getId(),
             'locale' => 'en',
-            'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT
+            'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
+            'eula' => [
+                'version' => 'v1beta',
+                'accepted_timestamp' => $eulaAcceptance,
+                'language' => 'en-US'
+            ],
         ];
 
         /* Then decide if you're a staff and you need more stuff
