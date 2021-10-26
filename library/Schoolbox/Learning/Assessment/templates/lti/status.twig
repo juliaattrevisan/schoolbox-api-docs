@@ -24,7 +24,9 @@
 
 {% block headerOptions %}
     <li>
-        <a class="icon-lti" href="{{ routeLookup('learningLtiResourceLink.getLaunchAssessment', {assessmentId: assessment.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">View in LTI Tool</a>
+        <a class="icon-lti"
+           target="_blank"
+           href="{{ routeLookup('learningLtiResourceLink.getLaunchAssessment', {assessmentId: assessment.id}) }}">View in LTI Tool</a>
     </li>
 {% endblock %}
 
