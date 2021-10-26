@@ -392,6 +392,10 @@ export default {
     display: none; //there's no footer, so no count/pagination/next/prev etc for this report
 }
 
+.table-responsive {
+    overflow-x: scroll;
+}
+
 @media (max-width: $tableToSingleColumn) { //display everything in one column
     .VueTables thead {
         display: none;

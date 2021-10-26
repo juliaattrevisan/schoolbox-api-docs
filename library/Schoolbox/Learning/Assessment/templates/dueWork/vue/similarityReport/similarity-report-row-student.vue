@@ -47,8 +47,8 @@ export default {
 }
 
 .student__portrait {
-    flex-basis: 0 0 32px; //32px is the size of the image, so only need occupy this space
     margin: 0 1rem 0.5rem 0;
+    flex: 0 0 32px; //32px is the size of the image, so only need occupy this space
 }
 
 .student__name {
