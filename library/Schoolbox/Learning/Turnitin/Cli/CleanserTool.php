@@ -74,7 +74,7 @@ class CleanserTool extends CliTool\App
      * Reserves this amount for every iteration,
      * refreshing at the start of every iteration
      */
-    private const LOCK_TTL = 10 * 60;
+    private const LOCK_TTL = 60;
 
 
     /**
