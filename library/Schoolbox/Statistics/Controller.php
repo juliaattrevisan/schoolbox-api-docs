@@ -247,7 +247,6 @@ class Controller extends Base
                     'maxTopVisitors'  => self::MAX_TOP_VISITORS,
                     'topVisitors'     => $topVisitors,
                     'topVisitorInfo'  => $topVisitors->first(),
-                    'topVisitorsMore' => $topVisitorsMore,
 
                     'topFiles'     => $topFiles,
                     'topFileInfo'  => $topFileInfo,
