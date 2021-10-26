@@ -107,6 +107,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
+        $this->setBlock($templateHandle, 'class_analytics_link', 'class_analytics_link_block');
 
         // Determine the term for the grades link
         $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
@@ -274,6 +275,20 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $hasClassActions = true;
         } else {
             $this->setVar('course_link_block', '');
+        }
+
+        // Class analytics link
+        $this->setVar('class_analytics_link_block', '');
+        if ($isClassPage) {
+            $cohortProfileRoute = 'intellischool.getClassAnalytics';
+            $params             = [
+                'folder'   => $this->getContext(),
+                'folderId' => $this->getContext()->getId(),
+            ];
+            if ($this->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $this->getUser())) {
+                $this->setVar('CLASS_ANALYTICS_LINK', $this->getRouter()->generate($cohortProfileRoute, $params));
+                $this->parse('class_analytics_link_block', 'class_analytics_link');
+            }
         }
 
         return $hasClassActions;
