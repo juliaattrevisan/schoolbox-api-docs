@@ -26,7 +26,7 @@
     <li>
         <a class="icon-lti"
            target="_blank"
-           href="{{ routeLookup('learningLtiResourceLink.getLaunchAssessment', {assessmentId: assessment.id}) }}">View in LTI Tool</a>
+           href="{{ routeLookup('learningAssessment.getLaunchAssessmentAsInstructor', {assessmentId: assessment.id}) }}">View in LTI Tool</a>
     </li>
 {% endblock %}
 

@@ -190,6 +190,22 @@ class Module extends BaseModule
          */
         $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewSimilarityReport, $preloadAssessment);
         $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewSimilarityReport, $preloadAssessment);
+
+        // LTI assessment launch
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/launch/instructor",
+            'getLaunchAssessmentAsInstructor',
+            $canViewStatus,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/launch/student/$studentParam",
+            'getLaunchAssessmentAsStudent',
+            $canSubmit,
+            $preloadParticipant,
+        );
     }
 
 
@@ -399,6 +415,8 @@ class Module extends BaseModule
         $lc['ltiToolMapper']            = $this->getMapperFactory()->getLazy(LtiToolMapper::class);
         $lc['ltiAssessmentMapper']      = $this->getMapperFactory()->getLazy(LtiAssessmentMapper::class);
         $lc['ltiAssessmentScoreMapper'] = $this->getMapperFactory()->getLazy(LtiAssessmentScoreMapper::class);
+        $lc['instance']                 = $injector->lazyGet('instance');
+        $lc['repository']               = $injector->lazyGet('lti.repository');
     }
 
     /**

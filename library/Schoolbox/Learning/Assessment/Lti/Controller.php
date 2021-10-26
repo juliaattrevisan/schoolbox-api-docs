@@ -10,9 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Alaress_Date_Format;
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
+use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -26,6 +32,11 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\Provider as LtiTool;
+use Schoolbox\LTI\Registration\Repository;
+use Schoolbox\LTI\Util\CustomClaimFactory;
+use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Util\RoleClaimFactory;
+use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -52,23 +63,35 @@ class Controller extends Assessment\Controller
     private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper;
 
     /**
+     * Repository of tool+platform configurations.
+     */
+    private RegistrationRepositoryInterface $repository;
+
+    /**
+     * Instance data repository.
+     */
+    private Instance $instance;
+
+    /**
      * Constructor
      *
-     * @param UserMapper                    $userMapper
-     * @param Error\Mapper                  $errorMapper
-     * @param MapperProxy                   $assessmentMapper
-     * @param WorkTypeMapper                $workTypeMapper
-     * @param Access                        $access
-     * @param Transactor                    $transactor
-     * @param Assessment\Breadcrumb\Factory $bakery
-     * @param Term\Mapper                   $termMapper
-     * @param Participant\DataSource        $participantDataSource
-     * @param CourseSpecificationMapper     $courseSpecificationMapper
-     * @param UnitSpecificationMapper       $unitSpecificationMapper
-     * @param Replicator                    $replicator
-     * @param LtiTool\Mapper                $ltiToolMapper
-     * @param LtiAssessment\Mapper          $ltiAssessmentMapper
-     * @param LtiAssessmentScore\Mapper     $ltiAssessmentScoreMapper
+     * @param UserMapper                      $userMapper
+     * @param Error\Mapper                    $errorMapper
+     * @param MapperProxy                     $assessmentMapper
+     * @param WorkTypeMapper                  $workTypeMapper
+     * @param Access                          $access
+     * @param Transactor                      $transactor
+     * @param Assessment\Breadcrumb\Factory   $bakery
+     * @param Term\Mapper                     $termMapper
+     * @param Participant\DataSource          $participantDataSource
+     * @param CourseSpecificationMapper       $courseSpecificationMapper
+     * @param UnitSpecificationMapper         $unitSpecificationMapper
+     * @param Replicator                      $replicator
+     * @param LtiTool\Mapper                  $ltiToolMapper
+     * @param LtiAssessment\Mapper            $ltiAssessmentMapper
+     * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper
+     * @param RegistrationRepositoryInterface $repository
+     * @param Instance                        $instance
      */
     public function __construct(
         UserMapper $userMapper,
@@ -85,7 +108,9 @@ class Controller extends Assessment\Controller
         Replicator $replicator,
         LtiTool\Mapper $ltiToolMapper,
         LtiAssessment\Mapper $ltiAssessmentMapper,
-        LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper
+        LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
+        RegistrationRepositoryInterface $repository,
+        Instance $instance
     ) {
         parent::__construct(
             $userMapper,
@@ -104,6 +129,8 @@ class Controller extends Assessment\Controller
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;
         $this->ltiAssessmentScoreMapper = $ltiAssessmentScoreMapper;
+        $this->repository               = $repository;
+        $this->instance                 = $instance;
     }
 
     /**
@@ -279,6 +306,104 @@ class Controller extends Assessment\Controller
             isset($encodedReturnUrl)
                 ? Redirect::decode($encodedReturnUrl)
                 : ('/homepage' . $assessment->getBaseContext()->getFolder()->getId()),
+        );
+    }
+
+    /**
+     * @api   GET /learning/assessments/:assessmentId/launch/instructor
+     * @since 21.1.0
+     *
+     * @param Model $assessment
+     */
+    public function getLaunchAssessmentAsInstructor(Model $assessment): void
+    {
+        $assessmentContext = $assessment->getBaseContext()->getFolder();
+
+        // Create an LTI resource link launch, send it to the iframe
+        $registration = $this->repository->find($assessment->getLtiTool()->getDeploymentId());
+
+        // Roles: dependent on whether user is a participant or instructor
+        $roleClaimFactory = new RoleClaimFactory($this->getAccess());
+        $roles            = array_merge(
+            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
+            $roleClaimFactory->buildContextRolesForAssessment($this->getUser(), $assessment),
+        );
+
+
+        // Additional claims:
+        $additionalClaims = [];
+
+        // Resource link claim: talk about the assessment
+        $resourceLinkClaim = new ResourceLinkClaim(
+            (string)$assessment->getId(),
+            $assessment->getLtiAssessmentTitle(),
+            $assessment->getLtiAssessmentText(),
+        );
+        $additionalClaims[] = $resourceLinkClaim;
+
+        // Context claim: talk about the folder
+        // I have seen no explanation for what context type actually is,
+        // thus I will make something up.
+        $contextClaim = new ContextClaim(
+            (string)$assessmentContext->getId(),
+            [ContextClaim::TYPE_COURSE_SECTION],
+            $assessmentContext->getCodeString(),
+            $assessmentContext->getTitle(),
+        );
+        $additionalClaims[] = $contextClaim;
+
+        // PlatformInstanceClaim: talk about the Schoolbox instance
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
+        $additionalClaims[]    = $platformInstanceClaim;
+
+        // Role-scope mentor claims:
+        // for parents, this might be their kids
+        // for kids, this won't be anyone
+        // for teachers, this will be all participants in the assessment
+        $roleScopeMentorClaim = (new RoleScopeMentorClaimFactory($this->getAccess()))
+            ->buildForAssessment($this->getUser(), $assessment);
+        if ($roleScopeMentorClaim) {
+            $additionalClaims[] = $roleScopeMentorClaim;
+        }
+
+        // Launch presentation:
+        // should come from assessment, but doesn't yet
+
+        // LIS claim: I don't think we support this yet
+
+        // Custom claims, with whatever was passed from the product
+        $customClaim = (new CustomClaimFactory())
+            ->withUser($this->getUser())
+            ->withActualUser($this->getUser())
+            ->withResourceLink($resourceLinkClaim)
+            ->withContext($contextClaim)
+            ->withPlatformInstance($platformInstanceClaim)
+            ->buildForAssessment($assessment);
+        if ($customClaim) {
+            $additionalClaims[] = $customClaim;
+        }
+
+        // AGS claims:
+        // if a line item is provided, send that
+
+        // Resource link request
+        $builder = new PlatformOriginatingLaunchBuilder();
+        $message = $builder->buildPlatformOriginatingLaunch(
+            $registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+            $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
+            $this->getUser()->getUsername(),
+            null,
+            array_unique($roles),
+            $additionalClaims,
+        );
+
+        // And send message to template, where it's POSTed
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@learningAssessment/lti/messageForm.twig',
+                ['message' => $message]
+            )
         );
     }
 }
