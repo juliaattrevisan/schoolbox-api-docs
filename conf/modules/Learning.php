@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbac
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
-use Schoolbox\Learning\Assessment\Lti\ResourceLink\Module as LtiResourceLinkModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
 use Schoolbox\Learning\Badge\Module as BadgeModule;
@@ -67,7 +66,6 @@ class Learning extends ModuleLoader
             $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
             $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
             $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
-            $this->loadModule($kernel, LtiResourceLinkModule::class, "/{$namespace}");
         }
 
         // Student toolkit component: not feature flagged
