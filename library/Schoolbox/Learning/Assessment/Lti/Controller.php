@@ -371,6 +371,7 @@ class Controller extends Assessment\Controller
         $registration = $this->repository->find($assessment->getLtiTool()->getDeploymentId());
 
         // Roles: dependent on whether user is a participant or instructor
+        // TODO determine how roles should be set if $actingUser != $currentUser
         $roleClaimFactory = new RoleClaimFactory($this->getAccess());
         $roles            = array_merge(
             $roleClaimFactory->buildInstitutionRoles($actingUser),
