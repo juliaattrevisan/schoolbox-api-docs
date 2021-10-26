@@ -43,7 +43,7 @@ export default {
             <p class="meta" v-html="getFormattedStatus"></p>
         </div>
         <div class="status__column">
-            <a class="button icon-approve" :href="data.submission._links.inline_grader" title="Review Submission">Review Submission</a>
+            <a class="button icon-approve" :href="data.submission._links.inline_grader" title="Review submission">Review submission</a>
         </div>
     </div>
 </template>
