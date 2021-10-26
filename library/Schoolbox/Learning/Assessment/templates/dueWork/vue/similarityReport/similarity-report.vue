@@ -121,11 +121,6 @@ export default {
                     similarity: SimilarityReportRowSimilarity,
                     status: SimilarityReportRowStatus,
                 },
-                texts: {
-                    noResults: 'No matching students...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
-                },
             },
             comment: '', //the message coupled with the mark as requiring resubmission
             singleRowName: 'submission',

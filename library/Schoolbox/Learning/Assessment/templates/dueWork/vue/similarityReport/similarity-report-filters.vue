@@ -18,8 +18,28 @@ export default {
         }
     },
 
+    mounted () {
+        this.initResetFiltersListener();
+    },
+
     methods: {
         
+        /**
+         * Reset all the filters back to there base level
+         */
+        initResetFiltersListener () {
+            document.addEventListener(FilterEvents.RESET_FILTERS, () => {
+                this.similarityScoreSelection = 0;
+                this.isResubmissionRequiredChecked = true;
+                this.isMarkingRequiredChecked = true;
+                this.isReviewedChecked = true;
+                this.onSimilarityScoreChange();
+                this.onResubmissionRequiredChange();
+                this.onMarkingRequiredChange();
+                this.onReviewedChange();
+            });
+        },
+
         /**
          * Show any rows that contain similarity scores above the selection
          * Note that for rows with multiple files, only a single file with a similarity
@@ -27,7 +47,7 @@ export default {
          */
         onSimilarityScoreChange () {
             Event.$emit(`vue-tables.filter::${FilterEvents.SIMILARITY_SCORE}`, this.similarityScoreSelection); //picked up by similarity-report.vue 
-            this.$nextTick(() => { //to ensure the latest filtered rows are available
+            this.$nextTick(() => { //to ensure the latest filtered rows are available, dispatched to similarity-report-row-similarity.vue
                 document.dispatchEvent(new CustomEvent(FilterEvents.SIMILARITY_SCORE, { detail: { score: this.similarityScoreSelection } } ) );
             });
         },
@@ -71,7 +91,7 @@ export default {
     <div class="filters">
         <div class="filters__column">
             <label>Similarity score</label>
-            <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange($event.target.value)">
+            <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange()">
                 <option value="0">-</option>
                 <option value="90">Above 90%</option>
                 <option value="80">Above 80%</option>
