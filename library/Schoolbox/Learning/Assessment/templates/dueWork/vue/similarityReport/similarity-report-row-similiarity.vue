@@ -97,7 +97,7 @@ export default {
 </script>
 
 <template>
-    <div class="title-on-single-column" data-title="Similarity %">
+    <div class="similarity title-on-single-column" data-title="Similarity %">
         <ul class="list">
             <li v-for="file in matchedFiles" :key="file.id">
                 <a :href="file._links.turnitin_report"  title="View similarity report">
@@ -112,6 +112,10 @@ export default {
 <style lang="scss" style="scoped">
 
 @import './similarity-report';
+
+.similarity {
+    min-width: 200px;
+}
 
 .list {
     list-style-type: none;

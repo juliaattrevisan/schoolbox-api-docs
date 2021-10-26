@@ -55,6 +55,7 @@ export default {
 .status {
     display: flex;
     justify-content: space-between; //the status and review buttons on either ends of column
+    min-width: 400px;
     @media (max-width: $tableToSingleColumn) {
         flex-direction: column;
     }

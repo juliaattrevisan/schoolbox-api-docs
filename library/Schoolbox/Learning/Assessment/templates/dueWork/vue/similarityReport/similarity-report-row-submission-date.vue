@@ -18,11 +18,17 @@ export default {
 </script>
 
 <template>
-    <div class="title-on-single-column" data-title="Submission date"> 
+    <div class="submission-date title-on-single-column" data-title="Submission date"> 
         <span :title="data.submission.submitted_at.relative">{{ data.submission.submitted_at.nice }}</span>
     </div>
 </template>
 
 <style lang="scss" scoped>
+
 @import './similarity-report';
+
+.submission-date {
+    min-width: 100px;
+}
+
 </style>

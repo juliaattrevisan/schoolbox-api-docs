@@ -11,8 +11,9 @@ $cdn-prefix: "/static";
 }
 
 .VueTables__wrapper {
-    padding: 0rem 1rem;
     background: white;
+    overflow-x: auto; //to horizontally scroll when required
+    padding: 0rem 1rem;
 }
 
 .VueTables input[type="checkbox"] {

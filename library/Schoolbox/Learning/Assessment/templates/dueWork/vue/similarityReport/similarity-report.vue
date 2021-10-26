@@ -39,7 +39,7 @@ export default {
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
             tableData: [], //hold all student tableData
-            tableColumns: ['student', 'submissionDate', 'similarity',    'status'], //the table tableColumns
+            tableColumns: ['student', 'submissionDate', 'similarity', 'status'], //the table tableColumns
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -390,10 +390,6 @@ export default {
 
 .VuePagination {
     display: none; //there's no footer, so no count/pagination/next/prev etc for this report
-}
-
-.table-responsive {
-    overflow-x: scroll;
 }
 
 @media (max-width: $tableToSingleColumn) { //display everything in one column
