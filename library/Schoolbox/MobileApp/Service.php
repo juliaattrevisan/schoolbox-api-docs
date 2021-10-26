@@ -9,6 +9,7 @@
 
 namespace Schoolbox\MobileApp;
 
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
 
@@ -19,6 +20,7 @@ use Alaress_Date_Format;
  */
 class Service
 {
+    use DeletedAtDate;
 
     /** @var int */
     private $id;
@@ -34,10 +36,6 @@ class Service
 
     /** @var IStorage */
     private $certificate;
-
-    /** @var Alaress_Date_Format */
-    protected $deletedAt;
-
 
     /**
      * @param int $id
@@ -137,34 +135,4 @@ class Service
         $this->certificate = $certificate;
         return $this;
     }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeleted()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeleted($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * Is this deleted? (added so there's a consistent method for determining if
-     * a model is deleted)
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeleted() instanceof \Alaress_Date_Format && !$this->getDeleted()->isNull());
-    }
-
 }

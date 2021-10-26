@@ -30,7 +30,19 @@
                 window.location.reload();
             }
         })
+
+        /* Delete confirmation
+         */
+        $('[data-delete-provider]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Do you want to remove this Notification Provider?',
+                confirmEvent: $.confirmDialog.submitForm
+            });
+        });
     });
+
+
 </script>
 
 {% import 'sub/breadcrumbs.twig' as bread  %}

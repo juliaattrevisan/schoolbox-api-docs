@@ -14,6 +14,16 @@
                 (<a href="#" data-open="change-digistorm-{{ appId }}">Change</a>)
             </p>
         </dd>
+        <dt class="small-12 medium-4">&nbsp;</dt>
+        <dd class="small-12 medium-8">
+
+            <form id="delete-digistorm-{{ appId }}" action="{{ routeLookup('adminMessages.postDeleteApp') }}" method="post">
+                <input type="hidden" name="id" value="{{ app.id }}" />
+                <a class="icon-delete" href="#" title="Delete" data-delete-provider ></a>
+            </form>
+
+        </dd>
+
     </dl>
     <div class="row">
         <div class="small-12 column">

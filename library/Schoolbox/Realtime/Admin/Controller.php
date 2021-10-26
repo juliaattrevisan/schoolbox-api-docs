@@ -590,7 +590,7 @@ class Controller extends BaseController
             //set deleted id in service / mobile_app table
             $serviceMapper->save(
                 $service
-                    ->setDeleted($date)
+                    ->setDeletedAt($date)
             );
 
             //set deleted in app registries
@@ -603,7 +603,7 @@ class Controller extends BaseController
             }
 
             $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
-            
+
         } else {
             if ($this->getRequest()->isXhr()) {
                 // respond with an empty 200 OK

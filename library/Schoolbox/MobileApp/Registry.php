@@ -10,10 +10,12 @@
 namespace Schoolbox\MobileApp;
 
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 
 class Registry
 {
+    use DeletedAtDate;
 
     const PROVIDER_GOOGLE    = 'GCM';
     const PROVIDER_APPLE     = 'APNS';
@@ -37,10 +39,6 @@ class Registry
 
     /** @var Alaress_Date_Format */
     protected $touchedAt;
-
-    /** @var Alaress_Date_Format */
-    protected $deletedAt;
-
 
     /**
      * @return User
@@ -159,34 +157,5 @@ class Registry
     {
         $this->createdAt = $createdAt;
         return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeleted()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeleted($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * Is this deleted? (added so there's a consistent method for determining if
-     * a model is deleted)
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeleted() instanceof \Alaress_Date_Format && !$this->getDeleted()->isNull());
     }
 }
