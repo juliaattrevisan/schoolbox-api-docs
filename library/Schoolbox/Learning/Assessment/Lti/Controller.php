@@ -186,6 +186,7 @@ class Controller extends Assessment\Controller
      * @since 21.1.0
      *
      * @param IAssessable|Model $assessment
+     * @param User              $student
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -209,11 +210,6 @@ class Controller extends Assessment\Controller
             $timeline = (new Assessment\Timeline\Generic($participant))->getForUser($this->getUser());
         }
 
-        // Assume that a student may only attempt LTI assessments for themselves
-        $canAttempt = false;
-        if ($student->getId() === $this->getUser()->getId()) {
-            $canAttempt = $assessment->isOpen($student, Alaress_Date_Format::now());
-        }
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/summary.twig',
@@ -225,7 +221,6 @@ class Controller extends Assessment\Controller
                     'student'     => $student,
                     'timeline'    => $timeline,
                     'returnUrl'   => $this->request->query->get(Assessment\Redirect::RETURN_URL),
-                    'canAttempt'  => $canAttempt,
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -405,5 +400,10 @@ class Controller extends Assessment\Controller
                 ['message' => $message]
             )
         );
+    }
+
+    public function getLaunchAssessmentAsStudent(Model $assessment, User $student): void
+    {
+
     }
 }

@@ -143,12 +143,22 @@
     </div>
 {% endif %}
 
-{% if canAttempt %}
+
+{% set launchAssessmentUrl = routeLookupIfAuthorized(
+    'learningAssessment.getLaunchAssessmentAsStudent',
+    {
+        assessment:   assessment,
+        assessmentId: assessment.id,
+        student:      student,
+        studentId:    student.id,
+    }
+) %}
+{% if launchAssessmentUrl %}
     <div class="row">
         <div class="small-12 column">
             <a class="button submit"
                target="_blank"
-               href="{{ routeLookup('learningLtiResourceLink.getLaunchAssessment', {assessmentId: assessment.id}) }}">Begin Assessment</a>
+               href="{{ launchAssessmentUrl }}">Begin Assessment</a>
         </div>
     </div>
 {% endif %}
