@@ -305,6 +305,9 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Launches this LTI assessment's resource link, within the context of an
+     * instructor.
+     *
      * @api   GET /learning/assessments/:assessmentId/launch/instructor
      * @since 21.1.0
      *
@@ -312,6 +315,56 @@ class Controller extends Assessment\Controller
      */
     public function getLaunchAssessmentAsInstructor(Model $assessment): void
     {
+        $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $this->getUser());
+
+        // And send message to template, where it's POSTed
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@learningAssessment/lti/messageForm.twig',
+                ['message' => $message]
+            )
+        );
+    }
+
+    /**
+     * Launches this LTI assessment's resource link, within the context of a
+     * student.
+     *
+     * @api   GET /learning/assessments/:assessmentId/launch/student/:studentId
+     * @since 21.1.0
+     *
+     * @param Model $assessment
+     * @param User  $student
+     */
+    public function getLaunchAssessmentAsStudent(Model $assessment, User $student): void
+    {
+        $message = $this->buildLaunchResourceLinkMessage($assessment, $this->getUser(), $student);
+
+        // And send message to template, where it's POSTed
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@learningAssessment/lti/messageForm.twig',
+                ['message' => $message]
+            )
+        );
+    }
+
+    /**
+     * Build a resource link launch message, which will then be used to launch
+     * the LTI tool's assessment.
+     *
+     * @param Model $assessment
+     * @param User  $currentUser The current user
+     * @param User  $actingUser  The user who the current user is acting as:
+     *                           if not themselves, it may be a student.
+     * @return LtiMessageInterface
+     */
+    private function buildLaunchResourceLinkMessage(
+        Model $assessment,
+        User $currentUser,
+        User $actingUser
+    ): LtiMessageInterface {
+
         $assessmentContext = $assessment->getBaseContext()->getFolder();
 
         // Create an LTI resource link launch, send it to the iframe
@@ -320,10 +373,9 @@ class Controller extends Assessment\Controller
         // Roles: dependent on whether user is a participant or instructor
         $roleClaimFactory = new RoleClaimFactory($this->getAccess());
         $roles            = array_merge(
-            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
-            $roleClaimFactory->buildContextRolesForAssessment($this->getUser(), $assessment),
+            $roleClaimFactory->buildInstitutionRoles($actingUser),
+            $roleClaimFactory->buildContextRolesForAssessment($actingUser, $assessment),
         );
-
 
         // Additional claims:
         $additionalClaims = [];
@@ -356,7 +408,7 @@ class Controller extends Assessment\Controller
         // for kids, this won't be anyone
         // for teachers, this will be all participants in the assessment
         $roleScopeMentorClaim = (new RoleScopeMentorClaimFactory($this->getAccess()))
-            ->buildForAssessment($this->getUser(), $assessment);
+            ->buildForAssessment($currentUser, $assessment);
         if ($roleScopeMentorClaim) {
             $additionalClaims[] = $roleScopeMentorClaim;
         }
@@ -368,8 +420,8 @@ class Controller extends Assessment\Controller
 
         // Custom claims, with whatever was passed from the product
         $customClaim = (new CustomClaimFactory())
-            ->withUser($this->getUser())
-            ->withActualUser($this->getUser())
+            ->withUser($actingUser)
+            ->withActualUser($currentUser)
             ->withResourceLink($resourceLinkClaim)
             ->withContext($contextClaim)
             ->withPlatformInstance($platformInstanceClaim)
@@ -383,27 +435,14 @@ class Controller extends Assessment\Controller
 
         // Resource link request
         $builder = new PlatformOriginatingLaunchBuilder();
-        $message = $builder->buildPlatformOriginatingLaunch(
+        return $builder->buildPlatformOriginatingLaunch(
             $registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
             $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
-            $this->getUser()->getUsername(),
+            $currentUser->getUsername(),
             null,
             array_unique($roles),
             $additionalClaims,
         );
-
-        // And send message to template, where it's POSTed
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@learningAssessment/lti/messageForm.twig',
-                ['message' => $message]
-            )
-        );
-    }
-
-    public function getLaunchAssessmentAsStudent(Model $assessment, User $student): void
-    {
-
     }
 }
