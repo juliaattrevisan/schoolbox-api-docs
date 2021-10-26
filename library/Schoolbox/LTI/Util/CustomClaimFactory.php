@@ -22,6 +22,12 @@ use Schoolbox\User;
  * This factory also handles the variable substitution that is required in
  * custom claims.
  *
+ * Currently, it supports translation of:
+ * * LTI user variables (ID and username only) for both acting and actual user
+ * * LTI context variables
+ * * LTI resource link variables
+ * * Tool platform variables
+ *
  * @see https://www.imsglobal.org/spec/lti/v1p3/#custom-properties-and-variable-substitution
  */
 class CustomClaimFactory
@@ -105,13 +111,13 @@ class CustomClaimFactory
     public function withPlatformInstance(PlatformInstanceClaim $platformInstanceClaim): self
     {
         $new                                                  = (clone $this);
-        $new->translations['$ToolPlatform.productFamilyCode'] = $platformInstanceClaim->getProductFamilyCode();
-        $new->translations['$ToolPlatform.version']           = $platformInstanceClaim->getVersion();
-        $new->translations['$ToolPlatform.guid']              = $platformInstanceClaim->getGuid();
-        $new->translations['$ToolPlatform.name']              = $platformInstanceClaim->getName();
-        $new->translations['$ToolPlatform.description']       = $platformInstanceClaim->getDescription();
-        $new->translations['$ToolPlatform.url']               = $platformInstanceClaim->getUrl();
-        $new->translations['$ToolPlatform.contactEmail']      = $platformInstanceClaim->getContactEmail();
+        $new->translations['$ToolPlatformInstance.productFamilyCode'] = $platformInstanceClaim->getProductFamilyCode();
+        $new->translations['$ToolPlatformInstance.version']           = $platformInstanceClaim->getVersion();
+        $new->translations['$ToolPlatformInstance.guid']              = $platformInstanceClaim->getGuid();
+        $new->translations['$ToolPlatformInstance.name']              = $platformInstanceClaim->getName();
+        $new->translations['$ToolPlatformInstance.description']       = $platformInstanceClaim->getDescription();
+        $new->translations['$ToolPlatformInstance.url']               = $platformInstanceClaim->getUrl();
+        $new->translations['$ToolPlatformInstance.contactEmail']      = $platformInstanceClaim->getContactEmail();
         return $new;
     }
 
