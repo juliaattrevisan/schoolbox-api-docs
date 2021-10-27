@@ -62,10 +62,13 @@ class Student extends IteratorIterator
 
         /* Emails - one for every item in stack
          */
-
         array_map([$student, "addEmail"], $this->columnValuesAsEmail($preStack, 'student_default_email'));
         array_map([$student, "addWorkEmail"], $this->columnValuesAsEmail($preStack, 'student_work_email'));
         array_map([$student, "addHomeEmail"], $this->columnValuesAsEmail($preStack, 'student_home_email'));
+
+        /* Set the student boarding status, effectively it's a bool
+         */
+        $student->setBoardingStatus((int)$currentResult['student_boarder']);
 
         /* Boarding House should be set if it has a value
          * You can't actually rely on StudentBoarder field, because that

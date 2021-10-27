@@ -52,6 +52,15 @@ class Student extends Base
      */
     protected $locker = '';
 
+
+    /**
+     * Boarding Status is a bool denoting whether they are a boarder or not
+     *
+     * @var int|null
+     */
+    protected ?int $boardingStatus = null;
+
+
     /* Academics
      */
 
@@ -345,5 +354,25 @@ class Student extends Base
     public function getYear()
     {
         return $this->year;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getBoardingStatus(): ?int
+    {
+        return $this->boardingStatus;
+    }
+
+
+    /**
+     * @param int|null $boardingStatus
+     * @return Student
+     */
+    public function setBoardingStatus(?int $boardingStatus): self
+    {
+        $this->boardingStatus = $boardingStatus;
+        return $this;
     }
 }
