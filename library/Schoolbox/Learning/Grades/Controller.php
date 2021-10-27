@@ -30,12 +30,12 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Assessment\Lti;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
-use Schoolbox\Learning\Grades\Cohort\Progression;
 use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
@@ -285,7 +285,7 @@ class Controller extends Base
             }
 
             if (
-                ($assessment instanceof DueWork\Model || $assessment instanceof Quiz\Model) &&
+                ($assessment instanceof DueWork\Model || $assessment instanceof Quiz\Model || $assessment instanceof Lti\Model) &&
                 $assessment->getWorkType() &&
                 \in_array($assessment->getWorkType()->getName(), $workTypeNames, true) &&
                 $visibility->isVisibleToUser($assessment, $viewee, true, null, !$this->access->isInstructor($this->getUser(), $folder))

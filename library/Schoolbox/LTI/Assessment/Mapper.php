@@ -66,6 +66,7 @@ class Mapper extends BaseMapper
         $this->uses('custom_fields', self::TYPE_JSON);
         $this->uses('line_item_resource_id', self::TYPE_STRING);
         $this->uses('line_item_score_maximum', self::TYPE_DECIMAL);
+        $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'truncateFields']);
     }
 

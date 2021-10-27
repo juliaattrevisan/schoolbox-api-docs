@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
@@ -144,6 +145,15 @@ class Mapper extends BaseMapper
                     'user_id'   => $participant->getUser()->getId(),
                 ]);
             $attemptMapper->restoreNotification();
+        } elseif ($assessment->getLtiAssessment() instanceof LTIAssessment) {
+            // delete score
+            $ltiScoreMapper = \Schoolbox\LTI\Assessment\Score\Mapper::getInstance();
+            $ltiScoreMapper->deleteByColumnList([
+                    'lti_assessment_id' => $assessment->getLtiAssessment()->getId(),
+                    'student_id'        => $participant->getUser()->getId(),
+                ]);
+            $ltiScoreMapper->suppressNotification();
+            $ltiScoreMapper->restoreNotification();
         }
     }
 
@@ -212,6 +222,17 @@ class Mapper extends BaseMapper
             $attemptMapper->restoreNotification();
 
             return $attempts->count();
+        } elseif ($assessment->getLtiAssessment() instanceof LTIAssessment) {
+            // delete score
+            $ltiScoreMapper = \Schoolbox\LTI\Assessment\Score\Mapper::getInstance();
+            $ltiScoreMapper->suppressNotification();
+            $params = [
+                'lti_assessment_id' => $assessment->getLtiAssessment()->getId(),
+                'student_id'        => $participant->getUser()->getId(),
+            ];
+            $scores = $ltiScoreMapper->findByColumnList($params, ['deleted' => true]);
+            $ltiScoreMapper->restoreSoftDeleted($scores);
+            $ltiScoreMapper->restoreNotification();
         }
 
         // should not get here, but.

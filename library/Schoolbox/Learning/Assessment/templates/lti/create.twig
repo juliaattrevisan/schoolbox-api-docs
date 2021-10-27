@@ -60,7 +60,8 @@
                                 data-tool-selector-url="{{ tool.deepLinkingUrl
                                     ? routeLookup('ltiPlatform.getGenerateDeepLinkingRequest', {toolId: tool.id})
                                     : ''
-                                }}">{{ tool.name }}</option>
+                                }}"
+                                {{ assessment.ltiTool.id is defined and tool.id == assessment.ltiTool.id ? 'selected="selected"' : '' }}>{{ tool.name }}</option>
                     {% endfor %}
                 </select>
                 <a href="#" id="ltiToolLaunchPicker" class="button disabled icon-lti">Use Tool</a>
@@ -297,6 +298,9 @@
     {% include '@learningAssessment/fragments/weight.twig' with {
         assessment: assessment,
     } only %}
+
+    {% import 'sub/visibility.twig' as visibility %}
+    {{ visibility.dropdown(markVisibility, availableVisibilities) }}
 </fieldset>
 
 

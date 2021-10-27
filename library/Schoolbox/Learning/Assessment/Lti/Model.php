@@ -141,6 +141,15 @@ class Model extends AbstractAssessment
     /**
      * @inheritdoc
      */
+    public function getHumanReadableMark(Participant $participant, $publishedOnly)
+    {
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getHumanReadableMark() : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
     {
         $this->assertSameAssessment($participant);
@@ -211,31 +220,6 @@ class Model extends AbstractAssessment
             'due'     => $this->getDueAt(),
             'late'    => $this->getCloseAt(),
         ]);
-    }
-
-    /**
-     * LTI assessment marks are currently always visible to all users which have
-     * permission to view the assessment.
-     *
-     * TODO add mark visibility as an actual field
-     *
-     * @return int
-     */
-    public function getMarkVisibility(): int
-    {
-        return self::MARK_VISIBILITY_PARENT_STUDENT;
-    }
-
-    /**
-     * LTI assessment marks are currently always visible to all users which have
-     * permission to view the assessment.
-     *
-     * @param int $markVisibility
-     * @return static
-     */
-    public function setMarkVisibility($markVisibility): self
-    {
-        return $this;
     }
 
     /**

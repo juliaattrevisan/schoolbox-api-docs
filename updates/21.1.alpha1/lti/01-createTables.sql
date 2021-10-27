@@ -9,6 +9,7 @@ CREATE TABLE lti_assessment
     custom_fields           JSON NULL,
     line_item_resource_id   VARCHAR(2048) NULL,
     line_item_score_maximum FLOAT NULL,
+    mark_visibility         INT(11),
     CONSTRAINT lti_assessment_assessment_id_fk
         FOREIGN KEY (assessment_id) REFERENCES assessment (id),
     CONSTRAINT lti_assessment_lti_provider_id_fk
