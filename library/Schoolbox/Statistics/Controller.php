@@ -11,7 +11,6 @@ namespace Schoolbox\Statistics;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
@@ -187,12 +186,6 @@ class Controller extends Base
         }
 
         [$colours, $graphData] = $this->compileVisitorGraphData($folder, $dataSource);
-
-        /**
-         * visitorCount is used for both top visitors and recent visitors
-         * to determine whether to show 'view all' buttons
-         */
-        $visitorCount = $dataSource->getVisitorCount($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
 
         /**
