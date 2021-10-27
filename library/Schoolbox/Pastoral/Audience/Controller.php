@@ -228,12 +228,13 @@ class Controller extends Base
         /* Set up flyout with special prefix breadcrumbs because we're in some deep
          * part of the system where the flyout doesn't represent the full app hierarchy
          */
+        $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
         $flyout = (new Flyout(
             $this->getConfigLoader(),
             new FlyoutNodes($this->router, $this->pastoralTypeMapper)
         ))->prefixBreadcrumbs([
-            [$this->rosettaStone->translate('pastoralCare', false, true), $this->router->generate('pastoral.getIndex')],
-            ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
+            [$pastoralCareProper, $this->router->generate('pastoral.getIndex')],
+            ["Manage ${pastoralCareProper} Record Settings", $this->router->generate('pastoralAudience.getAudiences')],
         ]);
 
 

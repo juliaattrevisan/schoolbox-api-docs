@@ -54,12 +54,12 @@
         </div>
         <div class="small-{% if severities | length %}12{% else %}6{% endif %} columns">
             <label> Tags
-                <span class="hint has-tip tip-top" data-tooltip title="Multiple tags can be added to aid filtering and reporting. Try to reuse existing tags by searching first. If necessary you may create new tags.">?</span>
+                <span class="hint has-tip tip-top" data-tooltip title="Tags can be added to support {{ locale.pastoral }} reports and filtering.">?</span>
                 <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}"> </label>
         </div>
         {% if config.pastoral_parent_access %}
         <div class="small-12 columns">
-            <label for="parent-comments-allowed">Allow parents to comment <span class="hint has-tip tip-top" data-tooltip title="Turn this ON to allow parent(s) of the student to comment on this record.">?</span></label>
+            <label for="parent-comments-allowed">Allow Parents to Comment <span class="hint has-tip tip-top" data-tooltip title="When toggled to ‘ON’, parent(s) of this student will be able to comment on this record.">?</span></label>
             <div class="switch">
                 <input id="parent-comments-allowed" type="checkbox"
                        name="parent comments allowed" value="1" {% if record.parentCommentsAllowed %}checked="checked"{% endif %}>

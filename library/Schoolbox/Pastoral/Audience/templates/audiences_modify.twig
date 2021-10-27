@@ -11,7 +11,7 @@
 
 <div class="admin-container row">
 
-    {# Default text is "Manage Type Defaults"
+    {# Default text is "Manage {{ locale.pastoral.proper }} Record Settings"
      # But you can set that to empty string to remove it
     #}
     {% include '@submenu/flyout.twig' with {
@@ -29,9 +29,9 @@
                             <label for="pastoralIcon">Flag</label>
                             <p class="meta">
                                 If a student has one or more {{ locale.pastoral }} records of this type,
-                                a flag with this icon and colour will display next to their name on their profile,
-                                attendance marking and class list. If no icon or colour is selected, no flag will
-                                display.
+                                a flag will display on their profile page, when marking attendance,
+                                and on the class list. If there is no icon or colour selected,
+                                no flag will appear for this {{ locale.pastoral }} type.
                             </p>
 
                             {% set icon  = (subtype ? subtype.icon  : type.icon) %}
@@ -138,7 +138,7 @@
                     <fieldset>
                         <div class="small-12 columns">
                             <label for="visibilityLocked">Lock Visibility</label>
-                            <p class="meta">When enabled, records created with this type will be unable to modify the default visibility.</p>
+                            <p class="meta">When enabled, users will be unable to modify the visibility settings for this record type.</p>
                             <div class="switch">
                                 {% set visibilityLocked = subtype ? subtype.visibilityLocked : type.visibilityLocked %}
                                 <input name="visibilityLocked" id="visibilityLocked" type="checkbox"
