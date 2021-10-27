@@ -509,8 +509,8 @@ class Transmit
                 ],
                 'group' => $group,
                 'group_context' => [
-                    'id' => $box->getAssessmentModel()->getContextFolder()->getId(),
-                    'name' => $box->getAssessmentModel()->getContextFolder()->getNameWithCodes(),
+                    'id' => $box->getAssessmentModel()->getAssessmentContext()->getFolder()->getId(),
+                    'name' => $box->getAssessmentModel()->getAssessmentContext()->getFolder()->getNameWithCodes(),
                     'owners' => [
                         [
                             'id' => $boxOwner->getId(),
