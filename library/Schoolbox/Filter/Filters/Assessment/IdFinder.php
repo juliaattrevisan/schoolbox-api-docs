@@ -12,13 +12,6 @@ namespace Schoolbox\Filter\Filters\Assessment;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-
-use function array_intersect;
-use function array_merge;
-use function array_unique;
-use function count;
-use function implode;
-
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Term;
@@ -28,6 +21,12 @@ use Schoolbox\Filter\Mapper;
 use Schoolbox\IMapper;
 use UnderflowException;
 use UnexpectedValueException;
+
+use function array_intersect;
+use function array_merge;
+use function array_unique;
+use function count;
+use function implode;
 
 /**
  * Helper for building the query clauses.
@@ -1190,8 +1189,8 @@ class IdFinder extends Filter\AbstractIdFinder
             if ($markPerCap->count() === 1) {
                 // Simplify to [no rubric usage]
                 $rubricUsage = null;
-            } // Filtering to just assessments with no relevant mark-per-cap attribute?
-            elseif ($rubricUsage->count() === 1) {
+            } elseif ($rubricUsage->count() === 1) {
+                // Filtering to just assessments with no relevant mark-per-cap attribute?
                 // Simplify to [NULL mark-per-cap]
                 $markPerCap = null;
             }

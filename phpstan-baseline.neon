@@ -4916,16 +4916,6 @@ parameters:
 			path: library/Schoolbox/Filter/Codec.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/AssessmentType/Definition.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/AssessmentType/Definition.php
-
-		-
 			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getAccess\\(\\) should return Schoolbox\\\\Permission\\\\Access\\\\Access but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php

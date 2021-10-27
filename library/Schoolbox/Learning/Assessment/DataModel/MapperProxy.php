@@ -826,7 +826,6 @@ class MapperProxy
                 $options
             );
         } else {
-
             $assessments = $this->baseMapper->findAllForFolderId(
                 $folderId,
                 $this->convertOptionsToPredicateBuilder($options, false),
