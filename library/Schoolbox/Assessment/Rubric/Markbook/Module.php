@@ -24,6 +24,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Filter;
+use Schoolbox\Role;
 
 class Module extends BaseModule
 {
@@ -59,7 +60,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(Access::getInstance())
+                new IsInstructor(Access::getInstance(), null, Role::PERMISSION_VIEW_STUDENT_GRADES)
             )
         );
 

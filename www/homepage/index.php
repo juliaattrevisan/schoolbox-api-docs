@@ -83,9 +83,12 @@ if (!$folder->getId()) {
     $this->localRedir('/resources/');
 }
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $this->getDi()->get('session')->get('user');
+
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
-if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < UserAccess::ACCESS_READ) {
+if (($actualPermission = $access->getFolderAccess($sessionUser, $folder->getId())) < UserAccess::ACCESS_READ) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
@@ -128,7 +131,7 @@ foreach ($homepageHandler->getColorList() as $key => $color) {
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\Folder\Log\Mapper();
-$mapper->incrementHitcount($this->getDi()->get('session')->get('user'), $folder);
+$mapper->incrementHitcount($sessionUser, $folder);
 $folderMapper->logPageView($folder);
 
 /* BUILD PAGE */
@@ -147,7 +150,7 @@ $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 $this->setBlock('page_controls', 'browse_resources', 'browse_resources_block');
 
 /* BUILD COMPONENTRY */
-$componentFactory = new Component_Homepage_Factory($this->getDi()->get('session')->get('user'), $this);
+$componentFactory = new Component_Homepage_Factory($sessionUser, $this);
 if ($_GET['readonly']) {
     $componentFactory->setMaximumPermission($virtualPermission);
 }
@@ -177,7 +180,11 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
-    if (Config::get('lms_enabled') && (!$hasCourseSpec && !$hasUnitSpec)) {
+    if (
+        Config::get('lms_enabled')
+        && (!$hasCourseSpec && !$hasUnitSpec)
+        && ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser())
+    ) {
         $this->parse('course_actions_block', 'course_actions');
     } else {
         $this->setVar('course_actions_block', '');
@@ -192,8 +199,8 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $definitionCollection = $componentFactory->getDefinitionList('component_category');
 
+    /** @var Component_Definition $definition */
     foreach ($definitionCollection as $definition) {
-        /** @var Component_Definition $definition */
         foreach ($componentCollection as $inst) {
             /** @var Component_ControllerAbstract $inst */
             if ($inst->getInstance()->getDefinitionId() == $definition->getId()) {
@@ -345,7 +352,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 //Setup control buttons
 $manageFolderController = new Component_Homepage_ManageFolderController(
     new Component_Instance(),
-    $this->getDi()->get('session')->get('user'),
+    $sessionUser,
     $this
 );
 $manageFolderController->setMaximumPermission($virtualPermission);
@@ -356,7 +363,7 @@ $manageFolderController->renderTemplate('page_controls');
 //Setup class list buttons
 $manageClassController = new Component_Homepage_ManageClassController(
     new Component_Instance(),
-    $this->getDi()->get('session')->get('user'),
+    $sessionUser,
     $this
 );
 $manageClassController->setMaximumPermission($virtualPermission);
@@ -369,9 +376,6 @@ if ($manageClassController->renderTemplate('manage_class')) {
 }
 
 $this->parse('page_controls_block', 'page_controls');
-
-/** @var \Schoolbox\User $sessionUser */
-$sessionUser = $this->getDi()->get('session')->get('user');
 
 if ($sessionUser->getRole()->isStaff()) {
     $codeString = Scrub::text($folder->getTruncatedCodeString());

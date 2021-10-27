@@ -114,17 +114,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Show markbook link to staff on class or group pages
         $this->setVar('markbook_link_block');
+        $classMarkbookLink = $this->buildMarkbookLink();
         if (
-            $isStaffOrSuper
+            $classMarkbookLink
             && ($isGroupPage || $isClassPage || $wasClassPage)
             && $this->getConfigLoader()->get('class_markbook_enable')
         ) {
-            $classMarkbookLink = $this->buildMarkbookLink();
-            if ($classMarkbookLink) {
-                $this->setVar('MARKBOOK_LINK', $classMarkbookLink);
-                $this->parse('markbook_link_block', 'markbook_link');
-                $hasClassActions = true;
-            }
+            $this->setVar('MARKBOOK_LINK', $classMarkbookLink);
+            $this->parse('markbook_link_block', 'markbook_link');
+            $hasClassActions = true;
         }
 
         /** @var Alaress\Authorizer\Authorizer $authorizer */

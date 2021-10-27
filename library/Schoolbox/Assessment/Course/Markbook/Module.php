@@ -75,7 +75,7 @@ class Module extends \Alaress\Module\Module
             }),
             new Rule\IsLoggedIn(),
             new Rule\Any(
-                new Rule\HasRole(Role::STAFF),
+                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
                 new Rule\IsSuperuser()
             )
         );

@@ -22,6 +22,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Role;
 
 class Module extends BaseModule
 {
@@ -60,7 +61,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(Access::getInstance())
+                new IsInstructor(Access::getInstance(), null, Role::PERMISSION_VIEW_STUDENT_GRADES)
             )
         );
 
