@@ -9,6 +9,28 @@ readonly cache_dir='/vagrant/vagrantcache';
 mkdir -p $cache_dir;
 cd $cache_dir || exit 1;  # TODO do we need to?
 
+if [[ $# -ne 6 ]]; then
+  error "Script requires 6 params, found $#"
+  exit 1
+fi
+instance_registry_url_override=$1
+instance_registry_api_token=$2
+data_source=$3
+extra_hostname=$4
+aws_iam_key=$5
+aws_iam_secret=$6
+
+if [[ -z "$data_source" ]]; then
+  echo "Please provide data_source" >&2;
+  exit 1;
+fi;
+if [[ -n $extra_hostname ]]; then
+  if [[ -z $aws_iam_key ]] || [[ -z $aws_iam_secret ]]; then
+    echo "If provisioning extra domain name '$extra_hostname', you must provide both IAM key + secret" >&2
+    exit 1
+  fi
+fi
+
 # Ensure running an appropriate era vagrant box
 if [ "$(cat /home/vagrant/.vagrant.buildtimestamp)" -gt 1612117411 ]; then
   echo "[SB][$(date +%Y-%m-%d\ %X)] Vagrant box meets minimum requirements: 1612117411 Current: $(cat /home/vagrant/.vagrant.buildtimestamp)";
@@ -64,8 +86,6 @@ ln -sf /vagrant/data /var/lib/schoolbox
 
 # Does vagrant.yaml file indicate we wish this host to use a custom IR endpoint?
 # We would do this if we wished to test an integration between Schoolbox, Puppet + IR
-instance_registry_url_override=$1
-instance_registry_api_token=$2
 instance_registry_conf_file="/etc/schoolbox/instance-registry.json"
 if [[ -n $instance_registry_url_override ]]; then
   echo "Setting instance_registry_url_override to '$instance_registry_url_override' in $instance_registry_conf_file";
@@ -93,14 +113,38 @@ done
 
 
 # vagrant does not use LE to deploy SSL certs, we need to deploy certs prior to running puppet so puppet can configure nginx vhosts
-if [[ -n "$3" ]]; then data_source=$3; else echo "Please provide data_source"; exit 1; fi;
-s3Referer=$(read_var AWS_S3_REFERER);
-if ! /vagrant/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
-  echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'";
-  exit 1;
+# If no extra hostname, just use vagrant cert. Otherwise we'll need the wildcard cert
+if [[ -z $extra_hostname ]]; then
+  # Download vagrant cert
+  s3Referer=$(read_var AWS_S3_REFERER);
+  if ! /vagrant/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
+    echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'";
+    exit 1;
+  fi
+  tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt
+  tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-vagrantx-private.key
+else
+  # Download wildcard cert
+  filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
+  file="certs/$filename"
+  bucket='schoolbox-cloud-tls'
+  resource="/${bucket}/${file}"
+  dateValue="$(date -u +'%a, %d %b %Y %H:%M:%S GMT')"
+  contentType="application/x-compressed-tar"
+  stringToSign="GET\n\n${contentType}\n\nx-amz-date:${dateValue}\n${resource}"
+  signature=$(/bin/echo -en "$stringToSign" | openssl sha1 -hmac "${aws_iam_secret}" -binary | base64)
+  if ! curl --silent --show-error -H "Host: ${bucket}.s3.amazonaws.com" \
+  -H "x-amz-date: ${dateValue}" \
+  -H "Content-Type: ${contentType}" \
+  -H "Authorization: AWS ${aws_iam_key}:${signature}" \
+  https://${bucket}.s3.amazonaws.com/${file} \
+  -o $cache_dir/$filename; then
+    echo "Unable to download wildcard certificate" >&2
+    exit 1
+  fi
+  tar xzfO $cache_dir/$filename dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt
+  tar xzfO $cache_dir/$filename dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-vagrantx-private.key
 fi
-tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt
-tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-vagrantx-private.key
 
 # Remove old style named cert/key
 rm -f /etc/nginx/certs/schoolbox-fullchain.crt /etc/nginx/certs/schoolbox-private.key

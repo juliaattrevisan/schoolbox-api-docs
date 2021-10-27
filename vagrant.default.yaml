@@ -30,3 +30,9 @@ instance_id_env_var: "vagrantx"
 puppet_sync_type: "pull"
 # By default, prevent upgrading SQL data that is too old for current codebase
 force_upgrade: false
+
+# Optional extra hostnames (domain hardcoded to dev.schoolbox.cloud) that this vagrant will serve.
+# eg 'aaa' will add 'aaa.dev.schoolbox.cloud' to vagrant vhost. AWS IAM credentials required to download wildcard cert
+extra_hostname:
+aws_iam_key: ''
+aws_iam_secret: ''

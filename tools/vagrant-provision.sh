@@ -29,8 +29,8 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
-if [[ $# -ne 9 ]]; then
-  error "Script requires 9 params, found $#"
+if [[ $# -ne 10 ]]; then
+  error "Script requires 10 params, found $#"
   exit 1
 fi
 
@@ -49,6 +49,7 @@ if [ ! -z $6 ]; then enable_xdebug=$6; fi;
 if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
 if [ -n "$8" ] && [[ "$8" != '0' ]] && [[ "$8" != 'false' ]]; then force_upgrade=1; fi;
 if [ -n "$9" ]; then instance_registry_url="$9"; fi;
+extra_hostname=${10}
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -249,7 +250,7 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.
 
 # Set up the host for the newly-installed instance
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
-/vagrant/puppet-apply.sh
+FACTER_vagrant_extra_hostname="$extra_hostname" /vagrant/puppet-apply.sh
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
