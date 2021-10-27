@@ -374,8 +374,8 @@ class Controller extends Assessment\Controller
         // TODO determine how roles should be set if $actingUser != $currentUser
         $roleClaimFactory = new RoleClaimFactory($this->getAccess());
         $roles            = array_merge(
-            $roleClaimFactory->buildInstitutionRoles($actingUser),
-            $roleClaimFactory->buildContextRolesForAssessment($actingUser, $assessment),
+            $roleClaimFactory->buildInstitutionRoles($currentUser),
+            $roleClaimFactory->buildContextRolesForAssessment($currentUser, $assessment),
         );
 
         // Additional claims:
