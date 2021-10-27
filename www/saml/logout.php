@@ -31,6 +31,9 @@ if (isset($_SESSION['samlNameIdFormat'])) {
     $nameIdFormat = $_SESSION['samlNameIdFormat'];
 }
 try {
+    SAMLDebugLog("Destroying local session");
+    session_regenerate_id(true);
+    session_destroy();
     SAMLDebugLog("Attempting SLO: " . json_encode(array('nameId' => $nameId, 'sessionIndex' => $sessionIndex, 'nameIdFormat' => $nameIdFormat)));
     $auth->logout(null, [], $nameId, $sessionIndex, false, $nameIdFormat);
 } catch (OneLogin\Saml2\Error $e) {
