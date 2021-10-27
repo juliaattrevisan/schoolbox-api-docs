@@ -534,10 +534,7 @@ class Factory
      * @param bool        $publishedOnly
      * @param string|null $roleTypeOverride
      *
-     * @return array {
-     *  folder: Folder
-     *  grades: array
-     * }
+     * @return array{folder: Folder|null, grades: array}
      */
     private function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
@@ -568,10 +565,9 @@ class Factory
             }
         }
 
-        // everything failed? return an empty model
-        // TODO this should return nothing, as there is nothing to show
+        // everything failed? return a null folder
         return [
-            'folder' => $this->folderMapper->createModel(),
+            'folder' => null,
             'grades' => [],
         ];
     }
