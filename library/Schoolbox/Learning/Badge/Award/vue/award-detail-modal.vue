@@ -187,10 +187,13 @@ export default {
         <template v-if="award.badge">
             <div class="badge-modal">
                 <div class="badge-img-container">
-                    <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>
-                    <template v-if="award.count > 1">
-                        <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
-                    </template>
+                    <div class="badge-img-container__background">
+
+                    </div>
+                    <div class="badge-img-container__foreground">
+                        <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>
+                        <div v-if="award.count > 1" class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
+                    </div>
                 </div>
                 <!-- Only show the count if one was provided in the award -->
                 <h2>{{ award.badge.name }}</h2>

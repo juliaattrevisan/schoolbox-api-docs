@@ -115,7 +115,7 @@
 .badge-img-container {
   background-color: $vapor;
   position: relative;
-  display: flex;
+  display: grid;
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
@@ -138,6 +138,19 @@
     padding: .35rem 0;
   }
 }
+
+    .badge-img-container__background,
+    .badge-img-container__foreground {
+        grid-area: 1/-1; //place the background/foreground on top of each other
+    }
+
+    .badge-img-container__background {
+        z-index: 1;
+    }
+    
+    .badge-img-container__foreground { 
+        z-index: 2;
+    }
 
 #badge-list-form-container {
   .flex-list.buttons li {
