@@ -167,6 +167,28 @@ class Controller extends Base
     }
 
     /**
+     * Generate oAuth access tokens
+     *
+     * @api   GET /lti-platform/auth/token
+     * @since 21.1.0
+     */
+    public function getOauthAccessTokenRequest(): void
+    {
+
+    }
+
+    /**
+     * Generate oAuth access tokens
+     *
+     * @api   POST /lti-platform/auth/token
+     * @since 21.1.0
+     */
+    public function postOauthAccessTokenRequest(): void
+    {
+        $this->getOauthAccessTokenRequest();
+    }
+
+    /**
      * Receive a deep linking response from the LTI tool.
      *
      * Currently, this assumes it's in an iframe: it will send a message to its
