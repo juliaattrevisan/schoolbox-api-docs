@@ -51,6 +51,7 @@ class Module extends BaseModule
 
         // OIDC authentication
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
+        $this->register(self::METHOD_POST, '/oidc/authentication', 'postOidcAuthenticationRequest');
 
         // Receive a response to a deep linking request
         $this->register(

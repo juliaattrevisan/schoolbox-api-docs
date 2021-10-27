@@ -154,6 +154,19 @@ class Controller extends Base
     }
 
     /**
+     * Authenticate an OIDC request
+     *
+     * @api   POST /lti-platform/oidc/authentication
+     * @since 21.1.0
+     *
+     * @throws LtiExceptionInterface if the request could not be built
+     */
+    public function postOidcAuthenticationRequest(): void
+    {
+        $this->getOidcAuthenticationRequest();
+    }
+
+    /**
      * Receive a deep linking response from the LTI tool.
      *
      * Currently, this assumes it's in an iframe: it will send a message to its
