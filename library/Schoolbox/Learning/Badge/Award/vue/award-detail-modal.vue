@@ -188,7 +188,7 @@ export default {
             <div class="badge-modal">
                 <div class="badge-img-container">
                     <div class="badge-img-container__background">
-
+                        <canvas width="972" height="300" data-canvas-background></canvas>
                     </div>
                     <div class="badge-img-container__foreground">
                         <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>

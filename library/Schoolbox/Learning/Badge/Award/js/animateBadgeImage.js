@@ -1,5 +1,6 @@
 
-import { gsap } from 'gsap/all'
+import { gsap } from 'gsap/all';
+import { init } from './animations/popUp';
 
 /**
  * Pop up 
@@ -108,5 +109,6 @@ const swingDown = (badgeImage) => {
  * @param { DOMElement }
  */
 export const animateBadgeImage = (badgeImage) => {
-    animateForeground(badgeImage)
+    // animateForeground(badgeImage)
+    init(badgeImage);
 }
