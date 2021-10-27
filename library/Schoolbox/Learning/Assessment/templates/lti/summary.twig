@@ -158,7 +158,10 @@
         <div class="small-12 column">
             <a class="button submit"
                target="_blank"
-               href="{{ launchAssessmentUrl }}">Begin Assessment</a>
+               href="{{ launchAssessmentUrl }}">
+                Attempt {{ locale.assessment.proper }}
+                {% if student.id != USER.id %}on behalf of {{ student.firstname }}{% endif %}
+            </a>
         </div>
     </div>
 {% endif %}
