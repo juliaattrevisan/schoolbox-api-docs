@@ -304,7 +304,7 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/import/directImport'            => [
+            '/adminv2/import/folder'            => [
                 'name'       => 'Import',
                 'visible'    => true,
                 'searchable' => false,
