@@ -196,16 +196,16 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('evidence_tag', 'et')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('evidence_tag', '', 'et', true)}
+            INNER JOIN {$this->getJoinSql('evidence_tag', '', 'et')}
             WHERE {$pb->getWhereIntersect()}
         ";
 
         $evidenceTagStatement = $this->database->query($query, $pb->getParams());
         foreach ($evidenceTagStatement as $row) {
-            /** @var Tag\Model $evidenceTag */
-            $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
-            if ($evidenceTag !== null) {
-                //dont die if there is issues with the evidence tag, just return the evidence without tag
+            if ($row['et.id'] !== null) {
+                //only step into if the evidence tag is NOT deleted
+                /** @var Tag\Model $evidenceTag */
+                $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
                 $collection[$row['id']]->getTags()->setOffset($evidenceTag->getId(), $evidenceTag);
             }
         }
