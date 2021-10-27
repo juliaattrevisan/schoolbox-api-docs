@@ -204,7 +204,7 @@ class Mapper extends BaseMapper
         foreach ($evidenceTagStatement as $row) {
             /** @var Tag\Model $evidenceTag */
             $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
-            if($evidenceTag !== null) {
+            if ($evidenceTag !== null) {
                 //dont die if there is issues with the evidence tag, just return the evidence without tag
                 $collection[$row['id']]->getTags()->setOffset($evidenceTag->getId(), $evidenceTag);
             }
