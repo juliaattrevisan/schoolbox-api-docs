@@ -187,17 +187,11 @@ class Controller extends Base
 
         [$colours, $graphData] = $this->compileVisitorGraphData($folder, $dataSource);
 
-        /**
-         * visitorCount is used for both top visitors and recent visitors
-         * to determine whether to show 'view all' buttons
-         */
-        $visitorCount = $dataSource->getVisitorCount($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-
 
         /**
          * Top visitors
          */
-        [$topVisitors, $topVisitorsMore] = $this->compileTopVisitorsData($folder, $dataSource, $visitorCount);
+        $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC', self::MAX_TOP_VISITORS);
 
 
         /**
@@ -247,7 +241,6 @@ class Controller extends Base
                     'maxTopVisitors'  => self::MAX_TOP_VISITORS,
                     'topVisitors'     => $topVisitors,
                     'topVisitorInfo'  => $topVisitors->first(),
-                    'topVisitorsMore' => $topVisitorsMore,
 
                     'topFiles'     => $topFiles,
                     'topFileInfo'  => $topFileInfo,
@@ -620,29 +613,6 @@ class Controller extends Base
         $nextCount = $nextDate ? $series[$nextDate] ?? 0 : 0;
         return $nextCount > 0;
     }
-
-
-    /**
-     * Compile data for top visitors.
-     *
-     * @param FolderModel $folder
-     * @param DataSource  $dataSource
-     * @param int         $visitorCount
-     * @return array [$topVisitors, $topVisitorsMore]
-     *               $topVisitors:     a list of `self::MAX_TOP_VISITORS` top visitors
-     *               $topVisitorsMore: are there more visitors?
-     */
-    private function compileTopVisitorsData(FolderModel $folder, DataSource $dataSource, int $visitorCount): array
-    {
-        $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC', self::MAX_TOP_VISITORS);
-
-        $topVisitorsMore = false;
-        if ($visitorCount > self::MAX_TOP_VISITORS) {
-            $topVisitorsMore = true;
-        }
-        return [$topVisitors, $topVisitorsMore];
-    }
-
 
     /**
      * Compile data for top files accessed.
