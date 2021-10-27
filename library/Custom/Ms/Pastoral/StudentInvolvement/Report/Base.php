@@ -59,9 +59,10 @@ class Base
     protected $grades;
 
     /**
-     * The Schoolbox folder for this tutor group for this student
+     * The Schoolbox folder for this tutor group for this student, if there is
+     * one.
      *
-     * @var Folder
+     * @var Folder|null
      */
     protected $folder;
 
@@ -182,7 +183,7 @@ class Base
     }
 
     /**
-     * @return Folder
+     * @return Folder|null
      */
     public function getFolder()
     {
@@ -190,7 +191,7 @@ class Base
     }
 
     /**
-     * @param  Folder $folder
+     * @param  Folder|null $folder
      *
      * @return $this
      */
