@@ -11,6 +11,7 @@ namespace Schoolbox\Statistics;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
@@ -197,7 +198,7 @@ class Controller extends Base
         /**
          * Top visitors
          */
-        [$topVisitors, $topVisitorsMore] = $this->compileTopVisitorsData($folder, $dataSource, $visitorCount);
+        $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC', self::MAX_TOP_VISITORS);
 
 
         /**
@@ -619,29 +620,6 @@ class Controller extends Base
         $nextCount = $nextDate ? $series[$nextDate] ?? 0 : 0;
         return $nextCount > 0;
     }
-
-
-    /**
-     * Compile data for top visitors.
-     *
-     * @param FolderModel $folder
-     * @param DataSource  $dataSource
-     * @param int         $visitorCount
-     * @return array [$topVisitors, $topVisitorsMore]
-     *               $topVisitors:     a list of `self::MAX_TOP_VISITORS` top visitors
-     *               $topVisitorsMore: are there more visitors?
-     */
-    private function compileTopVisitorsData(FolderModel $folder, DataSource $dataSource, int $visitorCount): array
-    {
-        $topVisitors = $dataSource->getVisitors($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), 'hitcount DESC', self::MAX_TOP_VISITORS);
-
-        $topVisitorsMore = false;
-        if ($visitorCount > self::MAX_TOP_VISITORS) {
-            $topVisitorsMore = true;
-        }
-        return [$topVisitors, $topVisitorsMore];
-    }
-
 
     /**
      * Compile data for top files accessed.
