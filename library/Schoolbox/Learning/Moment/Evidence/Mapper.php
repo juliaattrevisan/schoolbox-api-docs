@@ -202,9 +202,12 @@ class Mapper extends BaseMapper
 
         $evidenceTagStatement = $this->database->query($query, $pb->getParams());
         foreach ($evidenceTagStatement as $row) {
-            /** @var Tag\Model $evidenceTag */
-            $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
-            $collection[$row['id']]->getTags()->setOffset($evidenceTag->getId(), $evidenceTag);
+            if ($row['et.id'] !== null) {
+                //only step into if the evidence tag is NOT deleted
+                /** @var Tag\Model $evidenceTag */
+                $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
+                $collection[$row['id']]->getTags()->setOffset($evidenceTag->getId(), $evidenceTag);
+            }
         }
         return $collection;
     }
