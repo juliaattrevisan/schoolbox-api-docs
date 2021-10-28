@@ -40,6 +40,17 @@ class Transmit
 
 
     /**
+     * Collusion check type.
+     *
+     * Defaults to IMMEDIATELY_AND_DUE_DATE, so people's work are checked
+     * on the assessment's due date in addition to right now
+     *
+     * https://developers.turnitin.com/docs/tca#groups
+     */
+    private const REPORT_GENERATION_COLLUSION = 'IMMEDIATELY_AND_DUE_DATE';
+
+
+    /**
      * @var string
      */
     private string $instanceIdentifier;
@@ -371,7 +382,9 @@ class Transmit
 
             $newGroup = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
                 'name' => $box->getName(),
-                'type' => Turnitin\Group\Process\Group::GROUP_TYPE
+                'type' => Turnitin\Group\Process\Group::GROUP_TYPE,
+                'due_date' => gmdate("Y-m-d\TH:i:s\Z", $box->getDueDate()->getUnixTimeStamp()),
+                'report_generation' => self::REPORT_GENERATION_COLLUSION,
             ]);
 
             $group->setGroupId($newGroup['id']);
