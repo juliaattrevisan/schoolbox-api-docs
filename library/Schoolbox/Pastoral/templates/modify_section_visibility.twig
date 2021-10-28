@@ -151,9 +151,9 @@
 </section>
 
 {% if not record.id %}
-    {% set name = "yourself" %}
+    {% set name = "you" %}
 {% elseif record.owner is defined and USER.id != record.owner.id %}
-    {% set name = "yourself" %}
+    {% set name = "you" %}
 {% else %}
     {% set name = record.owner.fullName ?? '' %}
 {% endif %}
