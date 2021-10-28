@@ -115,13 +115,12 @@ export const animateBadgeImage = (badgeImage) => {
     init(badgeImage);
 }
 
-
 /**
  * Get the dimensions of the canvas, which can change depending on screen dimensions
  *  
  * @return { Number, Number }
  */
- export function getCanvasDimensions () {
+export function getCanvasDimensions () {
     const canvas = document.querySelector(CANVAS_SELECTOR);
     return { 
         width: canvas.width, 

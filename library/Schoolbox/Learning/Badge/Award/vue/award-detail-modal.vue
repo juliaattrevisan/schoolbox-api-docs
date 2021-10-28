@@ -7,6 +7,9 @@ import toastMixin from '@vue/components/toast-mixin';
 import userProfileMixin from '../../../vue/user-profile/mixin';
 import axios from 'axios';
 import { animateBadgeImage } from '../js/animateBadgeImage'
+import { ResizeObserver } from 'vue-resize';
+import 'vue-resize/dist/vue-resize.css';
+
 
 /**
  * Award detail modal.
@@ -51,7 +54,8 @@ export default {
     components: {
         BadgeImage,
         RelativeTime,
-        RevealModal
+        RevealModal,
+        ResizeObserver, //to track any size changes to the parent container
     },
 
     /**
@@ -62,7 +66,9 @@ export default {
      */
     data() {
         return {
-            award: {}
+            award: {},
+            canvasWidth: 0,
+            canvasHeight: 0,
         }
     },
 
@@ -105,7 +111,22 @@ export default {
         open (award) {
             this.award = award;
             this.$refs.modal.open();
-            this.checkForBadgeAnimation();
+            this.modelCheckInterval = setInterval(this.onModalCheck, 50); //be checking if the modal is on screen yet
+        },
+
+        /**
+         * The <canvas> element (that shows the stars) requires accurate width/height to function properly.
+         * As the canvas is within a modal, it's not currently in the dom, so we have to wait until 
+         * the foundation modal has displayed it, so we can ensure its dimensions are up to date. 
+         */
+        onModalCheck () {
+            const canvasDimensions = this.$refs.badgeImgContainer.getBoundingClientRect();
+            if (canvasDimensions.width > 0) {
+                clearInterval(this.modelCheckInterval);
+                this.canvasWidth = Math.round(canvasDimensions.width);
+                this.canvasHeight = Math.round(canvasDimensions.height);
+                this.$nextTick(() => this.checkForBadgeAnimation());
+            }
         },
 
         /**
@@ -113,14 +134,12 @@ export default {
          * and if so animate it to add a little sparkle
          */
         checkForBadgeAnimation () {
-            this.$nextTick(() => {
-                if (this.canAnimateBadgeImage()) {
-                    this.checkBadgeAnimationCleanedUp();
-                    this.animateBadgeImage();
-                } else {
-                    this.checkBadgeAnimationCleanedUp();
-                }
-            });
+            if (this.canAnimateBadgeImage()) {
+                this.checkBadgeAnimationCleanedUp();
+                this.animateBadgeImage();
+            } else {
+                this.checkBadgeAnimationCleanedUp();
+            }
         },
 
         /**
@@ -186,9 +205,9 @@ export default {
     <reveal-modal ref="modal" size="medium">
         <template v-if="award.badge">
             <div class="badge-modal">
-                <div class="badge-img-container">
+                <div class="badge-img-container" ref="badgeImgContainer">
                     <div class="badge-img-container__background">
-                        <canvas width="972" height="300" data-badge-award-canvas></canvas>
+                        <canvas :width="canvasWidth" :height="canvasHeight" data-badge-award-canvas></canvas>
                     </div>
                     <div class="badge-img-container__foreground">
                         <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>

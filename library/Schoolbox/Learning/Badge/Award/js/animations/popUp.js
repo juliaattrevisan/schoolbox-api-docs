@@ -1,4 +1,8 @@
 
+/**
+ * 'Pop up' the badge and throw some stars
+ */
+
 import { gsap, Physics2DPlugin } from 'gsap/all';
 import tinycolor from 'tinycolor2';
 import Star from './Star';
@@ -8,7 +12,7 @@ gsap.registerPlugin(Physics2DPlugin);
 
 
 /**
- * 
+ * Set up both the badge and the stars animations
  * 
  * @param { DOMElement }
  */
