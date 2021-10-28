@@ -4,8 +4,6 @@
  * It's to be used within a <canvas></canvas> element 
  */
 
-const alpha = (2 * Math.PI) / 10; //the angle of rotation to draw the line
-
 export default class Star {
 
     /**
@@ -31,20 +29,23 @@ export default class Star {
      * @param { CanvasRenderingContext2D } https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
      */
     draw (context) {
-
+        
         context.save(); //save the default state prior to rotation
   
         context.translate(this.x, this.y); //to rotate the canvas
         context.rotate(this.rotation * Math.PI / 180);
         context.translate(-this.x, -this.y);
-
+        
         context.beginPath();
+        //5 point star from: https://stackoverflow.com/questions/14580033/algorithm-for-drawing-a-5-point-star
+        const alpha = (2 * Math.PI) / 10; //the angle of rotation to draw the line
         for (var i = 11; i != 0; i--) { //there's 11 points to the star, so we draw 11 lines
-            const r = this.radius*(i % 2 + 1)/2;
+            const rotation = this.radius * (i % 2 + 1)/2;
             const omega = alpha * i;
-            context.lineTo((r * Math.sin(omega)) + this.x, (r * Math.cos(omega)) + this.y);
+            context.lineTo((rotation * Math.sin(omega)) + this.x, (rotation * Math.cos(omega)) + this.y);
         }
         context.closePath();    
+
         context.fillStyle = this.color;
         context.fill(); //then fill it with the colour specified
 

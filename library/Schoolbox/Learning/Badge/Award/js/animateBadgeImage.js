@@ -117,8 +117,8 @@ export const animateBadgeImage = (badgeImage) => {
 
 
 /**
- * 
- * 
+ * Get the dimensions of the canvas, which can change depending on screen dimensions
+ *  
  * @return { Number, Number }
  */
  export function getCanvasDimensions () {
@@ -130,7 +130,8 @@ export const animateBadgeImage = (badgeImage) => {
 }
 
 /**
- * 
+ * Get the context
+ * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
  * 
  * @return { CanvasRenderingContext2D }
  */
