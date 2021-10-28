@@ -2,6 +2,8 @@
 import { gsap } from 'gsap/all';
 import { init } from './animations/popUp';
 
+const CANVAS_SELECTOR = '[data-badge-award-canvas]';
+
 /**
  * Pop up 
  * 
@@ -111,4 +113,28 @@ const swingDown = (badgeImage) => {
 export const animateBadgeImage = (badgeImage) => {
     // animateForeground(badgeImage)
     init(badgeImage);
+}
+
+
+/**
+ * 
+ * 
+ * @return { Number, Number }
+ */
+ export function getCanvasDimensions () {
+    const canvas = document.querySelector(CANVAS_SELECTOR);
+    return { 
+        width: canvas.width, 
+        height: canvas.height 
+    }
+}
+
+/**
+ * 
+ * 
+ * @return { CanvasRenderingContext2D }
+ */
+export function getContext () {
+    const canvas = document.querySelector(CANVAS_SELECTOR);
+    return canvas.getContext('2d');
 }

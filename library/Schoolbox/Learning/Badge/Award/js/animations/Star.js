@@ -30,25 +30,25 @@ export default class Star {
      * 
      * @param { CanvasRenderingContext2D } https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
      */
-    draw (ctx) {
+    draw (context) {
 
-        ctx.save(); //save the default state prior to rotation
+        context.save(); //save the default state prior to rotation
   
-        ctx.translate(this.x, this.y); //to rotate the canvas
-        ctx.rotate(this.rotation * Math.PI / 180);
-        ctx.translate(-this.x, -this.y);
+        context.translate(this.x, this.y); //to rotate the canvas
+        context.rotate(this.rotation * Math.PI / 180);
+        context.translate(-this.x, -this.y);
 
-        ctx.beginPath();
+        context.beginPath();
         for (var i = 11; i != 0; i--) { //there's 11 points to the star, so we draw 11 lines
             const r = this.radius*(i % 2 + 1)/2;
             const omega = alpha * i;
-            ctx.lineTo((r * Math.sin(omega)) + this.x, (r * Math.cos(omega)) + this.y);
+            context.lineTo((r * Math.sin(omega)) + this.x, (r * Math.cos(omega)) + this.y);
         }
-        ctx.closePath();    
-        ctx.fillStyle = this.color;
-        ctx.fill(); //then fill it with the colour specified
+        context.closePath();    
+        context.fillStyle = this.color;
+        context.fill(); //then fill it with the colour specified
 
-        ctx.restore(); //restore to original top/left translation
+        context.restore(); //restore to original top/left translation
 
     }
 

@@ -2,47 +2,64 @@
 import { gsap, Physics2DPlugin } from 'gsap/all';
 import tinycolor from 'tinycolor2';
 import Star from './Star';
+import { timeout } from '@js/util/jsUtils';
+import { getCanvasDimensions, getContext } from '../animateBadgeImage';
 
 gsap.registerPlugin(Physics2DPlugin);
 
 
-
-export function init (badgeImage) {
-    
-    const canvas = document.querySelector('[data-canvas-background]');
-    const ctx = canvas.getContext('2d');
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
-    
+/**
+ * 
+ * 
+ * @param { DOMElement }
+ */
+export async function init (badgeImage) {
     animateBadge(badgeImage);
-    const starCount = 600;
-    const starList = [];
-    for (let i = 0; i < starCount; i++) { 
-        const randomBrightColour = tinycolor({ h: gsap.utils.random(0, 255), s: 100, l: 50 });
-        const star = new Star(486, 150, randomBrightColour.toHexString(), gsap.utils.random(5, 50), 0);
-        starList.push(star);
-    }
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    setTimeout(() => {
-        animateStars(starList);
-        gsap.ticker.add(() => {
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            starList.forEach((star) => star.draw(ctx));
-        });
-    }, 525);
-
+    await timeout(525); //wait prior to animating the stars to link when the pop up has 'hit' the screen
+    const stars = getStars(); 
+    setupStarsAnimations(stars);
+    gsap.ticker.add(() => redrawStars(stars));
 }
 
 /**
- * animateStars
+ * 
+ * 
+ * @param { DOMElement }
+ */
+function animateBadge (badgeImage) {
+    const popUpTL = gsap.timeline( { repeat: 0 } ); 
+    popUpTL.set(badgeImage, { scale: 0, transformOrigin: '50% 50%', filter: 'grayscale(100%)' } );
+    popUpTL.to(badgeImage, { duration: 2, scale: 1, ease: 'elastic.out', delay: 0.5 } );
+    popUpTL.to(badgeImage, { duration: 0.15, filter: 'grayscale(0%)' }, '-=1.75');
+}
+
+/**
+ * Set up an array of Stars with random bright colours
+ * Put them in the middle of the canvas, ready to animate out from the centre
+ * 
+ * @return { Array }
+ */
+function getStars () {
+    const stars = [];
+    const starCount = 600;
+    const canvasDimensions = getCanvasDimensions();
+    for (let i = 0; i < starCount; i++) { 
+        const randomBrightColour = tinycolor({ h: gsap.utils.random(0, 255), s: 100, l: 50 });
+        const star = new Star(canvasDimensions.width / 2, canvasDimensions.height / 2, randomBrightColour.toHexString(), gsap.utils.random(5, 50), 0);
+        stars.push(star);
+    }
+    return stars;
+}
+
+/**
+ * 
  * 
  * @param { Array }
- * 
  */
- function animateStars (starList) {
-    starList.forEach((star) => {
+function setupStarsAnimations (stars) {
+    stars.forEach((star) => {
         gsap.to(star, {
-            delay: 'random(0, 0.25)',
+            delay: 'random(0, 0.25)', //525
             radius: 'random(0, 0.3)',
             rotation: 'random(0, 360)',
             duration: 3,
@@ -59,14 +76,14 @@ export function init (badgeImage) {
 }
 
 /**
- * animateBadge
  * 
- * @param { DOMElement }
  * 
+ * @param { Array }
  */
- function animateBadge (badgeImage) {
-    const popUpTL = gsap.timeline( { repeat: 0 } ); 
-    popUpTL.set(badgeImage, { scale: 0, transformOrigin: '50% 50%', filter: 'grayscale(100%)' } );
-    popUpTL.to(badgeImage, { duration: 2, scale: 1, ease: 'elastic.out', delay: 0.5 } );
-    popUpTL.to(badgeImage, { duration: 0.15, filter: 'grayscale(0%)' }, '-=1.75');
+function redrawStars (stars) {
+    const canvasDimensions = getCanvasDimensions();
+    const context = getContext();
+    context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
+    stars.forEach((star) => star.draw(context));
 }
+
