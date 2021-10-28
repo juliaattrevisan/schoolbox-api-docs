@@ -1576,6 +1576,7 @@ abstract class Kernel
                 $ltiTools = $di->get('lti.tools');
                 $registrationRepositoryFactory = new RegistrationRepositoryFactory(
                     $config,
+                    $keyChains,
                     $router->generate('ltiPlatform.getOidcAuthenticationRequest'),
                 );
                 return $registrationRepositoryFactory->build($ltiTools);
