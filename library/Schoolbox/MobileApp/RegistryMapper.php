@@ -167,5 +167,4 @@ class RegistryMapper extends Mapper
             ->equals('user_id', $user->getId());
         $this->deleteByPredicates($predicatePb);
     }
-
 }
