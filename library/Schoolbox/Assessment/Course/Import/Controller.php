@@ -711,8 +711,8 @@ class Controller extends Base\Base
             }
             $configInstance->setValue($courseImpl->getId());
             $this->componentConfigInstanceMapper->save($configInstance);
-        } // Else no available component, create one.
-        else {
+        } else {
+            // No available component, create one.
             $folder             = $courseImpl->getFolder();
             $configDefinition   = ['importedCourse' => $courseImpl->getId()];
             $courseOutlineClass = HomepageOutlineComponentController::class;
