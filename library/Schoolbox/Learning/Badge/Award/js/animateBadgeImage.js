@@ -1,6 +1,6 @@
 
 import { gsap } from 'gsap/all';
-import { init } from './animations/popUp';
+import { init as initPopUp } from './animations/popUp';
 
 const CANVAS_SELECTOR = '[data-badge-award-canvas]';
 
@@ -95,24 +95,14 @@ const swingDown = (badgeImage) => {
 }
 
 /**
- * Play a random animation
- * 
- * @param { DOMElement }
- */
- const animateForeground = (badgeImage) => {
-    const animationList = [popUp, coinSpin, flipUp, dropDown, spinIn, swingDown];
-    const randomAnimation = animationList[Math.floor(Math.random()*animationList.length)](badgeImage);
-    randomAnimation.play();
-}
-
-/**
  * Animate the badge, acheievements should be celebrated a little!
  * 
  * @param { DOMElement }
  */
 export const animateBadgeImage = (badgeImage) => {
-    // animateForeground(badgeImage)
-    init(badgeImage);
+    const animationList = [initPopUp];
+    const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
+    initRandomAnimation(badgeImage);
 }
 
 /**
