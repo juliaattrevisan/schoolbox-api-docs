@@ -32,6 +32,7 @@ use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\Instance;
 use Schoolbox\LTI\AccessToken\Cache;
 use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
+use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
@@ -225,7 +226,7 @@ class Controller extends Base
         $response = $generator->generate(
             (new ServerRequestFactory())->build($this->request),
             (new ResponseFactory())->createResponse(),
-            $keychainId,
+            KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
 
         // Now do something with the response
