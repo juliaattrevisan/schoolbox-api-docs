@@ -19,6 +19,8 @@ use Schoolbox\Mapper;
 
 class PostMapper extends Mapper implements FeedableMapperInterface
 {
+    /** @var int */
+    public const FORUM_POSTS_PER_PAGE = 15;
 
     protected function mapping()
     {

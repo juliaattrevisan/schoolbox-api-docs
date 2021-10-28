@@ -6,7 +6,6 @@ use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Mapper\Exception\Deleted as DeletedException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -20,6 +19,9 @@ if (!isset($this)) {
 $groupHandler = new Group(); //only single call, still working out how to do the hasChildAccessOnly
 $access = Access::getInstance();
 $threadMapper = ThreadMapper::getInstance();
+
+/** @var \Schoolbox\User $currentUser */
+$currentUser = $_SESSION['user'];
 
 $this->setFile(TEMPLATE_content, 'forum/thread.html');
 $this->setBlock(TEMPLATE_content, 'post', 'post_block');
@@ -39,17 +41,10 @@ $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
  */
 if (is_numeric($this->arg[0])) {
     try {
-        /** @var \Schoolbox\Forum\Thread $thread */
         $thread = $threadMapper->findById($this->arg[0]);
-    } catch (DeletedException $e) {
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
     } catch (Exception $e) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
-}
-
-if ($thread->getId() === null) {
-    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 if ($thread->getCategory() === false ||  $thread->getCategory()->isDeleted() === true) {
@@ -68,7 +63,7 @@ if (!$threadMapper->isComponent($folder->getId())) {
 
 /* check permissions
  */
-$accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
+$accessLevel = $access->getFolderAccess($currentUser, $folder->getId());
 if ($accessLevel < UserAccess::ACCESS_READ) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
@@ -92,7 +87,7 @@ $this->setVar('modify_thread_block', '');
 
 
 
-$accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
+$accessLevel = $access->getFolderAccess($currentUser, $folder->getId());
 if ($accessLevel <= UserAccess::ACCESS_WRITE) {
     $this->parse('modify_thread_block', 'modify_thread');
 }
@@ -106,7 +101,7 @@ $is_post_allowed = !$groupHandler->hasChildAccessOnly($folder->getId());
 if (!$is_post_allowed && ConfigLoader::getInstance()->get('restrict_parent_forum_access')) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
-if (!$thread->isLocked() || $access->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_WRITE) {
+if (!$thread->isLocked() || $access->getFolderAccess($currentUser, $folder->getId()) >= UserAccess::ACCESS_WRITE) {
     if ($is_post_allowed) {
         $this->parse('reply_block', 'reply');
     }
@@ -127,7 +122,7 @@ if (!$pageNum) {
 }
 
 //dragged across from Forum.php what is the better way for this? put in db config table?
-$postPerPage = 15;
+$postPerPage = PostMapper::FORUM_POSTS_PER_PAGE;
 $totalPages = ceil(count($postList) / $postPerPage);
 $postIndex = max(0, $postPerPage * ($pageNum - 1));
 
@@ -208,7 +203,7 @@ if ($postList !== null) {
         $this->setVar('delete_block', '');
 
         if (
-            (!$thread->isLocked() && $post->getOwner()->getId() == $_SESSION['id']) || ($access->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_WRITE)
+            (!$thread->isLocked() && $post->getOwner() === $currentUser) || ($access->getFolderAccess($currentUser, $folder->getId()) >= UserAccess::ACCESS_WRITE)
         ) {
             $this->parse('modify_block', 'modify');
 
@@ -220,13 +215,13 @@ if ($postList !== null) {
 
         // edited time
         $this->setVar('modified_block', '');
-        if ($post->getModified() > 0 && $post->getModified() != $post->getDate()) {
+        if ($post->getModified() != $post->getDate()) {
             $this->parse('modified_block', 'modified');
         }
 
         // reply to this post
         $this->setVar('reply_post_block', '');
-        if (!$thread->isLocked() || ($access->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_WRITE)) {
+        if (!$thread->isLocked() || ($access->getFolderAccess($currentUser, $folder->getId()) >= UserAccess::ACCESS_WRITE)) {
             if ($is_post_allowed) {
                 $this->parse('reply_post_block', 'reply_post');
             }

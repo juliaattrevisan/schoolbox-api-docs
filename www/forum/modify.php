@@ -30,7 +30,6 @@ if (is_numeric($this->arg[0])) {
     /* Category exists
      */
     try {
-        /** @var \Schoolbox\Resource\Folder\Model $folder */
         $folder = FolderMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -69,13 +68,8 @@ if (is_numeric($this->arg[0])) {
      */
     if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         try {
-            /** @var \Schoolbox\Forum\Post $post */
             $post   = PostMapper::getInstance()->findById($this->arg[2]);
-
-            /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
         } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -129,10 +123,7 @@ if (is_numeric($this->arg[0])) {
         /* Add new reply
          */
         try {
-            /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
         } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
