@@ -198,14 +198,10 @@ class Controller extends Base
     /**
      * Generate oAuth access tokens
      *
-     * TODO don't need $keychainId as a param anymore
-     *
-     * @api   GET /lti-platform/auth/{keychainId}/token
+     * @api   GET /lti-platform/auth/token
      * @since 21.1.0
-     *
-     * @param string $keychainId
      */
-    public function getOauthAccessTokenRequest(string $keychainId): void
+    public function getOauthAccessTokenRequest(): void
     {
         // Access token repo: backs onto a mapper
         $factory = new AuthorizationServerFactory(
@@ -237,14 +233,12 @@ class Controller extends Base
     /**
      * Generate oAuth access tokens
      *
-     * @api   POST /lti-platform/auth/{keychainId}/token
+     * @api   POST /lti-platform/auth/token
      * @since 21.1.0
-     *
-     * @param string $keychainId
      */
-    public function postOauthAccessTokenRequest(string $keychainId): void
+    public function postOauthAccessTokenRequest(): void
     {
-        $this->getOauthAccessTokenRequest($keychainId);
+        $this->getOauthAccessTokenRequest();
     }
 
     /**

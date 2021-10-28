@@ -55,8 +55,8 @@ class Module extends BaseModule
         $this->register(self::METHOD_POST, '/oidc/authentication', 'postOidcAuthenticationRequest');
 
         // oAuth access token
-        $this->register(self::METHOD_GET, '/auth/{keychainId}/token', 'getOauthAccessTokenRequest');
-        $this->register(self::METHOD_POST, '/auth/{keychainId}/token', 'postOauthAccessTokenRequest');
+        $this->register(self::METHOD_GET, '/auth/token', 'getOauthAccessTokenRequest');
+        $this->register(self::METHOD_POST, '/auth/token', 'postOauthAccessTokenRequest');
 
         // Receive a response to a deep linking request
         $this->register(
