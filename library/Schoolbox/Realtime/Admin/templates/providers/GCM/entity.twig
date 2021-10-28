@@ -2,7 +2,8 @@
 <div class="small-12 column content">
     <dl class="inline-dl">
         <dt class="small-12 medium-4">App ID</dt>
-        <dd class="small-12 medium-8"><p>{{ app.appIdentifier }}</p></dd>
+        <dd class="small-12 medium-4"><p>{{ app.appIdentifier }}</p></dd>
+        <dd class="small-12 medium-4"><a class="right icon-delete" data-id="{{ app.id }}" href="#" title="Delete" data-delete-provider ></a></dd>
 
         <dt class="small-12 medium-4">Provider</dt>
         <dd class="small-12 medium-8"><p>Google</p></dd>
@@ -13,15 +14,6 @@
                 <code>{{ app.key }}</code>
                 (<a href="#" data-open="change-gcm-{{ appId }}">Change</a>)
             </p>
-        </dd>
-        <dt class="small-12 medium-4">&nbsp;</dt>
-        <dd class="small-12 medium-8">
-
-            <form id="delete-gcm-{{ appId }}" action="{{ routeLookup('adminMessages.postDeleteApp') }}" method="post">
-                <input type="hidden" name="id" value="{{ app.id }}" />
-                <a class="icon-delete" href="#" title="Delete" data-delete-provider ></a>
-            </form>
-
         </dd>
     </dl>
     <div class="row">

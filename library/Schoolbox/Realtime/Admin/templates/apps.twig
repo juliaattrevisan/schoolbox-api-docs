@@ -31,15 +31,40 @@
             }
         })
 
-        /* Delete confirmation
+        /* Delete confirmation now in ajax
          */
-        $('[data-delete-provider]').click(function(event) {
+        $('a[data-delete-provider]').on('click', function(event) {
             event.preventDefault();
+
+            var $this = $(this);
+            var href = "{{ routeLookup('adminMessages.postDeleteApp') }}";
+
             $(this).confirmDialog({
-                text: 'Do you want to remove this Notification Provider?',
-                confirmEvent: $.confirmDialog.submitForm
+                text: 'Are you sure you want to delete this Notification Provider?',
+                confirmLabel: 'Delete',
+                confirmEvent: function() {
+
+                    // A toast
+                    var $toast = $('[data-provider-toast]');
+                    $toast.toastActivate({text: 'Deleting Provider...'});
+
+                    $.post(href, {id : $this.data().id})
+                            .done(function() {
+                                // Kill the element
+                                $this.parents('[data-provider-row]').slideUp(function() {
+                                    $(this).remove();
+                                });
+
+                                // Toast success
+                                $toast.toastTimeout({text: 'Provider deleted.', css: 'success'});
+                            })
+                            .fail(function() {
+                                // Toast fail
+                                $toast.toastTimeout({text: 'Delete failed.', css: 'alert'});
+                            });
+                }
             });
-        });
+        })
     });
 
 
@@ -60,7 +85,7 @@
             <section>
                 <ul class="information-list" id="app-list">
                     {% for app in apps %}
-                        <li>
+                        <li data-provider-row>
                             {% include providers[app.providerName].template with {
                                 app:        app,
                                 attachzone: attachzones[app.id] ?? null,
@@ -114,3 +139,4 @@
         </div>
     </div>
 </div>
+<div class="toast" data-provider-toast></div>
