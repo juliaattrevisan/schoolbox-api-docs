@@ -33,6 +33,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -1131,7 +1132,15 @@ class Controller extends Base\Base
         // Therefore store in array and index by ClassFolderId
         /** @var CourseImplementation\Model[] $courseImpls */
         $courseImpls = [];
-        $courseSpec  = $this->courseSpecificationMapper->findById($courseSpecId);
+        $courseSpec = null;
+        try {
+            $courseSpec  = $this->courseSpecificationMapper->findById($courseSpecId);
+        } catch (MapperException\Deleted $e) {
+            // Fail, only if creating a new import. We can still modify.
+            if ('import' === $action) {
+                throw new \DomainException("Course {$courseSpecId} has been deleted.");
+            }
+        }
 
         // Collect folders for unit and course pages - needed for criteria import
         $unitSpecs = [];
@@ -1140,17 +1149,16 @@ class Controller extends Base\Base
         }
 
         $unitFolders = [];
-        foreach ($courseSpec->getUnits() as $unitSpec) {
-            if (in_array((int)$unitSpec->getId(), $unitSpecs, true)) {
-                $unitFolders[] = $unitSpec->getFolder()->getId();
+        if ($courseSpec) {
+            foreach ($courseSpec->getUnits() as $unitSpec) {
+                if (in_array((int)$unitSpec->getId(), $unitSpecs, true)) {
+                    $unitFolders[] = $unitSpec->getFolder()->getId();
+                }
             }
         }
 
-        $courseFolder = [$courseSpec->getFolder()->getId()];
-
         if ('import' === $action) {
             // We are creating a new import
-            $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
             foreach ($folderIds as $classFolderId) {
                 $courseImpl = $this->courseImplementationMapper->createModel();
                 $courseImpl->setSpecification($courseSpec);
@@ -1158,7 +1166,7 @@ class Controller extends Base\Base
                 $courseImpls[$classFolderId] = $courseImpl;
 
                 //Save unit criteria to class page
-                $allFolders = array_merge($courseFolder, $unitFolders);
+                $allFolders = array_merge([$courseSpec->getFolder()->getId()], $unitFolders);
                 $this->copyIndicator($allFolders, $classFolderId);
             }
         } else {
@@ -1224,7 +1232,7 @@ class Controller extends Base\Base
                     /** @var UnitImplementation\Model $unitImpl */
                     return (int)$unitSpecId === (int)$unitImpl->getSpecification()->getId();
                 };
-                /** @var UnitImplementation\Model $unitImpl */
+                /** @var UnitImplementation\Model|null $unitImpl */
                 $unitImpl = $courseImpl->getUnits()->filter($callback)->first();
 
                 // Did we already delete this UnitImpl ?
