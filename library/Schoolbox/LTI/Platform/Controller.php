@@ -12,12 +12,14 @@ namespace Schoolbox\LTI\Platform;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Http\Factory\Guzzle\ResponseFactory;
+use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Factory\AuthorizationServerFactory;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
@@ -208,7 +210,10 @@ class Controller extends Base
             new AccessTokenRepository(
                 new Cache($this->accessTokenMapper)
             ),
-            new ScopeRepository(),
+            // TODO figure out which scopes are supported
+            new ScopeRepository([
+                new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
+            ]),
             // TODO replace with a real key
             'B'
         );
@@ -237,7 +242,6 @@ class Controller extends Base
      */
     public function postOauthAccessTokenRequest(string $keychainId): void
     {
-        echo($this->request->post->get('client_assertion'));
         $this->getOauthAccessTokenRequest($keychainId);
     }
 
