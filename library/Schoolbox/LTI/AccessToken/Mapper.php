@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\AccessToken;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
@@ -18,6 +19,10 @@ use Schoolbox\UserMapper;
  *
  * Whilst this currently covers LTI only, I can see a future where oAuth access
  * tokens are made available for all.
+ *
+ * @method Model findById($identifierValue)
+ * @method Model createModel($idValue = null)
+ * @method GenericCollection|Model[] createCollection()
  */
 class Mapper extends BaseMapper
 {
