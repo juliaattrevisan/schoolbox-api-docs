@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Alaress_Date_Format;
+use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -38,6 +40,7 @@ use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -433,6 +436,13 @@ class Controller extends Assessment\Controller
 
         // AGS claims:
         // if a line item is provided, send that
+        // (Currently, score is the only service Schoolbox provides)
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $additionalClaims[] = new AgsClaim(
+            [ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE],
+            null,
+            // TODO build a controller for scores to be posted to
+        );
 
         // Resource link request
         $builder = new PlatformOriginatingLaunchBuilder();
