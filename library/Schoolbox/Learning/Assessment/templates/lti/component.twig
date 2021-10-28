@@ -8,9 +8,16 @@
 {% endblock studentMessage %}
 
 {% block teacherMessage %}
-    <a href="{{ createRouteType }}">Create an LTI assessment</a> that is not a part of your course to assess your students.
+    {% if config.lti_assessments_enable %}
+        <a href="{{ createRouteType }}">Create an LTI
+            assessment</a> that is not a part of your course to assess your students.
+    {% else %}
+        There are no LTI assessments.
+    {% endif %}
 {% endblock teacherMessage %}
 
 {% block createButton %}
-    <a href="{{ createRouteType }}" class="button">Create LTI assessment</a>
+    {% if config.lti_assessments_enable %}
+        <a href="{{ createRouteType }}" class="button">Create LTI assessment</a>
+    {% endif %}
 {% endblock createButton %}

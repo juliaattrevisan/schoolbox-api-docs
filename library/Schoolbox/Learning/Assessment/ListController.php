@@ -512,14 +512,16 @@ class ListController extends Web\Controller\Base
                 'icon'  => 'quiz',
                 'title' => 'Ask a series of questions with automatic marking',
             ],
-            [
+        ];
+        if ($this->getConfigLoader()->get('lti_assessments_enable')) {
+            $data['types'][] = [
                 'id'    => 'lti',
                 'value' => AssessmentType::TYPE_LTI_ASSESSMENT,
                 'label' => 'LTI Assessment',
                 'icon'  => 'lti',
                 'title' => 'Connect an assessment provided by an LTI tool',
-            ],
-        ];
+            ];
+        }
         // TODO, 'types' should just be the 3 objects, and twig should do the rest
         // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 

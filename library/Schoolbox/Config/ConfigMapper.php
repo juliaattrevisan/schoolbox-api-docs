@@ -44,6 +44,7 @@ class ConfigMapper extends Mapper
     public const MODULE_CUSTOM     = 'custom';
     public const MODULE_OAUTH      = 'oauth';
     public const MODULE_SCHOOLDATA = 'schoolData';
+    public const MODULE_LTI        = 'lti';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -191,7 +192,7 @@ class ConfigMapper extends Mapper
             self::TYPE_STRING,
             self::COLUMN_ENUM,
             null,
-            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH, self::MODULE_SCHOOLDATA]
+            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH, self::MODULE_SCHOOLDATA, self::MODULE_LTI]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);

@@ -13,11 +13,15 @@ namespace Schoolbox\Admin\LTI;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends BaseModule
 {
@@ -32,6 +36,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getModify', $basePath, "/modify/{providerId}");
         $this->addPostRoute($router, 'postModify', $basePath, "/modify");
         $this->addPostRoute($router, 'postDelete', $basePath, "/delete/{providerId}");
+        $this->addPostRoute($router, 'postConfig', $basePath, '/postConfig');
     }
 
     /**
@@ -85,6 +90,24 @@ class Module extends BaseModule
                 return $returnArray;
             }
         );
+    }
+
+    /**
+     * @inheritdoc
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
+            'providerMapper'       => $this->getMapperFactory()->getLazy(ProviderMapper::class),
+            'fieldStrategyFactory' => $injector->lazy(
+                function () {
+                    return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
+                }
+            ),
+        ];
     }
 
     /**
