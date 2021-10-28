@@ -16,7 +16,6 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 
-$groupHandler = new Group(); //only single call, still working out how to do the hasChildAccessOnly
 $access = Access::getInstance();
 $threadMapper = ThreadMapper::getInstance();
 
@@ -51,7 +50,6 @@ if ($thread->getCategory() === false ||  $thread->getCategory()->isDeleted() ===
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FOLDER_DELETED);
 } else {
     //$folder is (old)$category
-    /** @var  FolderModel $folder */
     $folder = FolderMapper::getInstance()->findById($thread->getCategory()->getId());
 }
 
@@ -63,6 +61,7 @@ if (!$threadMapper->isComponent($folder->getId())) {
 
 /* check permissions
  */
+//duplicated call, lets place it here to save some db calls, or just cpu cycles
 $accessLevel = $access->getFolderAccess($currentUser, $folder->getId());
 if ($accessLevel < UserAccess::ACCESS_READ) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
@@ -85,9 +84,6 @@ $this->setVar($output);
 
 $this->setVar('modify_thread_block', '');
 
-
-
-$accessLevel = $access->getFolderAccess($currentUser, $folder->getId());
 if ($accessLevel <= UserAccess::ACCESS_WRITE) {
     $this->parse('modify_thread_block', 'modify_thread');
 }
@@ -96,12 +92,30 @@ if ($accessLevel <= UserAccess::ACCESS_WRITE) {
  */
 $this->setVar('reply_block', '');
 
-//TODO: replace $groupHandler
-$is_post_allowed = !$groupHandler->hasChildAccessOnly($folder->getId());
+/** hasChildAccessOnly - the last handler... well in this file
+ * $is_post_allowed = !$groupHandler->hasChildAccessOnly($folder->getId());
+ * hasChildAccessOnly looks the same as:
+ *
+ * user is a parent
+ * user has read+ access to the group: \Schoolbox\Permission\Access\Access::getFolderAccess() >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ
+ * user isn't involved in the group: !\Schoolbox\Permission\Access\Access::involvedInGroup()
+ *
+ * getFolderAccess - if it is going to throw an error getting the folder, it should have done so by now...
+ */
+if (
+    $currentUser->getRole()->isParent() &&
+    $accessLevel >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ &&
+    !$access->involvedInGroup($currentUser, $folder->getId())
+) {
+    $is_post_allowed = false;
+} else {
+    $is_post_allowed = true;
+}
+
 if (!$is_post_allowed && ConfigLoader::getInstance()->get('restrict_parent_forum_access')) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
-if (!$thread->isLocked() || $access->getFolderAccess($currentUser, $folder->getId()) >= UserAccess::ACCESS_WRITE) {
+if (!$thread->isLocked() || $accessLevel >= UserAccess::ACCESS_WRITE) {
     if ($is_post_allowed) {
         $this->parse('reply_block', 'reply');
     }
@@ -203,7 +217,7 @@ if ($postList !== null) {
         $this->setVar('delete_block', '');
 
         if (
-            (!$thread->isLocked() && $post->getOwner() === $currentUser) || ($access->getFolderAccess($currentUser, $folder->getId()) >= UserAccess::ACCESS_WRITE)
+            (!$thread->isLocked() && $post->getOwner() === $currentUser) || ($accessLevel >= UserAccess::ACCESS_WRITE)
         ) {
             $this->parse('modify_block', 'modify');
 
@@ -221,7 +235,7 @@ if ($postList !== null) {
 
         // reply to this post
         $this->setVar('reply_post_block', '');
-        if (!$thread->isLocked() || ($access->getFolderAccess($currentUser, $folder->getId()) >= UserAccess::ACCESS_WRITE)) {
+        if (!$thread->isLocked() || ($accessLevel >= UserAccess::ACCESS_WRITE)) {
             if ($is_post_allowed) {
                 $this->parse('reply_post_block', 'reply_post');
             }
