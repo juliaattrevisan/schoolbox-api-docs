@@ -11,11 +11,15 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Http\Factory\Guzzle\ResponseFactory;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Factory\AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Generator\AccessTokenResponseGenerator;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ScopeRepository;
@@ -28,9 +32,9 @@ use Schoolbox\LTI\AccessToken\Cache;
 use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
-use Schoolbox\LTI\Registration\Repository;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Util\ServerRequestFactory;
 use Schoolbox\Url\Factory;
 
 /**
@@ -39,9 +43,14 @@ use Schoolbox\Url\Factory;
 class Controller extends Base
 {
     /**
+     * Repository of keychains.
+     */
+    private KeyChainRepositoryInterface $keyChains;
+
+    /**
      * Repository of tool+platform registrations.
      */
-    private Repository $registrations;
+    private RegistrationRepositoryInterface $registrations;
 
     /**
      * User authenticator.
@@ -61,17 +70,20 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Repository                 $registrations
-     * @param UserAuthenticatorInterface $userAuthenticator
-     * @param Instance                   $instance
-     * @param AccessTokenMapper          $accessTokenMapper
+     * @param KeyChainRepositoryInterface     $keyChains
+     * @param RegistrationRepositoryInterface $registrations
+     * @param UserAuthenticatorInterface      $userAuthenticator
+     * @param Instance                        $instance
+     * @param AccessTokenMapper               $accessTokenMapper
      */
     public function __construct(
-        Repository $registrations,
+        KeyChainRepositoryInterface $keyChains,
+        RegistrationRepositoryInterface $registrations,
         UserAuthenticatorInterface $userAuthenticator,
         Instance $instance,
         AccessTokenMapper $accessTokenMapper
     ) {
+        $this->keyChains         = $keyChains;
         $this->registrations     = $registrations;
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
@@ -183,10 +195,12 @@ class Controller extends Base
     /**
      * Generate oAuth access tokens
      *
-     * @api   GET /lti-platform/auth/token
+     * @api   GET /lti-platform/auth/{keychainId}/token
      * @since 21.1.0
+     *
+     * @param string $keychainId
      */
-    public function getOauthAccessTokenRequest(): void
+    public function getOauthAccessTokenRequest(string $keychainId): void
     {
         // Access token repo: backs onto a mapper
         $factory = new AuthorizationServerFactory(
@@ -198,17 +212,33 @@ class Controller extends Base
             // TODO replace with a real key
             'B'
         );
+
+        $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
+
+        // I think this??fier = KeyChainFactory::IDENTIFIER;
+
+        $response = $generator->generate(
+            (new ServerRequestFactory())->build($this->request),
+            (new ResponseFactory())->createResponse(),
+            $keychainId,
+        );
+
+        // Now do something with the response
+        $this->response->content->set($this->buildJsonOutput(['b' => 'c']));
     }
 
     /**
      * Generate oAuth access tokens
      *
-     * @api   POST /lti-platform/auth/token
+     * @api   POST /lti-platform/auth/{keychainId}/token
      * @since 21.1.0
+     *
+     * @param string $keychainId
      */
-    public function postOauthAccessTokenRequest(): void
+    public function postOauthAccessTokenRequest(string $keychainId): void
     {
-        $this->getOauthAccessTokenRequest();
+        echo($this->request->post->get('client_assertion'));
+        $this->getOauthAccessTokenRequest($keychainId);
     }
 
     /**
