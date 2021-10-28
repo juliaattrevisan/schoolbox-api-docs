@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 
 /**
@@ -88,6 +89,7 @@ class Module extends BaseModule
                     'repository'        => $injector->lazyGet('lti.repository'),
                     'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
                     'instance'          => $injector->lazyGet('instance'),
+                    'accessTokenMapper' => $this->getMapperFactory()->getLazy(AccessTokenMapper::class),
                 ]
             )
         );

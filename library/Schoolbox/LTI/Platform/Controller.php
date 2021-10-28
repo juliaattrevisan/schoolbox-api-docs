@@ -15,11 +15,17 @@ use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Factory\AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ScopeRepository;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\Instance;
+use Schoolbox\LTI\AccessToken\Cache;
+use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\Repository;
@@ -48,20 +54,28 @@ class Controller extends Base
     private Instance $instance;
 
     /**
+     * Access token mapper: used for building the cache of access tokens.
+     */
+    private AccessTokenMapper $accessTokenMapper;
+
+    /**
      * Constructor
      *
      * @param Repository                 $repository
      * @param UserAuthenticatorInterface $userAuthenticator
      * @param Instance                   $instance
+     * @param AccessTokenMapper          $accessTokenMapper
      */
     public function __construct(
         Repository $repository,
         UserAuthenticatorInterface $userAuthenticator,
-        Instance $instance
+        Instance $instance,
+        AccessTokenMapper $accessTokenMapper
     ) {
         $this->repository        = $repository;
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
+        $this->accessTokenMapper = $accessTokenMapper;
     }
 
     /**
@@ -174,7 +188,16 @@ class Controller extends Base
      */
     public function getOauthAccessTokenRequest(): void
     {
-
+        // Access token repo: backs onto a mapper
+        $factory = new AuthorizationServerFactory(
+            new ClientRepository($this->repository),
+            new AccessTokenRepository(
+                new Cache($this->accessTokenMapper)
+            ),
+            new ScopeRepository(),
+            // TODO replace with a real key
+            'B'
+        );
     }
 
     /**
