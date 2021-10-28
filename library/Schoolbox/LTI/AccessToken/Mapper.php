@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('lti_access_token');
+        $this->hasModel(Model::class);
         $this->uses('identifier', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->joins('lti_provider_id', ToolMapper::class, 'id', null, null, 'ltiTool', 'ltiTool');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
