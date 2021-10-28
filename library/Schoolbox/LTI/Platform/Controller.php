@@ -198,6 +198,8 @@ class Controller extends Base
     /**
      * Generate oAuth access tokens
      *
+     * TODO don't need $keychainId as a param anymore
+     *
      * @api   GET /lti-platform/auth/{keychainId}/token
      * @since 21.1.0
      *
@@ -220,17 +222,16 @@ class Controller extends Base
         );
 
         $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
-
-        // I think this??fier = KeyChainFactory::IDENTIFIER;
-
-        $response = $generator->generate(
+        $response  = $generator->generate(
             (new ServerRequestFactory())->build($this->request),
             (new ResponseFactory())->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
 
         // Now do something with the response
-        $this->response->content->set($this->buildJsonOutput(['b' => 'c']));
+        // TODO add convert PSR to Aura response method
+        $response->getBody()->rewind();
+        $this->response->content->set($this->buildJsonOutput(json_decode($response->getBody()->getContents())));
     }
 
     /**
