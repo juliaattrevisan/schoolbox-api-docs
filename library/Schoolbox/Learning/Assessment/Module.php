@@ -416,7 +416,7 @@ class Module extends BaseModule
         $lc['ltiAssessmentMapper']      = $this->getMapperFactory()->getLazy(LtiAssessmentMapper::class);
         $lc['ltiAssessmentScoreMapper'] = $this->getMapperFactory()->getLazy(LtiAssessmentScoreMapper::class);
         $lc['instance']                 = $injector->lazyGet('instance');
-        $lc['repository']               = $injector->lazyGet('lti.repository');
+        $lc['registrations']            = $injector->lazyGet('lti.registrations');
     }
 
     /**

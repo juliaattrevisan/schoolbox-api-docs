@@ -27,6 +27,7 @@ use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
+use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Config\Modules\ModuleConfigInterface;
@@ -40,6 +41,7 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use Predis;
 use Proxy\Server as ProxyServer;
 use RuntimeException;
@@ -100,10 +102,11 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
 use Schoolbox\LTI\Auth\UserAuthenticator;
+use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
-use Schoolbox\LTI\Registration\RepositoryFactory;
+use Schoolbox\LTI\Registration\RepositoryFactory as RegistrationRepositoryFactory;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
@@ -1544,19 +1547,38 @@ abstract class Kernel
 
         // LTI-related things
         $di->set(
-            'lti.repository',
-            $di->lazy(function () use ($di, $mapperFactory) {
+            'lti.tools',
+            $di->lazy(function () use ($mapperFactory) {
+                return $mapperFactory->get(ToolMapper::class)
+                                     ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3);
+            })
+        );
+        $di->set(
+            'lti.keyChains',
+            $di->lazy(function () use ($di) {
                 /** @var IConfigLoader $config */
                 $config = $di->get('config');
+                /** @var ToolModel[] $ltiTools */
+                $ltiTools = $di->get('lti.tools');
+                return (new KeyChainRepositoryFactory($config))->build($ltiTools);
+            })
+        );
+        $di->set(
+            'lti.registrations',
+            $di->lazy(function () use ($di) {
+                /** @var IConfigLoader $config */
+                $config = $di->get('config');
+                /** @var Router $router */
                 $router = $di->get('router');
-                $registrationRepositoryFactory = new RepositoryFactory(
+                /** @var KeyChainRepositoryInterface $keyChains */
+                $keyChains = $di->get('lti.keyChains');
+                /** @var ToolModel[] $ltiTools */
+                $ltiTools = $di->get('lti.tools');
+                $registrationRepositoryFactory = new RegistrationRepositoryFactory(
                     $config,
                     $router->generate('ltiPlatform.getOidcAuthenticationRequest'),
                 );
-                return $registrationRepositoryFactory->build(
-                    $mapperFactory->get(ToolMapper::class)
-                                  ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3),
-                );
+                return $registrationRepositoryFactory->build($ltiTools);
             })
         );
         $di->set(

@@ -86,7 +86,7 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'repository'        => $injector->lazyGet('lti.repository'),
+                    'registrations'     => $injector->lazyGet('lti.registrations'),
                     'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
                     'instance'          => $injector->lazyGet('instance'),
                     'accessTokenMapper' => $this->getMapperFactory()->getLazy(AccessTokenMapper::class),

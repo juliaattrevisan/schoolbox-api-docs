@@ -66,9 +66,9 @@ class Controller extends Assessment\Controller
     private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper;
 
     /**
-     * Repository of tool+platform configurations.
+     * Repository of tool+platform registrations.
      */
-    private RegistrationRepositoryInterface $repository;
+    private RegistrationRepositoryInterface $registrations;
 
     /**
      * Instance data repository.
@@ -93,7 +93,7 @@ class Controller extends Assessment\Controller
      * @param LtiTool\Mapper                  $ltiToolMapper
      * @param LtiAssessment\Mapper            $ltiAssessmentMapper
      * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper
-     * @param RegistrationRepositoryInterface $repository
+     * @param RegistrationRepositoryInterface $registrations
      * @param Instance                        $instance
      */
     public function __construct(
@@ -112,7 +112,7 @@ class Controller extends Assessment\Controller
         LtiTool\Mapper $ltiToolMapper,
         LtiAssessment\Mapper $ltiAssessmentMapper,
         LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
-        RegistrationRepositoryInterface $repository,
+        RegistrationRepositoryInterface $registrations,
         Instance $instance
     ) {
         parent::__construct(
@@ -132,7 +132,7 @@ class Controller extends Assessment\Controller
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;
         $this->ltiAssessmentScoreMapper = $ltiAssessmentScoreMapper;
-        $this->repository               = $repository;
+        $this->registrations            = $registrations;
         $this->instance                 = $instance;
     }
 
@@ -371,7 +371,7 @@ class Controller extends Assessment\Controller
         $assessmentContext = $assessment->getBaseContext()->getFolder();
 
         // Create an LTI resource link launch, send it to the iframe
-        $registration = $this->repository->find($assessment->getLtiTool()->getDeploymentId());
+        $registration = $this->registrations->find($assessment->getLtiTool()->getDeploymentId());
 
         // Roles: dependent on whether user is a participant or instructor
         // TODO determine how roles should be set if $actingUser != $currentUser

@@ -39,9 +39,9 @@ use Schoolbox\Url\Factory;
 class Controller extends Base
 {
     /**
-     * Repository of tool+platform configurations.
+     * Repository of tool+platform registrations.
      */
-    private Repository $repository;
+    private Repository $registrations;
 
     /**
      * User authenticator.
@@ -61,18 +61,18 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Repository                 $repository
+     * @param Repository                 $registrations
      * @param UserAuthenticatorInterface $userAuthenticator
      * @param Instance                   $instance
      * @param AccessTokenMapper          $accessTokenMapper
      */
     public function __construct(
-        Repository $repository,
+        Repository $registrations,
         UserAuthenticatorInterface $userAuthenticator,
         Instance $instance,
         AccessTokenMapper $accessTokenMapper
     ) {
-        $this->repository        = $repository;
+        $this->registrations     = $registrations;
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
         $this->accessTokenMapper = $accessTokenMapper;
@@ -91,7 +91,7 @@ class Controller extends Base
     public function getGenerateDeepLinkingRequest(ToolModel $tool): void
     {
         // Find the tool in the list of registrations
-        $repository = $this->repository->find($tool->getDeploymentId());
+        $repository = $this->registrations->find($tool->getDeploymentId());
 
         // Return URL:
         // this is somewhere else
@@ -155,7 +155,7 @@ class Controller extends Base
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
         $message = (new OidcAuthenticationRequestFactory(
-            $this->repository,
+            $this->registrations,
             $this->userAuthenticator,
         ))->build($this->request);
 
@@ -190,7 +190,7 @@ class Controller extends Base
     {
         // Access token repo: backs onto a mapper
         $factory = new AuthorizationServerFactory(
-            new ClientRepository($this->repository),
+            new ClientRepository($this->registrations),
             new AccessTokenRepository(
                 new Cache($this->accessTokenMapper)
             ),
@@ -228,7 +228,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->repository))->build($this->request);
+        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->request);
         if ($result->hasError()) {
             throw new LtiException($result->getError());
         }
