@@ -252,10 +252,9 @@ class Factory
             !$this->doesDraftFeedbackContribute($year),
             $roleTypeOverride
         );
-        /** @var Folder $folder */
         $folder = $folderWithGrades['folder'];
 
-        if (self::isSubjectLateralLearning($folder->getName())) {
+        if ($folder && self::isSubjectLateralLearning($folder->getName())) {
             return $this->buildLateralLearning(
                 $this->gateway->getSubject($year, $subjectCode, true),
                 $folder,
@@ -282,17 +281,17 @@ class Factory
      *
      * This is used as a data store for the eReport's standard subject page.
      *
-     * @param array   $externalData
-     * @param Folder  $folder
-     * @param array   $grades
-     * @param int     $year
-     * @param User    $student
-     * @param string  $subjectCode
+     * @param array       $externalData
+     * @param Folder|null $folder
+     * @param array       $grades
+     * @param int         $year
+     * @param User        $student
+     * @param string      $subjectCode
      * @return Subject\Standard
      */
     private function buildStandard(
         array $externalData,
-        Folder $folder,
+        ?Folder $folder,
         array $grades,
         int $year,
         User $student,
@@ -312,7 +311,7 @@ class Factory
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
         $subject
             ->setFolder($folder)
-            ->setCohortFolders($this->getCohortFolders($folder, $subjectCode))
+            ->setCohortFolders($folder ? $this->getCohortFolders($folder, $subjectCode) : [])
             ->setGrades($grades)
             ->moveToNamedGrade('courseGrade', 'Course Grade')
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
@@ -354,7 +353,7 @@ class Factory
      * This is used as a data store for the lateral learning eReport.
      *
      * @param array          $externalData
-     * @param Folder         $folder
+     * @param Folder|null    $folder
      * @param int            $year
      * @param User           $student
      * @param string         $subjectCode
@@ -364,7 +363,7 @@ class Factory
      */
     private function buildLateralLearning(
         array $externalData,
-        Folder $folder,
+        ?Folder $folder,
         int $year,
         User $student,
         string $subjectCode,
@@ -534,10 +533,7 @@ class Factory
      * @param bool        $publishedOnly
      * @param string|null $roleTypeOverride
      *
-     * @return array {
-     *  folder: Folder
-     *  grades: array
-     * }
+     * @return array{folder: Folder|null, grades: array}
      */
     private function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
@@ -568,10 +564,9 @@ class Factory
             }
         }
 
-        // everything failed? return an empty model
-        // TODO this should return nothing, as there is nothing to show
+        // everything failed? return a null folder
         return [
-            'folder' => $this->folderMapper->createModel(),
+            'folder' => null,
             'grades' => [],
         ];
     }

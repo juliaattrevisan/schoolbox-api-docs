@@ -21,7 +21,7 @@
         {% elseif report.subjectReport.subjectCode %}
             {{ report.subjectReport.year }} eReport:
             <br />
-            {{ report.subjectReport.name ?? report.subjectReport.folder.name }}
+            {{ report.subjectReport.name ?? report.subjectReport.folder.name ?? '' }}
             <br />
             ({{ report.subjectReport.subjectCode }})
         {% endif %}
