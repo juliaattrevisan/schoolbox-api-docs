@@ -178,7 +178,6 @@ if ($postList !== null) {
     $j = 0;
 
     foreach ($postList as $post) {
-
         $output = array('POST_ID' => $post->getId(),
                         'POST_AUTHOR' => Scrub::text($post->getOwner()->getFullName()),
                         'POST_TIME' => $post->getDate()->getRelativeTime(),
