@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\AccessToken;
 
+use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\AccessToken;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use Psr\Cache\CacheItemInterface;
@@ -26,6 +27,12 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
     private Mapper $mapper;
 
     /**
+     * A repository of clients: required so that rehydrated access tokens can be
+     * associated with a client.
+     */
+    private ClientRepositoryInterface $clientRepository;
+
+    /**
      * Access token cache
      *
      * @var array<string, CachedAccessToken>
@@ -35,11 +42,13 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper                    $mapper
+     * @param ClientRepositoryInterface $clientRepository
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, ClientRepositoryInterface $clientRepository)
     {
-        $this->mapper = $mapper;
+        $this->mapper           = $mapper;
+        $this->clientRepository = $clientRepository;
     }
 
     /**
@@ -60,11 +69,9 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
 
                 // TODO decide once and for all upon identifier in LTI: I think username makes most sense
                 $accessToken->setUserIdentifier($model->getUser()->getUsername() ?? null);
-
-                // TODO how do I set client ID?
-                // need to know which registration the client is for:
-                // need I pass that in the constructor?
-//                $accessToken->setClient(new \OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Client());
+                $accessToken->setClient(
+                    $this->clientRepository->getClientEntity($model->getLtiTool()->getClientId())
+                );
                 foreach ($model->getScopes() as $scope) {
                     $accessToken->addScope(new Scope($scope));
                 }

@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\Instance;
-use Schoolbox\LTI\AccessToken\Cache;
+use Schoolbox\LTI\AccessToken\CachedAccessTokenPool;
 use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
@@ -204,10 +204,14 @@ class Controller extends Base
     public function getOauthAccessTokenRequest(): void
     {
         // Access token repo: backs onto a mapper
+        $clientRepository = new ClientRepository($this->registrations);
         $factory = new AuthorizationServerFactory(
-            new ClientRepository($this->registrations),
+            $clientRepository,
             new AccessTokenRepository(
-                new Cache($this->accessTokenMapper)
+                new CachedAccessTokenPool(
+                    $this->accessTokenMapper,
+                    $clientRepository,
+                )
             ),
             // TODO figure out which scopes are supported
             new ScopeRepository([
