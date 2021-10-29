@@ -36,6 +36,11 @@ class CachedAccessToken implements CacheItemInterface
     private bool $hit;
 
     /**
+     * Has this cache item been changed since it has been persisted?
+     */
+    private bool $dirty;
+
+    /**
      * Constructor
      *
      * @param AccessToken $token
@@ -128,6 +133,24 @@ class CachedAccessToken implements CacheItemInterface
             $interval = $this->createDateInterval(self::DEFAULT_EXPIRATION);
         }
         $this->token->setExpiryDateTime($this->token->getExpiryDateTime()->add($interval));
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDirty(): bool
+    {
+        return $this->dirty;
+    }
+
+    /**
+     * @param bool $dirty
+     * @return static
+     */
+    public function setDirty(bool $dirty): self
+    {
+        $this->dirty = $dirty;
         return $this;
     }
 

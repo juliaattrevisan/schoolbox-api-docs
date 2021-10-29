@@ -26,7 +26,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
     /**
      * Access token mapper
      */
-    private Mapper $mapper;
+    private Mapper $accessTokenMapper;
 
     /**
      * A repository of clients: required so that rehydrated access tokens can be
@@ -44,13 +44,13 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
     /**
      * Constructor
      *
-     * @param Mapper                    $mapper
+     * @param Mapper                    $accessTokenMapper
      * @param ClientRepositoryInterface $clientRepository
      */
-    public function __construct(Mapper $mapper, ClientRepositoryInterface $clientRepository)
+    public function __construct(Mapper $accessTokenMapper, ClientRepositoryInterface $clientRepository)
     {
-        $this->mapper           = $mapper;
-        $this->clientRepository = $clientRepository;
+        $this->accessTokenMapper = $accessTokenMapper;
+        $this->clientRepository  = $clientRepository;
     }
 
     /**
@@ -67,7 +67,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
             $accessToken = new AccessToken();
             $accessToken->setIdentifier($key);
             try {
-                $model = $this->mapper->findById($key);
+                $model = $this->accessTokenMapper->findById($key);
 
                 // TODO decide once and for all upon identifier in LTI: I think username makes most sense
                 $accessToken->setUserIdentifier($model->getUser()->getUsername() ?? null);
@@ -79,23 +79,9 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
                 }
                 $tokenExists = true;
             } catch (MapperException $e) {
-//                // TODO need to pass in a tool, and possibly user, for cache misses.
-//                //      Alternately this needs to be NULL
-//                $model = (new Model())->setIdentifier($key);
-
                 $tokenExists = false;
             }
-
-            // Wait there is a difference between a cache hit and a dirty cache item
-            // A retrieved item is always a hit: but it still may be dirty
-
-            // Translate the cache item to a AccessToken
-
-            // What else does an AccessToken actually contain?
-            // I guess it needs to set client ID, user identifier, scopes
-//            $accessToken->setClient();
-
-            $this->cache[$key] = new CachedAccessToken($accessToken, $tokenExists);
+            $this->cache[$key] = (new CachedAccessToken($accessToken, $tokenExists))->setDirty(!$tokenExists);
         }
         return $this->cache[$key];
     }
@@ -158,7 +144,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
             return false;
         }
 
-        $deleted = $this->mapper->deleteByColumn('identifier', $key);
+        $deleted = $this->accessTokenMapper->deleteByColumn('identifier', $key);
         if ($deleted) {
             unset($this->cache[$key]);
             return true;
@@ -202,17 +188,21 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
             $user           = null;
             $userIdentifier = $token->getUserIdentifier();
             if (isset($userIdentifier)) {
+                // TODO inject this mapper
                 $user = UserMapper::getInstance()->findByUsername($userIdentifier);
             }
-            $model = $this->mapper->createModel()
+            $model = $this->accessTokenMapper
+                ->createModel()
                 ->setIdentifier($item->getKey())
                 ->setExpiresAt(Alaress_Date_Format::newFromTimestamp($token->getExpiryDateTime()->getTimestamp()))
                 ->setScopes($scopes)
                 ->setUser($user)
+                // TODO inject this mapper too
                 ->setLtiTool(\Schoolbox\LTI\Provider\Mapper::getInstance()->findOneByColumn('client_id', $token->getClient()->getIdentifier()));
             $this->cache[$item->getKey()] = $item;
             try {
-                $this->mapper->save($model);
+                $this->accessTokenMapper->save($model);
+                $item->setDirty(false);
                 return true;
             } catch (MapperException $e) {
                 // noop: fall through
@@ -230,6 +220,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
     public function saveDeferred(CacheItemInterface $item)
     {
         if ($item instanceof CachedAccessToken) {
+            $item->setDirty(true);
             $this->cache[$item->getKey()] = $item;
             return true;
         }
@@ -244,8 +235,10 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
     public function commit()
     {
         foreach ($this->cache as $item) {
-            if (!$this->save($item)) {
-                return false;
+            if ($item->isDirty()) {
+                if (!$this->save($item)) {
+                    return false;
+                }
             }
         }
         return true;
