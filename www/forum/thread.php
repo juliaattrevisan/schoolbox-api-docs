@@ -5,7 +5,6 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -92,7 +91,7 @@ if ($accessLevel <= UserAccess::ACCESS_WRITE) {
  */
 $this->setVar('reply_block', '');
 
-/** hasChildAccessOnly - the last handler... well in this file
+/** hasChildAccessOnly - the last handler gone... well in this file
  * $is_post_allowed = !$groupHandler->hasChildAccessOnly($folder->getId());
  * hasChildAccessOnly looks the same as:
  *
@@ -135,7 +134,6 @@ if (!$pageNum) {
     $pageNum = 1;
 }
 
-//dragged across from Forum.php what is the better way for this? put in db config table?
 $postPerPage = PostMapper::FORUM_POSTS_PER_PAGE;
 $totalPages = ceil(count($postList) / $postPerPage);
 $postIndex = max(0, $postPerPage * ($pageNum - 1));
@@ -179,13 +177,7 @@ if ($postList !== null) {
     $first = $postList->first();
     $j = 0;
 
-    foreach ($postList as $postObj) {
-        /**  hydrate the posts. need to do some further investigating into where this could be added to the initial call of get thread.
-         *
-         * when I just use $postObj and attempt to grab the owner name those fields default to null (some of the time)
-         * so it looks like it has hydrated the forum, post, owner.ID and that is all, but I need the owner full name also.
-        */
-        $post = PostMapper::getInstance()->findById($postObj->getId());
+    foreach ($postList as $post) {
 
         $output = array('POST_ID' => $post->getId(),
                         'POST_AUTHOR' => Scrub::text($post->getOwner()->getFullName()),
