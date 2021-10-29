@@ -90,7 +90,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
             // I guess it needs to set client ID, user identifier, scopes
 //            $accessToken->setClient();
 
-            $this->cache[$key] = new CachedAccessToken($accessToken);
+            $this->cache[$key] = new CachedAccessToken($accessToken, $tokenExists);
         }
         return $this->cache[$key];
     }

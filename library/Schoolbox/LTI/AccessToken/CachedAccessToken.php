@@ -26,20 +26,25 @@ class CachedAccessToken implements CacheItemInterface
     public const DEFAULT_EXPIRATION = 300;
 
     /**
-     * The model this cache item wraps.
-     *
-     * TODO make this wrap a `OAT\Library\Lti1p3Core\Security\OAuth2\Entity\AccessToken` instead
+     * The access token this cache item wraps.
      */
     private AccessToken $token;
+
+    /**
+     * Was this access token a hit or miss?
+     */
+    private bool $hit;
 
     /**
      * Constructor
      *
      * @param AccessToken $token
+     * @param bool        $hit
      */
-    public function __construct(AccessToken $token)
+    public function __construct(AccessToken $token, bool $hit)
     {
         $this->token = $token;
+        $this->hit   = $hit;
     }
 
     /**
@@ -65,13 +70,11 @@ class CachedAccessToken implements CacheItemInterface
     /**
      * If this model has an identifier, it's a hit; otherwise it's a miss.
      *
-     * TODO the identifier could exist even if the item isn't persisted
-     *
      * @return bool
      */
     public function isHit()
     {
-        return $this->token->getIdentifier() !== null;
+        return $this->hit;
     }
 
     /**
