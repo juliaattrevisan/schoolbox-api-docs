@@ -133,9 +133,13 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
         exit;
     }
 
-    $confI = new Component_Config();
-    $confI->setConfigDefinitionId($cdm->getId());
-    $confI->setInstanceId($cim->getId());
+    //find component config object
+    $confI = Component_ConfigMapper::getInstance()->findByColumnList(
+        array(
+            'component_config_definition_id' => $cdm->getId(),
+            'component_instance_id'          => $cim->getId()
+        )
+    )->first();
     $confI->setValue(null);
 
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
