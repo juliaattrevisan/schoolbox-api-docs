@@ -204,6 +204,8 @@ class Controller extends Base
     public function getOauthAccessTokenRequest(): void
     {
         // Access token repo: backs onto a mapper
+        // TODO this probably needs to be injected
+        // TODO how do I determine if this access token is creatable?
         $clientRepository = new ClientRepository($this->registrations);
         $factory = new AuthorizationServerFactory(
             $clientRepository,
