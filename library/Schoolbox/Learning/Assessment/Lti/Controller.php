@@ -10,13 +10,17 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Alaress_Date_Format;
+use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
+use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
+use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
@@ -33,12 +37,14 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
+use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Provider as LtiTool;
-use Schoolbox\LTI\Registration\Repository;
+use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\Util\CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
+use Schoolbox\LTI\Util\ServerRequestFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
@@ -311,7 +317,7 @@ class Controller extends Assessment\Controller
      * Launches this LTI assessment's resource link, within the context of an
      * instructor.
      *
-     * @api   GET /learning/assessments/:assessmentId/launch/instructor
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/instructor
      * @since 21.1.0
      *
      * @param Model $assessment
@@ -333,7 +339,7 @@ class Controller extends Assessment\Controller
      * Launches this LTI assessment's resource link, within the context of a
      * student.
      *
-     * @api   GET /learning/assessments/:assessmentId/launch/student/:studentId
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/student/:studentId
      * @since 21.1.0
      *
      * @param Model $assessment
@@ -367,7 +373,6 @@ class Controller extends Assessment\Controller
         User $currentUser,
         User $actingUser
     ): LtiMessageInterface {
-
         $assessmentContext = $assessment->getBaseContext()->getFolder();
 
         // Create an LTI resource link launch, send it to the iframe
@@ -441,7 +446,15 @@ class Controller extends Assessment\Controller
         $additionalClaims[] = new AgsClaim(
             [ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE],
             null,
-            // TODO build a controller for scores to be posted to
+            $baseUrl
+                ->setScheme('https')
+                ->setPath(
+                    $this->router->generate(
+                        'learningAssessment.postScorePublish',
+                        ['assessmentId' => $assessment->getId()]
+                    )
+                )
+                ->toString(),
         );
 
         // Resource link request
@@ -455,5 +468,38 @@ class Controller extends Assessment\Controller
             array_unique($roles),
             $additionalClaims,
         );
+    }
+
+    /**
+     * Score publish endpoint.
+     *
+     * @api   POST /learning/assessments/:assessmentId/lti/score
+     * @since 21.1.0
+     *
+     * @param Model $assessment
+     */
+    public function postScorePublish(Model $assessment): void
+    {
+        // Build and validate score publish request
+        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-ags/doc/score/platform/
+        $request = (new ServerRequestFactory())->build($this->request);
+
+        $lineItemRepository = new SingleAssessmentRepository($assessment);
+
+        $scoreRepository = new SingleAssessmentScoreRepository($assessment, $this->ltiAssessmentScoreMapper);
+
+        // Validate the scope
+        $validator = new RequestAccessTokenValidator($this->registrations);
+
+        $handler = new ScoreServiceServerRequestHandler(
+            $lineItemRepository,
+            $scoreRepository,
+        );
+
+        $server = new LtiServiceServer($validator, $handler);
+
+        $response = $server->handle($request);
+        $response->getBody()->rewind();
+        $this->response->content->set($this->buildJsonOutput(json_decode($response->getBody()->getContents())));
     }
 }

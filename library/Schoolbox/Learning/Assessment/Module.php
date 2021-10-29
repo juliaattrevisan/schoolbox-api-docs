@@ -194,17 +194,28 @@ class Module extends BaseModule
         // LTI assessment launch
         $this->register(
             self::METHOD_GET,
-            "$assRoute/launch/instructor",
+            "$assRoute/lti/launch/instructor",
             'getLaunchAssessmentAsInstructor',
             $canViewStatus,
             $preloadAssessment,
         );
         $this->register(
             self::METHOD_GET,
-            "$assRoute/launch/student/$studentParam",
+            "$assRoute/lti/launch/student/$studentParam",
             'getLaunchAssessmentAsStudent',
             $canSubmit,
             $preloadParticipant,
+        );
+
+        // LTI assessment score publish service
+        // (Permissions are handled within the controller action: they rely upon
+        //  the scope assigned to a JWt)
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/score",
+            'postScorePublish',
+            null,
+            $preloadAssessment,
         );
     }
 
