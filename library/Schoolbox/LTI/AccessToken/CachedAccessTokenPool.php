@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\AccessToken;
 
+use Alaress_Date_Format;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\AccessToken;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\UserMapper;
 
 /**
  * Access token cache: basically, a wrapper around a mapper.
@@ -83,6 +85,9 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
 
                 $tokenExists = false;
             }
+
+            // Wait there is a difference between a cache hit and a dirty cache item
+            // A retrieved item is always a hit: but it still may be dirty
 
             // Translate the cache item to a AccessToken
 
@@ -153,15 +158,10 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
             return false;
         }
 
-        $model = $this->getItem($key)->get();
-        try {
-            $deleted = $this->mapper->delete($model);
-            if ($deleted) {
-                unset($this->cache[$key]);
-                return true;
-            }
-        } catch (MapperException $e) {
-            // noop
+        $deleted = $this->mapper->deleteByColumn('identifier', $key);
+        if ($deleted) {
+            unset($this->cache[$key]);
+            return true;
         }
         return false;
     }
@@ -191,10 +191,28 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
-        if ($item instanceof CacheItem) {
+        if ($item instanceof CachedAccessToken) {
+            // Convert the access token into a model
+            $token  = $item->get();
+            $scopes = [];
+            foreach ($token->getScopes() as $scope) {
+                $scopes[] = $scope->getIdentifier();
+            }
+
+            $user           = null;
+            $userIdentifier = $token->getUserIdentifier();
+            if (isset($userIdentifier)) {
+                $user = UserMapper::getInstance()->findByUsername($userIdentifier);
+            }
+            $model = $this->mapper->createModel()
+                ->setIdentifier($item->getKey())
+                ->setExpiresAt(Alaress_Date_Format::newFromTimestamp($token->getExpiryDateTime()->getTimestamp()))
+                ->setScopes($scopes)
+                ->setUser($user)
+                ->setLtiTool(\Schoolbox\LTI\Provider\Mapper::getInstance()->findOneByColumn('client_id', $token->getClient()->getIdentifier()));
             $this->cache[$item->getKey()] = $item;
             try {
-                $this->mapper->save($item->get());
+                $this->mapper->save($model);
                 return true;
             } catch (MapperException $e) {
                 // noop: fall through
@@ -211,7 +229,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        if ($item instanceof CacheItem) {
+        if ($item instanceof CachedAccessToken) {
             $this->cache[$item->getKey()] = $item;
             return true;
         }

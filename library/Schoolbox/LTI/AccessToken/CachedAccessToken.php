@@ -100,11 +100,10 @@ class CachedAccessToken implements CacheItemInterface
     public function expiresAt($expiration)
     {
         if ($expiration instanceof DateTimeInterface) {
-            $this->token->setExpiryDateTime(new DateTimeImmutable($expiration->getTimestamp()));
+            $this->token->setExpiryDateTime((new DateTimeImmutable())->setTimestamp($expiration->getTimestamp()));
         } else {
             $this->token->setExpiryDateTime(
-                (new DateTimeImmutable())
-                    ->add(new DateInterval(sprintf('PT%dS', self::DEFAULT_EXPIRATION)))
+                (new DateTimeImmutable())->add($this->createDateInterval(self::DEFAULT_EXPIRATION))
             );
         }
         return $this;
@@ -124,11 +123,22 @@ class CachedAccessToken implements CacheItemInterface
         if ($time instanceof DateInterval) {
             $interval = $time;
         } elseif (is_int($time)) {
-            $interval = new DateInterval(sprintf('PT%dS', $time));
+            $interval = $this->createDateInterval($time);
         } else {
-            $interval = new DateInterval(sprintf('PT%dS', self::DEFAULT_EXPIRATION));
+            $interval = $this->createDateInterval(self::DEFAULT_EXPIRATION);
         }
         $this->token->setExpiryDateTime($this->token->getExpiryDateTime()->add($interval));
         return $this;
+    }
+
+    /**
+     * Helper for creating a DateInterval from a given number of seconds.
+     *
+     * @param int $seconds
+     * @return DateInterval
+     */
+    private function createDateInterval(int $seconds): DateInterval
+    {
+        return new DateInterval(sprintf('PT%dS', $seconds));
     }
 }
