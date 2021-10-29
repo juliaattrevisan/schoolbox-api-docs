@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\AccessToken;
+namespace Schoolbox\LTI\AccessToken\Cache;
 
 use DateInterval;
 use DateTimeImmutable;
@@ -18,7 +18,7 @@ use Psr\Cache\CacheItemInterface;
 /**
  * Access token cache item: a wrapper around an AccessToken object.
  */
-class CachedAccessToken implements CacheItemInterface
+class Item implements CacheItemInterface
 {
     /**
      * Expire an access token after 5 minutes by default.

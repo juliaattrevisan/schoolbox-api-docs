@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\AccessToken;
+namespace Schoolbox\LTI\AccessToken\Cache;
 
 use Alaress_Date_Format;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
@@ -15,13 +15,14 @@ use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\AccessToken;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Schoolbox\LTI\AccessToken\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
 /**
  * Access token cache: basically, a wrapper around a mapper.
  */
-class CachedAccessTokenPool implements CacheItemPoolInterface
+class ItemPool implements CacheItemPoolInterface
 {
     /**
      * Access token mapper
@@ -37,7 +38,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
     /**
      * Access token cache
      *
-     * @var array<string, CachedAccessToken>
+     * @var array<string, Item>
      */
     private array $cache = [];
 
@@ -57,8 +58,8 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      * Returns a Cache Item representing the specified key.
      *
      * @param string $key
-     * @return CachedAccessToken
-     * @throws CacheInvalidArgumentException if `$key` isn't valid
+     * @return Item
+     * @throws InvalidArgumentException if `$key` isn't valid
      */
     public function getItem($key)
     {
@@ -81,7 +82,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
             } catch (MapperException $e) {
                 $tokenExists = false;
             }
-            $this->cache[$key] = (new CachedAccessToken($accessToken, $tokenExists))->setDirty(!$tokenExists);
+            $this->cache[$key] = (new Item($accessToken, $tokenExists))->setDirty(!$tokenExists);
         }
         return $this->cache[$key];
     }
@@ -90,8 +91,8 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      * Returns a traversable set of cache items.
      *
      * @param array<string> $keys
-     * @return array<string, CachedAccessToken>
-     * @throws CacheInvalidArgumentException if any `$keys` aren't valid
+     * @return array<string, Item>
+     * @throws InvalidArgumentException if any `$keys` aren't valid
      */
     public function getItems(array $keys = [])
     {
@@ -107,7 +108,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      *
      * @param string $key
      * @return bool
-     * @throws CacheInvalidArgumentException if `$key` isn't valid
+     * @throws InvalidArgumentException if `$key` isn't valid
      */
     public function hasItem($key)
     {
@@ -135,7 +136,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      *
      * @param string $key
      * @return bool
-     * @throws CacheInvalidArgumentException if `$key` isn't valid
+     * @throws InvalidArgumentException if `$key` isn't valid
      */
     public function deleteItem($key)
     {
@@ -157,7 +158,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      *
      * @param array $keys
      * @return bool
-     * @throws CacheInvalidArgumentException if any `$keys` aren't valid
+     * @throws InvalidArgumentException if any `$keys` aren't valid
      */
     public function deleteItems(array $keys)
     {
@@ -177,7 +178,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
-        if ($item instanceof CachedAccessToken) {
+        if ($item instanceof Item) {
             // Convert the access token into a model
             $token  = $item->get();
             $scopes = [];
@@ -219,7 +220,7 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        if ($item instanceof CachedAccessToken) {
+        if ($item instanceof Item) {
             $item->setDirty(true);
             $this->cache[$item->getKey()] = $item;
             return true;
@@ -250,12 +251,12 @@ class CachedAccessTokenPool implements CacheItemPoolInterface
      * Currently, that just means "is it a string"?
      *
      * @param mixed $key
-     * @throws CacheInvalidArgumentException if $key isn't valid
+     * @throws InvalidArgumentException if $key isn't valid
      */
     private function assertKeyValid($key): void
     {
         if (!is_string($key)) {
-            throw new CacheInvalidArgumentException(sprintf('Cache key must be a string: received %s', gettype($key)));
+            throw new InvalidArgumentException(sprintf('Cache key must be a string: received %s', gettype($key)));
         }
     }
 }

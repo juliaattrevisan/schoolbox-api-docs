@@ -30,7 +30,7 @@ use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\Instance;
-use Schoolbox\LTI\AccessToken\CachedAccessTokenPool;
+use Schoolbox\LTI\AccessToken\Cache\ItemPool;
 use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
@@ -208,7 +208,7 @@ class Controller extends Base
         $factory = new AuthorizationServerFactory(
             $clientRepository,
             new AccessTokenRepository(
-                new CachedAccessTokenPool(
+                new ItemPool(
                     $this->accessTokenMapper,
                     $clientRepository,
                 )
