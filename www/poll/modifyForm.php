@@ -106,6 +106,10 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 } else if (is_numeric($_GET['delete'])) {
     $poll = $pollHandler->getByID($_GET['delete']);
 
+    if ($poll === false) {
+        SitePage::localRedir("/homepage/" . $_GET['folder']);
+    }
+
     /* Check permission
      */
     if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
@@ -121,12 +125,12 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     try {
         $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
         $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
-            array(
+            [
                 'id'                      => $_GET['homepageComponentID'],
                 'module'                  => 'homepage',
                 'identifier'              => $poll['folder_id'],
                 'component_definition_id' => $cdm->getDefinitionId(),
-            )
+            ]
         );
     } catch (Schoolbox\Mapper\Exception $e) {
         error(19);
@@ -134,12 +138,12 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     }
 
     //find component config object
-    $confI = Component_ConfigMapper::getInstance()->findByColumnList(
+    $confI = Component_ConfigMapper::getInstance()->findOneByColumnList(
         array(
             'component_config_definition_id' => $cdm->getId(),
             'component_instance_id'          => $cim->getId()
         )
-    )->first();
+    );
     $confI->setValue(null);
 
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
