@@ -103,24 +103,22 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     $componentConfigInstanceMapper->save($componentConfigInstance);
 
     SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
-} else if ($_POST['delete']==='true') {
+} else if ($_POST['delete'] === 'true') {
     //get the id and other post objects
-    $rq = $this->getRequest();
-    $post = $rq->post();
-
-    $id = $post->get('id', null);
-    $componentId = $post->get('id', null);
+    $id = $_POST['id'];
+    $componentId = $_POST['componentId'];
 
     //lets confirm there is actually an id and component id...
     if ($id === "" || $componentId === "") {
-        $this->sendError('Poll id not provided');
+        $page->outputJson(['message' => 'Poll id not provided'], false, 400);
         return;
     }
 
     //get the poll object if it exists? multiplayer schoolbox
     $poll = $pollHandler->getByID($id);
     if ($poll === false) {
-        $this->sendError("Poll not found, has it already been deleted?");
+        $page->outputJson(['message' => 'Poll not found, has it already been deleted?'], false, 400);
+        return;
     }
 
     /* Check permission
@@ -151,19 +149,25 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     }
 
     //find component config object
-    $confI = Component_ConfigMapper::getInstance()->findOneByColumnList(
-        array(
-            'component_config_definition_id' => $cdm->getId(),
-            'component_instance_id'          => $cim->getId()
-        )
-    );
-    $confI->setValue(null);
+    try {
+        $confI = Component_ConfigMapper::getInstance()->findOneByColumnList(
+            [
+                'component_config_definition_id' => $cdm->getId(),
+                'component_instance_id'          => $cim->getId()
+            ]
+        );
+        $confI->setValue(null);
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $page->outputJson(['message' => 'Unable to find component to update'], false, 400);
+        return;
+    }
 
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
     $componentConfigInstanceMapper->save($confI);
 
-    $this->getResponse()->content->set($this->buildJsonOutput([
-         'poll_id' => $poll['id'],
-         'homepage_id' => $poll['folder_id'],
-     ]));
+    $page->outputJson([
+        'message' => 'Poll deleted',
+        'poll_id' => $poll['id'],
+        'homepage_id' => $poll['folder_id'],
+          ], false, 200);
 }
