@@ -103,11 +103,24 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     $componentConfigInstanceMapper->save($componentConfigInstance);
 
     SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
-} else if (is_numeric($_GET['delete'])) {
-    $poll = $pollHandler->getByID($_GET['delete']);
+} else if ($_POST['delete']==='true') {
+    //get the id and other post objects
+    $rq = $this->getRequest();
+    $post = $rq->post();
 
+    $id = $post->get('id', null);
+    $componentId = $post->get('id', null);
+
+    //lets confirm there is actually an id and component id...
+    if ($id === "" || $componentId === "") {
+        $this->sendError('Poll id not provided');
+        return;
+    }
+
+    //get the poll object if it exists? multiplayer schoolbox
+    $poll = $pollHandler->getByID($id);
     if ($poll === false) {
-        SitePage::localRedir("/homepage/" . $_GET['folder']);
+        $this->sendError("Poll not found, has it already been deleted?");
     }
 
     /* Check permission
@@ -116,7 +129,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
         error(19);
     }
 
-    $pollHandler->delete($_GET['delete']);
+    $pollHandler->delete($id);
 
     /* do not select next poll, that's just dumb
      * I deleted this poll, then I don't expect to be Hydra'd by another poll
@@ -126,7 +139,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
         $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
         $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
             [
-                'id'                      => $_GET['homepageComponentID'],
+                'id'                      => $componentId,
                 'module'                  => 'homepage',
                 'identifier'              => $poll['folder_id'],
                 'component_definition_id' => $cdm->getDefinitionId(),
@@ -149,5 +162,8 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
     $componentConfigInstanceMapper->save($confI);
 
-    SitePage::localRedir("/homepage/" . $poll['folder_id']);
+    $this->getResponse()->content->set($this->buildJsonOutput([
+         'poll_id' => $poll['id'],
+         'homepage_id' => $poll['folder_id'],
+     ]));
 }
