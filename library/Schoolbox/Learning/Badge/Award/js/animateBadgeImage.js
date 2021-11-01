@@ -2,6 +2,7 @@
 import { gsap } from 'gsap/all';
 import { init as initPopUp } from './animations/popUp';
 import { init as initFlipUp } from './animations/flipUp';
+import { init as initDropDown } from './animations/dropDown';
 
 const CANVAS_SELECTOR = '[data-badge-award-canvas]';
 
@@ -73,7 +74,8 @@ const swingDown = (badgeImage) => {
  */
 export const animateBadgeImage = (badgeImage) => {
     // const animationList = [initPopUp];
-    const animationList = [initFlipUp];
+    // const animationList = [initFlipUp];
+    const animationList = [initDropDown];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
 }
