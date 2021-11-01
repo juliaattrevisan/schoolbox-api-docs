@@ -1,23 +1,10 @@
 
 import { gsap } from 'gsap/all';
 import { init as initPopUp } from './animations/popUp';
+import { init as initFlipUp } from './animations/flipUp';
 
 const CANVAS_SELECTOR = '[data-badge-award-canvas]';
 
-/**
- * Pop up 
- * 
- * @param { DOMElement }
- * 
- * @returns { Timeline }
- */
-const popUp = (badgeImage) => {
-    const popUpTL = gsap.timeline( { paused: true, repeat: 0 } ); 
-    popUpTL.set(badgeImage, { scale: 0, transformOrigin: '50% 50%', filter: 'grayscale(100%)' } );
-    popUpTL.to(badgeImage, { duration: 1.2, scale: 1, ease: 'bounce.out', delay: 0.5 } );
-    popUpTL.to(badgeImage, { duration: 0.3, filter: 'grayscale(0%)' }, '-=80%');
-    return popUpTL;
-}
 
 /**
  * Coin spin animation
@@ -32,21 +19,6 @@ const coinSpin = (badgeImage) => {
     coinSpinTL.to(badgeImage, { duration: 1.5, rotationY: 360, ease: 'power2.out', delay: 0.5 } );
     coinSpinTL.to(badgeImage, { duration: 0.4, filter: 'grayscale(0%)' }, '-=0.5' );
     return coinSpinTL;
-}
-
-/**
- * Flip up animation
- * 
- * @param { DOMElement }
- * 
- * @returns { Timeline }
- */
-const flipUp = (badgeImage) => {
-    const flipUpTL = gsap.timeline( { paused: true, repeat: 0 } ); 
-    flipUpTL.set(badgeImage, { transformOrigin: '50% 100%', transformStyle: 'preserve-3d', rotationX: 90, scaleX: 0.4, filter: 'grayscale(100%)' } );
-    flipUpTL.to(badgeImage, { duration: 1.5, rotationX: 0, scaleX: 1, ease: 'back.out(3.5)', transformOrigin: '50% 100%', delay: 0.5 } );
-    flipUpTL.to(badgeImage, { duration: 0.8, filter: 'grayscale(0%)' }, '-=0.7' );
-    return flipUpTL;
 }
 
 /**
@@ -100,7 +72,8 @@ const swingDown = (badgeImage) => {
  * @param { DOMElement }
  */
 export const animateBadgeImage = (badgeImage) => {
-    const animationList = [initPopUp];
+    // const animationList = [initPopUp];
+    const animationList = [initFlipUp];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
 }
