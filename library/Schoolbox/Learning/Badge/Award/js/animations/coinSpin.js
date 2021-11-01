@@ -54,7 +54,7 @@ function animateStars () {
  */
 function getStars () {
     const stars = [];
-    const starCount = 600;
+    const starCount = 500;
     const canvasDimensions = getCanvasDimensions();
     for (let i = 0; i < starCount; i++) { 
         const randomColour = tinycolor({ r: gsap.utils.random(0, 255), g: gsap.utils.random(0, 255), b: gsap.utils.random(0, 255) });
