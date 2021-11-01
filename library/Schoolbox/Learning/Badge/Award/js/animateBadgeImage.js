@@ -3,6 +3,7 @@ import { gsap } from 'gsap/all';
 import { init as initPopUp } from './animations/popUp';
 import { init as initFlipUp } from './animations/flipUp';
 import { init as initDropDown } from './animations/dropDown';
+import { init as initSwingDown } from './animations/swingDown';
 
 const CANVAS_SELECTOR = '[data-badge-award-canvas]';
 
@@ -23,21 +24,6 @@ const coinSpin = (badgeImage) => {
 }
 
 /**
- * Drop down animation
- * 
- * @param { DOMElement }
- * 
- * @returns { Timeline }
- */
-const dropDown = (badgeImage) => {
-    const dropDownTL = gsap.timeline( { paused: true, repeat: 0 } ); 
-    dropDownTL.set(badgeImage, { y: -500, transformOrigin: '50% 70%', transformStyle: 'preserve-3d', scaleX: 0, filter: 'grayscale(100%)' } );
-    dropDownTL.to(badgeImage, { duration: 1.2, y: 0, scaleX: 1, transformStyle: 'preserve-3d', ease: 'elastic.out(1, 0.3)', delay: 0.5 } );
-    dropDownTL.to(badgeImage, { duration: 0.1, filter: 'grayscale(0%)' }, '-=0.7' );
-    return dropDownTL;
-}
-
-/**
  * Spin in animation
  * 
  * @param { DOMElement }
@@ -53,21 +39,6 @@ const spinIn = (badgeImage) => {
 }
 
 /**
- * Swing down animation
- * 
- * @param { DOMElement }
- * 
- * @returns { Timeline }
- */
-const swingDown = (badgeImage) => {
-    const swingDownTL = gsap.timeline( { paused: true, repeat: 0 } ); 
-    swingDownTL.set(badgeImage, { rotationZ: 180, y: -50, transformOrigin: '50% 0%', filter: 'grayscale(100%)' } );
-    swingDownTL.to(badgeImage, { duration: 2.3, y: 0, rotationZ: 0, ease: 'elastic', delay: 0.5 } );
-    swingDownTL.to(badgeImage, { duration: 0.4, filter: 'grayscale(0%)' }, '-=0.6' );
-    return swingDownTL;
-}
-
-/**
  * Animate the badge, acheievements should be celebrated a little!
  * 
  * @param { DOMElement }
@@ -75,7 +46,8 @@ const swingDown = (badgeImage) => {
 export const animateBadgeImage = (badgeImage) => {
     // const animationList = [initPopUp];
     // const animationList = [initFlipUp];
-    const animationList = [initDropDown];
+    // const animationList = [initDropDown];
+    const animationList = [initSwingDown];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
 }

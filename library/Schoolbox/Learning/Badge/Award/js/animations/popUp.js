@@ -86,9 +86,9 @@ function redrawStars (stars) {
  function addStarAnimation (starsTimeline, star) {
     starsTimeline.to(star, {
         delay: 'random(0, 0.25)', 
+        duration: 3,
         radius: 'random(0, 0.3)',
         rotation: 'random(0, 360)',
-        duration: 3,
         physics2D: { //https://greensock.com/docs/v3/Plugins/Physics2DPlugin
             acceleration: 0,
             angle: 'random(0, 360)',

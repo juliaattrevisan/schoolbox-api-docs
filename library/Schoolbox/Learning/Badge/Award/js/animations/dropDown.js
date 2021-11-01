@@ -86,9 +86,9 @@ function redrawStars (stars) {
  */
 function addStarAnimation (starsTimeline, star) {
     starsTimeline.to(star, {
-        delay: 'random(0, 3)', 
-        rotation: 'random(0, 180)',
+        delay: 'random(0, 2)', 
         duration: 'random(0.25, 1)',
+        rotation: 'random(0, 180)',
         y: 400,
     }, 0 //0 so there's no delay between the animations, otherwise each star would only animate after the previous is complete
     );
