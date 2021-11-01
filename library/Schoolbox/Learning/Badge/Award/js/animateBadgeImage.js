@@ -1,5 +1,4 @@
 
-import { gsap } from 'gsap/all';
 import { init as initPopUp } from './animations/popUp';
 import { init as initFlipUp } from './animations/flipUp';
 import { init as initDropDown } from './animations/dropDown';
@@ -21,9 +20,20 @@ export const animateBadgeImage = (badgeImage) => {
     // const animationList = [initDropDown];
     // const animationList = [initSwingDown];
     // const animationList = [initCoinSpin];
-    const animationList = [initSpinIn];
+    // const animationList = [initSpinIn];
+    clearCanvas();
+    const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
+}
+
+/**
+ * Ensure there's no left over animation if user is moving through the new rewards quickly
+ */
+function clearCanvas () {
+    const canvasDimensions = getCanvasDimensions();
+    const context = getContext();
+    context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
 }
 
 /**

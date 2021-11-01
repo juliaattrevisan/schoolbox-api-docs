@@ -4,23 +4,33 @@
  * It's to be used within a <canvas></canvas> element 
  */
 
+import tinycolor from 'tinycolor2';
+import { gsap } from 'gsap/all';
+
 export default class Star {
 
     /**
      * Store the properties for reference within draw
      * 
-     * @param { Number }
-     * @param { Number }
-     * @param { String }
-     * @param { Number }
-     * @param { Number }
+     * @param { x, y, radius }
      */
-    constructor (x, y, color, radius, rotation) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        this.radius = radius;
-        this.rotation = rotation;
+    constructor (init) {
+        this.x = init.x;
+        this.y = init.y;
+        this.radius = init.radius;
+        this.color = this.getRandomPastelColour();
+        this.rotation = 0;
+    }
+
+    /**
+     * Get a random 'pastely' colour
+     * 
+     * @returns { String } 
+     */
+    getRandomPastelColour () {
+        const randomColour = tinycolor({ r: gsap.utils.random(0, 255), g: gsap.utils.random(0, 255), b: gsap.utils.random(0, 255) });
+        const randomPastelColour = tinycolor.mix(randomColour.saturate(10), tinycolor('white'), 25); //desaturate a bit and mix in white to make it pastel
+        return randomPastelColour.toHexString();
     }
 
     /**

@@ -4,7 +4,6 @@
  */
 
 import { gsap, Physics2DPlugin } from 'gsap/all';
-import tinycolor from 'tinycolor2';
 import Star from './Star';
 import { getCanvasDimensions, getContext } from '../animateBadgeImage';
 
@@ -39,7 +38,7 @@ function animateBadge (badgeImage) {
 function animateStars () {
     const stars = getStars(); 
     const starsTimeline = gsap.timeline( { //https://greensock.com/docs/v3/GSAP/gsap.timeline()
-        delay: 0.5, //wait prior to animating the stars to link when the pop up has 'hit' the screen
+        delay: 0.6, //wait prior to animating the stars to link when the pop up has 'hit' the screen
         repeat: 0, 
         onUpdate: () => redrawStars(stars) //to draw the new position of the stars each tick
     } ); 
@@ -57,9 +56,11 @@ function getStars () {
     const starCount = 600;
     const canvasDimensions = getCanvasDimensions();
     for (let i = 0; i < starCount; i++) { 
-        const randomColour = tinycolor({ r: gsap.utils.random(0, 255), g: gsap.utils.random(0, 255), b: gsap.utils.random(0, 255) });
-        const randomPastelColour = tinycolor.mix(randomColour.saturate(10), tinycolor('white'), 25); //desaturate a bit and mix in white to make it pastel
-        const star = new Star(gsap.utils.random(0, canvasDimensions.width), -20, randomPastelColour.toHexString(), gsap.utils.random(10, 20), 0);
+        const star = new Star({
+            x: gsap.utils.random(0, canvasDimensions.width), 
+            y: canvasDimensions.height + 50, 
+            radius: gsap.utils.random(20, 50),
+        });
         stars.push(star);
     }
     return stars;
@@ -86,10 +87,18 @@ function redrawStars (stars) {
  */
 function addStarAnimation (starsTimeline, star) {
     starsTimeline.to(star, {
-        delay: 'random(0, 2)', 
-        duration: 'random(0.25, 1)',
-        rotation: 'random(0, 180)',
-        y: 400,
+        delay: 'random(0, 0.25)', 
+        duration: 3,
+        radius: 'random(0, 0.3)',
+        rotation: 'random(0, 360)',
+        physics2D: { //https://greensock.com/docs/v3/Plugins/Physics2DPlugin
+            acceleration: 0,
+            angle: 'random(180, 360)',
+            accelerationAngle: 'random(0, 40)',
+            friction: 'random(0, 0.3)',
+            gravity: 'random(100, 400)',
+            velocity: 'random(600, 850)',
+        },
     }, 0 //0 so there's no delay between the animations, otherwise each star would only animate after the previous is complete
     );
 }

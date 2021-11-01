@@ -4,7 +4,6 @@
  */
 
 import { gsap, Physics2DPlugin } from 'gsap/all';
-import tinycolor from 'tinycolor2';
 import Star from './Star';
 import { getCanvasDimensions, getContext } from '../animateBadgeImage';
 
@@ -39,7 +38,7 @@ function animateBadge (badgeImage) {
 function animateStars () {
     const stars = getStars(); 
     const starsTimeline = gsap.timeline( { //https://greensock.com/docs/v3/GSAP/gsap.timeline()
-        delay: 0.5, //wait prior to animating the stars to link when the pop up has 'hit' the screen
+        delay: 0.2, //wait prior to animating the stars to link when the pop up has 'hit' the screen
         repeat: 0, 
         onUpdate: () => redrawStars(stars) //to draw the new position of the stars each tick
     } ); 
@@ -57,9 +56,11 @@ function getStars () {
     const starCount = 600;
     const canvasDimensions = getCanvasDimensions();
     for (let i = 0; i < starCount; i++) { 
-        const randomColour = tinycolor({ r: gsap.utils.random(0, 255), g: gsap.utils.random(0, 255), b: gsap.utils.random(0, 255) });
-        const randomPastelColour = tinycolor.mix(randomColour.saturate(10), tinycolor('white'), 25); //desaturate a bit and mix in white to make it pastel
-        const star = new Star(gsap.utils.random(0, canvasDimensions.width), -150, randomPastelColour.toHexString(), gsap.utils.random(40, 60), 0);
+        const star = new Star({
+            x: gsap.utils.random(0, canvasDimensions.width),  
+            y: -200, 
+            radius: gsap.utils.random(20, 40),
+        });
         stars.push(star);
     }
     return stars;
@@ -86,11 +87,10 @@ function redrawStars (stars) {
  */
 function addStarAnimation (starsTimeline, star) {
     starsTimeline.to(star, {
-        delay: 'random(0, 1)', 
-        duration: 'random(1, 2)',
-        ease: 'bounce',
+        delay: 'random(0, 1.5)', 
+        duration: 'random(0.5, 2.5)',
         radius: 0,
-        rotation: 'random(0, 360)',
+        rotation: 'random(0, 90)',
         physics2D: { //https://greensock.com/docs/v3/Plugins/Physics2DPlugin
             acceleration: 'random(0, 10)',
             angle: 'random(0, 180)',

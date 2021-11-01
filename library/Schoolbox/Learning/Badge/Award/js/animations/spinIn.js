@@ -4,7 +4,6 @@
  */
 
 import { gsap, Physics2DPlugin } from 'gsap/all';
-import tinycolor from 'tinycolor2';
 import Star from './Star';
 import { getCanvasDimensions, getContext } from '../animateBadgeImage';
 
@@ -57,9 +56,11 @@ function getStars () {
     const starCount = 500;
     const canvasDimensions = getCanvasDimensions();
     for (let i = 0; i < starCount; i++) { 
-        const randomColour = tinycolor({ r: gsap.utils.random(0, 255), g: gsap.utils.random(0, 255), b: gsap.utils.random(0, 255) });
-        const randomPastelColour = tinycolor.mix(randomColour.saturate(10), tinycolor('white'), 25); //desaturate a bit and mix in white to make it pastel
-        const star = new Star(Math.random() < 0.5 ? -100 : canvasDimensions.width + 100, gsap.utils.random(-100, canvasDimensions.height + 100), randomPastelColour.toHexString(), gsap.utils.random(30, 50), 0);
+        const star = new Star({
+            x: Math.random() < 0.5 ? -100 : canvasDimensions.width + 100,  //either the left or right edge
+            y: gsap.utils.random(-100, canvasDimensions.height + 100), //scatter across vertically
+            radius: gsap.utils.random(30, 50),
+        });
         stars.push(star);
     }
     return stars;

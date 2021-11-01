@@ -4,7 +4,6 @@
  */
 
 import { gsap, Physics2DPlugin } from 'gsap/all';
-import tinycolor from 'tinycolor2';
 import Star from './Star';
 import { getCanvasDimensions, getContext } from '../animateBadgeImage';
 
@@ -57,8 +56,11 @@ function getStars () {
     const starCount = 600;
     const canvasDimensions = getCanvasDimensions();
     for (let i = 0; i < starCount; i++) { 
-        const randomBrightColour = tinycolor({ h: gsap.utils.random(0, 255), s: 100, l: 50 });
-        const star = new Star(canvasDimensions.width / 2, canvasDimensions.height / 2, randomBrightColour.toHexString(), gsap.utils.random(5, 50), 0);
+        const star = new Star({
+            x: canvasDimensions.width / 2, 
+            y: canvasDimensions.height / 2, 
+            radius: gsap.utils.random(5, 50),
+        });
         stars.push(star);
     }
     return stars;
