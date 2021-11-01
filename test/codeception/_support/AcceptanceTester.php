@@ -1,5 +1,6 @@
 <?php
 
+use Codeception\Actor;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Codeception\Module;
 
@@ -18,7 +19,7 @@ use Codeception\Module;
  *
  * @SuppressWarnings(PHPMD)
  */
-class AcceptanceTester extends \Codeception\Actor
+class AcceptanceTester extends Actor
 {
     use _generated\AcceptanceTesterActions;
     use \Codeception\Lib\Actor\Shared\Friend;
@@ -26,16 +27,12 @@ class AcceptanceTester extends \Codeception\Actor
     /**
      * Define custom actions here
      */
-
-
-    public static $loginURL = '/login';
-    public static $logoutURL = '/logout';
-
-    public static $usernameField = '#username';
-    public static $passwordField = '#password';
-    public static $rememberMe = '#rememberme';
-    public static $loginButton = 'input[type=submit]';
-
+    public static string $loginURL  = '/login';
+    public static string $logoutURL = '/logout';
+    public static string $usernameField = '#username';
+    public static string $passwordField = '#password';
+    public static string $rememberMe  = '#rememberme';
+    public static string $loginButton = 'input[type=submit]';
     /**
      * Log out of Schoolbox
      */
@@ -44,7 +41,6 @@ class AcceptanceTester extends \Codeception\Actor
         $i = $this;
         $i->amOnPage(self::$logoutURL);
     }
-
     /**
      * Login as Alaress
      */
@@ -52,7 +48,6 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $this->login('alaress', 'alaress');
     }
-
     /**
      * Login to Schoolbox
      *
@@ -79,7 +74,6 @@ class AcceptanceTester extends \Codeception\Actor
 
         $i->saveSessionSnapshot($snapshotName);
     }
-
     /**
      * Impersonate Coles (sales data)
      */
@@ -88,11 +82,14 @@ class AcceptanceTester extends \Codeception\Actor
         $i = $this;
         $i->click('Alaress Admin');
         $i->click('Mr Jack Coles');
+        $i->deleteSessionSnapshot('Mr Jack Coles');
+        $i->deleteSessionSnapshot('login:alaress');
     }
 
     /**
      * Impersonate
      * @param $fullname
+     * @throws Exception
      */
     public function impersonate($fullname)
     {
@@ -103,11 +100,14 @@ class AcceptanceTester extends \Codeception\Actor
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
         $i->waitForText($fullname, 5);
         $i->click($fullname, '#switch-user');
+        $i->deleteSessionSnapshot($fullname);
+        $i->deleteSessionSnapshot('login:alaress');
     }
 
     /**
      * Impersonate
      * @param $fullname
+     * @throws Exception
      */
     public function impersonateAnyUser($fullname)
     {
@@ -118,12 +118,15 @@ class AcceptanceTester extends \Codeception\Actor
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
         $i->waitForText($fullname, 5);
         $i->click($fullname, '#switch-user');
+        $i->deleteSessionSnapshot($fullname);
+        $i->deleteSessionSnapshot('login:alaress');
     }
 
     /**
      * Fill in CKEditor
      * @param $element_id
      * @param $content
+     * @throws Exception
      */
     public function fillCkEditorById($element_id, $content)
     {
@@ -136,7 +139,6 @@ class AcceptanceTester extends \Codeception\Actor
             $content
         );
     }
-
     /**
      * Fill in CKEditor
      * @param $element_name
@@ -151,7 +153,6 @@ class AcceptanceTester extends \Codeception\Actor
             $content
         );
     }
-
     /**
      * Fill in TinyMice editor
      * @param $id
@@ -161,7 +162,6 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $this->fillTinyMceEditor('id', $id, $content);
     }
-
     /**
      * Fill in TinyMice editor
      * @param $name
@@ -171,7 +171,6 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $this->fillTinyMceEditor('name', $name, $content);
     }
-
     /**
      * Fill in TinyMice editor
      * @param $attribute
@@ -187,7 +186,6 @@ class AcceptanceTester extends \Codeception\Actor
             $content
         );
     }
-
     /**
      * Fill in RteEditor
      * @param $selector
@@ -210,20 +208,19 @@ class AcceptanceTester extends \Codeception\Actor
             }
         );
     }
-
     /**
      * Get current url from WebDriver
      * @return mixed
-     * @throws \Codeception\Exception\ModuleException
      */
     public function getCurrentUrl()
     {
         return $this->executeJS("return location.href");
     }
-
+    /**
+     * @throws Exception
+     */
     public function scrollAndClick($selector)
     {
-
         $this->scrollTo($selector);
         $this->waitForElementVisible($selector, 5);
         $this->click($selector);
