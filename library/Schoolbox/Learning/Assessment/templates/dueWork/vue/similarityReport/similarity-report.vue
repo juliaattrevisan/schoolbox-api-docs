@@ -410,9 +410,10 @@ export default {
     }
 }
 
-@media (max-width: $tableToSingleColumn) { //display everything in one column
+@media (max-width: $tableToSingleColumn) { //and then display everything in one column
     .VueTables__row td:not(.VueTables__select-row) {
         display: block;
+        padding: 0.5rem 0;
         width: 100%;
     }
 }
