@@ -4,24 +4,10 @@ import { init as initPopUp } from './animations/popUp';
 import { init as initFlipUp } from './animations/flipUp';
 import { init as initDropDown } from './animations/dropDown';
 import { init as initSwingDown } from './animations/swingDown';
+import { init as initCoinSpin } from './animations/coinSpin';
 
 const CANVAS_SELECTOR = '[data-badge-award-canvas]';
 
-
-/**
- * Coin spin animation
- * 
- * @param { DOMElement }
- * 
- * @returns { Timeline }
- */
-const coinSpin = (badgeImage) => {
-    const coinSpinTL = gsap.timeline( { paused: true, repeat: 0 } ); 
-    coinSpinTL.set(badgeImage, { filter: 'grayscale(100%)', rotationY: 90 } );
-    coinSpinTL.to(badgeImage, { duration: 1.5, rotationY: 360, ease: 'power2.out', delay: 0.5 } );
-    coinSpinTL.to(badgeImage, { duration: 0.4, filter: 'grayscale(0%)' }, '-=0.5' );
-    return coinSpinTL;
-}
 
 /**
  * Spin in animation
@@ -47,7 +33,8 @@ export const animateBadgeImage = (badgeImage) => {
     // const animationList = [initPopUp];
     // const animationList = [initFlipUp];
     // const animationList = [initDropDown];
-    const animationList = [initSwingDown];
+    // const animationList = [initSwingDown];
+    const animationList = [initCoinSpin];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
 }

@@ -59,7 +59,7 @@ function getStars () {
     for (let i = 0; i < starCount; i++) { 
         const randomColour = tinycolor({ r: gsap.utils.random(0, 255), g: gsap.utils.random(0, 255), b: gsap.utils.random(0, 255) });
         const randomPastelColour = tinycolor.mix(randomColour.saturate(10), tinycolor('white'), 25); //desaturate a bit and mix in white to make it pastel
-        const star = new Star(gsap.utils.random(0, canvasDimensions.width), -100, randomPastelColour.toHexString(), gsap.utils.random(40, 60), 0);
+        const star = new Star(gsap.utils.random(0, canvasDimensions.width), -150, randomPastelColour.toHexString(), gsap.utils.random(40, 60), 0);
         stars.push(star);
     }
     return stars;
@@ -85,18 +85,16 @@ function redrawStars (stars) {
  * @param { Star }
  */
 function addStarAnimation (starsTimeline, star) {
-    const canvasDimensions = getCanvasDimensions();
     starsTimeline.to(star, {
         delay: 'random(0, 1)', 
         duration: 'random(1, 2)',
         ease: 'bounce',
         radius: 0,
-        rotation: 'random(0, 180)',
-        x: canvasDimensions.width/2,
+        rotation: 'random(0, 360)',
         physics2D: { //https://greensock.com/docs/v3/Plugins/Physics2DPlugin
-            acceleration: 0,
-            angle: 'random(0, 360)',
-            accelerationAngle: 'random(0, 0.1)',
+            acceleration: 'random(0, 10)',
+            angle: 'random(0, 180)',
+            accelerationAngle: 'random(0, 0.5)',
             friction: 'random(0, 0.1)',
             gravity: 'random(400, 600)',
             velocity: 'random(500, 700)',
