@@ -18,7 +18,9 @@ use DomainException;
  * Sentral uses three pieces to authenticate access to their api:
  *   api host, api tenant, api key
  *
- * But we only support two, so we combine the host and tenant into one string
+ * But we only support two, so we combine the key and tenant into one string
+ * With the $host, ensure it has a trailing slash; sentral hasn't figured out
+ * how to tell you this is required
  *
  * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
  */
@@ -28,7 +30,7 @@ class DSNCodec
     /**
      * DSN format
      */
-    private const DSN_FORMAT = '/host=([A-Za-z0-9\/:\.-]+);tenant=([A-Za-z0-9]+)/';
+    private const DSN_FORMAT = '/key=([A-Za-z0-9]+);tenant=([A-Za-z0-9]+)/';
 
 
     /**
@@ -43,18 +45,11 @@ class DSNCodec
         preg_match(self::DSN_FORMAT, $dsn, $matches);
 
         if (!count($matches)) {
-            throw new DomainException('Sentral DSN: could not decode; check host and tenant format');
-        }
-
-        /* Check trailing slash in the host
-         * Without it you just get Generic Error in a valid payload struct
-         */
-        if ('/' !== substr($matches[1], -1)) {
-            throw new DomainException('Sentral DSN: host does not end with a forward slash /');
+            throw new DomainException('Sentral DSN: could not decode; check key and tenant format');
         }
 
         return [
-            'host' => $matches[1],
+            'key' => $matches[1],
             'tenant' => $matches[2]
         ];
     }
@@ -63,12 +58,12 @@ class DSNCodec
     /**
      * Encode a dsn string
      *
-     * @param string $host
+     * @param string $key
      * @param string $tenant
      * @return string
      */
-    public function encode(string $host, string $tenant): string
+    public function encode(string $key, string $tenant): string
     {
-        return "host={$host};tenant={$tenant}";
+        return "key={$key};tenant={$tenant}";
     }
 }

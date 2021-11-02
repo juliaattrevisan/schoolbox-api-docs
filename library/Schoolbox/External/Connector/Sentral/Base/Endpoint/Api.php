@@ -82,14 +82,14 @@ class Api implements IApi
     /**
      * Constructor
      *
-     * @param string $dsn
-     * @param string $apiKey
+     * @param string $host
+     * @param string $key
      * @throws InvalidArgumentException
      * @throws DomainException
      */
-    public function __construct(string $dsn, string $apiKey)
+    public function __construct(string $host, string $key)
     {
-        $this->client = $this->initClient($dsn, $apiKey, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($host, $key, self::DEFAULT_TIMEOUT);
 
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
@@ -101,29 +101,36 @@ class Api implements IApi
     /**
      * Set up guzzle client
      *
-     * @param string $dsn
+     * @param string $host
      * @param string $key
      * @param int    $timeout
      * @return Client
      * @throws InvalidArgumentException
      * @throws DomainException
      */
-    private function initClient(string $dsn, string $key, int $timeout): Client
+    private function initClient(string $host, string $key, int $timeout): Client
     {
-        $credentials = (new DSNCodec())->decode($dsn);
 
         /* Remember the actual host value
+         *
+         * Check trailing slash in the host
+         * Without it, you just get Generic Error in a valid payload struct
+         * This enforces a trailing slash so your host is always in the right format
          */
-        $this->host = $credentials['host'];
+        $this->host = rtrim($host, '/') . '/';
+
+        /* Dig out the key and tenant values
+         */
+        $credentials = (new DSNCodec())->decode($key);
 
         $headers = array_combine(
             ['X-API-KEY', 'X-API-TENANT', 'X-API-OPTIONS'],
-            [$key, $credentials['tenant'], 'map-include,inline-include']
+            [$credentials['key'], $credentials['tenant'], 'map-include,inline-include']
         );
 
         return new Client([
             'headers' => $headers,
-            'base_uri' => $credentials['host'],
+            'base_uri' => $this->host,
             'timeout' => $timeout,
             'http_errors' => false,
         ]);

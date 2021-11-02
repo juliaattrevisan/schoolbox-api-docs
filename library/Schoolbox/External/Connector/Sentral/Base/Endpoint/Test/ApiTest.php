@@ -32,7 +32,7 @@ class ApiTest extends TestCase
      * @param array  $expected
      * @throws DomainException
      */
-    public function testValidDSNDecode(string $dsn, $expected): void
+    public function testValidDSNDecode(string $dsn, array $expected): void
     {
         $codec = new DSNCodec();
 
@@ -49,16 +49,9 @@ class ApiTest extends TestCase
     {
         return [
             'Valid DSN 1' => [
-                'host=http://schoolbox.sentral.school/restapi/v1/;tenant=ABC12345abc',
+                'key=qwrSDFh823468;tenant=ABC12345abc',
                 [
-                    'host' => 'http://schoolbox.sentral.school/restapi/v1/',
-                    'tenant' => 'ABC12345abc'
-                ]
-            ],
-            'Valid DSN 2' => [
-                'host=http://school-box.sentral.school/restapi/v1/;tenant=ABC12345abc',
-                [
-                    'host' => 'http://school-box.sentral.school/restapi/v1/',
+                    'key' => 'qwrSDFh823468',
                     'tenant' => 'ABC12345abc'
                 ]
             ],
@@ -95,19 +88,19 @@ class ApiTest extends TestCase
                 '',
             ],
             'Invalid DSN 2' => [
-                'host=',
+                'key=',
             ],
             'Invalid DSN 3' => [
-                'host=;',
+                'key=;',
             ],
             'Invalid DSN 4' => [
-                'host=;tenant',
+                'key=;tenant',
             ],
             'Invalid DSN 5' => [
-                'host=;tenant=;',
+                'key=;tenant=;',
             ],
             'Invalid DSN 6' => [
-                'host=tenant=',
+                'key=tenant=',
             ],
             'Invalid DSN 7' => [
                 ';',
@@ -116,27 +109,19 @@ class ApiTest extends TestCase
                 '    ',
             ],
             'Invalid DSN 9' => [
-                '   host=;tenant=',
+                '   key=;tenant=',
             ],
             'Invalid DSN 10' => [
-                'host=;tenant=     ',
+                'key=;tenant=     ',
             ],
             'Invalid DSN 11' => [
-                'host=http://!;tenant=abc123',
+                'key=haaaaa!;tenant=abc123',
             ],
             'Invalid DSN 12' => [
-                'host=http://schoolbox.sentral.school;tenant=!#4acb',
+                'key=aaaaa;tenant=!#4acb',
             ],
             'Invalid DSN 13' => [
-                'host=http:// ;tenant=ab c123',
-            ],
-
-            /* Interestingly the host must end with a trailing slash
-             * Otherwise sentral tells you "Generic error - Unknown error"
-             * which is so extremely unhelpful
-             */
-            'Invalid DSN 14' => [
-                'host=http://schoolbox.sentral.school/restapi/v1',
+                'key=aaaaaa ;tenant=ab c123',
             ],
         ];
     }
