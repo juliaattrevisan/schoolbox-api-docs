@@ -196,8 +196,22 @@ HELP;
         $manifest = $this->getManifest();
 
         /* A set of reporting info
+         * Add some headings
          */
-        $strategic = [];
+        $strategic = [
+            $this->renderTableName($white, 'Table Name', 'Table Collation')
+        ];
+
+        $strategic[] =
+            str_pad('', 120, '-') .
+            "\n" .
+            $this->renderColumn($white, 'Column Name') .
+            $this->renderCell($grey, 'Collation') .
+            $this->renderCell($grey, 'Charset') .
+            $this->renderCell($grey, 'Data Type') .
+            "\n" .
+            str_pad('', 120, '-') .
+            "\n";
 
         /* A set of sql statements which execute changes on tables and columns
          */
