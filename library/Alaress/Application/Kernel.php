@@ -107,6 +107,7 @@ use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\RepositoryFactory as RegistrationRepositoryFactory;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
@@ -1583,11 +1584,20 @@ abstract class Kernel
             })
         );
         $di->set(
+            'lti.userCodec',
+            $di->lazyNew(
+                UserCodec::class,
+                [
+                    'userMapper' => $mapperFactory->getLazy(UserMapper::class),
+                ]
+            )
+        );
+        $di->set(
             'lti.userAuthenticator',
             $di->lazyNew(
                 UserAuthenticator::class,
                 [
-                    'userMapper' => $mapperFactory->getLazy(UserMapper::class),
+                    'userCodec' => $di->lazyGet('lti.userCodec'),
                 ]
             )
         );
