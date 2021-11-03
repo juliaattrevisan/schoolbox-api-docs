@@ -160,4 +160,7 @@ ALTER TABLE `user_assume_log`
 ALTER TABLE `lu_timetable_colour`
 CHANGE COLUMN `hex_colour` `hex_colour` VARCHAR(8) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
 
+ALTER TABLE `user_activity_log`
+CHANGE COLUMN `ip` `ip` VARCHAR(15) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
+
 SET foreign_key_checks = 1;
