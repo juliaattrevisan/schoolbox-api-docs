@@ -210,9 +210,13 @@ class Module extends BaseModule
         // LTI assessment score publish service
         // Permissions are handled within the controller action: they rely upon
         // the scope assigned to a JWT.
+        // See https://www.imsglobal.org/spec/lti-ags/v2p0/#service-endpoint:
+        // the score publish endpoint MUST match the line item endpoint, with
+        // the path appended with "/scores".
+        // (We don't actually expose the line item endpoint yet)
         $this->register(
             self::METHOD_POST,
-            "$assRoute/lti/score",
+            "$assRoute/lti/scores",
             'postScorePublish',
             null,
             $preloadAssessment,

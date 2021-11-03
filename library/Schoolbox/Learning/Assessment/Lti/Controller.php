@@ -473,7 +473,7 @@ class Controller extends Assessment\Controller
     /**
      * Score publish endpoint.
      *
-     * @api   POST /learning/assessments/:assessmentId/lti/score
+     * @api   POST /learning/assessments/:assessmentId/lti/scores
      * @since 21.1.0
      *
      * @param Model $assessment
