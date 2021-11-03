@@ -5,11 +5,11 @@
  # or modify the assessment details itself. It's since expanded to also become available for students when they
  # can showcase assessments to their eportfolio.
  #
- # @param string $viewRoute              the route to the Status screen, for instructors
- # @param string $modifyRoute            the route to the Modify Assessment screen, for instructors
- # @param string $similarityReportRoute  the route to the Similarity Report for this Due Work
- # @param bool   $canShowcase            a boolean for students' ability to Showcase to their eportfolio
- # @param bool   $isShowcased            whether this assessment is already showcased on a user's eportfolio
+ # @param string        $viewRoute              the route to the Status screen, for instructors
+ # @param string        $modifyRoute            the route to the Modify Assessment screen, for instructors
+ # @param string|null   $similarityReportRoute  (optional) the route to the Similarity Report for this Due Work
+ # @param bool          $canShowcase            a boolean for students' ability to Showcase to their eportfolio
+ # @param bool          $isShowcased            whether this assessment is already showcased on a user's eportfolio
  #}
 {% if viewRoute or modifyRoute or similarityReportRoute or (canShowcase is defined and canShowcase) %}
     <nav>
