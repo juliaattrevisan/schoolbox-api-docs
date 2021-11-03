@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\LineItem;
 
 use BadMethodCallException;
+use Laminas\Uri\Uri;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItem;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemInterface;
@@ -45,11 +46,14 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function find(string $lineItemIdentifier): ?LineItemInterface
     {
-        if ($lineItemIdentifier === (string)$this->ltiAssessment->getId()) {
+        // Line item identifier: the request URI, minus /scores
+        // For now, just extract an ID out of it and don't care about the rest
+        $url = new Uri($lineItemIdentifier);
+        if ($url->getPath() === sprintf('/learning/assessments/%d/lti', $this->ltiAssessment->getId())) {
             return new LineItem(
-                $this->ltiAssessment->getLineItemScoreMaximum(),
+                $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
                 $this->ltiAssessment->getTitle(),
-                (string)$this->ltiAssessment->getId(),
+                $url->getPath(),
             );
         }
         return null;
