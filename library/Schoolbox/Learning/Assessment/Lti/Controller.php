@@ -484,22 +484,20 @@ class Controller extends Assessment\Controller
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-ags/doc/score/platform/
         $request = (new ServerRequestFactory())->build($this->request);
 
+        // Line item repository: consists only of a single assessment
         $lineItemRepository = new SingleAssessmentRepository($assessment);
 
+        // Score repository: consists only of a single assessment, and its scores
         $scoreRepository = new SingleAssessmentScoreRepository($assessment, $this->ltiAssessmentScoreMapper);
 
-        // Validate the scope
+        // Access token sanity checker: validates the request token was created by a tool
         $validator = new RequestAccessTokenValidator($this->registrations);
 
-        $handler = new ScoreServiceServerRequestHandler(
-            $lineItemRepository,
-            $scoreRepository,
-        );
+        // Handle the request: this validates the request body
+        $handler = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
 
+        // Serve the request
         $server = new LtiServiceServer($validator, $handler);
-
-        $response = $server->handle($request);
-        $response->getBody()->rewind();
-        $this->response->content->set($this->buildJsonOutput(json_decode($response->getBody()->getContents())));
+        $this->populateResponseFromPsr7Response($server->handle($request));
     }
 }

@@ -204,10 +204,9 @@ class Controller extends Base
     public function getOauthAccessTokenRequest(): void
     {
         // Access token repo: backs onto a mapper
-        // TODO this probably needs to be injected
-        // TODO how do I determine if this access token is creatable?
+        // TODO inject this
         $clientRepository = new ClientRepository($this->registrations);
-        $factory = new AuthorizationServerFactory(
+        $factory          = new AuthorizationServerFactory(
             $clientRepository,
             new AccessTokenRepository(
                 new ItemPool(
@@ -215,7 +214,7 @@ class Controller extends Base
                     $clientRepository,
                 )
             ),
-            // TODO figure out which scopes are supported
+            // So far, Schoolbox supports only the Score service.
             new ScopeRepository([
                 new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
             ]),
@@ -223,6 +222,7 @@ class Controller extends Base
             'B'
         );
 
+        // Build the access token response
         $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
         $response  = $generator->generate(
             (new ServerRequestFactory())->build($this->request),
@@ -230,10 +230,8 @@ class Controller extends Base
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
 
-        // Now do something with the response
-        // TODO add convert PSR to Aura response method
-        $response->getBody()->rewind();
-        $this->response->content->set($this->buildJsonOutput(json_decode($response->getBody()->getContents())));
+        // Convert that response into something Aura understands, and output it
+        $this->populateResponseFromPsr7Response($response);
     }
 
     /**
