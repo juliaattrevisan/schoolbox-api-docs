@@ -19,6 +19,9 @@ use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
+/**
+ * A score repository for a single LTI assessment.
+ */
 class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
 {
     /**
@@ -37,20 +40,28 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
     private LtiScoreMapper $ltiScoreMapper;
 
     /**
+     * User mapper, for retrieving the student to score.
+     */
+    private UserMapper $userMapper;
+
+    /**
      * Constructor
      *
      * @param LtiAssessment       $model
      * @param LtiAssessmentMapper $ltiAssessmentMapper
      * @param LtiScoreMapper      $scoreMapper
+     * @param UserMapper          $userMapper
      */
     public function __construct(
         LtiAssessment $model,
         LtiAssessmentMapper $ltiAssessmentMapper,
-        LtiScoreMapper $scoreMapper
+        LtiScoreMapper $scoreMapper,
+        UserMapper $userMapper
     ) {
-        $this->ltiAssessment  = $model;
+        $this->ltiAssessment       = $model;
         $this->ltiAssessmentMapper = $ltiAssessmentMapper;
-        $this->ltiScoreMapper = $scoreMapper;
+        $this->ltiScoreMapper      = $scoreMapper;
+        $this->userMapper          = $userMapper;
     }
 
     /**
@@ -75,7 +86,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
             ->setMarkingUser(null);
 
         // Student: check if they exist and are actually a participant
-        $student = UserMapper::getInstance()->findByUsername($score->getUserIdentifier());
+        $student = $this->userMapper->findByUsername($score->getUserIdentifier());
         if (!$student) {
             throw new OutOfBoundsException(sprintf('No user with username "%s" exists', $score->getUserIdentifier()));
         }

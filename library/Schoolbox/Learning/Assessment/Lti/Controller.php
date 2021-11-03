@@ -510,6 +510,7 @@ class Controller extends Assessment\Controller
             $assessment,
             $this->ltiAssessmentMapper,
             $this->ltiAssessmentScoreMapper,
+            $this->getUserMapper(),
         );
 
         // Access token sanity checker: validates the request token was created by a tool
