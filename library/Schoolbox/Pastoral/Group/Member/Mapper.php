@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\Group\Member;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Group;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -39,14 +40,18 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
+        $userMapper = $this->getJoinMapper('user');
+        $roleMapper = $userMapper->getJoinMapper('role');
         return
             "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('user', 'u')},
+                        {$roleMapper->getColumnString( 'r')},
                         {$this->getJoinColumnString('author', 'a')},
                         {$this->getJoinColumnString('group', 'g')}
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('user', '', 'u')}
+            INNER JOIN  {$userMapper->getJoinSql('role', 'u', 'r')}
             INNER JOIN  {$this->getJoinSql('author', '', 'a', true)}
             INNER JOIN  {$this->getJoinSql('group', '', 'g', true)}
         ";
@@ -60,12 +65,17 @@ class Mapper extends BaseMapper
         // Return pastoral records fully hydrated by default
 
         $collection = $this->createCollection();
+        $userMapper = $this->getJoinMapper('user');
+        $roleMapper = $userMapper->getJoinMapper('role');
 
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
 
             /** @var User $user */
             $user = $this->hydrateJoin($row, 'user', 'u');
+            /** @var Role $role */
+            $role = $roleMapper->hydrate($row, 'r');
+            $user->setRole($role);
             $model->setUser($user);
 
             /** @var User $author */

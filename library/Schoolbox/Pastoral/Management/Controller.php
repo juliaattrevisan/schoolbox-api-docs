@@ -60,9 +60,6 @@ class Controller extends Base
     {
 
         $groups = $this->pastoralGroupMapper->findAll();
-        // hydrate role permission
-        $this->roleMapper->findByColumn('group_type', Role::STAFF);
-
         $groups->sortByCallback(
             function (PastoralGroup $a, PastoralGroup $b) {
                 return strnatcasecmp($a->getName(), $b->getName());
@@ -88,8 +85,13 @@ class Controller extends Base
      */
     public function getGroupsModify(PastoralGroup $group): void
     {
-        // Hydrate roles - using filterBy, to hydrate roles without access_pastoral as well
-        $roles = $this->roleMapper->findByColumn('group_type', Role::STAFF)->filterBy('accessPastoral', true);
+        // Find staff roles with pastoral permission
+        $roles = $this->roleMapper->findByColumnList(
+            [
+                'group_type'      => Role::STAFF,
+                'access_pastoral' => true,
+            ]
+        );
 
         $this->getResponse()->content->set(
             [
