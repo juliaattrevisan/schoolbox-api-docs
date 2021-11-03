@@ -89,9 +89,9 @@
         {# This HTML is duplicated inside the `searchModal.twig` file for the purposes of adding new rows dynamically #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        <section id="membersListContainer" {% if group.members | length == 0 %}class="hide"{% endif %}>
+        <section id="membersListContainer" {% if group.membersWithPermission | length == 0 %}class="hide"{% endif %}>
             <ul id="membersList" class="information-list">
-                {% for member in group.members %}
+                {% for member in group.membersWithPermission %}
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
@@ -121,7 +121,7 @@
         {# Empty state when there are no members in the group #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        <div id="membersEmpty" class="empty-state {% if group.members | length %}hide{% endif %}">
+        <div id="membersEmpty" class="empty-state {% if group.membersWithPermission | length %}hide{% endif %}">
             <i class="icon-group"></i>
             <p>There are no users currently in this group.</p>
             <p>Do you want to <a href="#" data-user-search="{{ guid }}">add a user to this group</a>?</p>
@@ -333,4 +333,4 @@
 {# Setup modal #}
 {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-{{ userSearch.modal(guid, 'Add User To Group', 'Enter name', 'staff', null, 'window.modalUserAdded', 'window.modalUsersExisting') }}
+{{ userSearch.modal(guid, 'Add User To Group', 'Enter name', 'staff', null, 'window.modalUserAdded', 'window.modalUsersExisting', roles) }}

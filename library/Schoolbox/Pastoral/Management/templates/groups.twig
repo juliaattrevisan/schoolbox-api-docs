@@ -41,8 +41,8 @@
                                     <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}">
                                         <h3>
                                             {{ group.name }}
-                                            {% if group.members | length %}
-                                                ({{ group.members | length }} Member{% if group.members | length %}s{% endif %})
+                                            {% if group.membersWithPermission | length %}
+                                                ({{ group.membersWithPermission | length }} Member{% if group.members | length %}s{% endif %})
                                             {% endif %}
                                         </h3>
                                     </a>

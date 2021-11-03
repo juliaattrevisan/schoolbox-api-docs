@@ -14,6 +14,7 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use InvalidArgumentException;
@@ -55,7 +56,7 @@ class Module extends BaseModule
     {
         $mappers = [
             'userMapper'                => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'pastoralAccessMapper'      => $this->getMapperFactory()->getLazy(Pastoral\Access\Mapper::class),
+            'roleMapper'                => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'pastoralGroupMapper'       => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
             'pastoralGroupMemberMapper' => $this->getMapperFactory()->getLazy(Pastoral\Group\Member\Mapper::class),
         ];

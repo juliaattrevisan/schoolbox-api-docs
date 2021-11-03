@@ -173,7 +173,7 @@ class Notifier extends AbstractModuleNotifier
             try {
                 if ($pastoralAccess->getRole() instanceof Role) {
                     // The system should only notify staff if they are a teacher of the student
-                    if ($pastoralAccess->getRole()->isStaff()) {
+                    if ($pastoralAccess->getRole()->isStaff() && $pastoralAccess->getRole()->getAccessPastoral()) {
                         $student->loadTeachers();
                         $teachers = $student->getTeacherCollection();
                         /** @var User $teacher */
@@ -197,7 +197,7 @@ class Notifier extends AbstractModuleNotifier
                     $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralAccess->getGroup()->getId());
 
                     /** @var PastoralGroupMember $member */
-                    foreach ($pastoralGroup->getMembers() as $member) {
+                    foreach ($pastoralGroup->getMembersWithPermission() as $member) {
                         // Only staff should be in pastoral groups
                         $user = $this->userMapper->findById($member->getUser()->getId());
                         if ($user->getRole()->isStaff()) {
@@ -209,7 +209,10 @@ class Notifier extends AbstractModuleNotifier
                     // user is not hydrated
                     $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
                     // Only send to parents if parent access is enabled
-                    if ($user->getRole()->isStaff() || ($user->getRole()->isParent() && $parentAccessEnabled)) {
+                    if (
+                        ($user->getRole()->isStaff() && $user->getRole()->getAccessPastoral())
+                        || ($user->getRole()->isParent() && $parentAccessEnabled)
+                    ) {
                         $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
                     }
                 }
