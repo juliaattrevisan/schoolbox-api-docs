@@ -96,8 +96,8 @@ function addStarAnimation (starsTimeline, star) {
             angle: 'random(180, 360)',
             accelerationAngle: 'random(0, 40)',
             friction: 'random(0, 0.3)',
-            gravity: 'random(100, 400)',
-            velocity: 'random(600, 850)',
+            gravity: 'random(50, 400)',
+            velocity: 'random(600, 1000)',
         },
     }, 0 //0 so there's no delay between the animations, otherwise each star would only animate after the previous is complete
     );

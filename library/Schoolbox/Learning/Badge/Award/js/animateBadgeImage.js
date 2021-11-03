@@ -15,14 +15,8 @@ const CANVAS_SELECTOR = '[data-badge-award-canvas]';
  * @param { DOMElement }
  */
 export const animateBadgeImage = (badgeImage) => {
-    const animationList = [initPopUp];
-    // const animationList = [initFlipUp];
-    // const animationList = [initDropDown];
-    // const animationList = [initSwingDown];
-    // const animationList = [initCoinSpin];
-    // const animationList = [initSpinIn];
     clearCanvas();
-    // const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
+    const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
 }
@@ -61,11 +55,13 @@ export function getContext () {
 }
 
 /**
- * Will be decreased on smaller screens, as there's not as 
- * much space to show them
+ * Will be decreased on smaller screens, as there's not as much space to show them.
+ * This gives us about 600 at max width (972px) and decreases as we get down to around 168 at (272px),
+ * which is an iPhone 5, a pretty small screen. 
  *  
  * @return { Number }
  */
  export function getStarCount () {
-    return 600;
+    const currentCanvasDimensions = getCanvasDimensions();
+    return Math.round(currentCanvasDimensions.width * 0.62); 
 }

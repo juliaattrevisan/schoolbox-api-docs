@@ -28,8 +28,8 @@ export async function init (badgeImage) {
 function animateBadge (badgeImage) {
     const spinInTL = gsap.timeline( { repeat: 0 } ); 
     spinInTL.set(badgeImage, { opacity: 0, scale: 3, rotation: 720, transformOrigin: '50% 50%', filter: 'grayscale(100%)' } );
-    spinInTL.to(badgeImage, { duration: 1, opacity: 1, scale: 1, rotation: 0, scale: 1, delay: 0.5 } );
-    spinInTL.to(badgeImage, { duration: 0.2, filter: 'grayscale(0%)' }, '-=0.2' );
+    spinInTL.to(badgeImage, { duration: 1.3, opacity: 1, rotation: 0, scale: 1, delay: 0.5 } );
+    spinInTL.to(badgeImage, { duration: 1, filter: 'grayscale(0%)' }, '-=0.2' );
 }
 
 /**
