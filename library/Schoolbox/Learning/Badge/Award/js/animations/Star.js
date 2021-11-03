@@ -49,9 +49,11 @@ export default class Star {
         context.beginPath();
         //5 point star from: https://stackoverflow.com/questions/14580033/algorithm-for-drawing-a-5-point-star
         const alpha = (2 * Math.PI) / 10; //the angle of rotation to draw the line
+        let rotation;
+        let omega;
         for (var i = 11; i != 0; i--) { //there's 11 points to the star, so we draw 11 lines
-            const rotation = this.radius * (i % 2 + 1)/2;
-            const omega = alpha * i;
+            rotation = this.radius * (i % 2 + 1)/2;
+            omega = alpha * i;
             context.lineTo((rotation * Math.sin(omega)) + this.x, (rotation * Math.cos(omega)) + this.y);
         }
         context.closePath();    
