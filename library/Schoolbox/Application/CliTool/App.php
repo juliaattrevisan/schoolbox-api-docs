@@ -43,6 +43,7 @@ abstract class App
     protected const COLOUR_GREEN = "\033[0;32m";
     protected const COLOUR_RED = "\033[0;31m";
     protected const COLOUR_GREY = "\033[0;37m";
+    protected const COLOUR_DARK_GREY = "\033[0;30m";
     protected const COLOUR_YELLOW = "\033[0;33m";
     protected const COLOUR_WHITE = "\033[0m";
 
