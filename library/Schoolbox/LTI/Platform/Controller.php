@@ -38,6 +38,7 @@ use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Url\Factory;
 
 /**
@@ -71,6 +72,11 @@ class Controller extends Base
     private AccessTokenMapper $accessTokenMapper;
 
     /**
+     * User codec, used to encode a user into a login hint.
+     */
+    private UserCodec $userCodec;
+
+    /**
      * Constructor
      *
      * @param KeyChainRepositoryInterface     $keyChains
@@ -78,19 +84,22 @@ class Controller extends Base
      * @param UserAuthenticatorInterface      $userAuthenticator
      * @param Instance                        $instance
      * @param AccessTokenMapper               $accessTokenMapper
+     * @param UserCodec                       $userCodec
      */
     public function __construct(
         KeyChainRepositoryInterface $keyChains,
         RegistrationRepositoryInterface $registrations,
         UserAuthenticatorInterface $userAuthenticator,
         Instance $instance,
-        AccessTokenMapper $accessTokenMapper
+        AccessTokenMapper $accessTokenMapper,
+        UserCodec $userCodec
     ) {
         $this->keyChains         = $keyChains;
         $this->registrations     = $registrations;
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
         $this->accessTokenMapper = $accessTokenMapper;
+        $this->userCodec         = $userCodec;
     }
 
     /**
@@ -141,7 +150,7 @@ class Controller extends Base
         $message = $builder->buildDeepLinkingLaunchRequest(
             $deepLinkingSettings,
             $repository,
-            $this->getUser()->getUsername(),
+            $this->userCodec->encode($this->getUser()),
             null,
             null,
             [$role],

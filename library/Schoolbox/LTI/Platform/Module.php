@@ -91,6 +91,7 @@ class Module extends BaseModule
                     'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
                     'instance'          => $injector->lazyGet('instance'),
                     'accessTokenMapper' => $this->getMapperFactory()->getLazy(AccessTokenMapper::class),
+                    'userCodec'         => $injector->lazyGet('lti.userCodec'),
                 ]
             )
         );
