@@ -21,7 +21,7 @@ export async function init (badgeImage) {
 }
 
 /**
- * Pop up the badge from the center, with a bit of elastic 'bounce'
+ * Animate the badge
  * 
  * @param { DOMElement }
  */
@@ -33,14 +33,14 @@ function animateBadge (badgeImage) {
 }
 
 /**
- * Get all the stars, add an anmation for each, and ensure the Canvas is redrawn on each update
+ * Get all the stars, add an animation to the gsap.timeline for each and ensure the Canvas is redrawn on each update.
  */
 function animateStars () {
     const stars = getStars(); 
     const context = getContext();
     const canvasDimensions = getCanvasDimensions(); 
     const starsTimeline = gsap.timeline( { //https://greensock.com/docs/v3/GSAP/gsap.timeline()
-        delay: 0.48, //wait prior to animating the stars to link when the pop up has 'hit' the screen
+        delay: 0.48, //wait prior to animating the stars ot best sync to the badge animation
         repeat: 0, 
         onUpdate: () => redrawStars(stars, context, canvasDimensions), //to draw the new position of the stars each tick
     } ); 
@@ -48,8 +48,8 @@ function animateStars () {
 }
 
 /**
- * Set up an array of Stars with random bright colours
- * Put them in the middle bottom of the canvas, ready to animate out from the middle bottom
+ * Set up an array of Stars
+ * Put them in the horizontal middle, but near the bottom, so they 'explode' linked to the flip up animation
  * 
  * @return { Array }
  */
