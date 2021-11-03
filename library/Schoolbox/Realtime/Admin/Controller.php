@@ -303,9 +303,29 @@ class Controller extends BaseController
         // Find the existing app, if one was passed
         $id = trim($post->get('id', null));
         if ($id) {
-            $serviceModel = $serviceMapper->findById($id);
+            //check id, if exists use that record (update), else find if it was deleted, or create new
+            try {
+                $serviceModel = $serviceMapper->findById($id);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $serviceModel = $serviceMapper->createModel();
+            }
         } else {
-            $serviceModel = $serviceMapper->createModel();
+            /**
+             * Check for previously deleted object with the same app_identifier, this is supposed to be unique
+             * if it is exists, throw error. as the DB will throw its own errors if there are dupes
+             */
+            try {
+                $serviceMapper->findOneByColumn('app_identifier', $appId);
+                //search including deleted, and other providers, the app_identifier is a unique column in the db.
+
+                $this->sendError("This App Identifier already exists. Please use a unique 'App Identifier'");
+                return;
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                $this->sendError("This Provider has previously been deleted");
+                return;
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $serviceModel = $serviceMapper->createModel();
+            }
         }
         $serviceMapper->save(
             $serviceModel
