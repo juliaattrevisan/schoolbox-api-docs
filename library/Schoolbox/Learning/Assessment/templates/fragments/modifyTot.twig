@@ -11,7 +11,7 @@
  # @param bool          $canShowcase            a boolean for students' ability to Showcase to their eportfolio
  # @param bool          $isShowcased            whether this assessment is already showcased on a user's eportfolio
  #}
-{% if viewRoute or modifyRoute or similarityReportRoute or (canShowcase is defined and canShowcase) %}
+{% if viewRoute or modifyRoute or (similarityReportRoute is defined and similarityReportRoute) or (canShowcase is defined and canShowcase) %}
     <nav>
         <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
