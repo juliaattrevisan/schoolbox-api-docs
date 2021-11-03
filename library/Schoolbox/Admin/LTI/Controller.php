@@ -10,12 +10,17 @@
 
 namespace Schoolbox\Admin\LTI;
 
-use Alaress\Web\Controller\Base;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Alaress\Web\Controller\ConfigController;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
-class Controller extends Base
+class Controller extends ConfigController
 {
     /**
      * Provider mapper, for fetching and saving LTI providers.
@@ -24,10 +29,17 @@ class Controller extends Base
 
     /**
      * Controller constructor.
-     * @param ProviderMapper $providerMapper
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param ProviderMapper       $providerMapper
      */
-    public function __construct(ProviderMapper $providerMapper)
-    {
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        ProviderMapper $providerMapper
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory);
+
         $this->providerMapper = $providerMapper;
     }
 
@@ -38,53 +50,72 @@ class Controller extends Base
     {
         // Render this thing out
 
-        $this->getResponse()->content->set([
-            'template' => '@adminLti/modify.twig',
-            'data'     => [
-                'pageCurrent' => $this->router->generate('adminLti.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
-            ],
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'template' => '@adminLti/modify.twig',
+                'data'     => [
+                    'pageCurrent'    => $this->router->generate('adminLti.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
+                ],
+            ]
+        );
     }
 
     /**
-     *
+     * LMS > LTI Providers page
+     * @throws RouteNotFound
      */
-    public function getIndex()
+    public function getIndex(): void
     {
-        // Render this thing out
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate(),
+            $this->router->generate('adminLti.postConfig')
+        );
 
-        $this->getResponse()->content->set([
-            'template' => '@adminLti/index.twig',
-            'data'     => [
-                'pageCurrent' => $this->router->generate('adminLti.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
-                'providers' => $this->providerMapper->findAll(),
-                'providerLtiVersion11' => Provider::LTI_VERSION_1_1,
-                'providerLtiVersion13' => Provider::LTI_VERSION_1_3,
-            ],
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'template' => '@adminLti/index.twig',
+                'data'     => [
+                    'pageCurrent'          => $this->router->generate('adminLti.getIndex'),
+                    'allBreadcrumbs'       => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
+                    'providers'            => $this->providerMapper->findAll(),
+                    'providerLtiVersion11' => Provider::LTI_VERSION_1_1,
+                    'providerLtiVersion13' => Provider::LTI_VERSION_1_3,
+                    'configContext'        => $configContext,
+                ],
+            ]
+        );
     }
 
     /**
      * Modify an existing LTI provider
      *
      * @param Provider $provider
+     * @throws RouteNotFound
      */
-    public function getModify($provider)
+    public function getModify(Provider $provider): void
     {
         // Render this thing out
-        $this->getResponse()->content->set([
-            'template' => '@adminLti/modify.twig',
-            'data'     => [
-                'pageCurrent' => $this->router->generate('adminLti.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
-                'provider' => $provider
-            ],
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'template' => '@adminLti/modify.twig',
+                'data'     => [
+                    'pageCurrent'    => $this->router->generate('adminLti.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
+                    'provider'       => $provider,
+                ],
+            ]
+        );
     }
 
-    public function postDelete($provider)
+    /**
+     * Delete an existing LTI provider
+     *
+     * @param Provider $provider
+     * @throws RouteNotFound
+     * @throws MapperException
+     */
+    public function postDelete(Provider $provider): void
     {
         if (!empty($provider)) {
             $this->providerMapper->delete($provider);
@@ -93,7 +124,13 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLti.getIndex'));
     }
 
-    public function postModify()
+    /**
+     * Update an existing LTI provider
+     *
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function postModify(): void
     {
         $post = $this->request->post;
 
@@ -166,5 +203,27 @@ class Controller extends Base
         $this->providerMapper->save($provider);
 
         $this->response->redirect->afterPost($this->router->generate('adminLti.getIndex'));
+    }
+
+    /**
+     * Save settings
+     *
+     * @throws RouteNotFound
+     * @throws MapperException
+     */
+    public function postConfig(): void
+    {
+        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        $this->response->redirect->afterPost($this->router->generate('adminLti.getIndex'));
+    }
+
+    /**
+     * Returns a predicate builder for finding all custom config for this module
+     *
+     * @return PredicateBuilder
+     */
+    private function buildConfigPredicate(): PredicateBuilder
+    {
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_LTI);
     }
 }

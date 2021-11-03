@@ -76,11 +76,13 @@ Usage:
                    title="Create a new Quiz"
                    class="button icon-quiz"
                 >New Quiz</a></li>
+            {% if config.lti_assessments_enable %}
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=lti&returnUrl={{ encodedReturnUrl }}"
                    title="Create a new LTI assessment"
                    class="button icon-lti"
                 >New LTI assessment</a></li>
+            {% endif %}
         </ul>
     </div>
 </li>
