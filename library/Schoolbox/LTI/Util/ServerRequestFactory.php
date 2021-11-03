@@ -21,17 +21,42 @@ class ServerRequestFactory
     /**
      * Build the server request.
      *
+     * Currently, this includes the following from the Aura request:
+     * * Method
+     * * URL
+     * * server vars ($_SERVER)
+     * * query params ($_GET)
+     * * cookies
+     * * headers
+     * * body ($_POST)
+     *
+     * TODO add files from Aura request to PSR-7 request
+     * TODO add raw body from Aura request to PSR-7 request
+     *
      * @param Request $request
      * @return ServerRequestInterface
      * @noinspection PhpDocMissingThrowsInspection
      */
     public function build(Request $request): ServerRequestInterface
     {
+        // Build the basic request, with query and cookie params
         /** @noinspection PhpUnhandledExceptionInspection */
-        return (new GuzzleServerRequestFactory())->createServerRequest(
-            $request->method->get(),
-            $request->url->get(),
-            $request->server->getArrayCopy(),
-        )->withParsedBody($request->post->getArrayCopy());
+        $psr7Request = (new GuzzleServerRequestFactory())
+            ->createServerRequest(
+                $request->method->get(),
+                $request->url->get(),
+                $request->server->getArrayCopy(),
+            )
+            ->withQueryParams($request->query->getArrayCopy())
+            ->withCookieParams($request->cookies->getArrayCopy());
+
+        // Add headers
+        foreach ($request->headers->get() as $name => $value) {
+            $psr7Request = $psr7Request->withHeader($name, $value);
+        }
+
+        // Add body and return
+//        return $psr7Request->withBody(\GuzzleHttp\Psr7\Utils::streamFor($request->content->getRaw()));
+        return $psr7Request->withParsedBody($request->post->getArrayCopy());
     }
 }
