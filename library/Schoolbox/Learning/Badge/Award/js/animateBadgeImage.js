@@ -11,10 +11,11 @@ const CANVAS_SELECTOR = '[data-badge-award-canvas]';
 
 /**
  * Animate the badge, acheievements should be celebrated a little!
+ * Put the list of animations in an array so one can be randomly chosen and played
  * 
  * @param { DOMElement }
  */
-export const animateBadgeImage = (badgeImage) => {
+export function animateBadgeImage (badgeImage) {
     clearCanvas();
     // const animationList = [initSpinIn]; //to test just one animation
     const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
