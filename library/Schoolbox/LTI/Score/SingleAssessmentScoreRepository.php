@@ -16,6 +16,7 @@ use OutOfBoundsException;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
@@ -40,9 +41,9 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
     private LtiScoreMapper $ltiScoreMapper;
 
     /**
-     * User mapper, for retrieving the student to score.
+     * User codec, used to decode the user ID in the score into a user to score.
      */
-    private UserMapper $userMapper;
+    private UserCodec $userCodec;
 
     /**
      * Constructor
@@ -50,18 +51,18 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
      * @param LtiAssessment       $model
      * @param LtiAssessmentMapper $ltiAssessmentMapper
      * @param LtiScoreMapper      $scoreMapper
-     * @param UserMapper          $userMapper
+     * @param UserCodec           $userCodec
      */
     public function __construct(
         LtiAssessment $model,
         LtiAssessmentMapper $ltiAssessmentMapper,
         LtiScoreMapper $scoreMapper,
-        UserMapper $userMapper
+        UserCodec $userCodec
     ) {
         $this->ltiAssessment       = $model;
         $this->ltiAssessmentMapper = $ltiAssessmentMapper;
         $this->ltiScoreMapper      = $scoreMapper;
-        $this->userMapper          = $userMapper;
+        $this->userCodec           = $userCodec;
     }
 
     /**
@@ -86,7 +87,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
             ->setMarkingUser(null);
 
         // Student: check if they exist and are actually a participant
-        $student = $this->userMapper->findByUsername($score->getUserIdentifier());
+        $student = $this->userCodec->decode($score->getUserIdentifier());
         if (!$student) {
             throw new OutOfBoundsException(sprintf('No user with username "%s" exists', $score->getUserIdentifier()));
         }

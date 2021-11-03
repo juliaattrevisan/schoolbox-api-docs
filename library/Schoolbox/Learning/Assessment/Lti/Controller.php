@@ -44,6 +44,7 @@ use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
@@ -81,6 +82,12 @@ class Controller extends Assessment\Controller
     private Instance $instance;
 
     /**
+     * User codec, used to encode a user into a login hint and in the score
+     * repository.
+     */
+    private UserCodec $userCodec;
+
+    /**
      * Constructor
      *
      * @param UserMapper                      $userMapper
@@ -100,6 +107,7 @@ class Controller extends Assessment\Controller
      * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper
      * @param RegistrationRepositoryInterface $registrations
      * @param Instance                        $instance
+     * @param UserCodec                       $userCodec
      */
     public function __construct(
         UserMapper $userMapper,
@@ -118,7 +126,8 @@ class Controller extends Assessment\Controller
         LtiAssessment\Mapper $ltiAssessmentMapper,
         LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
         RegistrationRepositoryInterface $registrations,
-        Instance $instance
+        Instance $instance,
+        UserCodec $userCodec
     ) {
         parent::__construct(
             $userMapper,
@@ -139,6 +148,7 @@ class Controller extends Assessment\Controller
         $this->ltiAssessmentScoreMapper = $ltiAssessmentScoreMapper;
         $this->registrations            = $registrations;
         $this->instance                 = $instance;
+        $this->userCodec                = $userCodec;
     }
 
     /**
@@ -462,7 +472,7 @@ class Controller extends Assessment\Controller
             $registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
             $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
-            $currentUser->getUsername(),
+            $this->userCodec->encode($currentUser),
             null,
             array_unique($roles),
             $additionalClaims,
@@ -510,7 +520,7 @@ class Controller extends Assessment\Controller
             $assessment,
             $this->ltiAssessmentMapper,
             $this->ltiAssessmentScoreMapper,
-            $this->getUserMapper(),
+            $this->userCodec,
         );
 
         // Access token sanity checker: validates the request token was created by a tool
