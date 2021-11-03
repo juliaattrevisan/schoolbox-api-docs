@@ -148,7 +148,7 @@ class CustomClaimFactoryTest extends TestCase
             ],
             [
                 'id: 555',
-                'type: $Context.type',
+                'type: ',
                 'label: $Context.label',
                 'title: $Context.title',
             ],

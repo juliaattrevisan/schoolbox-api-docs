@@ -97,9 +97,7 @@ class CustomClaimFactory
     {
         $new                                 = (clone $this);
         $new->translations['$Context.id']    = $contextClaim->getIdentifier();
-        $new->translations['$Context.type']  = count($contextClaim->getTypes()) > 0
-            ? implode(' ', $contextClaim->getTypes())
-            : null;
+        $new->translations['$Context.type']  = implode(' ', $contextClaim->getTypes());
         $new->translations['$Context.label'] = $contextClaim->getLabel();
         $new->translations['$Context.title'] = $contextClaim->getTitle();
         return $new;
