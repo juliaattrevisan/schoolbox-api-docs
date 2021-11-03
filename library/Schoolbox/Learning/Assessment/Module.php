@@ -31,7 +31,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -191,6 +190,22 @@ class Module extends BaseModule
          */
         $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewSimilarityReport, $preloadAssessment);
         $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewSimilarityReport, $preloadAssessment);
+
+        // LTI assessment launch
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/launch/instructor",
+            'getLaunchAssessmentAsInstructor',
+            $canViewStatus,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/launch/student/$studentParam",
+            'getLaunchAssessmentAsStudent',
+            $canSubmit,
+            $preloadParticipant,
+        );
     }
 
 
@@ -400,6 +415,8 @@ class Module extends BaseModule
         $lc['ltiToolMapper']            = $this->getMapperFactory()->getLazy(LtiToolMapper::class);
         $lc['ltiAssessmentMapper']      = $this->getMapperFactory()->getLazy(LtiAssessmentMapper::class);
         $lc['ltiAssessmentScoreMapper'] = $this->getMapperFactory()->getLazy(LtiAssessmentScoreMapper::class);
+        $lc['instance']                 = $injector->lazyGet('instance');
+        $lc['repository']               = $injector->lazyGet('lti.repository');
     }
 
     /**

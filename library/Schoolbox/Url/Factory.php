@@ -29,6 +29,8 @@ class Factory
     /**
      * Constructor
      *
+     * TODO allow this to be built from a `\Schoolbox\Instance` instead
+     *
      * @param IConfigLoader $config
      */
     public function __construct(IConfigLoader $config)

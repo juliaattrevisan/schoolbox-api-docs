@@ -99,7 +99,11 @@ use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
+use Schoolbox\LTI\Auth\UserAuthenticator;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
+use Schoolbox\LTI\Provider\Model as ToolModel;
+use Schoolbox\LTI\Registration\RepositoryFactory;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
@@ -1536,6 +1540,33 @@ abstract class Kernel
                     new Sanitizer\Exif($config)
                 );
             })
+        );
+
+        // LTI-related things
+        $di->set(
+            'lti.repository',
+            $di->lazy(function () use ($di, $mapperFactory) {
+                /** @var IConfigLoader $config */
+                $config = $di->get('config');
+                $router = $di->get('router');
+                $registrationRepositoryFactory = new RepositoryFactory(
+                    $config,
+                    $router->generate('ltiPlatform.getOidcAuthenticationRequest'),
+                );
+                return $registrationRepositoryFactory->build(
+                    $mapperFactory->get(ToolMapper::class)
+                                  ->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3),
+                );
+            })
+        );
+        $di->set(
+            'lti.userAuthenticator',
+            $di->lazyNew(
+                UserAuthenticator::class,
+                [
+                    'userMapper' => $mapperFactory->getLazy(UserMapper::class),
+                ]
+            )
         );
 
         return $di;
