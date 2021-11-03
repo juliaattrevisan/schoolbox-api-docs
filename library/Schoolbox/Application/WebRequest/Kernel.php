@@ -623,6 +623,13 @@ class Kernel extends WebKernelAbstract
                 throw new Unauthenticated('Token could not be parsed', 0, $e);
             }
             if (isset($claims['sub'])) {
+                // It's valid for the JWT's subject claim to be empty.
+                // In this case, the request will be performed with the context
+                // of an unknown user.
+                // (The request is still subject to authorization rules.)
+                if ($claims['sub'] === '') {
+                    return null;
+                }
                 /** @var MapperFactory $mapperFactory */
                 $mapperFactory = $this->di->get('mapperFactory');
                 /** @var UserMapper $userMapper */

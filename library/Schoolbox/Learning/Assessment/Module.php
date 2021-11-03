@@ -208,8 +208,8 @@ class Module extends BaseModule
         );
 
         // LTI assessment score publish service
-        // (Permissions are handled within the controller action: they rely upon
-        //  the scope assigned to a JWt)
+        // Permissions are handled within the controller action: they rely upon
+        // the scope assigned to a JWT.
         $this->register(
             self::METHOD_POST,
             "$assRoute/lti/score",
