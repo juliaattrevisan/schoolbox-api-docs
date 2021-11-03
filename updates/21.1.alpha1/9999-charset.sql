@@ -151,4 +151,12 @@ ADD CONSTRAINT `tour_trigger_tour_uuid_fk`
   FOREIGN KEY (`tour_uuid`)
   REFERENCES `tour` (`uuid`);
 
+ALTER TABLE `login_log`
+    CHANGE COLUMN  `ip` `ip` VARCHAR(39) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL COMMENT 'coverage for both ipv4 and ipv6 addresses';
+
+ALTER TABLE `user_assume_log`
+ CHANGE COLUMN `ip` `ip` VARCHAR(39) CHARACTER SET  'ascii' COLLATE 'ascii_general_ci' NULL;
+
+
+
 SET foreign_key_checks = 1;
