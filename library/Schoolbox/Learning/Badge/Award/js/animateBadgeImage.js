@@ -16,7 +16,7 @@ const CANVAS_SELECTOR = '[data-badge-award-canvas]';
  */
 export const animateBadgeImage = (badgeImage) => {
     clearCanvas();
-    // const animationList = [initSpinIn];
+    // const animationList = [initSpinIn]; //to test just one animation
     const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
@@ -62,7 +62,7 @@ export function getContext () {
  *  
  * @return { Number }
  */
- export function getStarCount () {
+export function getStarCount () {
     const currentCanvasDimensions = getCanvasDimensions();
     return Math.round(currentCanvasDimensions.width * 0.62); 
 }
