@@ -248,16 +248,19 @@ class Handler
                     $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
                 }
 
+                // If the user exists, but not in the role, fail.
+                if ($participantRole->getId() !== $user->getRole()->getId()) {
+                    $failedUsers[] = [
+                        "Failed: user already exists. Please contact support.",
+                        $userData,
+                    ];
+                    continue;
+                }
+
                 // cache the old values
                 $oldUsername   = $user->getUsername();
-            } catch (Mapper\Exception\Deleted $e) {
-                // user exists, but is deleted; consider this a fail case
-                $failedUsers[] = [
-                    'User is deleted', $userData
-                ];
-                continue;
             } catch (Mapper\Exception $e) {
-                // user does not exist; create the model
+                // user does not exist or deleted; create the model
                 $user = $this->getUserMapper()->createModel()
                     ->setRole($participantRole)
                     ->setCampusCollection($participantCampuses)
