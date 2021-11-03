@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Util;
 
 use Aura\Web\Request;
+use GuzzleHttp\Psr7\Utils;
 use Http\Factory\Guzzle\ServerRequestFactory as GuzzleServerRequestFactory;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -29,9 +30,9 @@ class ServerRequestFactory
      * * cookies
      * * headers
      * * body ($_POST)
+     * * raw body
      *
      * TODO add files from Aura request to PSR-7 request
-     * TODO add raw body from Aura request to PSR-7 request
      *
      * @param Request $request
      * @return ServerRequestInterface
@@ -56,7 +57,8 @@ class ServerRequestFactory
         }
 
         // Add body and return
-//        return $psr7Request->withBody(\GuzzleHttp\Psr7\Utils::streamFor($request->content->getRaw()));
-        return $psr7Request->withParsedBody($request->post->getArrayCopy());
+        return $psr7Request
+            ->withBody(Utils::streamFor($request->content->getRaw()))
+            ->withParsedBody($request->post->getArrayCopy());
     }
 }
