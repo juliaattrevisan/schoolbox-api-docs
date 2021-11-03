@@ -224,6 +224,42 @@ class Model implements ISoftDeletable
     private bool $isFeedback = false;
 
     /**
+     * Determine whether this score's activity progress value makes this score a
+     * response, given the previous score.
+     *
+     * @param Model|null $previous
+     * @return bool
+     */
+    public function determineResponseStatus(?Model $previous): bool
+    {
+        if (in_array($this->activityProgress, self::ACTIVITY_PROGRESS_RESPONSE_VALUES)) {
+            if (!$previous) {
+                return true;
+            }
+            return $this->activityProgress !== $previous->getActivityProgress();
+        }
+        return false;
+    }
+
+    /**
+     * Determine whether this score's activity progress value makes this score a
+     * feedback, given the previous score.
+     *
+     * @param Model|null $previous
+     * @return bool
+     */
+    public function determineFeedbackStatus(?Model $previous): bool
+    {
+        if (in_array($this->gradingProgress, self::GRADING_PROGRESS_FEEDBACK_VALUES)) {
+            if (!$previous) {
+                return true;
+            }
+            return $this->gradingProgress !== $previous->getGradingProgress();
+        }
+        return false;
+    }
+
+    /**
      * @return LTIAssessmentModel
      */
     public function getLtiAssessment(): LTIAssessmentModel

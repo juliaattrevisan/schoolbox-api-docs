@@ -488,7 +488,11 @@ class Controller extends Assessment\Controller
         $lineItemRepository = new SingleAssessmentRepository($assessment);
 
         // Score repository: consists only of a single assessment, and its scores
-        $scoreRepository = new SingleAssessmentScoreRepository($assessment, $this->ltiAssessmentScoreMapper);
+        $scoreRepository = new SingleAssessmentScoreRepository(
+            $assessment,
+            $this->ltiAssessmentMapper,
+            $this->ltiAssessmentScoreMapper,
+        );
 
         // Access token sanity checker: validates the request token was created by a tool
         $validator = new RequestAccessTokenValidator($this->registrations);
