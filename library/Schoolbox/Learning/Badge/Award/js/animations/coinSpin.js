@@ -1,6 +1,6 @@
 
 /**
- * 'Pop up' the badge and throw some stars
+ * Spin the badge in and throw some stars outwards as it spins around
  */
 
 import { gsap, Physics2DPlugin } from 'gsap/all';
@@ -37,12 +37,14 @@ function animateBadge (badgeImage) {
  */
 function animateStars () {
     const stars = getStars(); 
+    const context = getContext();
+    const canvasDimensions = getCanvasDimensions();
     const starsTimeline = gsap.timeline( { //https://greensock.com/docs/v3/GSAP/gsap.timeline()
         delay: 0.5, //wait prior to animating the stars to link when the pop up has 'hit' the screen
         repeat: 0, 
-        onUpdate: () => redrawStars(stars) //to draw the new position of the stars each tick
+        onUpdate: () => redrawStars(stars, context, canvasDimensions), //to draw the new position of the stars each tick
     } ); 
-    stars.forEach((star) => addStarAnimation(starsTimeline, star));
+    stars.forEach((star) => addStarAnimation(starsTimeline, star, canvasDimensions));
 }
 
 /**
@@ -53,10 +55,10 @@ function animateStars () {
  */
 function getStars () {
     const stars = [];
-    const starCount = getStarCount();
     const canvasDimensions = getCanvasDimensions();
-    for (let i = 0; i < starCount; i++) { 
-        const star = new Star({
+    let star; //reuse reference in loop
+    for (let i = 0; i < getStarCount(); i++) { 
+        star = new Star({
             x: canvasDimensions.width/2, 
             y: gsap.utils.random(50, 300), 
             radius: gsap.utils.random(5, 30),
@@ -70,10 +72,10 @@ function getStars () {
  * Each star needs to be removed and redrawn each 'tick'
  * 
  * @param { Array }
+ * @param { CanvasRenderingContext2D }
+ * @param { width, height }
  */
-function redrawStars (stars) {
-    const canvasDimensions = getCanvasDimensions();
-    const context = getContext();
+function redrawStars (stars, context, canvasDimensions) {
     context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
     stars.forEach((star) => star.draw(context));
 }
@@ -84,9 +86,9 @@ function redrawStars (stars) {
  * 
  * @param { gsap.timeline }
  * @param { Star }
+ * @param { width, height }
  */
-function addStarAnimation (starsTimeline, star) {
-    const canvasDimensions = getCanvasDimensions();
+function addStarAnimation (starsTimeline, star, canvasDimensions) {
     starsTimeline.to(star, {
         delay: 'random(0, 0.2)', 
         duration: 'random(0.5, 3)',

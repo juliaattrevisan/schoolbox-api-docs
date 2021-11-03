@@ -16,6 +16,7 @@ const CANVAS_SELECTOR = '[data-badge-award-canvas]';
  */
 export const animateBadgeImage = (badgeImage) => {
     clearCanvas();
+    // const animationList = [initSpinIn];
     const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
