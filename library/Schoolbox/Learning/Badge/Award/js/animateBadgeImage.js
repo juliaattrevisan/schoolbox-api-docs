@@ -15,14 +15,14 @@ const CANVAS_SELECTOR = '[data-badge-award-canvas]';
  * @param { DOMElement }
  */
 export const animateBadgeImage = (badgeImage) => {
-    // const animationList = [initPopUp];
+    const animationList = [initPopUp];
     // const animationList = [initFlipUp];
     // const animationList = [initDropDown];
     // const animationList = [initSwingDown];
     // const animationList = [initCoinSpin];
     // const animationList = [initSpinIn];
     clearCanvas();
-    const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
+    // const animationList = [initPopUp, initFlipUp, initDropDown, initSwingDown, initCoinSpin, initSpinIn];
     const initRandomAnimation = animationList[Math.floor(Math.random()*animationList.length)];
     initRandomAnimation(badgeImage);
 }
@@ -58,4 +58,14 @@ export function getCanvasDimensions () {
 export function getContext () {
     const canvas = document.querySelector(CANVAS_SELECTOR);
     return canvas.getContext('2d');
+}
+
+/**
+ * Will be decreased on smaller screens, as there's not as 
+ * much space to show them
+ *  
+ * @return { Number }
+ */
+ export function getStarCount () {
+    return 600;
 }

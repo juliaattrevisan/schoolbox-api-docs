@@ -5,7 +5,7 @@
 
 import { gsap, Physics2DPlugin } from 'gsap/all';
 import Star from './Star';
-import { getCanvasDimensions, getContext } from '../animateBadgeImage';
+import { getCanvasDimensions, getContext, getStarCount } from '../animateBadgeImage';
 
 gsap.registerPlugin(Physics2DPlugin);
 
@@ -53,7 +53,7 @@ function animateStars () {
  */
 function getStars () {
     const stars = [];
-    const starCount = 600;
+    const starCount = getStarCount();
     const canvasDimensions = getCanvasDimensions();
     for (let i = 0; i < starCount; i++) { 
         const star = new Star({
