@@ -44,14 +44,59 @@ class Model implements ISoftDeletable
         self::ACTIVITY_PROGRESS_SUBMITTED,
         self::ACTIVITY_PROGRESS_COMPLETED,
     ];
+
+    /**
+     * Activity progress values which are considered to be responses from the
+     * student.
+     *
+     * If this score has this value, and the previous score for this
+     * student+assessment has a different value, then this is a response.
+     */
+    public const ACTIVITY_PROGRESS_RESPONSE_VALUES = [
+        self::ACTIVITY_PROGRESS_SUBMITTED,
+        self::ACTIVITY_PROGRESS_COMPLETED,
+    ];
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#activityprogress:
+     *
+     * > the user has not started the activity, or the activity has been reset
+     * > for that student.
+     */
     public const ACTIVITY_PROGRESS_INITIALIZED = 'Initialized';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#activityprogress:
+     *
+     * > the activity associated with the line item has been started by the user
+     * > to which the result relates.
+     */
     public const ACTIVITY_PROGRESS_STARTED = 'Started';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#activityprogress:
+     *
+     * > the activity is being drafted and is available for comment.
+     */
     public const ACTIVITY_PROGRESS_IN_PROGRESS = 'InProgress';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#activityprogress:
+     *
+     * > the activity has been submitted at least once by the user but the user
+     * > is still able to make further submissions.
+     */
     public const ACTIVITY_PROGRESS_SUBMITTED = 'Submitted';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#activityprogress:
+     *
+     * > the user has completed the activity associated with the line item.
+     */
     public const ACTIVITY_PROGRESS_COMPLETED = 'Completed';
 
     /**
-     * Valid values for activity progress.
+     * Valid values for grading progress.
      *
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0/#gradingprogress
      */
@@ -62,10 +107,59 @@ class Model implements ISoftDeletable
         self::GRADING_PROGRESS_PENDING_MANUAL,
         self::GRADING_PROGRESS_FULLY_GRADED,
     ];
+
+    /**
+     * Grading progress values which are considered to be feedback from the
+     * instructor.
+     *
+     * If this score has this value, and the previous score for this
+     * student+assessment has a different value, then this is a feedback.
+     */
+    public const GRADING_PROGRESS_FEEDBACK_VALUES = [
+        self::GRADING_PROGRESS_PENDING,
+        self::GRADING_PROGRESS_PENDING_MANUAL,
+        self::GRADING_PROGRESS_FULLY_GRADED,
+    ];
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#gradingprogress:
+     *
+     * > There is no grading process occurring; for example, the student has not
+     * > yet made any submission.
+     */
     public const GRADING_PROGRESS_NOT_READY = 'NotReady';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#gradingprogress:
+     *
+     * > The grading could not complete.
+     */
     public const GRADING_PROGRESS_FAILED = 'Failed';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#gradingprogress:
+     *
+     * > Final Grade is pending, but does not require manual intervention; if a
+     * > Score value is present, it indicates the current value is partial and
+     * > may be updated.
+     */
     public const GRADING_PROGRESS_PENDING = 'Pending';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#gradingprogress:
+     *
+     * > Final Grade is pending, and it does require human intervention; if a
+     * > Score value is present, it indicates the current value is partial and
+     * > may be updated during the manual grading.
+     */
     public const GRADING_PROGRESS_PENDING_MANUAL = 'PendingManual';
+
+    /**
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#gradingprogress:
+     *
+     * > The grading process is completed; the score value, if any, represents
+     * > the current Final Grade;
+     */
     public const GRADING_PROGRESS_FULLY_GRADED = 'FullyGraded';
 
     /**
