@@ -191,6 +191,11 @@ class Module extends BaseModule
         $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewSimilarityReport, $preloadAssessment);
         $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewSimilarityReport, $preloadAssessment);
 
+
+        // LTI assessment related routes
+        // TODO extract to a different module:
+        //      they are only here so that they can use the standard assessment preloads and permissions
+
         // LTI assessment launch
         $this->register(
             self::METHOD_GET,
@@ -207,13 +212,22 @@ class Module extends BaseModule
             $preloadParticipant,
         );
 
+        // Services:
+        // These don't have permission handlers at the module level: instead,
+        // the controllers allow or deny access based upon the scope assigned to
+        // the JWT used for validation.
+        // (If no JWT was passed, access will be denied.)
+
+        // LTI line item service
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/lti",
+            'getLineItem',
+            null,
+            $preloadAssessment,
+        );
+
         // LTI assessment score publish service
-        // Permissions are handled within the controller action: they rely upon
-        // the scope assigned to a JWT.
-        // See https://www.imsglobal.org/spec/lti-ags/v2p0/#service-endpoint:
-        // the score publish endpoint MUST match the line item endpoint, with
-        // the path appended with "/scores".
-        // (We don't actually expose the line item endpoint yet)
         $this->register(
             self::METHOD_POST,
             "$assRoute/lti/scores",

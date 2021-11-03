@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Alaress_Date_Format;
-use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
@@ -450,7 +449,7 @@ class Controller extends Assessment\Controller
                 ->setScheme('https')
                 ->setPath(
                     $this->router->generate(
-                        'learningAssessment.postScorePublish',
+                        'learningAssessment.getLineItem',
                         ['assessmentId' => $assessment->getId()]
                     )
                 )
@@ -471,7 +470,26 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * Score publish endpoint.
+     * LTI line item service endpoint.
+     *
+     * Currently, this does nothing: however it must exist so that the resource
+     * link launch request can generate a score publish service endpoint.
+     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#service-endpoint:
+     * > The scores service endpoint MUST be the line item resource URL with the
+     * > path appended with '/scores'.
+     *
+     * @param Model $assessment
+     *@since 21.1.0
+     *
+     * @api   GET /learning/assessments/:assessmentId/lti
+     */
+    public function getLineItem(Model $assessment): void
+    {
+        throw new NotFound();
+    }
+
+    /**
+     * Score publish service endpoint.
      *
      * @api   POST /learning/assessments/:assessmentId/lti/scores
      * @since 21.1.0
