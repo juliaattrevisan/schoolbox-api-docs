@@ -23,7 +23,7 @@ class CustomClaimFactoryTest extends TestCase
 {
     /**
      * @dataProvider getTestBuildData
-     * @covers \Schoolbox\LTI\Util\CustomClaimFactory::build
+     * @covers       \Schoolbox\LTI\Util\CustomClaimFactory::build
      *
      * @param CustomClaimFactory $factory
      * @param array|null         $claims
@@ -45,23 +45,24 @@ class CustomClaimFactoryTest extends TestCase
 
         // No variables: create no custom claim
         yield 'null' => [$factory, null, null,];
+        yield 'empty' => [$factory, [], [],];
 
         // If a value is missing but replaceable: do not attempt to replace it
         yield 'replaceable but missing variables' => [
             $factory,
             [
-                'id: $User.id',
-                'username: $User.username',
-                'image: $User.image',
-                'org: $User.org',
-                'scope mentor: $User.scope.mentor',
+                'id'       => 'id: $User.id',
+                'username' => 'username: $User.username',
+                'image'    => 'image: $User.image',
+                'org'      => 'org: $User.org',
+                'scope'    => 'scope mentor: $User.scope.mentor',
             ],
             [
-                'id: $User.id',
-                'username: $User.username',
-                'image: $User.image',
-                'org: $User.org',
-                'scope mentor: $User.scope.mentor',
+                'id'       => 'id: $User.id',
+                'username' => 'username: $User.username',
+                'image'    => 'image: $User.image',
+                'org'      => 'org: $User.org',
+                'scope'    => 'scope mentor: $User.scope.mentor',
             ],
         ];
 
@@ -74,36 +75,36 @@ class CustomClaimFactoryTest extends TestCase
         yield 'user replacements' => [
             $factory->withUser($user),
             [
-                'id: $User.id',
-                'username: $User.username',
-                'image: $User.image',
-                'org: $User.org',
-                'scope mentor: $User.scope.mentor',
+                'id'       => 'id: $User.id',
+                'username' => 'username: $User.username',
+                'image'    => 'image: $User.image',
+                'org'      => 'org: $User.org',
+                'scope'    => 'scope mentor: $User.scope.mentor',
             ],
             [
-                'id: 123',
-                'username: user1',
-                'image: $User.image',
-                'org: $User.org',
-                'scope mentor: $User.scope.mentor',
+                'id'       => 'id: 123',
+                'username' => 'username: user1',
+                'image'    => 'image: $User.image',
+                'org'      => 'org: $User.org',
+                'scope'    => 'scope mentor: $User.scope.mentor',
             ],
         ];
 
         yield 'actual user replacements' => [
             $factory->withActualUser($user),
             [
-                'id: $ActualUser.id',
-                'username: $ActualUser.username',
-                'image: $ActualUser.image',
-                'org: $ActualUser.org',
-                'scope mentor: $ActualUser.scope.mentor',
+                'id'       => 'id: $ActualUser.id',
+                'username' => 'username: $ActualUser.username',
+                'image'    => 'image: $ActualUser.image',
+                'org'      => 'org: $ActualUser.org',
+                'scope'    => 'scope mentor: $ActualUser.scope.mentor',
             ],
             [
-                'id: 123',
-                'username: user1',
-                'image: $ActualUser.image',
-                'org: $ActualUser.org',
-                'scope mentor: $ActualUser.scope.mentor',
+                'id'       => 'id: 123',
+                'username' => 'username: user1',
+                'image'    => 'image: $ActualUser.image',
+                'org'      => 'org: $ActualUser.org',
+                'scope'    => 'scope mentor: $ActualUser.scope.mentor',
             ],
         ];
 
@@ -112,14 +113,14 @@ class CustomClaimFactoryTest extends TestCase
                 new ResourceLinkClaim('333', null, null)
             ),
             [
-                'id: $ResourceLink.id',
-                'title: $ResourceLink.title',
-                'description: $ResourceLink.description',
+                'id'          => 'id: $ResourceLink.id',
+                'title'       => 'title: $ResourceLink.title',
+                'description' => 'description: $ResourceLink.description',
             ],
             [
-                'id: 333',
-                'title: $ResourceLink.title',
-                'description: $ResourceLink.description',
+                'id'          => 'id: 333',
+                'title'       => 'title: $ResourceLink.title',
+                'description' => 'description: $ResourceLink.description',
             ],
         ];
         yield 'resource link replacements: non-null title+description' => [
@@ -127,45 +128,45 @@ class CustomClaimFactoryTest extends TestCase
                 new ResourceLinkClaim('333', 'ttt', 'ddd')
             ),
             [
-                'id: $ResourceLink.id',
-                'title: $ResourceLink.title',
-                'description: $ResourceLink.description',
+                'id'          => 'id: $ResourceLink.id',
+                'title'       => 'title: $ResourceLink.title',
+                'description' => 'description: $ResourceLink.description',
             ],
             [
-                'id: 333',
-                'title: ttt',
-                'description: ddd',
+                'id'          => 'id: 333',
+                'title'       => 'title: ttt',
+                'description' => 'description: ddd',
             ],
         ];
 
         yield 'context link replacements: empty values' => [
             $factory->withContext(new ContextClaim('555', [], null, null)),
             [
-                'id: $Context.id',
-                'type: $Context.type',
-                'label: $Context.label',
-                'title: $Context.title',
+                'id'    => 'id: $Context.id',
+                'type'  => 'type: $Context.type',
+                'label' => 'label: $Context.label',
+                'title' => 'title: $Context.title',
             ],
             [
-                'id: 555',
-                'type: ',
-                'label: $Context.label',
-                'title: $Context.title',
+                'id'    => 'id: 555',
+                'type'  => 'type: ',
+                'label' => 'label: $Context.label',
+                'title' => 'title: $Context.title',
             ],
         ];
         yield 'context link replacements: non-empty values' => [
             $factory->withContext(new ContextClaim('555', ['type1', 'type2'], 'label', 'title')),
             [
-                'id: $Context.id',
-                'type: $Context.type',
-                'label: $Context.label',
-                'title: $Context.title',
+                'id'    => 'id: $Context.id',
+                'type'  => 'type: $Context.type',
+                'label' => 'label: $Context.label',
+                'title' => 'title: $Context.title',
             ],
             [
-                'id: 555',
-                'type: type1 type2',
-                'label: label',
-                'title: title',
+                'id'    => 'id: 555',
+                'type'  => 'type: type1 type2',
+                'label' => 'label: label',
+                'title' => 'title: title',
             ],
         ];
 
@@ -182,23 +183,23 @@ class CustomClaimFactoryTest extends TestCase
                 )
             ),
             [
-                'productFamilyCode: $ToolPlatformInstance.productFamilyCode',
-                'version: $ToolPlatformInstance.version',
-                'guid: $ToolPlatformInstance.guid',
-                'name: $ToolPlatformInstance.name',
-                'description: $ToolPlatformInstance.description',
-                'url: $ToolPlatformInstance.url',
-                'contactEmail: $ToolPlatformInstance.contactEmail',
+                'productFamilyCode' => 'productFamilyCode: $ToolPlatformInstance.productFamilyCode',
+                'version'           => 'version: $ToolPlatformInstance.version',
+                'guid'              => 'guid: $ToolPlatformInstance.guid',
+                'name'              => 'name: $ToolPlatformInstance.name',
+                'description'       => 'description: $ToolPlatformInstance.description',
+                'url'               => 'url: $ToolPlatformInstance.url',
+                'contactEmail'      => 'contactEmail: $ToolPlatformInstance.contactEmail',
 
             ],
             [
-                'productFamilyCode: $ToolPlatformInstance.productFamilyCode',
-                'version: $ToolPlatformInstance.version',
-                'guid: 66666',
-                'name: $ToolPlatformInstance.name',
-                'description: $ToolPlatformInstance.description',
-                'url: $ToolPlatformInstance.url',
-                'contactEmail: $ToolPlatformInstance.contactEmail',
+                'productFamilyCode' => 'productFamilyCode: $ToolPlatformInstance.productFamilyCode',
+                'version'           => 'version: $ToolPlatformInstance.version',
+                'guid'              => 'guid: 66666',
+                'name'              => 'name: $ToolPlatformInstance.name',
+                'description'       => 'description: $ToolPlatformInstance.description',
+                'url'               => 'url: $ToolPlatformInstance.url',
+                'contactEmail'      => 'contactEmail: $ToolPlatformInstance.contactEmail',
             ],
         ];
 
@@ -215,23 +216,23 @@ class CustomClaimFactoryTest extends TestCase
                 )
             ),
             [
-                'productFamilyCode: $ToolPlatformInstance.productFamilyCode',
-                'version: $ToolPlatformInstance.version',
-                'guid: $ToolPlatformInstance.guid',
-                'name: $ToolPlatformInstance.name',
-                'description: $ToolPlatformInstance.description',
-                'url: $ToolPlatformInstance.url',
-                'contactEmail: $ToolPlatformInstance.contactEmail',
+                'productFamilyCode' => 'productFamilyCode: $ToolPlatformInstance.productFamilyCode',
+                'version'           => 'version: $ToolPlatformInstance.version',
+                'guid'              => 'guid: $ToolPlatformInstance.guid',
+                'name'              => 'name: $ToolPlatformInstance.name',
+                'description'       => 'description: $ToolPlatformInstance.description',
+                'url'               => 'url: $ToolPlatformInstance.url',
+                'contactEmail'      => 'contactEmail: $ToolPlatformInstance.contactEmail',
 
             ],
             [
-                'productFamilyCode: example',
-                'version: 1.0.0',
-                'guid: 66666',
-                'name: name',
-                'description: description',
-                'url: https://example.com',
-                'contactEmail: a@b.com',
+                'productFamilyCode' => 'productFamilyCode: example',
+                'version'           => 'version: 1.0.0',
+                'guid'              => 'guid: 66666',
+                'name'              => 'name: name',
+                'description'       => 'description: description',
+                'url'               => 'url: https://example.com',
+                'contactEmail'      => 'contactEmail: a@b.com',
             ],
         ];
 
@@ -240,10 +241,10 @@ class CustomClaimFactoryTest extends TestCase
                 ->withUser($user)
                 ->withPlatformInstance(new PlatformInstanceClaim('66666')),
             [
-                'userId: $User.id, platformGuid: $ToolPlatformInstance.guid',
+                'test' => 'userId: $User.id, platformGuid: $ToolPlatformInstance.guid',
             ],
             [
-                'userId: 123, platformGuid: 66666',
+                'test' => 'userId: 123, platformGuid: 66666',
             ],
         ];
     }
