@@ -9,15 +9,14 @@
 
 {% block teacherMessage %}
     {% if config.lti_assessments_enable %}
-        <a href="{{ createRouteType }}">Create an LTI
-            assessment</a> that is not a part of your course to assess your students.
+        <a href="{{ createRouteType }}">Create a 3rd party assessment</a> that is not a part of your course to assess your students.
     {% else %}
-        The LTI assessment feature is currently disabled, please contact your admin to enable this feature.
+        The 3rd party assessment feature is currently disabled, please contact your admin to enable this feature.
     {% endif %}
 {% endblock teacherMessage %}
 
 {% block createButton %}
     {% if config.lti_assessments_enable %}
-        <a href="{{ createRouteType }}" class="button">Create LTI assessment</a>
+        <a href="{{ createRouteType }}" class="button">Create 3rd Party Assessment</a>
     {% endif %}
 {% endblock createButton %}

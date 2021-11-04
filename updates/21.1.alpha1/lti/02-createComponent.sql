@@ -10,12 +10,12 @@ INSERT INTO component_definition (
     msg_namespace_slug_suffix,
     config_copy
 ) VALUES (
-    'LTI Assessments',
+    '3rd Party Assessment',
     'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller',
-    'Output all LTI assessments for this homepage.',
+    'Output all 3rd party assessments for this homepage.',
     'homepage',
     3, # Learning
-    'true',
+    'false',
     'false',
     null,
     null,
@@ -60,7 +60,7 @@ INSERT INTO component_config_definition (
 ), (
     (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Lti\\Component\\Homepage\\Controller'),
     'componentname',
-    'LTI Assessments',
+    '3rd Party Assessments',
     'Heading',
     null
 );

@@ -517,7 +517,7 @@ class ListController extends Web\Controller\Base
             $data['types'][] = [
                 'id'    => 'lti',
                 'value' => AssessmentType::TYPE_LTI_ASSESSMENT,
-                'label' => 'LTI Assessment',
+                'label' => '3rd Party Assessment',
                 'icon'  => 'lti',
                 'title' => 'Connect an assessment provided by an LTI tool',
             ];
