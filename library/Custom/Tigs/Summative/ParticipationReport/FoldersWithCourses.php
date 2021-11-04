@@ -60,10 +60,13 @@ class FoldersWithCourses
     public function find(): array {
         $statement = $this->folderMapper->getDatabase()->prepare('
             SELECT DISTINCT ci.folder_id
-            FROM `course_implementation` ci
-            INNER JOIN folder f ON folder_id = f.id
-            WHERE ci.deleted_at IS NULL
-            AND f.deleted_at IS NULL
+            FROM folder f
+            INNER JOIN `course_implementation` ci ON f.id = ci.folder_id
+            INNER JOIN course_unit_implementation cui ON ci.id = cui.course_implementation_id
+            INNER JOIN assessment_course_unit_implementation acui ON cui.id = acui.course_unit_implementation_id
+            WHERE f.deleted_at IS NULL
+            AND ci.deleted_at IS NULL
+            AND cui.deleted_at IS NULL
             ORDER BY folder_id
         ');
 
