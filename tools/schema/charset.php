@@ -155,10 +155,10 @@ $app = new class extends CliTool\App
 
 Finds all the tables (and their columns) and assign their charset to be utf8mb4 where they
 were previously utf8. This schema drift is likely caused by failed updates somewhere in an
-instance's distant past. 
+instance's distant past.
 
 Usage: php charset.php [--strategic] [--tablesql] [--perform]
- 
+
 1. Strategic View
 Get a list of tables and their columns which aren't utf8mb4. Gives a broad overview of the
 table collation, column collation + charset, column specification
@@ -185,7 +185,7 @@ Usage: php charset.php --tablesql
 Inflict all sql statements upon the db.
 
 Usage: php charset.php --perform
-  
+
 
 HELP;
             exit;
@@ -485,7 +485,7 @@ HELP;
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = '{$db}'
             AND TABLE_TYPE = 'BASE TABLE'
-            ORDER BY TABLE_NAME            
+            ORDER BY TABLE_NAME
         ";
 
         $tables = $this->getDatabaseInternal()->executeQuery($tablesQuery, [])->fetchAll();
@@ -502,13 +502,13 @@ HELP;
              */
             $columnsQuery = "
                 SELECT
-                    COLUMN_NAME, 
+                    COLUMN_NAME,
                     COLUMN_DEFAULT,
                     IS_NULLABLE,
                     DATA_TYPE,
                     COLUMN_TYPE,
                     CHARACTER_MAXIMUM_LENGTH,
-                    CHARACTER_SET_NAME, 
+                    CHARACTER_SET_NAME,
                     COLLATION_NAME
                 FROM INFORMATION_SCHEMA.COLUMNS
                 WHERE TABLE_NAME = :table
@@ -635,16 +635,12 @@ HELP;
 
 
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
      *
      * @return bool|null
      */
     public function runAsRoot(): ?bool
     {
-        return parent::runAsRoot();
+        return null;
     }
 };
 
