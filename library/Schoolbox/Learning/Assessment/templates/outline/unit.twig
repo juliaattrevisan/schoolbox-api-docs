@@ -34,7 +34,7 @@
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task">Task</a></li>
                     {% if config.lti_assessments_enable %}
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">LTI Assessment</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">3rd Party Assessment</a></li>
                     {% endif %}
                     {% endif %}
                     <li class="separator">Manage</li>

@@ -5,7 +5,7 @@ INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `opti
                       `required`, `module`, `sequence`)
 VALUES ('lti_assessments_enable',
         '0',
-        'Enable LTI Assessments',
+        'Enable 3rd Party Assessments',
         'If toggled "ON", teachers may create assessments that contain an LTI 1.3 compatible learning tool.',
         (SELECT id FROM lu_config_field WHERE field = 'boolean'),
         '',

@@ -90,7 +90,7 @@ class Definition extends Filter\AbstractDefinition
             case self::KEY_TASK:
                 return 'Task';
             case self::KEY_LTI_ASSESSMENT:
-                return 'LTI Assessment';
+                return '3rd Party Assessment';
         }
         throw new InvalidArgumentException("Unknown AssessmentType key: $key");
     }
