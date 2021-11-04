@@ -16,9 +16,9 @@ use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\LTI\AccessToken\Mapper;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
 
 /**
  * Access token cache: basically, a wrapper around a mapper.
@@ -29,6 +29,11 @@ class ItemPool implements CacheItemPoolInterface
      * Access token mapper
      */
     private Mapper $accessTokenMapper;
+
+    /**
+     * Tool mapper: for looking up the tool to associate an access token with.
+     */
+    private ToolMapper $toolMapper;
 
     /**
      * A repository of clients: required so that rehydrated access tokens can be
@@ -52,15 +57,18 @@ class ItemPool implements CacheItemPoolInterface
      * Constructor
      *
      * @param Mapper                    $accessTokenMapper
+     * @param ToolMapper                $toolMapper
      * @param ClientRepositoryInterface $clientRepository
      * @param UserCodec                 $userCodec
      */
     public function __construct(
         Mapper $accessTokenMapper,
+        ToolMapper $toolMapper,
         ClientRepositoryInterface $clientRepository,
         UserCodec $userCodec
     ) {
         $this->accessTokenMapper = $accessTokenMapper;
+        $this->toolMapper        = $toolMapper;
         $this->clientRepository  = $clientRepository;
         $this->userCodec         = $userCodec;
     }
@@ -207,8 +215,7 @@ class ItemPool implements CacheItemPoolInterface
                 ->setExpiresAt(Alaress_Date_Format::newFromTimestamp($token->getExpiryDateTime()->getTimestamp()))
                 ->setScopes($scopes)
                 ->setUser($user)
-                // TODO inject this mapper too
-                ->setLtiTool(\Schoolbox\LTI\Provider\Mapper::getInstance()->findOneByColumn('client_id', $token->getClient()->getIdentifier()));
+                ->setLtiTool($this->toolMapper->findOneByColumn('client_id', $token->getClient()->getIdentifier()));
             $this->cache[$item->getKey()] = $item;
             try {
                 $this->accessTokenMapper->save($model);

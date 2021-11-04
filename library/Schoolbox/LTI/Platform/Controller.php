@@ -34,6 +34,7 @@ use Schoolbox\LTI\AccessToken\Cache\ItemPool;
 use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
@@ -72,6 +73,12 @@ class Controller extends Base
     private AccessTokenMapper $accessTokenMapper;
 
     /**
+     * LTI tool mapper: used in the access token cache, for associating an
+     * access token with a tool.
+     */
+    private ToolMapper $toolMapper;
+
+    /**
      * User codec, used to encode a user into a login hint.
      */
     private UserCodec $userCodec;
@@ -84,6 +91,7 @@ class Controller extends Base
      * @param UserAuthenticatorInterface      $userAuthenticator
      * @param Instance                        $instance
      * @param AccessTokenMapper               $accessTokenMapper
+     * @param ToolMapper                      $toolMapper
      * @param UserCodec                       $userCodec
      */
     public function __construct(
@@ -92,6 +100,7 @@ class Controller extends Base
         UserAuthenticatorInterface $userAuthenticator,
         Instance $instance,
         AccessTokenMapper $accessTokenMapper,
+        ToolMapper $toolMapper,
         UserCodec $userCodec
     ) {
         $this->keyChains         = $keyChains;
@@ -99,6 +108,7 @@ class Controller extends Base
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
         $this->accessTokenMapper = $accessTokenMapper;
+        $this->toolMapper        = $toolMapper;
         $this->userCodec         = $userCodec;
     }
 
@@ -220,6 +230,7 @@ class Controller extends Base
             new AccessTokenRepository(
                 new ItemPool(
                     $this->accessTokenMapper,
+                    $this->toolMapper,
                     $clientRepository,
                     $this->userCodec,
                 )
