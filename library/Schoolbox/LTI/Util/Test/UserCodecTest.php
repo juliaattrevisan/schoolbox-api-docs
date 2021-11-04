@@ -50,10 +50,10 @@ class UserCodecTest extends TestCase
      * @dataProvider getTestEncodeData
      * @covers \Schoolbox\LTI\Util\UserCodec::encode
      *
-     * @param User   $user
-     * @param string $expected
+     * @param User|null   $user
+     * @param string|null $expected
      */
-    public function testEncode(User $user, string $expected): void
+    public function testEncode(?User $user, ?string $expected): void
     {
         $this->assertSame($expected, $this->userCodec->encode($user));
     }
@@ -65,6 +65,10 @@ class UserCodecTest extends TestCase
      */
     public function getTestEncodeData(): iterable
     {
+        yield 'Null user' => [
+            null,
+            null,
+        ];
         yield 'User exists' => [
             (new User())->setId(1)->setUsername('user1'),
             'user1',
@@ -79,10 +83,10 @@ class UserCodecTest extends TestCase
      * @dataProvider getTestDecodeData
      * @covers \Schoolbox\LTI\Util\UserCodec::decode
      *
-     * @param string    $encoded
-     * @param User|null $expected
+     * @param string|null $encoded
+     * @param User|null   $expected
      */
-    public function testDecode(string $encoded, ?User $expected): void
+    public function testDecode(?string $encoded, ?User $expected): void
     {
         $decoded = $this->userCodec->decode($encoded);
         if (!$expected) {
@@ -100,6 +104,10 @@ class UserCodecTest extends TestCase
      */
     public function getTestDecodeData(): iterable
     {
+        yield 'Null user' => [
+            null,
+            null,
+        ];
         yield 'User exists' => [
             'user1',
             (new User())->setId(1)->setUsername('user1'),

@@ -43,22 +43,22 @@ class UserCodec
     /**
      * Encode the user into a string value.
      *
-     * @param User $user
-     * @return string
+     * @param User|null $user
+     * @return string|null
      */
-    public function encode(User $user): string
+    public function encode(?User $user): ?string
     {
-        return $user->getUsername();
+        return $user ? $user->getUsername() : null;
     }
 
     /**
      * Decode the string back into a user.
      *
-     * @param string $encoded
+     * @param string|null $encoded
      * @return User|null
      */
-    public function decode(string $encoded): ?User
+    public function decode(?string $encoded): ?User
     {
-        return $this->userMapper->findByUsername($encoded);
+        return isset($encoded) ? $this->userMapper->findByUsername($encoded) : null;
     }
 }
