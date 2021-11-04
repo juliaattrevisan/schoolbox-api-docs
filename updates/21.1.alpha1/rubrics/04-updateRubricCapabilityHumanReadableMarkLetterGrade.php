@@ -180,6 +180,12 @@ require_once __DIR__ . '/../../../conf/core/require.php';
             ]);
             return true;
         }
+
+        /** Doesn't matter who runs this */
+        public function runAsRoot(): ?bool
+        {
+            return null;
+        }
     },
     [
         CliTool\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
