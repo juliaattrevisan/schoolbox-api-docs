@@ -612,8 +612,7 @@ class Controller extends Base
                 ]
             );
             return $collabDocsDefinition->getEnabled();
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
