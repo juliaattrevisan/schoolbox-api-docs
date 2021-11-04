@@ -16,9 +16,9 @@ use OutOfBoundsException;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
+use Schoolbox\LTI\Assessment\Score\Model as LtiScoreModel;
 use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
 
 /**
  * A score repository for a single LTI assessment.
@@ -89,17 +89,30 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         // Student: check if they exist and are actually a participant
         $student = $this->userCodec->decode($score->getUserIdentifier());
         if (!$student) {
-            throw new OutOfBoundsException(sprintf('No user with username "%s" exists', $score->getUserIdentifier()));
+            throw new OutOfBoundsException(
+                sprintf(
+                    'No user with username "%s" exists',
+                    $score->getUserIdentifier(),
+                )
+            );
         }
         $participant = $this->ltiAssessment->getParticipantIfExtant($student);
         if (!$participant) {
             throw new OutOfBoundsException(
-                sprintf('User with username "%s" is not a participant of assessment', $student->getUsername())
+                sprintf(
+                    'User with username "%s" is not a participant of assessment #%d',
+                    $student->getUsername(),
+                    $this->ltiAssessment->getId(),
+                )
             );
         }
         if ($participant->isExcluded()) {
             throw new OutOfBoundsException(
-                sprintf('User with username "%s" has been excluded from assessment', $student->getUsername())
+                sprintf(
+                    'User with username "%s" has been excluded from assessment #%d',
+                    $student->getUsername(),
+                    $this->ltiAssessment->getId(),
+                )
             );
         }
         $ltiScore = $ltiScore->setStudent($student);
@@ -114,8 +127,8 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         }
         $ltiScore = $ltiScore->setLtiAssessment($ltiAssessmentDataModel);
 
-        // Response/feedback status: determine from grading/activity progress,
-        // and previous score
+        // Find the most recent previous score
+        /** @var LtiScoreModel|null $previousLtiScore */
         $previousLtiScore = $this->ltiScoreMapper->findByColumnList(
             [
                 'lti_assessment_id' => $ltiAssessmentDataModel->getId(),
@@ -126,6 +139,21 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
                 'limit' => 1,
             ]
         )->first();
+
+        // Don't save anything if the most recent previous score is more
+        // recent than, or the same time as, the current score.
+        if ($previousLtiScore && $previousLtiScore->getSubmittedAt()->gte($ltiScore->getSubmittedAt())) {
+            throw new OutOfBoundsException(
+                sprintf(
+                    'User with username "%s" has a more recent score for assessment #%d',
+                    $student->getUsername(),
+                    $this->ltiAssessment->getId(),
+                )
+            );
+        }
+
+        // Response/feedback status: determine from grading/activity progress,
+        // and previous score.
         $ltiScore = $ltiScore
             ->setIsResponse($ltiScore->determineResponseStatus($previousLtiScore))
             ->setIsFeedback($ltiScore->determineFeedbackStatus($previousLtiScore));
