@@ -16,12 +16,14 @@ use Alaress_Date_Format;
 use Alaress_Rss_Stream;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
+use Component_DefinitionMapper;
 use GuzzleHttp;
 use InvalidArgumentException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Psr\Log\AbstractLogger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\LogMapper;
 use Proxy\Server as ProxyServer;
@@ -334,6 +336,7 @@ class Controller extends Base
                     'kamiEnabled' => $this->kamiConnector->isEnabled(),
                     'kamiOnline' => $this->kamiConnector->isOnline(),
                     'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
+                    'collabDocsEnabled' => $this->collabDocsEnabled(),
 
                     /* Turnitin status indicator
                      */
@@ -590,5 +593,28 @@ class Controller extends Base
     private function getDisasterRecoveryBackupsEnabled(): bool
     {
         return $this->getConfigLoader()->get('aws_s3_dr_backup_enabled');
+    }
+
+    /**
+     * Returns whether etherpad is enabled
+     *
+     * @return bool
+     */
+    private function collabDocsEnabled(): bool
+    {
+        // try catch to prevent Schoolbox\Mapper\Exception\NotFound if it is disabled
+        try {
+            $collabDocsDefinition = Component_DefinitionMapper::getInstance()->findOneByColumn(
+                "class",
+                "Component_Homepage_EtherpadController",
+                [
+                    'hidden' => true
+                ]
+            );
+            return $collabDocsDefinition->getEnabled();
+        }
+        catch (Exception $e) {
+            return false;
+        }
     }
 }

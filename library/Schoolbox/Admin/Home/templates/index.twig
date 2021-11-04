@@ -99,6 +99,18 @@
                 $('[data-light="www"]').addClass(light);
             });
         }
+        {% if collabDocsEnabled %}
+        // check if /pad is accessible
+        $.ajax({
+            url: '/pad',
+            success: function() {
+                $('[data-light="etherpad"]').html('Online').removeClass('alert').addClass('success');
+            },
+            error: function() {
+                $('[data-light="etherpad"]').html('Offline').addClass('alert');
+            }
+        });
+        {% endif %}
     });
 </script>
 
@@ -189,6 +201,16 @@
                                 <span class="full-width {{ www_light }} label" data-light="www">{{ www_status }}</span>
                             </div>
                         </li>
+                        {% if collabDocsEnabled %}
+                        <li>
+                            <div class="small-5 columns content">
+                                Collab Docs
+                            </div>
+                            <div class="small-7 columns content">
+                                <span class="full-width alert label" data-light="etherpad">Testing...</span>
+                            </div>
+                        </li>
+                        {% endif %}
                         {% if kamiEnabled %}
                             {% set kamiStatus = kamiOnline ? 'success' : 'alert' %}
                             {% set kamiLabel = kamiOnline ? 'Online' : 'Offline' %}
