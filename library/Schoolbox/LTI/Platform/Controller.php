@@ -29,6 +29,7 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\LTI\AccessToken\Cache\ItemPool;
 use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
@@ -251,7 +252,7 @@ class Controller extends Base
             //     but only if the access token response generator creates
             //     refresh tokens, which this one does not (because it's using
             //     the client credentials grant type)
-            'zzzz',
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
         );
 
         // Build the access token response
