@@ -35,7 +35,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
      */
     protected $user;
 
-    /** @var Collection|PastoralGroupMember[] $members */
+    /** @var Collection|PastoralGroupMember[]|null $members */
     protected $members;
 
     /**
@@ -95,6 +95,20 @@ class Model implements ISoftDeletable, ValueLabelInterface
     public function getMembers()
     {
         return $this->members;
+    }
+
+    /**
+     * Returns members with role with pastoral access
+     * @return Collection
+     */
+    public function getMembersWithPermission(): Collection
+    {
+        if (!$this->members) {
+            return new Collection();
+        }
+        return $this->members->filter(static function (Member\Model $member) {
+            return !$member->getUser()->getRole()->isStaff() || $member->getUser()->getRole()->getAccessPastoral();
+        });
     }
 
     /**

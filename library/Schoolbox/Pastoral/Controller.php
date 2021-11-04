@@ -460,11 +460,22 @@ class Controller extends Base
 
         // Hydrate group members and their roles so we can display them in the visibility section
         if ($record->getAccess()) {
-            foreach ($record->getAccess() as $access) {
+            foreach ($record->getAccess() as $key => $access) {
                 if ($access->getGroup() instanceof PastoralGroup) {
                     $this->pastoralGroupMapper->findById($access->getGroup()->getId());
-                    foreach ($access->getGroup()->getMembers() as $member) {
+                    foreach ($access->getGroup()->getMembersWithPermission() as $member) {
                         $this->userMapper->findById($member->getUser()->getId());
+                    }
+                } else {
+                    if ($access->getRole() instanceof Role) {
+                        $role = $access->getRole();
+                    } elseif ($access->getUser() instanceof User) {
+                        $role = $access->getUser()->getRole();
+                    } else {
+                        continue;
+                    }
+                    if ($role->isStaff() && !$role->getAccessPastoral()) {
+                        $record->getAccess()->offsetUnset($key);
                     }
                 }
             }
@@ -554,7 +565,7 @@ class Controller extends Base
         /** @var Role $roleCurrent */
         foreach ($rolesAll as $roleCurrent) {
             // Staff role? Show all users
-            if ($roleCurrent->isStaff()) {
+            if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {
                 $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
             }
@@ -651,7 +662,7 @@ class Controller extends Base
                     'severities'        => $severities,
                     'roles'             => $roles,
                     'roleUsers'         => $roleUsers,
-                    'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
+                    'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
                     'moderator'         => $moderator,
                     'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                     'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),

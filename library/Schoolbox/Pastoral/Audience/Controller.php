@@ -190,7 +190,8 @@ class Controller extends Base
      */
     private function getAudiencesModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $subType): void
     {
-        $pb = $this->roleMapper->getPredicateBuilder()->equals('group_type', Role::STAFF);
+        $staffPb = $this->roleMapper->getPredicateBuilder()->equals('group_type', Role::STAFF)->equals('access_pastoral', 1);
+        $pb = $this->roleMapper->getPredicateBuilder()->all($staffPb);
         if ($this->getConfigLoader()->get('pastoral_parent_access')) {
             $pb->equals('group_type', Role::PARENT);
             $pb = $this->roleMapper->getPredicateBuilder()->any($pb);
@@ -254,7 +255,7 @@ class Controller extends Base
                 'allowParents'    => false,  //prevent user search from including student parents
                 'roles'           => $roles,
                 'roleUsers'       => $roleUsers,
-                'groups'          => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
+                'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
                 'type'            => $type,
                 'subtype'         => $subType,
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),

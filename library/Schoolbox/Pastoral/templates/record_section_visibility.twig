@@ -63,7 +63,7 @@
                             {# Display links to group members profiles #}
 
                             <p class="meta">
-                                {% for member in access.group.members %}
+                                {% for member in access.group.membersWithPermission %}
                                     {% if member.user.isDeleted() %}
                                         {{ member.user.fullName }}
                                         ({{ member.user.role.name }})<br>
@@ -155,7 +155,7 @@
                             {# Display links to group members profiles#}
 
                             <p class="meta">
-                                {% for member in access.group.members %}
+                                {% for member in access.group.membersWithPermission %}
                                     {% if member.user.isDeleted() %}
                                         {{ member.user.fullName }}<br>
                                     {% else %}
@@ -246,7 +246,7 @@
                             {# Display links to group members profiles#}
 
                             <p class="meta">
-                                {% for member in access.group.members %}
+                                {% for member in access.group.membersWithPermission %}
                                     {% if member.user.isDeleted() %}
                                         {{ member.user.fullName }}<br>
                                     {% else %}

@@ -9,47 +9,46 @@
 namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Pastoral;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Resource\Search\Results;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    /** @var PastoralAccessMapper $pastoralAccessMapper */
-    private $pastoralAccessMapper;
+    /** PastoralGroupMapper */
+    private PastoralGroupMapper $pastoralGroupMapper;
 
-    /** @var PastoralGroupMapper $pastoralGroupMapper */
-    private $pastoralGroupMapper;
+    /** PastoralGroupMemberMapper */
+    private PastoralGroupMemberMapper $pastoralGroupMemberMapper;
 
-    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    private $pastoralGroupMemberMapper;
+    /** UserMapper */
+    private UserMapper $userMapper;
 
-    /** @var UserMapper $userMapper */
-    private $userMapper;
+    /** RoleMapper */
+    private RoleMapper $roleMapper;
 
 
     /**
      * Constructor
      *
      * @param UserMapper                $userMapper
-     * @param PastoralAccessMapper      $pastoralAccessMapper
+     * @param RoleMapper                $roleMapper
      * @param PastoralGroupMapper       $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
      */
     public function __construct(
         UserMapper $userMapper,
-        PastoralAccessMapper $pastoralAccessMapper,
+        RoleMapper $roleMapper,
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralGroupMemberMapper $pastoralGroupMemberMapper
     ) {
         $this->userMapper                = $userMapper;
-        $this->pastoralAccessMapper      = $pastoralAccessMapper;
+        $this->roleMapper                = $roleMapper;
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
     }
@@ -59,47 +58,52 @@ class Controller extends Base
      */
     public function getGroups()
     {
-        $groups = $this->pastoralGroupMapper->findAll();
-        $groups->sortByCallback(function (PastoralGroup $a, PastoralGroup $b) {
-            return strnatcasecmp($a->getName(), $b->getName());
-        });
 
-        $this->getResponse()->content->set([
-            'template' => '@pastoralManagement/groups.twig',
-            'data'     => [
-                'groups' => $groups,
-            ],
-            'title' => 'Pastoral Group Management',
-        ]);
+        $groups = $this->pastoralGroupMapper->findAll();
+        $groups->sortByCallback(
+            function (PastoralGroup $a, PastoralGroup $b) {
+                return strnatcasecmp($a->getName(), $b->getName());
+            }
+        );
+
+        $this->getResponse()->content->set(
+            [
+                'template' => '@pastoralManagement/groups.twig',
+                'data'     => [
+                    'groups' => $groups,
+                ],
+                'title'    => 'Pastoral Group Management',
+            ]
+        );
     }
 
 
     /**
      * Display form to allow insert/update of a pastoral group
      *
-     * @param Pastoral\Group\Model $group
+     * @param PastoralGroup $group
      */
-    public function getGroupsModify(Pastoral\Group\Model $group): void
+    public function getGroupsModify(PastoralGroup $group): void
     {
-        // Hydrate roles
-        if ($group->getMembers()) {
-            foreach ($group->getMembers() as $member) {
-                try {
-                    $this->userMapper->findById($member->getUser()->getId());
-                } catch (Exception $e) {
-                    // noop
-                }
-            }
-        }
+        // Find staff roles with pastoral permission
+        $roles = $this->roleMapper->findByColumnList(
+            [
+                'group_type'      => Role::STAFF,
+                'access_pastoral' => true,
+            ]
+        );
 
-        $this->getResponse()->content->set([
-            'template' => '@pastoralManagement/groups_modify.twig',
-            'data'     => [
-                'group'               => $group,
-                'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
-            ],
-            'title' => 'Update Pastoral Group',
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'template' => '@pastoralManagement/groups_modify.twig',
+                'data'     => [
+                    'group'               => $group,
+                    'roles'               => $roles,
+                    'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
+                ],
+                'title'    => 'Update Pastoral Group',
+            ]
+        );
     }
 
     /**

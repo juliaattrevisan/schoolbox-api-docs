@@ -7041,11 +7041,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Comment/Notifier.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Management/Controller.php
-
-		-
 			message: "#^Property Schoolbox\\\\Pastoral\\\\Report\\\\Model\\:\\:\\$houses \\(Schoolbox\\\\GenericCollection\\) does not accept iterable\\<House\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Report/Model.php
