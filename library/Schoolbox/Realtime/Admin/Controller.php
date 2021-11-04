@@ -324,8 +324,9 @@ class Controller extends BaseController
                 $this->sendError("This App Identifier already exists. Please use a unique 'App Identifier'");
                 return;
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                /** @var Service $serviceModel */
                 $serviceModel = $e->getDeletedObject();
-                $serviceModel->setDeletedAt(null);
+                $serviceModel->setDeletedAt();
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $serviceModel = $serviceMapper->createModel();
             }
