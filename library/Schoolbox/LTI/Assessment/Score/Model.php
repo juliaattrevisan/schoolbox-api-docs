@@ -49,8 +49,8 @@ class Model implements ISoftDeletable
      * Activity progress values which are considered to be responses from the
      * student.
      *
-     * If this score has this value, and the previous score for this
-     * student+assessment has a different value, then this is a response.
+     * If this score has this value, then this is a response (so long as it is
+     * not a feedback).
      */
     public const ACTIVITY_PROGRESS_RESPONSE_VALUES = [
         self::ACTIVITY_PROGRESS_SUBMITTED,
@@ -112,8 +112,7 @@ class Model implements ISoftDeletable
      * Grading progress values which are considered to be feedback from the
      * instructor.
      *
-     * If this score has this value, and the previous score for this
-     * student+assessment has a different value, then this is a feedback.
+     * If this score has this value, then this is a feedback.
      */
     public const GRADING_PROGRESS_FEEDBACK_VALUES = [
         self::GRADING_PROGRESS_PENDING,
@@ -225,36 +224,38 @@ class Model implements ISoftDeletable
 
     /**
      * Determine whether this score's activity progress value makes this score a
-     * response, given the previous score.
+     * response.
      *
-     * @param Model|null $previous
+     * This is a response if:
+     * * its activity progress is in `self::ACTIVITY_PROGRESS_RESPONSE_VALUES`
+     * * it's not a feedback
+     *
      * @return bool
      */
-    public function determineResponseStatus(?Model $previous): bool
+    public function determineResponseStatus(): bool
     {
+        if ($this->determineFeedbackStatus()) {
+            return false;
+        }
         if (in_array($this->activityProgress, self::ACTIVITY_PROGRESS_RESPONSE_VALUES)) {
-            if (!$previous) {
-                return true;
-            }
-            return $this->activityProgress !== $previous->getActivityProgress();
+            return true;
         }
         return false;
     }
 
     /**
      * Determine whether this score's activity progress value makes this score a
-     * feedback, given the previous score.
+     * feedback.
      *
-     * @param Model|null $previous
+     * This is a response if:
+     * * its grading progress is in `self::GRADING_PROGRESS_FEEDBACK_VALUES`
+     *
      * @return bool
      */
-    public function determineFeedbackStatus(?Model $previous): bool
+    public function determineFeedbackStatus(): bool
     {
         if (in_array($this->gradingProgress, self::GRADING_PROGRESS_FEEDBACK_VALUES)) {
-            if (!$previous) {
-                return true;
-            }
-            return $this->gradingProgress !== $previous->getGradingProgress();
+            return true;
         }
         return false;
     }

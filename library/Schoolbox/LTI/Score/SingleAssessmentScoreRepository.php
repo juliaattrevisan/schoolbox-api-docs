@@ -155,8 +155,8 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         // Response/feedback status: determine from grading/activity progress,
         // and previous score.
         $ltiScore = $ltiScore
-            ->setIsResponse($ltiScore->determineResponseStatus($previousLtiScore))
-            ->setIsFeedback($ltiScore->determineFeedbackStatus($previousLtiScore));
+            ->setIsResponse($ltiScore->determineResponseStatus())
+            ->setIsFeedback($ltiScore->determineFeedbackStatus());
 
         $this->ltiScoreMapper->save($ltiScore);
         return $score;
