@@ -49,6 +49,12 @@ class FolderFetcher
 
 
     /**
+     * @var FoldersWithCourses
+     */
+    private FoldersWithCourses $foldersWithCourses;
+
+
+    /**
      * @param Folder\Mapper          $folderMapper
      * @param External_UserInterface $externalUser
      */
@@ -60,6 +66,10 @@ class FolderFetcher
         /* A cache for remembering previous class ids
          */
         $this->previousClassIdCache = new PreviousClassIdCache($folderMapper);
+
+        /* A cache for remembering folders with courses
+         */
+        $this->foldersWithCourses = new FoldersWithCourses($folderMapper);
     }
 
 
@@ -129,17 +139,38 @@ class FolderFetcher
             );
         }
 
+        /* This is a human-curated blacklist which specifically excludes folders.
+         * The folders to be excluded are maintained through a user interface, by a human
+         * but the humans can't keep up with the exclusions using this mechanic...
+         */
         $exclusions = array_filter(array_map('\trim', explode(',', $excludedClassCodes ?? '')));
+
+        /* ...which means we programmatically exclude folders that would otherwise be
+         * blacklisted by a human through the ui. We only care about Folders With Courses;
+         * Folders Without Courses can be ignored
+         */
+        $foldersWithCourses = $this->foldersWithCourses->find();
+
         foreach ($folders as $idx => $folder) {
+            /* This folder was blacklisted via human curation
+             */
             if ($this->isFolderExcluded($folder, $exclusions)) {
+                $folders->offsetUnset($idx);
+            }
+
+            /* Only care about folders with course implementations
+             */
+            if (!isset($foldersWithCourses[$idx])) {
                 $folders->offsetUnset($idx);
             }
         }
 
+        /* Sort alphabetically
+         */
         $folders->indexBy($this->folderMapper->getIdentifierProperty())
-                ->sortByCallback(static function (Folder\Model $a, Folder\Model $b): int {
-                    return \strnatcasecmp($a->getName(), $b->getName());
-                }, true);
+            ->sortByCallback(static function (Folder\Model $a, Folder\Model $b): int {
+                return \strnatcasecmp($a->getName(), $b->getName());
+            }, true);
 
         return $folders;
     }
