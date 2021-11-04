@@ -257,6 +257,9 @@ export default {
             const fetchList = [];
             this.selectedRows.forEach((row) => {
                 fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
                     method: 'POST',
                     body: this.getFormData(),
                 }));
