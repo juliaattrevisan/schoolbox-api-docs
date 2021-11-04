@@ -257,11 +257,16 @@ export default {
             const fetchList = [];
             this.selectedRows.forEach((row) => {
                 fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    // headers: {
+                    //     'Content-Type': 'application/json',
+                    // },
+                    // method: 'POST',
+                    // body: this.getURLSearchParams(),
+                    // headers: {
+                    //     'Content-Type': 'multipart/form-data'
+                    // },
                     method: 'POST',
-                    body: this.getURLSearchParams(),
+                    body: this.getFormData(),
                 }));
             });
             return fetchList;
@@ -279,6 +284,20 @@ export default {
                 'comment': this.comment,
                 'publish': '1',
             })
+        },
+
+        /**
+         * Send through the data to delete the row
+         *
+         * @returns { FormData }
+         */
+        getFormData () {
+            const formData = new FormData();
+            formData.append('responseId', '');
+            formData.append('resubmissionRequired', '1');
+            formData.append('comment', this.comment);
+            formData.append('publish', '1');
+            return formData;
         },
 
         /**
