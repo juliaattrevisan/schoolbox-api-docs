@@ -216,7 +216,7 @@ class FolderFetcher
     /**
      * @return array
      */
-    public function getPreviouClassIds(): array
+    public function getPreviousClassIds(): array
     {
         return $this->previousClassIdCache->getIds();
     }

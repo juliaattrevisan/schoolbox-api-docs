@@ -457,7 +457,7 @@ class Controller extends Web\Controller\Base
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
         $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $this->getUser(), $roleTypeOverride);
 
-        $previousClassIds = $fetcher->getPreviouClassIds();
+        $previousClassIds = $fetcher->getPreviousClassIds();
 
         $subjects = [];
         foreach ($folders as $folder) {
