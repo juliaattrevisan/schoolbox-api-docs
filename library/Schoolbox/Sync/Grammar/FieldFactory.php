@@ -66,6 +66,7 @@ class FieldFactory
                     'form.level'         => 'Form Level',
                     'house.code'         => 'House Code',
                     'boardingHouse.code' => 'Boarding House Code',
+                    'boardingStatus'     => 'Boarding Status',
                     'gender'             => 'Gender',
                 ];
                 break;
