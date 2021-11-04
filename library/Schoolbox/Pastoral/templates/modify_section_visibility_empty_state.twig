@@ -9,7 +9,7 @@
     {%- endif %}
 {% endset %}
 <span id="visibility_empty_state">
-{% if name is not null %}
+{% if name is not empty %}
     <p>There is no visibility set for this record. It will only be visible to {{ name }} and {{ locale.pastoral }} moderators.</p>
     <p>
         To grant access to other users, add a
