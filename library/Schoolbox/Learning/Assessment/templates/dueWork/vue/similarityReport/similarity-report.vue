@@ -258,27 +258,27 @@ export default {
             this.selectedRows.forEach((row) => {
                 fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                        'Content-Type': 'application/json',
                     },
                     method: 'POST',
-                    body: this.getFormData(),
+                    body: this.getURLSearchParams(),
                 }));
             });
             return fetchList;
         },
 
         /**
-         * Send through the data to delete the row
+         * Send through the mark the submission as requiring submission and include the comment
          *
-         * @returns { FormData }
+         * @returns { URLSearchParams }
          */
-        getFormData () {
-            const formData = new FormData();
-            formData.append('responseId', '');
-            formData.append('resubmissionRequired', '1');
-            formData.append('comment', this.comment);
-            formData.append('publish', '1');
-            return formData;
+        getURLSearchParams () {
+            return new URLSearchParams({
+                'responseId': '',
+                'resubmissionRequired': '1',
+                'comment': this.comment,
+                'publish': '1',
+            })
         },
 
         /**
