@@ -221,6 +221,7 @@ class Controller extends Base
                 new ItemPool(
                     $this->accessTokenMapper,
                     $clientRepository,
+                    $this->userCodec,
                 )
             ),
             // So far, Schoolbox supports only the Score service.

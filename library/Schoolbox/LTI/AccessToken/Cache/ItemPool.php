@@ -16,6 +16,7 @@ use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\LTI\AccessToken\Mapper;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
@@ -36,6 +37,11 @@ class ItemPool implements CacheItemPoolInterface
     private ClientRepositoryInterface $clientRepository;
 
     /**
+     * User codec, for encoding the access token's user into a
+     */
+    private UserCodec $userCodec;
+
+    /**
      * Access token cache
      *
      * @var array<string, Item>
@@ -47,11 +53,16 @@ class ItemPool implements CacheItemPoolInterface
      *
      * @param Mapper                    $accessTokenMapper
      * @param ClientRepositoryInterface $clientRepository
+     * @param UserCodec                 $userCodec
      */
-    public function __construct(Mapper $accessTokenMapper, ClientRepositoryInterface $clientRepository)
-    {
+    public function __construct(
+        Mapper $accessTokenMapper,
+        ClientRepositoryInterface $clientRepository,
+        UserCodec $userCodec
+    ) {
         $this->accessTokenMapper = $accessTokenMapper;
         $this->clientRepository  = $clientRepository;
+        $this->userCodec         = $userCodec;
     }
 
     /**
@@ -70,8 +81,7 @@ class ItemPool implements CacheItemPoolInterface
             try {
                 $model = $this->accessTokenMapper->findById($key);
 
-                // TODO decide once and for all upon identifier in LTI: I think username makes most sense
-                $accessToken->setUserIdentifier($model->getUser()->getUsername() ?? null);
+                $accessToken->setUserIdentifier($this->userCodec->encode($model->getUser()));
                 $accessToken->setClient(
                     $this->clientRepository->getClientEntity($model->getLtiTool()->getClientId())
                 );
@@ -189,8 +199,7 @@ class ItemPool implements CacheItemPoolInterface
             $user           = null;
             $userIdentifier = $token->getUserIdentifier();
             if (isset($userIdentifier)) {
-                // TODO inject this mapper
-                $user = UserMapper::getInstance()->findByUsername($userIdentifier);
+                $user = $this->userCodec->decode($userIdentifier);
             }
             $model = $this->accessTokenMapper
                 ->createModel()
