@@ -239,8 +239,19 @@ class Controller extends Base
             new ScopeRepository([
                 new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
             ]),
-            // TODO replace with a real key
-            'B'
+            // I don't think we actually use this encryption key.
+            // AFAICT it's used in the following places:
+            // * \League\OAuth2\Server\Grant\AuthCodeGrant::completeAuthorizationRequest, called by
+            //   \League\OAuth2\Server\AuthorizationServer::completeAuthorizationRequest
+            //   (which for some reason we never call)
+            // * \League\OAuth2\Server\ResponseTypes\BearerTokenResponse::generateHttpResponse, called by:
+            //  * \League\OAuth2\Server\AuthorizationServer::completeAuthorizationRequest
+            //    (as above, we never call this)
+            //  * \League\OAuth2\Server\AuthorizationServer::respondToAccessTokenRequest,
+            //     but only if the access token response generator creates
+            //     refresh tokens, which this one does not (because it's using
+            //     the client credentials grant type)
+            'zzzz',
         );
 
         // Build the access token response
