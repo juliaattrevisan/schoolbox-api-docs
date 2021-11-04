@@ -43,7 +43,7 @@ export default {
             <p class="meta" v-html="getFormattedStatus"></p>
         </div>
         <div class="status__column">
-            <a class="button icon-approve" :href="data.submission._links.inline_grader" title="Review Submission">Review Submission</a>
+            <a class="button icon-approve" :href="data.submission._links.inline_grader" title="Review submission">Review submission</a>
         </div>
     </div>
 </template>
@@ -55,13 +55,13 @@ export default {
 .status {
     display: flex;
     justify-content: space-between; //the status and review buttons on either ends of column
-    @media (max-width: $tableToSingleColumn) {
+    @media (max-width: $tableToDoubleColumn) {
         flex-direction: column;
     }
 }
 
     .status__column {
-        @media (max-width: $tableToSingleColumn) {
+        @media (max-width: $tableToDoubleColumn) {
             margin-bottom: 0.5rem; //so there's a gap to .button
         }
     }

@@ -39,7 +39,7 @@ export default {
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
             tableData: [], //hold all student tableData
-            tableColumns: ['student', 'submissionDate', 'similarity',    'status'], //the table tableColumns
+            tableColumns: ['student', 'submissionDate', 'similarity', 'status'], //the table tableColumns
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -120,11 +120,6 @@ export default {
                     submissionDate: SimilarityReportRowSubmissionDate,
                     similarity: SimilarityReportRowSimilarity,
                     status: SimilarityReportRowStatus,
-                },
-                texts: {
-                    noResults: 'No matching students...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
                 },
             },
             comment: '', //the message coupled with the mark as requiring resubmission
@@ -242,15 +237,13 @@ export default {
             this.$refs.toast.activate('Updating...');
             try {
                 await Promise.all(this.getFetches());
-                this.isProcessing = false;
-                this.comment = '';
-                this.markAsRequiringResubmission();
-                this.clearRows();
+                this.onFeedbackPublished();
                 this.$refs.toast.timeout('Feedback published', true, 2000);
             } catch (error) {
-                this.isProcessing = false;
                 console.warn(error);
                 this.$refs.toast.timeout('Unable to update', false, 3000);
+            } finally {
+                this.isProcessing = false;
             }
         },
 
@@ -264,31 +257,43 @@ export default {
             const fetchList = [];
             this.selectedRows.forEach((row) => {
                 fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     method: 'POST',
-                    body: this.getFormData(),
+                    body: this.getURLSearchParams(),
                 }));
             });
             return fetchList;
         },
 
         /**
-         * Send through the data to delete the row
+         * Send through the mark the submission as requiring submission and include the comment
          *
-         * @returns { FormData }
+         * @returns { URLSearchParams }
          */
-        getFormData () {
-            const formData = new FormData();
-            formData.append('responseId', '');
-            formData.append('resubmissionRequired', '1');
-            formData.append('comment', this.comment);
-            formData.append('publish', '1');
-            return formData;
+        getURLSearchParams () {
+            return new URLSearchParams({
+                'responseId': '',
+                'resubmissionRequired': '1',
+                'comment': this.comment,
+                'publish': '1',
+            })
+        },
+
+        /**
+         * Set up for another possible update
+         */
+        onFeedbackPublished () {
+            this.comment = ''; //clear the comment for another possible entry
+            this.markRowsAsRequiringResubmission();
+            this.clearRows();
         },
 
         /**
          * Loop through and update the submissions
          */
-        markAsRequiringResubmission () {
+        markRowsAsRequiringResubmission () {
             this.selectedRows.forEach((selectedRow) => { //directly edit the original data to update the display
                 const rowData = this.tableData.find((row) => selectedRow.user.id === row.user.id);
                 rowData.submission.status = 'failed';
@@ -300,7 +305,7 @@ export default {
          */
         clearRows () {
             this.selectedRows = [];
-            this.$refs.table.resetSelectedRows();
+            this.$refs.table.resetSelectedRows(); //ensure vue-tables-2 updates
         },
 
         /**
@@ -390,11 +395,26 @@ export default {
     display: none; //there's no footer, so no count/pagination/next/prev etc for this report
 }
 
-@media (max-width: $tableToSingleColumn) { //display everything in one column
+@media (max-width: $tableToDoubleColumn) { //display everything in two columns
     .VueTables thead {
         display: none;
     }
-    .VueTables .VueTables__row td {
+    .VueTables__row td:not(.VueTables__select-row) {
+        border-bottom: none;
+        border-top: 1px solid var(--body-background);
+        display: inline-block;
+        width: 50%;
+    }
+    .VueTables__row td.VueTables__select-row {
+        border-bottom: none;
+        border-top: 2px solid var(--body-background);
+        display: block;
+        width: 100%;
+    }
+}
+
+@media (max-width: $tableToSingleColumn) { //and then display everything in one column
+    .VueTables__row td:not(.VueTables__select-row) {
         display: block;
         padding: 0.5rem 0;
         width: 100%;

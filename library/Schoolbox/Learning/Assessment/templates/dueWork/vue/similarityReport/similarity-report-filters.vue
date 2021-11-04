@@ -18,8 +18,28 @@ export default {
         }
     },
 
+    mounted () {
+        this.initResetFiltersListener();
+    },
+
     methods: {
         
+        /**
+         * Reset all the filters back to there base level
+         */
+        initResetFiltersListener () {
+            document.addEventListener(FilterEvents.RESET_FILTERS, () => {
+                this.similarityScoreSelection = 0;
+                this.isResubmissionRequiredChecked = true;
+                this.isMarkingRequiredChecked = true;
+                this.isReviewedChecked = true;
+                this.onSimilarityScoreChange();
+                this.onResubmissionRequiredChange();
+                this.onMarkingRequiredChange();
+                this.onReviewedChange();
+            });
+        },
+
         /**
          * Show any rows that contain similarity scores above the selection
          * Note that for rows with multiple files, only a single file with a similarity
@@ -27,7 +47,7 @@ export default {
          */
         onSimilarityScoreChange () {
             Event.$emit(`vue-tables.filter::${FilterEvents.SIMILARITY_SCORE}`, this.similarityScoreSelection); //picked up by similarity-report.vue 
-            this.$nextTick(() => { //to ensure the latest filtered rows are available
+            this.$nextTick(() => { //to ensure the latest filtered rows are available, dispatched to similarity-report-row-similarity.vue
                 document.dispatchEvent(new CustomEvent(FilterEvents.SIMILARITY_SCORE, { detail: { score: this.similarityScoreSelection } } ) );
             });
         },
@@ -71,18 +91,18 @@ export default {
     <div class="filters">
         <div class="filters__column">
             <label>Similarity score</label>
-                <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange($event.target.value)">
-                    <option value="0">-</option>
-                    <option value="90">Above 90%</option>
-                    <option value="80">Above 80%</option>
-                    <option value="70">Above 70%</option>
-                    <option value="60">Above 60%</option>
-                    <option value="50">Above 50%</option>
-                    <option value="40">Above 40%</option>
-                    <option value="30">Above 30%</option>
-                    <option value="20">Above 20%</option>
-                    <option value="10">Above 10%</option>
-                </select>
+            <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange()">
+                <option value="0">-</option>
+                <option value="90">Above 90%</option>
+                <option value="80">Above 80%</option>
+                <option value="70">Above 70%</option>
+                <option value="60">Above 60%</option>
+                <option value="50">Above 50%</option>
+                <option value="40">Above 40%</option>
+                <option value="30">Above 30%</option>
+                <option value="20">Above 20%</option>
+                <option value="10">Above 10%</option>
+            </select>
         </div>
         <div class="filters__column">
             <div class="checklist">

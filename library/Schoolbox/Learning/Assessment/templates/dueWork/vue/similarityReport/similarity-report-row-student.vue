@@ -41,14 +41,14 @@ export default {
 
 .student {
     display: flex;
-    @media (max-width: $tableToSingleColumn) {
+    @media (max-width: $tableToDoubleColumn) {
         flex-wrap: wrap; //so .title-on-single-column can be on its own row
     }
 }
 
 .student__portrait {
-    flex-basis: 0 0 32px; //32px is the size of the image, so only need occupy this space
     margin: 0 1rem 0.5rem 0;
+    flex: 0 0 32px; //32px is the size of the image, so only need occupy this space
 }
 
 .student__name {
