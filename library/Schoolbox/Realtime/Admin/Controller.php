@@ -307,7 +307,10 @@ class Controller extends BaseController
             try {
                 $serviceModel = $serviceMapper->findById($id);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $serviceModel = $serviceMapper->createModel();
+                /* You tried to modify a thing that doesn't exist anymore
+                 */
+                $this->sendError("This App does not exist.");
+                return;
             }
         } else {
             /**
