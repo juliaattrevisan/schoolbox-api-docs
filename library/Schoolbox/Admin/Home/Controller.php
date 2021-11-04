@@ -39,7 +39,6 @@ use function array_column;
 use function array_map;
 use function array_merge;
 use function array_sum;
-use function PHPUnit\Framework\fileExists;
 use function preg_filter;
 use function str_replace;
 use function strpos;
