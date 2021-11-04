@@ -2,6 +2,7 @@
 
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
@@ -16,7 +17,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     /* Check permission
      */
     if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_READ) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $pollHandler->placeVote($_POST['id'], $_POST['vote']);
@@ -26,7 +27,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     /* Check permission
      */
     if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $date = Alaress_Date_Format::newLocalShort($_POST['close']);
@@ -105,11 +106,11 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
 } else if ($_POST['delete'] === 'true') {
     //get the id and other post objects
-    $id = $_POST['id'];
-    $componentId = $_POST['componentId'];
+    $id = (int)$_POST['id'];
+    $componentId = (int)$_POST['componentId'];
 
     //lets confirm there is actually an id and component id...
-    if ($id === "" || $componentId === "") {
+    if (!$id || !$componentId) {
         $page->outputJson(['message' => 'Poll id not provided'], false, 400);
         return;
     }
@@ -124,7 +125,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     /* Check permission
      */
     if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $pollHandler->delete($id);
@@ -144,7 +145,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
             ]
         );
     } catch (Schoolbox\Mapper\Exception $e) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         exit;
     }
 
@@ -165,9 +166,13 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
     $componentConfigInstanceMapper->save($confI);
 
-    $page->outputJson([
-        'message' => 'Poll deleted',
-        'poll_id' => $poll['id'],
-        'homepage_id' => $poll['folder_id'],
-          ], false, 200);
+    $page->outputJson(
+        [
+            'message' => 'Poll deleted',
+            'poll_id' => $poll['id'],
+            'homepage_id' => $poll['folder_id'],
+        ],
+        false,
+        200
+    );
 }
