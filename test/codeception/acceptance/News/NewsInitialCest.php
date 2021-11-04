@@ -1,12 +1,19 @@
 <?php
 
+namespace NewsInitial;
+
+use AcceptanceTester;
 use Codeception\Util\Locator;
+use Exception;
 
 //TODO: add verification after the actions
 
 class NewsInitialCest
 {
 
+    /**
+     * @throws Exception
+     */
     public function createNews(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -33,6 +40,9 @@ class NewsInitialCest
         $i->see('Test News Title');
     }
 
+    /**
+     * @throws Exception
+     */
     public function unpublishNews(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -50,6 +60,9 @@ class NewsInitialCest
         //TODO: Check that article is actually unpublished
     }
 
+    /**
+     * @throws Exception
+     */
     public function publishNews(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -61,6 +74,9 @@ class NewsInitialCest
         $i->click(['css' => 'input#article-submit[value=Publish\ news]']);
     }
 
+    /**
+     * @throws Exception
+     */
     public function audienceViewsNewsFeed(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -72,6 +88,9 @@ class NewsInitialCest
         $i->seeElement($element);
     }
 
+    /**
+     * @throws Exception
+     */
     public function audienceViewsNewsItem(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -84,6 +103,9 @@ class NewsInitialCest
         $i->see("Test News Title");
     }
 
+    /**
+     * @throws Exception
+     */
     public function enableNewsComments(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -97,6 +119,9 @@ class NewsInitialCest
         $i->click(['css' => 'label[for=allow-comments]']);
     }
 
+    /**
+     * @throws Exception
+     */
     public function addTwoNewsComments(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -108,17 +133,20 @@ class NewsInitialCest
         //$i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
         $i->waitForElementVisible(['css' => 'button.btn-show-ckeditor'], 5);
         $i->click(['css' => 'button.btn-show-ckeditor']);
-        $i->waitForElementVisible(['css' => 'div#cke_comment'], 5);
-        $i->executeJS('CKEDITOR.instances[\'comment\'].setData("indeed this is intresting news");');
+        $i->waitForElementVisible(['css' => 'div#cke_comment-0'], 5);
+        $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("indeed this is intresting news");');
         sleep(2);
         $i->click(['css' => 'a[class=button\ submit]']);
         sleep(3);
-        $i->executeJS('CKEDITOR.instances[\'comment\'].setData("its poop, like your face");');
+        $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("its poop, like your face");');
         sleep(2);
         $i->click(['css' => 'a[class=button\ submit]']);
         sleep(3);
     }
 
+    /**
+     * @throws Exception
+     */
     public function deleteNewsComments(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -132,6 +160,9 @@ class NewsInitialCest
         $i->click('#article-threads-delete-button');
     }
 
+    /**
+     * @throws Exception
+     */
     public function disableNewsComments(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
@@ -144,6 +175,9 @@ class NewsInitialCest
         $i->click(['css' => 'label[for=allow-comments]']);
     }
 
+    /**
+     * @throws Exception
+     */
     public function deleteNews(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
