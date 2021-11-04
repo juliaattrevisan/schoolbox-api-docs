@@ -9,15 +9,19 @@
 
 namespace Schoolbox\MobileApp;
 
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Storage\IStorage;
+use Alaress_Date_Format;
 
 /**
  * This class is ONLY used to get data into/out of the database.
  *
  * @package Schoolbox\MobileApp
  */
-class Service
+class Service implements ISoftDeletable
 {
+    use DeletedAtDate;
 
     /** @var int */
     private $id;
@@ -33,7 +37,6 @@ class Service
 
     /** @var IStorage */
     private $certificate;
-
 
     /**
      * @param int $id

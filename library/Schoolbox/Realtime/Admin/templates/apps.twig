@@ -30,7 +30,47 @@
                 window.location.reload();
             }
         })
+
+        /* Delete confirmation now in ajax
+         */
+        $('a[data-delete-provider]').on('click', function(event) {
+            event.preventDefault();
+
+            var $this = $(this);
+            var href = "{{ routeLookup('adminMessages.postDeleteApp') }}";
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Notification Provider?',
+                confirmLabel: 'Delete',
+                confirmEvent: function() {
+
+                    // A toast
+                    var $toast = $('[data-provider-toast]');
+                    $toast.toastActivate({text: 'Deleting Provider...'});
+
+                    $.post(href, {id : $this.data().id})
+                            .done(function() {
+                                // Kill the element
+                                $this.parents('[data-provider-row]').slideUp(function() {
+                                    $(this).remove();
+                                    if ($('#app-list').children().length == 0) {
+                                        $('#provider-empty').show().slideDown();
+                                    }
+                                });
+
+                                // Toast success
+                                $toast.toastTimeout({text: 'Provider deleted.', css: 'success'});
+                            })
+                            .fail(function() {
+                                // Toast fail
+                                $toast.toastTimeout({text: 'Delete failed.', css: 'alert'});
+                            });
+                }
+            });
+        })
     });
+
+
 </script>
 
 {% import 'sub/breadcrumbs.twig' as bread  %}
@@ -44,11 +84,10 @@
     <div class="admin-content">
         <div class="small-12 island">
             <h2 class="subheader">Registered Apps</h2>
-            {% if apps | length %}
             <section>
                 <ul class="information-list" id="app-list">
                     {% for app in apps %}
-                        <li>
+                        <li data-provider-row>
                             {% include providers[app.providerName].template with {
                                 app:        app,
                                 attachzone: attachzones[app.id] ?? null,
@@ -57,12 +96,12 @@
                     {% endfor %}
                 </ul>
             </section>
-            {% else %}
-            <div class="empty-state">
+
+            <div id="provider-empty" class="empty-state" style="{% if apps | length %}display:none;{% endif %}">
                 <i class="icon-mobile"></i>
                 <p>No mobile apps are currently registered.</p>
             </div>
-            {% endif %}
+
 
             <h2 class="subheader">Register New App</h2>
             <form id="new-app" method="post" action="{{ routeLookup('adminMessages.postModifyApp') }}" class="mage">
@@ -88,12 +127,12 @@
                         <div class="small-12 columns" style="display:none;" data-mage-collapsed>
                             <div data-provider-details>{# will be populated by ajax #}</div>
                         </div>
+                        <div class="small-12 column">
+                            <div class="alert alert-box icon-alert" data-mage-error></div>
+                        </div>
                     </fieldset>
                 </section>
                 <div class="row" data-mage-submitrow>
-                    <div class="small-12 column">
-                        <div class="alert alert-box icon-alert" data-mage-error></div>
-                    </div>
                     <div class="small-12 column">
                         <input type="submit" name="part-2" value="Register" data-mage-next="part-3" data-mage-working="Registering app..." />
                     </div>
@@ -102,3 +141,4 @@
         </div>
     </div>
 </div>
+<div class="toast" data-provider-toast></div>

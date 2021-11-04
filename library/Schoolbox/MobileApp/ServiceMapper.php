@@ -43,6 +43,7 @@ class ServiceMapper extends Mapper
         $this->uses('provider', self::TYPE_STRING, null, 'providerName');
         $this->uses('key', self::TYPE_STRING);
         $this->joins('cert_hash', Storage\Mapper::class, 'hash', null, null, 'certificate', 'cert');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
     }
 
 

@@ -10,10 +10,13 @@
 namespace Schoolbox\MobileApp;
 
 use Alaress_Date_Format;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 
-class Registry
+class Registry implements ISoftDeletable
 {
+    use DeletedAtDate;
 
     const PROVIDER_GOOGLE    = 'GCM';
     const PROVIDER_APPLE     = 'APNS';
@@ -37,7 +40,6 @@ class Registry
 
     /** @var Alaress_Date_Format */
     protected $touchedAt;
-
 
     /**
      * @return User

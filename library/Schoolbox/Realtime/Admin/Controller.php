@@ -303,9 +303,29 @@ class Controller extends BaseController
         // Find the existing app, if one was passed
         $id = trim($post->get('id', null));
         if ($id) {
-            $serviceModel = $serviceMapper->findById($id);
+            //check id, if exists use that record (update), else find if it was deleted, or create new
+            try {
+                $serviceModel = $serviceMapper->findById($id);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $serviceModel = $serviceMapper->createModel();
+            }
         } else {
-            $serviceModel = $serviceMapper->createModel();
+            /**
+             * Check for previously deleted object with the same app_identifier, this is supposed to be unique
+             * if it is exists, throw error. as the DB will throw its own errors if there are dupes
+             */
+            try {
+                $serviceMapper->findOneByColumn('app_identifier', $appId);
+                //search including deleted, and other providers, the app_identifier is a unique column in the db.
+
+                $this->sendError("This App Identifier already exists. Please use a unique 'App Identifier'");
+                return;
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                $this->sendError("This Provider has previously been deleted");
+                return;
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $serviceModel = $serviceMapper->createModel();
+            }
         }
         $serviceMapper->save(
             $serviceModel
@@ -559,5 +579,48 @@ class Controller extends BaseController
         $content['data']['logs'] = array_filter(explode("\n", trim(stream_get_contents($write))));
 
         $this->getResponse()->content->set($content);
+    }
+
+    /**
+     * Deletes notification provider, and user registrations for that provider.
+     *
+     * @api POST /adminv2/messages/apps/delete
+     *
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postDeleteApp()
+    {
+        //get the ID to remove
+        $rq   = $this->getRequest();
+        $post = $rq->post;
+        $id = trim($post->get('id', null));
+
+        //lets confirm there is actually an id...
+        if ($id === "") {
+            $this->sendError('Provider id not provided');
+            return;
+        }
+
+        //steve: were you going to show me dependency injection?
+        $serviceMapper = MobileApp\ServiceMapper::getInstance();
+        $registryMapper = MobileApp\RegistryMapper::getInstance();
+
+        try {
+            $service = $serviceMapper->findById($id);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            //maybe this has already been deleted, or other error, just return to notification provider screen
+            $this->sendError('Provider not found, have they already been deleted?');
+            return;
+        }
+
+        //set deleted id in service / mobile_app table
+        $serviceMapper->delete($service);
+
+        //set deleted in app registries
+        $registryMapper->deleteByColumn('app_id', $service->getId());
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'id' => $service->getId(),
+        ]));
     }
 }
