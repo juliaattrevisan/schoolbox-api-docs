@@ -4,4 +4,4 @@ ALTER TABLE mobile_app
 ALTER TABLE mobile_app_registry
     ADD deleted_at DATETIME NULL;
 
-DROP TABLE mobile_app_registry_backup;
+DROP TABLE IF EXISTS mobile_app_registry_backup;
