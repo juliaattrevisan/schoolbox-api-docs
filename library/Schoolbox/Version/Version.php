@@ -22,7 +22,7 @@ class Version
 
     public const SITE_ENVIRONMENT_CLIENT_HOSTED = 'client-hosted'; // Hosted on client's infrastructure, regardless
                                                                    //  if physically onprem or in their cloud.
-    public const SITE_ENVIRONMENT_CLOUD_SASS    = 'cloud-sass';    // Hosted on Schoolbox's AWS infrastructure.
+    public const SITE_ENVIRONMENT_CLOUD_SAAS = 'cloud-saas';    // Hosted on Schoolbox's AWS infrastructure.
 
     /**
      * Constructor
@@ -104,7 +104,7 @@ class Version
      */
     public function isCloudHosted(): bool
     {
-        return $this->config->get('site_environment') === self::SITE_ENVIRONMENT_CLOUD_SASS;
+        return $this->config->get('site_environment') === self::SITE_ENVIRONMENT_CLOUD_SAAS;
     }
 
     public function showUpgradeReminder(): bool

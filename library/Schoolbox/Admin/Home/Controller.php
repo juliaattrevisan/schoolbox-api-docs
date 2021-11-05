@@ -640,6 +640,6 @@ class Controller extends Base
 
     private function isCloudHosted(): bool
     {
-        return $this->getConfigLoader()->get('site_environment') === 'cloud-saas';
+        return $this->getConfigLoader()->get('site_environment') === Version::SITE_ENVIRONMENT_CLOUD_SAAS;
     }
 }
