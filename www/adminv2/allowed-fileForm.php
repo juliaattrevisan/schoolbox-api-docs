@@ -58,6 +58,12 @@ if (isset($_POST['max_file_size'])) {
     $_POST['max_file_size'] = Alaress_Byte_Format::stringToBytes($_POST['max_file_size']);
 }
 
+//check if the post is bigger than the 2GB limit
+if ($_POST['max_file_size'] > Alaress_Byte_Format::stringToBytes('2GB')) {
+    error(Schoolbox\Error\Mapper::ERROR_FORM_SUBMIT, 'File Max Size is unable to larger than 2GB. Files larger than 2GB cannot be uploaded.');
+}
+
+
 /* Try to load an existing Mimetype that used $_POST['mime']
  * One of these instance might already exist but was deleted
  * In that case, resurrect it and give it the new settings
