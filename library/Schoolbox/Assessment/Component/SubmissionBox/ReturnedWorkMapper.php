@@ -150,6 +150,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
         if (!$previous) {
             $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
+            return true;
         }
         if ($object->isPublished() && $object->getResubmissionRequired() && !$previous->isPublished()) {
             $expireDateOffset = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_LMS_RESUBMIT_WINDOW);
