@@ -611,9 +611,9 @@ class Controller extends Base
                     'hidden' => true
                 ]
             );
-            return $collabDocsDefinition->getEnabled();
         } catch (Exception $e) {
             return false;
         }
+        return $collabDocsDefinition->getEnabled();
     }
 }
