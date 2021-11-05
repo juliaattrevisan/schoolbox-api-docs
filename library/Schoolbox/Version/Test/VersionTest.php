@@ -143,7 +143,7 @@ class VersionTest extends TestCase
             false,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SASS,
+                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SAAS,
             ],
         ];
 
@@ -182,7 +182,7 @@ class VersionTest extends TestCase
             true,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SASS,
+                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SAAS,
             ],
         ];
 
@@ -225,7 +225,7 @@ class VersionTest extends TestCase
             false,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SASS,
+                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SAAS,
             ],
         ];
 

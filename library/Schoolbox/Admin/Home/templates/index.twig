@@ -240,6 +240,17 @@
                                 </div>
                             </li>
                         {% endif %}
+                        {# Show ssh status if not cloud hosted #}
+                        {% if not is_cloud %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    Fleet Connectivity
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
+                                </div>
+                            </li>
+                        {% endif %}
                     </ul>
                 </section>
 

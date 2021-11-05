@@ -254,6 +254,25 @@ class Controller extends Base
             $www_status = 'Inaccessible';
         }
 
+        // check ssh status
+        if (file_exists('/etc/schoolbox/fleet-connected')) {
+            $last_touched = filemtime('/etc/schoolbox/fleet-connected');
+            $touched_diff = time() - $last_touched;
+            if ($touched_diff < 7200) {
+                $ssh_light  = 'success';
+                $ssh_status = 'Accessible';
+            } elseif ($touched_diff < 86400) {
+                $ssh_light  = 'warning';
+                $ssh_status = 'Inaccessible >2hrs';
+            } else {
+                $ssh_light  = 'alert';
+                $ssh_status = 'Inaccessible >24hrs';
+            }
+        } else {
+            $ssh_light  = 'alert';
+            $ssh_status = 'Inaccessible';
+        }
+
         // Get logs
 
         $logs = [];
@@ -338,6 +357,9 @@ class Controller extends Base
                     'kamiOnline' => $this->kamiConnector->isOnline(),
                     'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
                     'collabDocsEnabled' => $this->collabDocsEnabled(),
+                    'ssh_light' => $ssh_light,
+                    'ssh_status' => $ssh_status,
+                    'is_cloud'  => $this->isCloudHosted(),
 
                     /* Turnitin status indicator
                      */
@@ -614,5 +636,10 @@ class Controller extends Base
             return false;
         }
         return $collabDocsDefinition->getEnabled();
+    }
+
+    private function isCloudHosted(): bool
+    {
+        return $this->getConfigLoader()->get('site_environment') === Version::SITE_ENVIRONMENT_CLOUD_SAAS;
     }
 }
