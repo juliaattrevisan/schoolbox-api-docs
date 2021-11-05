@@ -17,6 +17,7 @@ use Alaress_Rss_Stream;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use Component_DefinitionMapper;
+use Component_Homepage_EtherpadController;
 use GuzzleHttp;
 use InvalidArgumentException;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -606,12 +607,10 @@ class Controller extends Base
         try {
             $collabDocsDefinition = Component_DefinitionMapper::getInstance()->findOneByColumn(
                 "class",
-                "Component_Homepage_EtherpadController",
-                [
-                    'hidden' => true
-                ]
+                Component_Homepage_EtherpadController::class
             );
         } catch (Exception $e) {
+            $this->captureException($e);
             return false;
         }
         return $collabDocsDefinition->getEnabled();
