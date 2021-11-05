@@ -86,17 +86,9 @@
             $('[data-light="www"]').html('Testing...');
 
             // Load service statuses via ajax
-
             $.post('/ajax/adminStats.php', { module : 'service_www' }, function(data)
             {
-                for(i in data) {
-                    var light = data[i].WWW_LIGHT;
-                    var status = data[i].WWW_STATUS;
-                }
-
-                $('[data-light="www"]').html(status);
-                $('[data-light="www"]').removeClass('warning');
-                $('[data-light="www"]').addClass(light);
+                $('[data-light="www"]').html(data[0].WWW_STATUS).removeClass('neutral').addClass(data[0].WWW_LIGHT);
             });
         }
         {% if collabDocsEnabled %}
@@ -104,10 +96,10 @@
         $.ajax({
             url: '/pad',
             success: function() {
-                $('[data-light="etherpad"]').html('Online').removeClass('alert').addClass('success');
+                $('[data-light="etherpad"]').html('Online').removeClass('neutral').addClass('success');
             },
             error: function() {
-                $('[data-light="etherpad"]').html('Offline').addClass('alert');
+                $('[data-light="etherpad"]').html('Offline').removeClass('neutral').addClass('alert');
             }
         });
         {% endif %}
@@ -198,7 +190,7 @@
                                 WWW
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width {{ www_light }} label" data-light="www">{{ www_status }}</span>
+                                <span class="full-width neutral label" data-light="www">{{ www_status }}</span>
                             </div>
                         </li>
                         {% if collabDocsEnabled %}
@@ -207,7 +199,7 @@
                                 Collab Docs
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width alert label" data-light="etherpad">Testing...</span>
+                                <span class="full-width neutral label" data-light="etherpad">Testing...</span>
                             </div>
                         </li>
                         {% endif %}
