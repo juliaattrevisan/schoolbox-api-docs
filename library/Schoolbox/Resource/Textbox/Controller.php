@@ -246,4 +246,19 @@ class Controller extends Base
          */
         $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
     }
+
+    /**
+     * Get a textbox.
+     *
+     * @api   GET /textbox/{id}
+     * @since 21.0
+     *
+     * @param Model $textbox
+     */
+    public function getTextbox(Model $textbox): void
+    {
+        $this->response->content->set($this->buildUnthemedHtmlOutput('@textbox/blank.twig', [
+            'textbox'         => $textbox,
+        ]));
+    }
 }

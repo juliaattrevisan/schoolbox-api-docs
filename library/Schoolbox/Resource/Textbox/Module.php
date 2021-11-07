@@ -95,6 +95,7 @@ class Module extends BaseModule
         $this->register('POST', '/rename/{folderId:\d+}', 'postRename', $folderAuth, $folderPreload);
         $this->register('PUT', '/{id:\d+}', 'updateTextbox', $folderAuth, $textboxPreload);
         $this->register('DELETE', '/{id:\d+}', 'deleteTextbox', $folderAuth, $textboxPreload);
+        $this->register('GET', '/{id:\d+}', 'getTextbox', $folderAuth, $textboxPreload);
     }
 
 
