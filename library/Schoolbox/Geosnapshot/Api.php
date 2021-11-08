@@ -80,6 +80,7 @@ class Api
     {
         $headers = [
             'X-API-KEY' => $this->apiKey,
+            'Accept' => '*/*'
         ];
 
         return new Client([
@@ -179,7 +180,16 @@ class Api
 
         /* Responds with this tuple: {"url":"https://geosnapshot.com/e/schoolbox-office-re-opening-from-iso-to-posh"}
          */
-        if ((int)$response->getStatusCode() === 200) {
+        if ($response->getStatusCode() === 200) {
+            /* Geosnapshot endpoints sometimes just echo back an empty string
+             * which is un-json_decodable - just return empty array I guess
+             */
+            if ('' === $response->getBody()->getContents()) {
+                return [];
+            }
+
+            /* Try to decode whatever json payload was given back
+             */
             return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         }
 
