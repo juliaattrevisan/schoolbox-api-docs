@@ -17,7 +17,7 @@
          #}
         {% for crumb in crumbsArray | filter(i=>i[0]) | map(i=>i) %}
             <li{% if loop.last %} class="active"{% endif %}>
-                <a{% if crumb[1] ?? false %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
+                <a{% if loop.last == false %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
             </li>
         {% endfor %}
     </ul>
