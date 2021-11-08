@@ -683,7 +683,7 @@ export default {
                 </li>
             </ul>
             <div class="input-group" id="audience-selectize-group">
-                <input type="text" id="audience-search" name="audience" :placeholder="audiencePlaceholder" required />
+                <input type="text" id="audience-search" name="audience-search" :placeholder="audiencePlaceholder" required />
                 <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
             </div>
         </div>
@@ -811,7 +811,7 @@ export default {
             </div>
         </div>
 
-        <input type="hidden" name="audienceGroup" :value="audienceFormString" />
+        <input type="hidden" name="audience" :value="audienceFormString" />
 
     </div>
 
