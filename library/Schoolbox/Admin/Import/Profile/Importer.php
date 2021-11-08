@@ -367,6 +367,7 @@ class Importer
                 ->setSpecialNeeds((bool)$row['Special Needs'])
                 ->setBoardingHouseName($row['Boarding House Name'])
                 ->setBoardingStatus((bool)$row['Boarding Status'])
+                ->setPhotoRedacted((bool)$row['Photo Redacted'])
                 ->setBaseProfile($baseProfile);
 
             if ($create) {

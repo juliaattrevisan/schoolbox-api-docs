@@ -21,208 +21,235 @@ class Model
     /**
      * @var Alaress_Date_Format|null
      */
-    private $dateOfBirth;
+    private ?Alaress_Date_Format $dateOfBirth;
 
     /**
      * @var string|null
      */
-    private $username;
+    private ?string $username;
 
     /**
      * @var string|null
      */
-    private $email;
+    private ?string $email;
 
     /**
      * @var string|null
      */
-    private $gender;
+    private ?string $gender;
 
     /**
      * @var string|null
      */
-    private $campusName;
+    private ?string $campusName;
 
     /**
      * @var string|null
      */
-    private $emergencyContactName1;
+    private ?string $emergencyContactName1;
 
     /**
      * @var string|null
      */
-    private $emergencyContactPhone1;
+    private ?string $emergencyContactPhone1;
 
     /**
      * @var string|null
      */
-    private $emergencyContactPhoneAlt1;
+    private ?string $emergencyContactPhoneAlt1;
 
     /**
      * @var string|null
      */
-    private $emergencyContactName2;
+    private ?string $emergencyContactName2;
 
     /**
      * @var string|null
      */
-    private $emergencyContactPhone2;
+    private ?string $emergencyContactPhone2;
 
     /**
      * @var string|null
      */
-    private $emergencyContactPhoneAlt2;
+    private ?string $emergencyContactPhoneAlt2;
 
     /**
      * @var string|null
      */
-    private $emergencyContactName3;
+    private ?string $emergencyContactName3;
 
     /**
      * @var string|null
      */
-    private $emergencyContactPhone3;
+    private ?string $emergencyContactPhone3;
 
     /**
      * @var string|null
      */
-    private $emergencyContactPhoneAlt3;
+    private ?string $emergencyContactPhoneAlt3;
 
     /**
      * @var string|null
      */
-    private $headOfHouseId;
+    private ?string $headOfHouseId;
 
     /**
      * @var string|null
      */
-    private $headOfHouseName;
+    private ?string $headOfHouseName;
 
     /**
      * @var string|null
      */
-    private $houseName;
+    private ?string $houseName;
 
     /**
      * @var string|null
      */
-    private $formName;
+    private ?string $formName;
 
     /**
      * @var string|null
      */
-    private $formTeacherId;
+    private ?string $formTeacherId;
 
     /**
      * @var string|null
      */
-    private $formTeacherName;
+    private ?string $formTeacherName;
 
     /**
      * @var string|null
      */
-    private $tutorGroup;
+    private ?string $tutorGroup;
 
     /**
      * @var string|null
      */
-    private $tutorTeacherId;
+    private ?string $tutorTeacherId;
 
     /**
      * @var string|null
      */
-    private $tutorTeacherName;
+    private ?string $tutorTeacherName;
 
     /**
      * @var string|null
      */
-    private $yearLevel;
+    private ?string $yearLevel;
 
     /**
      * @var string|null
      */
-    private $yearLevelCoordinatorId;
+    private ?string $yearLevelCoordinatorId;
 
     /**
      * @var string|null
      */
-    private $yearLevelCoordinatorName;
+    private ?string $yearLevelCoordinatorName;
 
     /**
      * @var string|null
      */
-    private $mobile;
+    private ?string $mobile;
 
     /**
      * @var string|null
      */
-    private $studiesCode;
+    private ?string $studiesCode;
 
     /**
      * @var string|null
      */
-    private $alertMedical;
+    private ?string $alertMedical;
 
     /**
      * @var string|null
      */
-    private $alertComment;
+    private ?string $alertComment;
 
     /**
      * @var string|null
      */
-    private $alertMessage;
+    private ?string $alertMessage;
 
     /**
      * @var string|null
      */
-    private $alertLegal;
+    private ?string $alertLegal;
 
     /**
      * @var Alaress_Date_Format|null
      */
-    private $enrolmentDate;
+    private ?Alaress_Date_Format $enrolmentDate;
 
     /**
      * @var Alaress_Date_Format|null
      */
-    private $leavingDate;
+    private ?Alaress_Date_Format $leavingDate;
 
     /**
      * @var bool|null
      */
-    private $ib;
+    private ?bool $ib;
 
     /**
      * @var bool|null
      */
-    private $individualLearningPlans;
+    private ?bool $individualLearningPlans;
 
     /**
      * @var bool|null
      */
-    private $esl;
+    private ?bool $esl;
 
     /**
      * @var bool|null
      */
-    private $specialNeeds;
+    private ?bool $specialNeeds;
 
     /**
      * @var bool|null
      */
-    private $boardingStatus;
+    private ?bool $boardingStatus;
+
+
+    /**
+     * @var bool|null
+     */
+    private ?bool $photoRedacted = false;
+
 
     /**
      * @var ProfileModel
      */
-    private $baseProfile;
+    private ProfileModel $baseProfile;
 
 
     /**
      * @var string|null
      */
     private ?string $boardingHouseName;
+
+
+    /**
+     * @return bool|null
+     */
+    public function getPhotoRedacted(): ?bool
+    {
+        return $this->photoRedacted;
+    }
+
+
+    /**
+     * @param bool|null $photoRedacted
+     * @return $this
+     */
+    public function setPhotoRedacted(?bool $photoRedacted): self
+    {
+        $this->photoRedacted = $photoRedacted;
+        return $this;
+    }
 
 
     /**

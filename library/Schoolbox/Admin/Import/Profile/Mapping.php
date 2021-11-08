@@ -101,7 +101,8 @@ class Mapping
         'EAL' => 'eal',
         'Special Needs' => 'special_needs',
         'Boarding House Name' => 'boarding_house_name',
-        'Boarding Status' => 'boarding_status'
+        'Boarding Status' => 'boarding_status',
+        'Photo Redacted' => 'photo_redacted',
     ];
 
 
