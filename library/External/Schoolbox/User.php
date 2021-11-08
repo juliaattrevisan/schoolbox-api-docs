@@ -541,7 +541,7 @@ class External_Schoolbox_User implements External_UserInterface
          */
         $query = '
             SELECT 
-                u.firstname, u.lastname,
+                u.id, u.firstname, u.lastname, u.updated_at,
                 lyl.name as yearLevel,
                 h.house,
                 sup.external_id, sups.photo_redacted
