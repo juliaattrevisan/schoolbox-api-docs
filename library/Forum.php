@@ -147,7 +147,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
         $query  = "SELECT ci.id FROM component_instance ci JOIN component_definition cd ON ci.`component_definition_id`=cd.`id` WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage' AND identifier = $categoryID";
         $result = $this->db->getOne($query);
 
-        if (isset($result)) {
+        if ($result !== false) {
             return true;
         }
 

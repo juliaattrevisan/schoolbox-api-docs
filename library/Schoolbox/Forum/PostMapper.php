@@ -13,12 +13,16 @@ namespace Schoolbox\Forum;
 
 use Alaress\Async\Notification\Instance\Instance;
 use PDO;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 
 class PostMapper extends Mapper implements FeedableMapperInterface
 {
+    /** @var int */
+    public const FORUM_POSTS_PER_PAGE = 15;
 
     protected function mapping()
     {
@@ -219,5 +223,54 @@ class PostMapper extends Mapper implements FeedableMapperInterface
         } else {
             throw new Mapper\Exception\NotFound();
         }
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('thread', 'thread')},
+                   {$this->getJoinColumnString('owner', 'owner')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM       {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('thread', '', 'thread', false)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'owner', false)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $post = $this->hydrate($row)
+                ->setOwner($this->hydrateJoin($row, 'owner', 'owner'))
+                ->setParent($this->hydrateJoin($row, 'parent', 'parent'))
+            ;
+            $collection[$post->getId()] = $post;
+        }
+
+        return $collection;
     }
 }

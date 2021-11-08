@@ -245,4 +245,38 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface
 
         return $c;
     }
+
+    /**
+     * @param int $folderID
+     * @return bool
+     */
+    public function isComponent($folderID)
+    {
+        /** replacement for forumHandler->hasForum the code:
+         *
+         * ```$result = $this->db->getOne($query);
+         * if (isset($result)) {
+         * return true;
+         * }
+         *
+         * will always return true, as the $result will always be set, even it its set to false.
+         * where this checks if there actually are results
+         */
+        $statement = $this->database->prepare("
+        SELECT ci.id
+        FROM component_instance ci
+            JOIN component_definition cd
+                ON ci.`component_definition_id`=cd.`id`
+        WHERE class = 'Component_Homepage_ForumListController'
+          AND ci.module = 'homepage'
+          AND identifier = ?
+        ");
+
+        $statement->execute(array($folderID));
+
+        if (($row = $statement->fetch()) !== false) {
+            return true;
+        }
+        return false;
+    }
 }

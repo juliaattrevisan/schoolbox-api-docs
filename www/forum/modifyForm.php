@@ -47,6 +47,8 @@ if (is_numeric($_POST['categoryID'])) {
         try {
             /** @var \Schoolbox\Forum\Post $post */
             $post = PostMapper::getInstance()->findById($_POST['postID']);
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
         } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
