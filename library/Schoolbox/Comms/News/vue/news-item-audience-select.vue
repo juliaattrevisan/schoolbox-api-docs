@@ -2,11 +2,11 @@
 
 /**
  * To select who will be able to see the news item
- * Various options are presented within a modal to 
+ * Various options are presented within a modal to
  * specifically target grades / groups / campuses etc
- * 
+ *
  * ATTENTION - There's quite a few global vars from library/Schoolbox/Comms/News/templates/create.twig being referenced here
- *             When you can't find the origin of a var, just search in the create.twig file 
+ *             When you can't find the origin of a var, just search in the create.twig file
  *
  */
 
@@ -215,7 +215,7 @@ export default {
     },
 
     mounted () {
-        
+
         var vue          = this;
         brickManager = new BrickManager(codec, entityTypeLabelMap);
 
@@ -310,7 +310,7 @@ export default {
     },
 
     methods: {
-        
+
         /**
          * Opening the 'browse...' modal
          * If only one audience type is available, just shows that. Otherwise displays an index page.
@@ -413,7 +413,7 @@ export default {
          * Submitting the simple-segment modal form
          */
         addAudienceSimple () {
-            
+
             let entityType = this.selectedAudienceOption.entityType;
 
             // Add to audienceSelectize
@@ -595,7 +595,7 @@ export default {
          * @param {string} list 'primary' or 'secondary'
          */
         updateIntersectList (list) {
-            
+
             var audienceOption = this.intersect[list];
 
             // Reset checked item model
@@ -641,7 +641,7 @@ export default {
 <template>
 
     <div v-if="countModalSegmentTypes">
-        
+
         <div class="small-12 columns">
             <label class="required">Audience</label>
             <p class="meta">
@@ -686,8 +686,9 @@ export default {
                 <input type="text" id="audience-search" name="audience-search" :placeholder="audiencePlaceholder" required />
                 <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
             </div>
+            <input type="hidden" name="audience" :value="audienceFormString" />
         </div>
-        
+
         <template v-if="!audienceIsReadOnly">
         <div data-reveal id="audience-browse" class="reveal-modal no-pad">
 
@@ -810,9 +811,6 @@ export default {
                 </div>
             </div>
         </div>
-
-        <input type="hidden" name="audience" :value="audienceFormString" />
-
     </div>
 
 </template>
