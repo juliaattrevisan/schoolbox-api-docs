@@ -1,4 +1,5 @@
 <script>
+import tinycolor from 'tinycolor2';
 import RevealModal from "@vue/components/reveal-modal";
 
 const FILTER_CHANGED = "filterChanged";
@@ -98,7 +99,22 @@ export default {
         default:
           return [];
       }
-    }
+    },
+
+    /**
+     * To ensure the background / text colour combo displays properly
+     * For example we don't want black text with a black background
+     *
+     * @param eventType
+     * @return {Object}
+     */
+    getEventTypeStyles(eventType) {
+      return { 
+        backgroundColor: eventType.color,
+        color: tinycolor.mostReadable(eventType.color, ['black', 'white']).toRgbString(),
+      }
+    },
+
   }
 };
 </script>
@@ -213,7 +229,7 @@ export default {
                     />
                     <label
                       :for="'eventType' + String(eventType.id)"
-                      :style="{ backgroundColor: eventType.color }"
+                      :style="getEventTypeStyles(eventType)"
                       :key="'label-' + eventType.id"
                       >{{ eventType.name }}</label
                     >
