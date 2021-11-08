@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Lti;
 
+use Alaress\Redis\Cache\ItemPool;
+use Alaress\Redis\Cache\KeyGenerator;
 use Alaress_Date_Format;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
@@ -37,7 +39,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\LTI\AccessToken\Cache\RedisItemPool;
+use Schoolbox\LTI\AccessToken\Codec;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
@@ -534,7 +536,11 @@ class Controller extends Assessment\Controller
         // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
         $resourceServerValidator = new ResourceServer(
             new AccessTokenRepository(
-                new RedisItemPool($this->getDi()->get('redis')),
+                new ItemPool(
+                    $this->getDi()->get('redis'),
+                    new Codec(),
+                    new KeyGenerator('accessToken', $this->instance->getId()),
+                ),
             ),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );

@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform;
 
+use Alaress\Redis\Cache\ItemPool;
+use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Cache\Adapter\PHPArray\ArrayCachePool;
 use Http\Factory\Guzzle\ResponseFactory;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
@@ -32,7 +33,7 @@ use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchReques
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
-use Schoolbox\LTI\AccessToken\Cache\RedisItemPool;
+use Schoolbox\LTI\AccessToken\Codec;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
@@ -211,7 +212,11 @@ class Controller extends Base
         $factory          = new AuthorizationServerFactory(
             $clientRepository,
             new AccessTokenRepository(
-                new RedisItemPool($this->getDi()->get('redis')),
+                new ItemPool(
+                    $this->getDi()->get('redis'),
+                    new Codec(),
+                    new KeyGenerator('accessToken', $this->instance->getId()),
+                ),
             ),
             // So far, Schoolbox supports only the Score service.
             new ScopeRepository([
