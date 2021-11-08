@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Cache\Adapter\PHPArray\ArrayCachePool;
 use Http\Factory\Guzzle\ResponseFactory;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
@@ -229,12 +230,8 @@ class Controller extends Base
         $factory          = new AuthorizationServerFactory(
             $clientRepository,
             new AccessTokenRepository(
-                new ItemPool(
-                    $this->accessTokenMapper,
-                    $this->toolMapper,
-                    $clientRepository,
-                    $this->userCodec,
-                )
+                // TODO replace with a real cache
+                new ArrayCachePool(),
             ),
             // So far, Schoolbox supports only the Score service.
             new ScopeRepository([
