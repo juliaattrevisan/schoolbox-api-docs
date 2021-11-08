@@ -100,6 +100,7 @@ class Mapping
         'ILP' => 'individual_learning_plans',
         'EAL' => 'eal',
         'Special Needs' => 'special_needs',
+        'Boarding House Name' => 'boarding_house_name',
         'Boarding Status' => 'boarding_status'
     ];
 

@@ -365,6 +365,7 @@ class Importer
                 ->setIndividualLearningPlans((bool)$row['ILP'])
                 ->setEsl((bool)$row['EAL'])
                 ->setSpecialNeeds((bool)$row['Special Needs'])
+                ->setBoardingHouseName($row['Boarding House Name'])
                 ->setBoardingStatus((bool)$row['Boarding Status'])
                 ->setBaseProfile($baseProfile);
 

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Profile\Student;
 
 use Alaress_Date_Format;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\External\Profile\Model as ProfileModel;
 
@@ -218,6 +217,32 @@ class Model
      * @var ProfileModel
      */
     private $baseProfile;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $boardingHouseName;
+
+
+    /**
+     * @return string|null
+     */
+    public function getBoardingHouseName(): ?string
+    {
+        return $this->boardingHouseName;
+    }
+
+
+    /**
+     * @param string|null $boardingHouseName
+     * @return $this
+     */
+    public function setBoardingHouseName(?string $boardingHouseName): self
+    {
+        $this->boardingHouseName = $boardingHouseName;
+        return $this;
+    }
 
 
     /**
