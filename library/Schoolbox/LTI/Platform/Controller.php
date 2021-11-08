@@ -214,7 +214,7 @@ class Controller extends Base
             new AccessTokenRepository(
                 new ItemPool(
                     $this->getDi()->get('redis'),
-                    new Codec(),
+                    new Codec($clientRepository),
                     new KeyGenerator('accessToken', $this->instance->getId()),
                 ),
             ),

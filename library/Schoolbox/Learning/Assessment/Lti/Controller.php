@@ -22,6 +22,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Schoolbox\Application\Exception\NotFound;
@@ -538,7 +539,7 @@ class Controller extends Assessment\Controller
             new AccessTokenRepository(
                 new ItemPool(
                     $this->getDi()->get('redis'),
-                    new Codec(),
+                    new Codec(new ClientRepository($this->registrations)),
                     new KeyGenerator('accessToken', $this->instance->getId()),
                 ),
             ),
