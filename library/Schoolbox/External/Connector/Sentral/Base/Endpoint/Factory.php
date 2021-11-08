@@ -257,6 +257,15 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
@@ -273,15 +282,6 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
-            ))
-            ->add(new Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
             ))
             ->add(new ApiStatistics(
                 $this->log,
