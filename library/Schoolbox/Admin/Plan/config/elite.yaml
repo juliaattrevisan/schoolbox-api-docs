@@ -25,9 +25,11 @@ config:
   pastoral_upload_timeout: {hide: false}
   pastoral_severity: {hide: false}
   pastoral_individual_access: {hide: false}
-  pastoral_parent_access: { hide: false}
+  pastoral_parent_access: {hide: false}
   pastoral_page_size: {hide: false}
+  pastoral_page_visible: {hide: false}
   pastoral_create_tag_enable: {hide: false}
+  pastoral_flag_count_period: {hide: false}
 
   #Boarder Leave
   debug_email_address: {hide: false}
