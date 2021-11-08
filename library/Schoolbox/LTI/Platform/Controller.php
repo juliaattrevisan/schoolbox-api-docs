@@ -32,6 +32,7 @@ use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchReques
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
+use Schoolbox\LTI\AccessToken\Cache\RedisItemPool;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
