@@ -32,6 +32,14 @@ class Api
 
 
     /**
+     * A list of guys whose photos have been redacted, along with some other metadata
+     *
+     * POST to this endpoint
+     */
+    private const GEOSNAPSHOT_ENDPOINT_REDACTION = 'https://geosnapshot.com/api/v1/master_participants';
+
+
+    /**
      * Arbitrarily-decided timeout duration
      */
     private const GEOSNAPSHOT_TIMEOUT = 10;
@@ -97,7 +105,7 @@ class Api
      */
     public function retrieveStudentPhotos(User $viewee): array
     {
-        return $this->retrieve((new StudentPhoto())->build($viewee));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto())->build($viewee));
     }
 
 
@@ -116,14 +124,15 @@ class Api
      */
     public function retrieveEventPhotos(string $eventName): array
     {
-        return $this->retrieve((new EventPhoto())->build($eventName));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName));
     }
 
 
     /**
-     * Send a payload to the endpoint
+     * Tell Geosnapshot about guys whose photos have been redacted
      *
-     * @param array $payload
+     * @param string $fqdn
+     * @param array  $externalRedactionList
      * @return array
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -131,7 +140,27 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    private function retrieve(array $payload): array
+    public function retrieveRedactionPhotos(string $fqdn, array $externalRedactionList): array
+    {
+        $payload = (new \Schoolbox\Geosnapshot\Payload\RedactedPhotoList($fqdn))->build($externalRedactionList);
+
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT_REDACTION, $payload);
+    }
+
+
+    /**
+     * Send a payload to the endpoint
+     *
+     * @param string $endpoint
+     * @param array  $payload
+     * @return array
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    private function retrieve(string $endpoint, array $payload): array
     {
         /* Remember it if we need to inspect it for some reason
          */
@@ -143,7 +172,7 @@ class Api
          *
          * https://docs.guzzlephp.org/en/latest/request-options.html#json
          */
-        $response = $this->build()->request('POST', self::GEOSNAPSHOT_ENDPOINT, [
+        $response = $this->build()->request('POST', $endpoint, [
             RequestOptions::JSON => $payload
         ]);
 
