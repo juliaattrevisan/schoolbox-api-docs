@@ -74,7 +74,7 @@ class Explorer
     {
         $payloads = [];
 
-        for ($i = 0; $nextUrl && $i < 1; $i++) {
+        for ($i = 0; $nextUrl && $i < 100; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
 
             $payloads[] = $payload;
