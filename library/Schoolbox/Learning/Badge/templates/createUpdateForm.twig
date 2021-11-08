@@ -187,9 +187,9 @@
                     </div>
                     <div class="small-6 columns">
                         <label for="badge-goal-expiry">
-                            Goal Valid for
+                            Goal Duration
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
-                                  title="How long will a goal set to achieve this badge last? (After the goal expires, it will no longer be visible on a user's profile.)">?</span>
+                                  title="Set the period of time, from being set, that this goal will be available for users to achieve. Expired goals will not be visible on the ‘Goals’ area of the student profile.">?</span>
                         </label>
                         <select name="goalExpiry" id="badge-goal-expiry" {% if not allowAsGoal %}disabled{% endif %}>
                             {% for key, value in expiries %}
@@ -203,9 +203,9 @@
                     </div>
                     <div class="small-12 columns">
                         <label for="badge-achievement-expiry">
-                            Achievement Valid for
+                            Achievement Duration
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
-                                  title="How long will this badge last once it is awarded as an achievement? (After the achievement expires, it will no longer be visible on a user's profile.)">?</span>
+                                  title="Set the period of time that this achievement will be visible in the ‘Achievements’ area of the student profile page.">?</span>
                         </label>
                         <select name="achievementExpiry" id="badge-achievement-expiry">
                             {% for key, value in expiries %}
@@ -236,7 +236,7 @@
                         </select>
                     </div>
                     <div class="small-12 columns">
-                        {% set toolTipTitle = 'Select the year levels to associate with this badge' %}
+                        {% set toolTipTitle = 'Select the year levels to associate with this badge to allow filtering.' %}
                         <label>
                             Year Levels
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ toolTipTitle }}">?</span>
@@ -415,7 +415,7 @@
                 // Toast then post
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
-                
+
                 fetch(form.action, {
                     method: 'POST',
                     headers: {
