@@ -348,7 +348,6 @@ class Module extends BaseModule
                 $userMapper = $this->getMapperFactory()->get(UserMapper::class);
 
                 try {
-
                     foreach ($studentIds as $studentId) {
                         $student = $userMapper->findWithSubjects($studentId);
                         $student->loadTeachers();
@@ -356,7 +355,6 @@ class Module extends BaseModule
 
                         $students->add($student);
                     }
-
                 } catch (MapperException $e) {
                     throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
