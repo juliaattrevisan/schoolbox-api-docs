@@ -205,13 +205,12 @@ class Controller extends Base
     public function getOauthAccessTokenRequest(): void
     {
         // Access token repo: backs onto a mapper
-        // TODO inject this
+        // TODO inject this: also shouldn't the access token repository be used to auth a request?
         $clientRepository = new ClientRepository($this->registrations);
         $factory          = new AuthorizationServerFactory(
             $clientRepository,
             new AccessTokenRepository(
-                // TODO replace with a real cache
-                new ArrayCachePool(),
+                new RedisItemPool($this->getDi()->get('redis')),
             ),
             // So far, Schoolbox supports only the Score service.
             new ScopeRepository([
