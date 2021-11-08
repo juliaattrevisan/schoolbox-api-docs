@@ -20,6 +20,7 @@ use External_Pastoral;
 use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
@@ -126,6 +127,9 @@ class Controller extends Base
     /** @var Audience\Mapper */
     private $audienceMapper;
 
+    /** TermMapper */
+    private TermMapper $termMapper;
+
     const ATTACHZONE_PRIVATE = 'private';
     const ATTACHZONE_PUBLIC  = 'public';
 
@@ -144,15 +148,16 @@ class Controller extends Base
      * @param PastoralRevisionDataSource $pastoralRevisionDataSource
      * @param PastoralTagMapper          $pastoralTagMapper
      * @param PastoralCommentMapper      $pastoralCommentMapper
-     * @param PastoralGroupMapper        $pastoralGroupMapper
-     * @param PastoralGroupMemberMapper  $pastoralGroupMemberMapper
      * @param PastoralAttachmentMapper   $pastoralAttachmentMapper
      * @param RoleMapper                 $roleMapper
      * @param UserMapper                 $userMapper
      * @param PastoralAccessMapper       $pastoralAccessMapper
+     * @param PastoralGroupMapper        $pastoralGroupMapper
+     * @param PastoralGroupMemberMapper  $pastoralGroupMemberMapper
      * @param ErrorMapper                $errorMapper
      * @param PastoralReportMapper       $pastoralReportMapper
      * @param Audience\Mapper            $audienceMapper ;
+     * @param TermMapper                 $termMapper
      */
     public function __construct(
         IConfigLoader $config,
@@ -175,7 +180,8 @@ class Controller extends Base
         PastoralGroupMemberMapper $pastoralGroupMemberMapper,
         ErrorMapper $errorMapper,
         PastoralReportMapper $pastoralReportMapper,
-        Audience\Mapper $audienceMapper
+        Audience\Mapper $audienceMapper,
+        TermMapper $termMapper
     ) {
         $this->config                     = $config;
         $this->errorMapper                = $errorMapper;
@@ -198,6 +204,7 @@ class Controller extends Base
         $this->userAccessMapper           = $userAccessMapper;
         $this->pastoralReportMapper       = $pastoralReportMapper;
         $this->audienceMapper             = $audienceMapper;
+        $this->termMapper                 = $termMapper;
     }
 
 
@@ -266,7 +273,7 @@ class Controller extends Base
      */
     public function getStudentsCount(Collection $students): void
     {
-        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->config, $this->termMapper);
         $output              = $pastoralCountHelper->countStudentsEventsByTypes($this->getUser(), $students);
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));
@@ -317,7 +324,7 @@ class Controller extends Base
         // populate related records
         $pageRecords = $this->pastoralDataSource->findRecords($user, $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
 
-        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->config, $this->termMapper);
         $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student);
 
         $this->getResponse()->content->set(

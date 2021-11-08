@@ -233,6 +233,7 @@ class Module extends BaseModule
             'userMapper'                 => UserMapper::getInstance(),
             'userAccessMapper'           => UserAccessMapper::getInstance(),
             'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
+            'termMapper'                 => $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Term\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

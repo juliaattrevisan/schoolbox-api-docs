@@ -12,7 +12,9 @@ namespace Schoolbox\Pastoral\Count;
 use Alaress\Color\Color;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -24,6 +26,15 @@ use Alaress_Date_Format;
 
 class Helper
 {
+    /**
+     * const for count period
+     */
+    const COUNT_PERIOD_FOREVER      = 0;
+    const COUNT_PERIOD_12MONTHS     = 1;
+    const COUNT_PERIOD_6MONTHS      = 2;
+    const COUNT_PERIOD_CURRENT_YEAR = 3;
+    const COUNT_PERIOD_CURRENT_TERM = 4;
+
     /**
      * @var PastoralTypeMapper
      */
@@ -54,7 +65,20 @@ class Helper
      */
     private $pastoralSubTypesWhitelist;
 
+    /**
+     * @var Router
+     */
     private Router $router;
+
+    /**
+     * @var IConfigLoader
+     */
+    private IConfigLoader $config;
+
+    /**
+     * @var TermMapper
+     */
+    private TermMapper $termMapper;
 
     /**
      * helper to bundle similar counts related to pastoral events of students
@@ -63,14 +87,18 @@ class Helper
      * @param PastoralTypeMapper    $pastoralTypeMapper
      * @param PastoralSubTypeMapper $pastoralSubTypeMapper
      * @param PastoralDataSource    $pastoralDataSource
+     * @param IConfigLoader         $config
+     * @param TermMapper            $termMapper
      */
-    public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource)
+    public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource, IConfigLoader $config, TermMapper $termMapper)
     {
         $this->pastoralTypeMapper    = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper = $pastoralSubTypeMapper;
         $this->pastoralDataSource    = $pastoralDataSource;
         $this->router                = $router;
         $this->colorHelper           = new ColorHelper();
+        $this->config                = $config;
+        $this->termMapper            = $termMapper;
     }
 
     /**
@@ -161,6 +189,7 @@ class Helper
                 $student->getId(),
                 $pastoralTypes->getPropertyValues('id'),
                 $pastoralSubtypes->getPropertyValues('id'),
+                $this->getStartDate()
             )
         );
 
@@ -189,7 +218,8 @@ class Helper
         $studentCounts = new Collection(
             $this->pastoralDataSource->countRecordsByTypeGroupByMonth(
                 $viewer,
-                $student->getId()
+                $student->getId(),
+                $this->getStartDate()
             )
         );
 
@@ -310,5 +340,28 @@ class Helper
         });
 
         return $output;
+    }
+
+    /**
+     * Gets start date of count period
+     * @return Alaress_Date_Format|null
+     */
+    private function getStartDate(): ?Alaress_Date_Format
+    {
+        $date = new Alaress_Date_Format();
+        switch ($this->config->get('pastoral_flag_count_period')) {
+            case self::COUNT_PERIOD_FOREVER:
+                return null;
+            case self::COUNT_PERIOD_6MONTHS:
+                $date = new Alaress_Date_Format();
+                return $date->addMonths(-6);
+            case self::COUNT_PERIOD_CURRENT_YEAR:
+                return $date->startOfYear();
+            case self::COUNT_PERIOD_CURRENT_TERM:
+                return $this->termMapper->findForToday()->getStart();
+            case self::COUNT_PERIOD_12MONTHS:
+            default:
+                return $date->addYears(-1);
+        }
     }
 }

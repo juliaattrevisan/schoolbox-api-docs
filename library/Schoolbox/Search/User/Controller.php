@@ -17,6 +17,7 @@ use Custom;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -114,6 +115,11 @@ class Controller extends BaseController
     private PastoralDataSource $pastoralDataSource;
 
     /**
+     * TermMapper
+     */
+    private TermMapper $termMapper;
+
+    /**
      * Constructor
      * @param UserMapper                    $userMapper
      * @param RoleMapper                    $roleMapper
@@ -127,6 +133,7 @@ class Controller extends BaseController
      * @param PastoralTypeMapper            $pastoralTypeMapper
      * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
      * @param PastoralDataSource            $pastoralDataSource
+     * @param TermMapper                    $termMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -140,7 +147,8 @@ class Controller extends BaseController
         ProfessionalDevelopmentMapper $professionalDevelopmentMapper,
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralSubTypeMapper $pastoralSubTypeMapper,
-        PastoralDataSource $pastoralDataSource
+        PastoralDataSource $pastoralDataSource,
+        TermMapper $termMapper
     ) {
         $this->userMapper                    = $userMapper;
         $this->roleMapper                    = $roleMapper;
@@ -154,6 +162,7 @@ class Controller extends BaseController
         $this->pastoralTypeMapper            = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
         $this->pastoralDataSource            = $pastoralDataSource;
+        $this->termMapper                    = $termMapper;
     }
 
     /**
@@ -657,7 +666,7 @@ class Controller extends BaseController
             $canEmailStaff = false;
         }
 
-        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->getConfigLoader(), $this->termMapper);
         $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student);
 
         $this->response->content->set(
