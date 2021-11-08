@@ -71,6 +71,17 @@ class Module extends BaseModule
             )
         );
 
+        $folderAuthView = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_READ,
+                function ($params): int {
+                    return $params['folder']->getId();
+                },
+                Access::getInstance()
+            )
+        );
+
         $textboxPreload = function ($params): array {
             /** @var Mapper $textboxMapper */
             $textboxMapper = $this->getMapperFactory()->get(Mapper::class);
@@ -95,6 +106,7 @@ class Module extends BaseModule
         $this->register('POST', '/rename/{folderId:\d+}', 'postRename', $folderAuth, $folderPreload);
         $this->register('PUT', '/{id:\d+}', 'updateTextbox', $folderAuth, $textboxPreload);
         $this->register('DELETE', '/{id:\d+}', 'deleteTextbox', $folderAuth, $textboxPreload);
+        $this->register('GET', '/{id:\d+}', 'getTextbox', $folderAuthView, $textboxPreload);
     }
 
 
