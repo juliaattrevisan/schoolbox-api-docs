@@ -14,11 +14,11 @@
             <li>
                 <div class="small-12 card wrap-down">
                     {% if record.owner.isDeleted() %}
-                            {{ profile.imageSquare64(record.owner) }}
-                            <span class="neutral label right">Author</span>
-                            <p>
-                                {{ record.owner.firstname }} {{ record.owner.lastname }}
-                            </p>
+                        {{ profile.imageSquare64(record.owner) }}
+                        <span class="neutral label right">Author</span>
+                        <p>
+                            {{ record.owner.firstname }} {{ record.owner.lastname }}
+                        </p>
                         <p class="meta">Author</p>
                     {% else %}
                         <a href="{{ profile.link(record.owner) }}">
@@ -34,284 +34,112 @@
             </li>
 
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
-            {# Confidential Access #}
+            {# Access #}
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
-
-            {% for access in record.access|filter(access=>access.access == 2) %}
-                {% if access.group is not empty %}
-
-                    {# Pastoral Group Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            <div class="icon-teacher size-48" title="Pastoral Group"></div>
-                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
-
-                            {# Display link to group if the user is a pastoral moderator #}
-
-                            {% set routeGetGroupModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: access.group.id}) %}
-                            {% if routeGetGroupModify %}
-                                <a href="{{ routeGetGroupModify }}">
-                                    <p>{{ access.group.name }}</p>
-                                </a>
-                            {% else %}
-                                <p>{{ access.group.name }}</p>
-                            {% endif %}
-
-                            <p class="meta">Pastoral Group</p>
-
-                            {# Display links to group members profiles #}
-
-                            <p class="meta">
-                                {% for member in access.group.membersWithPermission %}
-                                    {% if member.user.isDeleted() %}
-                                        {{ member.user.fullName }}
-                                        ({{ member.user.role.name }})<br>
-                                    {% else %}
-                                        <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a>
-                                        ({{ member.user.role.name }})<br>
-                                    {% endif %}
-                                {% endfor %}
-                            </p>
-
-                        </div>
-                    </li>
-                {% elseif access.role is not empty %}
-                    {# User Role Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            <div class="icon-group size-48" title="User Role"></div>
-                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
-                            <p>{{ access.role.name }}</p>
-                            {% if access.role.isParent %}
-                                {% for parent in record.student.parents %}
-                                    {%  if parent.isDeleted or record.student.hideContacts %}
-                                        {{ parent.fullName }}<br>
-                                    {% else %}
-                                        <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <p class="meta">User Role</p>
-                            {% endif %}
-                        </div>
-                    </li>
-                {% elseif access.user is not empty %}
-                    {# Individual User Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            {% if access.user.isDeleted() %}
-                                {{ profile.imageSquare64(access.user) }}
-                                <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
-                                <p>
-                                    {{ access.user.firstname }} {{ access.user.lastname }}
-                                </p>
-                                <p class="meta">
-                                    {{ access.user.role.name }}
-                                </p>
-                            {% else %}
-                                <a href="{{ profile.link(access.user) }}">
-                                    {{ profile.imageSquare64(access.user) }}
-                                    <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
-                                    <p>
-                                        {{ access.user.firstname }} {{ access.user.lastname }}
-                                    </p>
-                                    <p class="meta">
-                                        {{ access.user.role.name }}
-                                    </p>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </li>
+            {% for accessLevel in [2, 1, 0] %}
+                {% if accessLevel == 2 %}
+                    {% set accessLevelLabel = '<span class="neutral label right">'~locale.pastoralPrivate.proper~'</span>' %}
+                {% elseif accessLevel == 0 %}
+                    {% set accessLevelLabel = '<span class="neutral label right">Denied Access</span>' %}
+                {% else %}
+                    {% set accessLevelLabel = '' %}
                 {% endif %}
-            {% endfor %}
+                {% for access in record.access|filter(access=>access.access == accessLevel) %}
+                    {% if access.group is not empty %}
 
-            {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
-            {# General Content Access #}
-            {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
+                        {# Pastoral Group Access #}
 
-            {% for access in record.access|filter(access=>access.access == 1) %}
-                {% if access.group is not empty %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <div class="icon-teacher size-48" title="Pastoral Group"></div>
+                                {{ accessLevelLabel | raw }}
+                                {# Display link to group if the user is a pastoral moderator #}
 
-                    {# Pastoral Group Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            <div class="icon-teacher size-48" title="Pastoral Group"></div>
-                            {# Display link to group if the user is a pastoral moderator #}
-
-                            {% set routeGetGroupModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: access.group.id}) %}
-
-                            {% if routeGetGroupModify %}
-                                <a href="{{ routeGetGroupModify }}">
+                                {% set routeGetGroupModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: access.group.id}) %}
+                                {% if routeGetGroupModify %}
+                                    <a href="{{ routeGetGroupModify }}">
+                                        <p>{{ access.group.name }}</p>
+                                    </a>
+                                {% else %}
                                     <p>{{ access.group.name }}</p>
-                                </a>
-                            {% else %}
-                                <p>{{ access.group.name }}</p>
-                            {% endif %}
+                                {% endif %}
 
-                            {# Display links to group members profiles#}
+                                <p class="meta">Pastoral Group</p>
 
-                            <p class="meta">
-                                {% for member in access.group.membersWithPermission %}
-                                    {% if member.user.isDeleted() %}
-                                        {{ member.user.fullName }}<br>
-                                    {% else %}
-                                        <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a><br>
-                                    {% endif %}
-                                {% endfor %}
-                            </p>
+                                {# Display links to group members profiles #}
 
-                        </div>
-                    </li>
-                {% elseif access.role is not empty %}
+                                <p class="meta">
+                                    {% for member in access.group.membersWithPermission %}
+                                        {% if member.user.isDeleted() %}
+                                            {{ member.user.fullName }}
+                                            ({{ member.user.role.name }})<br>
+                                        {% else %}
+                                            <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a>
+                                            ({{ member.user.role.name }})<br>
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
 
-                    {# User Role Access #}
+                            </div>
+                        </li>
+                    {% elseif access.role is not empty %}
+                        {# User Role Access #}
 
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            <div class="icon-group size-48" title="User Role"></div>
-                            <p>{{ access.role.name }}</p>
-                            {% if access.role.isParent %}
-                                {% for parent in record.student.parents %}
-                                        {% if parent.isDeleted() or record.student.hideContacts  %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <div class="icon-group size-48" title="User Role"></div>
+                                {{ accessLevelLabel | raw }}
+                                {% if access.role.isParent and record.parentCommentsAllowed %}
+                                    <span class="neutral label right">Can Comment</span>
+                                {% endif %}
+                                <p>{{ access.role.name }}</p>
+                                {% if access.role.isParent %}
+                                    {% for parent in record.student.parents %}
+                                        {% if parent.isDeleted() or record.student.hideContacts %}
                                             {{ parent.fullName }}<br>
                                         {% else %}
                                             <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
                                         {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <p class="meta">User Role</p>
-                            {% endif %}
-                        </div>
-                    </li>
-                {% elseif access.user is not empty %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="meta">User Role</p>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% elseif access.user is not empty %}
+                        {# Individual User Access #}
 
-                    {# Individual User Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            {% if access.user.isDeleted() %}
-                                {{ profile.imageSquare64(access.user) }}
-                                <p>
-                                    {{ access.user.firstname }} {{ access.user.lastname }}
-                                </p>
-                                <p class="meta">
-                                    {{ access.user.role.name }}
-                                </p>
-                            {% else %}
-                                <a href="{{ profile.link(access.user) }}">
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                {% if access.user.isDeleted() %}
                                     {{ profile.imageSquare64(access.user) }}
+                                    {{ accessLevelLabel | raw }}
                                     <p>
                                         {{ access.user.firstname }} {{ access.user.lastname }}
                                     </p>
                                     <p class="meta">
                                         {{ access.user.role.name }}
                                     </p>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </li>
-                {% endif %}
+                                {% else %}
+                                    <a href="{{ profile.link(access.user) }}">
+                                        {{ profile.imageSquare64(access.user) }}
+                                        {{ accessLevelLabel | raw }}
+                                        {% if access.user.role.isParent and record.parentCommentsAllowed %}
+                                            <span class="neutral label right">Can Comment</span>
+                                        {% endif %}
+                                        <p>
+                                            {{ access.user.firstname }} {{ access.user.lastname }}
+                                        </p>
+                                        <p class="meta">
+                                            {{ access.user.role.name }}
+                                        </p>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
             {% endfor %}
-
-            {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
-            {# Denied Access #}
-            {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
-
-            {% for access in record.access|filter(access=>access.access == 0) %}
-                {% if access.group is not empty %}
-
-                    {# Pastoral Group Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            <div class="icon-teacher size-48" title="Pastoral Group"></div>
-                            <span class="alert label right">Denied Access</span>
-
-                            {# Display link to group if the user is a pastoral moderator #}
-
-                            {% set routeGetGroupModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: access.group.id}) %}
-
-                            {% if routeGetGroupModify %}
-                                <a href="{{ routeGetGroupModify }}">
-                                    <p>{{ access.group.name }}</p>
-                                </a>
-                            {% else %}
-                                <p>{{ access.group.name }}</p>
-                            {% endif %}
-
-                            {# Display links to group members profiles#}
-
-                            <p class="meta">
-                                {% for member in access.group.membersWithPermission %}
-                                    {% if member.user.isDeleted() %}
-                                        {{ member.user.fullName }}<br>
-                                    {% else %}
-                                        <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a><br>
-                                    {% endif %}
-                                {% endfor %}
-                            </p>
-
-                        </div>
-                    </li>
-                {% elseif access.role is not empty %}
-
-                    {# User Role Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            <div class="icon-group size-48" title="User Role"></div>
-                            <span class="alert label right">Denied Access</span>
-                            <p>{{ access.role.name }}</p>
-                            {% if access.role.isParent  %}
-                                {% for parent in record.student.parents %}
-                                    {% if parent.isDeleted() or record.student.hideContacts %}
-                                        {{ parent.fullName }}<br>
-                                    {% else %}
-                                        <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <p class="meta">User Role</p>
-                            {% endif %}
-
-                        </div>
-                    </li>
-                {% elseif access.user is not empty %}
-
-                    {# Individual User Access #}
-
-                    <li>
-                        <div class="small-12 card wrap-down">
-                            {% if access.user.isDeleted() %}
-                                {{ profile.imageSquare64(access.user) }}
-                                <span class="alert label right">Denied Access</span>
-                                <p>
-                                    {{ access.user.firstname }} {{ access.user.lastname }}
-                                </p>
-                                <p class="meta">
-                                    {{ access.user.role.name }}
-                                </p>
-                            {% else %}
-                                <a href="{{ profile.link(access.user) }}">
-                                    {{ profile.imageSquare64(access.user) }}
-                                    <span class="alert label right">Denied Access</span>
-                                    <p>
-                                        {{ access.user.firstname }} {{ access.user.lastname }}
-                                    </p>
-                                    <p class="meta">
-                                        {{ access.user.role.name }}
-                                    </p>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </li>
-                {% endif %}
-            {% endfor %}
-
         </ul>
     </section>
 </div>
