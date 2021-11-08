@@ -37,7 +37,7 @@ class Sync extends Base implements ISync
                 sups.year_level                             AS student_year_level,
                 sups.house_name                             AS student_house,
                 sups.boarding_status                        AS student_boarder,
-                ''                                          AS student_boarding_house,
+                sups.boarding_house_name                    AS student_boarding_house,
                 sups.campus_name                            AS student_campus
             FROM        `sis_user_profile` `sup`
             JOIN        `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
