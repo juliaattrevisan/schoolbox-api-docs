@@ -160,4 +160,13 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     {
         return [];
     }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

@@ -529,4 +529,13 @@ class External_Schoolpro_User implements External_UserInterface
     {
         return [];
     }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

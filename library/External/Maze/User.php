@@ -910,6 +910,16 @@ class External_Maze_User implements External_UserInterface
         return $this->getDb()->getAll($query);
     }
 
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
+
     /* Getters/Setters
      */
 

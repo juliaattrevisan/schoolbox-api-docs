@@ -1372,4 +1372,13 @@ class External_Synergetic_User implements External_UserInterface
         $relationshipBindings = Builder::getArrayBindings($relationships, 'relationship');
         return $relationshipBindings;
     }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

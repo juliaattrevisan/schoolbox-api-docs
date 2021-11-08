@@ -525,4 +525,13 @@ class External_Schoolbox_User implements External_UserInterface
             $bindings
         )->fetchAll();
     }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

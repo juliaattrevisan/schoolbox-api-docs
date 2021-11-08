@@ -175,6 +175,15 @@ interface External_UserInterface extends External\IConnector
      */
     public function getParentEmails(array $externalUserIds): array;
 
+
+    /**
+     * Get a list of all the students and their photo redaction flag
+     *
+     * @return array
+     */
+    public function getPhotoRedactionList(): array;
+
+
     /* Parent-specific
      */
 

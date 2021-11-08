@@ -646,4 +646,13 @@ class External_Pcschools_User implements External_UserInterface
         }
         return $result;
     }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

@@ -471,4 +471,13 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         return [];
     }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

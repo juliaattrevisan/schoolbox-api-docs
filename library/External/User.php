@@ -192,4 +192,12 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
+    }
 }
