@@ -89,10 +89,14 @@ class ItemPool implements CacheItemPoolInterface
 
         // Query redis for the encoded value
         $actualKey = $this->keyGenerator->generateKey($key);
-        $exists    = $this->redis->exists($actualKey);
+
+        // Avoid race condition by querying existence and value in transaction
+        $this->redis->multi();
+        $this->redis->exists($actualKey);
+        $this->redis->get($actualKey);
+        [$exists, $item] = $this->redis->exec();
         if ($exists) {
             // return the stored item
-            $item = $this->redis->get($actualKey);
             if (isset($item)) {
                 return new CacheItem($key, true, $this->codec->decode($item));
             }
