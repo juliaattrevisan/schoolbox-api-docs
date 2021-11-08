@@ -12,6 +12,7 @@ namespace Schoolbox\Geosnapshot;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
+use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
 
@@ -142,7 +143,7 @@ class Api
      */
     public function retrieveRedactionPhotos(string $fqdn, array $externalRedactionList): array
     {
-        $payload = (new \Schoolbox\Geosnapshot\Payload\RedactedPhotoList($fqdn))->build($externalRedactionList);
+        $payload = (new RedactedPhotoList($fqdn))->build($externalRedactionList);
 
         return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT_REDACTION, $payload);
     }
@@ -182,7 +183,11 @@ class Api
             return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         }
 
-        throw new \DomainException('Geosnapshot: Invalid response from Geosnapshot; could not decode json response');
+        throw new \DomainException(sprintf(
+            'Geosnapshot: Invalid response from Geosnapshot - could not decode json. %s %s',
+            $response->getStatusCode(),
+            $response->getReasonPhrase()
+        ));
     }
 
 
