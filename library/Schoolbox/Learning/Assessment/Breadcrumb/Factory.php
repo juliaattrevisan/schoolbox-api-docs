@@ -99,14 +99,7 @@ class Factory
         } elseif ($context instanceof UnitSpecification) {
             $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]) . '#' . $context->getId();
         } elseif ($context instanceof UnitImplementation) {
-            $routeName   = 'learningMarkbook.getMarkbookForClass';
-            $routeParams = [
-                'folder'   => $context->getFolder(),
-                'folderId' => $context->getFolder()->getId(),
-            ];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
-                $path = $this->router->generate($routeName, $routeParams);
-            } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
+            if ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
             } else {
                 $path = '';
