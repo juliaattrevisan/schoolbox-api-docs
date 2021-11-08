@@ -2,11 +2,11 @@
 
 /**
  * To select who will be able to see the news item
- * Various options are presented within a modal to 
+ * Various options are presented within a modal to
  * specifically target grades / groups / campuses etc
- * 
+ *
  * ATTENTION - There's quite a few global vars from library/Schoolbox/Comms/News/templates/create.twig being referenced here
- *             When you can't find the origin of a var, just search in the create.twig file 
+ *             When you can't find the origin of a var, just search in the create.twig file
  *
  */
 
@@ -201,12 +201,21 @@ export default {
                 return tooltipPrefixText + selectedMods.join(', ') + tooltipSufixText;
 
             }
-        }
+        },
+
+        //To create an audience string to add to the form submission, linked to the audienceBricks rather than the selectize element
+        //This is needed as it's possible to delete audience bricks just by tapping the backspace in the audience input field a few times...
+        //Which would result in the bricks displayed in the custom UI not matching what's actually going to be submitted
+        audienceFormString () {
+            const encodedAudienceSegments = this.audienceBricks.map((brick) => codec.encode(brick.segments[0])); //codec is available in this context, and is in audience-bricks.js
+            const audienceFormString = encodedAudienceSegments.join(','); //for a comma delimited segment string
+            return audienceFormString;
+        },
 
     },
 
     mounted () {
-        
+
         var vue          = this;
         brickManager = new BrickManager(codec, entityTypeLabelMap);
 
@@ -301,7 +310,7 @@ export default {
     },
 
     methods: {
-        
+
         /**
          * Opening the 'browse...' modal
          * If only one audience type is available, just shows that. Otherwise displays an index page.
@@ -404,7 +413,7 @@ export default {
          * Submitting the simple-segment modal form
          */
         addAudienceSimple () {
-            
+
             let entityType = this.selectedAudienceOption.entityType;
 
             // Add to audienceSelectize
@@ -586,7 +595,7 @@ export default {
          * @param {string} list 'primary' or 'secondary'
          */
         updateIntersectList (list) {
-            
+
             var audienceOption = this.intersect[list];
 
             // Reset checked item model
@@ -632,7 +641,7 @@ export default {
 <template>
 
     <div v-if="countModalSegmentTypes">
-        
+
         <div class="small-12 columns">
             <label class="required">Audience</label>
             <p class="meta">
@@ -674,9 +683,10 @@ export default {
                 </li>
             </ul>
             <div class="input-group" id="audience-selectize-group">
-                <input type="text" id="audience-search" name="audience" :placeholder="audiencePlaceholder" required />
+                <input type="text" id="audience-search" name="audience-search" :placeholder="audiencePlaceholder" required />
                 <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
             </div>
+            <input type="hidden" name="audience" :value="audienceFormString" />
         </div>
 
         <template v-if="!audienceIsReadOnly">
@@ -801,7 +811,6 @@ export default {
                 </div>
             </div>
         </div>
-
     </div>
 
 </template>
