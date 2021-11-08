@@ -68,6 +68,26 @@ HELP;
             exit;
         }
 
+        /* Only run if Geosnapshot api key exists and module enabled
+         */
+        if ('' === (string)$this->getConfig()->get('geosnapshot_api_key')) {
+            if (!$this->perform()) {
+                $this->getLogger()->info('Geosnapshot Api Key not configured; exiting.');
+            }
+
+            return;
+        }
+
+        if (!$this->getConfig()->get('geosnapshot_enabled')) {
+            if (!$this->perform()) {
+                $this->getLogger()->info('Geosnapshot is not enabled; exiting.');
+            }
+
+            return;
+        }
+
+        /* Otherwise carry onwards into darkness
+         */
         $this->getLogger()->info('Geosnapshot Redactions.');
 
         $fqdn = (new Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified()->toString();
