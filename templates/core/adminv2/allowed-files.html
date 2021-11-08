@@ -198,7 +198,7 @@
                                 <input type="text" class="text-input" name="mime">
                             </div>
                             <div class="column large-3">
-                                <label>Max Size <span data-tooltip class="hint has-tip tip-bottom" title="The maximum file size when uploading a file of this type - defaults to system-wide max file size">?</span></label>
+                                <label>Max Size <span data-tooltip class="hint has-tip tip-bottom" title="The maximum file size when uploading a file of this type - defaults to system-wide max file size<br>NOTE: Files above 2GB cannot be uploaded">?</span></label>
                                 <input type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value=""/>
                             </div>
                             <div class="column large-3">
@@ -294,7 +294,7 @@
                                     </div>
                                     <div class="max_size column large-3">
                                         <div>
-                                            <label for="max_file_size-{FILE_ID}">Max Size</label>
+                                            <label for="max_file_size-{FILE_ID}">Max Size<span data-tooltip class="hint has-tip tip-bottom" title="Files above 2GB cannot be uploaded">?</span></label>
                                             <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
                                         </div>
                                     </div>
