@@ -25,7 +25,7 @@ class SparqlClient extends Client
     /**
      * The URI for ACARA's API.
      */
-    public const API_URI = 'http://rdf.australiancurriculum.edu.au/api/sparql';
+    public const API_URI = 'https://rdf.australiancurriculum.edu.au/api/sparql';
 
 
     /**
