@@ -159,10 +159,6 @@ class ItemPool implements CacheItemPoolInterface
     public function deleteItem($key)
     {
         $this->assertKeyValid($key);
-        if (!$this->hasItem($key)) {
-            return false;
-        }
-
         if ($this->redis->del($this->keyGenerator->generateKey($key))) {
             unset($this->deferredItems[$key]);
             return true;
