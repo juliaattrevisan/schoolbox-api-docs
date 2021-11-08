@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Alaress_Date_Format;
+use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
@@ -18,10 +19,12 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment;
@@ -34,6 +37,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\LTI\AccessToken\Cache\RedisItemPool;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
@@ -525,6 +529,16 @@ class Controller extends Assessment\Controller
 
         // Access token sanity checker: validates the request token was created by a tool
         $validator = new RequestAccessTokenValidator($this->registrations);
+
+        // Access token validity checker
+        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
+        $resourceServerValidator = new ResourceServer(
+            new AccessTokenRepository(
+                new RedisItemPool($this->getDi()->get('redis')),
+            ),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+        );
+        $request = $resourceServerValidator->validateAuthenticatedRequest($request);
 
         // Handle the request: this validates the request body
         $handler = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
