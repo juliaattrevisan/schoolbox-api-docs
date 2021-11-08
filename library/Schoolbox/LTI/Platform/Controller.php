@@ -32,11 +32,8 @@ use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchReques
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
-use Schoolbox\LTI\AccessToken\Cache\ItemPool;
-use Schoolbox\LTI\AccessToken\Mapper as AccessTokenMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
-use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
@@ -70,17 +67,6 @@ class Controller extends Base
     private Instance $instance;
 
     /**
-     * Access token mapper: used for building the cache of access tokens.
-     */
-    private AccessTokenMapper $accessTokenMapper;
-
-    /**
-     * LTI tool mapper: used in the access token cache, for associating an
-     * access token with a tool.
-     */
-    private ToolMapper $toolMapper;
-
-    /**
      * User codec, used to encode a user into a login hint.
      */
     private UserCodec $userCodec;
@@ -92,8 +78,6 @@ class Controller extends Base
      * @param RegistrationRepositoryInterface $registrations
      * @param UserAuthenticatorInterface      $userAuthenticator
      * @param Instance                        $instance
-     * @param AccessTokenMapper               $accessTokenMapper
-     * @param ToolMapper                      $toolMapper
      * @param UserCodec                       $userCodec
      */
     public function __construct(
@@ -101,16 +85,12 @@ class Controller extends Base
         RegistrationRepositoryInterface $registrations,
         UserAuthenticatorInterface $userAuthenticator,
         Instance $instance,
-        AccessTokenMapper $accessTokenMapper,
-        ToolMapper $toolMapper,
         UserCodec $userCodec
     ) {
         $this->keyChains         = $keyChains;
         $this->registrations     = $registrations;
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
-        $this->accessTokenMapper = $accessTokenMapper;
-        $this->toolMapper        = $toolMapper;
         $this->userCodec         = $userCodec;
     }
 
