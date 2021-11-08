@@ -91,6 +91,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateNormMark']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createExtension']);
 
         // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
@@ -151,15 +152,25 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         if (!$previous) {
             $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
         }
-        if ($object->isPublished() && $object->getResubmissionRequired() && !$previous->isPublished()) {
-            $expireDateOffset = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_LMS_RESUBMIT_WINDOW);
-            $this->interactionChecker->createPlanForResubmission($object->getOwner(), $assessment, $expireDateOffset);
-        }
-
         return true;
     }
 
-
+    /**
+     * If a resubmission is requested and create an extension for the user
+     *
+     * @param ReturnedWork      $object
+     * @param ReturnedWork|null $previous
+     * @return bool
+     */
+    public function createExtension(ReturnedWork $object, ReturnedWork $previous = null): bool
+    {
+        $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
+        if ($object->isPublished() && $object->getResubmissionRequired()) {
+            $expireDateOffset = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_LMS_RESUBMIT_WINDOW);
+            $this->interactionChecker->createPlanForResubmission($object->getOwner(), $assessment, $expireDateOffset);
+        }
+        return true;
+    }
     /**
      * Soft deletes all Files for the specified Return
      *

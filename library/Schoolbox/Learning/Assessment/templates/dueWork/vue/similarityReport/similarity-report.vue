@@ -257,28 +257,26 @@ export default {
             const fetchList = [];
             this.selectedRows.forEach((row) => {
                 fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
                     method: 'POST',
-                    body: this.getURLSearchParams(),
+                    body: this.getFormData(),
                 }));
             });
             return fetchList;
         },
 
         /**
-         * Send through the mark the submission as requiring submission and include the comment
+         * Send through the data to mark the submission as requiring resubmssion
+         * and add the comment
          *
-         * @returns { URLSearchParams }
+         * @returns { FormData }
          */
-        getURLSearchParams () {
-            return new URLSearchParams({
-                'responseId': '',
-                'resubmissionRequired': '1',
-                'comment': this.comment,
-                'publish': '1',
-            })
+        getFormData () {
+            const formData = new FormData();
+            formData.append('responseId', ''); //to mark the submission as a floating comment
+            formData.append('resubmissionRequired', '1');
+            formData.append('comment', this.comment);
+            formData.append('publish', '1');
+            return formData;
         },
 
         /**
