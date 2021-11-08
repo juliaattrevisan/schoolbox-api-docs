@@ -641,7 +641,7 @@ class Controller extends Base
                 /**
                  * if the user has not nominated a field, we're not even going to attempt saving/handling it
                  */
-                if (empty($conditionArgs[0])) {
+                if ($conditionArgs[0] === null || trim($conditionArgs[0]) === '') {
                     continue;
                 }
 
