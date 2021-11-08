@@ -81,7 +81,7 @@ class Factory
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private UserProfile\Staff\Mapper$staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
