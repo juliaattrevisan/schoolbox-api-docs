@@ -48,13 +48,13 @@ class RedactedPhotoList
             /* Path to portrait picture and search page - what's this for though?
              */
             $redactPhotoPath = sprintf(
-                'https://%s/portrait.php?id=%s&size=constrain200',
+                'https:%s/portrait.php?id=%s&size=constrain200',
                 $this->fqdn,
                 $redactedPhoto['id']
             );
 
             $profilePhotoPath = sprintf(
-                'https://%s/search/user/%s',
+                'https:%s/search/user/%s',
                 $this->fqdn,
                 $redactedPhoto['id']
             );
