@@ -37,7 +37,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $permissionStaff       = new Rule\HasRole(Role::STAFF);
+        $permissionStaff       = new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF);
         $permissionReportOwner = new Rule\All(new IsReportOwner(), $permissionStaff);
 
         $this->registerRoutesArray([

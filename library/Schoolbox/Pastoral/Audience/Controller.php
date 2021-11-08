@@ -457,6 +457,6 @@ class Controller extends Base
     {
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
-        return $this->pastoralAudienceMapper->findByPredicates($pb);
+        return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
     }
 }

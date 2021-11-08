@@ -64,67 +64,67 @@ use UnexpectedValueException;
 class Controller extends Base
 {
     /** @var IConfigLoader $config */
-    protected $config;
+    protected IConfigLoader $config;
 
     /** @var ErrorMapper $errorMapper */
-    protected $errorMapper;
+    protected ErrorMapper $errorMapper;
 
     /** @var FileMapper $fileMapper */
-    protected $fileMapper;
+    protected FileMapper $fileMapper;
 
     /** @var PastoralDataSource $pastoralDataSource */
-    protected $pastoralDataSource;
+    protected PastoralDataSource $pastoralDataSource;
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
-    protected $pastoralAccessMapper;
+    protected PastoralAccessMapper $pastoralAccessMapper;
 
     /** @var PastoralGroupMapper $pastoralGroupMapper */
-    protected $pastoralGroupMapper;
+    protected PastoralGroupMapper $pastoralGroupMapper;
 
     /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    protected $pastoralGroupMemberMapper;
+    protected PastoralGroupMemberMapper $pastoralGroupMemberMapper;
 
     /** @var PastoralAttachmentMapper $pastoralAttachmentMapper */
-    protected $pastoralAttachmentMapper;
+    protected PastoralAttachmentMapper $pastoralAttachmentMapper;
 
     /** @var PastoralAuditMapper $pastoralAuditMapper */
-    protected $pastoralAuditMapper;
+    protected PastoralAuditMapper $pastoralAuditMapper;
 
     /** @var PastoralSubTypeMapper $pastoralSubTypeMapper */
-    protected $pastoralSubTypeMapper;
+    protected PastoralSubTypeMapper $pastoralSubTypeMapper;
 
     /** @var PastoralCommentMapper $pastoralCommentMapper */
-    protected $pastoralCommentMapper;
+    protected PastoralCommentMapper $pastoralCommentMapper;
 
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
-    protected $pastoralSeverityMapper;
+    protected PastoralSeverityMapper $pastoralSeverityMapper;
 
     /** @var PastoralRevisionDataSource $pastoralRevisionDataSource */
-    protected $pastoralRevisionDataSource;
+    protected PastoralRevisionDataSource $pastoralRevisionDataSource;
 
     /** @var PastoralTagMapper $pastoralTagMapper */
-    protected $pastoralTagMapper;
+    protected PastoralTagMapper $pastoralTagMapper;
 
     /** @var PastoralTypeMapper $pastoralTypeMapper */
-    protected $pastoralTypeMapper;
+    protected PastoralTypeMapper $pastoralTypeMapper;
 
     /** @var PastoralUploadQueueMapper $pastoralUploadQueueMapper */
-    protected $pastoralUploadQueueMapper;
+    protected PastoralUploadQueueMapper $pastoralUploadQueueMapper;
 
     /** @var RoleMapper $roleMapper */
-    protected $roleMapper;
+    protected RoleMapper $roleMapper;
 
     /** @var UserMapper $userMapper */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /** @var UserAccessMapper $userAccessMapper */
-    protected $userAccessMapper;
+    protected UserAccessMapper $userAccessMapper;
 
     /** @var PastoralReportMapper $pastoralReportMapper */
-    private $pastoralReportMapper;
+    private PastoralReportMapper $pastoralReportMapper;
 
     /** @var Audience\Mapper */
-    private $audienceMapper;
+    private Audience\Mapper $audienceMapper;
 
     const ATTACHZONE_PRIVATE = 'private';
     const ATTACHZONE_PUBLIC  = 'public';
@@ -460,22 +460,11 @@ class Controller extends Base
 
         // Hydrate group members and their roles so we can display them in the visibility section
         if ($record->getAccess()) {
-            foreach ($record->getAccess() as $key => $access) {
+            foreach ($record->getAccessWithPermission() as $access) {
                 if ($access->getGroup() instanceof PastoralGroup) {
                     $this->pastoralGroupMapper->findById($access->getGroup()->getId());
                     foreach ($access->getGroup()->getMembersWithPermission() as $member) {
                         $this->userMapper->findById($member->getUser()->getId());
-                    }
-                } else {
-                    if ($access->getRole() instanceof Role) {
-                        $role = $access->getRole();
-                    } elseif ($access->getUser() instanceof User) {
-                        $role = $access->getUser()->getRole();
-                    } else {
-                        continue;
-                    }
-                    if ($role->isStaff() && !$role->getAccessPastoral()) {
-                        $record->getAccess()->offsetUnset($key);
                     }
                 }
             }
@@ -584,7 +573,7 @@ class Controller extends Base
             }
         }
 
-        $audiences        = $this->audienceMapper->findAll();
+        $audiences        = $this->audienceMapper->findAll()->filter($this->audienceMapper->getPermissionCallback());
         $typeAudiences    = [];
         $subtypeAudiences = [];
         foreach ($audiences as $audience) {
