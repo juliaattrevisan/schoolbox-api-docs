@@ -122,9 +122,7 @@ Usage:
 <ul class="breadcrumb">
     <li><a href="/learning/classes">Learning</a></li>
     <li><a href="/homepage/{{ folder.id }}">{{ folder.title }}</a></li>
-    <li class="active">
-        <a href="{{ routeLookup('courseImport.getManagement', { folderId: folder.id }) }}">Modify Course</a>
-    </li>
+    <li class="active"><span>Modify Course</span></li>
 </ul>
 <div class="row">
     <div class="small-12 island">

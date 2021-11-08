@@ -45,7 +45,8 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
   list-style: none;
   overflow: hidden;
   li {
-    a {
+    a, 
+    span {
       // Note these styles will default to a disabled crumb, then add the link styles based on a[href]
       background-color: $breadcrumb-bg-color;
       color: $breadcrumb-noclick-color;
@@ -104,7 +105,8 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
     }
 
     // Active styles
-    &.active a {
+    &.active a, 
+    &.active span {
       &:before {
         margin-left: 0;
       }
@@ -120,7 +122,9 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
     }
 
     &.active a,
-    &.active a:after {
+    &.active span,
+    &.active a:after,
+    &.active span:after {
       background-color: $breadcrumb-active-bg-color;
       border-left: 0 solid $breadcrumb-active-bg-color;
     }
