@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
 use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
@@ -71,6 +72,12 @@ class Events implements IStrategy
 
 
     /**
+     * @var EventType
+     */
+    private EventType $defaultEventType;
+
+
+    /**
      * @var UserMapper
      */
     private UserMapper $userMapper;
@@ -113,6 +120,7 @@ class Events implements IStrategy
      * @param bool                              $perform
      * @param IApi                              $api
      * @param User                              $defaultOwner
+     * @param EventType                         $defaultEventType
      * @param UserMapper                        $userMapper
      * @param EventMapper                       $eventMapper
      * @param Mapper                            $eventSourceMapper
@@ -125,6 +133,7 @@ class Events implements IStrategy
         bool                              $perform,
         IApi                              $api,
         User                              $defaultOwner,
+        EventType                         $defaultEventType,
         UserMapper                        $userMapper,
         EventMapper                       $eventMapper,
         \Event\Source\Mapper              $eventSourceMapper,
@@ -137,6 +146,7 @@ class Events implements IStrategy
         $this->api = $api;
 
         $this->defaultOwner = $defaultOwner;
+        $this->defaultEventType = $defaultEventType;
         $this->userMapper = $userMapper;
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
@@ -346,7 +356,7 @@ class Events implements IStrategy
      */
     private function createGroupEvents(array $activity, array $activityInstance, array $meta, \Schoolbox\Resource\Folder\Model $folder): void
     {
-        $event = $this->eventMapper->createModel();
+        $event = $this->eventMapper->createModel()->setCampusCollection(new \Schoolbox\Collection());
         $eventSource = $this->eventSourceMapper->createModel();
 
         /* Start hydrating $event with info from $activity and $activityInstance
@@ -354,9 +364,11 @@ class Events implements IStrategy
         $event
             ->setTitle($meta['title'])
             ->setLocation($meta['location'])
+            ->setAuthor($this->defaultOwner)
             ->setOwner($this->defaultOwner)
             ->setStartDateTime($meta['startDatetime'])
-            ->setEndDateTime($meta['endDatetime']);
+            ->setEndDateTime($meta['endDatetime'])
+            ->setType($this->defaultEventType);
 
         /* Assign event source identifier, assign compass guid (whatever that might be)
          */
@@ -417,7 +429,7 @@ class Events implements IStrategy
                 continue;
             }
 
-            $event = $this->eventMapper->createModel();
+            $event = $this->eventMapper->createModel()->setCampusCollection(new \Schoolbox\Collection());
             $eventSource = $this->eventSourceMapper->createModel();
 
             /* Start hydrating $event with info from $activity and $activityInstance
@@ -425,9 +437,11 @@ class Events implements IStrategy
             $event
                 ->setTitle($meta['title'])
                 ->setLocation($meta['location'])
+                ->setAuthor($this->defaultOwner)
                 ->setOwner($owner)
                 ->setStartDateTime($meta['startDatetime'])
-                ->setEndDateTime($meta['endDatetime']);
+                ->setEndDateTime($meta['endDatetime'])
+                ->setType($this->defaultEventType);
 
             /* Assign event source identifier, assign compass guid (whatever that might be)
              */
@@ -467,7 +481,7 @@ class Events implements IStrategy
                 continue;
             }
 
-            $event = $this->eventMapper->createModel();
+            $event = $this->eventMapper->createModel()->setCampusCollection(new \Schoolbox\Collection());
             $eventSource = $this->eventSourceMapper->createModel();
 
             /* Start hydrating $event with info from $activity and $activityInstance
@@ -475,8 +489,11 @@ class Events implements IStrategy
             $event
                 ->setTitle($meta['title'])
                 ->setLocation($meta['location'])
+                ->setAuthor($this->defaultOwner)
+                ->setOwner($owner)
                 ->setStartDateTime($meta['startDatetime'])
-                ->setEndDateTime($meta['endDatetime']);
+                ->setEndDateTime($meta['endDatetime'])
+                ->setType($this->defaultEventType);
 
             /* Assign event source identifier, assign compass guid (whatever that might be)
              */
