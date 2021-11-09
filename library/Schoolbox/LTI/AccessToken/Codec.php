@@ -16,12 +16,31 @@ use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\AccessToken;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use TypeError;
+use UnexpectedValueException;
 
 /**
  * Codec for serializing/unserializing access tokens.
  */
 class Codec implements ICodec
 {
+    private const FIELD_IDENTIFIER      = 'identifier';
+    private const FIELD_USER_IDENTIFIER = 'userIdentifier';
+    private const FIELD_CLIENT_ID       = 'clientId';
+    private const FIELD_SCOPES          = 'scopes';
+    private const FIELD_EXPIRY          = 'expiry';
+
+    /**
+     * Fields which must be in the decoded value, otherwise the decoded value
+     * will be rejected.
+     */
+    private const REQUIRED_FIELDS = [
+        self::FIELD_IDENTIFIER,
+        self::FIELD_USER_IDENTIFIER,
+        self::FIELD_CLIENT_ID,
+        self::FIELD_SCOPES,
+        self::FIELD_EXPIRY,
+    ];
+
     /**
      * Client repository: required when decoding a token.
      */
@@ -43,17 +62,16 @@ class Codec implements ICodec
      */
     public function encode($rawValue)
     {
-        // TODO properly serialize/unserialize
         if (!$rawValue instanceof AccessToken) {
             throw new TypeError('$rawValue must be an AccessToken instance');
         }
 
         $serializedToken = [
-            'identifier'     => $rawValue->getIdentifier(),
-            'userIdentifier' => $rawValue->getUserIdentifier(),
-            'clientId'       => $rawValue->getClient()->getIdentifier(),
-            'scopes'         => $rawValue->getScopes(),
-            'expiry'         => $rawValue->getExpiryDateTime()->format(DateTimeInterface::ISO8601),
+            self::FIELD_IDENTIFIER      => $rawValue->getIdentifier(),
+            self::FIELD_USER_IDENTIFIER => $rawValue->getUserIdentifier(),
+            self::FIELD_CLIENT_ID       => $rawValue->getClient()->getIdentifier(),
+            self::FIELD_SCOPES          => $rawValue->getScopes(),
+            self::FIELD_EXPIRY          => $rawValue->getExpiryDateTime()->format(DateTimeInterface::ISO8601),
         ];
         return json_encode($serializedToken);
     }
@@ -65,15 +83,29 @@ class Codec implements ICodec
     public function decode($encodedValue)
     {
         $decoded = json_decode($encodedValue, true);
-        $token   = new AccessToken();
-        $token->setIdentifier($decoded['identifier']);
-        $token->setUserIdentifier($decoded['userIdentifier']);
+
+        // Need to verify all required fields exist
+        foreach (self::REQUIRED_FIELDS as $requiredField) {
+            if (!array_key_exists($requiredField, $decoded)) {
+                throw new UnexpectedValueException(
+                    sprintf('Required field "%s" does not exist in decoded value', $requiredField),
+                );
+            }
+        }
+
+
+        // Now create a token
+        $token = new AccessToken();
+        $token->setIdentifier($decoded[self::FIELD_IDENTIFIER]);
+        $token->setUserIdentifier($decoded[self::FIELD_USER_IDENTIFIER]);
         // Need to fetch client from repository
-        $token->setClient($this->clientRepository->getClientEntity($decoded['clientId']));
-        foreach ($decoded['scopes'] as $scope) {
+        $token->setClient($this->clientRepository->getClientEntity($decoded[self::FIELD_CLIENT_ID]));
+        foreach ($decoded[self::FIELD_SCOPES] as $scope) {
             $token->addScope(new Scope($scope));
         }
-        $token->setExpiryDateTime(DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $decoded['expiry']));
+        $token->setExpiryDateTime(
+            DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $decoded[self::FIELD_EXPIRY]),
+        );
         return $token;
     }
 }
