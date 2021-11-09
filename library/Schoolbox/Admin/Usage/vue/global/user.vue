@@ -152,7 +152,7 @@ export default {
          * 
          */
         onLoaded () {
-            this.$nextTick(() => this.$_footerUI_update());
+            this.$nextTick(() => this.footerUI_update());
         },
 
         /**
