@@ -23,7 +23,7 @@ class Prepare implements IStrategy
     /**
      * An arbitrarily-chosen string to denote where these events came from
      */
-    private const EVENT_IMPORT_IDENTIFIER = 'suds_compass';
+    public const EVENT_IMPORT_IDENTIFIER = 'suds_compass';
 
 
     /**

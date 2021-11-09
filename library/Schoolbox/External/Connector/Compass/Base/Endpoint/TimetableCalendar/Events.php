@@ -7,10 +7,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
 
+use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Role;
+use Schoolbox\UserMapper;
+
 
 /**
  * Set up calendar events to represent these class (Activity) instances
@@ -59,24 +65,66 @@ class Events implements IStrategy
 
 
     /**
+     * @var EventMapper
+     */
+    private EventMapper $eventMapper;
+
+
+    /**
+     * @var Mapper
+     */
+    private \Event\Source\Mapper $eventSourceMapper;
+
+
+    /**
+     * @var PersonalMapper
+     */
+    private PersonalMapper $relationPersonalMapper;
+
+
+    /**
+     * @var CategoryMapper
+     */
+    private CategoryMapper $relationFolderMapper;
+
+
+    /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
      * Constructor.
      *
-     * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param IApi            $api
-     * @param EventMapper     $eventMapper
+     * @param LoggerInterface                   $log
+     * @param bool                              $perform
+     * @param IApi                              $api
+     * @param EventMapper                       $eventMapper
+     * @param Mapper                            $eventSourceMapper
+     * @param PersonalMapper                    $relationPersonalMapper
+     * @param CategoryMapper                    $relationFolderMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         IApi $api,
-        EventMapper $eventMapper
+        EventMapper $eventMapper,
+        \Event\Source\Mapper $eventSourceMapper,
+        PersonalMapper $relationPersonalMapper,
+        CategoryMapper $relationFolderMapper,
+        \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
 
         $this->eventMapper = $eventMapper;
+        $this->eventSourceMapper = $eventSourceMapper;
+        $this->relationPersonalMapper = $relationPersonalMapper;
+        $this->relationFolderMapper = $relationFolderMapper;
+        $this->folderMapper = $folderMapper;
     }
 
 
@@ -223,23 +271,219 @@ class Events implements IStrategy
      */
     private function createClassEvents(array $activity, array $activityInstance, array $enrolments): void
     {
+        /* Arbitrarily concoct a superkey to represent this activity instance
+         *
+         * TODO Maybe you can use that to update, instead of recreate, some data.
+         */
+        $guid = "{$activity['activityId']}.{$activityInstance['importIdentifier']}.{$activityInstance['start']}";
+
+        /* Arbitrarily concoct a random array of event information that we can pass around
+         */
+        $meta = [
+            'location' => trim((string)$activityInstance['location']),
+            'title' => trim((string)$activity['name']),
+            'startDatetime' => \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['start'])),
+            'endDatetime' => \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['finish'])),
+            'guid' => $guid
+        ];
+
+        /* Assign Group (homepage/category/folder) relations using $activity['subjectImportIdentifier']
+         * as the folder code, assigning to individuals if folder code not found
+         */
+        try {
+            /* TODO Improve this with a hashtable lookup, maybe
+             */
+            $folder = $this->folderMapper->findByCode($activity['subjectImportIdentifier']);
+
+            $this->createGroupEvents($activity, $activityInstance, $enrolments, $meta, $folder);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->log->warning(sprintf(
+                'Activity %s Instance on %s: cannot find corresponding folder for subjectImportIdentifier %s. Creating personal events instead',
+                $activity['name'],
+                $activityInstance['start'],
+                $activity['subjectImportIdentifier']
+            ));
+
+            /* Folder wasn't found; install this event for each guy individually
+             */
+            $this->createPersonalEvents($activity, $activityInstance, $enrolments, $meta);
+        }
+    }
+
+
+    /**
+     * Create a calendar event with Folder relations
+     *
+     * @param array                            $activity
+     * @param array                            $activityInstance
+     * @param array                            $enrolments
+     * @param array                            $meta
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws \UnexpectedValueException
+     */
+    private function createGroupEvents(array $activity, array $activityInstance, array $enrolments, array $meta, \Schoolbox\Resource\Folder\Model $folder): void
+    {
+        /* I guess alaress admin owns the timetable now
+         */
+        $owner = UserMapper::getInstance()->findByExternalId(UserMapper::USERNAME_ALARESS_ADMIN, Role::STUDENT);
+
         $event = $this->eventMapper->createModel();
+        $eventSource = $this->eventSourceMapper->createModel();
 
         /* Start hydrating $event with info from $activity and $activityInstance
          */
+        $event
+            ->setTitle($meta['title'])
+            ->setLocation($meta['location'])
+            ->setOwner($owner)
+            ->setStartDateTime($meta['startDatetime'])
+            ->setEndDateTime($meta['endDatetime']);
 
         /* Assign event source identifier, assign compass guid (whatever that might be)
          */
-
-        /* Assign people relations from $enrolments - try to find the users if they exist
-         * via the usual User lookup technique, skipping if they don't exist
-         */
-
-        /* Assign Group (homepage/category/folder) relations using $activity['subjectImportIdentifier']
-         * as the folder code, skipping if it doesn't exist
-         */
+        $eventSource
+            ->setEvent($event)
+            ->setSourceName(Prepare::EVENT_IMPORT_IDENTIFIER)
+            ->setGuid($meta['guid']);
 
         /* Save it
          */
+        if ($this->perform) {
+            $this->eventMapper->save($event);
+            $this->eventSourceMapper->save($eventSource);
+
+            $this->log->debug(sprintf(
+                'Activity %s Instance on %s: saving folder relationship with %s',
+                $activity['name'],
+                $activityInstance['start'],
+                $folder->getNameWithCodes()
+            ));
+
+            /* Assign people relations from $enrolments - try to find the users if they exist
+             * via the usual User lookup technique, skipping if they don't exist
+             */
+            $this->relationFolderMapper->save($this->relationFolderMapper->createModel()
+                ->setEventId($event->getId())
+                ->setCategoryId($folder->getId()));
+        }
+    }
+
+
+    /**
+     * Create a calendar event with Personal relations
+     *
+     * @param array $activity
+     * @param array $activityInstance
+     * @param array $enrolments
+     * @param array $meta
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function createPersonalEvents(array $activity, array $activityInstance, array $enrolments, array $meta): void
+    {
+        foreach ($enrolments['students'] as $externalId) {
+            try {
+                $owner = UserMapper::getInstance()->findByExternalId($externalId, Role::STUDENT);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->log->warning(sprintf(
+                    'Activity %s Instance on %s: cannot find student %s, skipping',
+                    $activity['name'],
+                    $activityInstance['start'],
+                    $externalId
+                ));
+
+                continue;
+            }
+
+            $event = $this->eventMapper->createModel();
+            $eventSource = $this->eventSourceMapper->createModel();
+
+            /* Start hydrating $event with info from $activity and $activityInstance
+             */
+            $event
+                ->setTitle($meta['title'])
+                ->setLocation($meta['location'])
+                ->setOwner($owner)
+                ->setStartDateTime($meta['startDatetime'])
+                ->setEndDateTime($meta['endDatetime']);
+
+            /* Assign event source identifier, assign compass guid (whatever that might be)
+             */
+            $eventSource
+                ->setEvent($event)
+                ->setSourceName(Prepare::EVENT_IMPORT_IDENTIFIER)
+                ->setGuid($meta['guid']);
+
+            /* Save it
+             */
+            if ($this->perform) {
+                $this->eventMapper->save($event);
+                $this->eventSourceMapper->save($eventSource);
+
+                /* Assign people relations from $enrolments - try to find the users if they exist
+                 * via the usual User lookup technique, skipping if they don't exist
+                 */
+                $this->relationPersonalMapper->save($this->relationPersonalMapper->createModel()
+                    ->setEventId($event->getId())
+                    ->setUserId($owner->getId()));
+            }
+        }
+
+        /* Do this for the Lead Teacher as well
+         */
+        foreach ($enrolments['teachers'] as $externalId) {
+            try {
+                $owner = UserMapper::getInstance()->findByExternalId($externalId, Role::STAFF);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $this->log->warning(sprintf(
+                    'Activity %s Instance on %s: cannot find teacher %s, skipping',
+                    $activity['name'],
+                    $activityInstance['start'],
+                    $externalId
+                ));
+
+                continue;
+            }
+
+            $event = $this->eventMapper->createModel();
+            $eventSource = $this->eventSourceMapper->createModel();
+
+            /* Start hydrating $event with info from $activity and $activityInstance
+             */
+            $event
+                ->setTitle($meta['title'])
+                ->setLocation($meta['location'])
+                ->setStartDateTime($meta['startDatetime'])
+                ->setEndDateTime($meta['endDatetime']);
+
+            /* Assign event source identifier, assign compass guid (whatever that might be)
+             */
+            $eventSource
+                ->setEvent($event)
+                ->setSourceName(Prepare::EVENT_IMPORT_IDENTIFIER)
+                ->setGuid($meta['guid']);
+
+            /* Save it
+             */
+            if ($this->perform) {
+                $this->eventMapper->save($event);
+                $this->eventSourceMapper->save($eventSource);
+
+                /* Assign people relations from $enrolments - try to find the users if they exist
+                 * via the usual User lookup technique, skipping if they don't exist
+                 */
+                $this->relationPersonalMapper->save($this->relationPersonalMapper->createModel()
+                    ->setEventId($event->getId())
+                    ->setUserId($owner->getId()));
+            }
+        }
     }
 }

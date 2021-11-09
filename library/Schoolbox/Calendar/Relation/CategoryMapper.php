@@ -17,6 +17,7 @@ use Schoolbox\Mapper;
  * Maintains relationships between Folders and Events via event_folder
  * These are a Group level's events
  *
+ * @method Category createModel()
  * @package Schoolbox\Calendar\Relation
  */
 class CategoryMapper extends Schoolbox\Mapper
