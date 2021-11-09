@@ -9,7 +9,9 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use _HumbugBox243b3a4ed02c\Nette\Neon\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
@@ -84,10 +86,20 @@ class Controller extends AbstractController
     public function showFiles($componentID, $sourceFolderID)
     {
         $filesBuilder = new FilesBuilder($this->getDi()->get('databaseInternal'));
+        $homepage_id = $filesBuilder->getHomepage($componentID);
+
+        //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
+        $accessSource = $this->getAccess($sourceFolderID);
+        $accessHome = $this->getAccess($homepage_id);
+
+        // special case for root, just let that through to the keeper
+        if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        }
 
         $componentConfig = $filesBuilder->getComponentConf($componentID);
 
-        $files = $filesBuilder->getFolderData($sourceFolderID);
+        $files = $filesBuilder->getFolderData($componentConfig['src']['value']);
 
         //just dump the lot to the page for front end use.
         //output results
@@ -116,12 +128,24 @@ class Controller extends AbstractController
     public function showAllFiles($componentID, $sourceFolderID)
     {
         $filesBuilder = new FilesBuilder($this->getDi()->get('databaseInternal'));
+        $homepage_id = $filesBuilder->getHomepage($componentID);
+
+        //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
+        $accessSource = $this->getAccess($sourceFolderID);
+        $accessHome = $this->getAccess($homepage_id);
+
+        // special case for root, just let that through to the keeper
+        if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        }
+
         $files = $filesBuilder->getFolderData($sourceFolderID);
 
         //dump all as json
         $this->getResponse()->content->set($this->buildJsonOutput([
               'componentID' => $componentID,
               'sourceFolderID' => $sourceFolderID,
+              'homepageID' => $homepage_id,
               'file_list' => $files,
           ]));
     }

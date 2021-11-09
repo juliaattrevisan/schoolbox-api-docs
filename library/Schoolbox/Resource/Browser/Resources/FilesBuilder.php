@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser\Resources;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Exception;
 
 class FilesBuilder
 {
@@ -42,9 +43,33 @@ class FilesBuilder
     }
 
     /**
+     * get homepageId.
+     *
+     * @param int $componentId
+     * @returns int
+     * @throws Mapper\Exception\NotFound
+     */
+    public function getHomepage(int $componentId)
+    {
+        //get the homepage Id, from the component and confirm it is a files component
+        $statement = $this->db->executeQuery("
+            SELECT component_instance.identifier from component_instance
+            INNER JOIN component_definition
+            on component_instance.component_definition_id = component_definition.id
+            where component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
+            ", ['id' => $componentId]);
+        $homepage_id = $statement->fetch(\PDO::FETCH_ASSOC);
+        if ($homepage_id === false) {
+            //component ID does not exist
+            throw new \Schoolbox\Mapper\Exception\NotFound();
+        }
+        return $homepage_id;
+    }
+
+
+    /**
      * @param int $folderId
      * @return array of files
-     * @throws Mapper\Exception\Deleted
      */
     public function getFolderData(int $folderId): array
     {
@@ -83,6 +108,7 @@ class FilesBuilder
      * array (sourceId, title, sorting, direction, filter)
      * @param int $componentId
      * @return array componentConfig
+     * @throws Mapper\Exception\NotFound
      */
     public function getComponentConf(int $componentId): array
     {
@@ -106,7 +132,7 @@ class FilesBuilder
          * where component_config_instance.component_instance_id = 4901
          * ```
          */
-
+        $homepage_id = $this->getHomepage($componentId);
 
         //build default object / query
         $defaultComponentConfig = [];
@@ -141,15 +167,17 @@ class FilesBuilder
             ];
         }
         $config = [];
-        if (isset($instanceComponentConfig['homepage'])) {
-            $config['homepage'] = $instanceComponentConfig['homepage'];
-        }
+        $config['homepage'] = $instanceComponentConfig['homepage'] ?: $homepage_id['identifier'];
+
         foreach ($defaultComponentConfig as $key => $default) {
             $config[$key] = [
                 'label' => $instanceComponentConfig[$key]['label'] ?: $default['label'],
                 'value' => $instanceComponentConfig[$key]['value'] ?: $default['default_value'],
             ];
         }
+        //if there is no config, the source will be empty, so set it now
+        $config['src']['value'] = $config['src']['value'] ?: $config['homepage'];
+
         //return instance / default config values
         return $config;
     }
