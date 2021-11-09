@@ -314,7 +314,7 @@ class Events implements IStrategy
              */
             $folder = $this->folderMapper->findByCode($activity['subjectImportIdentifier']);
 
-            $this->createGroupEvents($activity, $activityInstance, $enrolments, $meta, $folder);
+            $this->createGroupEvents($activity, $activityInstance, $meta, $folder);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->log->warning(sprintf(
                 'Activity %s Instance on %s: cannot find corresponding folder for subjectImportIdentifier %s. Creating personal events instead',
@@ -335,7 +335,6 @@ class Events implements IStrategy
      *
      * @param array                            $activity
      * @param array                            $activityInstance
-     * @param array                            $enrolments
      * @param array                            $meta
      * @param \Schoolbox\Resource\Folder\Model $folder
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -345,7 +344,7 @@ class Events implements IStrategy
      * @throws \Schoolbox\Mapper\Exception\NotFound
      * @throws \UnexpectedValueException
      */
-    private function createGroupEvents(array $activity, array $activityInstance, array $enrolments, array $meta, \Schoolbox\Resource\Folder\Model $folder): void
+    private function createGroupEvents(array $activity, array $activityInstance, array $meta, \Schoolbox\Resource\Folder\Model $folder): void
     {
         $event = $this->eventMapper->createModel();
         $eventSource = $this->eventSourceMapper->createModel();
