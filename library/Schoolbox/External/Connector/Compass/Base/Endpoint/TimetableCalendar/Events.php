@@ -195,10 +195,51 @@ class Events implements IStrategy
                         /* Start manufacturing events and relationships for each person
                          * in $enrolments, then save it
                          */
+                        $this->log->info(sprintf(
+                            'Manufacturing event for Activity %s Instance on %s',
+                            $activity['name'],
+                            $activityInstance['start']
+                        ));
 
+                        /* The relationships here are based on actual schoolbox.user accounts existing
+                         * since we have foreigner keys for user.id in the schema. This means UPS must
+                         * have run prior to timetable imports...we'll just fumble through it
+                         */
+                        $this->createClassEvents($activity, $activityInstance, $enrolments);
                     }
                 }
             }
         }
+    }
+
+
+    /**
+     * Create an event that represents an occurrence of this Activity
+     *
+     * @param array $activity
+     * @param array $activityInstance
+     * @param array $enrolments
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function createClassEvents(array $activity, array $activityInstance, array $enrolments): void
+    {
+        $event = $this->eventMapper->createModel();
+
+        /* Start hydrating $event with info from $activity and $activityInstance
+         */
+
+        /* Assign event source identifier, assign compass guid (whatever that might be)
+         */
+
+        /* Assign people relations from $enrolments - try to find the users if they exist
+         * via the usual User lookup technique, skipping if they don't exist
+         */
+
+        /* Assign Group (homepage/category/folder) relations using $activity['subjectImportIdentifier']
+         * as the folder code, skipping if it doesn't exist
+         */
+
+        /* Save it
+         */
     }
 }
