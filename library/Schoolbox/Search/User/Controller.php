@@ -19,6 +19,7 @@ use External_ClassInterface;
 use External_UserInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
@@ -554,7 +555,7 @@ class Controller extends BaseController
             }
         }
 
-        $showPastoral = $this->getConfigLoader()->get('pastoral_enabled');
+        $showPastoral = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED);
 
         if ($this->getUser()->getRole()->isParent() && !$this->getConfigLoader()->get('pastoral_parent_access')) {
             $showPastoral = false;
@@ -667,7 +668,7 @@ class Controller extends BaseController
         }
 
         $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
-        $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get('pastoral_flag_count_period')));
+        $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
 
         $this->response->content->set(
             $this->buildHtmlOutput(
