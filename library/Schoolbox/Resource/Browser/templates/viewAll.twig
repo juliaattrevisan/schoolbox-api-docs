@@ -1,0 +1,31 @@
+
+{{ title }}
+<br>
+componentFolderId:
+{{ componentFolderId }}
+<br>
+<div>Source Folder: {{ componentInstanceConfig.src.value }}</div>
+
+
+<table>
+    <tr>
+        <th>File ID</th>
+        <th>File Name</th>
+        <th>hash</th>
+        <th>Mimetype</th>
+        <th>Date Modified</th>
+    </tr>
+    {% for file in files %}
+        <tr>
+            <td>{{ file.file_id }}</td>
+            <td>{{ file.name }}</td>
+            <td>{{ file.hash }}</td>
+            <td>{{ file.mime.description }}</td>
+            <td>{{ file.dateModified.formatted }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<iframe src="/resources/folder/{{ componentID }}/files/{{ sourceFolderID }}/all"></iframe>
+
+
+<pre>{{ dump(componentInstanceConfig) }}</pre>

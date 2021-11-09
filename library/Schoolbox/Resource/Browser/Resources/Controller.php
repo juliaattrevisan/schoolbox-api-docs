@@ -85,18 +85,21 @@ class Controller extends AbstractController
     {
         $filesBuilder = new FilesBuilder($this->getDi()->get('databaseInternal'));
 
-        $tmp = $filesBuilder->getComponentConf($componentID);
+        $componentConfig = $filesBuilder->getComponentConf($componentID);
+
+        $files = $filesBuilder->getFolderData($sourceFolderID);
 
         //just dump the lot to the page for front end use.
         //output results
         $this->getResponse()->content->set([
            'template' => '@resourceBrowser/viewAll.twig',
            'data' => [
-               'title' => $instConf['componentname']['value'],
-               'componentInstanceConfig' => $instConf,
+               'files' => $files,
+               'title' => $componentConfig['componentname']['value'],
+               'componentInstanceConfig' => $componentConfig,
                 'componentID' => $componentID,
                 'sourceFolderID' => $sourceFolderID,
-                'componentFolderId' => $compInstance->getIdentifier(),
+                'componentFolderId' => $componentConfig['homepage'],
                 'breadcrumbs' => [
                     $sourceFolderID => "/homepage/${sourceFolderID}",
                 ],
@@ -112,7 +115,7 @@ class Controller extends AbstractController
      */
     public function showAllFiles($componentID, $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder();
+        $filesBuilder = new FilesBuilder($this->getDi()->get('databaseInternal'));
         $files = $filesBuilder->getFolderData($sourceFolderID);
 
         //dump all as json

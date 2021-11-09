@@ -29,7 +29,7 @@ class FilesBuilder
          FROM component_config_definition
          INNER JOIN component_definition
          ON component_definition.id = component_config_definition.component_definition_id
-         WHERE component_definition.class = `Component_Homepage_FileListController`";
+         WHERE component_definition.class = 'Component_Homepage_FileListController'";
 
     /**
      * FilesBuilder constructor.
@@ -57,16 +57,20 @@ class FilesBuilder
         //lets build the list folder array, so we dont have to warry about hydration. etc
         $files = [];
         foreach ($fileList as $file) {
-            $files[$file->getId()] = [
-                'title'                 => $file->getTitle(),
+            $files[] = [
+                'name'                  => $file->getTitle(),
                 'file_id'               => $file->getId(),
-                'file_mime_image'       => $file->getStorage()->getMimetype()->getIconFile(),
-                'file_mime_type'        => $file->getStorage()->getMimetype()->getDescription(),
-                'file_posted_date'      => $file->getModifiedAt()->getShort() ?: $file->getCreatedAt()->getShort(),
-                'file_posted_relative'  => $file->getModifiedAt()->getRelativeTime() ?: $file->getCreatedAt()->getRelativeTime(),
+                'mime'                  => $file->getStorage()->getMimetype(),
                 'hash'                  => $file->getHash(),
                 'size'                  => $file->getSize(),
-                'folder'                => ['id' => $file->getFolder()->getId(), 'name' => $file->getFolder()->getTitle()],
+                'dateAdded'             => [
+                    'timestamp' => $file->getCreatedAt()->getUnixTimeStamp(),
+                    'formatted' => $file->getCreatedAt()->getShort(),
+                ],
+                'dateModified'             => [
+                    'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
+                    'formatted' => $file->getModifiedAt()->getShort(),
+                ],
             ];
         }
         return $files;
@@ -106,8 +110,7 @@ class FilesBuilder
 
         //build default object / query
         $defaultComponentConfig = [];
-        $statement = $this->db->prepare($this->defaultConf_query);
-        $statement->execute();
+        $statement = $this->db->executeQuery($this->defaultConf_query);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $defaultComponentConfig[$row['key']] = [
@@ -118,20 +121,36 @@ class FilesBuilder
 
         //build instance object / query
         $query = "
-        SELECT component_config_definition.label, component_config_definition.key, component_config_instance.value
+        SELECT component_config_definition.label, component_config_definition.key, component_config_instance.value, component_instance.identifier
         FROM component_config_definition
         INNER JOIN component_config_instance
-        ON component_config_instance.component_config_definition_id = component_config_definition.id
+                    ON component_config_instance.component_config_definition_id = component_config_definition.id
+        INNER JOIN component_instance
+                    ON component_config_instance.component_instance_id = component_instance.id
         WHERE component_config_instance.component_instance_id = :id
          ";
 
-        $statement = $this->db->prepare($query);
-        $statement->execute(['id' => $componentId]);
+        $statement = $this->db->executeQuery($query, ['id' => $componentId]);
 
         $instanceComponentConfig = [];
-
-
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $instanceComponentConfig['homepage'] = $row['identifier'];
+            $instanceComponentConfig[$row['key']] = [
+                'label' => $row['label'],
+                'value' => $row['value'],
+            ];
+        }
+        $config = [];
+        if (isset($instanceComponentConfig['homepage'])) {
+            $config['homepage'] = $instanceComponentConfig['homepage'];
+        }
+        foreach ($defaultComponentConfig as $key => $default) {
+            $config[$key] = [
+                'label' => $instanceComponentConfig[$key]['label'] ?: $default['label'],
+                'value' => $instanceComponentConfig[$key]['value'] ?: $default['default_value'],
+            ];
+        }
         //return instance / default config values
-        return [];
+        return $config;
     }
 }
