@@ -64,7 +64,6 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'userMapper'                    => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class),
             'houseMapper'                   => $this->getMapperFactory()->getLazy(HouseMapper::class),
             'campusMapper'                  => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'pastoralDataSource'            => $injector->get('pastoralDataSource'),
