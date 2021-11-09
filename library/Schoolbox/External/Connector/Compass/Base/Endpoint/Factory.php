@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
+use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Relation\CategoryMapper;
@@ -94,59 +95,59 @@ class Factory
 
 
     /**
-     * @var CampusMapper
+     * @var UserMapper
      */
-    private CampusMapper $campusMapper;
+    private UserMapper $userMapper;
 
 
     /**
-     * @var TimetableCycleMapper
+     * @var EventMapper
      */
-    private TimetableCycleMapper $timetableCycleMapper;
+    private EventMapper $eventMapper;
 
 
     /**
-     * @var TimetablePeriodMapper
+     * @var Mapper
      */
-    private TimetablePeriodMapper $timetablePeriodMapper;
+    private \Event\Source\Mapper $eventSourceMapper;
 
 
     /**
-     * @var ClassEntryMapper
+     * @var PersonalMapper
      */
-    private ClassEntryMapper $classEntryMapper;
+    private PersonalMapper $relationPersonalMapper;
 
 
     /**
-     * @var ClassInvolvementMapper
+     * @var CategoryMapper
      */
-    private ClassInvolvementMapper $classInvolvementMapper;
+    private CategoryMapper $relationFolderMapper;
 
 
     /**
-     * @var ClassPeriodMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
-    private ClassPeriodMapper $classPeriodMapper;
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
 
 
     /**
      * Factory constructor.
      *
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param string                          $host
-     * @param string                          $key
-     * @param UserProfile\Mapper              $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param CampusMapper                    $campusMapper
-     * @param TimetableCycleMapper            $timetableCycleMapper
-     * @param TimetablePeriodMapper           $timetablePeriodMapper
-     * @param ClassEntryMapper                $classEntryMapper
-     * @param ClassInvolvementMapper          $classInvolvementMapper
-     * @param ClassPeriodMapper               $classPeriodMapper
+     * @param LoggerInterface                   $log
+     * @param bool                              $perform
+     * @param string                            $host
+     * @param string                            $key
+     * @param UserProfile\Mapper                $baseProfileMapper
+     * @param UserProfile\Student\Mapper        $studentProfileMapper
+     * @param UserProfile\Parent\Mapper         $parentProfileMapper
+     * @param UserProfile\Staff\Mapper          $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper   $relationshipMapper
+     * @param UserMapper                        $userMapper
+     * @param EventMapper                       $eventMapper
+     * @param Mapper                            $eventSourceMapper
+     * @param PersonalMapper                    $relationalPersonalMapper
+     * @param CategoryMapper                    $relationFolderMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -160,12 +161,12 @@ class Factory
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
         /* Timetable pieces */
-        CampusMapper $campusMapper,
-        TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        \Schoolbox\UserMapper $userMapper,
+        EventMapper $eventMapper,
+        \Event\Source\Mapper $eventSourceMapper,
+        PersonalMapper $relationalPersonalMapper,
+        CategoryMapper $relationFolderMapper,
+        \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -182,12 +183,12 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->campusMapper = $campusMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->classPeriodMapper = $classPeriodMapper;
+        $this->userMapper = $userMapper;
+        $this->eventMapper = $eventMapper;
+        $this->eventSourceMapper = $eventSourceMapper;
+        $this->relationPersonalMapper = $relationalPersonalMapper;
+        $this->relationFolderMapper = $relationFolderMapper;
+        $this->folderMapper = $folderMapper;
     }
 
 
@@ -207,34 +208,34 @@ class Factory
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
              */
-//            ->add(new Profile\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-//            ->add(new Profile\Profile(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-//            ->add(new Profile\Cleanup(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//           ))
+            ->add(new Profile\Prepare(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Profile\Profile(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+           ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
@@ -245,12 +246,12 @@ class Factory
                 $this->perform,
                 $api,
                 $defaultOwner,
-                \Schoolbox\UserMapper::getInstance(),
-                EventMapper::getInstance(),
-                \Event\Source\Mapper::getInstance(),
-                PersonalMapper::getInstance(),
-                CategoryMapper::getInstance(),
-                \Schoolbox\Resource\Folder\Mapper::getInstance()
+                $this->userMapper,
+                $this->eventMapper,
+                $this->eventSourceMapper,
+                $this->relationPersonalMapper,
+                $this->relationFolderMapper,
+                $this->folderMapper
             ))
             ->add(new ApiCertification(
                 $this->log,

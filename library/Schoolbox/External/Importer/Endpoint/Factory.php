@@ -13,6 +13,9 @@ use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
@@ -229,12 +232,12 @@ class Factory implements IFactory
                     UserProfile\Relationship\Mapper::getInstance(),
                     /* Timetable pieces
                     */
-                    CampusMapper::getInstance(),
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance()
+                    \Schoolbox\UserMapper::getInstance(),
+                    EventMapper::getInstance(),
+                    \Event\Source\Mapper::getInstance(),
+                    PersonalMapper::getInstance(),
+                    CategoryMapper::getInstance(),
+                    \Schoolbox\Resource\Folder\Mapper::getInstance()
                 ))->produce();
 
             default:
