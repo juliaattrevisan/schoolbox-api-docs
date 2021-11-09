@@ -33,6 +33,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 use Schoolbox\Version\Version;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
+use Schoolbox\Notif\MQ;
 use UnexpectedValueException;
 
 use function array_column;
@@ -273,8 +274,15 @@ class Controller extends Base
             $ssh_status = 'Inaccessible';
         }
 
-        // Get logs
+        // Check RabbitMQ
+        $amqpOnline = true;
+        try {
+            MQ\Connector::getInstance();
+        } catch (\Throwable $e) {
+            $amqpOnline = false;
+        }
 
+        // Get logs
         $logs = [];
         $logsRecent = LogMapper::getInstance()->findRecent();
 
@@ -364,6 +372,7 @@ class Controller extends Base
                     /* Turnitin status indicator
                      */
                     'turnitin' => (new \Schoolbox\Learning\Turnitin\Admin\Status($this->getConfigLoader()))->generate(),
+                    'amqpOnline' => $amqpOnline,
                 ),
             )
         );
