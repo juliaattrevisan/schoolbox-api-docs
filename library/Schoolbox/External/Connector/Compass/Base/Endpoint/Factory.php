@@ -207,60 +207,38 @@ class Factory
 
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Profile\Prepare(
+//            ->add(new Profile\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Cleanup(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//           ))
+            ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Timetable\Prepare(
-                $this->log,
-                $this->perform,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Timetable\Definition(
-                $this->log,
-                $this->perform,
-                $academicGroups,
-                $schedule,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $lookup,
-                $academicGroups,
-                $schedule,
-                $api,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
+                \Event\Source\Mapper::getInstance(),
             ))
             ->add(new ApiCertification(
                 $this->log,
