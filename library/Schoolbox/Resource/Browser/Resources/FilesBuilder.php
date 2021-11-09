@@ -1,0 +1,137 @@
+<?php
+
+/**
+ *
+ * @author      Justin Clarke <justin.clarke@justinclarke.me>
+ * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+namespace Schoolbox\Resource\Browser\Resources;
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper;
+
+class FilesBuilder
+{
+    /**
+    * @var IConnector
+    */
+    private $db;
+
+    /**
+     * query default files component
+     * @var string
+     */
+    private $defaultConf_query = "
+         SELECT component_config_definition.label, component_config_definition.key, component_config_definition.default_value
+         FROM component_config_definition
+         INNER JOIN component_definition
+         ON component_definition.id = component_config_definition.component_definition_id
+         WHERE component_definition.class = `Component_Homepage_FileListController`";
+
+    /**
+     * FilesBuilder constructor.
+     *
+     * @param IConnector $db
+     */
+    public function __construct(IConnector $db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     * @param int $folderId
+     * @return array of files
+     * @throws Mapper\Exception\Deleted
+     */
+    public function getFolderData(int $folderId): array
+    {
+        //get the files, for the source folder
+        $fileMapper = \Schoolbox\Resource\File\Mapper::getInstance();
+        $fileList = $fileMapper->findForFolders(
+            [$folderId],
+        );
+
+        //lets build the list folder array, so we dont have to warry about hydration. etc
+        $files = [];
+        foreach ($fileList as $file) {
+            $files[$file->getId()] = [
+                'title'                 => $file->getTitle(),
+                'file_id'               => $file->getId(),
+                'file_mime_image'       => $file->getStorage()->getMimetype()->getIconFile(),
+                'file_mime_type'        => $file->getStorage()->getMimetype()->getDescription(),
+                'file_posted_date'      => $file->getModifiedAt()->getShort() ?: $file->getCreatedAt()->getShort(),
+                'file_posted_relative'  => $file->getModifiedAt()->getRelativeTime() ?: $file->getCreatedAt()->getRelativeTime(),
+                'hash'                  => $file->getHash(),
+                'size'                  => $file->getSize(),
+                'folder'                => ['id' => $file->getFolder()->getId(), 'name' => $file->getFolder()->getTitle()],
+            ];
+        }
+        return $files;
+    }
+
+    /**
+     * get instance config or default if not set.
+     * need DB object to be passed through.
+     * then return an array of the config
+     * array (sourceId, title, sorting, direction, filter)
+     * @param int $componentId
+     * @return array componentConfig
+     */
+    public function getComponentConf(int $componentId): array
+    {
+        /**
+         * Need to get the 'definations' out of the db for components.
+         * ```
+         * default config object
+         * select component_config_definition.label, component_config_definition.key, component_config_definition.default_value
+         * from component_config_definition
+         * inner join component_definition
+         * on component_definition.id = component_config_definition.component_definition_id
+         * where component_definition.class = 'Component_Homepage_FileListController'
+         * ```
+
+         * ```
+         * instance config object
+         * select component_config_definition.label, component_config_definition.key, component_config_instance.value
+         * from component_config_definition
+         * inner join component_config_instance
+         * on component_config_instance.component_config_definition_id = component_config_definition.id
+         * where component_config_instance.component_instance_id = 4901
+         * ```
+         */
+
+
+        //build default object / query
+        $defaultComponentConfig = [];
+        $statement = $this->db->prepare($this->defaultConf_query);
+        $statement->execute();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $defaultComponentConfig[$row['key']] = [
+            'label' => $row['label'],
+            'default_value' => $row['default_value'],
+            ];
+        }
+
+        //build instance object / query
+        $query = "
+        SELECT component_config_definition.label, component_config_definition.key, component_config_instance.value
+        FROM component_config_definition
+        INNER JOIN component_config_instance
+        ON component_config_instance.component_config_definition_id = component_config_definition.id
+        WHERE component_config_instance.component_instance_id = :id
+         ";
+
+        $statement = $this->db->prepare($query);
+        $statement->execute(['id' => $componentId]);
+
+        $instanceComponentConfig = [];
+
+
+        //return instance / default config values
+        return [];
+    }
+}
