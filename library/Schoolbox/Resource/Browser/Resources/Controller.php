@@ -91,7 +91,7 @@ class Controller extends AbstractController
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
         $accessSource = $this->getAccess($sourceFolderID);
-        $accessHome = $this->getAccess($homepage_id);
+        $accessHome = $this->getAccess($homepage_id['identifier']);
 
         // special case for root, just let that through to the keeper
         if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {
@@ -104,23 +104,33 @@ class Controller extends AbstractController
         //grab all files for component folder
         $files = $filesBuilder->getFolderData($componentConfig['src']['value']);
 
-        //build breadcrumbs
-        //TODO: build crumbs
+        //build the filter object
+        //weird magic, from the file list component.
+        $filterFields = ['document', 'audio', 'video', 'image', 'other'];
+        $filter            = [];
+        $countFilterFields = count($filterFields);
+        for ($i = 0; $i < $countFilterFields; $i++) {
+            $j = $componentConfig['filter']['value'] % 2;
+            if ($j) {
+                $filter[] = $filterFields[$i];
+            }
+            $componentConfig['filter']['value'] = (int)$componentConfig['filter']['value'] / 2;
+        }
 
         //just dump the lot to the page for front end use.
         //output results
         $this->getResponse()->content->set([
            'template' => '@resourceBrowser/viewAll.twig',
+           'title' => $componentConfig['componentname']['value'],
            'data' => [
-               'files' => $files,
-               'title' => $componentConfig['componentname']['value'],
-               'componentInstanceConfig' => $componentConfig,
-                'componentID' => $componentID,
-                'sourceFolderID' => $sourceFolderID,
-                'componentFolderId' => $componentConfig['homepage'],
-                'breadcrumbs' => [
-                    $sourceFolderID => "/homepage/${sourceFolderID}",
-                ],
+                    'homepage' => $homepage_id,
+                    'filter' => $filter,
+                    'files' => $files,
+                    'title' => $componentConfig['componentname']['value'],
+                    'componentInstanceConfig' => $componentConfig,
+                    'componentID' => $componentID,
+                    'sourceFolderID' => $sourceFolderID,
+                    'componentFolderId' => $componentConfig['homepage'],
            ],
         ]);
     }
@@ -141,7 +151,7 @@ class Controller extends AbstractController
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
         $accessSource = $this->getAccess($sourceFolderID);
-        $accessHome = $this->getAccess($homepage_id);
+        $accessHome = $this->getAccess($homepage_id['identifier']);
 
         // special case for root, just let that through to the keeper
         if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {

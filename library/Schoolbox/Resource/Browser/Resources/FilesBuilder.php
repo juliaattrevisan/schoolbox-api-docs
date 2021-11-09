@@ -51,10 +51,12 @@ class FilesBuilder
     {
         //get the homepage Id, from the component and confirm it is a files component
         $statement = $this->db->executeQuery("
-            SELECT component_instance.identifier from component_instance
-            INNER JOIN component_definition
-            on component_instance.component_definition_id = component_definition.id
-            where component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
+            SELECT component_instance.identifier, folder.name FROM component_instance
+                INNER JOIN component_definition
+                    ON component_instance.component_definition_id = component_definition.id
+                INNER JOIN folder
+                    ON folder.id= component_instance.identifier
+                WHERE component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
             ", ['id' => $componentId]);
 
         $homepage_id = $statement->fetch(\PDO::FETCH_ASSOC);

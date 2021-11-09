@@ -1,4 +1,7 @@
-
+<ul class="breadcrumb">
+    <li><a href="/homepage/{{ homepage.identifier }}">{{ homepage.name }}</a></li>
+    <li class="active"><a>{{ title }}</a></li>
+</ul>
 {{ title }}
 <br>
 componentFolderId:
@@ -6,7 +9,7 @@ componentFolderId:
 <br>
 <div>Source Folder: {{ componentInstanceConfig.src.value }}</div>
 
-
+<div>Filters: {{ dump(filter) }}</div>
 <table>
     <tr>
         <th>File ID</th>
@@ -18,7 +21,11 @@ componentFolderId:
     {% for file in files %}
         <tr>
             <td>{{ file.file_id }}</td>
-            <td>{{ file.name }}</td>
+            <td>
+                <a data-plugin="preview" href="/send.php?id={{ file.file_id }}" rel="external">
+                    <img class="mime" src="/images/mime/{{ file.mime.iconFile }}" height="64" width="64" title="{{ file.mime }}"/>{{ file.name }}
+                </a>
+            </td>
             <td>{{ file.hash }}</td>
             <td>{{ file.mime.description }}</td>
             <td>{{ file.dateModified.formatted }}</td>
