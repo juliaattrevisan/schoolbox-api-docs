@@ -543,6 +543,7 @@ class DataSource
      * @param bool                  $involved
      * @param Collection            $years
      * @param Collection            $houses
+     * @param Collection            $campuses
      * @param bool                  $includeStudentsWithoutYear
      * @param bool                  $includeStudentsWithoutHouse
      *
@@ -563,6 +564,7 @@ class DataSource
         $involved,
         Collection $years,
         Collection $houses,
+        Collection $campuses,
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse
     ): Collection {
@@ -583,6 +585,7 @@ class DataSource
                 $involved,
                 $years,
                 $houses,
+                $campuses,
                 $includeStudentsWithoutYear,
                 $includeStudentsWithoutHouse
             ),

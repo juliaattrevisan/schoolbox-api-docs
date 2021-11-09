@@ -194,7 +194,7 @@
                                                 {% endif %}
 
                                             {% endfor %}
-                                            </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </li>
@@ -207,7 +207,7 @@
             {# Pastoral moderators get an additional option to only show records in which they are involved #}
 
             {% if moderator %}
-                <h2 class="subheader">{{ locale.pastoral.proper }} Moderator Visiblity</h2>
+                <h2 class="subheader">{{ locale.pastoral.proper }} Moderator Visibility</h2>
                 <section>
                     <div class="small-12 columns content">
                         <div class="checklist">
@@ -312,6 +312,35 @@
                         </div>
                     </section>
                 </div>
+                <div class="small-12 medium-6 columns">
+                    <h2 class="subheader">Campuses</h2>
+                    <p class="meta">Select the campuses you want included in the report</p>
+
+                    <section>
+                        <div class="small-12 columns content">
+                            <div class="checklist">
+                                <ul class="option-list">
+                                    <li>
+                                        <input id="campus-all" type="checkbox" data-check-all-campus>
+                                        <label for="campus-all">Select All</label>
+                                    </li>
+                                    {% for campus in campuses %}
+                                        <li>
+                                            <input id="campus-{{ campus.id }}"
+                                                   name="campuses[]"
+                                                   value="{{ campus.id }}"
+                                                   type="checkbox"
+                                                   {% for campusSelected in (report.campuses ?? []) | filter(campusSelected => campusSelected == campus) %}checked{% endfor %}
+                                                   data-check-campus
+                                            >
+                                            <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
 
             <h2 class="subheader">Sort Order</h2>
@@ -355,6 +384,15 @@
                                     <div class="grip"></div>
                                     <div class="card small-12">
                                         <p>House</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% elseif order == 'campus' %}
+                            <li data-order="campus">
+                                <div>
+                                    <div class="grip"></div>
+                                    <div class="card small-12">
+                                        <p>Campus</p>
                                     </div>
                                 </div>
                             </li>
@@ -575,6 +613,11 @@
         $reportForm.selectAll({
             selector: '#house-all',
             checkboxes: '[data-check-house]'
+        });
+
+        $reportForm.selectAll({
+            selector: '#campus-all',
+            checkboxes: '[data-check-campus]'
         });
 
         {# Setup selectize boxes #}

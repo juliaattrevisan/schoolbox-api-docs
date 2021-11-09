@@ -10,6 +10,7 @@ namespace Schoolbox\Pastoral\Report;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDOStatement;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -58,6 +59,7 @@ class Mapper extends BaseMapper
         $this->uses('order', self::TYPE_STRING, null, 'orderCsv');
         $this->uses('years', self::TYPE_STRING, null, 'yearsCsv');
         $this->uses('houses', self::TYPE_STRING, null, 'housesCsv');
+        $this->uses('campuses', self::TYPE_STRING, null, 'campusesCsv');
 
         // Are students with no year or house included?
         $this->uses('include_students_without_year', self::TYPE_BOOLEAN);
@@ -176,6 +178,7 @@ class Mapper extends BaseMapper
             $model->setTags($this->getCollection(PastoralTagMapper::getInstance(), $row['tags']));
             $model->setGroups($this->getCollection(PastoralGroupMapper::getInstance(), $row['groups']));
             $model->setHouses($this->getCollection(\HouseMapper::getInstance(), $row['houses']));
+            $model->setCampuses($this->getCollection(CampusMapper::getInstance(), $row['campuses']));
 
             $collection->add($model);
         }

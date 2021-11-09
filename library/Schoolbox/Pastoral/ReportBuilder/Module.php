@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use HouseMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -65,6 +66,7 @@ class Module extends BaseModule
         $mappers = [
             'userMapper'                    => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class),
             'houseMapper'                   => $this->getMapperFactory()->getLazy(HouseMapper::class),
+            'campusMapper'                  => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'pastoralDataSource'            => $injector->get('pastoralDataSource'),
             'pastoralReportMapper'          => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Report\Mapper::class),
             'pastoralSeverityMapper'        => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Severity\Mapper::class),
