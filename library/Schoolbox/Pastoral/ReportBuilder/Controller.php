@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use HouseMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -63,11 +64,11 @@ class Controller extends Base
     /** @var PastoralGroupMapper $pastoralGroupMapper */
     private $pastoralGroupMapper;
 
-    /** @var UserMapper $userMapper */
-    private $userMapper;
-
     /** @var HouseMapper $houseMapper */
     private $houseMapper;
+
+    /** @var CampusMapper $campusMapper */
+    private CampusMapper $campusMapper;
 
     /** @var Term\Mapper $termMapper */
     private $termMapper;
@@ -108,8 +109,8 @@ class Controller extends Base
      * @param PastoralTypeMapper            $pastoralTypeMapper
      * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
      * @param PastoralSeverityMapper        $pastoralSeverityMapper
-     * @param UserMapper                    $userMapper
      * @param HouseMapper                   $houseMapper
+     * @param CampusMapper                  $campusMapper
      * @param PastoralGroupMapper           $pastoralGroupMapper
      * @param PastoralReportMapper          $pastoralReportMapper
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
@@ -123,8 +124,8 @@ class Controller extends Base
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralSubTypeMapper $pastoralSubTypeMapper,
         PastoralSeverityMapper $pastoralSeverityMapper,
-        UserMapper $userMapper,
         HouseMapper $houseMapper,
+        CampusMapper $campusMapper,
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralReportMapper $pastoralReportMapper,
         PastoralReportDashboardMapper $pastoralReportDashboardMapper,
@@ -137,8 +138,8 @@ class Controller extends Base
         $this->pastoralTypeMapper            = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
         $this->pastoralSeverityMapper        = $pastoralSeverityMapper;
-        $this->userMapper                    = $userMapper;
         $this->houseMapper                   = $houseMapper;
+        $this->campusMapper                  = $campusMapper;
         $this->pastoralGroupMapper           = $pastoralGroupMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
@@ -250,7 +251,8 @@ class Controller extends Base
             'author',
             'points',
             'year',
-            'house'
+            'house',
+            'campus'
         ];
 
         // Only show severity if it is enabled by policy
@@ -298,6 +300,7 @@ class Controller extends Base
                     )->count() > 0,
                     'years'            => $yearLevels,
                     'houses'           => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
+                    'campuses'         => $this->campusMapper->findAll()->sortBy('sequence', 'asc'),
                     'types'            => $this->pastoralTypeMapper->findAll(),
                     'subTypes'         => $this->pastoralSubTypeMapper->findAll(),
                     'severities'       => $severities,
@@ -395,6 +398,7 @@ class Controller extends Base
             'Student Name' => 'Student Name',
             'Student ID'   => 'Student ID',
             'House'        => 'House',
+            'Campus'       => 'Campus',
             'Year'         => 'Year',
             'Title'        => 'Title',
             'Type'         => 'Type',
@@ -430,6 +434,7 @@ class Controller extends Base
             'Student Name' => $record->getStudent()->getFullName(),
             'Student ID'   => $record->getStudent()->getId(),
             'House'        => $record->getStudent()->getSchoolHouse() ? $record->getStudent()->getSchoolHouse()->getHouse() : '',
+            'Campus'       => $record->getStudent()->getCampusCollection(),
             'Year'         => $record->getStudent()->getYear() ? $record->getStudent()->getYear()->getName() : '',
             'Title'        => $record->getHeading(),
             'Type'         => $record->getType() ? $record->getType()->getName() : '',
@@ -481,6 +486,7 @@ class Controller extends Base
             $report->getInvolved(),
             $report->getYears(),
             $report->getHouses(),
+            $report->getCampuses(),
             $report->getIncludeStudentsWithoutYear(),
             $report->getIncludeStudentsWithoutHouse()
         );
@@ -600,6 +606,12 @@ class Controller extends Base
             $pastoralReport->setHousesCsv(implode(',', $post['houses']));
         } else {
             $pastoralReport->setHousesCsv('');
+        }
+
+        if (is_array($post['campuses'])) {
+            $pastoralReport->setCampusesCsv(implode(',', $post['campuses']));
+        } else {
+            $pastoralReport->setCampusesCsv('');
         }
 
         $pastoralReport->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
