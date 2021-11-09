@@ -447,6 +447,7 @@ class Module extends BaseModule
         $lc['instance']                 = $injector->lazyGet('instance');
         $lc['registrations']            = $injector->lazyGet('lti.registrations');
         $lc['userCodec']                = $injector->lazyGet('lti.userCodec');
+        $lc['accessTokenCache']         = $injector->lazyGet('lti.accessTokenCache');
     }
 
     /**

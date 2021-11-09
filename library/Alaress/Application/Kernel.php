@@ -15,6 +15,8 @@ use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
+use Alaress\Redis\Cache\ItemPool;
+use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Session\Factory;
 use Alaress\Session\Session;
 use Alaress\Twig\Filter as AlaressFilter;
@@ -41,7 +43,9 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis;
 use Proxy\Server as ProxyServer;
 use RuntimeException;
@@ -100,6 +104,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Renderer as LearningRenderer;
+use Schoolbox\LTI\AccessToken\Codec;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
 use Schoolbox\LTI\Auth\UserAuthenticator;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
@@ -1600,6 +1605,20 @@ abstract class Kernel
                     'userCodec' => $di->lazyGet('lti.userCodec'),
                 ]
             )
+        );
+        $di->set(
+            'lti.accessTokenCache',
+            $di->lazy(function () use ($di) {
+                /** @var Predis\ClientInterface $redis */
+                $redis = $di->get('redis');
+                /** @var RegistrationRepositoryInterface $registrationRepository */
+                $registrationRepository = $di->get('lti.registrations');
+                return new ItemPool(
+                    $redis,
+                    new Codec(new ClientRepository($registrationRepository)),
+                    new KeyGenerator('accessToken', INSTANCE_ID),
+                );
+            })
         );
 
         return $di;

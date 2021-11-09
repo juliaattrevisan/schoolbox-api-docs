@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform;
 
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Http\Factory\Guzzle\ResponseFactory;
@@ -31,9 +29,9 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
+use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
-use Schoolbox\LTI\AccessToken\Codec;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
@@ -74,6 +72,11 @@ class Controller extends Base
     private UserCodec $userCodec;
 
     /**
+     * Cache for access tokens.
+     */
+    private CacheItemPoolInterface $accessTokenCache;
+
+    /**
      * Constructor
      *
      * @param KeyChainRepositoryInterface     $keyChains
@@ -81,19 +84,22 @@ class Controller extends Base
      * @param UserAuthenticatorInterface      $userAuthenticator
      * @param Instance                        $instance
      * @param UserCodec                       $userCodec
+     * @param CacheItemPoolInterface          $accessTokenCache
      */
     public function __construct(
         KeyChainRepositoryInterface $keyChains,
         RegistrationRepositoryInterface $registrations,
         UserAuthenticatorInterface $userAuthenticator,
         Instance $instance,
-        UserCodec $userCodec
+        UserCodec $userCodec,
+        CacheItemPoolInterface $accessTokenCache
     ) {
         $this->keyChains         = $keyChains;
         $this->registrations     = $registrations;
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
         $this->userCodec         = $userCodec;
+        $this->accessTokenCache  = $accessTokenCache;
     }
 
     /**
@@ -206,18 +212,10 @@ class Controller extends Base
      */
     public function getOauthAccessTokenRequest(): void
     {
-        // Access token repo: backs onto a mapper
-        // TODO inject this: also shouldn't the access token repository be used to auth a request?
         $clientRepository = new ClientRepository($this->registrations);
         $factory          = new AuthorizationServerFactory(
             $clientRepository,
-            new AccessTokenRepository(
-                new ItemPool(
-                    $this->getDi()->get('redis'),
-                    new Codec($clientRepository),
-                    new KeyGenerator('accessToken', $this->instance->getId()),
-                ),
-            ),
+            new AccessTokenRepository($this->accessTokenCache),
             // So far, Schoolbox supports only the Score service.
             new ScopeRepository([
                 new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),

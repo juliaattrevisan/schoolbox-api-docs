@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Lti;
 
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress_Date_Format;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
@@ -22,9 +20,9 @@ use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
+use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
@@ -40,7 +38,6 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\LTI\AccessToken\Codec;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
@@ -95,6 +92,11 @@ class Controller extends Assessment\Controller
     private UserCodec $userCodec;
 
     /**
+     * Cache for access tokens.
+     */
+    private CacheItemPoolInterface $accessTokenCache;
+
+    /**
      * Constructor
      *
      * @param UserMapper                      $userMapper
@@ -134,7 +136,8 @@ class Controller extends Assessment\Controller
         LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
         RegistrationRepositoryInterface $registrations,
         Instance $instance,
-        UserCodec $userCodec
+        UserCodec $userCodec,
+        CacheItemPoolInterface $accessTokenCache
     ) {
         parent::__construct(
             $userMapper,
@@ -156,6 +159,7 @@ class Controller extends Assessment\Controller
         $this->registrations            = $registrations;
         $this->instance                 = $instance;
         $this->userCodec                = $userCodec;
+        $this->accessTokenCache         = $accessTokenCache;
     }
 
     /**
@@ -536,13 +540,7 @@ class Controller extends Assessment\Controller
         // Access token validity checker
         // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
         $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository(
-                new ItemPool(
-                    $this->getDi()->get('redis'),
-                    new Codec(new ClientRepository($this->registrations)),
-                    new KeyGenerator('accessToken', $this->instance->getId()),
-                ),
-            ),
+            new AccessTokenRepository($this->accessTokenCache),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
         $request = $resourceServerValidator->validateAuthenticatedRequest($request);

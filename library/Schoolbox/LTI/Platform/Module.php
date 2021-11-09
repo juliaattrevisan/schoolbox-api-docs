@@ -90,6 +90,7 @@ class Module extends BaseModule
                     'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
                     'instance'          => $injector->lazyGet('instance'),
                     'userCodec'         => $injector->lazyGet('lti.userCodec'),
+                    'accessTokenCache'  => $injector->lazyGet('lti.accessTokenCache'),
                 ]
             )
         );
