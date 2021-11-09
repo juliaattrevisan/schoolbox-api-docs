@@ -294,7 +294,7 @@ class Events implements IStrategy
          *
          * TODO Maybe you can use that to update, instead of recreate, some data.
          */
-        $guid = "{$activity['activityId']}.{$activityInstance['importIdentifier']}.{$activityInstance['start']}";
+        $guid = "{$activity['activityId']}.{$activity['importIdentifier']}.{$activityInstance['start']}";
 
         /* Arbitrarily concoct a random array of event information that we can pass around
          */
