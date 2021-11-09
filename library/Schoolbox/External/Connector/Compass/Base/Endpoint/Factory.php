@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
@@ -19,6 +22,8 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Role;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -195,6 +200,10 @@ class Factory
     {
         $api = new Api($this->host, $this->key);
 
+        /* Default event owner
+         */
+        $defaultOwner = UserMapper::getInstance()->findByExternalId(UserMapper::USERNAME_ALARESS_ADMIN, Role::STAFF);
+
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
              */
@@ -235,7 +244,13 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
-                \Schoolbox\Calendar\EventMapper::getInstance(),
+                $defaultOwner,
+                \Schoolbox\UserMapper::getInstance(),
+                EventMapper::getInstance(),
+                \Event\Source\Mapper::getInstance(),
+                PersonalMapper::getInstance(),
+                CategoryMapper::getInstance(),
+                \Schoolbox\Resource\Folder\Mapper::getInstance()
             ))
             ->add(new ApiCertification(
                 $this->log,

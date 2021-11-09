@@ -15,8 +15,8 @@ use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
-
 
 /**
  * Set up calendar events to represent these class (Activity) instances
@@ -65,6 +65,18 @@ class Events implements IStrategy
 
 
     /**
+     * @var User
+     */
+    private User $defaultOwner;
+
+
+    /**
+     * @var UserMapper
+     */
+    private UserMapper $userMapper;
+    
+    
+    /**
      * @var EventMapper
      */
     private EventMapper $eventMapper;
@@ -100,6 +112,8 @@ class Events implements IStrategy
      * @param LoggerInterface                   $log
      * @param bool                              $perform
      * @param IApi                              $api
+     * @param User                              $defaultOwner
+     * @param UserMapper                        $userMapper
      * @param EventMapper                       $eventMapper
      * @param Mapper                            $eventSourceMapper
      * @param PersonalMapper                    $relationPersonalMapper
@@ -107,19 +121,23 @@ class Events implements IStrategy
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
-        EventMapper $eventMapper,
-        \Event\Source\Mapper $eventSourceMapper,
-        PersonalMapper $relationPersonalMapper,
-        CategoryMapper $relationFolderMapper,
+        LoggerInterface                   $log,
+        bool                              $perform,
+        IApi                              $api,
+        User                              $defaultOwner,
+        UserMapper                        $userMapper,
+        EventMapper                       $eventMapper,
+        \Event\Source\Mapper              $eventSourceMapper,
+        PersonalMapper                    $relationPersonalMapper,
+        CategoryMapper                    $relationFolderMapper,
         \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
 
+        $this->defaultOwner = $defaultOwner;
+        $this->userMapper = $userMapper;
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
         $this->relationPersonalMapper = $relationPersonalMapper;
@@ -129,13 +147,14 @@ class Events implements IStrategy
 
 
     /**
-     * @throws \DebugBar\DebugBarException
+     * Import as calendar events
      */
     public function import(): void
     {
         /* We'll need this for later
          */
         $now = \Alaress_Date_Format::now();
+        $enrolmentsLookup = new Lookup\Enrolments($this->api);
 
         /* Get a list of Schedules to consume
          */
@@ -176,7 +195,7 @@ class Events implements IStrategy
                     /* Get a list of student external ids, and a list of teacher external ids
                      * then create schoolbox events and their relationships
                      */
-                    $enrolments = (new Lookup\Enrolments($this->api))->generate($activity['name'], (string)$academicGroupCode);
+                    $enrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
 
                     $this->log->debug(sprintf(
                         'Fetched enrolments for activity %s starting on %s: %s students, %s teachers',
@@ -328,10 +347,6 @@ class Events implements IStrategy
      */
     private function createGroupEvents(array $activity, array $activityInstance, array $enrolments, array $meta, \Schoolbox\Resource\Folder\Model $folder): void
     {
-        /* I guess alaress admin owns the timetable now
-         */
-        $owner = UserMapper::getInstance()->findByExternalId(UserMapper::USERNAME_ALARESS_ADMIN, Role::STUDENT);
-
         $event = $this->eventMapper->createModel();
         $eventSource = $this->eventSourceMapper->createModel();
 
@@ -340,7 +355,7 @@ class Events implements IStrategy
         $event
             ->setTitle($meta['title'])
             ->setLocation($meta['location'])
-            ->setOwner($owner)
+            ->setOwner($this->defaultOwner)
             ->setStartDateTime($meta['startDatetime'])
             ->setEndDateTime($meta['endDatetime']);
 
@@ -391,7 +406,7 @@ class Events implements IStrategy
     {
         foreach ($enrolments['students'] as $externalId) {
             try {
-                $owner = UserMapper::getInstance()->findByExternalId($externalId, Role::STUDENT);
+                $owner = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->log->warning(sprintf(
                     'Activity %s Instance on %s: cannot find student %s, skipping',
@@ -441,7 +456,7 @@ class Events implements IStrategy
          */
         foreach ($enrolments['teachers'] as $externalId) {
             try {
-                $owner = UserMapper::getInstance()->findByExternalId($externalId, Role::STAFF);
+                $owner = $this->userMapper->findByExternalId($externalId, Role::STAFF);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $this->log->warning(sprintf(
                     'Activity %s Instance on %s: cannot find teacher %s, skipping',
