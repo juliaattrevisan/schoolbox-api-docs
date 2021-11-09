@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use _HumbugBox243b3a4ed02c\Nette\Neon\Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -22,7 +21,6 @@ use Schoolbox\Mapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Browser\Resources\FilesBuilder;
 
 class Controller extends AbstractController
 {
@@ -78,10 +76,13 @@ class Controller extends AbstractController
     }
 
     /**
+     * GUI display of files within a files component source
      * @api GET /folder/:componentID/files/:sourceFolderID
      *
      * @param int $componentID
      * @param int $sourceFolderID
+     * @throws Mapper\Exception\NotFound
+     * @throws Mapper\Exception
      */
     public function showFiles($componentID, $sourceFolderID)
     {
@@ -97,9 +98,14 @@ class Controller extends AbstractController
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
+        //lets get the config for the component
         $componentConfig = $filesBuilder->getComponentConf($componentID);
 
+        //grab all files for component folder
         $files = $filesBuilder->getFolderData($componentConfig['src']['value']);
+
+        //build breadcrumbs
+        //TODO: build crumbs
 
         //just dump the lot to the page for front end use.
         //output results
@@ -120,10 +126,13 @@ class Controller extends AbstractController
     }
 
     /**
+     * AJAX grab of all files within a files component source
      * @api GET /folder/:componentID/files/:sourceFolderID/all
      *
      * @param int $componentID
      * @param int $sourceFolderID
+     * @throws Mapper\Exception\NotFound
+     * @throws Mapper\Exception
      */
     public function showAllFiles($componentID, $sourceFolderID)
     {
@@ -139,6 +148,7 @@ class Controller extends AbstractController
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
+        //grab all files from files component
         $files = $filesBuilder->getFolderData($sourceFolderID);
 
         //dump all as json

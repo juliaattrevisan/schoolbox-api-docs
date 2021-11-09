@@ -10,9 +10,7 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Exception;
 
 class FilesBuilder
 {
@@ -22,7 +20,7 @@ class FilesBuilder
     private $db;
 
     /**
-     * query default files component
+     * query to get the files component defaults
      * @var string
      */
     private $defaultConf_query = "
@@ -43,7 +41,7 @@ class FilesBuilder
     }
 
     /**
-     * get homepageId.
+     * get homepageId from the componentID
      *
      * @param int $componentId
      * @returns int
@@ -58,16 +56,22 @@ class FilesBuilder
             on component_instance.component_definition_id = component_definition.id
             where component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
             ", ['id' => $componentId]);
+
         $homepage_id = $statement->fetch(\PDO::FETCH_ASSOC);
+
         if ($homepage_id === false) {
             //component ID does not exist
             throw new \Schoolbox\Mapper\Exception\NotFound();
         }
+
         return $homepage_id;
     }
 
 
     /**
+     * Get the list of files from a folder, not children just the ones in this folder.
+     * We will assume the user has access to this folder
+     * and lets build a nice array of the files
      * @param int $folderId
      * @return array of files
      */
@@ -79,7 +83,7 @@ class FilesBuilder
             [$folderId],
         );
 
-        //lets build the list folder array, so we dont have to warry about hydration. etc
+        //lets build the list folder array, so we don't have to worry about hydration. etc
         $files = [];
         foreach ($fileList as $file) {
             $files[] = [
@@ -89,12 +93,12 @@ class FilesBuilder
                 'hash'                  => $file->getHash(),
                 'size'                  => $file->getSize(),
                 'dateAdded'             => [
-                    'timestamp' => $file->getCreatedAt()->getUnixTimeStamp(),
-                    'formatted' => $file->getCreatedAt()->getShort(),
+                            'timestamp' => $file->getCreatedAt()->getUnixTimeStamp(),
+                            'formatted' => $file->getCreatedAt()->getShort(),
                 ],
-                'dateModified'             => [
-                    'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
-                    'formatted' => $file->getModifiedAt()->getShort(),
+                'dateModified'          => [
+                            'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
+                            'formatted' => $file->getModifiedAt()->getShort(),
                 ],
             ];
         }
@@ -102,10 +106,8 @@ class FilesBuilder
     }
 
     /**
-     * get instance config or default if not set.
-     * need DB object to be passed through.
-     * then return an array of the config
-     * array (sourceId, title, sorting, direction, filter)
+     * find the supplied component config, or build from the default if required
+     * returns array (sourceId, title, sorting, direction, filter)
      * @param int $componentId
      * @return array componentConfig
      * @throws Mapper\Exception\NotFound
@@ -113,7 +115,7 @@ class FilesBuilder
     public function getComponentConf(int $componentId): array
     {
         /**
-         * Need to get the 'definations' out of the db for components.
+         * Need to get the 'definitions' out of the db for components.
          * ```
          * default config object
          * select component_config_definition.label, component_config_definition.key, component_config_definition.default_value
@@ -129,12 +131,13 @@ class FilesBuilder
          * from component_config_definition
          * inner join component_config_instance
          * on component_config_instance.component_config_definition_id = component_config_definition.id
-         * where component_config_instance.component_instance_id = 4901
+         * where component_config_instance.component_instance_id = :id
          * ```
          */
+
         $homepage_id = $this->getHomepage($componentId);
 
-        //build default object / query
+        //build default config object / query
         $defaultComponentConfig = [];
         $statement = $this->db->executeQuery($this->defaultConf_query);
 
@@ -145,7 +148,7 @@ class FilesBuilder
             ];
         }
 
-        //build instance object / query
+        //build instance config object / query
         $query = "
         SELECT component_config_definition.label, component_config_definition.key, component_config_instance.value, component_instance.identifier
         FROM component_config_definition
@@ -166,6 +169,8 @@ class FilesBuilder
                 'value' => $row['value'],
             ];
         }
+
+        //build the final merged config between the instance object, and if needed add the defaults.
         $config = [];
         $config['homepage'] = $instanceComponentConfig['homepage'] ?: $homepage_id['identifier'];
 
