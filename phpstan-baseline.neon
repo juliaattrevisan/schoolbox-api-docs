@@ -7041,16 +7041,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Comment/Notifier.php
 
 		-
-			message: "#^Property Schoolbox\\\\Pastoral\\\\Report\\\\Model\\:\\:\\$houses \\(Schoolbox\\\\GenericCollection\\) does not accept iterable\\<House\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Report/Model.php
-
-		-
-			message: "#^Property Schoolbox\\\\Pastoral\\\\Report\\\\Model\\:\\:\\$subTypes \\(Schoolbox\\\\GenericCollection\\) does not accept iterable\\<Schoolbox\\\\Pastoral\\\\SubType\\\\Model\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Report/Model.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/ReportBuilder/Controller.php

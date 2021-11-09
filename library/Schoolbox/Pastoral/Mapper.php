@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use House;
 use PDOStatement;
+use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
