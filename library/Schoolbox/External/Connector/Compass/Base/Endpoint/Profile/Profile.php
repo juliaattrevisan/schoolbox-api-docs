@@ -264,6 +264,7 @@ class Profile implements IStrategy
         foreach ($students['d'] as $student) {
             $externalId = $this->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
+            $boardingHouseName = '';
             $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
             $campusName = $this->findCampusName($student['organisationMilestones']);
             $dob = $this->findDate($student['dateOfBirth']);
@@ -416,6 +417,7 @@ class Profile implements IStrategy
                 ->setYearLevel($yearLevel)
                 ->setYearLevelCoordinatorId(null)
                 ->setYearLevelCoordinatorName(null)
+                ->setBoardingHouseName($boardingHouseName)
 
                 /**
                  * Flags
