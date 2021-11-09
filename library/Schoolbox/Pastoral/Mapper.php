@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use House;
 use PDOStatement;
+use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
@@ -148,6 +149,7 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('student', 's')},
                         {$this->getJoinColumnString('student.year', 'sy')},
                         {$this->getJoinColumnString('student.schoolHouse', 'sh')},
+                        {$this->getJoinColumnString('student.userCampus', 'sc')},
                         {$this->getJoinColumnString('severity', 'sv')},
                         {$this->getJoinColumnString('owner', 'o')},
                         {$this->getJoinColumnString('type', 't')},
@@ -166,6 +168,7 @@ class Mapper extends BaseMapper
             INNER JOIN   {$this->getJoinSql('student', '', 's')}
             LEFT  JOIN   {$this->getJoinSql('student.year', 's', 'sy')}
             LEFT  JOIN   {$this->getJoinSql('student.schoolHouse', 's', 'sh')}
+            LEFT  JOIN   {$this->getJoinSql('student.userCampus', 's', 'sc')}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv', true)}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
@@ -771,8 +774,8 @@ class Mapper extends BaseMapper
      * @param Alaress_Date_Format   $before_date
      * @param Alaress_Date_Format   $after_date
      * @param null|PastoralSeverity $severity
-     * @param Collection            $types,
-     * @param Collection            $subtypes,
+     * @param Collection            $types
+     * @param Collection            $subtypes
      * @param Collection            $authors
      * @param Collection            $students
      * @param Collection            $tags
@@ -780,6 +783,7 @@ class Mapper extends BaseMapper
      * @param bool                  $involved
      * @param Collection            $years
      * @param Collection            $houses
+     * @param Collection            $campuses
      * @param bool                  $includeStudentsWithoutYear
      * @param bool                  $includeStudentsWithoutHouse
      *
@@ -799,6 +803,7 @@ class Mapper extends BaseMapper
         $involved,
         Collection $years,
         Collection $houses,
+        Collection $campuses,
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse
     ) {
@@ -825,6 +830,7 @@ class Mapper extends BaseMapper
         $this->addFilter($students, '`student_id`');
         $this->addYearFilter($years, $includeStudentsWithoutYear);
         $this->addHouseFilter($houses, $includeStudentsWithoutHouse);
+        $this->addCampusFilter($campuses);
         $this->addTypeFilter($types, $subtypes);
         $this->addFilter($authors, '`owner_id`');
 
@@ -1054,9 +1060,30 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Filter the report on the student's campus.
+     *
+     * @param Collection|Campus[] $campuses
+     */
+    private function addCampusFilter(Collection $campuses): void
+    {
+        if ($campuses->count() === 0) {
+            return;
+        }
+        $pbArray = PredicateBuilder::getArrayBindings(
+            $campuses->getPropertyValues('id'),
+            's_campus' . self::$placeholderIndex
+        );
+
+        $this->bindings  = array_merge($this->bindings, $pbArray['bindings']);
+        $this->filters[] = "`sc`.`id` IN ({$pbArray['placeholders']})";
+
+        self::$placeholderIndex++;
+    }
+
+    /**
      * @inheritDoc
      */
-    function raiseNotification($object, $verb, $previous = null)
+    public function raiseNotification($object, $verb, $previous = null)
     {
         return true;
     }
