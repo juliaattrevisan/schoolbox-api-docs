@@ -193,18 +193,9 @@ class Factory
      */
     public function produce(): GenericCollection
     {
-        /* Cache a list of known users and periods
-         * Every student timetable processing uses info stored there
-         */
-        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
-
         $api = new Api($this->host, $this->key);
 
-        $academicGroups = new Timetable\AcademicGroups($api);
-        $schedule       = new Timetable\Schedule($api);
-
         return (new GenericCollection(IStrategy::class))
-
             /* Purge previously-imported profile relationships and classes
              */
 //            ->add(new Profile\Prepare(
@@ -239,6 +230,12 @@ class Factory
                 $this->log,
                 $this->perform,
                 \Event\Source\Mapper::getInstance(),
+            ))
+            ->add(new TimetableCalendar\Events(
+                $this->log,
+                $this->perform,
+                $api,
+                \Schoolbox\Calendar\EventMapper::getInstance(),
             ))
             ->add(new ApiCertification(
                 $this->log,
