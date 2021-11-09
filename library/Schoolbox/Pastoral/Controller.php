@@ -273,7 +273,7 @@ class Controller extends Base
      */
     public function getStudentsCount(Collection $students): void
     {
-        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->config, $this->termMapper);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
         $output              = $pastoralCountHelper->countStudentsEventsByTypes($this->getUser(), $students);
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));
@@ -324,8 +324,8 @@ class Controller extends Base
         // populate related records
         $pageRecords = $this->pastoralDataSource->findRecords($user, $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
 
-        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->config, $this->termMapper);
-        $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
+        $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student, $pastoralCountHelper->getStartDate((int)$this->config->get('pastoral_flag_count_period')));
 
         $this->getResponse()->content->set(
             [

@@ -14,7 +14,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -71,11 +70,6 @@ class Helper
     private Router $router;
 
     /**
-     * @var IConfigLoader
-     */
-    private IConfigLoader $config;
-
-    /**
      * @var TermMapper
      */
     private TermMapper $termMapper;
@@ -87,17 +81,15 @@ class Helper
      * @param PastoralTypeMapper    $pastoralTypeMapper
      * @param PastoralSubTypeMapper $pastoralSubTypeMapper
      * @param PastoralDataSource    $pastoralDataSource
-     * @param IConfigLoader         $config
      * @param TermMapper            $termMapper
      */
-    public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource, IConfigLoader $config, TermMapper $termMapper)
+    public function __construct(Router $router, PastoralTypeMapper $pastoralTypeMapper, PastoralSubTypeMapper $pastoralSubTypeMapper, PastoralDataSource $pastoralDataSource, TermMapper $termMapper)
     {
         $this->pastoralTypeMapper    = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper = $pastoralSubTypeMapper;
         $this->pastoralDataSource    = $pastoralDataSource;
         $this->router                = $router;
         $this->colorHelper           = new ColorHelper();
-        $this->config                = $config;
         $this->termMapper            = $termMapper;
     }
 
@@ -163,15 +155,16 @@ class Helper
     /**
      * return counts of pastoral events types(and subtypes) for a single student
      *
-     * @param User            $viewer
-     * @param User            $student
-     * @param Collection|null $typesWhitelist
-     * @param Collection|null $subTypesWhitelist
-     * @param bool            $partitionByMonth
+     * @param User                     $viewer
+     * @param User                     $student
+     * @param Collection|null          $typesWhitelist
+     * @param Collection|null          $subTypesWhitelist
+     * @param bool                     $partitionByMonth
+     * @param Alaress_Date_Format|null $startDate
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, bool $partitionByMonth = false): Collection
+    public function countStudentEventsByTypes(User $viewer, User $student, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, bool $partitionByMonth = false, ?Alaress_Date_Format $startDate = null): Collection
     {
         /**
          * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
@@ -189,7 +182,7 @@ class Helper
                 $student->getId(),
                 $pastoralTypes->getPropertyValues('id'),
                 $pastoralSubtypes->getPropertyValues('id'),
-                $this->getStartDate()
+                $startDate
             )
         );
 
@@ -202,12 +195,13 @@ class Helper
      * returns counts of pastoral evens types(and subtypes) for a single student but additionally partitioned by the
      * month and year they were created in
      *
-     * @param User            $viewer
-     * @param User            $student
+     * @param User                     $viewer
+     * @param User                     $student
+     * @param Alaress_Date_Format|null $startDate
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentEventsByTypesByMonth(User $viewer, User $student): Collection
+    public function countStudentEventsByTypesByMonth(User $viewer, User $student, ?Alaress_Date_Format $startDate): Collection
     {
         /**
          * if we're partitioned by month, then we will want to make sure that we are fetching all types & subtypes,
@@ -219,7 +213,7 @@ class Helper
             $this->pastoralDataSource->countRecordsByTypeGroupByMonth(
                 $viewer,
                 $student->getId(),
-                $this->getStartDate()
+                $startDate
             )
         );
 
@@ -344,12 +338,13 @@ class Helper
 
     /**
      * Gets start date of count period
+     * @param int $countPeriodConfig
      * @return Alaress_Date_Format|null
      */
-    private function getStartDate(): ?Alaress_Date_Format
+    public function getStartDate(int $countPeriodConfig): ?Alaress_Date_Format
     {
         $date = new Alaress_Date_Format();
-        switch ($this->config->get('pastoral_flag_count_period')) {
+        switch ($countPeriodConfig) {
             case self::COUNT_PERIOD_FOREVER:
                 return null;
             case self::COUNT_PERIOD_6MONTHS:

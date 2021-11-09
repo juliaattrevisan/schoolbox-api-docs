@@ -666,8 +666,8 @@ class Controller extends BaseController
             $canEmailStaff = false;
         }
 
-        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->getConfigLoader(), $this->termMapper);
-        $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
+        $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get('pastoral_flag_count_period')));
 
         $this->response->content->set(
             $this->buildHtmlOutput(
