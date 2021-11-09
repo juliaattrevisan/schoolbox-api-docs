@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -28,6 +29,21 @@ class Controller extends AbstractController
      * @var Resource\LinkMapper
      */
     protected $linkMapper;
+
+    /**
+     * @var object
+     */
+    protected $database;
+
+
+    /**
+     * Constructor, just using this for the showAll files and FilesBuilder class
+     * @param IConnector $database
+     */
+    public function __construct(IConnector $database)
+    {
+        $this->database = $database;
+    }
 
     // Injectables
 
@@ -84,9 +100,9 @@ class Controller extends AbstractController
      * @throws Mapper\Exception\NotFound
      * @throws Mapper\Exception
      */
-    public function showFiles($componentID, $sourceFolderID)
+    public function showFiles(int $componentID, int $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder($this->getDi()->get('databaseInternal'));
+        $filesBuilder = new FilesBuilder($this->database);
         $homepage_id = $filesBuilder->getHomepage($componentID);
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
@@ -144,9 +160,9 @@ class Controller extends AbstractController
      * @throws Mapper\Exception\NotFound
      * @throws Mapper\Exception
      */
-    public function showAllFiles($componentID, $sourceFolderID)
+    public function showAllFiles(int $componentID, int $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder($this->getDi()->get('databaseInternal'));
+        $filesBuilder = new FilesBuilder($this->database);
         $homepage_id = $filesBuilder->getHomepage($componentID);
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link

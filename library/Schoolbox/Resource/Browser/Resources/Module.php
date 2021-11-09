@@ -92,5 +92,16 @@ class Module extends AbstractModule
         );
 
         $injector->setters[$this->getControllerClass()]['setTab'] = 'resources';
+
+        //send the DB to the controller for showAllFiles to use.
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'database' => $injector->lazyGet('databaseInternal'),
+                ]
+            )
+        );
     }
 }
