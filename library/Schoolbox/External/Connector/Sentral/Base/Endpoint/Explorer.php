@@ -40,9 +40,9 @@ class Explorer
 {
 
     /**
-     * @var Api
+     * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
@@ -53,7 +53,6 @@ class Explorer
      */
     public function __construct()
     {
-
         /* Intentionally fully self-contained
          */
         $config = new \Schoolbox\Config\Loader();
@@ -69,6 +68,7 @@ class Explorer
      * @param string $nextUrl
      * @return array
      * @throws \InvalidArgumentException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function explore(string $nextUrl): array
     {

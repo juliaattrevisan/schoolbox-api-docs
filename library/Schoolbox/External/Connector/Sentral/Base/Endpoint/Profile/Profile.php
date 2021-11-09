@@ -227,6 +227,7 @@ class Profile implements IStrategy
 
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
+                $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
                 $campusName = '';
                 $comments = '';
@@ -381,6 +382,7 @@ class Profile implements IStrategy
                     ->setYearLevel($yearLevel)
                     ->setYearLevelCoordinatorId($yearLevelCoordinator['id'] ?? null)
                     ->setYearLevelCoordinatorName($yearLevelCoordinator['name'] ?? null)
+                    ->setBoardingHouseName($boardingHouseName)
 
                     /**
                      * Flags

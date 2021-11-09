@@ -270,6 +270,12 @@ class Profile implements IStrategy
         foreach ($students['students'] as $student) {
             $externalId = trim((string)$student['general_details']['student_code']);
             $academicHouse = trim((string)$student['school_details']['house']);
+
+            /* TASS API sometimes won't have this field (optional in its return payload)
+             * Disgusting
+             */
+            $boardingHouseName = trim((string)($student['other_school_details']['residential_house'] ?? ''));
+
             $boardingStatus = trim((string)$student['school_details']['boarder']) === self::BOARDER;
             $campusName = trim((string)$student['school_details']['campus']);
             $dob = trim((string)$student['general_details']['date_of_birth']);
@@ -378,6 +384,7 @@ class Profile implements IStrategy
                 ->setYearLevel($yearLevel)
                 ->setYearLevelCoordinatorId(null)
                 ->setYearLevelCoordinatorName(null)
+                ->setBoardingHouseName($boardingHouseName)
 
                 /**
                  * Flags
@@ -753,6 +760,7 @@ class Profile implements IStrategy
      *
      * @throws DomainException
      * @throws RuntimeException|InvalidArgumentException
+     * @throws \JsonException
      */
     private function findStaff()
     {
