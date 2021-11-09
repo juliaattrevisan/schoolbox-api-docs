@@ -58,28 +58,28 @@ Usage:
         <ul class="flex-list buttons">
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=project&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new {{ locale.project.proper }}"
+                   title="Create a new {{ locale.project }}"
                    class="button icon-project"
                 >New {{ locale.project.proper }}</a></li>
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=task&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new Task"
+                   title="Create a new task"
                    class="button icon-task"
                 >New Task</a></li>
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=dueWork&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new {{ locale.dueWork.proper }}"
+                   title="Create a new {{ locale.dueWork }}"
                    class="button icon-due-work"
                 >New {{ locale.dueWork.proper }}</a></li>
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=quiz&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new Quiz"
+                   title="Create a new quiz"
                    class="button icon-quiz"
                 >New Quiz</a></li>
             {% if config.lti_assessments_enable %}
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=lti&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new LTI assessment"
+                   title="Create a new assessment with a 3rd party tool"
                    class="button icon-lti"
                 >New 3rd Party Assessment</a></li>
             {% endif %}
