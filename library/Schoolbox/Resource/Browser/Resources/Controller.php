@@ -31,18 +31,24 @@ class Controller extends AbstractController
     protected $linkMapper;
 
     /**
-     * @var object
+     * @var IConnector
      */
     protected $database;
+
+    /**
+     * @var Folder\Mapper
+     */
+    protected $folderMapper;
 
 
     /**
      * Constructor, just using this for the showAll files and FilesBuilder class
      * @param IConnector $database
      */
-    public function __construct(IConnector $database)
+    public function __construct(IConnector $database, Folder\Mapper $folderMapper)
     {
         $this->database = $database;
+        $this->folderMapper = $folderMapper;
     }
 
     // Injectables

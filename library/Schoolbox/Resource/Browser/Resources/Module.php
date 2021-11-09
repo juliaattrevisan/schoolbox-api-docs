@@ -100,6 +100,7 @@ class Module extends AbstractModule
                 Controller::class,
                 [
                     'database' => $injector->lazyGet('databaseInternal'),
+                    'folder' => $this->getMapperFactory()->getLazy(Resource\Folder\Mapper::class),
                 ]
             )
         );
