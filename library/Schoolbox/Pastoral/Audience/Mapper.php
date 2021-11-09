@@ -97,18 +97,16 @@ class Mapper extends BaseMapper
     {
         $results = $this->createCollection();
 
-        /**
-         * @var UserMapper    $userMapper
-         * @var RoleMapper    $roleMapper
-         * @var TypeMapper    $typeMapper
-         * @var SubTypeMapper $subTypeMapper
-         * @var GroupMapper   $pGroupMapper
-         */
-        $userMapper    = $this->getJoinMapper('user');
-        $roleMapper    = $this->getJoinMapper('role');
-        $typeMapper    = $this->getJoinMapper('type');
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('user');
+        /* @var RoleMapper $roleMapper */
+        $roleMapper = $this->getJoinMapper('role');
+        /** @var TypeMapper $typeMapper */
+        $typeMapper = $this->getJoinMapper('type');
+        /** @var SubTypeMapper $subTypeMapper */
         $subTypeMapper = $this->getJoinMapper('subtype');
-        $pGroupMapper  = $this->getJoinMapper('group');
+        /** @var GroupMapper $pGroupMapper */
+        $pGroupMapper = $this->getJoinMapper('group');
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
