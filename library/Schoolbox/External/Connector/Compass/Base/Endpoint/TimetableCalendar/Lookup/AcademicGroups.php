@@ -51,7 +51,7 @@ class AcademicGroups
     {
         /* Only ever generate AcademicGroups once
          */
-        if (isset($this->cache)) {
+        if (null !== $this->cache) {
             return $this->cache;
         }
 
