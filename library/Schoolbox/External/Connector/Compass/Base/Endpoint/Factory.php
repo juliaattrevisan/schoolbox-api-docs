@@ -202,7 +202,7 @@ class Factory
 
         /* Default event owner
          */
-        $defaultOwner = UserMapper::getInstance()->findByExternalId(UserMapper::USERNAME_ALARESS_ADMIN, Role::STAFF);
+        $defaultOwner = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
 
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
