@@ -106,8 +106,8 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
 } else if ($_POST['delete'] === 'true') {
     //get the id and other post objects
-    $id = (int)$_POST['id'];
-    $componentId = (int)$_POST['componentId'];
+    $id = (int)($_POST['id'] ?? null);
+    $componentId = (int)($_POST['componentId'] ?? null) ;
 
     //lets confirm there is actually an id and component id...
     if (!$id || !$componentId) {
