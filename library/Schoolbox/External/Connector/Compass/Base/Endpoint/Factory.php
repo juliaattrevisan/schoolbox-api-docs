@@ -220,7 +220,7 @@ class Factory
 
         /* Default event type, I guess
          */
-        $defaultEventType = $this->findDefaultEventType();
+        $defaultEventType = $this->findDefaultEventType($defaultOwner);
 
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
@@ -288,14 +288,16 @@ class Factory
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function findDefaultEventType(): EventType
+    private function findDefaultEventType(\Schoolbox\User $defaultOwner): EventType
     {
         try {
             $defaultEventType = $this->eventTypeMapper->findOneByColumn('eventType', self::TIMETABLE_EVENT_TYPE);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $defaultEventType = $this->eventTypeMapper->createModel()
                 ->setType(self::TIMETABLE_EVENT_TYPE)
-                ->setColor(self::TIMETABLE_COLOR);
+                ->setColor(self::TIMETABLE_COLOR)
+                ->setSequence(99)
+                ->setUpdatedBy($defaultOwner->getId());
 
             $this->eventTypeMapper->save($defaultEventType);
         }
