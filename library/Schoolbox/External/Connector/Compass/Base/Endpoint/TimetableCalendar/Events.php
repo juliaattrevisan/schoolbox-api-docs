@@ -50,6 +50,17 @@ class Events implements IStrategy
 
 
     /**
+     * Number of days into the past whose Activity Instances we import.
+     * This is used to import past events so you can see what you did last week.
+     *
+     * Otherwise at the end of the current day you wouldn't be able to see the
+     * events of that day if UPS ran and deleted those events because they were
+     * just "in the past"
+     */
+    private const PAST_THRESHOLD = 7;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -270,11 +281,11 @@ class Events implements IStrategy
                          */
                         $start = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['start']));
 
-                        /* TODO maybe fetch a week into the past, so people can see where they've been
+                        /* Fetch PAST_THRESHOLD days into the past, so people can see where they've been
                          */
-                        if ($start->isPast()) {
+                        if ($start->isPast() && $start->diffInDays($now) > self::PAST_THRESHOLD) {
                             $this->log->debug(sprintf(
-                                'Activity %s Instance on %s is in the past; skipping',
+                                'Activity %s Instance on %s is too far in the past; skipping',
                                 $activity['name'],
                                 $activityInstance['start']
                             ));
