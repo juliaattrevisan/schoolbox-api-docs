@@ -24,6 +24,9 @@ use TypeError;
  *
  * This value will need to be decoded back into a user object for usage within
  * Schoolbox.
+ *
+ * TODO consider changing the format (encoded: FQDN, decoded: ID)
+ *      this seems to be the standard for other types of claim
  */
 class UserCodec implements ICodec
 {
@@ -54,7 +57,6 @@ class UserCodec implements ICodec
             return null;
         }
         if ($rawValue instanceof User) {
-            // TODO most identifying claim have a FQDN. Should this too?
             return $rawValue->getUsername();
         }
 
