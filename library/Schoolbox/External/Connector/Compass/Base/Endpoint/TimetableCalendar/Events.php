@@ -209,7 +209,20 @@ class Events implements IStrategy
                     /* Get a list of student external ids, and a list of teacher external ids
                      * then create schoolbox events and their relationships
                      */
-                    $enrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
+                    try {
+                        $enrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
+                    } catch (\RuntimeException $e) {
+                        $this->log->warning($e->getMessage());
+
+                        /* Sometimes this randomly dies:
+                         *
+                         * Bad endpoint schedule/v1/GetStandardClassDetails: 500 Internal Server Error after 3  [   ]
+                         * retries. Payload: {"activityCode":"AM Bus","academicGroupCode":"2021"}
+                         *
+                         * Just skip it and keep going
+                         */
+                        continue;
+                    }
 
                     $this->log->info(sprintf(
                         'Schedule %s: fetched enrolments for activity %s starting on %s: %s students, %s teachers',
