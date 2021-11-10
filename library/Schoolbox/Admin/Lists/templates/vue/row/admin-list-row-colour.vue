@@ -20,10 +20,21 @@ export default {
     },
 
     mounted () {
+        this.setDefaultColour();
         this.initColourPicker();
     },
 
     methods: {
+
+        /**
+         * We don't want to save a row without ensuring a default colour is set
+         * As then references that may expect a colour would be blank instead
+         */
+        setDefaultColour () {
+            if (this.colour === '') {
+                this.$emit('input', '#000000');
+            }
+        },
 
         /**
          * Set up the jQuery spectrum colour picker and emit changes
@@ -37,7 +48,6 @@ export default {
                 clickoutFiresChange: true,
                 showInitial: true,
                 change: (color) => {
-                    console.warn(color.toHexString());
                     this.$emit('input', color.toHexString())
                 }
             });
