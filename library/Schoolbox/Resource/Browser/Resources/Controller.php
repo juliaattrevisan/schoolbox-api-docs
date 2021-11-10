@@ -113,11 +113,14 @@ class Controller extends AbstractController
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
+        //check if user has edit perms on source folder
+        $canEdit = ($accessSource >= UserAccess::ACCESS_WRITE);
+
         //lets get the config for the component
         $componentConfig = $filesBuilder->getComponentConf($componentID);
 
         //grab all files for component folder
-        $files = $filesBuilder->getFolderData($componentConfig['src']['value']);
+        $files = $filesBuilder->getFolderData($componentConfig['src']['value'], $canEdit);
 
         //build the filter object
         //weird magic, from the file list component.
@@ -173,8 +176,11 @@ class Controller extends AbstractController
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
+        //check if user has edit perms on source folder
+        $canEdit = ($accessSource >= UserAccess::ACCESS_WRITE);
+
         //grab all files from files component
-        $files = $filesBuilder->getFolderData($sourceFolderID);
+        $files = $filesBuilder->getFolderData($sourceFolderID, $canEdit);
 
         //dump all as json
         $this->getResponse()->content->set($this->buildJsonOutput([

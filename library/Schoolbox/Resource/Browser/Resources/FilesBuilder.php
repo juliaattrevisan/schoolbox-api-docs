@@ -76,9 +76,10 @@ class FilesBuilder
      * We will assume the user has access to this folder
      * and lets build a nice array of the files
      * @param int $folderId
+     * @param bool $userEdit (can the user edit files within this folder?)
      * @return array of files
      */
-    public function getFolderData(int $folderId): array
+    public function getFolderData(int $folderId, $userEdit = false): array
     {
         //get the files, for the source folder
         $fileMapper = \Schoolbox\Resource\File\Mapper::getInstance();
@@ -105,6 +106,10 @@ class FilesBuilder
                 'dateModified'          => [
                             'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
                             'formatted' => $file->getModifiedAt()->getShort(),
+                ],
+                'edit'                  => [
+                            'enabled'   => $userEdit,
+                            'url'      => '/cms/file/' . $file->getId(),
                 ],
             ];
         }
