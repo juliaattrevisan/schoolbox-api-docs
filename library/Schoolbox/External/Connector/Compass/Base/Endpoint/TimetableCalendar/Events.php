@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
 
 use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\Relation\CategoryMapper;
@@ -46,7 +47,7 @@ class Events implements IStrategy
      *
      * Defaults to 6 months but we can tune that later.
      */
-    private const FUTURE_THRESHOLD = 30 * 6;
+    private const FUTURE_THRESHOLD = 30 * 1;
 
 
     /**
@@ -392,7 +393,8 @@ class Events implements IStrategy
             ->setOwner($this->defaultOwner)
             ->setStartDateTime($meta['startDatetime'])
             ->setEndDateTime($meta['endDatetime'])
-            ->setType($this->defaultEventType);
+            ->setType($this->defaultEventType)
+            ->setAccess(Event::ACCESS_PERSONAL);
 
         /* Assign event source identifier, assign compass guid (whatever that might be)
          */
@@ -400,11 +402,6 @@ class Events implements IStrategy
             ->setEvent($event)
             ->setSourceName(Prepare::EVENT_IMPORT_IDENTIFIER)
             ->setGuid($meta['guid']);
-
-        if ($this->perform) {
-            $this->eventMapper->save($event);
-            $this->eventSourceMapper->save($eventSource);
-        }
 
         /* Assign Group (homepage/category/folder) relations using $activity['subjectImportIdentifier']
          * as the folder code, assigning to individuals if folder code not found
@@ -414,6 +411,15 @@ class Events implements IStrategy
              */
             $folder = $this->folderMapper->findByCode($activity['subjectImportIdentifier']);
 
+            /* Update the Access Level to GROUP before saving it
+             */
+            if ($this->perform) {
+                $event->setAccess(Event::ACCESS_GROUP);
+
+                $this->eventMapper->save($event);
+                $this->eventSourceMapper->save($eventSource);
+            }
+
             return $this->createGroupEvents($activity, $activityInstance, $event, $folder);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->log->warning(sprintf(
@@ -422,6 +428,11 @@ class Events implements IStrategy
                 $activityInstance['start'],
                 $activity['subjectImportIdentifier']
             ));
+
+            if ($this->perform) {
+                $this->eventMapper->save($event);
+                $this->eventSourceMapper->save($eventSource);
+            }
 
             /* Folder wasn't found; install this event for each guy individually
              */
@@ -435,7 +446,7 @@ class Events implements IStrategy
      *
      * @param array                            $activity
      * @param array                            $activityInstance
-     * @param \Schoolbox\Calendar\Event        $event
+     * @param Event        $event
      * @param \Schoolbox\Resource\Folder\Model $folder
      * @return int
      * @throws \PDOException
@@ -445,7 +456,7 @@ class Events implements IStrategy
     private function createGroupEvents(
         array $activity,
         array $activityInstance,
-        \Schoolbox\Calendar\Event $event,
+        Event $event,
         \Schoolbox\Resource\Folder\Model $folder
     ): int {
         $this->log->debug(sprintf(
@@ -476,7 +487,7 @@ class Events implements IStrategy
      * @param array                     $activity
      * @param array                     $activityInstance
      * @param array                     $enrolments
-     * @param \Schoolbox\Calendar\Event $event
+     * @param Event $event
      * @return int
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
@@ -487,7 +498,7 @@ class Events implements IStrategy
         array $activity,
         array $activityInstance,
         array $enrolments,
-        \Schoolbox\Calendar\Event $event
+        Event $event
     ): int {
         $n = 0;
 
