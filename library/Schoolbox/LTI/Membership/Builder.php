@@ -130,9 +130,18 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
+        // Extract an ID out of the resource link
+        // TODO add codec for resource links, contexts as there are with users
+        // TODO assert that the tool requesting this link owns the resource link
+        $assessment = $this->assessmentDataSource->findByIdForReview($resourceLinkIdentifier);
+        if (!$assessment instanceof LtiAssessment) {
+            // raise an error instead
+            return $this->buildContextMembership($registration, $role, $limit, $offset);
+        }
+
         $members = $this->buildMemberCollection(
-            $this->roleIncludesLearners($role) ? $this->findLearnersForResourceLink($resourceLinkIdentifier) : null,
-            $this->roleIncludesInstructors($role) ? $this->findInstructorsForFolder() : null,
+            $this->roleIncludesLearners($role) ? $this->findLearnersForLtiAssessment($assessment) : null,
+            $this->roleIncludesInstructors($role) ? $this->findInstructorsForLtiAssessment($assessment) : null,
             $limit,
             $offset,
         );
@@ -198,11 +207,10 @@ class Builder implements MembershipServiceServerBuilderInterface
      * @param LtiAssessment $assessment
      * @return MemberInterface
      */
-    private function mapUserToLearnerWithAssessmentResourceLink(User $user, LtiAssessment $assessment): MemberInterface
+    private function mapUserToLearnerWithAssessment(User $user, LtiAssessment $assessment): MemberInterface
     {
         $member = $this->mapUserToLearner($user);
-        $member->setMessage($this->buildMessage($user, $assessment));
-        return $member;
+        return $member->setMessage($this->buildMessage($user, $assessment));
     }
 
     /**
@@ -224,11 +232,10 @@ class Builder implements MembershipServiceServerBuilderInterface
      * @param LtiAssessment $assessment
      * @return MemberInterface
      */
-    private function mapUserToInstructorWithAssessmentResourceLink(User $user, LtiAssessment $assessment): MemberInterface
+    private function mapUserToInstructorWithAssessment(User $user, LtiAssessment $assessment): MemberInterface
     {
         $member = $this->mapUserToInstructor($user);
-        $member->setMessage($this->buildMessage($user, $assessment));
-        return $member;
+        return $member->setMessage($this->buildMessage($user, $assessment));
     }
 
     /**
@@ -288,29 +295,25 @@ class Builder implements MembershipServiceServerBuilderInterface
     }
 
     /**
-     * Finds learners for this resource link.
+     * Finds learners for this assessment.
      *
-     * (This will be the participants in the assessment identified by the
-     *  resource link.)
+     * This will be the participants in the assessment: the member record will
+     * also contain a message which contains the claims in the resource link
+     * launch request, as per
+     * http://www.imsglobal.org/spec/lti-nrps/v2p0#message-section.
      *
-     * @param string $resourceLinkIdentifier
+     * @param LtiAssessment $assessment
      * @return GenericCollection|MemberInterface[]
      */
-    private function findLearnersForResourceLink(string $resourceLinkIdentifier): GenericCollection
+    private function findLearnersForLtiAssessment(LtiAssessment $assessment): GenericCollection
     {
-        // Extract an ID out of the resource link
-        // TODO add codec for resource links, contexts as there are with users
-        // TODO assert that the tool requesting this link owns the resource link
-        $assessment = $this->assessmentDataSource->findByIdForReview($resourceLinkIdentifier);
         return $this
             ->buildEmptyMemberCollection()
             ->merge(
                 $assessment
                     ->getParticipantUsers()
                     ->map(function (User $user) use ($assessment) {
-                        return $assessment instanceof LtiAssessment
-                            ? $this->mapUserToLearnerWithAssessmentResourceLink($user, $assessment)
-                            : $this->mapUserToLearner($user);
+                        return $this->mapUserToLearnerWithAssessment($user, $assessment);
                     })
             );
     }
@@ -334,6 +337,36 @@ class Builder implements MembershipServiceServerBuilderInterface
                         false,
                     )
                     ->map(Closure::fromCallable([$this, 'mapUserToInstructor']))
+            );
+    }
+
+    /**
+     * Finds instructors for this assessment.
+     *
+     * This will be the same as the folder instructors: the member record will
+     * also contain a message which contains the claims in the resource link
+     * launch request, as per
+     * http://www.imsglobal.org/spec/lti-nrps/v2p0#message-section.
+     *
+     * @param LtiAssessment $assessment
+     * @return GenericCollection|MemberInterface[]
+     */
+    private function findInstructorsForLtiAssessment(LtiAssessment $assessment): GenericCollection
+    {
+        return $this
+            ->buildEmptyMemberCollection()
+            ->merge(
+                $this->userAccessMapper
+                    ->findUsersInCategory(
+                        $assessment->getBaseContext()->getFolder(),
+                        null,
+                        UserAccess::ACCESS_WRITE,
+                        true,
+                        false,
+                    )
+                    ->map(function (User $user) use ($assessment) {
+                        return $this->mapUserToInstructorWithAssessment($user, $assessment);
+                    })
             );
     }
 
