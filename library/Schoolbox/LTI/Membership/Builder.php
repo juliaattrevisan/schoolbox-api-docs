@@ -20,6 +20,7 @@ use OAT\Library\Lti1p3Nrps\Model\Member\MemberInterface;
 use OAT\Library\Lti1p3Nrps\Model\Membership\Membership;
 use OAT\Library\Lti1p3Nrps\Model\Membership\MembershipInterface;
 use OAT\Library\Lti1p3Nrps\Service\Server\Builder\MembershipServiceServerBuilderInterface;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Permission\Access\Access;
@@ -83,49 +84,18 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
-        // Get learners
-        switch ($role) {
-            // TODO extract these consts somewhere
-            case RoleInterface::NAMESPACE_CONTEXT . '#Learner':
-            case 'Learner':
-            case null:
-                $learners = $this->userAccessMapper->findUsersInCategory(
-                    $this->folder,
-                    null,
-                    UserAccess::ACCESS_READ,
-                    true,
-                    true,
-                );
-                break;
+        $learners = $this->roleIncludesLearners($role)
+            ? $this->findLearnersForFolder()
+            : new GenericCollection(MemberInterface::class);
 
-            default:
-                $learners = new GenericCollection(User::class);
-                break;
-        }
-
-        // Get instructors
-        switch ($role) {
-            case RoleInterface::NAMESPACE_CONTEXT . '#Instructor':
-            case 'Instructor':
-            case null:
-                $instructors = $this->userAccessMapper->findUsersInCategory(
-                    $this->folder,
-                    null,
-                    UserAccess::ACCESS_WRITE,
-                    true,
-                    false,
-                );
-                break;
-
-            default:
-                $instructors = new GenericCollection(User::class);
-                break;
-        }
+        $instructors = $this->roleIncludesInstructors($role)
+            ? $this->findInstructorsForFolder()
+            : new GenericCollection(MemberInterface::class);
 
         // Ensure members are in order
-        $members = (new GenericCollection(MemberInterface::class))
-            ->merge($learners->map(Closure::fromCallable([$this, 'mapUserToLearner'])))
-            ->merge($instructors->map(Closure::fromCallable([$this, 'mapUserToInstructor'])))
+        $members = $this->buildEmptyMemberCollection()
+            ->merge($learners)
+            ->merge($instructors)
             ->sortByCallback(Closure::fromCallable([$this, 'sortMemberships']))
             ->slice($offset ?? 0, $limit, true);
 
@@ -158,6 +128,7 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
+        // Get learners
         return new Membership(
             (string)$this->folder->getId(),
             new Context(
@@ -232,5 +203,81 @@ class Builder implements MembershipServiceServerBuilderInterface
     private function sortMemberships(MemberInterface $a, MemberInterface $b): int
     {
         return $a->getUserIdentity()->getIdentifier() <=> $b->getUserIdentity()->getIdentifier();
+    }
+
+    /**
+     * Does this role param include learners?
+     *
+     * @param string|null $role
+     * @return bool
+     */
+    private function roleIncludesLearners(?string $role): bool
+    {
+        return !isset($role) || in_array($role, [RoleInterface::NAMESPACE_CONTEXT . '#Learner', 'Learner']);
+    }
+
+    /**
+     * Does this role param include instructors?
+     *
+     * @param string|null $role
+     * @return bool
+     */
+    private function roleIncludesInstructors(?string $role): bool
+    {
+        return !isset($role) || in_array($role, [RoleInterface::NAMESPACE_CONTEXT . '#Instructor', 'Instructor']);
+    }
+
+    /**
+     * Find learners in this builder's folder.
+     *
+     * @return GenericCollection|MemberInterface[]
+     */
+    private function findLearnersForFolder(): GenericCollection
+    {
+        return $this
+            ->buildEmptyMemberCollection()
+            ->merge(
+                $this->userAccessMapper
+                    ->findUsersInCategory(
+                        $this->folder,
+                        null,
+                        UserAccess::ACCESS_READ,
+                        true,
+                        true,
+                    )
+                    ->map(Closure::fromCallable([$this, 'mapUserToLearner']))
+            );
+    }
+
+    /**
+     * Find instructors in this builder's folder.
+     *
+     * @return GenericCollection|MemberInterface[]
+     */
+    private function findInstructorsForFolder(): GenericCollection
+    {
+        return $this
+            ->buildEmptyMemberCollection()
+            ->merge(
+                $this->userAccessMapper
+                    ->findUsersInCategory(
+                        $this->folder,
+                        null,
+                        UserAccess::ACCESS_WRITE,
+                        true,
+                        false,
+                    )
+                    ->map(Closure::fromCallable([$this, 'mapUserToInstructor']))
+            );
+    }
+
+    /**
+     * Build an empty member collection
+     *
+     * @return GenericCollection|MemberInterface[]
+     */
+    private function buildEmptyMemberCollection(): GenericCollection
+    {
+        return new GenericCollection(MemberInterface::class);
     }
 }
