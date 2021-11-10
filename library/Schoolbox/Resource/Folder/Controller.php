@@ -27,9 +27,12 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Curriculum;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\LTI\Membership\Builder;
+use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -50,6 +53,7 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 use UnexpectedValueException;
 use Schoolbox\Resource\Folder;
@@ -979,7 +983,23 @@ class Controller extends BaseController
 
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-        $builder = new Builder($folder, $this->userAccessMapper, $assessmentDataSource);
+
+        /** @var Instance $instance */
+        $instance = $this->getDi()->get('instance');
+
+        $builder = new Builder(
+            $folder,
+            $this->userAccessMapper,
+            $assessmentDataSource,
+            new LaunchFactory(
+                $registrationRepository,
+                Access::getInstance(),
+                $this->router,
+                $instance,
+                $this->getConfigLoader(),
+                new UserCodec(UserMapper::getInstance()),
+            ),
+        );
 
         // Access token sanity checker: validates the request token was created by a tool
         $validator = new RequestAccessTokenValidator($registrationRepository);

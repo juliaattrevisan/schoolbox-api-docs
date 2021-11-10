@@ -14,6 +14,7 @@ use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Schoolbox\IConfigLoader;
@@ -109,8 +110,6 @@ class LaunchFactory
         User $currentUser,
         User $actingUser
     ): LtiMessageInterface {
-        $assessmentContext = $assessment->getBaseContext()->getFolder();
-
         // Roles: dependent on whether user is a participant or instructor
         // TODO determine how roles should be set if $actingUser != $currentUser
         $roleClaimFactory = new RoleClaimFactory($this->access);
@@ -119,7 +118,38 @@ class LaunchFactory
             $roleClaimFactory->buildContextRolesForAssessment($currentUser, $assessment),
         );
 
-        // Additional claims:
+        // Build additional claims
+        $additionalClaims = $this->buildAdditionalClaims($assessment, $currentUser, $actingUser);
+
+        // Create an LTI resource link launch, send it to the iframe
+        $registration = $this->registrations->find($assessment->getLtiTool()->getDeploymentId());
+
+        // Resource link request
+        $builder = new PlatformOriginatingLaunchBuilder();
+        return $builder->buildPlatformOriginatingLaunch(
+            $registration,
+            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
+            $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
+            $this->userCodec->encode($currentUser),
+            null,
+            array_unique($roles),
+            $additionalClaims,
+        );
+    }
+
+    /**
+     * Build a list of additional claims for this resource link launch.
+     *
+     * @param Model $assessment
+     * @param User  $currentUser
+     * @param User  $actingUser
+     * @return array<MessagePayloadClaimInterface>
+     */
+    public function buildAdditionalClaims(
+        Model $assessment,
+        User $currentUser,
+        User $actingUser
+    ): array {
         $additionalClaims = [];
 
         // Resource link claim: talk about the assessment
@@ -127,7 +157,7 @@ class LaunchFactory
         $additionalClaims[] = $resourceLinkClaim;
 
         // Context claim: talk about the folder
-        $contextClaim       = (new ContextClaimFactory())->buildForFolder($assessmentContext);
+        $contextClaim       = (new ContextClaimFactory())->buildForFolder($assessment->getBaseContext()->getFolder());
         $additionalClaims[] = $contextClaim;
 
         // PlatformInstanceClaim: talk about the Schoolbox instance
@@ -192,19 +222,6 @@ class LaunchFactory
                 ->toString(),
         );
 
-        // Create an LTI resource link launch, send it to the iframe
-        $registration = $this->registrations->find($assessment->getLtiTool()->getDeploymentId());
-
-        // Resource link request
-        $builder = new PlatformOriginatingLaunchBuilder();
-        return $builder->buildPlatformOriginatingLaunch(
-            $registration,
-            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
-            $this->userCodec->encode($currentUser),
-            null,
-            array_unique($roles),
-            $additionalClaims,
-        );
+        return $additionalClaims;
     }
 }

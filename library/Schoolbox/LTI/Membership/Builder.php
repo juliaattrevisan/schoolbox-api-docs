@@ -19,9 +19,14 @@ use OAT\Library\Lti1p3Nrps\Model\Member\MemberCollection;
 use OAT\Library\Lti1p3Nrps\Model\Member\MemberInterface;
 use OAT\Library\Lti1p3Nrps\Model\Membership\Membership;
 use OAT\Library\Lti1p3Nrps\Model\Membership\MembershipInterface;
+use OAT\Library\Lti1p3Nrps\Model\Message\Message;
+use OAT\Library\Lti1p3Nrps\Model\Message\MessageInterface;
 use OAT\Library\Lti1p3Nrps\Service\Server\Builder\MembershipServiceServerBuilderInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\LTI\Assessment\Model;
+use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -51,6 +56,11 @@ class Builder implements MembershipServiceServerBuilderInterface
     private AssessmentDataSource $assessmentDataSource;
 
     /**
+     * Launch factory, for building parameters for the resource link launch.
+     */
+    private LaunchFactory $launchFactory;
+
+    /**
      * Constructor
      *
      * @param Folder               $folder
@@ -60,11 +70,13 @@ class Builder implements MembershipServiceServerBuilderInterface
     public function __construct(
         Folder $folder,
         UserAccessMapper $userAccessMapper,
-        AssessmentDataSource $assessmentDataSource
+        AssessmentDataSource $assessmentDataSource,
+        LaunchFactory $launchFactory
     ) {
         $this->folder               = $folder;
         $this->userAccessMapper     = $userAccessMapper;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->launchFactory        = $launchFactory;
     }
 
     /**
@@ -179,6 +191,21 @@ class Builder implements MembershipServiceServerBuilderInterface
     }
 
     /**
+     * Map function: convert a user+assessment to a learner-type member object,
+     * with a message appropriate for the assessment.
+     *
+     * @param User          $user
+     * @param LtiAssessment $assessment
+     * @return MemberInterface
+     */
+    private function mapUserToLearnerWithAssessmentResourceLink(User $user, LtiAssessment $assessment): MemberInterface
+    {
+        $member = $this->mapUserToLearner($user);
+        $member->setMessage($this->buildMessage($user, $assessment));
+        return $member;
+    }
+
+    /**
      * Map function: convert a user to an instructor-type member object.
      *
      * @param User $user
@@ -187,6 +214,21 @@ class Builder implements MembershipServiceServerBuilderInterface
     private function mapUserToInstructor(User $user): MemberInterface
     {
         return $this->mapUserToMember($user, 'Instructor');
+    }
+
+    /**
+     * Map function: convert a user+assessment to an instructor-type member
+     * object, with a message appropriate for the assessment.
+     *
+     * @param User          $user
+     * @param LtiAssessment $assessment
+     * @return MemberInterface
+     */
+    private function mapUserToInstructorWithAssessmentResourceLink(User $user, LtiAssessment $assessment): MemberInterface
+    {
+        $member = $this->mapUserToInstructor($user);
+        $member->setMessage($this->buildMessage($user, $assessment));
+        return $member;
     }
 
     /**
@@ -258,17 +300,18 @@ class Builder implements MembershipServiceServerBuilderInterface
     {
         // Extract an ID out of the resource link
         // TODO add codec for resource links, contexts as there are with users
+        // TODO assert that the tool requesting this link owns the resource link
         $assessment = $this->assessmentDataSource->findByIdForReview($resourceLinkIdentifier);
-
-        // TODO also include a message
-        //      (which tells how the user should launch the link)
-
         return $this
             ->buildEmptyMemberCollection()
             ->merge(
                 $assessment
                     ->getParticipantUsers()
-                    ->map(Closure::fromCallable([$this, 'mapUserToLearner']))
+                    ->map(function (User $user) use ($assessment) {
+                        return $assessment instanceof LtiAssessment
+                            ? $this->mapUserToLearnerWithAssessmentResourceLink($user, $assessment)
+                            : $this->mapUserToLearner($user);
+                    })
             );
     }
 
@@ -330,5 +373,25 @@ class Builder implements MembershipServiceServerBuilderInterface
         return $result
             ->sortByCallback(Closure::fromCallable([$this, 'sortMemberships']))
             ->slice($offset ?? 0, $limit, true);
+    }
+
+    /**
+     * Build the message part of the membership response for this
+     * user+assessment.
+     *
+     * @param User          $user
+     * @param LtiAssessment $assessment
+     * @return MessageInterface
+     */
+    private function buildMessage(User $user, LtiAssessment $assessment): MessageInterface
+    {
+        // Inject claims from the assessment:
+        // http://www.imsglobal.org/spec/lti-nrps/v2p0#message-section
+        $message = [];
+        $claims  = $this->launchFactory->buildAdditionalClaims($assessment, $user, $user);
+        foreach ($claims as $claim) {
+            $message[$claim::getClaimName()] = $claim->normalize();
+        }
+        return new Message($message);
     }
 }
