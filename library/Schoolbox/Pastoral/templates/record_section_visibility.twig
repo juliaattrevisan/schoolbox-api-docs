@@ -44,7 +44,7 @@
                 {% else %}
                     {% set accessLevelLabel = '' %}
                 {% endif %}
-                {% for access in record.access|filter(access=>access.access == accessLevel) %}
+                {% for access in record.accessWithPermission|filter(access=>access.access == accessLevel) %}
                     {% if access.group is not empty %}
 
                         {# Pastoral Group Access #}
