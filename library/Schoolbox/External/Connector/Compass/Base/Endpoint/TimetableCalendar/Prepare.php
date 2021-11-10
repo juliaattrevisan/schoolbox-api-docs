@@ -76,10 +76,8 @@ class Prepare implements IStrategy
     /**
      * Delete all the events that used a particular source identifier
      *
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnderflowException
      */
     public function import(): void
     {
@@ -180,7 +178,7 @@ class Prepare implements IStrategy
                     WHERE id IN ($ids)
                 ";
 
-                $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
                 $statement->execute();
             }
 
