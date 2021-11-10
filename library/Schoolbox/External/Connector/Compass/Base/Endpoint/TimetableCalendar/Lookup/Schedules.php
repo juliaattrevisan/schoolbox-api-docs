@@ -94,7 +94,7 @@ class Schedules
                         $schedule['name'],
                         \count($schedule['activities'])
                     ));
-                    
+
                     $stack[$year]['schedules'][] = $schedule;
                 } else {
                     $this->log->debug(sprintf(

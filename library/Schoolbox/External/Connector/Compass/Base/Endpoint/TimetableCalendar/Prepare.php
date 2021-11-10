@@ -144,7 +144,7 @@ class Prepare implements IStrategy
                 'Beginning the great purge of existing events/relations that used event_source: %s',
                 self::EVENT_IMPORT_IDENTIFIER
             ));
-            
+
             $this->log->debug('This might take a while.');
             $this->log->debug('');
 

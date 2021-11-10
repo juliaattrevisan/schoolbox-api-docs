@@ -118,7 +118,7 @@ class Factory
      * @var EventTypeMapper
      */
     private EventTypeMapper $eventTypeMapper;
-    
+
 
     /**
      * @var PersonalMapper
