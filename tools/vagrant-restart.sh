@@ -1,4 +1,7 @@
 #!/bin/bash
+# Override vagrant's network configuration with this host's network config
+/etc/init.d/procps restart
+
 # wait for /vagrant to mount correctly
 for i in {1..60};
 do
