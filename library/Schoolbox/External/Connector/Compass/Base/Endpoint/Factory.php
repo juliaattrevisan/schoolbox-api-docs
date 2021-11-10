@@ -117,7 +117,7 @@ class Factory
     /**
      * @var EventTypeMapper
      */
-    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
+    private EventTypeMapper $eventTypeMapper;
     
 
     /**
@@ -170,10 +170,10 @@ class Factory
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
         /* Timetable pieces */
-        \Schoolbox\UserMapper $userMapper,
+        UserMapper $userMapper,
         EventMapper $eventMapper,
         \Event\Source\Mapper $eventSourceMapper,
-        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        EventTypeMapper $eventTypeMapper,
         PersonalMapper $relationalPersonalMapper,
         CategoryMapper $relationFolderMapper,
         \Schoolbox\Resource\Folder\Mapper $folderMapper
