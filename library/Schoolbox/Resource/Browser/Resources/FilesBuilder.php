@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\File\Mimetype;
 use Schoolbox\Mapper;
 
 class FilesBuilder
@@ -96,12 +97,9 @@ class FilesBuilder
                     'iconFile'  => $file->getStorage()->getMimetype()->getIconFile(),
                     'description'  => $file->getStorage()->getMimetype()->getDescription(),
                 ],
+                'type'                  => $this->getType($file->getMimetype()),
                 'hash'                  => $file->getHash(),
                 'size'                  => $file->getSize(),
-                'dateAdded'             => [
-                            'timestamp' => $file->getCreatedAt()->getUnixTimeStamp(),
-                            'formatted' => $file->getCreatedAt()->getShort(),
-                ],
                 'dateModified'          => [
                             'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
                             'formatted' => $file->getModifiedAt()->getShort(),
@@ -191,5 +189,51 @@ class FilesBuilder
 
         //return instance / default config values
         return $config;
+    }
+
+    /**
+     *get Type, returns the string for one of the following:
+     *  ['Document', 'Audio', 'Video', 'Image', 'Other']
+     * @param Mimetype $mime
+     * @return string
+     */
+    private function getType(Mimetype $mime)
+    {
+        /**
+        //get filters from FileMapper
+        // Put together mimetype filters
+        $fileTypeMimes = [
+            'document' => [
+                "%pdf%",
+                "%msword%",
+                "%vnd.ms%",
+                "%rtf%",
+                "%text%",
+                "%document%",
+                "%powerpoint%",
+            ],
+            'image' => ["%image%",],
+            'audio' => ["%audio%",],
+            'video' => ["%video%", "%flash%", "%realmedia%",],
+        ];
+        */
+        //check if image
+        if ($mime->isImage() === true) {
+            return "image";
+        }
+        //check if audio
+        if ($mime->isAudio() === true) {
+            return "audio";
+        }
+        //check if video
+        if ($mime->isVideo()) {
+            return "video";
+        }
+        //check if document
+        if (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $mime->getMime())) {
+            return "document";
+        }
+        //else other??
+        return "other";
     }
 }
