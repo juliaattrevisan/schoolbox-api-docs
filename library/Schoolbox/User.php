@@ -280,7 +280,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * Returns a list of collections the user belongs in
      *
-     * @return GenericCollection|Campus[]
+     * @return GenericCollection|Campus[]|null
      */
     public function getCampusCollection()
     {
