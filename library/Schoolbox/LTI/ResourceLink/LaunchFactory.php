@@ -14,9 +14,7 @@ use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
@@ -32,27 +30,61 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User;
 
+/**
+ * Factory for building resource link launches.
+ */
 class LaunchFactory
 {
-    private Access $access;
-
-    private Router $router;
-
-    private Instance $instance;
-
+    /**
+     * Registration repository, used to find the registration to launch a
+     * resource link within the context of.
+     */
     private RegistrationRepositoryInterface $registrations;
 
-    private UserCodec $userCodec;
+    /**
+     * User access class: used to determine the roles in the resource link
+     * launch.
+     */
+    private Access $access;
 
+    /**
+     * Router: used to build links to other content.
+     */
+    private Router $router;
+
+    /**
+     * Schoolbox instance data: used to build the platform instance claim.
+     */
+    private Instance $instance;
+
+    /**
+     * Config: currently used to build a fully-qualified domain name for use
+     * within generated links.
+     */
     private IConfigLoader $config;
 
+    /**
+     * User codec: used to encode/decode users for inclusion within the launch.
+     */
+    private UserCodec $userCodec;
+
+    /**
+     * Constructor
+     *
+     * @param RegistrationRepositoryInterface $registrations
+     * @param Access                          $access
+     * @param Router                          $router
+     * @param Instance                        $instance
+     * @param IConfigLoader                   $config
+     * @param UserCodec                       $userCodec
+     */
     public function __construct(
+        RegistrationRepositoryInterface $registrations,
         Access $access,
         Router $router,
-        RegistrationRepositoryInterface $registrations,
         Instance $instance,
-        UserCodec $userCodec,
-        IConfigLoader $config
+        IConfigLoader $config,
+        UserCodec $userCodec
     ) {
         $this->access        = $access;
         $this->router        = $router;
@@ -78,9 +110,6 @@ class LaunchFactory
         User $actingUser
     ): LtiMessageInterface {
         $assessmentContext = $assessment->getBaseContext()->getFolder();
-
-        // Create an LTI resource link launch, send it to the iframe
-        $registration = $this->registrations->find($assessment->getLtiTool()->getDeploymentId());
 
         // Roles: dependent on whether user is a participant or instructor
         // TODO determine how roles should be set if $actingUser != $currentUser
@@ -162,6 +191,9 @@ class LaunchFactory
                 ->setQuery(['rlid' => $assessment->getId(),])
                 ->toString(),
         );
+
+        // Create an LTI resource link launch, send it to the iframe
+        $registration = $this->registrations->find($assessment->getLtiTool()->getDeploymentId());
 
         // Resource link request
         $builder = new PlatformOriginatingLaunchBuilder();

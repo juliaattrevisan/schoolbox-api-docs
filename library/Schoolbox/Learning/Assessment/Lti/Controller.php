@@ -385,12 +385,12 @@ class Controller extends Assessment\Controller
         User $actingUser
     ): LtiMessageInterface {
         return (new LaunchFactory(
+            $this->registrations,
             $this->getAccess(),
             $this->router,
-            $this->registrations,
             $this->instance,
-            $this->userCodec,
-            $this->getConfigLoader()
+            $this->getConfigLoader(),
+            $this->userCodec
         ))->buildForAssessment($assessment, $currentUser, $actingUser);
     }
 
