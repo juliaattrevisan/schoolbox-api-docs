@@ -191,20 +191,49 @@ class Module extends BaseModule
         $this->register('GET', "{$assRoute}/status/similarity", 'getSimilarityReport', $canViewSimilarityReport, $preloadAssessment);
         $this->register('GET', "{$assRoute}/status/similarity/payload", 'getSimilarityReportPayload', $canViewSimilarityReport, $preloadAssessment);
 
+
+        // LTI assessment related routes
+        // TODO extract to a different module:
+        //      they are only here so that they can use the standard assessment preloads and permissions
+
         // LTI assessment launch
         $this->register(
             self::METHOD_GET,
-            "$assRoute/launch/instructor",
+            "$assRoute/lti/launch/instructor",
             'getLaunchAssessmentAsInstructor',
             $canViewStatus,
             $preloadAssessment,
         );
         $this->register(
             self::METHOD_GET,
-            "$assRoute/launch/student/$studentParam",
+            "$assRoute/lti/launch/student/$studentParam",
             'getLaunchAssessmentAsStudent',
             $canSubmit,
             $preloadParticipant,
+        );
+
+        // Services:
+        // These don't have permission handlers at the module level: instead,
+        // the controllers allow or deny access based upon the scope assigned to
+        // the JWT used for validation.
+        // (If no JWT was passed, access will be denied.)
+
+        // LTI line item service
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/lti",
+            'getLineItem',
+            null,
+            $preloadAssessment,
+        );
+
+        // LTI assessment score publish service
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/scores",
+            'postScorePublish',
+            null,
+            $preloadAssessment,
         );
     }
 
@@ -416,7 +445,9 @@ class Module extends BaseModule
         $lc['ltiAssessmentMapper']      = $this->getMapperFactory()->getLazy(LtiAssessmentMapper::class);
         $lc['ltiAssessmentScoreMapper'] = $this->getMapperFactory()->getLazy(LtiAssessmentScoreMapper::class);
         $lc['instance']                 = $injector->lazyGet('instance');
-        $lc['repository']               = $injector->lazyGet('lti.repository');
+        $lc['registrations']            = $injector->lazyGet('lti.registrations');
+        $lc['userCodec']                = $injector->lazyGet('lti.userCodec');
+        $lc['accessTokenCache']         = $injector->lazyGet('lti.accessTokenCache');
     }
 
     /**

@@ -12,9 +12,11 @@ namespace Schoolbox\LTI\Registration;
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Tool\Tool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\Url\Factory as UrlFactory;
 
@@ -29,6 +31,12 @@ class RepositoryFactory
     private IConfigLoader $config;
 
     /**
+     * Key chain repository: contains the platform's key chain, and the key
+     * chain for each tool that could be set up.
+     */
+    private KeyChainRepositoryInterface $keyChainRepository;
+
+    /**
      * The OIDC authentication path (relative to the Schoolbox instance)
      * for the Schoolbox platform.
      */
@@ -37,12 +45,17 @@ class RepositoryFactory
     /**
      * Constructor
      *
-     * @param IConfigLoader $config
-     * @param string        $oidcAuthenticationPath
+     * @param IConfigLoader               $config
+     * @param KeyChainRepositoryInterface $keyChainRepository
+     * @param string                      $oidcAuthenticationPath
      */
-    public function __construct(IConfigLoader $config, string $oidcAuthenticationPath)
-    {
+    public function __construct(
+        IConfigLoader $config,
+        KeyChainRepositoryInterface $keyChainRepository,
+        string $oidcAuthenticationPath
+    ) {
         $this->config                 = $config;
+        $this->keyChainRepository     = $keyChainRepository;
         $this->oidcAuthenticationPath = $oidcAuthenticationPath;
     }
 
@@ -107,12 +120,8 @@ class RepositoryFactory
                 $platform,
                 $tool,
                 [$toolModel->getDeploymentId(),],
-                $platformKeyChain,
-                $keyChainFactory->create(
-                    $toolModel->getName(),
-                    $toolModel->getName(),
-                    $toolModel->getPublicKey() === null ? null : trim($toolModel->getPublicKey()),
-                ),
+                $this->keyChainRepository->find(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER),
+                $this->keyChainRepository->find($toolModel->getClientId()),
                 null,
                 $toolModel->getJwksUrl() === null ? null : trim($toolModel->getJwksUrl()),
             );

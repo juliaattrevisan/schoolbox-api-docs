@@ -51,6 +51,11 @@ class Module extends BaseModule
 
         // OIDC authentication
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
+        $this->register(self::METHOD_POST, '/oidc/authentication', 'postOidcAuthenticationRequest');
+
+        // oAuth access token
+        $this->register(self::METHOD_GET, '/auth/token', 'getOauthAccessTokenRequest');
+        $this->register(self::METHOD_POST, '/auth/token', 'postOauthAccessTokenRequest');
 
         // Receive a response to a deep linking request
         $this->register(
@@ -80,9 +85,12 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'repository'        => $injector->lazyGet('lti.repository'),
+                    'keyChains'         => $injector->lazyGet('lti.keyChains'),
+                    'registrations'     => $injector->lazyGet('lti.registrations'),
                     'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
                     'instance'          => $injector->lazyGet('instance'),
+                    'userCodec'         => $injector->lazyGet('lti.userCodec'),
+                    'accessTokenCache'  => $injector->lazyGet('lti.accessTokenCache'),
                 ]
             )
         );

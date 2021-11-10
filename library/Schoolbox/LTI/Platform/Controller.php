@@ -11,20 +11,34 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Http\Factory\Guzzle\ResponseFactory;
+use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Factory\AuthorizationServerFactory;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Generator\AccessTokenResponseGenerator;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ScopeRepository;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
+use Psr\Cache\CacheItemPoolInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
+use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
-use Schoolbox\LTI\Registration\Repository;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Util\ServerRequestFactory;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Url\Factory;
 
 /**
@@ -33,9 +47,14 @@ use Schoolbox\Url\Factory;
 class Controller extends Base
 {
     /**
-     * Repository of tool+platform configurations.
+     * Repository of keychains.
      */
-    private Repository $repository;
+    private KeyChainRepositoryInterface $keyChains;
+
+    /**
+     * Repository of tool+platform registrations.
+     */
+    private RegistrationRepositoryInterface $registrations;
 
     /**
      * User authenticator.
@@ -48,20 +67,39 @@ class Controller extends Base
     private Instance $instance;
 
     /**
+     * User codec, used to encode a user into a login hint.
+     */
+    private UserCodec $userCodec;
+
+    /**
+     * Cache for access tokens.
+     */
+    private CacheItemPoolInterface $accessTokenCache;
+
+    /**
      * Constructor
      *
-     * @param Repository                 $repository
-     * @param UserAuthenticatorInterface $userAuthenticator
-     * @param Instance                   $instance
+     * @param KeyChainRepositoryInterface     $keyChains
+     * @param RegistrationRepositoryInterface $registrations
+     * @param UserAuthenticatorInterface      $userAuthenticator
+     * @param Instance                        $instance
+     * @param UserCodec                       $userCodec
+     * @param CacheItemPoolInterface          $accessTokenCache
      */
     public function __construct(
-        Repository $repository,
+        KeyChainRepositoryInterface $keyChains,
+        RegistrationRepositoryInterface $registrations,
         UserAuthenticatorInterface $userAuthenticator,
-        Instance $instance
+        Instance $instance,
+        UserCodec $userCodec,
+        CacheItemPoolInterface $accessTokenCache
     ) {
-        $this->repository        = $repository;
+        $this->keyChains         = $keyChains;
+        $this->registrations     = $registrations;
         $this->userAuthenticator = $userAuthenticator;
         $this->instance          = $instance;
+        $this->userCodec         = $userCodec;
+        $this->accessTokenCache  = $accessTokenCache;
     }
 
     /**
@@ -77,7 +115,7 @@ class Controller extends Base
     public function getGenerateDeepLinkingRequest(ToolModel $tool): void
     {
         // Find the tool in the list of registrations
-        $repository = $this->repository->find($tool->getDeploymentId());
+        $repository = $this->registrations->find($tool->getDeploymentId());
 
         // Return URL:
         // this is somewhere else
@@ -112,7 +150,7 @@ class Controller extends Base
         $message = $builder->buildDeepLinkingLaunchRequest(
             $deepLinkingSettings,
             $repository,
-            $this->getUser()->getUsername(),
+            $this->userCodec->encode($this->getUser()),
             null,
             null,
             [$role],
@@ -141,7 +179,7 @@ class Controller extends Base
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
         $message = (new OidcAuthenticationRequestFactory(
-            $this->repository,
+            $this->registrations,
             $this->userAuthenticator,
         ))->build($this->request);
 
@@ -151,6 +189,73 @@ class Controller extends Base
                 ['message' => $message,]
             )
         );
+    }
+
+    /**
+     * Authenticate an OIDC request
+     *
+     * @api   POST /lti-platform/oidc/authentication
+     * @since 21.1.0
+     *
+     * @throws LtiExceptionInterface if the request could not be built
+     */
+    public function postOidcAuthenticationRequest(): void
+    {
+        $this->getOidcAuthenticationRequest();
+    }
+
+    /**
+     * Generate oAuth access tokens
+     *
+     * @api   GET /lti-platform/auth/token
+     * @since 21.1.0
+     */
+    public function getOauthAccessTokenRequest(): void
+    {
+        $clientRepository = new ClientRepository($this->registrations);
+        $factory          = new AuthorizationServerFactory(
+            $clientRepository,
+            new AccessTokenRepository($this->accessTokenCache),
+            // So far, Schoolbox supports only the Score service.
+            new ScopeRepository([
+                new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
+            ]),
+            // I don't think we actually use this encryption key.
+            // AFAICT it's used in the following places:
+            // * \League\OAuth2\Server\Grant\AuthCodeGrant::completeAuthorizationRequest, called by
+            //   \League\OAuth2\Server\AuthorizationServer::completeAuthorizationRequest
+            //   (which for some reason we never call)
+            // * \League\OAuth2\Server\ResponseTypes\BearerTokenResponse::generateHttpResponse, called by:
+            //  * \League\OAuth2\Server\AuthorizationServer::completeAuthorizationRequest
+            //    (as above, we never call this)
+            //  * \League\OAuth2\Server\AuthorizationServer::respondToAccessTokenRequest,
+            //     but only if the access token response generator creates
+            //     refresh tokens, which this one does not (because it's using
+            //     the client credentials grant type)
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
+        );
+
+        // Build the access token response
+        $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
+        $response  = $generator->generate(
+            (new ServerRequestFactory())->build($this->request),
+            (new ResponseFactory())->createResponse(),
+            KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
+        );
+
+        // Convert that response into something Aura understands, and output it
+        $this->populateResponseFromPsr7Response($response);
+    }
+
+    /**
+     * Generate oAuth access tokens
+     *
+     * @api   POST /lti-platform/auth/token
+     * @since 21.1.0
+     */
+    public function postOauthAccessTokenRequest(): void
+    {
+        $this->getOauthAccessTokenRequest();
     }
 
     /**
@@ -170,7 +275,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->repository))->build($this->request);
+        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->request);
         if ($result->hasError()) {
             throw new LtiException($result->getError());
         }
