@@ -163,6 +163,8 @@ class Events implements IStrategy
      */
     public function import(): void
     {
+        $this->log->info('Fetching Enrolments, Academic Groups, Schedules and their Activity Instances...');
+
         /* We'll need this for later
          */
         $now = \Alaress_Date_Format::now();
@@ -170,9 +172,9 @@ class Events implements IStrategy
 
         /* Get a list of Schedules to consume
          */
-        $this->log->debug('Fetching Schedules...');
-
         $academicGroupSchedules = (new Lookup\Schedules($this->log, $this->api))->generate();
+
+        $this->log->info('Mining all the Schedules for their Activity Instances...');
 
         /* Quartic n^4 complexity, but I can't think of a convenient way to improve this
          */
