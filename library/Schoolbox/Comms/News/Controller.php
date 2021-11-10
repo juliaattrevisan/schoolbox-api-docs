@@ -906,6 +906,11 @@ class Controller extends Base
                 'relativeTime',
                 'json',
             ],
+            'viewedAt' => [
+                'long',
+                'relativeTime',
+                'json',
+            ],
             'topics' => [
                 'name',
                 'slug',
