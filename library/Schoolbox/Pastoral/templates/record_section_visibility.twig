@@ -90,7 +90,7 @@
                                 <div class="icon-group size-48" title="User Role"></div>
                                 {{ accessLevelLabel | raw }}
                                 {% if access.role.isParent and record.parentCommentsAllowed %}
-                                    <span class="neutral label right">Can Comment</span>
+                                    <span class="neutral label right">Comments</span>
                                 {% endif %}
                                 <p>{{ access.role.name }}</p>
                                 {% if access.role.isParent %}
