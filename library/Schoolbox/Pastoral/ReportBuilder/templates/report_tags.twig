@@ -52,10 +52,10 @@
                                     {% endif %}
 
                                     {# Indicate if not audience has been set #}
-                                    {% if record.access | length == 0 %}No Audience Set{% endif %}
+                                    {% if record.accessWithPermission | length == 0 %}No Audience Set{% endif %}
 
                                     {# Show audienced roles  #}
-                                    {% for access in record.access %}
+                                    {% for access in record.accessWithPermission %}
                                         {% if access.role %}
                                             {{ access.role.name }}{% if not loop.last %},{% endif %}
                                         {% elseif access.user %}
