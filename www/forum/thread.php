@@ -207,8 +207,11 @@ if ($postList !== null) {
 
         $this->setVar('delete_block', '');
 
+        /**using the getID, as the post getOwner didn't hydrate completely, so the check between $post->getOwner === $currentUser failed.
+         * looks like it is the date objects that aren't being filled.
+         */
         if (
-            (!$thread->isLocked() && $post->getOwner() === $currentUser) || ($accessLevel >= UserAccess::ACCESS_WRITE)
+            (!$thread->isLocked() && $post->getOwner()->getId() === $currentUser->getId()) || ($accessLevel >= UserAccess::ACCESS_WRITE)
         ) {
             $this->parse('modify_block', 'modify');
 
