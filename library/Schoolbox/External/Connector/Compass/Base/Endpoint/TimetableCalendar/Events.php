@@ -47,7 +47,7 @@ class Events implements IStrategy
      *
      * Defaults to 6 months but we can tune that later.
      */
-    private const FUTURE_THRESHOLD = 30 * 1;
+    private const FUTURE_THRESHOLD = 30 * 6;
 
 
     /**
