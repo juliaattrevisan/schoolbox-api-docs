@@ -261,7 +261,7 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
-           ))
+            ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
