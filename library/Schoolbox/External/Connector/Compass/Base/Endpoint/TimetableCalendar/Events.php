@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
@@ -81,8 +83,8 @@ class Events implements IStrategy
      * @var UserMapper
      */
     private UserMapper $userMapper;
-    
-    
+
+
     /**
      * @var EventMapper
      */
@@ -129,16 +131,16 @@ class Events implements IStrategy
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
-        LoggerInterface                   $log,
-        bool                              $perform,
-        IApi                              $api,
-        User                              $defaultOwner,
-        EventType                         $defaultEventType,
-        UserMapper                        $userMapper,
-        EventMapper                       $eventMapper,
-        \Event\Source\Mapper              $eventSourceMapper,
-        PersonalMapper                    $relationPersonalMapper,
-        CategoryMapper                    $relationFolderMapper,
+        LoggerInterface $log,
+        bool $perform,
+        IApi $api,
+        User $defaultOwner,
+        EventType $defaultEventType,
+        UserMapper $userMapper,
+        EventMapper $eventMapper,
+        \Event\Source\Mapper $eventSourceMapper,
+        PersonalMapper $relationPersonalMapper,
+        CategoryMapper $relationFolderMapper,
         \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         $this->log = $log;
