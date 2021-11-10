@@ -513,10 +513,10 @@ class Controller extends Assessment\Controller
      * > The scores service endpoint MUST be the line item resource URL with the
      * > path appended with '/scores'.
      *
-     * @param Model $assessment
-     *@since 21.1.0
-     *
      * @api   GET /learning/assessments/:assessmentId/lti
+     * @since 21.1.0
+     *
+     * @param Model $assessment
      */
     public function getLineItem(Model $assessment): void
     {
