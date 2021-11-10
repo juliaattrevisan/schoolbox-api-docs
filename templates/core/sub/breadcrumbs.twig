@@ -22,7 +22,7 @@
             </li>
             {% else %}
             <li>
-                <a href="{{ crumb[1] }}">{{ crumb[0] }}</a>
+                <a {% if crumb[1] ?? false %} href="{{ crumb[1] }}" {% endif %}>{{ crumb[0] }}</a>
             </li>
             {% endif %}
         {% endfor %}
@@ -44,7 +44,7 @@
             </li>
             {% else %}
             <li>
-                <a href="{{ crumb[1] }}">{{ crumb[0] }}</a>
+                <a {% if crumb[1] ?? false %} href="{{ crumb[1] }}" {% endif %}>{{ crumb[0] }}</a>
             </li>
             {% endif %}
         {% endfor %}
