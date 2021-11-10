@@ -1,0 +1,236 @@
+<?php
+
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\LTI\Membership;
+
+use Closure;
+use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
+use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3Core\User\UserIdentity;
+use OAT\Library\Lti1p3Nrps\Model\Context\Context;
+use OAT\Library\Lti1p3Nrps\Model\Member\Member;
+use OAT\Library\Lti1p3Nrps\Model\Member\MemberCollection;
+use OAT\Library\Lti1p3Nrps\Model\Member\MemberInterface;
+use OAT\Library\Lti1p3Nrps\Model\Membership\Membership;
+use OAT\Library\Lti1p3Nrps\Model\Membership\MembershipInterface;
+use OAT\Library\Lti1p3Nrps\Service\Server\Builder\MembershipServiceServerBuilderInterface;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
+
+/**
+ * NPRS membership service server builder.
+ *
+ * Returns memberships for a given context (in this case, a folder) and a
+ * resource link (in this case, an assessment within the folder).
+ */
+class Builder implements MembershipServiceServerBuilderInterface
+{
+    /**
+     * @var Folder
+     */
+    private Folder $folder;
+
+    /**
+     * @var UserAccessMapper
+     */
+    private UserAccessMapper $userAccessMapper;
+
+    /**
+     * @var AssessmentDataSource
+     */
+    private AssessmentDataSource $assessmentDataSource;
+
+    /**
+     * Constructor
+     *
+     * @param Folder               $folder
+     * @param UserAccessMapper     $userAccessMapper
+     * @param AssessmentDataSource $assessmentDataSource
+     */
+    public function __construct(
+        Folder $folder,
+        UserAccessMapper $userAccessMapper,
+        AssessmentDataSource $assessmentDataSource
+    ) {
+        $this->folder               = $folder;
+        $this->userAccessMapper     = $userAccessMapper;
+        $this->assessmentDataSource = $assessmentDataSource;
+    }
+
+    /**
+     * Builds memberships for a given context.
+     *
+     * @param RegistrationInterface $registration
+     * @param string|null           $role
+     * @param int|null              $limit
+     * @param int|null              $offset
+     * @return MembershipInterface
+     */
+    public function buildContextMembership(
+        RegistrationInterface $registration,
+        ?string $role = null,
+        ?int $limit = null,
+        ?int $offset = null
+    ): MembershipInterface {
+        // Get learners
+        switch ($role) {
+            // TODO extract these consts somewhere
+            case RoleInterface::NAMESPACE_CONTEXT . '#Learner':
+            case 'Learner':
+            case null:
+                $learners = $this->userAccessMapper->findUsersInCategory(
+                    $this->folder,
+                    null,
+                    UserAccess::ACCESS_READ,
+                    true,
+                    true,
+                );
+                break;
+
+            default:
+                $learners = new GenericCollection(User::class);
+                break;
+        }
+
+        // Get instructors
+        switch ($role) {
+            case RoleInterface::NAMESPACE_CONTEXT . '#Instructor':
+            case 'Instructor':
+            case null:
+                $instructors = $this->userAccessMapper->findUsersInCategory(
+                    $this->folder,
+                    null,
+                    UserAccess::ACCESS_WRITE,
+                    true,
+                    false,
+                );
+                break;
+
+            default:
+                $instructors = new GenericCollection(User::class);
+                break;
+        }
+
+        // Ensure members are in order
+        $members = (new GenericCollection(MemberInterface::class))
+            ->merge($learners->map(Closure::fromCallable([$this, 'mapUserToLearner'])))
+            ->merge($instructors->map(Closure::fromCallable([$this, 'mapUserToInstructor'])))
+            ->sortByCallback(Closure::fromCallable([$this, 'sortMemberships']))
+            ->slice($offset ?? 0, $limit, true);
+
+        return new Membership(
+            // TODO identifiers usually are fully qualified
+            (string)$this->folder->getId(),
+            new Context(
+                (string)$this->folder->getId(),
+                $this->folder->getCodeString(),
+                $this->folder->getTitle(),
+            ),
+            new MemberCollection($members),
+        );
+    }
+
+    /**
+     * Builds memberships for a given resource link.
+     *
+     * @param RegistrationInterface $registration
+     * @param string                $resourceLinkIdentifier
+     * @param string|null           $role
+     * @param int|null              $limit
+     * @param int|null              $offset
+     * @return MembershipInterface
+     */
+    public function buildResourceLinkMembership(
+        RegistrationInterface $registration,
+        string $resourceLinkIdentifier,
+        ?string $role = null,
+        ?int $limit = null,
+        ?int $offset = null
+    ): MembershipInterface {
+        return new Membership(
+            (string)$this->folder->getId(),
+            new Context(
+                (string)$this->folder->getId(),
+                $this->folder->getCodeString(),
+                $this->folder->getTitle(),
+            ),
+            new MemberCollection(),
+            $resourceLinkIdentifier
+        );
+    }
+
+    /**
+     * Map function: convert a user to a member object.
+     *
+     * @param User   $user
+     * @param string $role
+     * @return MemberInterface
+     */
+    private function mapUserToMember(User $user, string $role): MemberInterface
+    {
+        return new Member(
+            new UserIdentity(
+                $user->getUsername(),
+                $user->getFullName(),
+                $user->getEmail()
+            ),
+            MemberInterface::STATUS_ACTIVE,
+            [$role],
+            // Why must I provide the above as properties below?
+            [
+                'user_id'     => $user->getUsername(),
+                'status'      => MemberInterface::STATUS_ACTIVE,
+                'name'        => $user->getFullName(),
+                'given_name'  => $user->getFirstname(),
+                'family_name' => $user->getLastname(),
+                'email'       => $user->getEmail(),
+                'roles'       => [$role],
+            ]
+        );
+    }
+
+    /**
+     * Map function: convert a user to a learner-type member object.
+     *
+     * @param User $user
+     * @return MemberInterface
+     */
+    private function mapUserToLearner(User $user): MemberInterface
+    {
+        return $this->mapUserToMember($user, 'Learner');
+    }
+
+    /**
+     * Map function: convert a user to an instructor-type member object.
+     *
+     * @param User $user
+     * @return MemberInterface
+     */
+    private function mapUserToInstructor(User $user): MemberInterface
+    {
+        return $this->mapUserToMember($user, 'Instructor');
+    }
+
+    /**
+     * Sort function: sort memberships by user ID.
+     *
+     * @param MemberInterface $a
+     * @param MemberInterface $b
+     * @return int
+     */
+    private function sortMemberships(MemberInterface $a, MemberInterface $b): int
+    {
+        return $a->getUserIdentity()->getIdentifier() <=> $b->getUserIdentity()->getIdentifier();
+    }
+}
