@@ -142,7 +142,7 @@ class Vcal
         if ($document instanceof VCalendar) {
             $document = $document->expand(
                 new DateTimeImmutable('-1 year', $timezone),
-                new DateTimeImmutable('+1 year', $timezone)
+                new DateTimeImmutable('+2 year', $timezone)
             );
         }
         return $document;
