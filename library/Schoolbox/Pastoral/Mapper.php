@@ -14,6 +14,7 @@ use Alaress_Date_NullDate;
 use House;
 use PDOStatement;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
@@ -241,6 +242,9 @@ class Mapper extends BaseMapper
         /** @var PastoralSubTypeMapper $subtypeMapper */
         $subtypeMapper = $this->getJoinMapper('subtype');
 
+        /** @var CampusMapper $campusMapper */
+        $campusMapper = $this->getJoinMapper('student.userCampus');
+
         $model = $this->hydrate($row);
 
         $model->setOwner($ownerMapper->hydrate($row, 'o'));
@@ -254,6 +258,15 @@ class Mapper extends BaseMapper
         if ($studentHouse) {
             $model->getStudent()->setSchoolHouse($studentHouse);
         }
+
+        if (!$model->getStudent()->getCampusCollection()) {
+            $model->getStudent()->setCampusCollection($campusMapper->createCollection());
+        }
+        $campus = $campusMapper->hydrate($row, 'sc');
+        if ($campus instanceof Campus && !$model->getStudent()->getCampusCollection()->offsetGet($campus->getId())) {
+            $model->getStudent()->getCampusCollection()->offsetSet($campus->getId(), $campus);
+        }
+
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
 
         if ($this->getConfigLoader()->get('pastoral_severity')) {

@@ -434,7 +434,7 @@ class Controller extends Base
             'Student Name' => $record->getStudent()->getFullName(),
             'Student ID'   => $record->getStudent()->getId(),
             'House'        => $record->getStudent()->getSchoolHouse() ? $record->getStudent()->getSchoolHouse()->getHouse() : '',
-            'Campus'       => $record->getStudent()->getCampusCollection(),
+            'Campus'       => implode(',', $record->getStudent()->getCampusCollection()->getPropertyValues('name')),
             'Year'         => $record->getStudent()->getYear() ? $record->getStudent()->getYear()->getName() : '',
             'Title'        => $record->getHeading(),
             'Type'         => $record->getType() ? $record->getType()->getName() : '',

@@ -3641,11 +3641,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/RelationshipFilterer.php
 
 		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\Campus\\:\\:getValues\\(\\) should return array\\<string\\|null\\> but returns array\\<int, int\\|null\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Campus.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Folder.php
@@ -6826,16 +6821,6 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Menu/Side/Mapper.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Menu/Top/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Menu\\\\Top\\\\Model\\:\\:getWebmail\\(\\) should return string but returns bool\\.$#"
 			count: 1
 			path: library/Schoolbox/Menu/Top/Model.php
@@ -8284,11 +8269,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\User and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/User/Password/Reset/Controller.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Translator/ModelToArray.php
 
 		-
 			message: "#^If condition is always true\\.$#"
