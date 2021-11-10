@@ -11,14 +11,8 @@ namespace Schoolbox\Learning\Assessment\Lti;
 
 use Alaress_Date_Format;
 use League\OAuth2\Server\ResourceServer;
-use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
-use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
@@ -43,15 +37,11 @@ use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Provider as LtiTool;
+use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
-use Schoolbox\LTI\Util\CustomClaimFactory;
-use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
-use Schoolbox\LTI\Util\RoleClaimFactory;
-use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
 use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -394,114 +384,14 @@ class Controller extends Assessment\Controller
         User $currentUser,
         User $actingUser
     ): LtiMessageInterface {
-        $assessmentContext = $assessment->getBaseContext()->getFolder();
-
-        // Create an LTI resource link launch, send it to the iframe
-        $registration = $this->registrations->find($assessment->getLtiTool()->getDeploymentId());
-
-        // Roles: dependent on whether user is a participant or instructor
-        // TODO determine how roles should be set if $actingUser != $currentUser
-        $roleClaimFactory = new RoleClaimFactory($this->getAccess());
-        $roles            = array_merge(
-            $roleClaimFactory->buildInstitutionRoles($currentUser),
-            $roleClaimFactory->buildContextRolesForAssessment($currentUser, $assessment),
-        );
-
-        // Additional claims:
-        $additionalClaims = [];
-
-        // Resource link claim: talk about the assessment
-        $resourceLinkClaim = new ResourceLinkClaim(
-            (string)$assessment->getId(),
-            $assessment->getLtiAssessmentTitle(),
-            $assessment->getLtiAssessmentText(),
-        );
-        $additionalClaims[] = $resourceLinkClaim;
-
-        // Context claim: talk about the folder
-        // I have seen no explanation for what context type actually is,
-        // thus I will make something up.
-        $contextClaim = new ContextClaim(
-            (string)$assessmentContext->getId(),
-            [ContextClaim::TYPE_COURSE_SECTION],
-            $assessmentContext->getCodeString(),
-            $assessmentContext->getTitle(),
-        );
-        $additionalClaims[] = $contextClaim;
-
-        // PlatformInstanceClaim: talk about the Schoolbox instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
-        $additionalClaims[]    = $platformInstanceClaim;
-
-        // Role-scope mentor claims:
-        // for parents, this might be their kids
-        // for kids, this won't be anyone
-        // for teachers, this will be all participants in the assessment
-        $roleScopeMentorClaim = (new RoleScopeMentorClaimFactory($this->getAccess()))
-            ->buildForAssessment($currentUser, $assessment);
-        if ($roleScopeMentorClaim) {
-            $additionalClaims[] = $roleScopeMentorClaim;
-        }
-
-        // Launch presentation:
-        // should come from assessment, but doesn't yet
-
-        // LIS claim: I don't think we support this yet
-
-        // Custom claims, with whatever was passed from the product
-        $customClaim = (new CustomClaimFactory())
-            ->withUser($actingUser)
-            ->withActualUser($currentUser)
-            ->withResourceLink($resourceLinkClaim)
-            ->withContext($contextClaim)
-            ->withPlatformInstance($platformInstanceClaim)
-            ->buildForAssessment($assessment);
-        if ($customClaim) {
-            $additionalClaims[] = $customClaim;
-        }
-
-        // AGS claims:
-        // if a line item is provided, send that
-        // (Currently, score is the only service Schoolbox provides)
-        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
-        $additionalClaims[] = new AgsClaim(
-            [ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE],
-            null,
-            (clone $baseUrl)
-                ->setPath(
-                    $this->router->generate(
-                        'learningAssessment.getLineItem',
-                        ['assessmentId' => $assessment->getId()]
-                    )
-                )
-                ->toString(),
-        );
-
-        // NPRS claim:
-        // provide the folder as the context, with a resource ID parameter
-        $additionalClaims[] = new NrpsClaim(
-            (clone $baseUrl)
-                ->setPath(
-                    $this->router->generate(
-                        'folder.getMemberships',
-                        ['id' => $assessment->getBaseContext()->getFolder()->getId()]
-                    )
-                )
-                ->setQuery(['rlid' => $assessment->getId(),])
-                ->toString(),
-        );
-
-        // Resource link request
-        $builder = new PlatformOriginatingLaunchBuilder();
-        return $builder->buildPlatformOriginatingLaunch(
-            $registration,
-            LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
-            $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
-            $this->userCodec->encode($currentUser),
-            null,
-            array_unique($roles),
-            $additionalClaims,
-        );
+        return (new LaunchFactory(
+            $this->getAccess(),
+            $this->router,
+            $this->registrations,
+            $this->instance,
+            $this->userCodec,
+            $this->getConfigLoader()
+        ))->buildForAssessment($assessment, $currentUser, $actingUser);
     }
 
     /**
