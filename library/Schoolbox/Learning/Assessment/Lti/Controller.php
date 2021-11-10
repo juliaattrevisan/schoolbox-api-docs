@@ -17,6 +17,7 @@ use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuild
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
@@ -462,18 +463,31 @@ class Controller extends Assessment\Controller
         // AGS claims:
         // if a line item is provided, send that
         // (Currently, score is the only service Schoolbox provides)
-        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
         $additionalClaims[] = new AgsClaim(
             [ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE],
             null,
-            $baseUrl
-                ->setScheme('https')
+            (clone $baseUrl)
                 ->setPath(
                     $this->router->generate(
                         'learningAssessment.getLineItem',
                         ['assessmentId' => $assessment->getId()]
                     )
                 )
+                ->toString(),
+        );
+
+        // NPRS claim:
+        // provide the folder as the context, with a resource ID parameter
+        $additionalClaims[] = new NrpsClaim(
+            (clone $baseUrl)
+                ->setPath(
+                    $this->router->generate(
+                        'folder.getMemberships',
+                        ['id' => $assessment->getBaseContext()->getFolder()->getId()]
+                    )
+                )
+                ->setQuery(['rlid' => $assessment->getId(),])
                 ->toString(),
         );
 

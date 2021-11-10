@@ -136,6 +136,15 @@ class Module extends BaseModule
         $this->register('PUT', '/folder/{id:\d+}/move/{parentId:\d+}', 'putMoveFolder', $permWriteBoth, $preloadBoth);
         $this->register('DELETE', '/folder/{id:\d+}', 'deleteFolder', $canDelete, $preloadFolder);
         $this->register('POST', '/folder/{id:\d+}/reset', 'postFolderReset', $writeAccessAndNotRoot, $preloadFolder);
+
+        // LTI memberships: currently on folder, could move to assessment itself
+        $this->register(
+            self::METHOD_GET,
+            '/folder/{id:\d+}/lti/memberships',
+            'getMemberships',
+            null,
+            $preloadFolder,
+        );
     }
 
 
