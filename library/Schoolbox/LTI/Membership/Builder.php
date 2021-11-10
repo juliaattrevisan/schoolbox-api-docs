@@ -118,16 +118,22 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
-        // Get learners
+        $members = $this->buildMemberCollection(
+            $this->roleIncludesLearners($role) ? $this->findLearnersForResourceLink($resourceLinkIdentifier) : null,
+            $this->roleIncludesInstructors($role) ? $this->findInstructorsForFolder() : null,
+            $limit,
+            $offset,
+        );
+
         return new Membership(
+            // TODO identifiers usually are fully qualified
             (string)$this->folder->getId(),
             new Context(
                 (string)$this->folder->getId(),
                 $this->folder->getCodeString(),
                 $this->folder->getTitle(),
             ),
-            new MemberCollection(),
-            $resourceLinkIdentifier
+            new MemberCollection($members),
         );
     }
 
@@ -235,6 +241,33 @@ class Builder implements MembershipServiceServerBuilderInterface
                         true,
                         true,
                     )
+                    ->map(Closure::fromCallable([$this, 'mapUserToLearner']))
+            );
+    }
+
+    /**
+     * Finds learners for this resource link.
+     *
+     * (This will be the participants in the assessment identified by the
+     *  resource link.)
+     *
+     * @param string $resourceLinkIdentifier
+     * @return GenericCollection|MemberInterface[]
+     */
+    private function findLearnersForResourceLink(string $resourceLinkIdentifier): GenericCollection
+    {
+        // Extract an ID out of the resource link
+        // TODO add codec for resource links, contexts as there are with users
+        $assessment = $this->assessmentDataSource->findByIdForReview($resourceLinkIdentifier);
+
+        // TODO also include a message
+        //      (which tells how the user should launch the link)
+
+        return $this
+            ->buildEmptyMemberCollection()
+            ->merge(
+                $assessment
+                    ->getParticipantUsers()
                     ->map(Closure::fromCallable([$this, 'mapUserToLearner']))
             );
     }
