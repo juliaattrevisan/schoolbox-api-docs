@@ -311,8 +311,8 @@ class Factory
             $defaultEventType = $this->eventTypeMapper->createModel()
                 ->setType(self::TIMETABLE_EVENT_TYPE)
                 ->setColor(self::TIMETABLE_COLOR)
-                ->setSequence($sequence)
-                ->setUpdatedBy($defaultOwner->getId());
+                ->setUpdatedBy($defaultOwner->getId())
+                ->setSequence($sequence);
 
             $this->eventTypeMapper->save($defaultEventType);
         }
