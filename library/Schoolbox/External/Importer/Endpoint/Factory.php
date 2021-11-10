@@ -174,14 +174,14 @@ class Factory implements IFactory
                     $this->host,
                     $this->key,
                     /* Profile pieces
-                    */
+                     */
                     UserProfile\Mapper::getInstance(),
                     UserProfile\Student\Mapper::getInstance(),
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
                     /* Timetable pieces
-                    */
+                     */
                     CampusMapper::getInstance(),
                     TimetableCycleMapper::getInstance(),
                     TimetablePeriodMapper::getInstance(),
@@ -202,14 +202,14 @@ class Factory implements IFactory
                     (string)Loader::getInstance()->get('external_tass_address_description_father'),
                     (string)Loader::getInstance()->get('external_tass_address_description_mother'),
                     /* Profile pieces
-                    */
+                     */
                     UserProfile\Mapper::getInstance(),
                     UserProfile\Student\Mapper::getInstance(),
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
                     /* Timetable pieces
-                    */
+                     */
                     TimetableCycleMapper::getInstance(),
                     TimetablePeriodMapper::getInstance(),
                     ClassEntryMapper::getInstance(),
@@ -224,17 +224,18 @@ class Factory implements IFactory
                     $this->host,
                     $this->key,
                     /* Profile pieces
-                    */
+                     */
                     UserProfile\Mapper::getInstance(),
                     UserProfile\Student\Mapper::getInstance(),
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
                     /* Timetable pieces
-                    */
+                     */
                     \Schoolbox\UserMapper::getInstance(),
                     EventMapper::getInstance(),
                     \Event\Source\Mapper::getInstance(),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     PersonalMapper::getInstance(),
                     CategoryMapper::getInstance(),
                     \Schoolbox\Resource\Folder\Mapper::getInstance()

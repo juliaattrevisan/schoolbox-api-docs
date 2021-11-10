@@ -122,6 +122,12 @@ class Factory
 
 
     /**
+     * @var EventTypeMapper
+     */
+    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
+    
+
+    /**
      * @var PersonalMapper
      */
     private PersonalMapper $relationPersonalMapper;
@@ -154,6 +160,7 @@ class Factory
      * @param UserMapper                        $userMapper
      * @param EventMapper                       $eventMapper
      * @param Mapper                            $eventSourceMapper
+     * @param EventTypeMapper                   $eventTypeMapper
      * @param PersonalMapper                    $relationalPersonalMapper
      * @param CategoryMapper                    $relationFolderMapper
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
@@ -173,6 +180,7 @@ class Factory
         \Schoolbox\UserMapper $userMapper,
         EventMapper $eventMapper,
         \Event\Source\Mapper $eventSourceMapper,
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         PersonalMapper $relationalPersonalMapper,
         CategoryMapper $relationFolderMapper,
         \Schoolbox\Resource\Folder\Mapper $folderMapper
@@ -195,6 +203,7 @@ class Factory
         $this->userMapper = $userMapper;
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
+        $this->eventTypeMapper = $eventTypeMapper;
         $this->relationPersonalMapper = $relationalPersonalMapper;
         $this->relationFolderMapper = $relationFolderMapper;
         $this->folderMapper = $folderMapper;
@@ -205,6 +214,8 @@ class Factory
      * @return GenericCollection
      * @throws UnexpectedValueException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function produce(): GenericCollection
     {
@@ -287,13 +298,13 @@ class Factory
     private function findDefaultEventType(): EventType
     {
         try {
-            $defaultEventType = EventTypeMapper::getInstance()->findOneByColumn('eventType', self::TIMETABLE_EVENT_TYPE);
+            $defaultEventType = $this->eventTypeMapper->findOneByColumn('eventType', self::TIMETABLE_EVENT_TYPE);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $defaultEventType = EventTypeMapper::getInstance()->createModel()
+            $defaultEventType = $this->eventTypeMapper->createModel()
                 ->setType(self::TIMETABLE_EVENT_TYPE)
                 ->setColor(self::TIMETABLE_COLOR);
 
-            EventTypeMapper::getInstance()->save($defaultEventType);
+            $this->eventTypeMapper->save($defaultEventType);
         }
 
         return $defaultEventType;
