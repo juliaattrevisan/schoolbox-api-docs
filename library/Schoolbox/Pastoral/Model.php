@@ -148,13 +148,14 @@ class Model implements ISoftDeletable, IModel
      */
     public function getAccessWithPermission()
     {
-        foreach ($this->access as $key => $access) {
+        $accessWithPermission = clone $this->access;
+        foreach ($accessWithPermission as $key => $access) {
             $role = $access->getRole() ?: ($access->getUser() ? $access->getUser()->getRole() : null);
             if ($role && in_array(Role::PERMISSION_ACCESS_PASTORAL, Role::VALID_PERMISSIONS[$role->getType()]) && !$role->getAccessPastoral()) {
-                $this->access->offsetUnset($key);
+                $accessWithPermission->offsetUnset($key);
             }
         }
-        return $this->access;
+        return $accessWithPermission;
     }
 
     /**
