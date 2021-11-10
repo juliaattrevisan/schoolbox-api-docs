@@ -83,7 +83,7 @@ $this->setVar($output);
 
 $this->setVar('modify_thread_block', '');
 
-if ($accessLevel <= UserAccess::ACCESS_WRITE) {
+if ($accessLevel >= UserAccess::ACCESS_WRITE) {
     $this->parse('modify_thread_block', 'modify_thread');
 }
 
