@@ -21,8 +21,10 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model;
+use Schoolbox\LTI\Util\ContextClaimFactory;
 use Schoolbox\LTI\Util\CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Util\ResourceLinkClaimFactory;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\LTI\Util\UserCodec;
@@ -92,22 +94,11 @@ class LaunchFactory
         $additionalClaims = [];
 
         // Resource link claim: talk about the assessment
-        $resourceLinkClaim  = new ResourceLinkClaim(
-            (string)$assessment->getId(),
-            $assessment->getLtiAssessmentTitle(),
-            $assessment->getLtiAssessmentText(),
-        );
+        $resourceLinkClaim  = (new ResourceLinkClaimFactory())->buildForAssessment($assessment);
         $additionalClaims[] = $resourceLinkClaim;
 
         // Context claim: talk about the folder
-        // I have seen no explanation for what context type actually is,
-        // thus I will make something up.
-        $contextClaim       = new ContextClaim(
-            (string)$assessmentContext->getId(),
-            [ContextClaim::TYPE_COURSE_SECTION],
-            $assessmentContext->getCodeString(),
-            $assessmentContext->getTitle(),
-        );
+        $contextClaim       = (new ContextClaimFactory())->buildForFolder($assessmentContext);
         $additionalClaims[] = $contextClaim;
 
         // PlatformInstanceClaim: talk about the Schoolbox instance
