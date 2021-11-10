@@ -20,10 +20,8 @@ use OAT\Library\Lti1p3Nrps\Model\Member\MemberInterface;
 use OAT\Library\Lti1p3Nrps\Model\Membership\Membership;
 use OAT\Library\Lti1p3Nrps\Model\Membership\MembershipInterface;
 use OAT\Library\Lti1p3Nrps\Service\Server\Builder\MembershipServiceServerBuilderInterface;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -84,20 +82,12 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
-        $learners = $this->roleIncludesLearners($role)
-            ? $this->findLearnersForFolder()
-            : new GenericCollection(MemberInterface::class);
-
-        $instructors = $this->roleIncludesInstructors($role)
-            ? $this->findInstructorsForFolder()
-            : new GenericCollection(MemberInterface::class);
-
-        // Ensure members are in order
-        $members = $this->buildEmptyMemberCollection()
-            ->merge($learners)
-            ->merge($instructors)
-            ->sortByCallback(Closure::fromCallable([$this, 'sortMemberships']))
-            ->slice($offset ?? 0, $limit, true);
+        $members = $this->buildMemberCollection(
+            $this->roleIncludesLearners($role) ? $this->findLearnersForFolder() : null,
+            $this->roleIncludesInstructors($role) ? $this->findInstructorsForFolder() : null,
+            $limit,
+            $offset,
+        );
 
         return new Membership(
             // TODO identifiers usually are fully qualified
@@ -279,5 +269,33 @@ class Builder implements MembershipServiceServerBuilderInterface
     private function buildEmptyMemberCollection(): GenericCollection
     {
         return new GenericCollection(MemberInterface::class);
+    }
+
+    /**
+     * Build a member collection out of learners and instructors, and also apply
+     * a limit and offset.
+     *
+     * @param GenericCollection|MemberInterface[]|null $learners
+     * @param GenericCollection|MemberInterface[]|null $instructors
+     * @param int|null                                 $limit
+     * @param int|null                                 $offset
+     * @return GenericCollection|MemberInterface[]
+     */
+    private function buildMemberCollection(
+        ?GenericCollection $learners,
+        ?GenericCollection $instructors,
+        ?int $limit,
+        ?int $offset
+    ): GenericCollection {
+        $result = $this->buildEmptyMemberCollection();
+        if ($learners) {
+            $result = $result->merge($learners);
+        }
+        if ($instructors) {
+            $result = $result->merge($instructors);
+        }
+        return $result
+            ->sortByCallback(Closure::fromCallable([$this, 'sortMemberships']))
+            ->slice($offset ?? 0, $limit, true);
     }
 }
