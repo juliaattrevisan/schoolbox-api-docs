@@ -40,13 +40,13 @@ class Events implements IStrategy
 
 
     /**
-     * Number of months into the future whose Activity Instances we import,
+     * Number of days into the future whose Activity Instances we import,
      * used to prevent importing billions of events from a distant future
      * that might not really have much relevance to today
      *
      * Defaults to 6 months but we can tune that later.
      */
-    private const FUTURE_THRESHOLD = 6;
+    private const FUTURE_THRESHOLD = 30 * 6;
 
 
     /**
@@ -295,7 +295,7 @@ class Events implements IStrategy
 
                         /* Don't fetch too many from the future
                          */
-                        if ($start->diffInMonths($now) > self::FUTURE_THRESHOLD) {
+                        if ($start->isFuture() && $start->diffInDays($now) > self::FUTURE_THRESHOLD) {
                             $this->log->debug(sprintf(
                                 'Activity %s Instance on %s is too far into the future; skipping',
                                 $activity['name'],
