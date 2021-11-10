@@ -65,6 +65,8 @@ CHANGE COLUMN `top_hover` `top_hover` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 
 ALTER TABLE `luEventType`
 CHANGE COLUMN `eventColour` `eventColour` VARCHAR(10) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL DEFAULT NULL ;
 
+DELETE FROM storage_transform WHERE transform <> CONVERT(transform USING ASCII);
+
 ALTER TABLE `storage_transform`
 CHANGE COLUMN `transform` `transform` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ;
 
