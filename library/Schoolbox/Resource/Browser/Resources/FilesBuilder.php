@@ -92,10 +92,12 @@ class FilesBuilder
             $files[] = [
                 'name'                  => $file->getTitle(),
                 'file_id'               => $file->getId(),
+                'url'                   => '/send.php?id=' . $file->getId(),
                 'mime'                  => [
-                    'mimetype'  => $file->getStorage()->getMimetype()->getMime(),
-                    'iconFile'  => $file->getStorage()->getMimetype()->getIconFile(),
-                    'description'  => $file->getStorage()->getMimetype()->getDescription(),
+                    'mimetype'          => $file->getStorage()->getMimetype()->getMime(),
+                    'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
+                    'description'       => $file->getStorage()->getMimetype()->getDescription(),
+                    'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
                 ],
                 'type'                  => $this->getType($file->getMimetype()),
                 'hash'                  => $file->getHash(),
