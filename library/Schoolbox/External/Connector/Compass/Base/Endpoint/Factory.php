@@ -16,16 +16,9 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
-use Schoolbox\CampusMapper;
-use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
