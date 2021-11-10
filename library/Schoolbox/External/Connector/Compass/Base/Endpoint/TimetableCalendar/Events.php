@@ -351,8 +351,7 @@ class Events implements IStrategy
     private function createClassEvents(array $activity, array $activityInstance, array $enrolments): int
     {
         /* Arbitrarily concoct a superkey to represent this activity instance
-         *
-         * TODO Maybe you can use that to update, instead of recreate, some data.
+         * Unlocking shared personal events basically makes this useless imho
          */
         $guid = "{$activity['activityId']}.{$activity['importIdentifier']}.{$activityInstance['start']}";
 
