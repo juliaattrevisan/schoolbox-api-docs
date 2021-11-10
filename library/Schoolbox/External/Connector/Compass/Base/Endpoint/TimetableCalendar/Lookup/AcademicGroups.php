@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 
 /**
@@ -20,6 +21,12 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  */
 class AcademicGroups
 {
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
 
     /**
      * API for communicating with Compass.
@@ -36,10 +43,12 @@ class AcademicGroups
     /**
      * Constructor
      *
-     * @param IApi $api
+     * @param LoggerInterface $log
+     * @param IApi            $api
      */
-    public function __construct(IApi $api)
+    public function __construct(LoggerInterface $log, IApi $api)
     {
+        $this->log = $log;
         $this->api = $api;
     }
 
@@ -68,8 +77,18 @@ class AcademicGroups
          */
         foreach ($academicGroups['d'] as $academicGroup) {
             if (!$academicGroup['isRelevant']) {
+                $this->log->debug(sprintf(
+                    'Academic Group %s isRelevant is false; skipping',
+                    $academicGroup['name']
+                ));
+
                 continue;
             }
+
+            $this->log->info(sprintf(
+                'Academic Group %s found',
+                $academicGroup['name']
+            ));
 
             $stack[] = $academicGroup;
         }

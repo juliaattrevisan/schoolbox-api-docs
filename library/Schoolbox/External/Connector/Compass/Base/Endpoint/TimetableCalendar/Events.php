@@ -166,11 +166,13 @@ class Events implements IStrategy
         /* We'll need this for later
          */
         $now = \Alaress_Date_Format::now();
-        $enrolmentsLookup = new Lookup\Enrolments($this->api);
+        $enrolmentsLookup = new Lookup\Enrolments($this->log, $this->api);
 
         /* Get a list of Schedules to consume
          */
-        $academicGroupSchedules = (new Lookup\Schedules($this->api))->generate();
+        $this->log->debug('Fetching Schedules...');
+
+        $academicGroupSchedules = (new Lookup\Schedules($this->log, $this->api))->generate();
 
         /* Quartic n^4 complexity, but I can't think of a convenient way to improve this
          */
@@ -209,8 +211,9 @@ class Events implements IStrategy
                      */
                     $enrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
 
-                    $this->log->debug(sprintf(
-                        'Fetched enrolments for activity %s starting on %s: %s students, %s teachers',
+                    $this->log->info(sprintf(
+                        'Schedule %s: fetched enrolments for activity %s starting on %s: %s students, %s teachers',
+                        $schedule['name'],
                         $activity['name'],
                         $activity['start'],
                         \count($enrolments['students']),

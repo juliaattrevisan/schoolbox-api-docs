@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 
 /**
@@ -19,6 +20,12 @@ class Enrolments
 {
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
+
+    /**
      * API for communicating with Compass.
      */
     private IApi $api;
@@ -27,10 +34,12 @@ class Enrolments
     /**
      * Constructor
      *
-     * @param IApi $api
+     * @param LoggerInterface $log
+     * @param IApi            $api
      */
-    public function __construct(IApi $api)
+    public function __construct(LoggerInterface $log, IApi $api)
     {
+        $this->log = $log;
         $this->api = $api;
     }
 

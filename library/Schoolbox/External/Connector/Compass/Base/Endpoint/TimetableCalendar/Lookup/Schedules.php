@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 
 /**
@@ -18,6 +19,12 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  */
 class Schedules
 {
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
 
     /**
      * API for communicating with Compass.
@@ -34,10 +41,12 @@ class Schedules
     /**
      * Constructor
      *
-     * @param IApi $api
+     * @param LoggerInterface $log
+     * @param IApi            $api
      */
-    public function __construct(IApi $api)
+    public function __construct(LoggerInterface $log, IApi $api)
     {
+        $this->log = $log;
         $this->api = $api;
     }
 
@@ -55,12 +64,19 @@ class Schedules
             return $this->cache;
         }
 
-        $academicGroups = (new AcademicGroups($this->api))->generate();
+        $this->log->debug('Fetching Academic Groups...');
+
+        $academicGroups = (new AcademicGroups($this->log, $this->api))->generate();
 
         $stack = [];
 
         foreach ($academicGroups as $academicGroup) {
             $year = $academicGroup['academicGroupCode'];
+
+            $this->log->debug(sprintf(
+                'Fetching Schedules for Academic Group %s',
+                $academicGroup['academicGroupCode']
+            ));
 
             $schedules = $this->api->retrieveDocument('schedule/v1/GetSchedule', [
                 'year' => $year
@@ -73,7 +89,18 @@ class Schedules
              */
             foreach ($schedules as $schedule) {
                 if ($schedule['allowImport']) {
+                    $this->log->info(sprintf(
+                        'Schedule %s with %s activities allows import',
+                        $schedule['name'],
+                        \count($schedule['activities'])
+                    ));
+                    
                     $stack[$year]['schedules'][] = $schedule;
+                } else {
+                    $this->log->debug(sprintf(
+                        'Schedule %s does not allow import; skipping',
+                        $schedule['name']
+                    ));
                 }
             }
         }
