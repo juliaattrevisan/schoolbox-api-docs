@@ -218,6 +218,15 @@ class Factory
          */
         $defaultOwner = $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
 
+        if (null === $defaultOwner) {
+            $this->log->info(sprintf(
+                'Username %s not found, but we needed that. Exiting',
+                UserMapper::USERNAME_ALARESS_ADMIN
+            ));
+
+            return new GenericCollection(IStrategy::class);
+        }
+
         /* Default event type, I guess
          */
         $defaultEventType = $this->findDefaultEventType($defaultOwner);
@@ -225,34 +234,34 @@ class Factory
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-           ))
+//            ->add(new Profile\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Cleanup(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//           ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
@@ -283,6 +292,7 @@ class Factory
      * Forcibly create a new luEventType for Compass Timetable events
      * if one doesn't already exist for us to reuse
      *
+     * @param \Schoolbox\User $defaultOwner
      * @return EventType
      * @throws UnexpectedValueException
      * @throws \PDOException
@@ -290,13 +300,18 @@ class Factory
      */
     private function findDefaultEventType(\Schoolbox\User $defaultOwner): EventType
     {
+        /* Arbitrarily put this event into sequence 999
+         * The next time someone saves this list, they can put it wherever they want
+         */
+        $sequence = 999;
+
         try {
             $defaultEventType = $this->eventTypeMapper->findOneByColumn('eventType', self::TIMETABLE_EVENT_TYPE);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $defaultEventType = $this->eventTypeMapper->createModel()
                 ->setType(self::TIMETABLE_EVENT_TYPE)
                 ->setColor(self::TIMETABLE_COLOR)
-                ->setSequence(99)
+                ->setSequence($sequence)
                 ->setUpdatedBy($defaultOwner->getId());
 
             $this->eventTypeMapper->save($defaultEventType);
