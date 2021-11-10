@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
@@ -38,6 +39,13 @@ use UnexpectedValueException;
  */
 class Factory
 {
+
+    /**
+     * luEventType setup
+     */
+    private const TIMETABLE_EVENT_TYPE = 'Timetable';
+    private const TIMETABLE_COLOR = '#dedede';
+
 
     /**
      * @var LoggerInterface
@@ -208,7 +216,7 @@ class Factory
 
         /* Default event type, I guess
          */
-        $defaultEventType = EventTypeMapper::getInstance()->findAll()->first();
+        $defaultEventType = $this->findDefaultEventType();
 
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
@@ -264,5 +272,30 @@ class Factory
                 $this->log,
                 $api
             ));
+    }
+
+
+    /**
+     * Forcibly create a new luEventType for Compass Timetable events
+     * if one doesn't already exist for us to reuse
+     *
+     * @return EventType
+     * @throws UnexpectedValueException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function findDefaultEventType(): EventType
+    {
+        try {
+            $defaultEventType = EventTypeMapper::getInstance()->findOneByColumn('eventType', self::TIMETABLE_EVENT_TYPE);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $defaultEventType = EventTypeMapper::getInstance()->createModel()
+                ->setType(self::TIMETABLE_EVENT_TYPE)
+                ->setColor(self::TIMETABLE_COLOR);
+
+            EventTypeMapper::getInstance()->save($defaultEventType);
+        }
+
+        return $defaultEventType;
     }
 }
