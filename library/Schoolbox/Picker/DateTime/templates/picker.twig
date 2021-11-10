@@ -179,7 +179,7 @@
         timetable: {{ timetable ? 'true' : 'false' }},
         {% if timetableVars %}
         timetableVars: {
-            {% for campus in timetableVars.byCampus %}
+            {% for campus in (timetableVars.byCampus ?? []) %}
             campus_{{ campus.id }}: {
                 cycles: {{ campus.cycles|raw }}
             },
