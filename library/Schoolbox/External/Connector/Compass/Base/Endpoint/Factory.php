@@ -204,7 +204,7 @@ class Factory
 
         /* Default event owner
          */
-        $defaultOwner = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+        $defaultOwner = $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
 
         /* Default event type, I guess
          */
@@ -213,37 +213,38 @@ class Factory
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-           ))
+//            ->add(new Profile\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Cleanup(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//           ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
+                $this->eventMapper,
                 \Event\Source\Mapper::getInstance(),
             ))
             ->add(new TimetableCalendar\Events(

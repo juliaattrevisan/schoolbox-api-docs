@@ -163,7 +163,7 @@ class Events implements IStrategy
      */
     public function import(): void
     {
-        $this->log->info('Fetching Enrolments, Academic Groups, Schedules and their Activity Instances...');
+        $this->log->info('Fetching Academic Groups, Enrolments, Schedules and their Activity Instances...');
 
         /* We'll need this for later
          */
