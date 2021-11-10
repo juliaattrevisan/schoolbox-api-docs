@@ -91,7 +91,11 @@ class FilesBuilder
             $files[] = [
                 'name'                  => $file->getTitle(),
                 'file_id'               => $file->getId(),
-                'mime'                  => $file->getStorage()->getMimetype(),
+                'mime'                  => [
+                    'mimetype'  => $file->getStorage()->getMimetype()->getMime(),
+                    'iconFile'  => $file->getStorage()->getMimetype()->getIconFile(),
+                    'description'  => $file->getStorage()->getMimetype()->getDescription(),
+                ],
                 'hash'                  => $file->getHash(),
                 'size'                  => $file->getSize(),
                 'dateAdded'             => [
