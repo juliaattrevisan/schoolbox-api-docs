@@ -246,7 +246,7 @@ class Profile implements IStrategy
         /* Save them into a hash lookup because compass guids are used to
          * identify parents and this is will be a fast way to get them
          */
-        $families = (new Families($this->api))->generate($this->lBound, $this->uBound);
+        $families = (new Lookup\Families($this->api))->generate($this->lBound, $this->uBound);
 
         $this->log->info(sprintf(
             'Downloading students active between %s and %s...',
