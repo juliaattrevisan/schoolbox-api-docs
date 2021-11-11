@@ -257,23 +257,23 @@ class Events implements IStrategy
      */
     public function import(): void
     {
-        $this->log->info('Fetching Academic Groups, Enrolments, Schedules and their Activity Instances...');
-
         /* Some extra details about how many things were made
          */
         $numEvents = 0;
         $numRelationships = 0;
 
+        $this->log->info('Fetching Staff Lookup, Academic Groups, Enrolments, Schedules and their Activity Instances...');
+
+        /* Generate a list of staff members
+         */
+        $this->log->debug('Preloading staff compassPersonIds for non-academic classes...');
+        $staffLookup = (new Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
+        $attendeesLookup = new Attendees($this->log, $staffLookup);
+
         /* We'll need this for later
          */
         $now = \Alaress_Date_Format::now();
         $enrolmentsLookup = new Lookup\Enrolments($this->log, $this->api);
-
-        /* Generate a list of staff members
-         */
-        $this->log->info('Preloading staff compassPersonIds for non-academic classes...');
-        $staffLookup = (new Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
-        $attendeesLookup = new Attendees($this->log, $staffLookup);
 
         /* Get a list of Schedules to consume
          */
