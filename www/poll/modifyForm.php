@@ -2,6 +2,7 @@
 
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
@@ -16,7 +17,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     /* Check permission
      */
     if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_READ) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $pollHandler->placeVote($_POST['id'], $_POST['vote']);
@@ -26,7 +27,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     /* Check permission
      */
     if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $date = Alaress_Date_Format::newLocalShort($_POST['close']);
@@ -103,16 +104,31 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     $componentConfigInstanceMapper->save($componentConfigInstance);
 
     SitePage::localRedir('/homepage/' . Scrub::text($_POST['folder_id']));
-} else if (is_numeric($_GET['delete'])) {
-    $poll = $pollHandler->getByID($_GET['delete']);
+} else if ($_POST['delete'] === 'true') {
+    //get the id and other post objects
+    $id = (int)($_POST['id'] ?? null);
+    $componentId = (int)($_POST['componentId'] ?? null) ;
+
+    //lets confirm there is actually an id and component id...
+    if (!$id || !$componentId) {
+        $page->outputJson(['message' => 'Poll id not provided'], false, 400);
+        return;
+    }
+
+    //get the poll object if it exists? multiplayer schoolbox
+    $poll = $pollHandler->getByID($id);
+    if ($poll === false) {
+        $page->outputJson(['message' => 'Poll not found, has it already been deleted?'], false, 400);
+        return;
+    }
 
     /* Check permission
      */
     if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
-    $pollHandler->delete($_GET['delete']);
+    $pollHandler->delete($id);
 
     /* do not select next poll, that's just dumb
      * I deleted this poll, then I don't expect to be Hydra'd by another poll
@@ -121,25 +137,42 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     try {
         $cdm = Component_ConfigDefinitionMapper::getInstance()->findOneByColumn('key', 'poll');
         $cim = Component_InstanceMapper::getInstance()->findOneByColumnList(
-            array(
-                'id'                      => $_GET['homepageComponentID'],
+            [
+                'id'                      => $componentId,
                 'module'                  => 'homepage',
                 'identifier'              => $poll['folder_id'],
                 'component_definition_id' => $cdm->getDefinitionId(),
-            )
+            ]
         );
     } catch (Schoolbox\Mapper\Exception $e) {
-        error(19);
+        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         exit;
     }
 
-    $confI = new Component_Config();
-    $confI->setConfigDefinitionId($cdm->getId());
-    $confI->setInstanceId($cim->getId());
-    $confI->setValue(null);
+    //find component config object
+    try {
+        $confI = Component_ConfigMapper::getInstance()->findOneByColumnList(
+            [
+                'component_config_definition_id' => $cdm->getId(),
+                'component_instance_id'          => $cim->getId()
+            ]
+        );
+        $confI->setValue(null);
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $page->outputJson(['message' => 'Unable to find component to update'], false, 400);
+        return;
+    }
 
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
     $componentConfigInstanceMapper->save($confI);
 
-    SitePage::localRedir("/homepage/" . $poll['folder_id']);
+    $page->outputJson(
+        [
+            'message' => 'Poll deleted',
+            'poll_id' => $poll['id'],
+            'homepage_id' => $poll['folder_id'],
+        ],
+        false,
+        200
+    );
 }
