@@ -262,7 +262,7 @@ class Profile implements IStrategy
         ]);
 
         foreach ($students['d'] as $student) {
-            $externalId = $this->findExternalId($student['importIdentifiers']);
+            $externalId = $this->helper->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingHouseName = '';
             $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
@@ -476,35 +476,6 @@ class Profile implements IStrategy
              */
             $this->importParentsOfStudent($student['relationships'], $studentBaseProfile, $families);
         }
-    }
-
-
-    /**
-     * A student has multiple externalIds based on whichever school they're in
-     * These import identifiers are not the same if they're involved in multiple schools
-     * We have to find the external id relevant to the current school (host)
-     *
-     * The IApi conveniently knows this, though
-     *
-     * @param array  $importIdentifiers
-     * @return string|null
-     */
-    private function findExternalId(array $importIdentifiers): ?string
-    {
-        /* Example usage:
-         *
-         * $this->api->getHost()        https://wyndhamchristiancollege-integration-vic.compass.education/api/
-         * $importIdentifier['school']  wyndhamchristiancollege-integration.vic.edu.au
-         *
-         * Commonality:                 wyndhamchristiancollege-integration
-         */
-        foreach ($importIdentifiers as $importIdentifier) {
-            if ($this->helper->matchesHost($importIdentifier['school'])) {
-                return $importIdentifier['importIdentifier'];
-            }
-        }
-
-        return null;
     }
 
 
@@ -828,7 +799,7 @@ class Profile implements IStrategy
 
             /* Start piling in the deets
              */
-            $externalId = $this->findExternalId($parent['importIdentifiers']);
+            $externalId = $this->helper->findExternalId($parent['importIdentifiers']);
 
             /* If the externalId was empty, skip them
              */
@@ -977,7 +948,7 @@ class Profile implements IStrategy
         ]);
 
         foreach ($staffs['d'] as $staff) {
-            $externalId = $this->findExternalId($staff['importIdentifiers']);
+            $externalId = $this->helper->findExternalId($staff['importIdentifiers']);
             $campusName = $this->findCampusName($staff['organisationMilestones']);
 
             /* Prioritise preferred names over official names
