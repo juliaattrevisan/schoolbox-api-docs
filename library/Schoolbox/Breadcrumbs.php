@@ -27,13 +27,21 @@ class Breadcrumbs
 
         $page->setBlock(self::TPL, 'breadcrumb', 'breadcrumb_block');
         $page->setVar('breadcrumb_block', '');
+        $page->setBlock(self::TPL, 'breadcrumb_last', 'breadcrumb_last_block');
+        $page->setVar('breadcrumb_last_block', '');
 
-        foreach ($data as $crumb) {
-            $page->setVar('BREADCRUMB_HREF', $crumb['href']);
+        $keys    = array_keys($data);
+        $lastKey = end($keys);
+
+        foreach ($data as $key => $crumb) {
             $page->setVar('BREADCRUMB_TEXT', \Scrub::text($crumb['text']));
             $page->setVar('BREADCRUMB_CLASS', $crumb['class']);
-
-            $page->parse('breadcrumb_block', 'breadcrumb', true);
+            if ($key !== $lastKey) {
+                $page->setVar('BREADCRUMB_HREF', $crumb['href']);
+                $page->parse('breadcrumb_block', 'breadcrumb', true);
+            } else {
+                $page->parse('breadcrumb_last_block', 'breadcrumb_last', true);
+            }
         }
 
         $page->parse($handle, self::TPL);
