@@ -57,6 +57,9 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/auth/token', 'getOauthAccessTokenRequest');
         $this->register(self::METHOD_POST, '/auth/token', 'postOauthAccessTokenRequest');
 
+        // JWKS
+        $this->register(self::METHOD_GET, '/.well-known/jwks.json', 'getJsonWebKeySet');
+
         // Receive a response to a deep linking request
         $this->register(
             self::METHOD_GET,
