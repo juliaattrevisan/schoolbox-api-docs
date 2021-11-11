@@ -34,6 +34,9 @@ export default {
         return {
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+                columnsClasses: {
+                    ['dateModified.formatted']: 'date-modified-td' //to hide the column for mobile
+                },
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
                         name: filterEvents.DOCUMENT_CHECKED,
@@ -168,6 +171,12 @@ export default {
 .VueTables__table td {
     padding: 0.25rem;
     vertical-align: middle;
+}
+
+.date-modified-td {
+    @media (max-width: 480px) {
+        display: none; //hide on mobile, as the date will then be shown within view-all-files-name.vue
+    }
 }
 
 </style>
