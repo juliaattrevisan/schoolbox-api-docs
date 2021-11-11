@@ -165,4 +165,9 @@ export default {
     margin-bottom: 0; //to put the view-all-files-filters.vue up closer to the search input
 }
 
+.VueTables__table td {
+    padding: 0.25rem;
+    vertical-align: middle;
+}
+
 </style>

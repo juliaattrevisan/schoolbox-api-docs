@@ -22,7 +22,7 @@ export default {
         <div class="list-item">
             <div class="compact card small-12">
                 <a data-plugin="preview" :href="data.url" rel="external" target="_blank">
-                    <img class="mime" :src="`/static/images/mime/application-pdf.svg`" height="64" width="64" :title="data.mime.description">
+                    <img class="mime" :src="`/static/images/mime/application-pdf.svg`" height="32" width="32" :title="data.mime.description">
                     <h3>{{ data.name }}</h3>
                 </a>
             </div>
@@ -37,6 +37,10 @@ export default {
 
 .card.compact { //remove the left/right padding
     padding: 0;
+}
+
+h3 {
+    font-size: 0.825rem;
 }
 
 </style>

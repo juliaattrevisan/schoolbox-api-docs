@@ -146,7 +146,7 @@ export default {
 .filters {
     background: white;
     display: flex;
-    padding: 0 1rem 0 1.5rem;
+    padding: 0 1rem;
     // @media (max-width: $tableToSingleColumn) {
     //     flex-direction: column;
     // }
