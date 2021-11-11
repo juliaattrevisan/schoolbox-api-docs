@@ -36,7 +36,7 @@ class RepositoryFactory
      *
      * AFAIK this doesn't have to be unique?
      */
-    public const PLATFORM_KEYCHAIN_KEY_SET_NAME = 'Schoolbox Platform';
+    public const PLATFORM_KEYCHAIN_KEY_SET_NAME = 'schoolbox-lti-platform';
 
     /**
      * Configuration: contains the platform keychain's key pair.
