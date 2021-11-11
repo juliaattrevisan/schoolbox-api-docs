@@ -67,21 +67,6 @@ class RepositoryFactory
      */
     public function build(iterable $tools): Repository
     {
-        // Configure security keys
-        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-security-keys
-        $keyChainFactory = new KeyChainFactory();
-
-        // The platform keychain needs both a private and public key:
-        // * the chain factory requires public keys
-        // * the platform will decipher messages sent by the tool, signed by its
-        //   own public key
-        $platformKeyChain = $keyChainFactory->create(
-            '1',
-            'schoolboxPlatform',
-            $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-            $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
-        );
-
         // Configure a platform
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-platform
         $baseUrl  = (new UrlFactory($this->config))->buildFullyQualified()->setScheme('https');

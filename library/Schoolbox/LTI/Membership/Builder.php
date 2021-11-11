@@ -25,7 +25,6 @@ use OAT\Library\Lti1p3Nrps\Service\Server\Builder\MembershipServiceServerBuilder
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
-use Schoolbox\LTI\Assessment\Model;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
