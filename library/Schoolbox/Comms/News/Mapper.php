@@ -110,7 +110,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             null,
             self::COLUMN_JOIN_MULTI,
             'viewedAt'
-
         );
 
         $this->hasJoin(
