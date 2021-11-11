@@ -4,6 +4,8 @@
  * Presents all the files within a homepage file component in a filterable table
  */
 
+import ViewAllFilesRowName from './view-all-files-row-name.vue';
+
 export default {
     
     props: {
@@ -67,7 +69,7 @@ export default {
                 debounce: 100, //sorter debounce as data is stored locally
                 headings: {
                     name: 'Name',
-                    ['dateModified.formatted']: 'Date added',
+                    ['dateModified.formatted']: 'Date modified',
                 },
                 orderBy: { //initial sorting display
                     ascending: true,
@@ -82,12 +84,9 @@ export default {
                     down: 'glyphicon-chevron-down'
                 },
                 tabbable: false,
-                // templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
-                //     student: SimilarityReportRowStudent,
-                //     submissionDate: SimilarityReportRowSubmissionDate,
-                //     similarity: SimilarityReportRowSimilarity,
-                //     status: SimilarityReportRowStatus,
-                // },
+                templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
+                    name: ViewAllFilesRowName,
+                },
                 texts: {
                     filterPlaceholder: 'Search files',
                     noResults: 'No matching files',
