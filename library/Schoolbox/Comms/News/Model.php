@@ -17,6 +17,8 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Json\Api\AuraLink;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -1166,5 +1168,26 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     {
         $this->attachedFilesCount = $attachedFilesCount;
         return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getViewedAt()
+    {
+        //check if current user has opened article from comms_news_article_statistics
+        $stats = \Schoolbox\Comms\News\Statistics\Mapper::getInstance();
+        try {
+            $viewed = $stats->findOneByColumnList([
+                                                      'article_id' => $this->getId(),
+                                                      'user_id'    => $_SESSION['user']->getID(),
+                                                  ]);
+        } catch (Deleted $e) {
+        } catch (NotFound $e) {
+            return null;
+        }
+        if ($viewed !== null) {
+            return $viewed->getOccursAt();
+        }
     }
 }
