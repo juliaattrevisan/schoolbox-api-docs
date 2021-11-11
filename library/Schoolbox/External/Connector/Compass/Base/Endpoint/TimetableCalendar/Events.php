@@ -288,6 +288,21 @@ class Events implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
+                    /* We only care about certain activities.
+                     *
+                     * 1. Activity must have one of the allowed activityTypes - we skip certain
+                     * activityType classes
+                     *
+                     * 2. Activity must have a runningStatus 1. 0 is cancelled and 1 is draft,
+                     * neither of which we really would care about
+                     *
+                     * 3. There have to be active instances to import; otherwise no use
+                     *
+                     * 4. Sometimes trying to look up enrolment data for non-enrolment events
+                     * occurs because there's busted data in compass. Schools can put things in
+                     * the wrong place. In that case it retries and dies
+                     */
+
                     /* Only import specific Activity Types
                      */
                     if (!self::ACTIVITY_TYPES[$activityType]['allowed']) {
@@ -301,10 +316,7 @@ class Events implements IStrategy
                         continue;
                     }
 
-                    /* We only care about certain activities.
-                     *
-                     * 1. Activity must have a runningStatus 1. 0 is cancelled and 1 is draft,
-                     * neither of which we really would care about
+                    /* Has to be runningStatus 1
                      */
                     if (self::IS_RUNNING !== (int)$activity['runningStatus']) {
                         $this->log->debug(sprintf(
