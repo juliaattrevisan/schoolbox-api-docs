@@ -47,7 +47,7 @@ class Events implements IStrategy
      *
      * Defaults to 6 months but we can tune that later.
      */
-    private const FUTURE_THRESHOLD = 30 * 6;
+    private const FUTURE_THRESHOLD = 30 * 1;
 
 
     /**
@@ -59,6 +59,54 @@ class Events implements IStrategy
      * just "in the past"
      */
     private const PAST_THRESHOLD = 7;
+
+
+    /**
+     * We only import certain activityType values, as described in
+     * https://wyndhamchristiancollege-integration-vic.compass.education/ApiDocs/Documentation/index.html#api-Schedule-GetSchedule
+     */
+    private const ACTIVITY_TYPES = [
+        1 => [
+            'name' => 'StandardClass',
+            'allowed' => true
+        ],
+        2 => [
+            'name' => 'Event',
+            'allowed' => true
+        ],
+        3 => [
+            'name' => 'Meeting',
+            'allowed' => true
+        ],
+        4 => [
+            'name' => 'Assembly',
+            'allowed' => true
+        ],
+        5 => [
+            'name' => 'Generic',
+            'allowed' => true
+        ],
+        6 => [
+            'name' => 'Duty',
+            'allowed' => true
+        ],
+        7 => [
+            'name' => 'CalendarItem',
+            'allowed' => false
+        ],
+        8 => [
+            'name' => 'GenericGroup',
+            'allowed' => false
+        ],
+        9 => [
+            'name' => 'ProfessionalDevelopment',
+            'allowed' => false
+        ],
+        10 => [
+            'name' => 'LearningTask',
+            'allowed' => false
+        ],
+    ];
 
 
     /**
@@ -198,6 +246,21 @@ class Events implements IStrategy
         foreach ($academicGroupSchedules as $academicGroupCode => $schedules) {
             foreach ($schedules['schedules'] as $schedule) {
                 foreach ($schedule['activities'] as $activity) {
+                    $activityType = (int)$activity['activityType'];
+
+                    /* Only import specific Activity Types
+                     */
+                    if (!self::ACTIVITY_TYPES[$activityType]['allowed']) {
+                        $this->log->debug(sprintf(
+                            'Activity %s starting on %s is a disallowed %s activityType; skipping',
+                            $activity['name'],
+                            $activity['start'],
+                            self::ACTIVITY_TYPES[$activityType]['name']
+                        ));
+
+                        continue;
+                    }
+
                     /* We only care about certain activities.
                      *
                      * 1. Activity must have a runningStatus 1. 0 is cancelled and 1 is draft,
