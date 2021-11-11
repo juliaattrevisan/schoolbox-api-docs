@@ -431,10 +431,11 @@ class Events implements IStrategy
                          * in $enrolments, then save it
                          */
                         $this->log->info(sprintf(
-                            'Manufacturing event for Activity %s Instance on %s which originated in schedule %s',
+                            'Manufacturing event for Activity %s Instance on %s which originated in schedule %s; using import identifier %s as folder code',
                             $activity['name'],
                             $activityInstance['start'],
-                            $schedule['name']
+                            $schedule['name'],
+                            $activity['subjectImportIdentifier']
                         ));
 
                         /* The relationships here are based on actual schoolbox.user accounts existing
