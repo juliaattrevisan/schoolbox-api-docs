@@ -4,10 +4,21 @@
  * Presents all the files within a homepage file component in a filterable table
  */
 
-import ViewAllFilesRowName from './view-all-files-row-name.vue';
+import filterEvents from './viewAllFilesFilterEvents';
+import ViewAllFilesFilters from './view-all-files-filters';
+import ViewAllFilesRowName from './view-all-files-row-name';
+import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
     
+    components: {
+        ViewAllFilesFilters
+    },
+
+    mixins: [
+        footerUI //to place and keep the tables UI in the footer
+    ],
+
     props: {
         files: { //all files within the component
             type: Array,
@@ -21,40 +32,30 @@ export default {
 
     data () {
         return {
-            isDataLoaded: false, //show loading display until true
-            hasDataLoadError: false, //display load error
-            tableData: [], //hold all student tableData
-            tableColumns: ['name', 'dateModified.formatted'], //the table tableColumns
+            tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-                // customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
-                //     {
-                //         name: FilterEvents.SIMILARITY_SCORE,
-                //         callback: (row, filteredPercentage) => {
-                //             const hasFilesAboveSimilarity = row.files.some((file) => {
-                //                 return parseInt(file.turnitin.percentage.overall) >= parseInt(filteredPercentage);
-                //             });
-                //             return hasFilesAboveSimilarity;
-                //         }
-                //     },
-                //     {
-                //         name: FilterEvents.RESUBMISSION_REQUIRED,
-                //         callback: (row, query) => {
-                //             return row.submission.status !== query;
-                //         }
-                //     },
-                //     {
-                //         name: FilterEvents.MARKING_REQUIRED,
-                //         callback: (row, query) => {
-                //             return row.submission.status !== query;
-                //         }
-                //     },
-                //     {
-                //         name: FilterEvents.REVIEWED,
-                //         callback: (row, query) => {
-                //             return row.submission.status !== query;
-                //         }
-                //     },
-                // ],
+                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+                    {
+                        name: filterEvents.DOCUMENT_CHECKED,
+                        callback: (row, query) => row.type !== query
+                    },
+                    {
+                        name: filterEvents.AUDIO_CHECKED,
+                        callback: (row, query) => row.type !== query
+                    },
+                    {
+                        name: filterEvents.VIDEO_CHECKED,
+                        callback: (row, query) => row.type !== query
+                    },
+                    {
+                        name: filterEvents.IMAGE_CHECKED,
+                        callback: (row, query) => row.type !== query
+                    },
+                    {
+                        name: filterEvents.OTHER_CHECKED,
+                        callback: (row, query) => row.type !== query
+                    },
+                ],
                 customSorting: {
                     ['dateModified.formatted']: (ascending) => { //sort date modified accurately by the timestamp
                         return (a, b) => {
@@ -65,8 +66,7 @@ export default {
                         }
                     },
                 },
-                // filterable: false, //this hides the search input field, the custom filters still function as expected
-                debounce: 100, //sorter debounce as data is stored locally
+                debounce: 100, //shorter debounce time as data is stored locally
                 headings: {
                     name: 'Name',
                     ['dateModified.formatted']: 'Date modified',
@@ -75,7 +75,8 @@ export default {
                     ascending: true,
                     column: 'name'
                 },
-                perPage: 9999, //absurdly large value to avoid pagination as there's no footer
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
                 resizableColumns: false,
                 sortIcon: {
                     is: 'glyphicon-sort',
@@ -88,16 +89,36 @@ export default {
                     name: ViewAllFilesRowName,
                 },
                 texts: {
+                    count: 'Showing {from} to {to} of {count} files|{count} files|One file',
                     filterPlaceholder: 'Search files',
                     noResults: 'No matching files',
                 },
             },
-            isProcessing: false,
+            tableColumns: ['name', 'dateModified.formatted'], //the table tableColumns
         }
     },
 
     mounted () {
-        this.tableData = this.files;
+        this.initTable();
+        this.onTableLoaded();
+    },
+
+    methods: {
+
+        /**
+         * Populate the table with the files list
+         */
+        initTable () {
+            this.tableData = this.files;
+        },
+
+        /**
+         * To update the table to show the UI in the footer
+         */
+        onTableLoaded () {
+            this.$nextTick(() => this.footerUI_update());
+        },
+
     },
 
 }
@@ -109,13 +130,19 @@ export default {
     <div class="row">
 
         <v-client-table
+            ref="table"
             :data="tableData"
             :columns="tableColumns"
             :options="tableOptions"
         >
-            <!-- <div slot="beforeTable">
-                <similarity-report-filters />
-            </div> -->
+            <div slot="beforeTable">
+                <view-all-files-filters 
+                    :selected-filters="selectedFilters"
+                />
+            </div>
+            <div slot="afterTable">
+                <div class="VueTables__table-footer" ref="tableFooter"></div>
+            </div>
         </v-client-table>
 
     </div>
@@ -126,8 +153,16 @@ export default {
 
 @import '@vue/components/vueTables2/vueTables2';
 
-.VuePagination {
-    display: none; //there's no footer, so no count/pagination/next/prev etc for this report
+.VueTables__search { 
+    padding-bottom: 0.5rem; //to put the view-all-files-filters.vue up closer to the search input
+}
+
+.VueTables__search-field label {
+    display: none; //there's a 'Search files' in the input and 'Filter to' label below in view-all-files-filters.vue, so not needed
+}
+
+.VueTables__search-field input {
+    margin-bottom: 0; //to put the view-all-files-filters.vue up closer to the search input
 }
 
 </style>
