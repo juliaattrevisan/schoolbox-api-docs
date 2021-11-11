@@ -109,7 +109,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             'id',
             null,
             self::COLUMN_JOIN_MULTI,
-            'views'
+            'viewedAt'
 
         );
 
