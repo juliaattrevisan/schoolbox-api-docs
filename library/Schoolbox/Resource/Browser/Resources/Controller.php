@@ -120,13 +120,13 @@ class Controller extends AbstractController
         $componentConfig = $filesBuilder->getComponentConf($componentID);
 
         //grab all files for component folder
-        $files = $filesBuilder->getFolderData($componentConfig['src']['value'], $canEdit);
+        $files = $filesBuilder->getFolderData($componentConfig['src']['value']);
 
         //build the filter object
         //weird magic, from the file list component.
-        $filterFields = ['document', 'audio', 'video', 'image', 'other'];
-        $filter            = [];
-        $countFilterFields = count($filterFields);
+        $filterFields       = ['document', 'audio', 'video', 'image', 'other'];
+        $filter             = [];
+        $countFilterFields  = count($filterFields);
         for ($i = 0; $i < $countFilterFields; $i++) {
             $j = $componentConfig['filter']['value'] % 2;
             if ($j) {
@@ -138,17 +138,18 @@ class Controller extends AbstractController
         //just dump the lot to the page for front end use.
         //output results
         $this->getResponse()->content->set([
-           'template' => '@resourceBrowser/viewAll.twig',
-           'title' => $componentConfig['componentname']['value'],
-           'data' => [
-                    'homepage' => $homepage_id,
-                    'filter' => $filter,
-                    'files' => $files,
-                    'title' => $componentConfig['componentname']['value'],
-                    'componentInstanceConfig' => $componentConfig,
-                    'componentID' => $componentID,
-                    'sourceFolderID' => $sourceFolderID,
-                    'componentFolderId' => $componentConfig['homepage'],
+           'template'   => '@resourceBrowser/viewAll.twig',
+           'title'      => $componentConfig['componentname']['value'],
+           'data'       => [
+                    'canEdit'                   => $canEdit,
+                    'homepage'                  => $homepage_id,
+                    'filter'                    => $filter,
+                    'files'                     => $files,
+                    'title'                     => $componentConfig['componentname']['value'],
+                    'componentInstanceConfig'   => $componentConfig,
+                    'componentID'               => $componentID,
+                    'sourceFolderID'            => $sourceFolderID,
+                    'componentFolderId'         => $componentConfig['homepage'],
            ],
         ]);
     }
@@ -180,14 +181,15 @@ class Controller extends AbstractController
         $canEdit = ($accessSource >= UserAccess::ACCESS_WRITE);
 
         //grab all files from files component
-        $files = $filesBuilder->getFolderData($sourceFolderID, $canEdit);
+        $files = $filesBuilder->getFolderData($sourceFolderID);
 
         //dump all as json
         $this->getResponse()->content->set($this->buildJsonOutput([
-              'componentID' => $componentID,
-              'sourceFolderID' => $sourceFolderID,
-              'homepageID' => $homepage_id,
-              'file_list' => $files,
+              'canEdit'         => $canEdit,
+              'componentID'     => $componentID,
+              'sourceFolderID'  => $sourceFolderID,
+              'homepageID'      => $homepage_id,
+              'file_list'       => $files,
           ]));
     }
 
