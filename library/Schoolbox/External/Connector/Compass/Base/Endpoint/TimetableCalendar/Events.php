@@ -17,6 +17,7 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -110,6 +111,16 @@ class Events implements IStrategy
 
 
     /**
+     * This activityType can use getStandardClassDetails to fetch the
+     * students and teachers involved (enrolled) in this class
+     *
+     * All other event types will 500 Internal Server Error if you try
+     * You have to fetch those involvements in another way (Attendees)
+     */
+    private const ACADEMIC_ACTIVITY_TYPE = 1;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -176,6 +187,22 @@ class Events implements IStrategy
 
 
     /**
+     * Used for api calls
+     *
+     * @var string
+     */
+    private string $lBound;
+
+
+    /**
+     * Used for api calls
+     *
+     * @var string
+     */
+    private string $uBound;
+
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface                   $log
@@ -215,6 +242,13 @@ class Events implements IStrategy
         $this->relationPersonalMapper = $relationPersonalMapper;
         $this->relationFolderMapper = $relationFolderMapper;
         $this->folderMapper = $folderMapper;
+
+        /* Data is obtained daily; remember lower and upper bound values
+         * for api calls. It needs to be in a specific format so might
+         * as well remember that
+         */
+        $this->lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $this->uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
     }
 
 
@@ -234,6 +268,12 @@ class Events implements IStrategy
          */
         $now = \Alaress_Date_Format::now();
         $enrolmentsLookup = new Lookup\Enrolments($this->log, $this->api);
+
+        /* Generate a list of staff members
+         */
+        $this->log->info('Preloading staff compassPersonIds for non-academic classes...');
+        $staffLookup = (new Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
+        $attendeesLookup = new Attendees($this->log, $staffLookup);
 
         /* Get a list of Schedules to consume
          */
@@ -291,19 +331,25 @@ class Events implements IStrategy
                     /* Get a list of student external ids, and a list of teacher external ids
                      * then create schoolbox events and their relationships
                      */
-                    try {
-                        $enrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
-                    } catch (\RuntimeException $e) {
-                        $this->log->warning($e->getMessage());
+                    if (self::ACADEMIC_ACTIVITY_TYPE === $activityType) {
+                        try {
+                            $enrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
+                        } catch (\RuntimeException $e) {
+                            $this->log->warning($e->getMessage());
 
-                        /* Sometimes this randomly dies:
-                         *
-                         * Bad endpoint schedule/v1/GetStandardClassDetails: 500 Internal Server Error after 3  [   ]
-                         * retries. Payload: {"activityCode":"AM Bus","academicGroupCode":"2021"}
-                         *
-                         * Just skip it and keep going
+                            /* Sometimes this randomly dies:
+                             *
+                             * Bad endpoint schedule/v1/GetStandardClassDetails: 500 Internal Server Error after 3  [   ]
+                             * retries. Payload: {"activityCode":"AM Bus","academicGroupCode":"2021"}
+                             *
+                             * Just skip it and keep going
+                             */
+                            continue;
+                        }
+                    } else {
+                        /* Find them via attendees struct
                          */
-                        continue;
+                        $enrolments = $attendeesLookup->generate($activity);
                     }
 
                     $this->log->info(sprintf(

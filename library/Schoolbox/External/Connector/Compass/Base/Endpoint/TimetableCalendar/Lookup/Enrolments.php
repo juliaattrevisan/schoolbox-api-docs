@@ -56,7 +56,6 @@ class Enrolments
      * @param string $activityCode
      * @param string $academicGroupCode
      * @return array
-     * @throws \DebugBar\DebugBarException
      */
     public function generate(string $activityCode, string $academicGroupCode): array
     {
