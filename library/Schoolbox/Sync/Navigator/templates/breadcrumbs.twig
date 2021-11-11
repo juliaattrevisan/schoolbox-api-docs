@@ -1,9 +1,15 @@
 {% if allNodes|length %}
 <ul class="breadcrumb">
     {% for currentNode in allNodes %}
-    <li {% if currentNode.isActive() %}class="active"{% endif %}>
+    {% if currentNode.isActive() %}
+    <li class="active">
+        <span>{{ currentNode.getName() }}</span>
+    </li>
+    {% else %}
+    <li>
         <a href="{{ currentNode.getUrl() }}">{{ currentNode.getName() }}</a>
     </li>
+    {% endif %}
     {% endfor %}
 </ul>
 {% endif %}

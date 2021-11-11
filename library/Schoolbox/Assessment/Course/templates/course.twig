@@ -259,9 +259,9 @@ Usage:
     <li><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
     <li class="active">
         {% if courseSpec %}
-            <a href="{{ routeLookup('course.modifyCourse', { id: courseSpec.id }) }}">Modify Course</a>
+            <span>Modify Course</span>
         {% else %}
-            <a href="{{ routeLookup('course.newCourse') }}">New Course</a>
+            <span>New Course</span>
         {% endif %}
     </li>
 </ul>
