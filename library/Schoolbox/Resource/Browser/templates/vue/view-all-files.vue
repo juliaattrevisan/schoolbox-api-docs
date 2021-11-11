@@ -1,17 +1,17 @@
 <script>
 
 /**
- * 
+ * Presents all the files within a homepage file component in a filterable table
  */
 
 export default {
     
     props: {
-        files: {
+        files: { //all files within the component
             type: Array,
             required: true,
         },
-        filters: {
+        selectedFilters: { //the list of currently selected filters passed through
             type: Array,
             required: true,
         }
@@ -22,7 +22,7 @@ export default {
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
             tableData: [], //hold all student tableData
-            tableColumns: ['name', 'dateAdded'], //the table tableColumns
+            tableColumns: ['name', 'dateModified.formatted'], //the table tableColumns
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 // customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                 //     {
@@ -53,33 +53,26 @@ export default {
                 //         }
                 //     },
                 // ],
-                // customSorting: {
-                //     student: (ascending) => { //sort student by lastname
-                //         return (a, b) => {
-                //             if (ascending) {
-                //                 return a.user.lastname >= b.user.lastname ? 1 : -1;
-                //             }
-                //             return a.user.lastname <= b.user.lastname ? 1 : -1;
-                //         }
-                //     },
-                //     submissionDate: (ascending) => { //sort submission date accurately by the timestamp
-                //         return (a, b) => {
-                //             if (ascending) {
-                //                 return a.submission.submitted_at.timestamp >= b.submission.submitted_at.timestamp ? 1 : -1;
-                //             }
-                //             return a.submission.submitted_at.timestamp <= b.submission.submitted_at.timestamp ? 1 : -1;
-                //         }
-                //     }
-                // },
+                customSorting: {
+                    ['dateModified.formatted']: (ascending) => { //sort date modified accurately by the timestamp
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.dateModified.timestamp >= b.dateModified.timestamp ? 1 : -1;
+                            }
+                            return a.dateModified.timestamp <= b.dateModified.timestamp ? 1 : -1;
+                        }
+                    },
+                },
                 // filterable: false, //this hides the search input field, the custom filters still function as expected
+                debounce: 100, //sorter debounce as data is stored locally
                 headings: {
                     name: 'Name',
-                    dateAdded: 'Date added',
+                    ['dateModified.formatted']: 'Date added',
                 },
-                // orderBy: { //initial sorting display
-                //     ascending: true,
-                //     column: 'student'
-                // },
+                orderBy: { //initial sorting display
+                    ascending: true,
+                    column: 'name'
+                },
                 perPage: 9999, //absurdly large value to avoid pagination as there's no footer
                 resizableColumns: false,
                 sortIcon: {
@@ -95,6 +88,10 @@ export default {
                 //     similarity: SimilarityReportRowSimilarity,
                 //     status: SimilarityReportRowStatus,
                 // },
+                texts: {
+                    filterPlaceholder: 'Search files',
+                    noResults: 'No matching files',
+                },
             },
             isProcessing: false,
         }

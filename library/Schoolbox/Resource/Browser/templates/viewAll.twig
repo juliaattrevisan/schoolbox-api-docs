@@ -30,7 +30,7 @@ componentFolderId:
 <div id="view-all-files-container">
   <view-all-files
     :files="{{ files|json_encode }}"
-    :filters="{{ filter|json_encode }}"
+    :selected-filters="{{ filter|json_encode }}"
   />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/viewAllFiles.js"></script>
