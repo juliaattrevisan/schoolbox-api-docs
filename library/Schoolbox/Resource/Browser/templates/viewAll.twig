@@ -1,36 +1,18 @@
 <ul class="breadcrumb">
     <li><a href="/homepage/{{ homepage.identifier }}">{{ homepage.name }}</a></li>
-    <li class="active"><a>{{ title }}</a></li>
+    <li class="active"><span>{{ title }}</span></li>
 </ul>
-{{ title }}
-<br>
-componentFolderId:
-{{ componentFolderId }}
-<br>
-<div>Source Folder: {{ componentInstanceConfig.src.value }}</div>
 
-<div>Filters: {{ dump(filter) }}</div>
-<table>
-    <tr>
-        <th>File Name</th>
-        <th>Date Modified</th>
-    </tr>
-    {% for file in files %}
-        <tr>
-            <td>
-                <a data-plugin="preview" href="/send.php?id={{ file.file_id }}" rel="external">
-                    <img class="mime" src="/images/mime/{{ file.mime.iconFile }}" height="64" width="64" title="{{ file.mime }}"/>{{ file.name }}
-                </a>
-            </td>
-            <td>{{ file.dateModified.formatted }}</td>
-        </tr>
-    {% endfor %}
-</table>
+<div class="row">
+    <div class="small-12">
+        <h1>{{ title }}</h1>
+    </div>
+</div>
 
 <div id="view-all-files-container">
-  <view-all-files
-    :files="{{ files|json_encode }}"
-    :selected-filters="{{ filter|json_encode }}"
-  />
+    <view-all-files
+        :files="{{ files|json_encode }}"
+        :selected-filters="{{ filter|json_encode }}"
+    />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/viewAllFiles.js"></script>
