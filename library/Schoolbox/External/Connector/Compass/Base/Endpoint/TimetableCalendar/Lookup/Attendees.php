@@ -20,6 +20,12 @@ class Attendees
 {
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
+
+    /**
      * @var array
      */
     private array $staffLookup;
