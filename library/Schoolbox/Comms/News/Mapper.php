@@ -100,6 +100,19 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             'topics'
         );
 
+        $this->joinsVia(
+            'comms_news_article_statistics',
+            Statistics\Mapper::class,
+            'article_id',
+            'article_id',
+            'article_id',
+            'id',
+            null,
+            self::COLUMN_JOIN_MULTI,
+            'views'
+
+        );
+
         $this->hasJoin(
             'files',
             [
@@ -128,7 +141,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 {$this->getJoinColumnString('rejector', 'r')},
                 {$this->getJoinColumnString('featureImage', 'fi')},
                 {$this->getJoinColumnString('featureImage.allowedFileExtension', 'afe')},
-                {$this->getJoinColumnString('discussionThread', 'dt')}
+                {$this->getJoinColumnString('discussionThread', 'dt')},
+                {$this->getJoinColumnString('comms_news_article_statistics', 'stats')}
         ";
     }
 
@@ -150,6 +164,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             LEFT JOIN {$this->getJoinSql('featureImage', null, 'fi')}
             LEFT JOIN {$this->getJoinSql('featureImage.allowedFileExtension', 'fi', 'afe', true)}
             LEFT JOIN {$this->getJoinSql('discussionThread', null, 'dt', true)}
+            LEFT JOIN {$this->getJoinSql('comms_news_article_statistics', null, 'stats')}
         ";
     }
 
@@ -182,6 +197,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         /** @var MimetypeMapper $mimeTypeMapper */
         $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
+
+        /** @var Statistics\Mapper $statsMapper */
+        $statsMapper = $this->getJoinMapper('comms_news_article_statistics');
 
         $collection = $this->createCollection();
 
@@ -216,6 +234,15 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
                 if ($discussionThread) {
                     $article->setDiscussionThread($discussionThread);
+                }
+
+                /*
+                 * if there is a view set it now
+                 */
+                /** @var Statistics\Model|null $views */
+                $views = $statsMapper->hydrate($row, 'stats');
+                if ($views !== null) {
+                    $article->setViewedAt($views->getOccursAt());
                 }
             }
 

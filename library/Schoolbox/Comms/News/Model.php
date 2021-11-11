@@ -212,6 +212,13 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     protected ?int $attachedFilesCount = null;
 
     /**
+     * The fisttime the news article was viewed, or null
+     *
+     * @var Alaress_Date_Format | null
+     */
+    private $viewedAt;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -1175,19 +1182,16 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function getViewedAt()
     {
-        //check if current user has opened article from comms_news_article_statistics
-        $stats = \Schoolbox\Comms\News\Statistics\Mapper::getInstance();
-        try {
-            $viewed = $stats->findOneByColumnList([
-                                                      'article_id' => $this->getId(),
-                                                      'user_id'    => $_SESSION['user']->getID(),
-                                                  ]);
-        } catch (Deleted $e) {
-        } catch (NotFound $e) {
-            return null;
-        }
-        if ($viewed !== null) {
-            return $viewed->getOccursAt();
-        }
+        return $this->viewedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $date
+     * @return Model
+     */
+    public function setViewedAt(?Alaress_Date_Format $date): self
+    {
+        $this->viewedAt = $date;
+        return $this;
     }
 }
