@@ -27,7 +27,9 @@ config:
   pastoral_individual_access: {hide: true}
   pastoral_parent_access: {value: false, hide: true}
   pastoral_page_size: {hide: true}
+  pastoral_page_visible: {hide: true}
   pastoral_create_tag_enable: {hide: true}
+  pastoral_flag_count_period: {hide: true}
 
   #Boarder Leave
   debug_email_address: {hide: true}

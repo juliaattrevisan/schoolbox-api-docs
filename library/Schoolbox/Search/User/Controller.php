@@ -17,7 +17,9 @@ use Custom;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
@@ -114,6 +116,11 @@ class Controller extends BaseController
     private PastoralDataSource $pastoralDataSource;
 
     /**
+     * TermMapper
+     */
+    private TermMapper $termMapper;
+
+    /**
      * Constructor
      * @param UserMapper                    $userMapper
      * @param RoleMapper                    $roleMapper
@@ -127,6 +134,7 @@ class Controller extends BaseController
      * @param PastoralTypeMapper            $pastoralTypeMapper
      * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
      * @param PastoralDataSource            $pastoralDataSource
+     * @param TermMapper                    $termMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -140,7 +148,8 @@ class Controller extends BaseController
         ProfessionalDevelopmentMapper $professionalDevelopmentMapper,
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralSubTypeMapper $pastoralSubTypeMapper,
-        PastoralDataSource $pastoralDataSource
+        PastoralDataSource $pastoralDataSource,
+        TermMapper $termMapper
     ) {
         $this->userMapper                    = $userMapper;
         $this->roleMapper                    = $roleMapper;
@@ -154,6 +163,7 @@ class Controller extends BaseController
         $this->pastoralTypeMapper            = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
         $this->pastoralDataSource            = $pastoralDataSource;
+        $this->termMapper                    = $termMapper;
     }
 
     /**
@@ -545,7 +555,7 @@ class Controller extends BaseController
             }
         }
 
-        $showPastoral = $this->getConfigLoader()->get('pastoral_enabled');
+        $showPastoral = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED);
 
         if ($this->getUser()->getRole()->isParent() && !$this->getConfigLoader()->get('pastoral_parent_access')) {
             $showPastoral = false;
@@ -657,8 +667,8 @@ class Controller extends BaseController
             $canEmailStaff = false;
         }
 
-        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
-        $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student);
+        $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
+        $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
 
         $this->response->content->set(
             $this->buildHtmlOutput(
