@@ -18,6 +18,7 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Factory\AuthorizationServerFactory;
@@ -256,6 +257,20 @@ class Controller extends Base
     public function postOauthAccessTokenRequest(): void
     {
         $this->getOauthAccessTokenRequest();
+    }
+
+    /**
+     * Generate a JSON Web Key Set (JWKS)
+     *
+     * @api   GET /lti-platform/.well-known/jwks.json
+     * @since 21.1.0
+     */
+    public function getJsonWebKeySet(): void
+    {
+        $jwksExporter = new JwksExporter($this->keyChains);
+        $this->response->content->set(
+            $this->buildJsonOutput($jwksExporter->export(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_KEY_SET_NAME))
+        );
     }
 
     /**
