@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Membership;
 
 use Closure;
+use Laminas\Uri\Uri;
 use Laminas\Uri\UriInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
@@ -153,7 +154,7 @@ class Builder implements MembershipServiceServerBuilderInterface
             $offset,
         );
 
-        return $this->buildMembership($members);
+        return $this->buildMembership($members, $resourceLinkIdentifier);
     }
 
     /**
@@ -429,14 +430,20 @@ class Builder implements MembershipServiceServerBuilderInterface
     /**
      * Builds the actual membership object from the list of members.
      *
-     * @param iterable $members
+     * @param iterable    $members
+     * @param string|null $resourceLinkIdentifier
      * @return MembershipInterface
      */
-    private function buildMembership(iterable $members): MembershipInterface
+    private function buildMembership(iterable $members, ?string $resourceLinkIdentifier = null): MembershipInterface
     {
         $baseUrl      = $this->buildBaseUrl();
         $contextId    = (new ContextCodec($baseUrl))->encode($this->folder->getId());
-        $membershipId = $contextId;
+        $membershipId = $contextId . '/memberships';
+        if (isset($resourceLinkIdentifier)) {
+            $membershipId = (new Uri($membershipId))
+                ->setQuery(['rlid' => $resourceLinkIdentifier])
+                ->toString();
+        }
         return new Membership(
             $membershipId,
             new Context(
