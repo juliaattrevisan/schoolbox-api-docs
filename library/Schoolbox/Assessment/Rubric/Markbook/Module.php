@@ -24,7 +24,6 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Filter;
-use Schoolbox\Role;
 
 class Module extends BaseModule
 {

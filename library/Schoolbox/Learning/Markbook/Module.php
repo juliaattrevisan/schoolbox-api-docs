@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
-use Schoolbox\Role;
 
 class Module extends BaseModule
 {
