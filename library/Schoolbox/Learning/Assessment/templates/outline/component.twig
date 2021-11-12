@@ -45,7 +45,7 @@
 
         {% include '@learningAssessment/outline/unit.twig' %}
 
-        {% set modifyRoute = routeLookupIfAuthorized('courseImport.getModify', { courseImplId: courseImplementation.id }) %}
+        {% set modifyRoute = routeLookupIfAuthorized('courseImport.getModify', { courseImplId: courseImplementation.id, courseImpl: courseImplementation }) %}
         {% if not readOnly and modifyRoute %}
         <div class="component-action">
             <section>
