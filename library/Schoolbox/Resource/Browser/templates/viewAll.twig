@@ -11,6 +11,7 @@
 
 <div id="view-all-files-container">
     <view-all-files
+        :component-instance-config="{{ componentInstanceConfig|json_encode }}"
         :files="{{ files|json_encode }}"
         :selected-filters="{{ filter|json_encode }}"
     />

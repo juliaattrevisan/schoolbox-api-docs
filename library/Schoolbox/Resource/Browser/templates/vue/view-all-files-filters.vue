@@ -33,7 +33,7 @@ export default {
 
     mounted () {
         this.initFilterStatus();
-        // this.initResetFiltersListener();
+        this.$nextTick(() => this.updateAllFilters()); //nextTick to allow the data to be populated prior to filtering
     },
 
     methods: {
@@ -47,24 +47,18 @@ export default {
             this.isVideoChecked = this.selectedFilters.includes(fileTypes.VIDEO);
             this.isImageChecked = this.selectedFilters.includes(fileTypes.IMAGE);
             this.isOtherChecked = this.selectedFilters.includes(fileTypes.OTHER);
-
         },
 
         /**
-         * Reset all the filters back to there base level
+         * Trigger all filters based on the current selections
          */
-        // initResetFiltersListener () {
-        //     document.addEventListener(filterEvents.RESET_FILTERS, () => {
-        //         this.similarityScoreSelection = 0;
-        //         this.isResubmissionRequiredChecked = true;
-        //         this.isMarkingRequiredChecked = true;
-        //         this.isReviewedChecked = true;
-        //         this.onSimilarityScoreChange();
-        //         this.onResubmissionRequiredChange();
-        //         this.onMarkingRequiredChange();
-        //         this.onReviewedChange();
-        //     });
-        // },
+        updateAllFilters () {
+            this.onDocumentChange();
+            this.onAudioChange();
+            this.onVideoChange();
+            this.onImageChange();
+            this.onOtherChange();
+        },
 
         /**
          * Toggle the display of files of type document
@@ -94,7 +88,7 @@ export default {
          * Toggle the display of files of type image
          */
         onImageChange () {
-            const filterParam = this.isDocumentChecked ? '' : fileTypes.IMAGE; 
+            const filterParam = this.isImageChecked ? '' : fileTypes.IMAGE; 
             Event.$emit(`vue-tables.filter::${filterEvents.IMAGE_CHECKED}`, filterParam); //picked up by view-all-files.vue 
         },
 

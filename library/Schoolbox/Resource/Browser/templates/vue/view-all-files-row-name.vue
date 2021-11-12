@@ -18,8 +18,8 @@ export default {
 </script>
 
 <template>
-    <div class="actions-small-1">
-        <div>
+    <div class="container">
+        <div class="name">
             <div class="compact card">
                 <a data-plugin="preview" :href="data.url" rel="external" target="_blank">
                     <img class="mime" :src="`/static/${data.mime.url}`" height="32" width="32" :title="data.mime.description">
@@ -36,19 +36,45 @@ export default {
 
 <style lang="scss" scoped>
 
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.name {
+    margin-right: 1rem;
+}
+
 .card { 
     padding: 0; //remove the left/right padding
 }
 
 h3 {
     font-size: 0.825rem;
+    text-overflow: clip;
+    white-space: normal;
 }
 
 .meta {
     display: none;
-    @media (max-width: 480px) { //show on mobile, as the date modified td will be hidden
+    @media (max-width: 700px) { //show on mobile, as the date modified td will be hidden
         display: block;
     }
+}
+
+nav {
+    flex: 0 0 2.5rem;
+    height: 2.5rem;
+    text-align: center;
+    width: 2.5rem;
+}
+
+nav a {
+    color: var(--content-ui-foreground);
+    display: block;
+    line-height: 2.5;
+    opacity: 0.7;
+    padding-left: 8px; //move the pencil into the centre
 }
 
 </style>

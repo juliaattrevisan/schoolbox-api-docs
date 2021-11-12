@@ -20,6 +20,10 @@ export default {
     ],
 
     props: {
+        componentInstanceConfig: { //any config used within the homepage component instance, currently used to set initial sorting
+            type: Object,
+            required: true,
+        },
         files: { //all files within the component
             type: Array,
             required: true,
@@ -35,7 +39,7 @@ export default {
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 columnsClasses: {
-                    ['dateModified.formatted']: 'date-modified-td' //to hide the column for mobile
+                    ['dateModified.formatted']: 'date-modified-td ' //to hide the column for mobile
                 },
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -74,12 +78,12 @@ export default {
                     name: 'Name',
                     ['dateModified.formatted']: 'Date modified',
                 },
-                orderBy: { //initial sorting display
-                    ascending: true,
-                    column: 'name'
+                orderBy: { //use the passed through component instance config to match the initial sorting
+                    ascending: this.componentInstanceConfig.sortdir.value === 'asc' ? true : false,
+                    column: this.componentInstanceConfig.sort.value === 'name' ? 'name' : 'dateModified.formatted',
                 },
-                perPage: 50, 
-                perPageValues: [50, 100, 200],
+                perPage: 100, 
+                perPageValues: [100, 200, 300],
                 resizableColumns: false,
                 sortIcon: {
                     is: 'glyphicon-sort',
@@ -174,7 +178,11 @@ export default {
 }
 
 .date-modified-td {
-    @media (max-width: 480px) {
+    width: 250px; //keep on the right hand side, and don't alter width when filtering changes
+    @media (max-width: 1000px) {
+        width: 150px;
+    }
+    @media (max-width: 700px) {
         display: none; //hide on mobile, as the date will then be shown within view-all-files-name.vue
     }
 }
