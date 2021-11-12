@@ -157,7 +157,8 @@ class LaunchFactory
         $additionalClaims = [];
 
         // Resource link claim: talk about the assessment
-        $resourceLinkClaim  = (new ResourceLinkClaimFactory(new ResourceLinkCodec($baseUrl)))
+        $resourceLinkCodec  = new ResourceLinkCodec($baseUrl);
+        $resourceLinkClaim  = (new ResourceLinkClaimFactory($resourceLinkCodec))
             ->buildForAssessment($assessment);
         $additionalClaims[] = $resourceLinkClaim;
 
@@ -223,7 +224,7 @@ class LaunchFactory
                         ['id' => $assessment->getBaseContext()->getFolder()->getId()]
                     )
                 )
-                ->setQuery(['rlid' => $assessment->getId(),])
+                ->setQuery(['rlid' => $resourceLinkCodec->encode($assessment->getId()),])
                 ->toString(),
         );
 
