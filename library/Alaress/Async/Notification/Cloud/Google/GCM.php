@@ -149,7 +149,7 @@ class GCM extends AbstractService
             } catch (RuntimeException $e) {
                 if ($e->getCode() == 401) {
                     // your API key is bad: don't try to do anything else
-                    throw $e;
+                    throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
                 }
                 $this->getLog()->warning($e->getMessage(), [ 'exception' => $e ]);
             }
