@@ -37,7 +37,7 @@
         </div>
 
         <div class="v-card-list">
-            <div class="v-card card wrap-down" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
+            <div class="v-card card wrap-down" v-bind:class="{sticky: article.sticky, unread: !article.viewedAt}" v-for="article in currentArticles">
                 <template v-if="article.featureImage">
                     <div class="card-feature-image">
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">

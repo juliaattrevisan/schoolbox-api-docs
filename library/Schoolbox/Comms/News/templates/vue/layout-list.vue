@@ -36,7 +36,7 @@
             </div>
         </li>
 
-        <li class="actions-small-1" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
+        <li class="actions-small-1" v-bind:class="{sticky: article.sticky, unread: !article.viewedAt, read: article.viewedAt}" v-for="article in currentArticles">
             <div class="list-item">
                 <div class="small-12 card wrap-down">
                     <template>
@@ -64,8 +64,7 @@
                         </template>
                     </template>
                     <h3>
-                        <a v-if="article.viewedAt" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a>
-                        <a v-else :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"><b>{{ article.title }}</b></a>
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a>
                     </h3>
 
                     <p class="meta">
@@ -102,8 +101,7 @@
 
                         <template v-if="article.readMore.available">
                             <div class="article-read-more">
-                                <a v-if="article.viewedAt" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readMore.string"></a>
-                                <a v-else :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"><b v-html="article.readMore.string"></b></a>
+                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readMore.string"></a>
                             </div>
                         </template>
                     </article>

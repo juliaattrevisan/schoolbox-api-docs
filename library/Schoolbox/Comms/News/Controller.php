@@ -947,6 +947,22 @@ class Controller extends Base
             )
         );
 
+        //lets check for article views, and if so add them now
+        $statsMapper = \Schoolbox\Comms\News\Statistics\Mapper::getInstance();
+        foreach ($articles as $id => $article) {
+            $var = true;
+            try {
+                $viewed = $statsMapper->findOneByColumnList([
+                    'article_id' => $article['id'],
+                    'user_id'    => $this->getUser()->getID()
+                ]);
+                $articles[$id]['viewedAt'] = $viewed->getOccursAt();
+            } catch (MapperException\Deleted $e) {
+            } catch (MapperException\NotFound $e) {
+                $articles[$id]['viewedAt'] = null;
+            }
+        }
+
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
     }
 

@@ -212,13 +212,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     protected ?int $attachedFilesCount = null;
 
     /**
-     * The fisttime the news article was viewed, or null
-     *
-     * @var Alaress_Date_Format | null
-     */
-    private $viewedAt;
-
-    /**
      * Model constructor.
      */
     public function __construct()
@@ -1174,24 +1167,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function setAttachedFilesCount(?int $attachedFilesCount): self
     {
         $this->attachedFilesCount = $attachedFilesCount;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getViewedAt()
-    {
-        return $this->viewedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $date
-     * @return Model
-     */
-    public function setViewedAt(?Alaress_Date_Format $date): self
-    {
-        $this->viewedAt = $date;
         return $this;
     }
 }
