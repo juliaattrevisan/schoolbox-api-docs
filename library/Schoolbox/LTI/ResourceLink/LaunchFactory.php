@@ -21,9 +21,11 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Util\ContextClaimFactory;
+use Schoolbox\LTI\Util\ContextCodec;
 use Schoolbox\LTI\Util\CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Util\ResourceLinkClaimFactory;
+use Schoolbox\LTI\Util\ResourceLinkCodec;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\LTI\Util\UserCodec;
@@ -150,14 +152,18 @@ class LaunchFactory
         User $currentUser,
         User $actingUser
     ): array {
+        $baseUrl = (new UrlFactory($this->config))->buildFullyQualified()->setScheme('https');
+
         $additionalClaims = [];
 
         // Resource link claim: talk about the assessment
-        $resourceLinkClaim  = (new ResourceLinkClaimFactory())->buildForAssessment($assessment);
+        $resourceLinkClaim  = (new ResourceLinkClaimFactory(new ResourceLinkCodec($baseUrl)))
+            ->buildForAssessment($assessment);
         $additionalClaims[] = $resourceLinkClaim;
 
         // Context claim: talk about the folder
-        $contextClaim       = (new ContextClaimFactory())->buildForFolder($assessment->getBaseContext()->getFolder());
+        $contextClaim       = (new ContextClaimFactory(new ContextCodec($baseUrl)))
+            ->buildForFolder($assessment->getBaseContext()->getFolder());
         $additionalClaims[] = $contextClaim;
 
         // PlatformInstanceClaim: talk about the Schoolbox instance
@@ -194,7 +200,6 @@ class LaunchFactory
         // AGS claims:
         // if a line item is provided, send that
         // (Currently, score is the only service Schoolbox provides)
-        $baseUrl            = (new UrlFactory($this->config))->buildFullyQualified()->setScheme('https');
         $additionalClaims[] = new AgsClaim(
             [ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE],
             null,

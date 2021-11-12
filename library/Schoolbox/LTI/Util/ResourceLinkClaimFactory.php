@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Util;
 
+use Alaress\Codec\ICodec;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 
@@ -18,6 +19,21 @@ use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 class ResourceLinkClaimFactory
 {
     /**
+     * Codec, for encoding resource link ID into a claim identifier.
+     */
+    private ICodec $codec;
+
+    /**
+     * Constructor
+     *
+     * @param ICodec $codec
+     */
+    public function __construct(ICodec $codec)
+    {
+        $this->codec = $codec;
+    }
+
+    /**
      * Builds a resource link claim from an assessment.
      *
      * @param LtiAssessment $assessment
@@ -25,9 +41,8 @@ class ResourceLinkClaimFactory
      */
     public function buildForAssessment(LtiAssessment $assessment): ResourceLinkClaim
     {
-        // TODO Resource link's identifier should be a FQDN, with a codec
         return new ResourceLinkClaim(
-            (string)$assessment->getId(),
+            (string)$this->codec->encode($assessment->getId()),
             $assessment->getLtiAssessmentTitle(),
             $assessment->getLtiAssessmentText(),
         );
