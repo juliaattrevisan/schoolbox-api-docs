@@ -981,6 +981,9 @@ class Controller extends BaseController
         /** @var RegistrationRepositoryInterface $registrationRepository */
         $registrationRepository = $this->getDi()->get('lti.registrations');
 
+        /** @var UserCodec $userCodec */
+        $userCodec = $this->getDi()->get('lti.userCodec');
+
         /** @var AssessmentDataSource $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
@@ -992,6 +995,7 @@ class Controller extends BaseController
             $this->userAccessMapper,
             $assessmentDataSource,
             $this->getConfigLoader(),
+            $userCodec,
             new LaunchFactory(
                 $registrationRepository,
                 Access::getInstance(),

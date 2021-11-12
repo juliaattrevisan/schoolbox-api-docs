@@ -31,6 +31,7 @@ use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Util\ContextCodec;
 use Schoolbox\LTI\Util\ResourceLinkCodec;
+use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -68,6 +69,11 @@ class Builder implements MembershipServiceServerBuilderInterface
     private IConfigLoader $config;
 
     /**
+     * User codec, for encoding users into the membership output.
+     */
+    private UserCodec $userCodec;
+
+    /**
      * Launch factory, for building parameters for the resource link launch.
      */
     private LaunchFactory $launchFactory;
@@ -79,6 +85,7 @@ class Builder implements MembershipServiceServerBuilderInterface
      * @param UserAccessMapper     $userAccessMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param IConfigLoader        $config
+     * @param UserCodec            $userCodec
      * @param LaunchFactory        $launchFactory
      */
     public function __construct(
@@ -86,12 +93,14 @@ class Builder implements MembershipServiceServerBuilderInterface
         UserAccessMapper $userAccessMapper,
         AssessmentDataSource $assessmentDataSource,
         IConfigLoader $config,
+        UserCodec $userCodec,
         LaunchFactory $launchFactory
     ) {
         $this->folder               = $folder;
         $this->userAccessMapper     = $userAccessMapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->config               = $config;
+        $this->userCodec            = $userCodec;
         $this->launchFactory        = $launchFactory;
     }
 
@@ -184,15 +193,14 @@ class Builder implements MembershipServiceServerBuilderInterface
         // Share minimal information by default, as per
         // http://www.imsglobal.org/spec/lti-nrps/v2p0#sharing-of-personal-data
         // (Not yet sure how to receive data sharing consent)
+        $encodedUser = $this->userCodec->encode($user);
         return new Member(
-            new UserIdentity(
-                $user->getUsername(),
-            ),
+            new UserIdentity($encodedUser),
             MemberInterface::STATUS_ACTIVE,
             [$role],
             // Why must I provide the above as properties below?
             [
-                'user_id' => $user->getUsername(),
+                'user_id' => $encodedUser,
                 'status'  => MemberInterface::STATUS_ACTIVE,
                 'roles'   => [$role],
             ]
