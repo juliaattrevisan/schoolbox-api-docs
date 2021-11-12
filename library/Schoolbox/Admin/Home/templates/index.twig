@@ -284,6 +284,14 @@
                                 </div>
                             </li>
                         {% endif %}
+                        <li>
+                            <div class="small-5 columns content">
+                                Async Message Broker
+                            </div>
+                            <div class="small-7 columns content">
+                                <span class="full-width {% if amqpOnline %}success{% else %}alert{% endif %} label" data-light="ssh">{% if amqpOnline %}Online{% else %}Offline{% endif %}</span>
+                            </div>
+                        </li>
                     </ul>
                 </section>
 
