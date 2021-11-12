@@ -949,17 +949,21 @@ class Controller extends Base
 
         //lets check for article views, and if so add them now
         $statsMapper = \Schoolbox\Comms\News\Statistics\Mapper::getInstance();
+
+        $viewedList = $statsMapper->findByColumnList([
+            'article_id' => $articleIds,
+            'user_id'    => $this->getUser()->getID()
+        ]);
+
+
         foreach ($articles as $id => $article) {
-            $var = true;
-            try {
-                $viewed = $statsMapper->findOneByColumnList([
-                    'article_id' => $article['id'],
-                    'user_id'    => $this->getUser()->getID()
-                ]);
-                $articles[$id]['viewedAt'] = $viewed->getOccursAt();
-            } catch (MapperException\Deleted $e) {
-            } catch (MapperException\NotFound $e) {
-                $articles[$id]['viewedAt'] = null;
+            //set the 'default' null to all articles,
+            $articles[$id]['viewedAt'] = null;
+            //check for if this article has been viewed, if so set its viewedAt date
+            foreach ($viewedList as $viewed) {
+                if ($viewed->getArticleId() === $article['id']) {
+                    $articles[$id]['viewedAt'] = $viewed->getOccursAt();
+                }
             }
         }
 
