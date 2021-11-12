@@ -5,9 +5,7 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 
-
 require_once __DIR__ . '/../../conf/core/require.php';
-
 
 $app = new class extends CliTool\App {
 
@@ -54,7 +52,8 @@ $app = new class extends CliTool\App {
                 if ($item->isDir()) {
                     $this->cleanup("$dir/$item");
                 } else {
-                    if ($this->isTransformFile($item) &&
+                    if (
+                        $this->isTransformFile($item) &&
                         !$this->isVideoTransform($item) &&
                         !$this->isValidTransformNameFormat($item)
                     ) {
@@ -112,7 +111,7 @@ $app = new class extends CliTool\App {
 
         /** @var \Alaress\Image\Transformation\ITransformFactory[] $transforms */
         foreach ($transforms as $transform) {
-            if ($transform->recognisesCacheKey($this->getCacheKeyFromFileName($item->getFilename()))){
+            if ($transform->recognisesCacheKey($this->getCacheKeyFromFileName($item->getFilename()))) {
                 return true;
             }
         }
@@ -142,11 +141,11 @@ $app = new class extends CliTool\App {
 
         if ($this->perform()) {
             $this->getDatabaseInternal()->executeQuery(
-            "DELETE FROM storage_transform WHERE hash = :hash AND transform = :transform",
-            [
-                'hash'      => $fileName,
-                'transform' => $this->getCacheKeyFromFileName($fileName),
-            ]
+                "DELETE FROM storage_transform WHERE hash = :hash AND transform = :transform",
+                [
+                    'hash'      => $fileName,
+                    'transform' => $this->getCacheKeyFromFileName($fileName),
+                ]
             );
         }
     }
