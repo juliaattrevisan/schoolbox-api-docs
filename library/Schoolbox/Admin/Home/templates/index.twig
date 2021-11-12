@@ -253,7 +253,7 @@
                                 </div>
                             </li>
                         {% endif %}
-                        {# Show ssh status if not cloud hosted #}
+                        {# Show ssh + SSL cert status if not cloud hosted #}
                         {% if not is_cloud %}
                             <li>
                                 <div class="small-5 columns content">
@@ -261,6 +261,18 @@
                                 </div>
                                 <div class="small-7 columns content">
                                     <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
+                                </div>
+                            </li>
+                            {% set certMessage = 'Expires in ' ~ certExpiry ~ ' days.' %}
+                            {% if isCustomCert %}
+                                {% set certMessage = 'Unmanaged cert. ' ~ certMessage %}
+                            {% endif %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    SSL Certificate
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width {% if certExpiry < 7 %}alert{% elseif certExpiry < 30 or isCustomCert %}warning{% else %}success{% endif %} label">{{ certMessage }}</span>
                                 </div>
                             </li>
                             <li>
