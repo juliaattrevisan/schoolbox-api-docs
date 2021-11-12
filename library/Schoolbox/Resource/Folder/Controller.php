@@ -991,6 +991,7 @@ class Controller extends BaseController
             $folder,
             $this->userAccessMapper,
             $assessmentDataSource,
+            $this->getConfigLoader(),
             new LaunchFactory(
                 $registrationRepository,
                 Access::getInstance(),

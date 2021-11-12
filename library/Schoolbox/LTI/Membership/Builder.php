@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Membership;
 
 use Closure;
+use Laminas\Uri\UriInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
@@ -23,12 +24,16 @@ use OAT\Library\Lti1p3Nrps\Model\Message\Message;
 use OAT\Library\Lti1p3Nrps\Model\Message\MessageInterface;
 use OAT\Library\Lti1p3Nrps\Service\Server\Builder\MembershipServiceServerBuilderInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
+use Schoolbox\LTI\Util\ContextCodec;
+use Schoolbox\LTI\Util\ResourceLinkCodec;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 
 /**
@@ -40,19 +45,25 @@ use Schoolbox\User;
 class Builder implements MembershipServiceServerBuilderInterface
 {
     /**
-     * @var Folder
+     * Folder, for creating the membership's context.
      */
     private Folder $folder;
 
     /**
-     * @var UserAccessMapper
+     * User access mapper, for finding the users in the context.
      */
     private UserAccessMapper $userAccessMapper;
 
     /**
-     * @var AssessmentDataSource
+     * Assessment data source, for finding the assessment to use as a resource
+     * link.
      */
     private AssessmentDataSource $assessmentDataSource;
+
+    /**
+     * Config, for creating the codec for contexts.
+     */
+    private IConfigLoader $config;
 
     /**
      * Launch factory, for building parameters for the resource link launch.
@@ -65,16 +76,20 @@ class Builder implements MembershipServiceServerBuilderInterface
      * @param Folder               $folder
      * @param UserAccessMapper     $userAccessMapper
      * @param AssessmentDataSource $assessmentDataSource
+     * @param IConfigLoader        $config
+     * @param LaunchFactory        $launchFactory
      */
     public function __construct(
         Folder $folder,
         UserAccessMapper $userAccessMapper,
         AssessmentDataSource $assessmentDataSource,
+        IConfigLoader $config,
         LaunchFactory $launchFactory
     ) {
         $this->folder               = $folder;
         $this->userAccessMapper     = $userAccessMapper;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->config               = $config;
         $this->launchFactory        = $launchFactory;
     }
 
@@ -100,16 +115,7 @@ class Builder implements MembershipServiceServerBuilderInterface
             $offset,
         );
 
-        return new Membership(
-            // TODO identifiers usually are fully qualified
-            (string)$this->folder->getId(),
-            new Context(
-                (string)$this->folder->getId(),
-                $this->folder->getCodeString(),
-                $this->folder->getTitle(),
-            ),
-            new MemberCollection($members),
-        );
+        return $this->buildMembership($members);
     }
 
     /**
@@ -129,10 +135,12 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
+        $resourceLinkCodec = (new ResourceLinkCodec($this->buildBaseUrl()));
+
         // Extract an ID out of the resource link
-        // TODO add codec for resource links, contexts as there are with users
         // TODO assert that the tool requesting this link owns the resource link
-        $assessment = $this->assessmentDataSource->findByIdForReview($resourceLinkIdentifier);
+        $assessmentId = $resourceLinkCodec->decode($resourceLinkIdentifier);
+        $assessment   = $this->assessmentDataSource->findByIdForReview($assessmentId);
         if (!$assessment instanceof LtiAssessment) {
             // raise an error instead
             return $this->buildContextMembership($registration, $role, $limit, $offset);
@@ -145,16 +153,7 @@ class Builder implements MembershipServiceServerBuilderInterface
             $offset,
         );
 
-        return new Membership(
-            // TODO identifiers usually are fully qualified
-            (string)$this->folder->getId(),
-            new Context(
-                (string)$this->folder->getId(),
-                $this->folder->getCodeString(),
-                $this->folder->getTitle(),
-            ),
-            new MemberCollection($members),
-        );
+        return $this->buildMembership($members);
     }
 
     /**
@@ -425,5 +424,37 @@ class Builder implements MembershipServiceServerBuilderInterface
             $message[$claim::getClaimName()] = $claim->normalize();
         }
         return new Message($message);
+    }
+
+    /**
+     * Builds the actual membership object from the list of members.
+     *
+     * @param iterable $members
+     * @return MembershipInterface
+     */
+    private function buildMembership(iterable $members): MembershipInterface
+    {
+        $baseUrl      = $this->buildBaseUrl();
+        $contextId    = (new ContextCodec($baseUrl))->encode($this->folder->getId());
+        $membershipId = $contextId;
+        return new Membership(
+            $membershipId,
+            new Context(
+                $contextId,
+                $this->folder->getCodeString(),
+                $this->folder->getTitle(),
+            ),
+            new MemberCollection($members),
+        );
+    }
+
+    /**
+     * Build a base URL.
+     *
+     * @return UriInterface
+     */
+    private function buildBaseUrl(): UriInterface
+    {
+        return (new Factory($this->config))->buildFullyQualified()->setScheme('https');
     }
 }
