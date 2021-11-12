@@ -36,6 +36,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * NPRS membership service server builder.
@@ -139,12 +140,26 @@ class Builder implements MembershipServiceServerBuilderInterface
         $resourceLinkCodec = (new ResourceLinkCodec($this->buildBaseUrl()));
 
         // Extract an ID out of the resource link
-        // TODO assert that the tool requesting this link owns the resource link
         $assessmentId = $resourceLinkCodec->decode($resourceLinkIdentifier);
-        $assessment   = $this->assessmentDataSource->findByIdForReview($assessmentId);
+
+        // Assert the assessment is an LTI assessment
+        $assessment = null;
+        if (isset($assessmentId)) {
+            $assessment = $this->assessmentDataSource->findByIdForReview($assessmentId);
+        }
         if (!$assessment instanceof LtiAssessment) {
-            // raise an error instead
-            return $this->buildContextMembership($registration, $role, $limit, $offset);
+            throw new UnexpectedValueException('Resource link identifier does not identify a resource link');
+        }
+
+        // Assert the assessment's folder matches the membership's folder
+        if ($assessment->getBaseContext()->getFolder()->getId() !== $this->folder->getId()) {
+            throw new UnexpectedValueException('Resource link identifier identifies a resource outside of the context');
+        }
+
+        // Assert the assessment's LTI tool's registration matches $registration
+        // (see http://www.imsglobal.org/spec/lti-nrps/v2p0#access-restriction)
+        if ($assessment->getLtiTool()->getClientId() !== $registration->getClientId()) {
+            throw new UnexpectedValueException('Resource link identifier identifies a resource belonging to another tool');
         }
 
         $members = $this->buildMemberCollection(
