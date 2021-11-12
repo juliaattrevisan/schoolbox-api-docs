@@ -20,13 +20,10 @@ export default {
 <template>
     <div class="container">
         <div class="name">
-            <div class="compact card">
-                <a data-plugin="preview" :href="data.url" rel="external" target="_blank">
-                    <img class="mime" :src="`/static/${data.mime.url}`" height="32" width="32" :title="data.mime.description">
-                    <h3>{{ data.name }}</h3>
-                </a>
-                <p class="meta">Date modified: {{ data.dateModified.formatted }}</p>
-            </div>
+            <a :href="data.url" rel="external" target="_blank">
+                <h3><img class="mime" :src="`/static/${data.mime.url}`" height="32" width="32" :title="data.mime.description"> {{ data.name }}</h3>
+            </a>
+            <p class="meta">Date modified: {{ data.dateModified.formatted }}</p>
         </div>
         <nav>
             <a class="icon-modify" :href="data.editUrl" title="Modify File"></a>
@@ -38,21 +35,21 @@ export default {
 
 .container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; //so the modify link can sit on the right hand side
 }
 
 .name {
+    flex: 1;
     margin-right: 1rem;
-}
-
-.card { 
-    padding: 0; //remove the left/right padding
+    min-width: 0; //so the h3 can text-overflow properly, oterwise the flex item won't go below the content-size
 }
 
 h3 {
     font-size: 0.825rem;
-    text-overflow: clip;
-    white-space: normal;
+    margin-bottom: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .meta {

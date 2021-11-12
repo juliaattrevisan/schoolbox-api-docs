@@ -136,21 +136,25 @@ export default {
 
     <div class="row">
 
-        <v-client-table
-            ref="table"
-            :data="tableData"
-            :columns="tableColumns"
-            :options="tableOptions"
-        >
-            <div slot="beforeTable">
-                <view-all-files-filters 
-                    :selected-filters="selectedFilters"
-                />
-            </div>
-            <div slot="afterTable">
-                <div class="VueTables__table-footer" ref="tableFooter"></div>
-            </div>
-        </v-client-table>
+        <div class="small-12 columns">
+
+            <v-client-table
+                ref="table"
+                :data="tableData"
+                :columns="tableColumns"
+                :options="tableOptions"
+            >
+                <div slot="beforeTable">
+                    <view-all-files-filters 
+                        :selected-filters="selectedFilters"
+                    />
+                </div>
+                <div slot="afterTable">
+                    <div class="VueTables__table-footer" ref="tableFooter"></div>
+                </div>
+            </v-client-table>
+
+        </div>
 
     </div>
 
@@ -159,6 +163,10 @@ export default {
 <style lang="scss">
 
 @import '@vue/components/vueTables2/vueTables2';
+
+.VueTables table {
+    table-layout: fixed; //to ensure the flex within view-all-files-row-name can shrink all the way down
+}
 
 .VueTables__search { 
     padding-bottom: 0.5rem; //to put the view-all-files-filters.vue up closer to the search input
@@ -173,7 +181,7 @@ export default {
 }
 
 .VueTables__table td {
-    padding: 0.25rem;
+    padding: 0.25rem 0.5rem 0.25rem 0;
     vertical-align: middle;
 }
 
