@@ -75,7 +75,7 @@ abstract class UriBasedCodec implements ICodec
         $expectedBasePathLength = strlen($expectedBasePath);
         $actualBasePath         = substr($path, 0, $expectedBasePathLength);
         return $expectedBasePath === $actualBasePath
-            ? substr($path, $expectedBasePathLength)
+            ? substr($path, $expectedBasePathLength + 1)
             : null;
     }
 
