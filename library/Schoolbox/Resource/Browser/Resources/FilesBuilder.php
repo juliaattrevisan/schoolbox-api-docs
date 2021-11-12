@@ -91,10 +91,10 @@ class FilesBuilder
         foreach ($fileList as $file) {
             $files[] = [
                 'name'                  => $file->getTitle(),
-                'file_id'               => $file->getId(),
+                'id'                    => $file->getId(),
                 'url'                   => '/send.php?id=' . $file->getId(),
                 'mime'                  => [
-                    'mimetype'          => $file->getStorage()->getMimetype()->getMime(),
+                    'mimeType'          => $file->getStorage()->getMimetype()->getMime(),
                     'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
                     'description'       => $file->getStorage()->getMimetype()->getDescription(),
                     'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
@@ -106,7 +106,7 @@ class FilesBuilder
                             'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
                             'formatted' => $file->getModifiedAt()->getShort(),
                 ],
-                'edit_url'              => '/cms/file/' . $file->getId(),
+                'editUrl'              => '/cms/file/' . $file->getId(),
             ];
         }
         return $files;

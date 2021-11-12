@@ -189,7 +189,7 @@ class Controller extends AbstractController
               'componentID'     => $componentID,
               'sourceFolderID'  => $sourceFolderID,
               'homepageID'      => $homepage_id,
-              'file_list'       => $files,
+              'files'           => $files,
           ]));
     }
 
