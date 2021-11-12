@@ -60,7 +60,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(Access::getInstance(), null, Role::PERMISSION_VIEW_STUDENT_GRADES)
+                new IsInstructor(Access::getInstance())
             )
         );
 

@@ -12,7 +12,6 @@ use Alaress\Authorizer\Failure;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Role;
 use Schoolbox\User;
 use InvalidArgumentException;
 
@@ -39,23 +38,17 @@ class IsInstructor extends AbstractParticipationRule
      */
     private $folderLocator;
 
-    /**
-     * @var string|null
-     */
-    private ?string $permissionRequired;
 
     /**
      * Constructor
      *
      * @param Access        $access
      * @param callable|null $folderLocator
-     * @param string|null   $permissionRequired If provided, only user with this role based permission will be allowed
      */
-    public function __construct(Access $access, callable $folderLocator = null, ?string $permissionRequired = null)
+    public function __construct(Access $access, callable $folderLocator = null)
     {
         $this->access             = $access;
         $this->folderLocator      = $folderLocator;
-        $this->permissionRequired = $permissionRequired;
     }
 
 
@@ -69,6 +62,7 @@ class IsInstructor extends AbstractParticipationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
+
         $folder = is_callable($this->folderLocator)
             ? call_user_func($this->folderLocator, $params)
             : $this->defaultFolderLocator($params);
@@ -88,14 +82,10 @@ class IsInstructor extends AbstractParticipationRule
             }
         }
 
-        if ($this->permissionRequired && in_array($this->permissionRequired, Role::VALID_PERMISSIONS[$user->getRole()->getType()])) {
-            $permissionMethod = 'get' . ucfirst($this->permissionRequired);
-            if (!$user->getRole()->$permissionMethod()) {
-                throw new Failure\Unauthorized();
-            }
-        }
-
-        if ($user->getRole()->isStaff() || $this->access->isInstructor($user, $folder)) {
+        if (
+            ($user->getRole()->isStaff() && $user->getRole()->getViewStudentGrades())
+            || $this->access->isInstructor($user, $folder)
+        ) {
             return true;
         }
 
