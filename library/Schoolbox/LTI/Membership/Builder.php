@@ -181,23 +181,20 @@ class Builder implements MembershipServiceServerBuilderInterface
      */
     private function mapUserToMember(User $user, string $role): MemberInterface
     {
+        // Share minimal information by default, as per
+        // http://www.imsglobal.org/spec/lti-nrps/v2p0#sharing-of-personal-data
+        // (Not yet sure how to receive data sharing consent)
         return new Member(
             new UserIdentity(
                 $user->getUsername(),
-                $user->getFullName(),
-                $user->getEmail()
             ),
             MemberInterface::STATUS_ACTIVE,
             [$role],
             // Why must I provide the above as properties below?
             [
-                'user_id'     => $user->getUsername(),
-                'status'      => MemberInterface::STATUS_ACTIVE,
-                'name'        => $user->getFullName(),
-                'given_name'  => $user->getFirstname(),
-                'family_name' => $user->getLastname(),
-                'email'       => $user->getEmail(),
-                'roles'       => [$role],
+                'user_id' => $user->getUsername(),
+                'status'  => MemberInterface::STATUS_ACTIVE,
+                'roles'   => [$role],
             ]
         );
     }
