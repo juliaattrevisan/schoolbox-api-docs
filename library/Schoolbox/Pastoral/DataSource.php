@@ -132,20 +132,22 @@ class DataSource
     /**
      * count and details of pastoral events of a single student that a specified `viewer` is allowed to see
      *
-     * @param User  $viewer
-     * @param int   $studentId
-     * @param array $typeIds
-     * @param array $subtypeIds
+     * @param User                     $viewer
+     * @param int                      $studentId
+     * @param array                    $typeIds
+     * @param array                    $subtypeIds
+     * @param Alaress_Date_Format|null $startDate
      * @return array
      */
-    public function countRecordsByType(User $viewer, int $studentId, array $typeIds, array $subtypeIds): array
+    public function countRecordsByType(User $viewer, int $studentId, array $typeIds, array $subtypeIds, ?Alaress_Date_Format $startDate): array
     {
         if (empty($typeIds) && empty($subtypeIds)) {
             return [];
         }
 
-        $typeWheres           = [];
-        $typeParams           = [];
+        $typeWheres     = [];
+        $typeParams     = [];
+        $startDateWhere = $startDate ? ' AND created_at >= :startDate ' : '';
 
         if (!empty($typeIds)) {
             $typeBindings = Builder::getBindings($typeIds, 'typeId');
@@ -167,15 +169,17 @@ class DataSource
                 FROM pastoral p
         WHERE ({$where['where']})
         AND ({$typeWhere})
-        AND created_at >= :yearAgo
+        {$startDateWhere}
         GROUP BY p.type_id, p.subtype_id
         ";
-        $date   = new \Alaress_Date_Format();
+
         $params = array_merge(
-            ['yearAgo' => $date->addYears(-1)->getDatabaseDate()],
             $typeParams,
             $where['params']
         );
+        if ($startDate) {
+            $params = array_merge($params, ['startDate' => $startDate->getDatabaseDate()]);
+        }
 
         $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -184,26 +188,27 @@ class DataSource
     /**
      * count pastoral records and group the results by month
      *
-     * @param User  $viewer
-     * @param int   $studentId
+     * @param User                     $viewer
+     * @param int                      $studentId
+     * @param Alaress_Date_Format|null $startDate
      * @return array
      */
-    public function countRecordsByTypeGroupByMonth(User $viewer, int $studentId): array
+    public function countRecordsByTypeGroupByMonth(User $viewer, int $studentId, ?Alaress_Date_Format $startDate): array
     {
-        $where     = $this->getPermissionClause($viewer, $studentId, null);
+        $where          = $this->getPermissionClause($viewer, $studentId, null);
+        $startDateWhere = $startDate ? ' AND created_at >= :startDate ' : '';
 
-        $sql    = "
+        $sql = "
         SELECT count(*) as count, p.type_id as typeId, p.subtype_id as subtypeId, month(p.created_at) as partition_month, year(p.created_at) as partition_year
                 FROM pastoral p
         WHERE ({$where['where']})
-        AND created_at >= :yearAgo
+        {$startDateWhere}
         GROUP BY year(p.created_at), month(p.created_at), p.type_id, p.subtype_id
         ";
-        $date   = new \Alaress_Date_Format();
-        $params = array_merge(
-            ['yearAgo' => $date->addYears(-1)->getDatabaseDate()],
-            $where['params']
-        );
+
+        $params = $startDate
+            ? array_merge($where['params'], ['startDate' => $startDate->getDatabaseDate()])
+            : $where['params'];
 
         $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -543,6 +548,7 @@ class DataSource
      * @param bool                  $involved
      * @param Collection            $years
      * @param Collection            $houses
+     * @param Collection            $campuses
      * @param bool                  $includeStudentsWithoutYear
      * @param bool                  $includeStudentsWithoutHouse
      *
@@ -563,6 +569,7 @@ class DataSource
         $involved,
         Collection $years,
         Collection $houses,
+        Collection $campuses,
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse
     ): Collection {
@@ -583,6 +590,7 @@ class DataSource
                 $involved,
                 $years,
                 $houses,
+                $campuses,
                 $includeStudentsWithoutYear,
                 $includeStudentsWithoutHouse
             ),

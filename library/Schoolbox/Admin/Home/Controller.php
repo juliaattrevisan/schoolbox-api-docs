@@ -362,6 +362,7 @@ class Controller extends Base
                     'ssh_light' => $ssh_light,
                     'ssh_status' => $ssh_status,
                     'is_cloud'  => $this->isCloudHosted(),
+                    'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
 
                     /* Turnitin status indicator
                      */

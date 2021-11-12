@@ -103,6 +103,19 @@
             }
         });
         {% endif %}
+
+        {% if not is_cloud %}
+        // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/ping is accessible
+        $.ajax({
+            url: "{{ api_url }}/urlCheck/?url=http://" + location.hostname + "/.well-known/ping",
+            success: function() {
+                $('[data-light="port_80"]').html('Online').removeClass('neutral').addClass('success');
+            },
+            error: function() {
+                $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
+            }
+        });
+        {% endif %}
     });
 </script>
 
@@ -244,7 +257,7 @@
                         {% if not is_cloud %}
                             <li>
                                 <div class="small-5 columns content">
-                                    Fleet Connectivity
+                                    Security Management
                                 </div>
                                 <div class="small-7 columns content">
                                     <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
@@ -260,6 +273,14 @@
                                 </div>
                                 <div class="small-7 columns content">
                                     <span class="full-width {% if certExpiry < 7 %}alert{% elseif certExpiry < 30 or isCustomCert %}warning{% else %}success{% endif %} label">{{ certMessage }}</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="small-5 columns content">
+                                    SSL Verification
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="port_80">Testing...</span>
                                 </div>
                             </li>
                         {% endif %}

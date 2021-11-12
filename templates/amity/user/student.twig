@@ -169,7 +169,7 @@
                                  # Otherwise hide them, so we don't show empty lines with only a comma
                                  #}
                                 {% for field in ['StudentContactAddress1', 'StudentContactAddress2', 'StudentContactAddress3'] %}
-                                    {% if contact[field]|length %}
+                                    {% if contact[field] ?? ''|length %}
                                         <p>{{ contact[field] }}</p>
                                     {% endif %}
                                 {% endfor %}
@@ -179,7 +179,7 @@
                                  #}
                                 <p>
                                     {% for field in ['StudentContactSuburb', 'StudentContactState', 'StudentContactPostCode'] %}
-                                        {% if contact[field]|length %}
+                                        {% if contact[field] ?? ''|length %}
                                             {{ contact[field] }}
                                         {% endif %}
                                     {% endfor %}

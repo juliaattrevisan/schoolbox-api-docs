@@ -116,11 +116,18 @@ class Jwt
      */
     public function decode(string $jwt, ?string $publicKey = null): array
     {
-        return (array)JwtLibrary::decode(
-            $jwt,
-            $publicKey ?? $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-            [self::SIGNING_ALGORITHM]
-        );
+        // Set leeway for this decode only, set it back once done
+        $previousLeeway     = JwtLibrary::$leeway;
+        JwtLibrary::$leeway = (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY);
+        try {
+            return (array)JwtLibrary::decode(
+                $jwt,
+                $publicKey ?? $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+                [self::SIGNING_ALGORITHM]
+            );
+        } finally {
+            JwtLibrary::$leeway = $previousLeeway;
+        }
     }
 
     /**

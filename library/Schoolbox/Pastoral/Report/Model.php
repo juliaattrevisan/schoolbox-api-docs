@@ -9,6 +9,7 @@
 namespace Schoolbox\Pastoral\Report;
 
 use Alaress_Date_Format;
+use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -95,6 +96,9 @@ class Model implements ISoftDeletable
     /** @var string $housesCsv */
     private $housesCsv;
 
+    /** @var string $campusesCsv */
+    private $campusesCsv;
+
     /** @var string $authorsCsv */
     private $authorsCsv;
 
@@ -127,11 +131,14 @@ class Model implements ISoftDeletable
     /** @var Collection|PastoralType\Model[] $types */
     private $types;
 
-    /** @var Collection|PastoralSubType\Model[] $types */
+    /** @var Collection|PastoralSubType\Model[] $subTypes */
     private $subTypes;
 
-    /** @var Collection|House[] $types */
+    /** @var Collection|House[] $houses */
     private $houses;
+
+    /** @var Collection|Campus[] $campuses */
+    private $campuses;
 
     /**
      * Will be null if severity is turned off in admin config
@@ -172,6 +179,7 @@ class Model implements ISoftDeletable
         $this->types    = new GenericCollection(PastoralType\Model::class);
         $this->subTypes = new GenericCollection(PastoralSubType\Model::class);
         $this->houses   = new GenericCollection(House::class);
+        $this->campuses = new GenericCollection(Campus::class);
 
         // This is a collection of groups that have access to this report
         $this->groups = new GenericCollection(PastoralGroup\Model::class);
@@ -251,6 +259,24 @@ class Model implements ISoftDeletable
     public function getHousesCsv(): ?string
     {
         return $this->housesCsv;
+    }
+
+    /**
+     * @param null|string $campusesCsv
+     * @return $this
+     */
+    public function setCampusesCsv(?string $campusesCsv): self
+    {
+        $this->campusesCsv = $campusesCsv;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getCampusesCsv(): ?string
+    {
+        return $this->campusesCsv;
     }
 
     /**
@@ -547,6 +573,24 @@ class Model implements ISoftDeletable
     public function getHouses(): ?Collection
     {
         return $this->houses;
+    }
+
+    /**
+     * @param Collection|Campus[] $campuses
+     * @return $this
+     */
+    public function setCampuses(Collection $campuses): self
+    {
+        $this->campuses = $campuses;
+        return $this;
+    }
+
+    /**
+     * @return null|Collection|Campus[]
+     */
+    public function getCampuses(): ?Collection
+    {
+        return $this->campuses;
     }
 
     /**

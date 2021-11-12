@@ -19,25 +19,25 @@
                     <div class="small-12 medium-10 columns no-pad">
                         <dl>
                             {# Display student name #}
-                            <dt class="small-12 medium-3">Campus</dt>
-                            <dd class="small-12 medium-9">{% for campus in student.campusCollection %}{{ campus.name }} {% endfor %}</dd>
-                            <dt class="small-12 medium-3">Year Level</dt>
-                            <dd class="small-12 medium-9">{{ student.year.name | default('Unknown') }}</dd>
-                            <dt class="small-12 medium-3">House</dt>
-                            <dd class="small-12 medium-9">{{ student.schoolhouse.house | default('Unknown') }}</dd>
+                            <dt class="small-4 medium-3 columns">Campus</dt>
+                            <dd class="small-8 medium-9 columns">{% for campus in student.campusCollection %}{{ campus.name }} {% endfor %}</dd>
+                            <dt class="small-4 medium-3 columns">Year Level</dt>
+                            <dd class="small-8 medium-9 columns">{{ student.year.name | default('Unknown') }}</dd>
+                            <dt class="small-4 medium-3 columns">House</dt>
+                            <dd class="small-8 medium-9 columns">{{ student.schoolhouse.house | default('Unknown') }}</dd>
 
                             {# Display links to students parents #}
 
                             {% if not student.hideContacts %}
                             {% for parent in student.parents %}
-                                <dt class="small-12 medium-3">
+                                <dt class="small-4 medium-3 columns">
                                     {% if loop.first %}
                                         Parents
                                     {% else %}
                                         &nbsp;
                                     {% endif %}
                                 </dt>
-                                <dd class="small-12 medium-9">
+                                <dd class="small-8 medium-9 columns">
                                     <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a>
                                 </dd>
                             {% endfor %}

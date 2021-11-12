@@ -66,6 +66,7 @@ class Module extends BaseModule
                     'pastoralTypeMapper'            => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Type\Mapper::class),
                     'pastoralSubTypeMapper'         => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\SubType\Mapper::class),
                     'pastoralDataSource'            => $injector->lazyGet('pastoralDataSource'),
+                    'termMapper'                    => $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Term\Mapper::class),
                 ]
             )
         );

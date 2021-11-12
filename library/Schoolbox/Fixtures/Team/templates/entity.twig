@@ -3,7 +3,7 @@
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) }}">{{ sport.name }}</a></li>
     <li><a href="{{ routeLookup('sportsfixturesDivision.getEntity', { entityId: division.id }) }}">{{ division.name }}</a></li>
-    <li class="active"><a href="#">{{ team.name }}</a></li>
+    <li class="active"><span>{{ team.name }}</span></li>
 </ul>
 
 <div class="row">

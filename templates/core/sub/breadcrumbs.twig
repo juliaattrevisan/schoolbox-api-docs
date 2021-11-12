@@ -16,9 +16,15 @@
          # Alternately, use CSS to apply a style to the last crumb
          #}
         {% for crumb in crumbsArray | filter(i=>i[0]) | map(i=>i) %}
-            <li{% if loop.last %} class="active"{% endif %}>
-                <a{% if crumb[1] ?? false %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
+            {% if loop.last %}
+            <li class="active">
+                <span>{{ crumb[0] }}</span>
             </li>
+            {% else %}
+            <li>
+                <a {% if crumb[1] ?? false %} href="{{ crumb[1] }}" {% endif %}>{{ crumb[0] }}</a>
+            </li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endmacro %}
@@ -32,9 +38,15 @@
 {% macro basicArray(crumbsArray) %}
     <ul class="breadcrumb-basic meta no-margin">
         {% for crumb in crumbsArray | filter(i=>i[0]) | map(i=>i) %}
-            <li{% if loop.last %} class="active"{% endif %}>
-                <a{% if crumb[1] ?? false %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
+            {% if loop.last %}
+            <li class="active">
+                <span>{{ crumb[0] }}</span>
             </li>
+            {% else %}
+            <li>
+                <a {% if crumb[1] ?? false %} href="{{ crumb[1] }}" {% endif %}>{{ crumb[0] }}</a>
+            </li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endmacro %}

@@ -128,6 +128,10 @@ class Report_StaffDepartment extends Report_Abstract
                 $sort['StaffPreferredName'][$k] = $v['StaffPreferredName'];
             }
 
+            if (empty($sort)) {
+                return;
+            }
+
             array_multisort(
                 $sort['StaffDepartment'],
                 SORT_ASC,

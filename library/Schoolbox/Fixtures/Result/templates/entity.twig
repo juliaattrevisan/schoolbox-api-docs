@@ -4,11 +4,10 @@
     <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
     <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
     <li><a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.id}) }}">{{ match.name }}</a></li>
-
     {% if result.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: result.id}) }}">Result</a></li>
+        <li class="active"><span>Result</span></li>
     {% else %}
-        <li class="active"><a href="#">{{ action }}</a></li>
+        <li class="active"><span>{{ action }}</span></li>
     {% endif %}
 </ul>
 

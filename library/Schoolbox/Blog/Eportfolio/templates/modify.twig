@@ -32,7 +32,7 @@
 <ul class="breadcrumb">
     <li><a href="/eportfolio/{{ pageOwner.id }}">{{ pageOwner.getFullName }}'s ePortfolio</a></li>
     <li><a href="/eportfolio/{{ pageOwner.id }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
-    <li class="active"><a href="#">{% if record is defined %}Modify{% else %}Post{% endif %} Blog</a></li>
+    <li class="active"><span>{% if record is defined %}Modify{% else %}Post{% endif %} Blog</span></li>
 </ul>
 
 <div class="row">

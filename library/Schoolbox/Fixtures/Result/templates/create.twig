@@ -29,11 +29,10 @@
     <li><a href="#">{{ sport.name }}</a></li>
     <li><a href="3">{{ division.name }}</a></li>
     <li><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchHeading.generate(match) }}</a></li>
-
     {% if result.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: result.id}) }}">Result for {{ team.name }}</a></li>
+        <li class="active"><span>Result for {{ team.name }}</span></li>
     {% else %}
-        <li class="active"><a href="#">{{ action }} Result for {{ team.name }}</a></li>
+        <li class="active"><span>{{ action }} Result for {{ team.name }}</span></li>
     {% endif %}
 </ul>
 

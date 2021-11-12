@@ -7,12 +7,25 @@
             $('#component{COMPONENT_INSTANCE_ID}').find('[data-poll-delete]').click(function(event) {
                 event.preventDefault();
 
-                var self = $(this);
+                let self = $(this);
+                let href = "/poll/modifyForm.php";
 
                 self.confirmDialog({
                     text: 'Delete this poll and all of the results?',
                     confirmEvent: function() {
-                        window.location.href = self.attr('href');
+                        // A toast
+                        let $toast = $('[data-poll-toast]');
+                        $toast.toastActivate({text: 'Deleting Poll...'});
+                        $.post(href, {delete: true, id: self.data().id, componentId: self.data().componentid})
+                                .done(function() {
+                                    window.location.reload();
+                                    // Toast success
+                                    $toast.toastTimeout({text: 'Poll deleted.', css: 'success'});
+                                })
+                                .fail(function() {
+                                    // Toast fail
+                                    $toast.toastTimeout({text: 'Delete failed.', css: 'alert'});
+                                });
                     }
                 });
             });
@@ -104,7 +117,7 @@
                             <!-- END show_results -->
                             <!-- BEGIN modify_poll -->
                             <li><a href="/poll/modify/{POLL_ID}" class="icon-modify">Modify</a></li>
-                            <li><a href="/poll/modifyForm.php?delete={POLL_ID}&amp;homepageComponentID={COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete">Delete</a></li>
+                            <li><a href="#" data-id="{POLL_ID}" data-componentid="{COMPONENT_INSTANCE_ID}" data-poll-delete class="icon-delete">Delete</a></li>
                             <!-- END modify_poll -->
                         </ul>
                         <!-- END poll_actions -->
@@ -177,3 +190,4 @@
         </div>
     </div>
 </div>
+<div class="toast" data-poll-toast></div>

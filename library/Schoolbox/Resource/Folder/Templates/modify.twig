@@ -232,7 +232,11 @@
 
 <ul class="breadcrumb">
     {% for breadcrumb in breadcrumbs %}
-        <li {% if loop.last %}class="active"{% endif %}><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% if loop.last %}
+        <li class="active"}><span>{{ breadcrumb.text }}</span></li>
+        {% else %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endif %}
     {% endfor %}
 </ul>
 

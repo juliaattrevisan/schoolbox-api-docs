@@ -115,7 +115,7 @@
 
                                     {% for campus in timetable %}
                                         <select class="adtp-tt-period {% if loop.index0 > 0 %}hide{% endif %}" data-adtp-tt-period data-campus="{{ campus.campusId }}">
-                                            {% for description in timetable[campus.campusId].desc %}
+                                            {% for description in (timetable[campus.campusId].desc ?? []) %}
                                                 <option value="" data-start-time="{{ timetable[campus.campusId].start[loop.index0] }}" data-end-time="{{ timetable[campus.campusId].end[loop.index0] }}">{{ description }}</option>
                                             {% endfor %}
                                         </select>
@@ -179,7 +179,7 @@
         timetable: {{ timetable ? 'true' : 'false' }},
         {% if timetableVars %}
         timetableVars: {
-            {% for campus in timetableVars.byCampus %}
+            {% for campus in (timetableVars.byCampus ?? []) %}
             campus_{{ campus.id }}: {
                 cycles: {{ campus.cycles|raw }}
             },

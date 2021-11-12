@@ -1,7 +1,7 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
     <li><a href="{{ routeLookup('resourceCategory.browse') }}">Categories</a></li>
-    <li class="active"><a href="{{ routeLookup('resourceCategory.browse') }}?category={{ category.id|e('url') }}" >{{ category.name }}</a></li>
+    <li class="active"><span>{{ category.name }}</span></li>
 </ul>
 
 <div class="row">
