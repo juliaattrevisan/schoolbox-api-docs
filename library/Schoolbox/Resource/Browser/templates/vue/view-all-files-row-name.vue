@@ -29,7 +29,7 @@ export default {
             </div>
         </div>
         <nav>
-            <a class="icon-modify" :href="data.edit_url" title="Modify File"></a>
+            <a class="icon-modify" :href="data.editUrl" title="Modify File"></a>
         </nav>
     </div>
 </template>
