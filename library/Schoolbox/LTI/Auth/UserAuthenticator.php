@@ -14,29 +14,29 @@ use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResult;
 use OAT\Library\Lti1p3Core\Security\User\Result\UserAuthenticationResultInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
-use Schoolbox\UserMapper;
+use Schoolbox\LTI\Util\UserCodec;
 
 /**
  * User authenticator for the Schoolbox platform.
  *
- * Currently only authenticates whatever user is passed in the login hint: if
+ * Currently, only authenticates whatever user is passed in the login hint: if
  * no user was passed, authentication fails.
  */
 class UserAuthenticator implements UserAuthenticatorInterface
 {
     /**
-     * The user mapper, used to find the authenticated user.
+     * The user codec, used to transform the login hint into a user object.
      */
-    private UserMapper $userMapper;
+    private UserCodec $userCodec;
 
     /**
      * Constructor
      *
-     * @param UserMapper $userMapper
+     * @param UserCodec $userCodec
      */
-    public function __construct(UserMapper $userMapper)
+    public function __construct(UserCodec $userCodec)
     {
-        $this->userMapper = $userMapper;
+        $this->userCodec = $userCodec;
     }
 
     /**
@@ -52,7 +52,7 @@ class UserAuthenticator implements UserAuthenticatorInterface
             return new UserAuthenticationResult(false);
         }
 
-        $user = $this->userMapper->findByUsername($loginHint);
+        $user = $this->userCodec->decode($loginHint);
         if ($user) {
             return new UserAuthenticationResult(
                 true,

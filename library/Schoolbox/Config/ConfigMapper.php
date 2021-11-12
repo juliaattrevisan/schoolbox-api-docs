@@ -133,6 +133,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_JWT_PUBLIC_KEY  = 'jwt_public_key';
     public const NAME_JWT_PRIVATE_KEY = 'jwt_private_key';
+    public const NAME_JWT_LEEWAY      = 'jwt_leeway';
     public const NAME_ETHERPAD_HOST   = 'etherpad_host';
 
     public const NAME_SITE_VERSION = 'site_version';
@@ -167,6 +168,8 @@ class ConfigMapper extends Mapper
     public const NAME_INTELLISCHOOL_DEPLOYMENT_ID                     = 'intellischool_deployment_id';
     public const NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL        = 'intellischool_learner_dashboard_base_url';
     public const NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL         = 'intellischool_cohort_dashboard_base_url';
+
+    public const NAME_PASTORAL_FLAG_COUNT_PERIOD = 'pastoral_flag_count_period';
 
     /**
      * @throws \InvalidArgumentException

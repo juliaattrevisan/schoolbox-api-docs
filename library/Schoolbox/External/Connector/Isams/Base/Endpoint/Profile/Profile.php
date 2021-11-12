@@ -195,14 +195,15 @@ class Profile implements IStrategy
          */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
-            $username = trim((string)$student->UserName);
+            $academicHouse = trim((string)$student->AcademicHouse);
+            $boardingHouseName = '';
+            $dob = strtotime(trim((string)$student->DOB));
             $firstname = trim((string)$student->Forename);
+            $form = trim((string)$student->Form);
             $lastname = trim((string)$student->Surname);
             $studentId = trim((string)$student->xpath('@Id')[0]);
+            $username = trim((string)$student->UserName);
             $yearLevel = trim((string)$student->NCYear);
-            $form = trim((string)$student->Form);
-            $academicHouse = trim((string)$student->AcademicHouse);
-            $dob = strtotime(trim((string)$student->DOB));
 
             /* Find out if this externalId already has a student profile
              * If one already exists, load it, update it, then save it
@@ -285,6 +286,7 @@ class Profile implements IStrategy
                 ->setYearLevel($yearLevel)
                 ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
                 ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+                ->setBoardingHouseName($boardingHouseName)
 
                 /**
                  * Flags

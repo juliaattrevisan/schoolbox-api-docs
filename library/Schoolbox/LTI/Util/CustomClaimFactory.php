@@ -97,7 +97,7 @@ class CustomClaimFactory
     {
         $new                                 = (clone $this);
         $new->translations['$Context.id']    = $contextClaim->getIdentifier();
-        $new->translations['$Context.type']  = implode(',', $contextClaim->getTypes());
+        $new->translations['$Context.type']  = implode(' ', $contextClaim->getTypes());
         $new->translations['$Context.label'] = $contextClaim->getLabel();
         $new->translations['$Context.title'] = $contextClaim->getTitle();
         return $new;
@@ -111,7 +111,7 @@ class CustomClaimFactory
      */
     public function withPlatformInstance(PlatformInstanceClaim $platformInstanceClaim): self
     {
-        $new                                                  = (clone $this);
+        $new                                                          = (clone $this);
         $new->translations['$ToolPlatformInstance.productFamilyCode'] = $platformInstanceClaim->getProductFamilyCode();
         $new->translations['$ToolPlatformInstance.version']           = $platformInstanceClaim->getVersion();
         $new->translations['$ToolPlatformInstance.guid']              = $platformInstanceClaim->getGuid();

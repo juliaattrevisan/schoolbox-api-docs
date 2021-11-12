@@ -219,10 +219,8 @@ class Profile implements IStrategy
 
         foreach ($students as $student) {
             $externalId = trim((string)$student->xpath('@id')[0]);
-
             $academicHouse = trim((string)$student->house);
-
-            $title = '';
+            $boardingHouseName = '';
             $campus = $this->campus;
             $dob = trim((string)$student->datebirth);
             $email = trim((string)$student->email);
@@ -235,6 +233,7 @@ class Profile implements IStrategy
             $mobile = trim((string)$student->mobile);
             $nsn = trim((string)$student->nsn);
             $startingDate = $this->traverser->findDate(trim((string)$student->startingdate));
+            $title = '';
             $tutorGroup = trim((string)$student->tutor);
             $username = trim((string)$student->username);
             $yearLevel = trim((string)$student->yearlevel);
@@ -365,6 +364,7 @@ class Profile implements IStrategy
                 ->setYearLevel($yearLevel)
                 ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
                 ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+                ->setBoardingHouseName($boardingHouseName)
                 ;
 
             /* Date of birth requires special treatment as ADF doesn't deal with nulls well

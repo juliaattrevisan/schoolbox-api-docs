@@ -7,8 +7,8 @@
         </div>
         <div class="small-12 medium-10 large-11 columns">
             <dl class="profile">
-                <dt class="small-12 medium-3">Created By:</dt>
-                <dd class="small-12 medium-9">
+                <dt class="small-4 medium-3 columns">Created By:</dt>
+                <dd class="small-8 medium-9 columns">
                     {% if record.owner.deletedAt.isNull %}
                         <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
                     {% else %}
@@ -16,37 +16,37 @@
                     {% endif %}
                 </dd>
 
-                <dt class="small-12 medium-3">Created:</dt>
-                <dd class="small-12 medium-9">{{ record.createdAt.long }}</dd>
+                <dt class="small-4 medium-3 columns">Created:</dt>
+                <dd class="small-8 medium-9 columns">{{ record.createdAt.long }}</dd>
 
                 {% if record.createdAt.long != record.updatedAtDisplay.long %}
-                    <dt class="small-12 medium-3">Last Updated By:</dt>
-                    <dd class="small-12 medium-9"><a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a></dd>
+                    <dt class="small-4 medium-3 columns">Last Updated By:</dt>
+                    <dd class="small-8 medium-9 columns"><a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a></dd>
                 {% endif %}
 
                 {% if record.createdAt.long != record.updatedAtDisplay.long %}
-                    <dt class="small-12 medium-3">Last Updated:</dt>
-                    <dd class="small-12 medium-9">{{ record.updatedAtDisplay.long }}</dd>
+                    <dt class="small-4 medium-3 columns">Last Updated:</dt>
+                    <dd class="small-8 medium-9 columns">{{ record.updatedAtDisplay.long }}</dd>
                 {% endif %}
 
                 {% if user.role.isStaff %}
 
                     {% if record.severity and config.pastoral_severity %}
-                        <dt class="small-12 medium-3">{{ locale.severity.proper }}:</dt>
-                        <dd class="small-12 medium-9">{{ record.severity.name }}</dd>
+                        <dt class="small-4 medium-3 columns">{{ locale.severity.proper }}:</dt>
+                        <dd class="small-8 medium-9 columns">{{ record.severity.name }}</dd>
                     {% endif %}
 
-                    <dt class="small-12 medium-3">Type:</dt>
-                    <dd class="small-12 medium-9">{{ record.type.name }}</dd>
+                    <dt class="small-4 medium-3 columns">Type:</dt>
+                    <dd class="small-8 medium-9 columns">{{ record.type.name }}</dd>
 
                     {% if record.subtype.name ?? '' is not empty %}
-                        <dt class="small-12 medium-3">Sub-Type:</dt>
-                        <dd class="small-12 medium-9">{{ record.subtype.name }}</dd>
+                        <dt class="small-4 medium-3 columns">Sub-Type:</dt>
+                        <dd class="small-8 medium-9 columns">{{ record.subtype.name }}</dd>
                     {% endif %}
 
                     {% if record.points is not empty %}
-                        <dt class="small-12 medium-3">Points:</dt>
-                        <dd class="small-12 medium-9">{{ record.points }}</dd>
+                        <dt class="small-4 medium-3 columns">Points:</dt>
+                        <dd class="small-8 medium-9 columns">{{ record.points }}</dd>
                     {% endif %}
 
                 {% endif %}

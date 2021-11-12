@@ -42,7 +42,7 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
     <li><a href="{{ routeLookup('resourceCategory.browse') }}">Resource Categories</a></li>
-    <li class="active"><a href="#">{% if category is defined %}Edit{% else %}Add{% endif %}</a></li>
+    <li class="active"><span>{% if category is defined %}Edit{% else %}Add{% endif %}</span></li>
 </ul>
 
 <div class="actions-small-1 row">

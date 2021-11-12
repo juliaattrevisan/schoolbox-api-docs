@@ -282,6 +282,9 @@ class Controller extends Base
             $amqpOnline = false;
         }
 
+        // SSL cert details
+        [$isCustomCert, $certExpiry] = $this->sslCertCheck();
+
         // Get logs
         $logs = [];
         $logsRecent = LogMapper::getInstance()->findRecent();
@@ -368,11 +371,14 @@ class Controller extends Base
                     'ssh_light' => $ssh_light,
                     'ssh_status' => $ssh_status,
                     'is_cloud'  => $this->isCloudHosted(),
+                    'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
 
                     /* Turnitin status indicator
                      */
                     'turnitin' => (new \Schoolbox\Learning\Turnitin\Admin\Status($this->getConfigLoader()))->generate(),
                     'amqpOnline' => $amqpOnline,
+                    'isCustomCert' => $isCustomCert,
+                    'certExpiry'   => $certExpiry,
                 ),
             )
         );
@@ -650,5 +656,54 @@ class Controller extends Base
     private function isCloudHosted(): bool
     {
         return $this->getConfigLoader()->get('site_environment') === Version::SITE_ENVIRONMENT_CLOUD_SAAS;
+    }
+
+
+    /**
+     * Returns whether this onprem instance:
+     * * is using a custom cert or a managed LetsEncrypt cert, and
+     * * number of days till cert expiry
+     *
+     * If cloud-hosted, returns NULL
+     *
+     * @return array
+     */
+    private function sslCertCheck(): array
+    {
+        if ($this->isCloudHosted()) {
+            return [null, null];
+        }
+        $streamContext = stream_context_create(
+            [
+                'ssl' => [
+                    'capture_peer_cert' => true,
+                ],
+            ]
+        );
+        $timeout = 4.0;
+        $client = stream_socket_client(
+            sprintf("ssl://%s:443", $_SERVER['HTTP_HOST']),
+            $errorNumber,
+            $errorDescription,
+            $timeout,
+            STREAM_CLIENT_CONNECT,
+            $streamContext
+        );
+        $response = stream_context_get_params($client);
+        $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
+
+        // Check cert is issued by LetsEncrypt for exact hostname
+        if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
+            // Not issued by LetsEncrypt
+            $isCustomCert = true;
+        } else {
+            // Does not contain exact match
+            $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $_SERVER['HTTP_HOST']) === false;
+        }
+
+        return [
+            $isCustomCert,
+            (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24),
+        ];
     }
 }

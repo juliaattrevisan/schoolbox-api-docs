@@ -78,6 +78,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 $this->setVar(
                     [
                         'POLL_ID'           => $poll['id'],
+                        'FOLDER_ID'         => $poll['folder_id'],
                         'POLL_QUESTION'     => Scrub::text($poll['question']),
                         'POLL_AUTHOR_ID'    => $author->getId(),
                         'POLL_AUTHOR_THUMB' => "/portrait.php?id={$author->getId()}&size=square64",

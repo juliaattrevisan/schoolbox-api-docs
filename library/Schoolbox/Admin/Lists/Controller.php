@@ -617,7 +617,7 @@ class Controller extends Base
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
                         'width'     => 2,
-                        'default'   => '',
+                        'default'   => null,
                     ]
                 ]
             ],

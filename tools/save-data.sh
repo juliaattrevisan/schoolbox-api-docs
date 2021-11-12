@@ -64,6 +64,10 @@ cleanup_vagrant() {
   mysql --defaults-extra-file=~/.my.cnf schoolbox < $CACHE_DIR/vagrant-cleanup-secrets.sql;
   log "Applying data dir sql changes";
   /vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+
+  # These files are not migrated by s3-migration tool, so will cause issues if we use the generated dataset with S3
+  log "Deleting invalid 'storage_transform' rows"
+  mysql --defaults-extra-file=~/.my.cnf schoolbox -e "DELETE st FROM storage_transform st LEFT JOIN storage s ON st.hash = s.hash WHERE s.storage_id IS NULL";
 }
 
 # Update instance to act like a vagrant development environment
