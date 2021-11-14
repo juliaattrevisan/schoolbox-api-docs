@@ -7,16 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\ResourceLink\Assessment;
 
 use Alaress\Codec\ICodec;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 
 /**
- * Factory for building resource link claims.
+ * Factory for building resource link claims from an assessment.
  */
-class ResourceLinkClaimFactory
+class ClaimFactory
 {
     /**
      * Codec, for encoding resource link ID into a claim identifier.

@@ -7,17 +7,19 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\ResourceLink\Assessment;
+
+use Schoolbox\LTI\Util\UriBasedCodec;
 
 /**
- * Codec for assessment resource link identifiers.
+ * Codec for assessment resource link identifiers from an assessment.
  *
  * Encodes an assessment ID into a URI which represents the assessment, and vice
  * versa.
  *
  * (Note that the URI may not actually be a valid URL.)
  */
-class ResourceLinkCodec extends UriBasedCodec
+class Codec extends UriBasedCodec
 {
     /**
      * @inheritdoc

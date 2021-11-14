@@ -24,8 +24,8 @@ use Schoolbox\LTI\Util\ContextClaimFactory;
 use Schoolbox\LTI\Util\ContextCodec;
 use Schoolbox\LTI\Util\CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
-use Schoolbox\LTI\Util\ResourceLinkClaimFactory;
-use Schoolbox\LTI\Util\ResourceLinkCodec;
+use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory;
+use Schoolbox\LTI\ResourceLink\Assessment\Codec;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\LTI\Util\UserCodec;
@@ -157,8 +157,8 @@ class LaunchFactory
         $additionalClaims = [];
 
         // Resource link claim: talk about the assessment
-        $resourceLinkCodec  = new ResourceLinkCodec($baseUrl);
-        $resourceLinkClaim  = (new ResourceLinkClaimFactory($resourceLinkCodec))
+        $resourceLinkCodec  = new Codec($baseUrl);
+        $resourceLinkClaim  = (new ClaimFactory($resourceLinkCodec))
             ->buildForAssessment($assessment);
         $additionalClaims[] = $resourceLinkClaim;
 

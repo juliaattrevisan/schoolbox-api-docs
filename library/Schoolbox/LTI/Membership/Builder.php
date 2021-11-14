@@ -30,7 +30,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Util\ContextCodec;
-use Schoolbox\LTI\Util\ResourceLinkCodec;
+use Schoolbox\LTI\ResourceLink\Assessment\Codec;
 use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -146,7 +146,7 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
-        $resourceLinkCodec = (new ResourceLinkCodec($this->buildBaseUrl()));
+        $resourceLinkCodec = (new Codec($this->buildBaseUrl()));
 
         // Extract an ID out of the resource link
         $assessmentId = $resourceLinkCodec->decode($resourceLinkIdentifier);
