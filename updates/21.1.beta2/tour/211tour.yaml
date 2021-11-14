@@ -13,20 +13,19 @@ tour:
         type: modal
         content: "<img src='/static/images/tour/21_1_release.png' style='width:100%;margin-bottom:16px;'>
                   <h3>Pastoral Flags</h3>
-                  <p>Staying well informed about each and every student can be challenging,
-                  requiring teachers to keep up to date with a range of student information including ILPs,
-                  medical plans and strategy sheets.
-                  Pastoral flags will be visible on the class list, Synergetic attendance screen and the student profile page.</p>
+                  <p>Visible on the class list, Synergetic attendance screen, and student profile pages—pastoral flags
+                  keep teachers informed of a range of student information including ILPs, medical plans, and strategy
+                  sheets, at a glance.</p>
                   <h3>Class Badge Report</h6>
                   <p>Keep track of your students’ goals and achievements easily with the new class badge report.
-                  Quickly assign new goals, mark off achievements and identify next steps.</p>
+                  Quickly assign new goals, mark off achievements, and identify next steps.</p>
                   <h3>3rd Party Assessments</h3>
-                  <p>Now you can integrate your favourite 3rd party learning tools into your class work and markbook.
-                  Assign students work in your favourite tool and we will launch the work for the student
-                  and even capture their progress and results, so you can review in your markbook.</p>
+                  <p>Now you can integrate your favourite online learning tools into your class work and markbook.
+                  Assign students work in your favourite tool and we’ll launch that work for the student and even
+                  capture their progress and results, so you can review in your markbook.</p>
                   <h3>SimCheck by TurnitIn (available 2022)</h3>
-                  <p>The similarity checking system is getting a big update to improve the integrity checking of student submissions.
-                  Utilising TurnitIn Simcheck, you will now get improved reports that are even editable.
-                  The accuracy is further improved by automatically excluding your worksheets and never matching the student against themselves.</p>
+                  <p>The similarity system has been upgraded to Simcheck by Turninitin. You will now get improved
+                  reports that are modifiable. The accuracy has been improved by automatically excluding your worksheets
+                  and never matching the student against themselves.</p>
                   <p><a href='https://help.schoolbox.com.au/homepage/3174'>Find out more via our release notes.</a><br />"
         class: introjs-newsmodal
