@@ -16,10 +16,6 @@ use ArrayAccess;
 use Aura\Router;
 use Homepage;
 use InvalidArgumentException;
-use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
-use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
-use OAT\Library\Lti1p3Nrps\Service\Server\Handler\MembershipServiceServerRequestHandler;
 use OutOfBoundsException;
 use PDOException;
 use RangeException;
@@ -27,12 +23,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Curriculum;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Instance;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\LTI\Membership\Builder;
-use Schoolbox\LTI\ResourceLink\LaunchFactory;
-use Schoolbox\LTI\Util\ServerRequestFactory;
-use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -53,7 +43,6 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 use UnexpectedValueException;
 use Schoolbox\Resource\Folder;
@@ -956,62 +945,5 @@ class Controller extends BaseController
             }),
             'userAccess'          => $userAccess
         ]));
-    }
-
-    /**
-     * LTI 1.3 NPRS endpoint: retrieves this folder's members.
-     *
-     * A `rlid` (resource link ID) query string parameter may be supplied:
-     * if supplied, that corresponds to an LTI assessment's ID, and the unique
-     * membership for that assessment will be supplied instead.
-     *
-     * TODO consider moving this elsewhere, so folder doesn't require this method's dependencies
-     *
-     * @api GET /resource/folder/{id}/lti/memberships
-     * @since 21.1.0
-     *
-     * @param Model $folder
-     */
-    public function getMemberships(Model $folder): void
-    {
-        // Build and validate membership request
-        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-nrps/doc/platform/
-        $request = (new ServerRequestFactory())->build($this->request);
-
-        /** @var RegistrationRepositoryInterface $registrationRepository */
-        $registrationRepository = $this->getDi()->get('lti.registrations');
-
-        /** @var UserCodec $userCodec */
-        $userCodec = $this->getDi()->get('lti.userCodec');
-
-        /** @var AssessmentDataSource $assessmentDataSource */
-        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-        /** @var Instance $instance */
-        $instance = $this->getDi()->get('instance');
-
-        $builder = new Builder(
-            $folder,
-            $this->userAccessMapper,
-            $assessmentDataSource,
-            $this->getConfigLoader(),
-            $userCodec,
-            new LaunchFactory(
-                $registrationRepository,
-                Access::getInstance(),
-                $this->router,
-                $instance,
-                $this->getConfigLoader(),
-                new UserCodec(UserMapper::getInstance()),
-            ),
-        );
-
-        // Access token sanity checker: validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($registrationRepository);
-
-        $handler = new MembershipServiceServerRequestHandler($builder);
-
-        $server = new LtiServiceServer($validator, $handler);
-        $this->populateResponseFromPsr7Response($server->handle($request));
     }
 }
