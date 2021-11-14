@@ -20,12 +20,12 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model;
-use Schoolbox\LTI\Context\Folder\ClaimFactory;
-use Schoolbox\LTI\Context\Folder\Codec;
-use Schoolbox\LTI\Custom\ClaimFactory;
+use Schoolbox\LTI\Context\Folder\ClaimFactory as FolderClaimFactory;
+use Schoolbox\LTI\Context\Folder\Codec as FolderCodec;
+use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
-use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory;
-use Schoolbox\LTI\ResourceLink\Assessment\Codec;
+use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory as AssessmentClaimFactory;
+use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
 use Schoolbox\LTI\Util\RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\LTI\Util\UserCodec;
@@ -157,13 +157,13 @@ class LaunchFactory
         $additionalClaims = [];
 
         // Resource link claim: talk about the assessment
-        $resourceLinkCodec  = new Codec($baseUrl);
-        $resourceLinkClaim  = (new ClaimFactory($resourceLinkCodec))
+        $resourceLinkCodec  = new AssessmentCodec($baseUrl);
+        $resourceLinkClaim  = (new AssessmentClaimFactory($resourceLinkCodec))
             ->buildForAssessment($assessment);
         $additionalClaims[] = $resourceLinkClaim;
 
         // Context claim: talk about the folder
-        $contextClaim       = (new ClaimFactory(new Codec($baseUrl)))
+        $contextClaim       = (new FolderClaimFactory(new FolderCodec($baseUrl)))
             ->buildForFolder($assessment->getBaseContext()->getFolder());
         $additionalClaims[] = $contextClaim;
 
@@ -187,7 +187,7 @@ class LaunchFactory
         // LIS claim: I don't think we support this yet
 
         // Custom claims, with whatever was passed from the product
-        $customClaim = (new ClaimFactory())
+        $customClaim = (new CustomClaimFactory())
             ->withUser($actingUser)
             ->withActualUser($currentUser)
             ->withResourceLink($resourceLinkClaim)
