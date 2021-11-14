@@ -220,7 +220,7 @@ class LaunchFactory
             (clone $baseUrl)
                 ->setPath(
                     $this->router->generate(
-                        'ltiPlatformContext.getMemberships',
+                        'ltiPlatformContext.getMembershipsForFolder',
                         ['folderId' => $assessment->getBaseContext()->getFolder()->getId()]
                     )
                 )

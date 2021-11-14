@@ -28,13 +28,53 @@ use Schoolbox\UserMapper;
 class Controller extends BaseController
 {
     /**
+     * Repository of tool+platform registrations.
+     */
+    private RegistrationRepositoryInterface $registrations;
+
+    /**
+     * User codec, used to encode a user into a user ID when attaching mentors.
+     */
+    private UserCodec $userCodec;
+
+    /**
+     * Assessment data source, used to load an assessment's participation.
+     */
+    private AssessmentDataSource $assessmentDataSource;
+
+    private UserAccessMapper $userAccessMapper;
+
+    private Access $access;
+
+    /**
+     * Instance data repository, used to build resource link launch data.
+     */
+    private Instance $instance;
+
+    public function __construct(
+        RegistrationRepositoryInterface $registrations,
+        UserCodec $userCodec,
+        AssessmentDataSource $assessmentDataSource,
+        Instance $instance,
+        UserAccessMapper $userAccessMapper,
+        Access $access
+    ) {
+        $this->registrations        = $registrations;
+        $this->userCodec            = $userCodec;
+        $this->assessmentDataSource = $assessmentDataSource;
+        $this->instance             = $instance;
+        $this->userAccessMapper     = $userAccessMapper;
+        $this->access               = $access;
+    }
+
+    /**
      * LTI 1.3 NPRS endpoint: retrieves this folder's members.
      *
      * A `rlid` (resource link ID) query string parameter may be supplied:
      * if supplied, that corresponds to an LTI assessment's ID, and the unique
      * membership for that assessment will be supplied instead.
      *
-     * @api GET /lti-plaform/context/folder/{folderId}/memberships
+     * @api   GET /lti-plaform/context/folder/{folderId}/memberships
      * @since 21.1.0
      *
      * @param Model $folder
@@ -45,36 +85,24 @@ class Controller extends BaseController
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-nrps/doc/platform/
         $request = (new ServerRequestFactory())->build($this->request);
 
-        /** @var RegistrationRepositoryInterface $registrationRepository */
-        $registrationRepository = $this->getDi()->get('lti.registrations');
-
-        /** @var UserCodec $userCodec */
-        $userCodec = $this->getDi()->get('lti.userCodec');
-
-        /** @var AssessmentDataSource $assessmentDataSource */
-        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-
-        /** @var Instance $instance */
-        $instance = $this->getDi()->get('instance');
-
         $builder = new Builder(
             $folder,
-            UserAccessMapper::getInstance(),
-            $assessmentDataSource,
+            $this->userAccessMapper,
+            $this->assessmentDataSource,
             $this->getConfigLoader(),
-            $userCodec,
+            $this->userCodec,
             new LaunchFactory(
-                $registrationRepository,
-                Access::getInstance(),
+                $this->registrations,
+                $this->access,
                 $this->router,
-                $instance,
+                $this->instance,
                 $this->getConfigLoader(),
-                new UserCodec(UserMapper::getInstance()),
+                $this->userCodec,
             ),
         );
 
         // Access token sanity checker: validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($registrationRepository);
+        $validator = new RequestAccessTokenValidator($this->registrations);
 
         $handler = new MembershipServiceServerRequestHandler($builder);
 

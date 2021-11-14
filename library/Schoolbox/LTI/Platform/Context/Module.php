@@ -13,6 +13,8 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Resource\Folder\Model;
 
@@ -64,6 +66,8 @@ class Module extends BaseModule
                     'instance'          => $injector->lazyGet('instance'),
                     'userCodec'         => $injector->lazyGet('lti.userCodec'),
                     'accessTokenCache'  => $injector->lazyGet('lti.accessTokenCache'),
+                    'userAccessMapper'  => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'access'            => $this->getMapperFactory()->getLazy(Access::class),
                 ]
             )
         );
