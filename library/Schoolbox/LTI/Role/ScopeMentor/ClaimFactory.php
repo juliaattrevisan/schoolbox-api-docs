@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Role\ScopeMentor;
 
+use Alaress\Codec\ICodec;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -32,13 +33,20 @@ class ClaimFactory
     private Access $access;
 
     /**
+     * User codec, used for encoding a user into the claim.
+     */
+    private ICodec $userCodec;
+
+    /**
      * Constructor
      *
      * @param Access $access
+     * @param ICodec $userCodec
      */
-    public function __construct(Access $access)
+    public function __construct(Access $access, ICodec $userCodec)
     {
-        $this->access = $access;
+        $this->access    = $access;
+        $this->userCodec = $userCodec;
     }
 
     /**
@@ -59,14 +67,14 @@ class ClaimFactory
         if ($this->access->isInstructor($user, $folder)) {
             foreach ($assessment->getAllParticipants() as $participant) {
                 if (!$participant->isExcluded()) {
-                    $mentoredUserIds[] = $this->extractUserId($participant->getUser());
+                    $mentoredUserIds[] = $this->userCodec->encode($participant->getUser());
                 }
             }
         } elseif ($user->getRole()->isParent()) {
             foreach ($user->getChildren() as $child) {
                 $participant = $assessment->getParticipantIfExtant($child);
                 if ($participant && !$participant->isExcluded()) {
-                    $mentoredUserIds[] = $this->extractUserId($child);
+                    $mentoredUserIds[] = $this->userCodec->encode($child);
                 }
             }
         }
@@ -79,20 +87,5 @@ class ClaimFactory
         return count($mentoredUserIds) > 0
             ? new Claim(...$mentoredUserIds)
             : null;
-    }
-
-    /**
-     * Extracts the user ID out of a user object.
-     *
-     * Currently, this is the external ID as this is what's most likely to be
-     * shared; however this is subject to change.
-     *
-     * @param User $user
-     * @return string|null
-     */
-    private function extractUserId(User $user): ?string
-    {
-        // TODO use user codec here
-        return $user->getExternalId();
     }
 }

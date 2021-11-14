@@ -175,7 +175,7 @@ class LaunchFactory
         // for parents, this might be their kids
         // for kids, this won't be anyone
         // for teachers, this will be all participants in the assessment
-        $roleScopeMentorClaim = (new RoleScopeMentorClaimFactory($this->access))
+        $roleScopeMentorClaim = (new RoleScopeMentorClaimFactory($this->access, $this->userCodec))
             ->buildForAssessment($currentUser, $assessment);
         if ($roleScopeMentorClaim) {
             $additionalClaims[] = $roleScopeMentorClaim;
