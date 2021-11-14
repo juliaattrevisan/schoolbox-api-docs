@@ -7,22 +7,22 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util\Test;
+namespace Schoolbox\LTI\User\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * @covers \Schoolbox\LTI\Util\UserCodec
+ * @covers \Schoolbox\LTI\User\Codec
  */
-class UserCodecTest extends TestCase
+class CodecTest extends TestCase
 {
     /**
      * User codec being tested.
      */
-    private UserCodec $userCodec;
+    private Codec $userCodec;
 
     /**
      * Set up the user codec, with a stubbed user mapper.
@@ -43,12 +43,12 @@ class UserCodecTest extends TestCase
                     }
                 }
             );
-        $this->userCodec = new UserCodec($userMapper);
+        $this->userCodec = new Codec($userMapper);
     }
 
     /**
      * @dataProvider getTestEncodeData
-     * @covers \Schoolbox\LTI\Util\UserCodec::encode
+     * @covers \Schoolbox\LTI\User\Codec::encode
      *
      * @param User|null   $user
      * @param string|null $expected
@@ -81,7 +81,7 @@ class UserCodecTest extends TestCase
 
     /**
      * @dataProvider getTestDecodeData
-     * @covers \Schoolbox\LTI\Util\UserCodec::decode
+     * @covers \Schoolbox\LTI\User\Codec::decode
      *
      * @param string|null $encoded
      * @param User|null   $expected

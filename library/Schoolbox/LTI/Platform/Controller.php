@@ -40,7 +40,7 @@ use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Url\Factory;
 
 /**

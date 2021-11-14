@@ -32,7 +32,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\LTI\Membership\Builder;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;

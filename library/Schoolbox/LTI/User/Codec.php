@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\User;
 
 use Alaress\Codec\ICodec;
 use Schoolbox\User;
@@ -28,7 +28,7 @@ use TypeError;
  * TODO consider changing the format (encoded: FQDN, decoded: ID)
  *      this seems to be the standard for other types of claim
  */
-class UserCodec implements ICodec
+class Codec implements ICodec
 {
     /**
      * User mapper: used for creating a user from an encoded value.

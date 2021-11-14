@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
 use Schoolbox\LTI\Assessment\Score\Model as LtiScoreModel;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**

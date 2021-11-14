@@ -31,7 +31,7 @@ use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Context\Folder\Codec as FolderCodec;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;

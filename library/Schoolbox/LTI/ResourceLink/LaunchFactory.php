@@ -28,7 +28,7 @@ use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory as AssessmentClaimFactory
 use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
 use Schoolbox\LTI\Role\ScopeMentor\ClaimFactory as RoleScopeMentorClaimFactory;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User;

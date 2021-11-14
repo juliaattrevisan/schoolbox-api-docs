@@ -40,7 +40,7 @@ use Schoolbox\LTI\Provider as LtiTool;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\Util\ServerRequestFactory;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
