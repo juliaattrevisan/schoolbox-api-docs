@@ -10,10 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform\Context;
 
 use Alaress\Web\Controller\Base as BaseController;
+use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use OAT\Library\Lti1p3Nrps\Service\Server\Handler\MembershipServiceServerRequestHandler;
+use Psr\Cache\CacheItemPoolInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\LTI\Membership\Builder;
@@ -23,7 +27,6 @@ use Schoolbox\LTI\Util\ServerRequestFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model;
-use Schoolbox\UserMapper;
 
 class Controller extends BaseController
 {
@@ -42,8 +45,14 @@ class Controller extends BaseController
      */
     private AssessmentDataSource $assessmentDataSource;
 
+    /**
+     * User access mapper, used for retrieving the users within a folder.
+     */
     private UserAccessMapper $userAccessMapper;
 
+    /**
+     * Access class, used for retrieving the user's level of access to a folder.
+     */
     private Access $access;
 
     /**
@@ -51,13 +60,30 @@ class Controller extends BaseController
      */
     private Instance $instance;
 
+    /**
+     * Cache for access tokens.
+     */
+    private CacheItemPoolInterface $accessTokenCache;
+
+    /**
+     * Constructor
+     *
+     * @param RegistrationRepositoryInterface $registrations
+     * @param UserCodec                       $userCodec
+     * @param AssessmentDataSource            $assessmentDataSource
+     * @param Instance                        $instance
+     * @param UserAccessMapper                $userAccessMapper
+     * @param Access                          $access
+     * @param CacheItemPoolInterface          $accessTokenCache
+     */
     public function __construct(
         RegistrationRepositoryInterface $registrations,
         UserCodec $userCodec,
         AssessmentDataSource $assessmentDataSource,
         Instance $instance,
         UserAccessMapper $userAccessMapper,
-        Access $access
+        Access $access,
+        CacheItemPoolInterface $accessTokenCache
     ) {
         $this->registrations        = $registrations;
         $this->userCodec            = $userCodec;
@@ -65,6 +91,7 @@ class Controller extends BaseController
         $this->instance             = $instance;
         $this->userAccessMapper     = $userAccessMapper;
         $this->access               = $access;
+        $this->accessTokenCache     = $accessTokenCache;
     }
 
     /**
@@ -83,8 +110,21 @@ class Controller extends BaseController
     {
         // Build and validate membership request
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-nrps/doc/platform/
-        $request = (new ServerRequestFactory())->build($this->request);
 
+        // Access token sanity checker: validates the request token was created by a tool
+        $validator = new RequestAccessTokenValidator($this->registrations);
+
+        // Access token validity checker:
+        // validate the access token hasn't expired
+        $resourceServerValidator = new ResourceServer(
+            new AccessTokenRepository($this->accessTokenCache),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+        );
+        $request = $resourceServerValidator->validateAuthenticatedRequest(
+            (new ServerRequestFactory())->build($this->request)
+        );
+
+        // Handle the request
         $builder = new Builder(
             $folder,
             $this->userAccessMapper,
@@ -100,13 +140,8 @@ class Controller extends BaseController
                 $this->userCodec,
             ),
         );
-
-        // Access token sanity checker: validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations);
-
         $handler = new MembershipServiceServerRequestHandler($builder);
-
-        $server = new LtiServiceServer($validator, $handler);
+        $server  = new LtiServiceServer($validator, $handler);
         $this->populateResponseFromPsr7Response($server->handle($request));
     }
 }

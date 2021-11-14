@@ -60,7 +60,6 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'keyChains'         => $injector->lazyGet('lti.keyChains'),
                     'registrations'     => $injector->lazyGet('lti.registrations'),
                     'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
                     'instance'          => $injector->lazyGet('instance'),
