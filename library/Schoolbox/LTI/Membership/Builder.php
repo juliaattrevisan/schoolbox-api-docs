@@ -29,8 +29,8 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
-use Schoolbox\LTI\Context\Folder\Codec;
-use Schoolbox\LTI\ResourceLink\Assessment\Codec;
+use Schoolbox\LTI\Context\Folder\Codec as FolderCodec;
+use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
 use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -146,7 +146,7 @@ class Builder implements MembershipServiceServerBuilderInterface
         ?int $limit = null,
         ?int $offset = null
     ): MembershipInterface {
-        $resourceLinkCodec = (new Codec($this->buildBaseUrl()));
+        $resourceLinkCodec = (new AssessmentCodec($this->buildBaseUrl()));
 
         // Extract an ID out of the resource link
         $assessmentId = $resourceLinkCodec->decode($resourceLinkIdentifier);
@@ -457,7 +457,7 @@ class Builder implements MembershipServiceServerBuilderInterface
     private function buildMembership(iterable $members, ?string $resourceLinkIdentifier = null): MembershipInterface
     {
         $baseUrl      = $this->buildBaseUrl();
-        $contextId    = (new Codec($baseUrl))->encode($this->folder->getId());
+        $contextId    = (new FolderCodec($baseUrl))->encode($this->folder->getId());
         $membershipId = $contextId . '/memberships';
         if (isset($resourceLinkIdentifier)) {
             $membershipId = (new Uri($membershipId))
