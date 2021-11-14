@@ -7,16 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\Context\Folder;
 
 use Alaress\Codec\ICodec;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
- * Factory for building contexts.
+ * Factory for building contexts from a folder.
  */
-class ContextClaimFactory
+class ClaimFactory
 {
     /**
      * Codec, for encoding resource link ID into a claim identifier.

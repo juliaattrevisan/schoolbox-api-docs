@@ -20,8 +20,8 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model;
-use Schoolbox\LTI\Util\ContextClaimFactory;
-use Schoolbox\LTI\Util\ContextCodec;
+use Schoolbox\LTI\Context\Folder\ClaimFactory;
+use Schoolbox\LTI\Context\Folder\Codec;
 use Schoolbox\LTI\Util\CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory;
@@ -163,7 +163,7 @@ class LaunchFactory
         $additionalClaims[] = $resourceLinkClaim;
 
         // Context claim: talk about the folder
-        $contextClaim       = (new ContextClaimFactory(new ContextCodec($baseUrl)))
+        $contextClaim       = (new ClaimFactory(new Codec($baseUrl)))
             ->buildForFolder($assessment->getBaseContext()->getFolder());
         $additionalClaims[] = $contextClaim;
 

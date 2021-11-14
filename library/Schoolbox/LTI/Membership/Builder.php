@@ -29,7 +29,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
-use Schoolbox\LTI\Util\ContextCodec;
+use Schoolbox\LTI\Context\Folder\Codec;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec;
 use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Permission\Access\UserAccess;
@@ -457,7 +457,7 @@ class Builder implements MembershipServiceServerBuilderInterface
     private function buildMembership(iterable $members, ?string $resourceLinkIdentifier = null): MembershipInterface
     {
         $baseUrl      = $this->buildBaseUrl();
-        $contextId    = (new ContextCodec($baseUrl))->encode($this->folder->getId());
+        $contextId    = (new Codec($baseUrl))->encode($this->folder->getId());
         $membershipId = $contextId . '/memberships';
         if (isset($resourceLinkIdentifier)) {
             $membershipId = (new Uri($membershipId))

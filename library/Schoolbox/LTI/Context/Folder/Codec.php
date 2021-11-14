@@ -7,16 +7,18 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\Context\Folder;
+
+use Schoolbox\LTI\Util\UriBasedCodec;
 
 /**
- * Codec for context identifiers.
+ * Codec for context identifiers for a folder.
  *
  * Encodes a folder ID into a URI which represents the folder, and vice versa.
  *
  * (Note that the URI may not actually be a valid URL.)
  */
-class ContextCodec extends UriBasedCodec
+class Codec extends UriBasedCodec
 {
     /**
      * @inheritdoc
