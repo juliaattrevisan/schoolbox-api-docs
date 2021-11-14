@@ -1,0 +1,25 @@
+{% extends '@core/user/student.twig' %}
+
+{% block details_tutorTeacher %}
+    {% if showClasses %}
+                {% if tutorTeacher %}
+                    <dt class="small-4 medium-3 columns">Mentor:</dt>
+                    <dd class="small-8 medium-9 columns">
+                        {% if tutorTeacher.id %}
+                            <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
+                        {% else %}
+                            {{ tutorTeacher.formatName }}
+                        {% endif %}
+                        </dd>
+            {% endif %}
+        {% endif %}
+{% endblock details_tutorTeacher %}
+
+ {% block details_tutorGroup %}
+                                        {% if showClasses %}
+                                            {% if externalUser.StudentTutorDescription ?? false %}
+                                                <dt class="small-4 medium-3 columns">Mentor Group:</dt>
+                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endblock details_tutorGroup %}
