@@ -220,8 +220,8 @@ class LaunchFactory
             (clone $baseUrl)
                 ->setPath(
                     $this->router->generate(
-                        'folder.getMemberships',
-                        ['id' => $assessment->getBaseContext()->getFolder()->getId()]
+                        'ltiPlatformContext.getMemberships',
+                        ['folderId' => $assessment->getBaseContext()->getFolder()->getId()]
                     )
                 )
                 ->setQuery(['rlid' => $resourceLinkCodec->encode($assessment->getId()),])
