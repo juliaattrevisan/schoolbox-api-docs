@@ -22,7 +22,7 @@ use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Context\Folder\ClaimFactory;
 use Schoolbox\LTI\Context\Folder\Codec;
-use Schoolbox\LTI\Util\CustomClaimFactory;
+use Schoolbox\LTI\Custom\ClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec;
@@ -187,7 +187,7 @@ class LaunchFactory
         // LIS claim: I don't think we support this yet
 
         // Custom claims, with whatever was passed from the product
-        $customClaim = (new CustomClaimFactory())
+        $customClaim = (new ClaimFactory())
             ->withUser($actingUser)
             ->withActualUser($currentUser)
             ->withResourceLink($resourceLinkClaim)

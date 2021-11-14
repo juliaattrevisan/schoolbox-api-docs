@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Claim;
+namespace Schoolbox\LTI\Custom;
 
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
@@ -16,12 +16,12 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
  * Representation of the custom claim in an LTI message.
  *
  * This does not perform variable substitution on custom claims:
- * @see \Schoolbox\LTI\Util\CustomClaimFactory for a method for building custom
- *                                             claims which does that.
+ * @see \Schoolbox\LTI\Custom\ClaimFactory for a method for building custom
+ *                                         claims which does that.
  *
  * @see https://www.imsglobal.org/spec/lti/v1p3/#custom-properties-and-variable-substitution
  */
-class CustomClaim implements MessagePayloadClaimInterface
+class Claim implements MessagePayloadClaimInterface
 {
     /**
      * Custom claims, as a set of key-value pairs.
@@ -50,9 +50,9 @@ class CustomClaim implements MessagePayloadClaimInterface
 
     /**
      * @param array $claimData
-     * @return CustomClaim
+     * @return Claim
      */
-    public static function denormalize(array $claimData): CustomClaim
+    public static function denormalize(array $claimData): Claim
     {
         return new self($claimData);
     }
