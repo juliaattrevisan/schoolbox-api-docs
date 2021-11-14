@@ -136,7 +136,7 @@ class Service extends AbstractService
                 if ($responseCode === 401) {
                     // your API key is bad: don't try to do anything else
                     $this->getLog()->error('Received response code 401: this means the API key is incorrect');
-                    throw $e;
+                    throw new \OutOfBoundsException($e->getMessage(), $e->getCode(), $e);
                 }
 
                 // Some error other than rate-limit? raise an error
