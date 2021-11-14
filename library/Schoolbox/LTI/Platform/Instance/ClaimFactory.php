@@ -7,13 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\Platform\Instance;
 
 use Laminas\Uri\Uri;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use Schoolbox\Instance;
 
-class PlatformInstanceClaimFactory
+/**
+ * Factory for claims about the Schoolbox instance.
+ */
+class ClaimFactory
 {
     /**
      * Instance data repository.

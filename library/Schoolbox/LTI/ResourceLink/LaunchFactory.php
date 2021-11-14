@@ -23,7 +23,7 @@ use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Context\Folder\ClaimFactory as FolderClaimFactory;
 use Schoolbox\LTI\Context\Folder\Codec as FolderCodec;
 use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
-use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory as AssessmentClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
