@@ -16,7 +16,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper;
-use Schoolbox\Resource\Folder\Model;
 
 /**
  * LTI Platform sub-module for contexts.

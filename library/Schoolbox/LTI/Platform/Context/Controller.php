@@ -28,6 +28,12 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model;
 
+/**
+ * LTI platform controller for context requests.
+ *
+ * Currently, this only contains an endpoint for fetching membership of a
+ * context.
+ */
 class Controller extends BaseController
 {
     /**
