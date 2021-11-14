@@ -26,7 +26,7 @@ use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory as AssessmentClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
-use Schoolbox\LTI\Util\RoleClaimFactory;
+use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
 use Schoolbox\LTI\Util\RoleScopeMentorClaimFactory;
 use Schoolbox\LTI\Util\UserCodec;
 use Schoolbox\Permission\Access\Access;
