@@ -7,14 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\Role\ScopeMentor;
 
-use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\LTI\Claim\RoleScopeMentorClaim;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Model;
 use Schoolbox\User;
 
 /**
@@ -26,7 +23,7 @@ use Schoolbox\User;
  *
  * @see https://www.imsglobal.org/spec/lti/v1p3/#role-scope-mentor-claims
  */
-class RoleScopeMentorClaimFactory
+class ClaimFactory
 {
     /**
      * Access permission checker, used for checking if the given user is an
@@ -52,11 +49,10 @@ class RoleScopeMentorClaimFactory
      *
      * @param User        $user
      * @param IAssessable $assessment
-     * @return RoleScopeMentorClaim|null A claim object, or null if it would've
-     *                                   been empty.
+     * @return Claim|null A claim object, or null if it would've been empty.
      * @throws MapperException
      */
-    public function buildForAssessment(User $user, IAssessable $assessment): ?RoleScopeMentorClaim
+    public function buildForAssessment(User $user, IAssessable $assessment): ?Claim
     {
         $mentoredUserIds = [];
         $folder          = $assessment->getBaseContext()->getFolder();
@@ -81,7 +77,7 @@ class RoleScopeMentorClaimFactory
             }
         );
         return count($mentoredUserIds) > 0
-            ? new RoleScopeMentorClaim(...$mentoredUserIds)
+            ? new Claim(...$mentoredUserIds)
             : null;
     }
 
@@ -96,6 +92,7 @@ class RoleScopeMentorClaimFactory
      */
     private function extractUserId(User $user): ?string
     {
+        // TODO use user codec here
         return $user->getExternalId();
     }
 }
