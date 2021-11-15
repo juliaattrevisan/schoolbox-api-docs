@@ -243,6 +243,7 @@ DESCRIPTION
                 $unlock = false;
                 if ($this->getOpt(self::OPT_SHORT_ANSWER_YES) || in_array($lockName, $unlockFilter)) {
                     $unlock = true;
+                    $this->getLogger()->notice('... unlocking automatically');
                 } elseif ($this->getOpt(self::OPT_SHORT_ANSWER_NO)) {
                     $unlock = false;
                 } elseif ($this->isInteractive()) {
