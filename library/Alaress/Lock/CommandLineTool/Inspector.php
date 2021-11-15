@@ -49,6 +49,12 @@ class Inspector extends CliTool\App
     // --instance: override instance ID
     private const OPT_LONG_INSTANCE = 'instance:';
 
+    // --key: only report a particular lock
+    private const OPT_LONG_KEY = 'key:';
+
+    // --unlock: only unlock a particular lock
+    private const OPT_LONG_UNLOCK = 'unlock:';
+
     private const LOCK_NAMES = [
         ErrorRequeuer::LOCK_NAME      => 'Kami Error Requeuer (./tools/kami/requeue-errors.php)',
         StatusChecker::LOCK_NAME      => 'Kami Status Checker (./tools/kami/check-status.php)',
@@ -82,7 +88,7 @@ class Inspector extends CliTool\App
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_INSTANCE,];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_INSTANCE, self::OPT_LONG_KEY, self::OPT_LONG_UNLOCK];
     }
 
 
@@ -95,7 +101,16 @@ class Inspector extends CliTool\App
         $green  = self::COLOUR_GREEN;
         $white  = self::COLOUR_WHITE;
         $yellow = self::COLOUR_YELLOW;
-        $help   = "$white
+
+        // Output lock description as well
+        $locks = [];
+        foreach (self::LOCK_NAMES as $lockName => $lockDescription) {
+            $locks[] = $yellow . $lockName . $white;
+            $locks[] = '    ' . $lockDescription;
+        }
+        $locks = implode("\n        ", $locks);
+
+        $help = "$white
 
 NAME:
     Lock inspector
@@ -123,6 +138,18 @@ DESCRIPTION
     $yellow--instance=INSTANCE_ID$white
         If provided, inspect locks for the given instance.
 
+    $yellow--key=KEY$white
+        If provided, only inspect the given lock. The following locks are
+        available:
+        $locks
+
+        (This option may be provided more than once to inspect multiple locks.)
+
+    $yellow--unlock=KEY$white
+        If provided, only unlock the given lock. This is the equivalent of
+        `$yellow--key$white` with the `$yellow-y$white` option.
+
+        (This option may be provided more than once to unlock multiple locks.)
 ";
         \fwrite(STDOUT, $help);
     }
