@@ -91,39 +91,6 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
 
 
     /**
-     * @param int $threadID
-     * @return array|bool|null
-     */
-    public function getThread($threadID)
-    {
-        $query = "SELECT t.*, p.postID, p.body FROM forumThread t, forumPost p
-                  WHERE t.threadID = p.threadID AND t.threadID = $threadID AND t.deleted = 'false'
-                  ORDER BY p.date ASC LIMIT 1";
-        return $this->db->getRow($query);
-    }
-
-
-    /**
-     * @param int $threadID
-     * @param int $index
-     * @param int $limit
-     * @return array|bool
-     */
-    public function getPostList($threadID, $index = 0, $limit = 0)
-    {
-        $query = "SELECT p.*, u.synergy_id, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, g.name userGroup FROM forumPost p
-                  LEFT JOIN user u ON u.id = p.userID
-                  LEFT JOIN groups g ON g.id = u.group_id
-                  WHERE p.threadID = $threadID AND p.deleted = 'false' ";
-        if ($limit) {
-            $query .= "LIMIT $index, $limit ";
-        }
-
-        return $this->db->getAll($query);
-    }
-
-
-    /**
      * @param int $postID
      * @return array|bool|null
      */
@@ -155,41 +122,7 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
     }
 
 
-    /**
-     * @param int $threadID
-     */
-    public function lockThread($threadID)
-    {
-        $data = [
-            'threadID' => $threadID,
-            'locked'   => 'true',
-        ];
-
-        $this->update($data);
-    }
-
-
-    /**
-     * @param int $threadID
-     */
-    public function uniqueView($threadID)
-    {
-        if (!isset($_SESSION['threads_viewed'])) {
-            $_SESSION['threads_viewed'] = [];
-        }
-
-        if (!isset($_SESSION['threads_viewed'][$threadID])) {
-            $query = "UPDATE " . $this->_table . " SET views = views + 1 WHERE threadID = " . $this->db->smartQuote($threadID);
-            $this->db->query($query);
-
-            $_SESSION['threads_viewed'][$threadID] = true;
-        }
-
-        return;
-    }
-
-
-    /**
+     /**
      * @param int $postID
      * @return false|float
      */
@@ -214,112 +147,6 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
         }
 
         return ceil($postNumber / FORUM_POSTS_PER_PAGE);
-    }
-
-
-    /**
-     * @param string $text
-     * @return string|string[]|null
-     */
-    public function parseBB($text)
-    {
-        $find    = [
-            '%\[quote\](.+)\[/quote\]%',
-            '%\[quote(="([^"]+)")?\](.+)\[/quote\]%',
-        ];
-        $replace = [
-            '<blockquote><p>$1</p></blockquote>',
-            '<cite>$2</cite><blockquote><p>$3</p></blockquote>',
-        ];
-
-        return preg_replace($find, $replace, html_entity_decode($text));
-    }
-
-
-    /**
-     * @param array $data
-     * @return int|string
-     */
-    public function create($data)
-    {
-        $data['date'] = 'NOW()';
-        return parent::create($data);
-    }
-
-
-    /**
-     * @param int $threadID
-     * @return bool
-     */
-    public function delete($threadID)
-    {
-        $data = [
-            'threadID' => $threadID,
-            'deleted'  => 'true',
-        ];
-        return $this->update($data);
-    }
-
-
-    /**
-     * @deprecated
-     */
-    public function createPost($data)
-    {
-        $data['date'] = 'NOW()';
-        $this->db->insert($this->_postTable, $data);
-        $data['postID'] = $this->db->insertID();
-
-
-        /* update thread */
-        $userHandler = new User();
-        $user        = $userHandler->getByID($_SESSION['id']);
-
-        $thread = [
-            'threadID'          => $data['threadID'],
-            'last_post_id'      => $data['postID'],
-            'last_post_date'    => 'NOW()',
-            'last_post_user_id' => $_SESSION['id'],
-            'last_post_user'    => $userHandler->formatName($user),
-        ];
-
-        $this->update($thread);
-
-        return $data['postID'];
-    }
-
-
-    /**
-     * @deprecated
-     */
-    public function updatePost($data)
-    {
-        $data['modified'] = 'NOW()';
-
-        unset($data['threadID']);
-        unset($data['userID']);
-
-        $current = $this->getPost($data['postID']);
-        if ($current['userID'] != $_SESSION['id']) {
-            $data['censored'] = 'true';
-        }
-
-        return $this->db->update($this->_postTable, 'postID', $data);
-    }
-
-
-    /**
-     * @param int $postID
-     * @return bool
-     */
-    public function deletePost($postID)
-    {
-        $data = [
-            'postID'  => $postID,
-            'deleted' => 'true',
-        ];
-
-        return $this->updatePost($data);
     }
 
 
