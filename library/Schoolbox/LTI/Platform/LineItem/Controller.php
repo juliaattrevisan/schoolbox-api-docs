@@ -129,7 +129,7 @@ class Controller extends BaseController
         );
 
         // Line item repository: consists only of a single assessment
-        $lineItemRepository = new SingleAssessmentRepository($assessment);
+        $lineItemRepository = new SingleAssessmentRepository($assessment, $this->router);
 
         // Score repository: consists only of a single assessment, and its scores
         $scoreRepository = new SingleAssessmentScoreRepository(
