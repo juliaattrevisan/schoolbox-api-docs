@@ -47,8 +47,8 @@ class IsInstructor extends AbstractParticipationRule
      */
     public function __construct(Access $access, callable $folderLocator = null)
     {
-        $this->access        = $access;
-        $this->folderLocator = $folderLocator;
+        $this->access             = $access;
+        $this->folderLocator      = $folderLocator;
     }
 
 
@@ -58,6 +58,7 @@ class IsInstructor extends AbstractParticipationRule
      * @return bool
      * @throws Failure\Unauthorized If user is not an instructor of this class
      * @throws InvalidArgumentException If unable to locate an User instance in route params
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function authorize(array $params = [], User $user = null)
     {
@@ -81,7 +82,10 @@ class IsInstructor extends AbstractParticipationRule
             }
         }
 
-        if ($user->getRole()->isStaff() || $this->access->isInstructor($user, $folder)) {
+        if (
+            ($user->getRole()->isStaff() && $user->getRole()->getViewStudentGrades())
+            || $this->access->isInstructor($user, $folder)
+        ) {
             return true;
         }
 
