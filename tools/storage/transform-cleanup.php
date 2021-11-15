@@ -24,6 +24,7 @@ $app = new class extends CliTool\App {
         return [
             'help',
             'lock-timeout:',
+            'force'
         ];
     }
 
@@ -41,16 +42,23 @@ Usage: transform-cleanup.php [--perform]
         --perform   Persist changes
         --lock-timeout   The max amount of time (in seconds) to hold the lock for.
                          Defaults to {$timeout}
-
+        --force This tool is meant to run one times a day. Adding this arg will let the operator re-run the this tool.
 
 HELP;
+            exit;
+        }
+
+        $logFile = $this->getConfig()->get('logs_dir') . '/' . 'transform-cleanup-' . date('Ymd');
+
+        if ($this->checkIfToolHasRanByLogFile($logFile) && !$this->getOpt('force')) {
+            $this->getLogger()->notice("[Terminated] This tool has already been executed. You may add --force flag to override.");
             exit;
         }
 
         $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
 
         if (!$lock->isAcquired()) {
-            $this->getLogger()->notice("[Terminate] Unable to run this tool as another process is currently running.");
+            $this->getLogger()->notice("[Terminated] Unable to run this tool as another process is currently running.");
             exit;
         }
 
@@ -58,7 +66,16 @@ HELP;
         $this->cleanup($this->getConfig()->get('storage_dir'));
         $lock->release();
 
-        $this->writeLog($startDate, date("d/m/Y H:i:s"));
+        $this->writeLogFile($logFile, $startDate, date("d/m/Y H:i:s"));
+    }
+
+    /**
+     * @param string $logFilePath
+     * @return bool
+     */
+    private function checkIfToolHasRanByLogFile(string $logFilePath): bool
+    {
+        return file_exists($logFilePath);
     }
 
     /**
@@ -196,15 +213,16 @@ HELP;
     /**
      * Create log file in instance logs directory to indicate that the tool ran.
      *
+     * @param string $logFilePath
      * @param string $startDate
      * @param string $endDate
      */
-    private function writeLog(string $startDate, string $endDate)
+    private function writeLogFile(string $logFilePath, string $startDate, string $endDate)
     {
         if ($this->perform()) {
             try {
                 file_put_contents(
-                    $this->getConfig()->get('logs_dir') . '/' . 'transform-cleanup.log',
+                    $logFilePath,
                     sprintf('Job ran from: %s to: %s' . PHP_EOL, $startDate, $endDate),
                     FILE_APPEND | LOCK_EX
                 );
