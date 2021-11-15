@@ -117,7 +117,8 @@ class Controller extends BaseController
         // Build and validate membership request
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-nrps/doc/platform/
 
-        // Access token sanity checker: validates the request token was created by a tool
+        // Access token sanity checker:
+        // validates the request token was created by a tool
         $validator = new RequestAccessTokenValidator($this->registrations);
 
         // Access token validity checker:

@@ -113,7 +113,20 @@ class Controller extends BaseController
     {
         // Build and validate score publish request
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-ags/doc/score/platform/
-        $request = (new ServerRequestFactory())->build($this->request);
+
+        // Access token sanity checker:
+        // validates the request token was created by a tool
+        $validator = new RequestAccessTokenValidator($this->registrations);
+
+        // Access token validity checker
+        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
+        $resourceServerValidator = new ResourceServer(
+            new AccessTokenRepository($this->accessTokenCache),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+        );
+        $request = $resourceServerValidator->validateAuthenticatedRequest(
+            (new ServerRequestFactory())->build($this->request)
+        );
 
         // Line item repository: consists only of a single assessment
         $lineItemRepository = new SingleAssessmentRepository($assessment);
@@ -126,22 +139,9 @@ class Controller extends BaseController
             $this->userCodec,
         );
 
-        // Access token sanity checker: validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations);
-
-        // Access token validity checker
-        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
-        $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-        );
-        $request = $resourceServerValidator->validateAuthenticatedRequest($request);
-
         // Handle the request: this validates the request body
         $handler = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
-
-        // Serve the request
-        $server = new LtiServiceServer($validator, $handler);
+        $server  = new LtiServiceServer($validator, $handler);
         $this->populateResponseFromPsr7Response($server->handle($request));
     }
 }
