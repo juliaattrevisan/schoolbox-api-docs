@@ -207,7 +207,7 @@ class LaunchFactory
             (clone $baseUrl)
                 ->setPath(
                     $this->router->generate(
-                        'learningAssessment.getLineItem',
+                        'ltiPlatformLineItem.getLineItemForAssessment',
                         ['assessmentId' => $assessment->getId()]
                     )
                 )
