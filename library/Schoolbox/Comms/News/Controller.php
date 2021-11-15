@@ -63,71 +63,20 @@ use function array_merge;
 class Controller extends Base
 {
 
-    /**
-     * @var Mapper
-     */
-    private $newsMapper;
 
-    /**
-     * @var Topic\Mapper
-     */
-    private $topicMapper;
-
-    /**
-     * @var SaveForLater\Mapper
-     */
-    private $saveForLaterMapper;
-
-    /**
-     * @var Statistics\Mapper
-     */
-    private $statisticsMapper;
-
-    /**
-     * @var Statistics\Cumulative\Mapper
-     */
-    private $statisticsCumulativeMapper;
-
-    /**
-     * @var IConnector
-     */
-    private $databaseInternal;
-
-    /**
-     * @var Mapper
-     */
-    private $folderMapper;
-
-      /**
-     * @var Audience\Mapper
-     */
-    private $audienceMapper;
-
-    /**
-     * @var Audience\ArticleResolver
-     */
-    private $articleResolver;
-
-
-    /** @var Audience\Segment\StrategyFactory */
-    private $strategyFactory;
-
-    /** @var Access */
-    private $access;
-
-    /** @var Thread\Mapper */
-    private $threadMapper;
-
-    /** @var ErrorMapper */
-    private $errorMapper;
-
-    /** @var CommentMapper */
-    private $commentMapper;
-
-
-    /**
-     * @var File\Mapper
-     */
+    private Mapper $newsMapper;
+    private Topic\Mapper $topicMapper;
+    private SaveForLater\Mapper $saveForLaterMapper;
+    private Statistics\Mapper $statisticsMapper;
+    private Statistics\Cumulative\Mapper $statisticsCumulativeMapper;
+    private IConnector $databaseInternal;
+    private Folder\Mapper $folderMapper;
+    private Audience\Mapper $audienceMapper;
+    private Audience\ArticleResolver $articleResolver;
+    private Audience\Segment\StrategyFactory $strategyFactory;
+    private Access $access;
+    private Thread\Mapper $threadMapper;
+    private CommentMapper $commentMapper;
     private File\Mapper $fileMapper;
 
 
@@ -150,7 +99,6 @@ class Controller extends Base
      * @param Audience\Segment\StrategyFactory $strategyFactory
      * @param Access                           $access
      * @param Thread\Mapper                    $threadMapper
-     * @param ErrorMapper                      $errorMapper
      * @param CommentMapper                    $commentMapper
      * @param File\Mapper                      $fileMapper
      */
@@ -167,7 +115,6 @@ class Controller extends Base
         Audience\Segment\StrategyFactory $strategyFactory,
         Access $access,
         Thread\Mapper $threadMapper,
-        ErrorMapper $errorMapper,
         CommentMapper $commentMapper,
         File\Mapper $fileMapper
     ) {
@@ -183,7 +130,6 @@ class Controller extends Base
         $this->strategyFactory            = $strategyFactory;
         $this->access                     = $access;
         $this->threadMapper               = $threadMapper;
-        $this->errorMapper                = $errorMapper;
         $this->commentMapper              = $commentMapper;
         $this->fileMapper                 = $fileMapper;
     }
@@ -955,7 +901,6 @@ class Controller extends Base
             'user_id'    => $this->getUser()->getID()
         ]);
 
-
         foreach ($articles as $id => $article) {
             //set the 'default' null to all articles,
             $articles[$id]['viewedAt'] = null;
@@ -963,6 +908,7 @@ class Controller extends Base
             foreach ($viewedList as $viewed) {
                 if ($viewed->getArticleId() === $article['id']) {
                     $articles[$id]['viewedAt'] = $viewed->getOccursAt();
+                    break;
                 }
             }
         }
