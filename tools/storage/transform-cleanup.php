@@ -173,16 +173,16 @@ $app = new class extends CliTool\App {
      */
     private function writeLog(string $startDate, string $endDate)
     {
-        $prefix = $this->perform() ? 'Actioned' : 'Dry run';
-
-        try {
-            file_put_contents(
-                $this->getConfig()->get('logs_dir') . '/' . 'transform-cleanup.log',
-                sprintf('[%s] Job ran from: %s to: %s' . PHP_EOL, $prefix, $startDate, $endDate),
-                FILE_APPEND | LOCK_EX
-            );
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+        if ($this->perform()) {
+            try {
+                file_put_contents(
+                    $this->getConfig()->get('logs_dir') . '/' . 'transform-cleanup.log',
+                    sprintf('Job ran from: %s to: %s' . PHP_EOL, $startDate, $endDate),
+                    FILE_APPEND | LOCK_EX
+                );
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode());
+            }
         }
     }
 };
