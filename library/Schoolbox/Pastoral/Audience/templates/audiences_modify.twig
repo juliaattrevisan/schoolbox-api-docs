@@ -63,6 +63,49 @@
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
+                            <label for="template">Available Actions</label>
+                            <script type="text/javascript"
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
+                            <script type="text/javascript"
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+                            <input id="actions" name="actions"
+                                   value="{% for action in typeActions %}{{ action.name }},{% endfor %}">
+                        </div>
+                        <script type="text/javascript">
+                            {% autoescape 'js' %}
+
+                            $('#actions').selectizeSelector({
+                                multiple: true,
+                                selectize: {
+                                    create: false,
+                                    preload: true,
+                                    load: function (query, callback) {
+                                        $.ajax({
+                                            url: '/pastoral/actions',
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            data: {query: query}
+                                        }).done(function (result) {
+                                            callback(result)
+                                        }).fail(function () {
+                                            callback()
+                                        })
+                                    }
+                                },
+                                value: [
+                                    {% for action in typeActions %}
+                                    {
+                                        'id': '{{ action.name }}',
+                                        'name': '{{ action.name }}'
+                                    }{% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                ]
+                            });
+                            {% endautoescape %}
+                        </script>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
                             <label for="template">General Template</label>
 
                             <p class="meta">

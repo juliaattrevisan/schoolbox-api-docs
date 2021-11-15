@@ -109,4 +109,12 @@ class External_Offline_Pastoral implements External_PastoralInterface, IOfflineC
     {
         return [];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getActionList(): array
+    {
+        return [];
+    }
 }

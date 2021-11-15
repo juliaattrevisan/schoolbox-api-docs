@@ -110,4 +110,13 @@ class External_Pastoral implements External_PastoralInterface
     {
         return $this->database->getDocumentClassificationList();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getActionList(): array
+    {
+        return $this->database->getActionList();
+    }
+
 }

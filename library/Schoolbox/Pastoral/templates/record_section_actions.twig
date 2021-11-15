@@ -1,0 +1,19 @@
+{% if record.actions | length > 0 %}
+    <div class="row">
+        <div class="small-12 medium-6 columns island">
+            <h2 class="subheader">Actions</h2>
+            <section>
+                <fieldset class="checklist">
+                    <ul class="option-list">
+                        {% for action in record.actions %}
+                            <li>
+                                <input id="action-{{ action.id }}" name="actions[]" type="checkbox"/>
+                                <label for="action-{{ action.id }}">{{ action.name }}</label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </fieldset>
+            </section>
+        </div>
+    </div>
+{% endif %}

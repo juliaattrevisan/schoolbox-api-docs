@@ -56,6 +56,33 @@
             ]
         });
 
+        {# Pastoral Action Selectize #}
+
+        $('#actions').selectizeSelector({
+            multiple: true,
+            selectize: {
+                create: false,
+                preload: true,
+                load: function(query, callback) {
+                    $.ajax({
+                        url: '/pastoral/actions',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    }).done(function(result) {
+                        callback(result)
+                    }).fail(function() {
+                        callback()
+                    })
+                }
+            },
+            value: [
+                {% for action in record.actions %}
+                {'id': '{{ action.name }}', 'name': '{{ action.name }}'}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+        });
+
         {# Delete Button For Existing Records #}
 
         {% if record.id != '' %}

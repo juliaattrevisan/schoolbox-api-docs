@@ -81,6 +81,7 @@ class Module extends AlaressModule\Module
             'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'pastoralTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
             'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
+            'pastoralActionMapper'   => $this->getMapperFactory()->getLazy(Pastoral\Action\Mapper::class),
             'iconMapper'             => $this->getMapperFactory()->getLazy(IconMapper::class),
             'rosettaStone'           => $injector->lazyGet('l10n'),
             'colorFactory'           => $injector->lazyNew(ColorFactory::class),

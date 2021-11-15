@@ -576,6 +576,8 @@ class Healthcheck
 
         if ($this->configMapper->get('pastoral_enabled')) {
             $allPastoralTables = [
+                'luPastoralCareAction',
+                'luPastoralCareActionType',
                 'luPastoralCareCategory',
                 'luPastoralCareType',
                 'PastoralCareComments',

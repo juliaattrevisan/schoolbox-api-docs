@@ -100,6 +100,9 @@ class Model implements ISoftDeletable, IModel
     /** @var Collection|Tag\Model[] */
     private $tags;
 
+    /** @var Collection|Action\Model[] */
+    private $actions;
+
     /** @var Collection|Model[] */
     private $relatedRecords;
 
@@ -117,6 +120,7 @@ class Model implements ISoftDeletable, IModel
         $this->comments = new Collection();
         $this->attachments = new Collection();
         $this->tags = new Collection();
+        $this->actions = new Collection();
         $this->relatedRecords = new Collection();
         $this->revisions = new Collection();
         $this->parentCommentsAllowed = false;
@@ -179,6 +183,26 @@ class Model implements ISoftDeletable, IModel
     public function getTags()
     {
         return $this->tags;
+    }
+
+    /**
+     * @param Collection|Action\Model[] $actions
+     *
+     * @return self
+     */
+    public function setActions(Collection $actions): self
+    {
+        $this->actions = $actions;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Action\Model[]
+     */
+    public function getActions()
+    {
+        return $this->actions;
     }
 
     /**

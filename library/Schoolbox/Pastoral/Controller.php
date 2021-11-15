@@ -47,6 +47,7 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
+use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -107,6 +108,9 @@ class Controller extends Base
     /** @var PastoralTagMapper $pastoralTagMapper */
     protected PastoralTagMapper $pastoralTagMapper;
 
+    /** @var PastoralActionMapper */
+    protected PastoralActionMapper $pastoralActionMapper;
+
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     protected PastoralTypeMapper $pastoralTypeMapper;
 
@@ -148,6 +152,7 @@ class Controller extends Base
      * @param PastoralSeverityMapper     $pastoralSeverityMapper
      * @param PastoralRevisionDataSource $pastoralRevisionDataSource
      * @param PastoralTagMapper          $pastoralTagMapper
+     * @param PastoralActionMapper       $pastoralActionMapper
      * @param PastoralCommentMapper      $pastoralCommentMapper
      * @param PastoralAttachmentMapper   $pastoralAttachmentMapper
      * @param RoleMapper                 $roleMapper
@@ -172,6 +177,7 @@ class Controller extends Base
         PastoralSeverityMapper $pastoralSeverityMapper,
         PastoralRevisionDataSource $pastoralRevisionDataSource,
         PastoralTagMapper $pastoralTagMapper,
+        PastoralActionMapper $pastoralActionMapper,
         PastoralCommentMapper $pastoralCommentMapper,
         PastoralAttachmentMapper $pastoralAttachmentMapper,
         RoleMapper $roleMapper,
@@ -198,6 +204,7 @@ class Controller extends Base
         $this->pastoralSeverityMapper     = $pastoralSeverityMapper;
         $this->pastoralRevisionDataSource = $pastoralRevisionDataSource;
         $this->pastoralTagMapper          = $pastoralTagMapper;
+        $this->pastoralActionMapper       = $pastoralActionMapper;
         $this->pastoralTypeMapper         = $pastoralTypeMapper;
         $this->pastoralUploadQueueMapper  = $pastoralUploadQueueMapper;
         $this->roleMapper                 = $roleMapper;
@@ -1008,7 +1015,6 @@ class Controller extends Base
                 $subtype = null;
             }
         }
-        $visibilityLocked = $subtype ? $subtype->getVisibilityLocked() : $type->getVisibilityLocked();
 
         // Prepare Severity. No database change.
         $severity = null;
@@ -1052,6 +1058,8 @@ class Controller extends Base
                     $record->setParent($parent);
                 }
             }
+            $actions = $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter(explode(',', $post->get('actions')))));
+            $record->setActions($actions);
 
             // Find student
             try {
@@ -1295,6 +1303,26 @@ class Controller extends Base
         }
 
         return $newAttachments;
+    }
+
+    /**
+     * Get a list of available actions
+     *
+     * @api   GET /pastoral/actions
+     * @since 21.1
+     */
+    public function getActions()
+    {
+        $actions      = $this->pastoralActionMapper->findAll();
+        $output    = [];
+        /** @var Action\Model $action */
+        foreach ($actions as $action) {
+            $output[] = [
+                'id'   => $action->getId(),
+                'name' => $action->getName(),
+            ];
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
     }
 }
 

@@ -110,4 +110,11 @@ interface External_PastoralInterface extends External\IConnector
      * @return array
      */
     public function getDocumentClassificationList(): array;
+
+    /**
+     * Gets available actions
+     * @return array
+     */
+    public function getActionList(): array;
+
 }

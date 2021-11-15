@@ -193,6 +193,7 @@ class Module extends BaseModule
                                        'GET'  => [
                                            ''                                                                             => ['getIndex' => $permissionStaff],
                                            '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
+                                           '/actions'                                                                     => ['getActions' => $permissionStaff],
                                            '/search'                                                                      => ['getSearch' => $permissionStaff],
                                            '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
                                            '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentView],
@@ -226,6 +227,7 @@ class Module extends BaseModule
             'pastoralDataSource'         => $injector->get('pastoralDataSource'),
             'pastoralRevisionDataSource' => $injector->get('pastoralRevisionDataSource'),
             'pastoralAccessMapper'       => PastoralAccessMapper::getInstance(),
+            'pastoralActionMapper'       => \Schoolbox\Pastoral\Action\Mapper::getInstance(),
             'pastoralAttachmentMapper'   => PastoralAttachmentMapper::getInstance(),
             'pastoralSubTypeMapper'      => PastoralSubTypeMapper::getInstance(),
             'pastoralGroupMapper'        => PastoralGroupMapper::getInstance(),
