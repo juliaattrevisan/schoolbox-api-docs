@@ -11,15 +11,43 @@ $app = new class extends CliTool\App {
 
     public const LOCK_NAME = 'transform_cleanup';
 
+    public const DEFAULT_TIMEOUT = 604800;
+
     public function runAsRoot(): ?bool
     {
         // We are deleting files from local file system
         return true;
     }
 
+    public function getLongOpts(): array
+    {
+        return [
+            'help',
+            'lock-timeout:',
+        ];
+    }
+
     public function run(): void
     {
-        $lock = $this->acquireLock(self::LOCK_NAME, null);
+
+        $timeout = $this->getOptAsInt('lock-timeout:', self::DEFAULT_TIMEOUT);
+
+        if ($this->getOpt('help')) {
+            echo <<<HELP
+
+Cleanup orphaned transform files.
+
+Usage: transform-cleanup.php [--perform]
+        --perform   Persist changes
+        --lock-timeout   The max amount of time (in seconds) to hold the lock for.
+                         Defaults to {$timeout}
+
+
+HELP;
+            exit;
+        }
+
+        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
 
         if (!$lock->isAcquired()) {
             $this->getLogger()->notice("[Terminate] Unable to run this tool as another process is currently running.");
