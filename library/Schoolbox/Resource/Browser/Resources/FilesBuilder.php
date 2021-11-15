@@ -11,20 +11,18 @@ namespace Schoolbox\Resource\Browser\Resources;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 
 class FilesBuilder
 {
-    /**
-    * @var IConnector
-    */
-    private $db;
+    private IConnector $db;
+    private int $componentId;
 
     /**
      * query to get the files component defaults
-     * @var string
      */
-    private $defaultConf_query = "
+    private string $defaultConf_query = "
          SELECT component_config_definition.label, component_config_definition.key, component_config_definition.default_value
          FROM component_config_definition
          INNER JOIN component_definition
@@ -50,6 +48,7 @@ class FilesBuilder
      */
     public function getHomepage(int $componentId)
     {
+        $this->componentId = $componentId;
         //get the homepage Id, from the component and confirm it is a files component
         $statement = $this->db->executeQuery("
             SELECT component_instance.identifier, folder.name FROM component_instance
@@ -86,6 +85,10 @@ class FilesBuilder
             [$folderId],
         );
 
+        //get return url, for edit page
+
+        $returnURL = Redirect::encode("/resources/folder/" . $this->componentId . "/files/${folderId}");
+
         //lets build the list folder array, so we don't have to worry about hydration. etc
         $files = [];
         foreach ($fileList as $file) {
@@ -106,7 +109,7 @@ class FilesBuilder
                             'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
                             'formatted' => $file->getModifiedAt()->getShort(),
                 ],
-                'editUrl'              => '/cms/file/' . $file->getId(),
+                'editUrl'              => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "=${returnURL}",
             ];
         }
         return $files;

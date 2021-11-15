@@ -155,45 +155,6 @@ class Controller extends AbstractController
     }
 
     /**
-     * AJAX grab of all files within a files component source
-     * @api GET /folder/:componentID/files/:sourceFolderID/all
-     *
-     * @param int $componentID
-     * @param int $sourceFolderID
-     * @throws Mapper\Exception\NotFound
-     * @throws Mapper\Exception
-     */
-    public function showAllFiles(int $componentID, int $sourceFolderID)
-    {
-        $filesBuilder = new FilesBuilder($this->database);
-        $homepage_id = $filesBuilder->getHomepage($componentID);
-
-        //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
-        $accessSource = $this->getAccess($sourceFolderID);
-        $accessHome = $this->getAccess($homepage_id['identifier']);
-
-        // special case for root, just let that through to the keeper
-        if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
-
-        //check if user has edit perms on source folder
-        $canEdit = ($accessSource >= UserAccess::ACCESS_WRITE);
-
-        //grab all files from files component
-        $files = $filesBuilder->getFolderData($sourceFolderID);
-
-        //dump all as json
-        $this->getResponse()->content->set($this->buildJsonOutput([
-              'canEdit'         => $canEdit,
-              'componentID'     => $componentID,
-              'sourceFolderID'  => $sourceFolderID,
-              'homepageID'      => $homepage_id,
-              'files'           => $files,
-          ]));
-    }
-
-    /**
      * @param int $folderId
      * @return array
      */
