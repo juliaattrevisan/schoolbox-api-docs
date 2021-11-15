@@ -52,6 +52,7 @@ $app = new class extends CliTool\App {
         "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
         "^groups$",
         "^External_.+",
+        "^vcal.[0-9a-f]{64}",
         '^accessToken:' . INSTANCE_ID . ':.+',
     ];
 
