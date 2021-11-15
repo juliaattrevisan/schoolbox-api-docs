@@ -26,17 +26,17 @@
     colours['{COLOUR_ARRAY}'] = {
         'top_head_font'      : '{top_head_font}',
         'top_head_bg'        : '{top_head_bg}',
-        'top_font'           : '{top_font}',
+        'top_font_primary'   : '{top_font_primary}',
         'top_bg_primary'     : '{top_bg_primary}',
 
         'left_head_font'     : '{left_head_font}',
         'left_head_bg'       : '{left_head_bg}',
-        'left_font'          : '{left_font}',
+        'left_font_primary'  : '{left_font_primary}',
         'left_bg_primary'    : '{left_bg_primary}',
 
         'right_head_font'    : '{right_head_font}',
         'right_head_bg'      : '{right_head_bg}',
-        'right_font'         : '{right_font}',
+        'right_font_primary' : '{right_font_primary}',
         'right_bg_primary'   : '{right_bg_primary}'
     };
     // <!-- END colour_list -->
@@ -270,7 +270,7 @@
 
                     <!-- BEGIN markbook_link -->
                     <li>
-                        <a href="{MARKBOOK_LINK}" class="icon-curriculum">Markbook</a>
+                        <a href="{MARKBOOK_LINK}" class="icon-curriculum">Class Markbook</a>
                     </li>
                     <!-- END markbook_link -->
 
@@ -288,7 +288,7 @@
 
                     <!-- BEGIN assessment_calendar_link -->
                     <li>
-                        <a href="/learning/assessment/calendar" class="icon-calendar">{TPL_LOCAL_ASSESSMENT_PC} Calendar</a>
+                        <a href="{ASSESSMENT_CALENDAR_LINK}" class="icon-calendar">{TPL_LOCAL_ASSESSMENT_PC} Calendar</a>
                     </li>
                     <!-- END assessment_calendar_link -->
 
@@ -307,6 +307,12 @@
                         <a href="/rubric/manager/{ID}" class="icon-criteria">Manage Rubric {TPL_LOCAL_RUBRICGROUP_PLURAL_PC}</a>
                     </li>
                     <!-- END manage_criteria -->
+
+                    <!-- BEGIN award_list_link -->
+                    <li>
+                        <a href="{AWARD_LIST_LINK}" class="icon-achievement">Badge Report</a>
+                    </li>
+                    <!-- END award_list_link -->
 
                     <!-- BEGIN class_analytics_link -->
                     <li>
@@ -348,7 +354,11 @@
                         <a href="/resources/{ID}" class="icon-folder">Browse {TPL_LOCAL_RESOURCE_PLURAL_PC}</a>
                     </li>
                     <!-- END browse_resources -->
-
+                    <!-- BEGIN manage_textboxes -->
+                    <li>
+                        <a href="/textbox/folder/{ID}?returnUrl={ENCODED_RETURN_URL}" class="icon-textbox">Manage Text Boxes</a>
+                    </li>
+                    <!-- END manage_textboxes -->
                     <li>
                         <a href="{RSS}" class="icon-homepagefeed">RSS</a>
                     </li>
@@ -497,8 +507,8 @@
                         <div class="small-12 medium-6 columns">
                             <fieldset>
                                 <legend>Content Colours</legend>
-                                <label for="font">Text</label>
-                                <input id="font" class="colorBox" name="colors[font]" type="text" data-colorpicker />
+                                <label for="font_primary">Text</label>
+                                <input id="font_primary" class="colorBox" name="colors[font_primary]" type="text" data-colorpicker />
                                 <label for="bg_primary">Background</label>
                                 <input id="bg_primary" class="colorBox" name="colors[bg_primary]" type="text" data-colorpicker />
                             </fieldset>
