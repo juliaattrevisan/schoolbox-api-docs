@@ -59,13 +59,13 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'registrations'     => $injector->lazyGet('lti.registrations'),
-                    'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
-                    'instance'          => $injector->lazyGet('instance'),
-                    'userCodec'         => $injector->lazyGet('lti.userCodec'),
-                    'accessTokenCache'  => $injector->lazyGet('lti.accessTokenCache'),
-                    'userAccessMapper'  => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                    'access'            => $this->getMapperFactory()->getLazy(Access::class),
+                    'registrations'        => $injector->lazyGet('lti.registrations'),
+                    'userCodec'            => $injector->lazyGet('lti.userCodec'),
+                    'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
+                    'instance'             => $injector->lazyGet('instance'),
+                    'userAccessMapper'     => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'access'               => $this->getMapperFactory()->getLazy(Access::class),
+                    'accessTokenCache'     => $injector->lazyGet('lti.accessTokenCache'),
                 ]
             )
         );
