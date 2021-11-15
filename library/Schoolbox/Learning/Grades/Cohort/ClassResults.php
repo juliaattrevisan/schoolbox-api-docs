@@ -311,7 +311,12 @@ class ClassResults
         /* Now process summaries for each of the data sets we obtained
          * Each assessment needs its own five-point summary
          */
-        $statistics = [];
+        $statistics = [
+            'graphInfo'         => [],
+            'graphAssessments'  => [],
+            'graphData'         => [],
+            'graphScatter'      => [],
+        ];
 
         foreach ($normMarks as $specificationId => $dataSet) {
             /* The hover info thingy on the highcharts
