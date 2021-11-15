@@ -19,10 +19,6 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
-        if ($this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_OTFS_ADAPTER) === \Schoolbox\Resource\FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
-            exit;
-        }
-
         if (file_exists(self::LOCK_FILE)) {
             $this->getLogger()->notice("[Terminate] Unable to run this tool as another process is currently running.");
             exit;
