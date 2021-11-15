@@ -18,6 +18,7 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -33,9 +34,14 @@ class Module extends AlaressModule\Module
      */
     protected function registerRoutes(): void
     {
-        $loggedInAndPastoralWritePerm = new Rule\LazyCallback(function () {
-            return new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
-        });
+        $loggedInAndPastoralWritePerm = new Rule\LazyCallback(
+            function () {
+                return new Rule\All(
+                    new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
+                    new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF)
+                );
+            }
+        );
 
         // Don't permit creation of default audience for a PastoralType if it has SubTypes
         $pastoralWriteAndTypeHasSubTypes = new Rule\LazyCallback(function () use ($loggedInAndPastoralWritePerm) {

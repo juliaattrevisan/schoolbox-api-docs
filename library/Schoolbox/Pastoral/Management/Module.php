@@ -8,12 +8,15 @@
 
 namespace Schoolbox\Pastoral\Management;
 
+use Alaress\Authorizer\Rule\All;
+use Alaress\Authorizer\Rule\HasRolePermission;
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -33,7 +36,10 @@ class Module extends BaseModule
     {
         // Define routes and permissions
 
-        $permissionPastoralModeratorWrite = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
+        $permissionPastoralModeratorWrite = new All(
+            new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
+            new HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF)
+        );
 
         $this->registerRoutesArray([
             'GET'  => [

@@ -22,6 +22,7 @@ use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
@@ -139,6 +140,22 @@ class Model implements ISoftDeletable, IModel
     public function getAccess()
     {
         return $this->access;
+    }
+
+    /**
+     * Returns access with role based permission
+     * @return Collection|Access\Model[]
+     */
+    public function getAccessWithPermission()
+    {
+        $accessWithPermission = clone $this->access;
+        foreach ($accessWithPermission as $key => $access) {
+            $role = $access->getRole() ?: ($access->getUser() ? $access->getUser()->getRole() : null);
+            if ($role && in_array(Role::PERMISSION_ACCESS_PASTORAL, Role::VALID_PERMISSIONS[$role->getType()]) && !$role->getAccessPastoral()) {
+                $accessWithPermission->offsetUnset($key);
+            }
+        }
+        return $accessWithPermission;
     }
 
     /**

@@ -148,7 +148,7 @@ class Notifier extends AbstractModuleNotifier
                 continue;
             }
 
-            if ($pastoralAccess->getRole() && $pastoralAccess->getRole()->isStaff()) {
+            if ($pastoralAccess->getRole() && $pastoralAccess->getRole()->isStaff() && $pastoralAccess->getRole()->getAccessPastoral()) {
                 // Get the kids teachers
                 try {
                     $student = $this->userMapper->findById($pastoral->getStudent()->getId());
@@ -178,13 +178,13 @@ class Notifier extends AbstractModuleNotifier
                 /** @var PastoralGroupMember $member */
                 foreach ($pastoralGroup->getMembers() as $member) {
                     // Only staff should be in pastoral groups
-                    if ($member->getUser()->getRole()->isStaff()) {
+                    if ($member->getUser()->getRole()->isStaff() && $member->getUser()->getRole()->getAccessPastoral()) {
                         $targetUsers[$member->getUser()->getId()] = $member->getUser();
                     }
                 }
             } elseif ($pastoralAccess->getUser()) {
                 // Only staff ever have access to pastoral comments
-                if ($pastoralAccess->getUser()->getRole()->isStaff()) {
+                if ($pastoralAccess->getUser()->getRole()->isStaff() && $pastoralAccess->getUser()->getRole()->getAccessPastoral()) {
                     $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
                 }
             }

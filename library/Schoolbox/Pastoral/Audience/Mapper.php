@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral\Audience;
 
+use Closure;
 use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
@@ -15,6 +16,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\SubType\Mapper as SubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -95,18 +97,16 @@ class Mapper extends BaseMapper
     {
         $results = $this->createCollection();
 
-        /**
-         * @var UserMapper    $userMapper
-         * @var RoleMapper    $roleMapper
-         * @var TypeMapper    $typeMapper
-         * @var SubTypeMapper $subTypeMapper
-         * @var GroupMapper   $pGroupMapper
-         */
-        $userMapper    = $this->getJoinMapper('user');
-        $roleMapper    = $this->getJoinMapper('role');
-        $typeMapper    = $this->getJoinMapper('type');
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('user');
+        /* @var RoleMapper $roleMapper */
+        $roleMapper = $this->getJoinMapper('role');
+        /** @var TypeMapper $typeMapper */
+        $typeMapper = $this->getJoinMapper('type');
+        /** @var SubTypeMapper $subTypeMapper */
         $subTypeMapper = $this->getJoinMapper('subtype');
-        $pGroupMapper  = $this->getJoinMapper('group');
+        /** @var GroupMapper $pGroupMapper */
+        $pGroupMapper = $this->getJoinMapper('group');
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -159,7 +159,7 @@ class Mapper extends BaseMapper
             $errors[] = "Audience must have either a Type and SubType";
         }
 
-        $count = (int)$model->getUser() + (int)$model->getRole() + (int)$model->getGroup();
+        $count = ($model->getUser() ? 1 : 0) + ($model->getRole() ? 1 : 0) + ($model->getGroup() ? 1 : 0);
         if (!$count) {
             $errors[] = "Audience must have either a User, Role, or Group";
         } elseif ($count > 1) {
@@ -171,5 +171,20 @@ class Mapper extends BaseMapper
         }
 
         return true;
+    }
+
+    /**
+     * Returns callback to filter list with role permission
+     * @return Closure
+     */
+    public function getPermissionCallback(): Closure
+    {
+        return static function (Model $model) {
+            $role = $model->getRole() ?: ($model->getUser() ? $model->getUser()->getRole() : null);
+            if ($role) {
+                return !in_array(Role::PERMISSION_ACCESS_PASTORAL, Role::VALID_PERMISSIONS[$role->getType()]) || $role->getAccessPastoral();
+            }
+            return true;
+        };
     }
 }

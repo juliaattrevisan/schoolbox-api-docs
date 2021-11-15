@@ -206,9 +206,9 @@ class Controller extends Base
         }
 
         //This is fudged using the same audience screen from the record. So to get the saved records to display, it is easiest to attach them to $record
-        $record           = [];
-        $record['id']     = "fakeId";
-        $record['access'] = $this->getAudienceForType($type, $subType);
+        $record                         = [];
+        $record['id']                   = "fakeId";
+        $record['accessWithPermission'] = $this->getAudienceForType($type, $subType);
 
         /* Set up flyout menu; identify our current url to see what should
          * be selected in the flyout menu. Since the modify route addresses both
@@ -457,6 +457,6 @@ class Controller extends Base
     {
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
-        return $this->pastoralAudienceMapper->findByPredicates($pb);
+        return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
     }
 }
