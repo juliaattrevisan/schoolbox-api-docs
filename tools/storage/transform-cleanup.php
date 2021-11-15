@@ -34,11 +34,13 @@ $app = new class extends CliTool\App {
     }
 
     /**
+     * @param string $dir
+     *
      * Get the list of files in storage directory. And delete orphaned transform files.
      * Transform filename format should conform with one of the ITransformFactory::recognisesCacheKey().
      * If it doesn't, we'll delete the transform file from disk and its record from storage_transform table.
      */
-    private function cleanup($dir)
+    private function cleanup(string $dir)
     {
         $directoryIterator = new DirectoryIterator($dir);
 
