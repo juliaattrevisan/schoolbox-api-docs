@@ -51,6 +51,8 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
 
         $classDefinitionOverride = str_replace('Controller', 'Definition', $row['cd.class']);
 
+        $row['visible']  = $row['visible'] === 'true';
+
         if (
             class_exists($classDefinitionOverride) &&
             is_subclass_of($classDefinitionOverride, Component_Definition::class)
