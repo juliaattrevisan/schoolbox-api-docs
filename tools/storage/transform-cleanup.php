@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
 
-    private const LOCK_FILE = '/tmp/.transform-cleanup.lock';
+    public const LOCK_NAME = 'transform_cleanup';
 
     public function runAsRoot(): ?bool
     {
@@ -19,16 +19,16 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
-        if (file_exists(self::LOCK_FILE)) {
+        $lock = $this->acquireLock(self::LOCK_NAME, null);
+
+        if (!$lock->isAcquired()) {
             $this->getLogger()->notice("[Terminate] Unable to run this tool as another process is currently running.");
             exit;
         }
 
         $startDate = date("d/m/Y H:i:s");
-
-        $this->createLockFile();
         $this->cleanup($this->getConfig()->get('storage_dir'));
-        $this->releaseLockFile();
+        $lock->release();
 
         $this->writeLog($startDate, date("d/m/Y H:i:s"));
     }
@@ -161,34 +161,6 @@ $app = new class extends CliTool\App {
                 unlink($item->getPathInfo() . '/' . $item->getFilename());
             } catch (Exception $e) {
                 $this->getLogger()->error("Unable to delete " . $item->getFilename() . "\n" . $e->getMessage());
-            }
-        }
-    }
-
-    /**
-     * Create lock file for overlap protection.
-     */
-    private function createLockFile(): void
-    {
-        if ($this->perform()) {
-            try {
-                touch(self::LOCK_FILE);
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
-            }
-        }
-    }
-
-    /**
-     * Delete lock file once the job is done.
-     */
-    private function releaseLockFile()
-    {
-        if ($this->perform()) {
-            try {
-                unlink(self::LOCK_FILE);
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
             }
         }
     }
