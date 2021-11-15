@@ -261,3 +261,14 @@ div[id^='news-container'], div[id*='news-container']{
   }
 }
 
+/* show the read news items with lower opacity, to make it more obvious
+*/
+.read h3, .read article, .read meta, .read .article-read-more {
+    opacity: 70%;
+}
+/* show the unread news items with a bold header and "Read More" link
+*/
+.unread h3, .unread .article-read-more {
+    font-weight: bold;
+}
+

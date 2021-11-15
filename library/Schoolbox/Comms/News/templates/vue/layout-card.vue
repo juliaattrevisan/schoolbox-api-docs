@@ -37,7 +37,7 @@
         </div>
 
         <div class="v-card-list">
-            <div class="v-card card wrap-down" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
+            <div class="v-card card wrap-down" v-bind:class="{sticky: article.sticky, unread: !article.viewedAt, read: article.viewedAt}" v-for="article in currentArticles">
                 <template v-if="article.featureImage">
                     <div class="card-feature-image">
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
@@ -95,7 +95,7 @@
                 </div>
                 <div class="card-actions">
                     <template v-if="article.readMore.available">
-                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readMore.string"></a>
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readMore.string" class="article-read-more"></a>
                     </template>
 
                     <div class="card-spacer"></div>

@@ -8,6 +8,9 @@
 
 namespace Schoolbox\Comms\News\Statistics;
 
+use InvalidArgumentException;
+use Schoolbox\GenericCollection;
+
 /**
  * Class Mapper
  *
@@ -15,6 +18,7 @@ namespace Schoolbox\Comms\News\Statistics;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model findOneByColumnList($columnList, array $options = []);
+ * @method GenericCollection|Model[] findByColumnList($columnList, array $options = []);
  */
 class Mapper extends \Schoolbox\Mapper
 {
@@ -57,7 +61,7 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function mapping(): void
     {

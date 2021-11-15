@@ -36,7 +36,7 @@
             </div>
         </li>
 
-        <li class="actions-small-1" v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
+        <li class="actions-small-1" v-bind:class="{sticky: article.sticky, unread: !article.viewedAt, read: article.viewedAt}" v-for="article in currentArticles">
             <div class="list-item">
                 <div class="small-12 card wrap-down">
                     <template>
@@ -63,7 +63,9 @@
                             </a>
                         </template>
                     </template>
-                    <h3><a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a></h3>
+                    <h3>
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a>
+                    </h3>
 
                     <p class="meta">
                         <span>
@@ -94,12 +96,12 @@
                         </template>
                     </p>
 
-                    <article>
-                        <div v-if="!isCompactMode" v-html="article.blurb"></div>
+                    <article v-if="!isCompactMode">
+                        <div v-html="article.blurb"></div>
 
                         <template v-if="article.readMore.available">
                             <div class="article-read-more">
-                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-if="!isCompactMode" v-html="article.readMore.string"></a>
+                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readMore.string"></a>
                             </div>
                         </template>
                     </article>
