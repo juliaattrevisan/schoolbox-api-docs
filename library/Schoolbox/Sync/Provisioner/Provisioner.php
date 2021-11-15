@@ -272,7 +272,7 @@ class Provisioner
                     }
 
                     // get a diff of the original user and what we've ended up with
-                    $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
+                    $diff = $this->userMapper->diffForLog($originalUser, $internalUser, ['old', 'new']);
 
 
                     /* Modify accessList only when ups_groups_enabled is actually enabled
