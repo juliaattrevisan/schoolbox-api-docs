@@ -47,8 +47,6 @@ class Module extends BaseModule
             $preloadTool,
         );
 
-        // TODO add JWKS endpoint?
-
         // OIDC authentication
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
         $this->register(self::METHOD_POST, '/oidc/authentication', 'postOidcAuthenticationRequest');

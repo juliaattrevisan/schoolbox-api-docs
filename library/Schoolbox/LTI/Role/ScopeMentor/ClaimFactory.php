@@ -7,14 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\Role\ScopeMentor;
 
-use OAT\Library\Lti1p3Core\Role\RoleInterface;
+use Alaress\Codec\ICodec;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\LTI\Claim\RoleScopeMentorClaim;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Model;
 use Schoolbox\User;
 
 /**
@@ -26,7 +24,7 @@ use Schoolbox\User;
  *
  * @see https://www.imsglobal.org/spec/lti/v1p3/#role-scope-mentor-claims
  */
-class RoleScopeMentorClaimFactory
+class ClaimFactory
 {
     /**
      * Access permission checker, used for checking if the given user is an
@@ -35,13 +33,20 @@ class RoleScopeMentorClaimFactory
     private Access $access;
 
     /**
+     * User codec, used for encoding a user into the claim.
+     */
+    private ICodec $userCodec;
+
+    /**
      * Constructor
      *
      * @param Access $access
+     * @param ICodec $userCodec
      */
-    public function __construct(Access $access)
+    public function __construct(Access $access, ICodec $userCodec)
     {
-        $this->access = $access;
+        $this->access    = $access;
+        $this->userCodec = $userCodec;
     }
 
     /**
@@ -52,25 +57,24 @@ class RoleScopeMentorClaimFactory
      *
      * @param User        $user
      * @param IAssessable $assessment
-     * @return RoleScopeMentorClaim|null A claim object, or null if it would've
-     *                                   been empty.
+     * @return Claim|null A claim object, or null if it would've been empty.
      * @throws MapperException
      */
-    public function buildForAssessment(User $user, IAssessable $assessment): ?RoleScopeMentorClaim
+    public function buildForAssessment(User $user, IAssessable $assessment): ?Claim
     {
         $mentoredUserIds = [];
         $folder          = $assessment->getBaseContext()->getFolder();
         if ($this->access->isInstructor($user, $folder)) {
             foreach ($assessment->getAllParticipants() as $participant) {
                 if (!$participant->isExcluded()) {
-                    $mentoredUserIds[] = $this->extractUserId($participant->getUser());
+                    $mentoredUserIds[] = $this->userCodec->encode($participant->getUser());
                 }
             }
         } elseif ($user->getRole()->isParent()) {
             foreach ($user->getChildren() as $child) {
                 $participant = $assessment->getParticipantIfExtant($child);
                 if ($participant && !$participant->isExcluded()) {
-                    $mentoredUserIds[] = $this->extractUserId($child);
+                    $mentoredUserIds[] = $this->userCodec->encode($child);
                 }
             }
         }
@@ -81,21 +85,7 @@ class RoleScopeMentorClaimFactory
             }
         );
         return count($mentoredUserIds) > 0
-            ? new RoleScopeMentorClaim(...$mentoredUserIds)
+            ? new Claim(...$mentoredUserIds)
             : null;
-    }
-
-    /**
-     * Extracts the user ID out of a user object.
-     *
-     * Currently, this is the external ID as this is what's most likely to be
-     * shared; however this is subject to change.
-     *
-     * @param User $user
-     * @return string|null
-     */
-    private function extractUserId(User $user): ?string
-    {
-        return $user->getExternalId();
     }
 }

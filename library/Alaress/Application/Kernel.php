@@ -112,7 +112,7 @@ use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\RepositoryFactory as RegistrationRepositoryFactory;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;

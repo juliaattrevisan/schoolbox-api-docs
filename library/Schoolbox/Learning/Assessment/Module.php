@@ -211,30 +211,6 @@ class Module extends BaseModule
             $canSubmit,
             $preloadParticipant,
         );
-
-        // Services:
-        // These don't have permission handlers at the module level: instead,
-        // the controllers allow or deny access based upon the scope assigned to
-        // the JWT used for validation.
-        // (If no JWT was passed, access will be denied.)
-
-        // LTI line item service
-        $this->register(
-            self::METHOD_GET,
-            "$assRoute/lti",
-            'getLineItem',
-            null,
-            $preloadAssessment,
-        );
-
-        // LTI assessment score publish service
-        $this->register(
-            self::METHOD_POST,
-            "$assRoute/lti/scores",
-            'postScorePublish',
-            null,
-            $preloadAssessment,
-        );
     }
 
 
@@ -447,7 +423,6 @@ class Module extends BaseModule
         $lc['instance']                 = $injector->lazyGet('instance');
         $lc['registrations']            = $injector->lazyGet('lti.registrations');
         $lc['userCodec']                = $injector->lazyGet('lti.userCodec');
-        $lc['accessTokenCache']         = $injector->lazyGet('lti.accessTokenCache');
     }
 
     /**

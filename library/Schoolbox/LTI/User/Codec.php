@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\User;
 
+use Alaress\Codec\ICodec;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use TypeError;
 
 /**
  * Codec for Schoolbox user objects in an LTI context.
@@ -22,8 +24,11 @@ use Schoolbox\UserMapper;
  *
  * This value will need to be decoded back into a user object for usage within
  * Schoolbox.
+ *
+ * TODO consider changing the format (encoded: FQDN, decoded: ID)
+ *      this seems to be the standard for other types of claim
  */
-class UserCodec
+class Codec implements ICodec
 {
     /**
      * User mapper: used for creating a user from an encoded value.
@@ -43,22 +48,31 @@ class UserCodec
     /**
      * Encode the user into a string value.
      *
-     * @param User|null $user
+     * @param User|null $rawValue
      * @return string|null
      */
-    public function encode(?User $user): ?string
+    public function encode($rawValue)
     {
-        return $user ? $user->getUsername() : null;
+        if (!isset($rawValue)) {
+            return null;
+        }
+        if ($rawValue instanceof User) {
+            return $rawValue->getUsername();
+        }
+
+        // The typehint implies this will never happen, but logically it can
+        /** @phpstan-ignore-next-line */
+        throw new TypeError(sprintf('$rawValue must be an instance of %s', User::class));
     }
 
     /**
      * Decode the string back into a user.
      *
-     * @param string|null $encoded
+     * @param string|null $encodedValue
      * @return User|null
      */
-    public function decode(?string $encoded): ?User
+    public function decode($encodedValue)
     {
-        return isset($encoded) ? $this->userMapper->findByUsername($encoded) : null;
+        return isset($encodedValue) ? $this->userMapper->findByUsername($encodedValue) : null;
     }
 }

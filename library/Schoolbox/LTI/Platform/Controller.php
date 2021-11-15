@@ -30,16 +30,17 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
+use OAT\Library\Lti1p3Nrps\Service\MembershipServiceInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
+use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
-use Schoolbox\LTI\Util\PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
-use Schoolbox\LTI\Util\UserCodec;
+use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Url\Factory;
 
 /**
@@ -217,22 +218,13 @@ class Controller extends Base
         $factory          = new AuthorizationServerFactory(
             $clientRepository,
             new AccessTokenRepository($this->accessTokenCache),
-            // So far, Schoolbox supports only the Score service.
             new ScopeRepository([
                 new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
+                new Scope(MembershipServiceInterface::AUTHORIZATION_SCOPE_MEMBERSHIP),
             ]),
-            // I don't think we actually use this encryption key.
-            // AFAICT it's used in the following places:
-            // * \League\OAuth2\Server\Grant\AuthCodeGrant::completeAuthorizationRequest, called by
-            //   \League\OAuth2\Server\AuthorizationServer::completeAuthorizationRequest
-            //   (which for some reason we never call)
-            // * \League\OAuth2\Server\ResponseTypes\BearerTokenResponse::generateHttpResponse, called by:
-            //  * \League\OAuth2\Server\AuthorizationServer::completeAuthorizationRequest
-            //    (as above, we never call this)
-            //  * \League\OAuth2\Server\AuthorizationServer::respondToAccessTokenRequest,
-            //     but only if the access token response generator creates
-            //     refresh tokens, which this one does not (because it's using
-            //     the client credentials grant type)
+            // Currently, the auth token gets verified in:
+            // `\Schoolbox\Learning\Assessment\Lti\Controller::postScorePublish`
+            // OAT-SA docs make no mention of how to actually verify the token.
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
         );
 

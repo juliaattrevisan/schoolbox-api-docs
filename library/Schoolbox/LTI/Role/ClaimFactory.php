@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util;
+namespace Schoolbox\LTI\Role;
 
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -19,7 +19,7 @@ use Schoolbox\User;
 /**
  * Factory for building various role claims.
  */
-class RoleClaimFactory
+class ClaimFactory
 {
     public const INSTITUTION_ROLE_STAFF   = RoleInterface::NAMESPACE_INSTITUTION . '#Staff';
     public const INSTITUTION_ROLE_STUDENT = RoleInterface::NAMESPACE_INSTITUTION . '#Student';

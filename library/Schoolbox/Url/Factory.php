@@ -52,6 +52,8 @@ class Factory
     public function buildFullyQualified(): UriInterface
     {
         $host = trim("{$this->config->get('site_hostname')}.{$this->config->get('site_domain')}", '. ');
-        return (new Uri())->setHost($host);
+        return (new Uri())
+            ->setScheme('https')
+            ->setHost($host);
     }
 }

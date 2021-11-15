@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Claim;
+namespace Schoolbox\LTI\Role\ScopeMentor;
 
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
@@ -17,7 +17,7 @@ use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
  *
  * @see https://www.imsglobal.org/spec/lti/v1p3/#role-scope-mentor-claims
  */
-class RoleScopeMentorClaim implements MessagePayloadClaimInterface
+class Claim implements MessagePayloadClaimInterface
 {
     /**
      * A list of user IDs.
@@ -46,9 +46,9 @@ class RoleScopeMentorClaim implements MessagePayloadClaimInterface
 
     /**
      * @param array $claimData
-     * @return RoleScopeMentorClaim
+     * @return Claim
      */
-    public static function denormalize(array $claimData): RoleScopeMentorClaim
+    public static function denormalize(array $claimData): Claim
     {
         return new self(... $claimData);
     }

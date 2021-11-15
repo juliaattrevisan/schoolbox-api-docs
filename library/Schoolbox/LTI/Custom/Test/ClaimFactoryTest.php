@@ -7,29 +7,29 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Util\Test;
+namespace Schoolbox\LTI\Custom\Test;
 
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ContextClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\ResourceLinkClaim;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\LTI\Util\CustomClaimFactory;
+use Schoolbox\LTI\Custom\ClaimFactory;
 use Schoolbox\User;
 
 /**
- * @covers \Schoolbox\LTI\Util\CustomClaimFactory
+ * @covers \Schoolbox\LTI\Custom\ClaimFactory
  */
-class CustomClaimFactoryTest extends TestCase
+class ClaimFactoryTest extends TestCase
 {
     /**
      * @dataProvider getTestBuildData
-     * @covers       \Schoolbox\LTI\Util\CustomClaimFactory::build
+     * @covers       \Schoolbox\LTI\Custom\ClaimFactory::build
      *
-     * @param CustomClaimFactory $factory
-     * @param array|null         $claims
-     * @param array|null         $expected
+     * @param ClaimFactory $factory
+     * @param array|null   $claims
+     * @param array|null   $expected
      */
-    public function testBuild(CustomClaimFactory $factory, ?array $claims, ?array $expected): void
+    public function testBuild(ClaimFactory $factory, ?array $claims, ?array $expected): void
     {
         $actual = $factory->build($claims);
         if (!isset($expected)) {
@@ -41,7 +41,7 @@ class CustomClaimFactoryTest extends TestCase
 
     public function getTestBuildData(): iterable
     {
-        $factory = new CustomClaimFactory();
+        $factory = new ClaimFactory();
 
         // No variables: create no custom claim
         yield 'null' => [$factory, null, null,];

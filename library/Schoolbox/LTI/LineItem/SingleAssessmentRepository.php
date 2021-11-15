@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\LineItem;
 
+use Aura\Router\Router;
 use BadMethodCallException;
 use Laminas\Uri\Uri;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItem;
@@ -28,13 +29,20 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
     private LtiAssessment $ltiAssessment;
 
     /**
+     * Router, used to generate the line item route for the assessment.
+     */
+    private Router $router;
+
+    /**
      * Constructor
      *
      * @param LtiAssessment $ltiAssessment
+     * @param Router        $router
      */
-    public function __construct(LtiAssessment $ltiAssessment)
+    public function __construct(LtiAssessment $ltiAssessment, Router $router)
     {
         $this->ltiAssessment = $ltiAssessment;
+        $this->router        = $router;
     }
 
     /**
@@ -46,10 +54,14 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function find(string $lineItemIdentifier): ?LineItemInterface
     {
-        // Line item identifier: the request URI, minus /scores
-        // For now, just extract an ID out of it and don't care about the rest
-        $url = new Uri($lineItemIdentifier);
-        if ($url->getPath() === sprintf('/learning/assessments/%d/lti', $this->ltiAssessment->getId())) {
+        // Line item identifier: the line item request URI
+        $url          = new Uri($lineItemIdentifier);
+        $assessmentId = $this->ltiAssessment->getId();
+        $route        = $this->router->generate(
+            'ltiPlatformLineItem.getLineItemForAssessment',
+            ['assessmentId' => $assessmentId],
+        );
+        if ($url->getPath() === $route) {
             return new LineItem(
                 $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
                 $this->ltiAssessment->getTitle(),
