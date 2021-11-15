@@ -10,17 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Alaress_Date_Format;
-use League\OAuth2\Server\ResourceServer;
-use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
-use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
-use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment;
@@ -35,11 +29,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
-use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Provider as LtiTool;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
-use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
-use Schoolbox\LTI\Util\ServerRequestFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
@@ -83,11 +74,6 @@ class Controller extends Assessment\Controller
     private UserCodec $userCodec;
 
     /**
-     * Cache for access tokens.
-     */
-    private CacheItemPoolInterface $accessTokenCache;
-
-    /**
      * Constructor
      *
      * @param UserMapper                      $userMapper
@@ -127,8 +113,7 @@ class Controller extends Assessment\Controller
         LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
         RegistrationRepositoryInterface $registrations,
         Instance $instance,
-        UserCodec $userCodec,
-        CacheItemPoolInterface $accessTokenCache
+        UserCodec $userCodec
     ) {
         parent::__construct(
             $userMapper,
@@ -150,7 +135,6 @@ class Controller extends Assessment\Controller
         $this->registrations            = $registrations;
         $this->instance                 = $instance;
         $this->userCodec                = $userCodec;
-        $this->accessTokenCache         = $accessTokenCache;
     }
 
     /**
@@ -392,68 +376,5 @@ class Controller extends Assessment\Controller
             $this->getConfigLoader(),
             $this->userCodec
         ))->buildForAssessment($assessment, $currentUser, $actingUser);
-    }
-
-    /**
-     * LTI line item service endpoint.
-     *
-     * Currently, this does nothing: however it must exist so that the resource
-     * link launch request can generate a score publish service endpoint.
-     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#service-endpoint:
-     * > The scores service endpoint MUST be the line item resource URL with the
-     * > path appended with '/scores'.
-     *
-     * @api   GET /learning/assessments/:assessmentId/lti
-     * @since 21.1.0
-     *
-     * @param Model $assessment
-     */
-    public function getLineItem(Model $assessment): void
-    {
-        throw new NotFound();
-    }
-
-    /**
-     * Score publish service endpoint.
-     *
-     * @api   POST /learning/assessments/:assessmentId/lti/scores
-     * @since 21.1.0
-     *
-     * @param Model $assessment
-     */
-    public function postScorePublish(Model $assessment): void
-    {
-        // Build and validate score publish request
-        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-ags/doc/score/platform/
-        $request = (new ServerRequestFactory())->build($this->request);
-
-        // Line item repository: consists only of a single assessment
-        $lineItemRepository = new SingleAssessmentRepository($assessment);
-
-        // Score repository: consists only of a single assessment, and its scores
-        $scoreRepository = new SingleAssessmentScoreRepository(
-            $assessment,
-            $this->ltiAssessmentMapper,
-            $this->ltiAssessmentScoreMapper,
-            $this->userCodec,
-        );
-
-        // Access token sanity checker: validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations);
-
-        // Access token validity checker
-        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
-        $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-        );
-        $request = $resourceServerValidator->validateAuthenticatedRequest($request);
-
-        // Handle the request: this validates the request body
-        $handler = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
-
-        // Serve the request
-        $server = new LtiServiceServer($validator, $handler);
-        $this->populateResponseFromPsr7Response($server->handle($request));
     }
 }
