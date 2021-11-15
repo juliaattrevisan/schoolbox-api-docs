@@ -36,7 +36,7 @@
             </div>
         </li>
 
-        <li v-bind:class="{sticky: article.sticky, unread: !article.viewedAt}" v-for="article in currentArticles">
+        <li v-bind:class="{sticky: article.sticky, unread: !article.viewedAt, read: article.viewedAt}" v-for="article in currentArticles">
             <div class="small-12 card reversed wrap-down">
                 <template>
                     <template v-if="article.featureImage">
