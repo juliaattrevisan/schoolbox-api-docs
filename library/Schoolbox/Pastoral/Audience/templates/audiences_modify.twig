@@ -68,20 +68,22 @@
                                     src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
                             <script type="text/javascript"
                                     src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
-                            <input id="actions" name="actions"
-                                   value="{% for action in typeActions %}{{ action.name }},{% endfor %}">
+                            <select data-actions name="actions[]" id="pastoral-actions" multiple></select>
                         </div>
                         <script type="text/javascript">
                             {% autoescape 'js' %}
 
-                            $('#actions').selectizeSelector({
+                            $('#pastoral-actions').selectizeSelector({
                                 multiple: true,
                                 selectize: {
                                     create: false,
+                                    placeholder: '',
                                     preload: true,
+                                    persist: true,
+                                    hideSelected: true,
                                     load: function (query, callback) {
                                         $.ajax({
-                                            url: '/pastoral/actions',
+                                            url: '{{ routeLookup('pastoral.getActions') }}',
                                             type: 'GET',
                                             dataType: 'json',
                                             data: {query: query}
@@ -94,10 +96,7 @@
                                 },
                                 value: [
                                     {% for action in typeActions %}
-                                    {
-                                        'id': '{{ action.name }}',
-                                        'name': '{{ action.name }}'
-                                    }{% if not loop.last %},{% endif %}
+                                    {'id': '{{ action.id }}', 'name': '{{ action.name | escape('js') }}'},
                                     {% endfor %}
                                 ]
                             });

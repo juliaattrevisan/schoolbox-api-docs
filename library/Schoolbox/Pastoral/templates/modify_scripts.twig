@@ -58,14 +58,17 @@
 
         {# Pastoral Action Selectize #}
 
-        $('#actions').selectizeSelector({
+        $('#pastoral-actions').selectizeSelector({
             multiple: true,
             selectize: {
                 create: false,
+                placeholder: '',
                 preload: true,
+                persist: true,
+                hideSelected: true,
                 load: function(query, callback) {
                     $.ajax({
-                        url: '/pastoral/actions',
+                        url: '{{ routeLookup('pastoral.getActions') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: { query: query }
@@ -78,7 +81,7 @@
             },
             value: [
                 {% for action in record.actions %}
-                {'id': '{{ action.name }}', 'name': '{{ action.name }}'}{% if not loop.last %},{% endif %}
+                {'id': '{{ action.id }}', 'name': '{{ action.name }}'}{% if not loop.last %},{% endif %}
                 {% endfor %}
             ]
         });

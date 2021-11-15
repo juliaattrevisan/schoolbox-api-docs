@@ -118,5 +118,4 @@ class External_Pastoral implements External_PastoralInterface
     {
         return $this->database->getActionList();
     }
-
 }
