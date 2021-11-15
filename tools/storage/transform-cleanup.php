@@ -48,7 +48,7 @@ HELP;
             exit;
         }
 
-        $logFile = $this->getConfig()->get('logs_dir') . '/' . 'transform-cleanup-' . date('Ymd');
+        $logFile = $this->getConfig()->get('backup_dir') . '/' . 'transform-cleanup-' . date('Ymd') . '.complete';
 
         if ($this->checkIfToolHasRanByLogFile($logFile) && !$this->getOpt('force')) {
             $this->getLogger()->notice("[Terminated] This tool has already been executed. You may add --force flag to override.");
