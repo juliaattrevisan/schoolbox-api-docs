@@ -3706,16 +3706,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Validation/Factory.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Comms\\\\News\\\\Mapper\\:\\:findCheaplyById\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Comms/News/Controller.php
-
-		-
-			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Controller\\:\\:\\$folderMapper \\(Schoolbox\\\\Comms\\\\News\\\\Mapper\\) does not accept Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Discussion\\\\Thread\\\\Context\\\\IThreadLocation\\:\\:setAudience\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
