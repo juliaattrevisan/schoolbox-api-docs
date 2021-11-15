@@ -62,8 +62,6 @@ use function array_merge;
  */
 class Controller extends Base
 {
-
-
     private Mapper $newsMapper;
     private Topic\Mapper $topicMapper;
     private SaveForLater\Mapper $saveForLaterMapper;
@@ -78,7 +76,6 @@ class Controller extends Base
     private Thread\Mapper $threadMapper;
     private CommentMapper $commentMapper;
     private File\Mapper $fileMapper;
-
 
     /**
      * Default number of items to display in case config is broken
