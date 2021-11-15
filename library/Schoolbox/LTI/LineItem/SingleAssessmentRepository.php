@@ -48,8 +48,9 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
     {
         // Line item identifier: the request URI, minus /scores
         // For now, just extract an ID out of it and don't care about the rest
+        // TODO this should be a codec
         $url = new Uri($lineItemIdentifier);
-        if ($url->getPath() === sprintf('/learning/assessments/%d/lti', $this->ltiAssessment->getId())) {
+        if ($url->getPath() === sprintf('/lti-platform/line-item/assessment/%s', $this->ltiAssessment->getId())) {
             return new LineItem(
                 $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
                 $this->ltiAssessment->getTitle(),
