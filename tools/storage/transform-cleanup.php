@@ -16,6 +16,11 @@ $app = new class extends CliTool\App {
 
     public const DEFAULT_TIMEOUT = 604800;
 
+    /**
+     * All image/video transforms found on disk
+     *
+     * @var string[]
+     */
     private array $validTransforms = [];
 
     private ConfigMapper $configMapper;
@@ -28,6 +33,9 @@ $app = new class extends CliTool\App {
 
     /** @var ITransformFactory[]  */
     private array $imageTransforms;
+
+    private int $countOrphanTransformsDeleted = 0;
+    private int $countEmptyDirectoriesDeleted = 0;
 
     public function __construct()
     {
@@ -80,6 +88,7 @@ $app = new class extends CliTool\App {
         $this->cleanupStorageTransformTable();
         $lock->release();
         $this->registerToolCompletion();
+        $this->printResults();
     }
 
 
@@ -114,11 +123,11 @@ HELP;
     }
 
     /**
-     * @param string $dir
-     *
      * Get the list of files in storage directory. And delete orphaned transform files.
      * Transform filename format should conform with one of the ITransformFactory::recognisesCacheKey().
      * If it doesn't, we'll delete the transform file from disk and its record from storage_transform table.
+     *
+     * @param string $dir
      */
     private function cleanupStorageDirectory(string $dir): void
     {
@@ -126,27 +135,29 @@ HELP;
 
         /** @var DirectoryIterator $item */
         foreach ($directoryIterator as $item) {
-            if (!$item->isDot()) {
-                if ($item->isDir()) {
-                    $this->cleanupStorageDirectory("$dir/$item");
-                    $this->cleanupEmptyDirectory($item);
-                } else {
-                    if (
-                        $this->isTransformFile($item) &&
-                        !$this->isVideoTransform($item) &&
-                        !$this->isValidTransformNameFormat($item)
-                    ) {
-                        $this->deleteRecordFromStorageTransformTable($item);
-                        $this->deleteTransformFileFromDisk($item);
-                    }
-
-                    // Save the list of valid transform files in memory for later.
-                    if ($this->isTransformFile($item) &&
-                        !$this->isVideoTransform($item) &&
-                        $this->isValidTransformNameFormat($item)) {
-                        $this->validTransforms[] = $item->getFilename();
-                    }
+            if ($item->isDot()) {
+                continue;
+            }
+            if ($item->isDir()) {
+                $this->cleanupStorageDirectory("$dir/$item");
+                $this->cleanupEmptyDirectory($item);
+            } else {
+                if(!$this->isTransformFile($item)){
+                    $this->getLogger()->info("Retaining storage file: '$item'");
+                    continue;
                 }
+                if($this->isVideoTransform($item)){
+                    $this->getLogger()->info("Retaining video transform: '$item'");
+                    $this->validTransforms[] = $item->getFilename();
+                    continue;
+                }
+                if($this->isValidImageTransformNameFormat($item)){
+                    $this->getLogger()->info("Retaining image transform: '$item'");
+                    $this->validTransforms[] = $item->getFilename();
+                    continue;
+                }
+                $this->deleteRecordFromStorageTransformTable($item);
+                $this->deleteTransformFileFromDisk($item);
             }
         }
     }
@@ -173,11 +184,12 @@ HELP;
      * @param DirectoryIterator $item
      * @return bool
      */
-    private function isValidTransformNameFormat(DirectoryIterator $item): bool
+    private function isValidImageTransformNameFormat(DirectoryIterator $item): bool
     {
         $cacheKey = $this->getCacheKeyFromFileName($item->getFilename());
         foreach ($this->imageTransforms as $transform) {
             if ($transform->recognisesCacheKey($cacheKey)) {
+                $this->getLogger()->info("Image Transform recognised: '$cacheKey' ({$transform::getSlug()})");
                 return true;
             }
         }
@@ -228,6 +240,7 @@ HELP;
         if ($this->perform()) {
             try {
                 unlink($item->getPathInfo() . '/' . $item->getFilename());
+                $this->countOrphanTransformsDeleted++;
             } catch (Exception $e) {
                 $this->getLogger()->error("Unable to delete " . $item->getFilename() . "\n" . $e->getMessage());
             }
@@ -251,13 +264,16 @@ HELP;
      */
     private function cleanupEmptyDirectory(DirectoryIterator $item): void
     {
-        if ($item->isDir() && $this->dirIsEmpty($item->getRealPath())) {
+        if ($this->dirIsEmpty($item->getRealPath())) {
             $verb = $this->perform() ? "Deleted" : "Would delete";
             $this->getLogger()->notice(sprintf("$verb %s empty directory from disk.", $item->getRealPath()));
 
             if ($this->perform()) {
                 rmdir($item->getRealPath());
             }
+            $this->countEmptyDirectoriesDeleted++;
+        } else {
+            $this->getLogger()->debug("Retaining non-empty dir: {$item->getRealPath()}");
         }
     }
 
@@ -322,13 +338,19 @@ HELP;
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     private function getStorageTransforms(): array
     {
         return $this->getDatabaseInternal()
                     ->executeQuery("SELECT CONCAT(hash, '-', transform) FROM storage_transform")
                     ->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    private function printResults(): void
+    {
+        $this->getLogger()->notice("Count orphan transforms deleted: {$this->countOrphanTransformsDeleted}");
+        $this->getLogger()->notice("Count empty dirs deleted: {$this->countEmptyDirectoriesDeleted}");
     }
 };
 
