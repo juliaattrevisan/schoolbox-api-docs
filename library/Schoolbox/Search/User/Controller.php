@@ -555,11 +555,16 @@ class Controller extends BaseController
             }
         }
 
-        $showPastoral = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED);
-
-        if ($this->getUser()->getRole()->isParent() && !$this->getConfigLoader()->get('pastoral_parent_access')) {
-            $showPastoral = false;
-        }
+        $showPastoral =
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+            && $this->getAuthorizer()->isPathAuthorizedForUser(
+                'pastoral.getStudent',
+                [
+                    'studentId' => $student->getId(),
+                    'student'   => $student,
+                ],
+                $this->getUser()
+            );
 
         $protectStudentContacts = $this->getConfigLoader()->get('protect_student_contacts');
 

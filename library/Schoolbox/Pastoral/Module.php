@@ -54,10 +54,23 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // Define permissions for the routes
+        $permissionPastoralModeratorModerate =
+            new Rule\All(
+                new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF)
+            );
 
-        $permissionPastoralModeratorModerate = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
-        $permissionPastoralModeratorWrite    = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
-        $permissionPastoralModerator         = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ);
+        $permissionPastoralModeratorWrite =
+            new Rule\All(
+                new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF)
+            );
+
+        $permissionPastoralModerator =
+            new Rule\All(
+                new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF)
+            );
 
         $permissionStaff =
             new Rule\All(
