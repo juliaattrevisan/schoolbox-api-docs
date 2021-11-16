@@ -26,6 +26,9 @@ $app = new class extends CliTool\App {
         ResourceVideo::TRANSCODE,
     ];
 
+    /** @var ITransformFactory[]  */
+    private array $imageTransforms;
+
     public function runAsRoot(): ?bool
     {
         // We are deleting files from local file system
@@ -61,6 +64,12 @@ HELP;
             exit;
         }
         $this->configMapper = ConfigMapper::getInstance();
+        $this->imageTransforms = [
+            new \Alaress\Image\Transformation\MyImage(),
+            new \Alaress\Image\Transformation\Storage(),
+            new \Alaress\Image\Transformation\Icon(),
+            new \Alaress\Image\Transformation\Portrait(),
+        ];
 
         if ($this->hasToolCompleted() && !$this->getOpt('force')) {
             $this->getLogger()->notice("[Terminated] This tool has already been executed. You may add --force flag to override.");
@@ -153,16 +162,9 @@ HELP;
      */
     private function isValidTransformNameFormat(DirectoryIterator $item): bool
     {
-        /** @var ITransformFactory[] $transforms */
-        $transforms = [
-            new \Alaress\Image\Transformation\MyImage(),
-            new \Alaress\Image\Transformation\Storage(),
-            new \Alaress\Image\Transformation\Icon(),
-            new \Alaress\Image\Transformation\Portrait(),
-        ];
-
-        foreach ($transforms as $transform) {
-            if ($transform->recognisesCacheKey($this->getCacheKeyFromFileName($item->getFilename()))) {
+        $cacheKey = $this->getCacheKeyFromFileName($item->getFilename());
+        foreach ($this->imageTransforms as $transform) {
+            if ($transform->recognisesCacheKey($cacheKey)) {
                 return true;
             }
         }
