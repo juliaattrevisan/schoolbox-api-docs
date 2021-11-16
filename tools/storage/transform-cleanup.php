@@ -13,6 +13,8 @@ $app = new class extends CliTool\App {
 
     public const DEFAULT_TIMEOUT = 604800;
 
+    private array $validTransforms = [];
+
     public function runAsRoot(): ?bool
     {
         // We are deleting files from local file system
@@ -30,7 +32,6 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
-
         $timeout = $this->getOptAsInt('lock-timeout:', self::DEFAULT_TIMEOUT);
 
         if ($this->getOpt('help')) {
@@ -64,6 +65,7 @@ HELP;
 
         $startDate = date("d/m/Y H:i:s");
         $this->cleanup($this->getConfig()->get('storage_dir'));
+        $this->cleanupStorageTransformTable();
         $lock->release();
 
         $this->writeLogFile($logFile, $startDate, date("d/m/Y H:i:s"));
@@ -103,7 +105,15 @@ HELP;
                         $this->deleteRecordFromStorageTransformTable($item);
                         $this->deleteTransformFileFromDisk($item);
                     }
+
+                    // Save the list of valid transform files in memory for later.
+                    if ($this->isTransformFile($item) &&
+                        !$this->isVideoTransform($item) &&
+                        $this->isValidTransformNameFormat($item)) {
+                        $this->validTransforms[] = $item->getFilename();
+                    }
                 }
+
                 $this->cleanupEmptyDirectory($item);
             }
         }
@@ -167,6 +177,15 @@ HELP;
      * @param string $fileName
      * @return false|string
      */
+    private function extractFileHashOnly(string $fileName)
+    {
+        return strtok($fileName, '-');
+    }
+
+    /**
+     * @param string $fileName
+     * @return false|string
+     */
     private function getCacheKeyFromFileName(string $fileName)
     {
         return substr(strstr($fileName, '-'), 1);
@@ -180,18 +199,10 @@ HELP;
     {
         $fileName = $item->getFilename();
 
-        $verb = $this->perform() ? "Deleted" : "Would delete";
-        $this->getLogger()->notice(sprintf("$verb %s from storage_transform table.", $item->getFilename()));
-
-        if ($this->perform()) {
-            $this->getDatabaseInternal()->executeQuery(
-                "DELETE FROM storage_transform WHERE hash = :hash AND transform = :transform",
-                [
-                    'hash'      => $fileName,
-                    'transform' => $this->getCacheKeyFromFileName($fileName),
-                ]
-            );
-        }
+        $this->deleteStorageTransformDataByHashAndCacheKey(
+            $this->extractFileHashOnly($fileName),
+            $this->getCacheKeyFromFileName($fileName),
+        );
     }
 
     /**
@@ -240,7 +251,7 @@ HELP;
     {
         if ($item->isDir() && $this->dirIsEmpty($item->getRealPath())) {
             $verb = $this->perform() ? "Deleted" : "Would delete";
-            $this->getLogger()->error(sprintf("$verb %s empty directory from disk.", $item->getRealPath()));
+            $this->getLogger()->notice(sprintf("$verb %s empty directory from disk.", $item->getRealPath()));
 
             if ($this->perform()) {
                 rmdir($item->getRealPath());
@@ -265,6 +276,57 @@ HELP;
 
         closedir($handle);
         return true;
+    }
+
+    /**
+     * Remove records in storage_transform table where transform is no longer available from disk.
+     */
+    private function cleanupStorageTransformTable()
+    {
+        $this->getLogger()->notice("Cleanup storage_transform table for transforms that don't exist on disk.");
+        foreach ($this->getStorageTransforms() as $transform) {
+            if (!in_array($transform, $this->validTransforms)) {
+                $this->deleteStorageTransformDataByHashAndCacheKey(
+                    $this->extractFileHashOnly($transform),
+                    $this->getCacheKeyFromFileName($transform),
+                );
+            }
+        }
+    }
+
+    /**
+     * @param string $hash
+     * @param string $cacheKey
+     */
+    private function deleteStorageTransformDataByHashAndCacheKey(string $hash, string $cacheKey)
+    {
+        $verb = $this->perform() ? "Deleted" : "Would delete";
+
+        if ($this->perform()) {
+            try {
+                $this->getDatabaseInternal()->executeQuery(
+                "DELETE FROM storage_transform WHERE hash = :hash AND transform = :transform",
+                    [
+                        'hash'      => $hash,
+                        'transform' => $cacheKey,
+                    ]
+                );
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage(), $e->getCode());
+            }
+        }
+
+        $this->getLogger()->notice(sprintf("$verb %s from storage_transform table.", $hash . '-' . $cacheKey));
+    }
+
+    /**
+     * @return array
+     */
+    private function getStorageTransforms(): array
+    {
+        return $this->getDatabaseInternal()
+             ->executeQuery("SELECT CONCAT(hash, '-', transform) FROM storage_transform")
+             ->fetchAll(PDO::FETCH_COLUMN);
     }
 };
 
