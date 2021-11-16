@@ -343,7 +343,7 @@ HELP;
     private function getStorageTransforms(): array
     {
         return $this->getDatabaseInternal()
-                    ->executeQuery("SELECT CONCAT(hash, '-', transform) FROM storage_transform")
+                    ->executeQuery("SELECT CONCAT(hash, '-', transform) FROM storage_transform WHERE state = 'done'")
                     ->fetchAll(PDO::FETCH_COLUMN);
     }
 
