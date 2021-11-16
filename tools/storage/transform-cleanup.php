@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Image\Transformation\ITransformFactory;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 
@@ -166,7 +167,6 @@ HELP;
             new \Alaress\Image\Transformation\Portrait(),
         ];
 
-        /** @var \Alaress\Image\Transformation\ITransformFactory[] $transforms */
         foreach ($transforms as $transform) {
             if ($transform->recognisesCacheKey($this->getCacheKeyFromFileName($item->getFilename()))) {
                 return true;
