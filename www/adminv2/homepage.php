@@ -135,7 +135,7 @@ foreach ($groupedCollection as $category => $categoryDefinitions) {
 
         $multiState = '';
         // Failse
-        if ($definition->getMultiple() == 'false') {
+        if ($definition->getMultiple() === false) {
             $multiState .= 'one-only';
             if ($count >= 1) {
                 $multiState .= ' disabled';

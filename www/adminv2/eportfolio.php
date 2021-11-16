@@ -103,7 +103,7 @@ foreach ($definitionCollection as $definition) {
     $count        = $componentCounts[$definitionId] ?: 0;
     $multiState   = '';
     // Failse
-    if ($definition->getMultiple() == 'false') {
+    if ($definition->getMultiple() === false) {
         $multiState .= 'one-only';
         if ($count >= 1) {
             $multiState .= ' disabled';

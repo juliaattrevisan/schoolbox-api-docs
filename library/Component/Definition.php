@@ -12,9 +12,9 @@ class Component_Definition
 {
     // Constants defining modules where components are allowed
 
-    const MODULE_DASHBOARD = 'dashboard';
-    const MODULE_HOMEPAGE = 'homepage';
-    const MODULE_EPORTFOLIO = 'eportfolio';
+    public const MODULE_DASHBOARD = 'dashboard';
+    public const MODULE_HOMEPAGE   = 'homepage';
+    public const MODULE_EPORTFOLIO = 'eportfolio';
 
     /** @var int $id */
     protected $id;
@@ -37,7 +37,7 @@ class Component_Definition
     /** @var bool $visible */
     protected $visible;
 
-    /** @var string $multiple */
+    /** @var bool $multiple */
     protected $multiple;
 
     /** @var string $componentCategory */
@@ -79,25 +79,25 @@ class Component_Definition
     /**
      * @return bool
      */
-    public function isHomepageModule()
+    public function isHomepageModule(): bool
     {
-        return $this->getModule() == self::MODULE_HOMEPAGE;
+        return $this->getModule() === self::MODULE_HOMEPAGE;
     }
 
     /**
      * @return bool
      */
-    public function isDashboardModule()
+    public function isDashboardModule(): bool
     {
-        return $this->getModule() == self::MODULE_DASHBOARD;
+        return $this->getModule() === self::MODULE_DASHBOARD;
     }
 
     /**
      * @return bool
      */
-    public function isEportfolioModule()
+    public function isEportfolioModule(): bool
     {
-        return $this->getModule() == self::MODULE_EPORTFOLIO;
+        return $this->getModule() === self::MODULE_EPORTFOLIO;
     }
 
     /**
@@ -115,7 +115,7 @@ class Component_Definition
      *
      * @return string
      */
-    public function getCssClass()
+    public function getCssClass(): string
     {
         return str_replace('\\', '_', $this->getClass());
     }
@@ -249,18 +249,18 @@ class Component_Definition
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getMultiple()
+    public function getMultiple(): bool
     {
         return $this->multiple;
     }
 
     /**
-     * @param string $multiple
+     * @param bool $multiple
      * @return self
      */
-    public function setMultiple($multiple)
+    public function setMultiple(bool $multiple): self
     {
         $this->multiple = $multiple;
         return $this;
@@ -305,7 +305,7 @@ class Component_Definition
     /**
      * @return bool
      */
-    public function getVisible()
+    public function getVisible(): bool
     {
         return $this->visible;
     }
@@ -314,7 +314,7 @@ class Component_Definition
      * @param bool $visible
      * @return self
      */
-    public function setVisible($visible)
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
         return $this;

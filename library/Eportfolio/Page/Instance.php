@@ -171,10 +171,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 $class         = $component->getDefinition()->getCssClass();
                 $multipleClass = '';
 
-                if ($component->getDefinition()->getMultiple() == 'false') {
+                if ($component->getDefinition()->getMultiple() === false) {
                     $multipleClass .= ' one-only';
 
-                    if ($component->getDefinition()->getMultiple() == 'false' && $component->getInstanceCount() > 0) {
+                    if ($component->getDefinition()->getMultiple() === false && $component->getInstanceCount() > 0) {
                         $multipleClass .= ' disabled';
                     }
                 }
