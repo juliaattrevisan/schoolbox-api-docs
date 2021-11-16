@@ -86,13 +86,19 @@ class RepositoryFactory
                     sprintf('Key with identifier "%s" already exists: change that tool\'s client ID', $identifier)
                 );
             }
-            $keyChainRepository->addKeyChain(
-                $keyChainFactory->create(
-                    $tool->getDeploymentId(),
-                    $tool->getName(),
-                    $tool->getPublicKey() === null ? null : trim($tool->getPublicKey()),
-                )
-            );
+
+            // Don't add the keychain if there is no public key:
+            // instead, use the tool's JWKS URL
+            $publicKey = $tool->getPublicKey() ?? '';
+            if (trim($publicKey) !== '') {
+                $keyChainRepository->addKeyChain(
+                    $keyChainFactory->create(
+                        $tool->getDeploymentId(),
+                        $tool->getName(),
+                        $publicKey,
+                    )
+                );
+            }
         }
         return $keyChainRepository;
     }
