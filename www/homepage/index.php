@@ -228,9 +228,9 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
             }
 
             $class = '';
-            if ($component->getMultiple() == 'false') {
+            if ($component->getMultiple() === false) {
                 $class = 'one-only ';
-                if ($component->getMultiple() == 'false' && $component->getInstanceCount() > 0) {
+                if ($component->getMultiple() === false && $component->getInstanceCount() > 0) {
                     $class .= 'disabled ';
                 }
             }

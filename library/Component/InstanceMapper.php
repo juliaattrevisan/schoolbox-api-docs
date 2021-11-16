@@ -380,7 +380,7 @@ class Component_InstanceMapper extends BaseMapper
 
             // Check for multiple instances with the same definition if disallowed
 
-            if ($dirtyInstance->getDefinition()->getMultiple() == 'false') {
+            if ($dirtyInstance->getDefinition()->getMultiple() === false) {
                 $similarInstanceCollection = $this->findByColumnList([
                     'module'                  => $dirtyInstance->getModule(),
                     'identifier'              => $dirtyInstance->getIdentifier(),
