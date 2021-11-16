@@ -188,12 +188,17 @@
 
 .audience-grid {
     margin-bottom: 1rem;
-
     > li {
         background: $accent-background;
         border: 0;
-        border-bottom: 2px solid $white;
-        border-right: 2px solid $white;
+        //shadow trick to have a 1px 'border' around child items without them becoming 
+        //2px borders when sitting next to other children: https://stackoverflow.com/a/52807938 
+        box-shadow: 
+            2px 0 0 0 $white, 
+            0 2px 0 0 $white, 
+            2px 2px 0 0 $white,
+            2px 0 0 0 $white inset, 
+            0 2px 0 0 $white inset; 
         min-height: 80px;
     }
 }
