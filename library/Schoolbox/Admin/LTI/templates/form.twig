@@ -36,30 +36,17 @@
         {# 1.3 fields #}
         <div {% if not (provider.isLtiVersion13 ?? false) %}class="hide"{% endif %} data-lti-version-section="{{ providerLtiVersion13 }}">
             <div class="small-6 columns">
-                <label for="client_id-{{ identifier }}" class="required">
-                    Client ID
+                <label for="deployment_id-{{ identifier }}">
+                    Client/Deployment ID
                 </label>
-                <input required
+                <input readonly
                        data-lti-version="{{ providerLtiVersion13 }}"
-                       id="client_id-{{ identifier }}"
+                       placeholder="(generated on creation)"
+                       id="deployment_id-{{ identifier }}"
                        type="text"
-                       name="client_id"
-                       value="{{ provider.clientId ?? '' }}">
+                       name="deployment_id"
+                       value="{{ provider.deploymentId ?? '' }}">
             </div>
-            {# The tool's audience is not required when the platform is communicating with the tool #}
-            {#
-            <div class="small-6 columns">
-                <label for="audience-{{ identifier }}" class="required">
-                    Audience
-                </label>
-                <input required
-                       data-lti-version="{{ providerLtiVersion13 }}"
-                       id="audience-{{ identifier }}"
-                       type="text"
-                       name="audience"
-                       value="{{ provider.audience ?? '' }}">
-            </div>
-            #}
             <div class="small-6 columns">
                 <label for="oidc_initiation_url-{{ identifier }}" class="required">
                     OIDC Initiation URL
