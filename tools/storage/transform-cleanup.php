@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -14,6 +15,8 @@ $app = new class extends CliTool\App {
     public const DEFAULT_TIMEOUT = 604800;
 
     private array $validTransforms = [];
+
+    private ConfigMapper $configMapper;
 
     public function runAsRoot(): ?bool
     {
@@ -49,10 +52,9 @@ Usage: transform-cleanup.php [--perform]
 HELP;
             exit;
         }
+        $this->configMapper = ConfigMapper::getInstance();
 
-        $logFile = $this->getConfig()->get('backup_dir') . '/' . 'transform-cleanup-' . date('Ymd') . '.complete';
-
-        if ($this->checkIfToolHasRanByLogFile($logFile) && !$this->getOpt('force')) {
+        if ($this->hasToolCompleted() && !$this->getOpt('force')) {
             $this->getLogger()->notice("[Terminated] This tool has already been executed. You may add --force flag to override.");
             exit;
         }
@@ -64,21 +66,21 @@ HELP;
             exit;
         }
 
-        $startDate = date("d/m/Y H:i:s");
         $this->cleanup($this->getConfig()->get('storage_dir'));
         $this->cleanupStorageTransformTable();
         $lock->release();
 
-        $this->writeLogFile($logFile, $startDate, date("d/m/Y H:i:s"));
+        $this->registerToolCompletion();
     }
 
     /**
-     * @param string $logFilePath
+     * Returns whether this tool has previously successfully completed
+     *
      * @return bool
      */
-    private function checkIfToolHasRanByLogFile(string $logFilePath): bool
+    private function hasToolCompleted(): bool
     {
-        return file_exists($logFilePath);
+        return $this->getConfig()->get('transform_cleanup_completed');
     }
 
     /**
@@ -225,23 +227,13 @@ HELP;
 
     /**
      * Create log file in instance logs directory to indicate that the tool ran.
-     *
-     * @param string $logFilePath
-     * @param string $startDate
-     * @param string $endDate
      */
-    private function writeLogFile(string $logFilePath, string $startDate, string $endDate)
+    private function registerToolCompletion(): void
     {
         if ($this->perform()) {
-            try {
-                file_put_contents(
-                    $logFilePath,
-                    sprintf('Job ran from: %s to: %s' . PHP_EOL, $startDate, $endDate),
-                    FILE_APPEND | LOCK_EX
-                );
-            } catch (Exception $e) {
-                throw new Exception($e->getMessage(), $e->getCode());
-            }
+            $config = $this->configMapper->findOneByColumn('name', 'transform_cleanup_completed');
+            $config->setValue('1');
+            $this->configMapper->save($config);
         }
     }
 
