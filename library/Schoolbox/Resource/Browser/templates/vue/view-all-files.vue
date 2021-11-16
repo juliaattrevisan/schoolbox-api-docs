@@ -7,6 +7,7 @@
 import filterEvents from './viewAllFilesFilterEvents';
 import ViewAllFilesFilters from './view-all-files-filters';
 import ViewAllFilesRowName from './view-all-files-row-name';
+import ViewAllFilesRowEdit from './view-all-files-row-edit';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
@@ -39,7 +40,8 @@ export default {
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 columnsClasses: {
-                    ['dateModified.formatted']: 'date-modified-td ' //to hide the column for mobile
+                    ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
+                    edit: 'edit-td ', //to hide the column for mobile
                 },
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -77,6 +79,7 @@ export default {
                 headings: {
                     name: 'Name',
                     ['dateModified.formatted']: 'Date modified',
+                    edit: '',
                 },
                 orderBy: { //use the passed through component instance config to match the initial sorting
                     ascending: this.componentInstanceConfig.sortdir.value === 'asc' ? true : false,
@@ -85,6 +88,7 @@ export default {
                 perPage: 100, 
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
+                sortable: ['name', 'dateModified.formatted'], //the edit column doesn't need to be sortable
                 sortIcon: {
                     is: 'glyphicon-sort',
                     base: 'glyphicon',
@@ -94,6 +98,7 @@ export default {
                 tabbable: false,
                 templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
                     name: ViewAllFilesRowName,
+                    edit: ViewAllFilesRowEdit,
                 },
                 texts: {
                     count: 'Showing {from} to {to} of {count} files|{count} files|One file',
@@ -101,7 +106,7 @@ export default {
                     noResults: 'No matching files',
                 },
             },
-            tableColumns: ['name', 'dateModified.formatted'], //the table tableColumns
+            tableColumns: ['name', 'dateModified.formatted', 'edit'], //the table tableColumns
         }
     },
 
@@ -186,13 +191,18 @@ export default {
 }
 
 .date-modified-td {
-    width: 250px; //keep on the right hand side, and don't alter width when filtering changes
+    width: 15.625rem; //keep on the right hand side, and don't alter width when filtering changes
     @media (max-width: 1000px) {
-        width: 150px;
+        width: 9.375rem;
     }
     @media (max-width: 700px) {
         display: none; //hide on mobile, as the date will then be shown within view-all-files-name.vue
     }
 }
+
+.edit-td {
+    width: 2.5rem; //keep the edit icon on the right side
+}
+
 
 </style>
