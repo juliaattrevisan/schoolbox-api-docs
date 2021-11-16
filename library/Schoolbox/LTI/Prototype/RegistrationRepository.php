@@ -245,7 +245,7 @@ class RegistrationRepository implements RegistrationRepositoryInterface
 
             $this->registrations[] = new Registration(
                 $toolModel->getDeploymentId(),
-                $toolModel->getClientId(),
+                $toolModel->getDeploymentId(),
                 $platform,
                 $tool,
                 [$toolModel->getDeploymentId(),],

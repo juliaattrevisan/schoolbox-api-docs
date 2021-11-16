@@ -80,7 +80,7 @@ class RepositoryFactory
             )
         );
         foreach ($tools as $tool) {
-            $identifier = $tool->getClientId();
+            $identifier = $tool->getDeploymentId();
             if (!isset($identifier)) {
                 continue;
             }
@@ -91,7 +91,7 @@ class RepositoryFactory
             }
             $keyChainRepository->addKeyChain(
                 $keyChainFactory->create(
-                    $tool->getClientId(),
+                    $tool->getDeploymentId(),
                     $tool->getName(),
                     $tool->getPublicKey() === null ? null : trim($tool->getPublicKey()),
                 )

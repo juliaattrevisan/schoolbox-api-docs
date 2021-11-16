@@ -167,7 +167,7 @@ class Builder implements MembershipServiceServerBuilderInterface
 
         // Assert the assessment's LTI tool's registration matches $registration
         // (see http://www.imsglobal.org/spec/lti-nrps/v2p0#access-restriction)
-        if ($assessment->getLtiTool()->getClientId() !== $registration->getClientId()) {
+        if ($assessment->getLtiTool()->getDeploymentId() !== $registration->getDefaultDeploymentId()) {
             throw new UnexpectedValueException('Resource link identifier identifies a resource belonging to another tool');
         }
 

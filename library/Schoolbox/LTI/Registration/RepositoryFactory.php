@@ -101,12 +101,12 @@ class RepositoryFactory
             // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-registration
             $registrations[] = new Registration(
                 $toolModel->getDeploymentId(),
-                $toolModel->getClientId(),
+                $toolModel->getDeploymentId(),
                 $platform,
                 $tool,
                 [$toolModel->getDeploymentId(),],
                 $this->keyChainRepository->find(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER),
-                $this->keyChainRepository->find($toolModel->getClientId()),
+                $this->keyChainRepository->find($toolModel->getDeploymentId()),
                 null,
                 $toolModel->getJwksUrl() === null ? null : trim($toolModel->getJwksUrl()),
             );
