@@ -145,9 +145,8 @@ class Controller extends ConfigController
 
         // LTI 1.3 fields
         $provider = $provider
-            ->setClientId($post['client_id'])
-            ->setAudience('')
-//            ->setAudience($post['audience'])
+            ->setClientId(null)
+            ->setAudience(null)
             ->setOidcInitiationUrl($post['oidc_initiation_url'])
             ->setLaunchUrl($post['launch_url'])
             ->setDeepLinkingUrl($post['deep_linking_url'])
