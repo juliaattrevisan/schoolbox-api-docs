@@ -90,7 +90,7 @@ HELP;
      * Transform filename format should conform with one of the ITransformFactory::recognisesCacheKey().
      * If it doesn't, we'll delete the transform file from disk and its record from storage_transform table.
      */
-    private function cleanup(string $dir)
+    private function cleanup(string $dir): void
     {
         $directoryIterator = new DirectoryIterator($dir);
 
@@ -187,9 +187,9 @@ HELP;
 
     /**
      * @param string $fileName
-     * @return false|string
+     * @return string
      */
-    private function getCacheKeyFromFileName(string $fileName)
+    private function getCacheKeyFromFileName(string $fileName): string
     {
         return substr(strstr($fileName, '-'), 1);
     }
@@ -211,7 +211,7 @@ HELP;
     /**
      * @param DirectoryIterator $item
      */
-    private function deleteTransformFileFromDisk(DirectoryIterator $item)
+    private function deleteTransformFileFromDisk(DirectoryIterator $item): void
     {
         $verb = $this->perform() ? "Deleted" : "Would delete";
         $this->getLogger()->notice(sprintf("$verb %s from disk.", $item->getFilename()));
@@ -240,7 +240,7 @@ HELP;
     /**
      * @param DirectoryIterator $item
      */
-    private function cleanupEmptyDirectory(DirectoryIterator $item)
+    private function cleanupEmptyDirectory(DirectoryIterator $item): void
     {
         if ($item->isDir() && $this->dirIsEmpty($item->getRealPath())) {
             $verb = $this->perform() ? "Deleted" : "Would delete";
@@ -260,7 +260,7 @@ HELP;
     {
         $handle = opendir($pathName);
         while (false !== ($entry = readdir($handle))) {
-            if ($entry != "." && $entry != "..") {
+            if ($entry !== "." && $entry !== "..") {
               closedir($handle);
 
               return false;
@@ -274,11 +274,11 @@ HELP;
     /**
      * Remove records in storage_transform table where transform is no longer available from disk.
      */
-    private function cleanupStorageTransformTable()
+    private function cleanupStorageTransformTable(): void
     {
         $this->getLogger()->notice("Cleanup storage_transform table for transforms that don't exist on disk.");
         foreach ($this->getStorageTransforms() as $transform) {
-            if (!in_array($transform, $this->validTransforms)) {
+            if (!in_array($transform, $this->validTransforms, true)) {
                 $this->deleteStorageTransformDataByHashAndCacheKey(
                     $this->extractFileHashOnly($transform),
                     $this->getCacheKeyFromFileName($transform),
@@ -291,7 +291,7 @@ HELP;
      * @param string $hash
      * @param string $cacheKey
      */
-    private function deleteStorageTransformDataByHashAndCacheKey(string $hash, string $cacheKey)
+    private function deleteStorageTransformDataByHashAndCacheKey(string $hash, string $cacheKey): void
     {
         $verb = $this->perform() ? "Deleted" : "Would delete";
 
