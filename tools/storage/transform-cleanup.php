@@ -104,6 +104,7 @@ HELP;
                         $this->deleteTransformFileFromDisk($item);
                     }
                 }
+                $this->cleanupEmptyDirectory($item);
             }
         }
     }
@@ -230,6 +231,40 @@ HELP;
                 throw new Exception($e->getMessage(), $e->getCode());
             }
         }
+    }
+
+    /**
+     * @param DirectoryIterator $item
+     */
+    private function cleanupEmptyDirectory(DirectoryIterator $item)
+    {
+        if ($item->isDir() && $this->dirIsEmpty($item->getRealPath())) {
+            $verb = $this->perform() ? "Deleted" : "Would delete";
+            $this->getLogger()->error(sprintf("$verb %s empty directory from disk.", $item->getRealPath()));
+
+            if ($this->perform()) {
+                rmdir($item->getRealPath());
+            }
+        }
+    }
+
+    /**
+     * @param string $pathName
+     * @return bool
+     */
+    private function dirIsEmpty(string $pathName): bool
+    {
+        $handle = opendir($pathName);
+        while (false !== ($entry = readdir($handle))) {
+            if ($entry != "." && $entry != "..") {
+              closedir($handle);
+
+              return false;
+            }
+        }
+
+        closedir($handle);
+        return true;
     }
 };
 
