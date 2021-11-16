@@ -89,6 +89,6 @@ MAILTO="support@schoolbox.com.au"
 45 03 * * * root /usr/local/bin/jitter 3600 /usr/share/schoolbox/tools/schema/optimize.sh >> /var/log/schoolbox/mysql-optimize.log 2>&1
 
 # Clean orphaned transforms at 2:00 AM everyday
-0 2 * * * root /usr/share/schoolbox/tools/storage/transform-cleanup.php >> /var/log/schoolbox/transform-cleanup.log 2>&1
+0 2 * * * root /usr/share/schoolbox/tools/storage/transform-cleanup.php -p >> /var/log/schoolbox/transform-cleanup.log 2>&1
 
 # End of file - do not delete
