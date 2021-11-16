@@ -3,6 +3,7 @@
 @import "www/static/css/foundation/_settings";
 
 .fc {
+    overflow-y: auto;
     .fc-button {
         background-color: $content-ui-background;
         border: 0;
