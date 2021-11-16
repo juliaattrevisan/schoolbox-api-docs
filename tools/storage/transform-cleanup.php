@@ -6,6 +6,7 @@ declare(strict_types=1);
 use Alaress\Image\Transformation\ITransformFactory;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Video\ResourceVideo;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -18,6 +19,12 @@ $app = new class extends CliTool\App {
     private array $validTransforms = [];
 
     private ConfigMapper $configMapper;
+
+    private const VIDEO_TRANSFORMS = [
+        ResourceVideo::POSTER,
+        ResourceVideo::THUMBNAIL,
+        ResourceVideo::TRANSCODE,
+    ];
 
     public function runAsRoot(): ?bool
     {
@@ -137,19 +144,7 @@ HELP;
      */
     private function isVideoTransform(DirectoryIterator $item): bool
     {
-        $videoTransforms = [
-            \Schoolbox\Video\ResourceVideo::POSTER,
-            \Schoolbox\Video\ResourceVideo::THUMBNAIL,
-            \Schoolbox\Video\ResourceVideo::TRANSCODE,
-        ];
-
-        foreach ($videoTransforms as $transform) {
-            if ($this->getCacheKeyFromFileName($item->getFilename()) === $transform) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($this->getCacheKeyFromFileName($item->getFilename()), self::VIDEO_TRANSFORMS, true);
     }
 
     /**
