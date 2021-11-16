@@ -47,14 +47,14 @@ export default {
 }
 
 .student__portrait {
-    margin: 0 1rem 0.5rem 0;
     flex: 0 0 32px; //32px is the size of the image, so only need occupy this space
+    margin: 0 1rem 0.5rem 0;
 }
 
 .student__name {
     h3 {
-        margin-top: 0.25rem;
         margin-bottom: 0rem; //prevent any extra space at the bottom of rows
+        margin-top: 0.25rem;
     }
 }
 

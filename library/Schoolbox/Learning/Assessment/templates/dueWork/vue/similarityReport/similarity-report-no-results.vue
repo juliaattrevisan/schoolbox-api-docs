@@ -42,10 +42,10 @@ export default {
 <style lang="scss" scoped>
 
 .button-reset {
-    padding: 0px;
     background: none;
-    vertical-align: baseline;
     font-size: 0.8rem;
+    padding: 0px;
+    vertical-align: baseline;
     &:hover {
         background: none;
     }
