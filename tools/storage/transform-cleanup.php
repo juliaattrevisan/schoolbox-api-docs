@@ -67,7 +67,7 @@ HELP;
             exit;
         }
 
-        $this->cleanup($this->getConfig()->get('storage_dir'));
+        $this->cleanupStorageDirectory($this->getConfig()->get('storage_dir'));
         $this->cleanupStorageTransformTable();
         $lock->release();
 
@@ -91,7 +91,7 @@ HELP;
      * Transform filename format should conform with one of the ITransformFactory::recognisesCacheKey().
      * If it doesn't, we'll delete the transform file from disk and its record from storage_transform table.
      */
-    private function cleanup(string $dir): void
+    private function cleanupStorageDirectory(string $dir): void
     {
         $directoryIterator = new DirectoryIterator($dir);
 
@@ -99,7 +99,7 @@ HELP;
         foreach ($directoryIterator as $item) {
             if (!$item->isDot()) {
                 if ($item->isDir()) {
-                    $this->cleanup("$dir/$item");
+                    $this->cleanupStorageDirectory("$dir/$item");
                 } else {
                     if (
                         $this->isTransformFile($item) &&
