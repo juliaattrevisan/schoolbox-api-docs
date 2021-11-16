@@ -63,6 +63,7 @@ class Inspector extends CliTool\App
         Processor::LOCK_NAME          => 'Video Processor (./tools/video/processor.php)',
         Manager::LOCK_NAME            => 'Image Processor (./tools/image/processor.php)',
         Scheduler::LOCK_NAME          => 'SUDS On-Demand Importer (./tools/synchronise/sisImporter.php) and SUDS Automated Scheduler (./tools/synchronise/scheduler.php)',
+        'transform_cleanup'           => 'Storage transcode cleanup',
 
         /* Turnitin CLI Tools
          */
