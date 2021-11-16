@@ -110,6 +110,17 @@ class RepositoryFactory
 
             // Configure a registration
             // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-registration
+
+            // Is there a key in the tool's keychain?
+            // If so, use the keychain: otherwise, use the JWKS URL
+            $toolKeyChain = $this->keyChainRepository->find($toolModel->getDeploymentId());
+            if ($toolKeyChain) {
+                $keyContent = trim($toolKeyChain->getPublicKey()->getContent() ?? '');
+                if ($keyContent === '') {
+                    $toolKeyChain = null;
+                }
+            }
+
             $registrations[] = new Registration(
                 $toolModel->getDeploymentId(),
                 $toolModel->getDeploymentId(),
@@ -117,7 +128,7 @@ class RepositoryFactory
                 $tool,
                 [$toolModel->getDeploymentId(),],
                 $this->keyChainRepository->find(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER),
-                $this->keyChainRepository->find($toolModel->getDeploymentId()),
+                $toolKeyChain,
                 $jsonWebKeySetPath,
                 $toolModel->getJwksUrl() === null ? null : trim($toolModel->getJwksUrl()),
             );
