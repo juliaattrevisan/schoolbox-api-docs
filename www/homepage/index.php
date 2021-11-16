@@ -44,11 +44,10 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     } catch (\Schoolbox\Mapper\Exception $e) {
         $this->pageNotFound();
     }
-}
-/* If a prefixed argument is given, load category code directly
- * e.g. /homepage/$prefix/EN344
- */
-elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
+} elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
+    /* If a prefixed argument is given, load category code directly
+     * e.g. /homepage/$prefix/EN344
+     */
     $items = $this->arg;
     array_shift($items);
 
@@ -60,11 +59,10 @@ elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
     } catch (\Exception $e) {
         $this->pageNotFound();
     }
-}
-/* When just an alphabetical category code provided
- * e.g. /homepage/EN344
- */
-elseif (!is_numeric($this->arg[0])) {
+} elseif (!is_numeric($this->arg[0])) {
+    /* When just an alphabetical category code provided
+     * e.g. /homepage/EN344
+     */
     $items = $this->arg;
     $code = implode('/', $items);
 
