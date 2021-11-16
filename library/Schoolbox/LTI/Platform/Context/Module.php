@@ -12,10 +12,11 @@ namespace Schoolbox\LTI\Platform\Context;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * LTI Platform sub-module for contexts.
@@ -41,7 +42,23 @@ class Module extends BaseModule
             null,
             function (array $params) {
                 try {
-                    return ['folder' => $this->getMapperFactory()->get(Mapper::class)->findById($params['folderId'])];
+                    return ['folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId'])];
+                } catch (MapperException $e) {
+                    throw new NotFound($e->getMessage());
+                }
+            },
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/folder/{folderId}/deep-linking-request/{toolId}',
+            'getGenerateDeepLinkingRequestForFolder',
+            null,
+            function (array $params) {
+                try {
+                    return [
+                        'folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
+                        'tool'   => $this->getMapperFactory()->get(ToolMapper::class)->findById($params['toolId']),
+                    ];
                 } catch (MapperException $e) {
                     throw new NotFound($e->getMessage());
                 }
