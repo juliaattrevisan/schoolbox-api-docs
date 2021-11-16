@@ -100,6 +100,7 @@ HELP;
             if (!$item->isDot()) {
                 if ($item->isDir()) {
                     $this->cleanupStorageDirectory("$dir/$item");
+                    $this->cleanupEmptyDirectory($item);
                 } else {
                     if (
                         $this->isTransformFile($item) &&
@@ -117,8 +118,6 @@ HELP;
                         $this->validTransforms[] = $item->getFilename();
                     }
                 }
-
-                $this->cleanupEmptyDirectory($item);
             }
         }
     }
