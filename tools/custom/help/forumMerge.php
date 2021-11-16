@@ -12,7 +12,6 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Forum\PostMapper;
 
-
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
@@ -55,8 +54,16 @@ Usage: forumMerge.php [-v] [-p]
 HELP;
             exit;
         }
+
         $threadMapper = ThreadMapper::getInstance();
         $postMapper = PostMapper::getInstance();
+
+        if (!$this->perform()) {
+            $this->getLogger()->alert("Preview Mode");
+        } else {
+            $this->getLogger()->alert("Action Mode");
+        }
+
         /**
          * get list of all forum threads with [MERGE :id]
          * then merge the included posts to the :id forum thread
@@ -79,17 +86,20 @@ HELP;
 
             //if no matched continue
             if (empty($matches)) {
-                $this->getLogger()->warning("Forum ${title} does not match [MERGE \d+]");
+                $this->getLogger()->warning("Forum '${title}' does not match [MERGE \d+]");
                 continue;
             }
 
             $mergeId = $matches[1];
 
-            $this->getLogger()->info("Found Forum ${title} to merge into: ${mergeId}");
+            $this->getLogger()->notice("Found Forum '${title}' to merge into: Forum ID: ${mergeId}");
 
             //check if the merge ID has been exists. /else return a warning, and do nothing.
+            //this does not do a full hydrate, so i think its fine to just ignore the returned data
             try {
                 $merge = $threadMapper->findById($mergeId);
+                $mergeTitle = $merge->getTitle();
+                $this->getLogger()->notice("New Forum: ${mergeId} Title: '${mergeTitle}'");
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 $this->getLogger()->warning("Forum: ${mergeId} has been Deleted");
                 continue;
@@ -102,7 +112,7 @@ HELP;
             $postsToMerge = $postMapper->findByColumn('threadID', $forum->getId());
             $postCount = $postsToMerge->count();
             if (!$this->perform()) {
-                $this->getLogger()->info('Would have updated the following ${postCount} posts:');
+                $this->getLogger()->notice("Would have updated the following ${postCount} posts:");
             }
             foreach ($postsToMerge as $post) {
                 $postId = $post->getId();
@@ -113,21 +123,19 @@ HELP;
                 }
             }
 
-            //'set deleted' on the current thread (if perform, else just display the list)
+            //'set deleted' on the current thread (if perform)
             if (!$this->perform()) {
-                $this->getLogger()->notice("Would have Soft Deleted Forum: ${title}");
+                $this->getLogger()->notice("Would have Soft Deleted Forum: '${title}'");
             }
             if ($this->perform()) {
-                $this->getLogger()->notice("Soft Deleting Forum: ${title}");
+                $this->getLogger()->notice("Soft Deleting Forum: '${title}'");
                 $forum->setDeleted(true);
                 $threadMapper->save($forum);
             }
-
         }
         $this->getLogger()->info("All Complete.");
     }
 };
-
 
 $options = [CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
