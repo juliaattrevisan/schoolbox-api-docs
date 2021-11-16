@@ -30,7 +30,7 @@ $app = new class extends CliTool\App {
         return [
             'help',
             'lock-timeout:',
-            'force'
+            'force',
         ];
     }
 
@@ -141,7 +141,7 @@ HELP;
             \Schoolbox\Video\ResourceVideo::POSTER,
             \Schoolbox\Video\ResourceVideo::THUMBNAIL,
             \Schoolbox\Video\ResourceVideo::TRANSCODE,
-            ];
+        ];
 
         foreach ($videoTransforms as $transform) {
             if ($this->getCacheKeyFromFileName($item->getFilename()) === $transform) {
@@ -260,9 +260,9 @@ HELP;
         $handle = opendir($pathName);
         while (false !== ($entry = readdir($handle))) {
             if ($entry !== "." && $entry !== "..") {
-              closedir($handle);
+                closedir($handle);
 
-              return false;
+                return false;
             }
         }
 
@@ -297,9 +297,9 @@ HELP;
         if ($this->perform()) {
             try {
                 $this->getDatabaseInternal()->executeQuery(
-                "DELETE FROM storage_transform WHERE hash = :hash AND transform = :transform",
+                    "DELETE FROM storage_transform WHERE hash = :hash AND transform = :transform",
                     [
-                        'hash'      => $hash,
+                        'hash' => $hash,
                         'transform' => $cacheKey,
                     ]
                 );
@@ -317,8 +317,8 @@ HELP;
     private function getStorageTransforms(): array
     {
         return $this->getDatabaseInternal()
-             ->executeQuery("SELECT CONCAT(hash, '-', transform) FROM storage_transform")
-             ->fetchAll(PDO::FETCH_COLUMN);
+                    ->executeQuery("SELECT CONCAT(hash, '-', transform) FROM storage_transform")
+                    ->fetchAll(PDO::FETCH_COLUMN);
     }
 };
 
