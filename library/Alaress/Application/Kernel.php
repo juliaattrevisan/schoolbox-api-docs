@@ -1584,6 +1584,7 @@ abstract class Kernel
                     $config,
                     $keyChains,
                     $router->generate('ltiPlatform.getOidcAuthenticationRequest'),
+                    $router->generate('ltiPlatform.getJsonWebKeySet'),
                 );
                 return $registrationRepositoryFactory->build($ltiTools);
             })

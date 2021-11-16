@@ -43,20 +43,29 @@ class RepositoryFactory
     private string $oidcAuthenticationPath;
 
     /**
+     * The JSON web key set path (relative to the Schoolbox instance)
+     * for the Schoolbox platform.
+     */
+    private string $jsonWebKeySetPath;
+
+    /**
      * Constructor
      *
      * @param IConfigLoader               $config
      * @param KeyChainRepositoryInterface $keyChainRepository
      * @param string                      $oidcAuthenticationPath
+     * @param string                      $jsonWebKeySetPath
      */
     public function __construct(
         IConfigLoader $config,
         KeyChainRepositoryInterface $keyChainRepository,
-        string $oidcAuthenticationPath
+        string $oidcAuthenticationPath,
+        string $jsonWebKeySetPath
     ) {
         $this->config                 = $config;
         $this->keyChainRepository     = $keyChainRepository;
         $this->oidcAuthenticationPath = $oidcAuthenticationPath;
+        $this->jsonWebKeySetPath      = $jsonWebKeySetPath;
     }
 
     /**
@@ -76,6 +85,8 @@ class RepositoryFactory
             $baseUrl->toString(),
             (clone $baseUrl)->setPath($this->oidcAuthenticationPath)->toString(),
         );
+
+        $jsonWebKeySetPath = (clone $baseUrl)->setPath($this->jsonWebKeySetPath)->toString();
 
         // Build a registration out of each tool
         $registrations = [];
@@ -107,7 +118,7 @@ class RepositoryFactory
                 [$toolModel->getDeploymentId(),],
                 $this->keyChainRepository->find(KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER),
                 $this->keyChainRepository->find($toolModel->getDeploymentId()),
-                null,
+                $jsonWebKeySetPath,
                 $toolModel->getJwksUrl() === null ? null : trim($toolModel->getJwksUrl()),
             );
         }
