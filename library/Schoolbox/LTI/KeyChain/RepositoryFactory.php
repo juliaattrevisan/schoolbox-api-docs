@@ -81,19 +81,23 @@ class RepositoryFactory
         );
         foreach ($tools as $tool) {
             $identifier = $tool->getDeploymentId();
-            if (!isset($identifier)) {
-                continue;
-            }
             if ($keyChainRepository->find($identifier)) {
                 throw new OverflowException(
                     sprintf('Key with identifier "%s" already exists: change that tool\'s client ID', $identifier)
                 );
             }
+            $publicKey = $tool->getPublicKey();
+            if (isset($publicKey)) {
+                $publicKey = trim($publicKey);
+                if ($publicKey === '') {
+                    $publicKey = null;
+                }
+            }
             $keyChainRepository->addKeyChain(
                 $keyChainFactory->create(
                     $tool->getDeploymentId(),
                     $tool->getName(),
-                    $tool->getPublicKey() === null ? null : trim($tool->getPublicKey()),
+                    $publicKey,
                 )
             );
         }
