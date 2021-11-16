@@ -35,6 +35,7 @@ $app = new class extends CliTool\App {
     private array $imageTransforms;
 
     private int $countOrphanTransformsDeleted = 0;
+    private int $sizeStorageRecovered = 0;
     private int $countEmptyDirectoriesDeleted = 0;
 
     public function __construct()
@@ -237,10 +238,11 @@ HELP;
         $verb = $this->perform() ? "Deleted" : "Would delete";
         $this->getLogger()->notice(sprintf("$verb %s from disk.", $item->getFilename()));
 
+        $this->countOrphanTransformsDeleted++;
+        $this->sizeStorageRecovered += $item->getSize();
         if ($this->perform()) {
             try {
                 unlink($item->getPathInfo() . '/' . $item->getFilename());
-                $this->countOrphanTransformsDeleted++;
             } catch (Exception $e) {
                 $this->getLogger()->error("Unable to delete " . $item->getFilename() . "\n" . $e->getMessage());
             }
@@ -272,6 +274,7 @@ HELP;
                 rmdir($item->getRealPath());
             }
             $this->countEmptyDirectoriesDeleted++;
+            $this->sizeStorageRecovered += $item->getSize();
         } else {
             $this->getLogger()->debug("Retaining non-empty dir: {$item->getRealPath()}");
         }
@@ -349,6 +352,7 @@ HELP;
 
     private function printResults(): void
     {
+        $this->getLogger()->notice(sprintf("Storage deleted: %s B", number_format($this->sizeStorageRecovered)));
         $this->getLogger()->notice("Count orphan transforms deleted: {$this->countOrphanTransformsDeleted}");
         $this->getLogger()->notice("Count empty dirs deleted: {$this->countEmptyDirectoriesDeleted}");
     }
