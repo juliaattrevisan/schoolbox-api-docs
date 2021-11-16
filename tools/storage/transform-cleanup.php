@@ -29,6 +29,17 @@ $app = new class extends CliTool\App {
     /** @var ITransformFactory[]  */
     private array $imageTransforms;
 
+    public function __construct()
+    {
+        $this->configMapper = ConfigMapper::getInstance();
+        $this->imageTransforms = [
+            new \Alaress\Image\Transformation\MyImage(),
+            new \Alaress\Image\Transformation\Storage(),
+            new \Alaress\Image\Transformation\Icon(),
+            new \Alaress\Image\Transformation\Portrait(),
+        ];
+    }
+
     public function runAsRoot(): ?bool
     {
         // We are deleting files from local file system
@@ -47,29 +58,11 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $timeout = $this->getOptAsInt('lock-timeout:', self::DEFAULT_TIMEOUT);
-        $default = self::DEFAULT_TIMEOUT;
 
         if ($this->getOpt('help')) {
-            echo <<<HELP
-
-Cleanup orphaned transform files.
-
-Usage: transform-cleanup.php [--perform]
-        --perform   Persist changes
-        --lock-timeout   The max amount of time (in seconds) to hold the lock for.
-                         Defaults to {$default}
-        --force This tool is meant to run one times a day. Adding this arg will let the operator re-run the this tool.
-
-HELP;
+            $this->printHelp();
             exit;
         }
-        $this->configMapper = ConfigMapper::getInstance();
-        $this->imageTransforms = [
-            new \Alaress\Image\Transformation\MyImage(),
-            new \Alaress\Image\Transformation\Storage(),
-            new \Alaress\Image\Transformation\Icon(),
-            new \Alaress\Image\Transformation\Portrait(),
-        ];
 
         if ($this->hasToolCompleted() && !$this->getOpt('force')) {
             $this->getLogger()->notice("[Terminated] This tool has already been executed. You may add --force flag to override.");
@@ -86,9 +79,29 @@ HELP;
         $this->cleanupStorageDirectory($this->getConfig()->get('storage_dir'));
         $this->cleanupStorageTransformTable();
         $lock->release();
-
         $this->registerToolCompletion();
     }
+
+
+    /**
+     * Print Help message
+     */
+    private function printHelp(): void
+    {
+        $default = self::DEFAULT_TIMEOUT;
+        echo <<<HELP
+
+Cleanup orphaned transform files.
+
+Usage: transform-cleanup.php [--perform]
+        --perform   Persist changes
+        --lock-timeout   The max amount of time (in seconds) to hold the lock for.
+                         Defaults to {$default}
+        --force This tool is meant to run one times a day. Adding this arg will let the operator re-run the this tool.
+
+HELP;
+    }
+
 
     /**
      * Returns whether this tool has previously successfully completed
