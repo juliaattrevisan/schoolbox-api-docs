@@ -73,6 +73,7 @@ export default {
                             }
                             return a.dateModified.timestamp <= b.dateModified.timestamp ? 1 : -1;
                         }
+
                     },
                 },
                 debounce: 100, //shorter debounce time as data is stored locally
@@ -96,7 +97,7 @@ export default {
                     down: 'glyphicon-chevron-down'
                 },
                 tabbable: false,
-                templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
+                templates: { //custom vue templates - refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
                     name: ViewAllFilesRowName,
                     edit: ViewAllFilesRowEdit,
                 },

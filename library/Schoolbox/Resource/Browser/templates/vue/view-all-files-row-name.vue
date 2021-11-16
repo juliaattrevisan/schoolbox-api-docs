@@ -38,7 +38,7 @@ h3 {
 
 .meta {
     display: none;
-    @media (max-width: 700px) { //show on mobile, as the date modified td will be hidden
+    @media (max-width: 700px) { //show on mobile, as the .date-modified-td will be hidden
         display: block;
     }
 }
