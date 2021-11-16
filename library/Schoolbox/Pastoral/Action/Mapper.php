@@ -49,13 +49,15 @@ class Mapper extends BaseMapper
      */
     public function findForRecord(Pastoral $pastoral): GenericCollection
     {
-        $statement = $this->getDatabase()->prepare("
+        $statement = $this->getDatabase()->prepare(
+            "
             {$this->getSelectString()}
             INNER JOIN      `pastoral_record_action` ON `pastoral_record_action`.`action_id` = `{$this->getTable()}`.`id`
             WHERE           `pastoral_record_action`.`pastoral_id` = :pastoralId
             AND             `{$this->getTable()}`.`deleted_at` IS NULL
             ORDER BY        `sequence`
-        ");
+        "
+        );
 
         $statement->execute(['pastoralId' => $pastoral->getId()]);
 
@@ -71,13 +73,15 @@ class Mapper extends BaseMapper
      */
     public function findForType(PastoralType $pastoralType): GenericCollection
     {
-        $statement = $this->getDatabase()->prepare("
+        $statement = $this->getDatabase()->prepare(
+            "
             {$this->getSelectString()}
             INNER JOIN      `pastoral_type_action` ON `pastoral_type_action`.`action_id` = `{$this->getTable()}`.`id`
             WHERE           `pastoral_type_action`.`type_id` = :pastoralTypeId
             AND             `{$this->getTable()}`.`deleted_at` IS NULL
             ORDER BY        `sequence`
-        ");
+        "
+        );
 
         $statement->execute(['pastoralTypeId' => $pastoralType->getId()]);
 
@@ -93,16 +97,26 @@ class Mapper extends BaseMapper
      */
     public function findForSubtype(PastoralSubtype $pastoralSubtype): GenericCollection
     {
-        $statement = $this->getDatabase()->prepare("
+        $statement = $this->getDatabase()->prepare(
+            "
             {$this->getSelectString()}
             INNER JOIN      `pastoral_type_action` ON `pastoral_type_action`.`action_id` = `{$this->getTable()}`.`id`
             WHERE           `pastoral_type_action`.`subtype_id` = :pastoralSubtypeId
             AND             `{$this->getTable()}`.`deleted_at` IS NULL
             ORDER BY        `sequence`
-        ");
+        "
+        );
 
         $statement->execute(['pastoralSubtypeId' => $pastoralSubtype->getId()]);
 
         return $this->hydrateSelect($statement);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }

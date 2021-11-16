@@ -77,14 +77,14 @@
                                 multiple: true,
                                 selectize: {
                                     create: false,
-                                    placeholder: '',
+                                    placeholder: 'Search Actions',
                                     preload: true,
                                     persist: true,
                                     hideSelected: true,
                                     load: function (query, callback) {
                                         $.ajax({
-                                            url: '{{ routeLookup('pastoral.getActions') }}',
-                                            type: 'GET',
+                                    url: '{{ routeLookup('pastoral.getActions') }}',
+                                    type:     'GET',
                                             dataType: 'json',
                                             data: {query: query}
                                         }).done(function (result) {

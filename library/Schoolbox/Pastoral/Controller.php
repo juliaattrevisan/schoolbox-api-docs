@@ -1058,7 +1058,10 @@ class Controller extends Base
                     $record->setParent($parent);
                 }
             }
-            $actions = $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter(explode(',', $post->get('actions')))));
+            $actions =
+                is_array($post->get('actions'))
+                    ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post->get('actions'))))
+                    : $this->pastoralActionMapper->createCollection();
             $record->setActions($actions);
 
             // Find student
@@ -1313,8 +1316,30 @@ class Controller extends Base
      */
     public function getActions()
     {
-        $actions      = $this->pastoralActionMapper->findAll();
-        $output    = [];
+        // If subtype id is provided, attempt to get actions of the subtype
+        if (is_numeric($this->request->query->get('subtypeId'))) {
+            try {
+                $subtype = $this->pastoralSubTypeMapper->findById((int)$this->request->query->get('subtypeId'));
+                $actions = $this->pastoralActionMapper->findForSubtype($subtype);
+            } catch (MapperException $e) {
+            }
+        }
+
+        // If type id is provided, attempt to get actions of the type
+        if (!isset($actions) && is_numeric($this->request->query->get('typeId'))) {
+            try {
+                $type    = $this->pastoralTypeMapper->findById((int)$this->request->query->get('typeId'));
+                $actions = $this->pastoralActionMapper->findForType($type);
+            } catch (MapperException $e) {
+            }
+        }
+
+        // If no actions are set for type/subtype, just get all
+        if (!isset($actions) || $actions->count() === 0) {
+            $actions = $this->pastoralActionMapper->findAll();
+        }
+
+        $output = [];
         /** @var Action\Model $action */
         foreach ($actions as $action) {
             $output[] = [
