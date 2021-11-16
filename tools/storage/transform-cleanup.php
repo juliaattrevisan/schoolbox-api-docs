@@ -33,6 +33,7 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $timeout = $this->getOptAsInt('lock-timeout:', self::DEFAULT_TIMEOUT);
+        $default = self::DEFAULT_TIMEOUT;
 
         if ($this->getOpt('help')) {
             echo <<<HELP
@@ -42,7 +43,7 @@ Cleanup orphaned transform files.
 Usage: transform-cleanup.php [--perform]
         --perform   Persist changes
         --lock-timeout   The max amount of time (in seconds) to hold the lock for.
-                         Defaults to {$timeout}
+                         Defaults to {$default}
         --force This tool is meant to run one times a day. Adding this arg will let the operator re-run the this tool.
 
 HELP;
