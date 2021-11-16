@@ -10,14 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
-use Aura\Router\Exception\RouteNotFound;
 use Http\Factory\Guzzle\ResponseFactory;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
-use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Entity\Scope;
@@ -28,20 +25,14 @@ use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ScopeRepository;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
-use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
-use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use OAT\Library\Lti1p3Nrps\Service\MembershipServiceInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Instance;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
-use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 use Schoolbox\LTI\Util\ServerRequestFactory;
-use Schoolbox\LTI\User\Codec as UserCodec;
-use Schoolbox\Url\Factory;
 
 /**
  * Controller for LTI platform stuff.
@@ -64,16 +55,6 @@ class Controller extends Base
     private UserAuthenticatorInterface $userAuthenticator;
 
     /**
-     * Instance data repository
-     */
-    private Instance $instance;
-
-    /**
-     * User codec, used to encode a user into a login hint.
-     */
-    private UserCodec $userCodec;
-
-    /**
      * Cache for access tokens.
      */
     private CacheItemPoolInterface $accessTokenCache;
@@ -84,88 +65,18 @@ class Controller extends Base
      * @param KeyChainRepositoryInterface     $keyChains
      * @param RegistrationRepositoryInterface $registrations
      * @param UserAuthenticatorInterface      $userAuthenticator
-     * @param Instance                        $instance
-     * @param UserCodec                       $userCodec
      * @param CacheItemPoolInterface          $accessTokenCache
      */
     public function __construct(
         KeyChainRepositoryInterface $keyChains,
         RegistrationRepositoryInterface $registrations,
         UserAuthenticatorInterface $userAuthenticator,
-        Instance $instance,
-        UserCodec $userCodec,
         CacheItemPoolInterface $accessTokenCache
     ) {
         $this->keyChains         = $keyChains;
         $this->registrations     = $registrations;
         $this->userAuthenticator = $userAuthenticator;
-        $this->instance          = $instance;
-        $this->userCodec         = $userCodec;
         $this->accessTokenCache  = $accessTokenCache;
-    }
-
-    /**
-     * Generate a deep linking request, which is then sent to the LTI tool.
-     *
-     * @api GET /lti-platform/deep-linking-request/{toolId}
-     * @since 21.1.0
-     *
-     * @param ToolModel $tool
-     * @throws LtiExceptionInterface if the linking request couldn't be built
-     * @throws RouteNotFound         if somehow the route was not found
-     */
-    public function getGenerateDeepLinkingRequest(ToolModel $tool): void
-    {
-        // Find the tool in the list of registrations
-        $repository = $this->registrations->find($tool->getDeploymentId());
-
-        // Return URL:
-        // this is somewhere else
-        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
-        $returnUrl = (clone $baseUrl)
-            ->setPath(
-                $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
-            )
-            ->toString();
-
-        // Standard deep linking settings
-        $deepLinkingSettings = new DeepLinkingSettings(
-            $returnUrl,
-            [LtiResourceLinkInterface::TYPE,],
-            ['window', 'iframe'],
-            null,
-            false,
-            false,
-        );
-
-        // Figure out who's trying to log in: use that to determine their role
-        // TODO make this dependent on the context the request is happening within, or pass via query string
-        $role = $this->getUser()->getRole()->isStaff()
-            ? RoleInterface::NAMESPACE_CONTEXT . '#Instructor'
-            : RoleInterface::NAMESPACE_CONTEXT . '#Learner'
-        ;
-
-        // Claim about the platform instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
-
-        $builder = new DeepLinkingLaunchRequestBuilder();
-        $message = $builder->buildDeepLinkingLaunchRequest(
-            $deepLinkingSettings,
-            $repository,
-            $this->userCodec->encode($this->getUser()),
-            null,
-            null,
-            [$role],
-            [$platformInstanceClaim],
-        );
-
-        // Build a DL request to this tool
-        $this->response->content->set(
-            $this->buildUnthemedHtmlOutput(
-                '@ltiPlatform/messageForm.twig',
-                ['message' => $message],
-            )
-        );
     }
 
     /**
