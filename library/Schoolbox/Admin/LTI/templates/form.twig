@@ -13,13 +13,13 @@
 
     <fieldset>
         <legend>Provider Identity</legend>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label class="required" for="name-{{ identifier }}">
                 Name
             </label>
             <input required id="name-{{ identifier }}" type="text" name="name" value="{{ provider.name ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label {% if isNew %}class="required"{% endif%} for="lti_version-{{ identifier }}">
                 Version
             </label>
@@ -43,7 +43,7 @@
                 These details need to be copied from your LTI provider.
             </p>
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="oidc_initiation_url-{{ identifier }}" class="required">
                 OpenID Connect Initiation URL
             </label>
@@ -54,7 +54,7 @@
                    name="oidc_initiation_url"
                    value="{{ provider.oidcInitiationUrl ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="launch_url-{{ identifier }}">
                 Launch URL
             </label>
@@ -64,7 +64,7 @@
                    name="launch_url"
                    value="{{ provider.launchUrl ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="deep_linking_url-{{ identifier }}">
                 Deep Linking URL
             </label>
@@ -74,7 +74,7 @@
                    name="deep_linking_url"
                    value="{{ provider.deepLinkingUrl ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="jwks_url-{{ identifier }}">
                 JSON Web Key Set URL
             </label>
@@ -84,7 +84,7 @@
                    name="jwks_url"
                    value="{{ provider.jwksUrl ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="public_key-{{ identifier }}">
                 Public Key
                 <span data-tooltip
@@ -108,7 +108,7 @@
                 These details are read-only, and need to be copied into your LTI provider's configuration.
             </p>
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="platform_oidc_authentication_url-{{ identifier }}">
                 OpenID Connect Authentication URL
             </label>
@@ -120,7 +120,7 @@
                    value="{{ oidcAuthenticationUrl }}">
         </div>
 
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="platform_oauth_access_token_url-{{ identifier }}">
                 oAuth Access Token URL
             </label>
@@ -132,7 +132,7 @@
                    value="{{ oauthAccessTokenUrl }}">
         </div>
 
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="platform_jwks_url-{{ identifier }}">
                 JSON Web Key Set URL
             </label>
@@ -144,7 +144,7 @@
                    value="{{ jsonWebKeySetUrl }}">
         </div>
 
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="deployment_id-{{ identifier }}">
                 Client/Deployment ID
             </label>
@@ -161,7 +161,7 @@
     {# 1.1 fields #}
     <fieldset {% if not (provider.isLtiVersion11 ?? false) %}class="hide"{% endif %} data-lti-version-section="{{ providerLtiVersion11 }}">
         <legend>Configuration</legend>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="xml-{{ identifier }}">
                 Configuration XML URL
                 <span data-tooltip class="has-tip tip-top hint" title="If provided, Launch and Icon URL will be extracted from this configuration.">?</span>
@@ -172,7 +172,7 @@
                    name="xml"
                    value="{{ provider.xml ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="url-{{ identifier }}">
                 Launch URL
             </label>
@@ -182,7 +182,7 @@
                    name="url"
                    value="{{ provider.url ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="icon-{{ identifier }}">
                 Icon URL
             </label>
@@ -192,7 +192,7 @@
                    name="icon"
                    value="{{ provider.icon ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="key-{{ identifier }}">
                 Consumer Key
             </label>
@@ -202,7 +202,7 @@
                    name="key"
                    value="{{ provider.key ?? '' }}">
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 large-6 columns">
             <label for="secret-{{ identifier }}">
                 Consumer Secret
             </label>
