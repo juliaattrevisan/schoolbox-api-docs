@@ -13,7 +13,7 @@ class LearningMoments
     public const URL = '/search/user/{student_id}';
     public const URL_STUDENT_ID = '{student_id}';
 
-    public const SHARE_LEARNING_MOMENTS_LINK = 'a[title="Share a learning moment"]';
+    public const SHARE_LEARNING_MOMENTS_LINK = 'a[data-reveal-id="shareLearningMoment"]';
     public const SHARE_LEARNING_MOMENTS_BUTTON = 'a.learning.icon-share';
     public const TAKE_A_PHOTO_BUTTON = 'a.icon-camera.share-photo';
     public const TAKE_WRITE_SOMETHING = 'a.icon-textbox.share-text';
