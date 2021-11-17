@@ -11,10 +11,8 @@ namespace Schoolbox\LTI\Registration;
 
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Registration\Registration;
-use OAT\Library\Lti1p3Core\Security\Key\KeyChainFactory;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Tool\Tool;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
@@ -43,6 +41,12 @@ class RepositoryFactory
     private string $oidcAuthenticationPath;
 
     /**
+     * The oAuth2 access token path (relative to the Schoolbox instance)
+     * for the Schoolbox platform.
+     */
+    private string $oAuth2AccessTokenPath;
+
+    /**
      * The JSON web key set path (relative to the Schoolbox instance)
      * for the Schoolbox platform.
      */
@@ -54,17 +58,20 @@ class RepositoryFactory
      * @param IConfigLoader               $config
      * @param KeyChainRepositoryInterface $keyChainRepository
      * @param string                      $oidcAuthenticationPath
+     * @param string                      $oAuth2AccessTokenPath
      * @param string                      $jsonWebKeySetPath
      */
     public function __construct(
         IConfigLoader $config,
         KeyChainRepositoryInterface $keyChainRepository,
         string $oidcAuthenticationPath,
+        string $oAuth2AccessTokenPath,
         string $jsonWebKeySetPath
     ) {
         $this->config                 = $config;
         $this->keyChainRepository     = $keyChainRepository;
         $this->oidcAuthenticationPath = $oidcAuthenticationPath;
+        $this->oAuth2AccessTokenPath  = $oAuth2AccessTokenPath;
         $this->jsonWebKeySetPath      = $jsonWebKeySetPath;
     }
 
@@ -84,6 +91,7 @@ class RepositoryFactory
             'Schoolbox Platform',
             $baseUrl->toString(),
             (clone $baseUrl)->setPath($this->oidcAuthenticationPath)->toString(),
+            (clone $baseUrl)->setPath($this->oAuth2AccessTokenPath)->toString(),
         );
 
         $jsonWebKeySetPath = (clone $baseUrl)->setPath($this->jsonWebKeySetPath)->toString();
