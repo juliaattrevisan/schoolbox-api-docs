@@ -74,6 +74,7 @@ class FilesBuilder
         $statementCode = $this->db->executeQuery("
             SELECT code FROM folder_code
             WHERE folder_id = :id
+            AND deleted_at IS NULL LIMIT 1
             ", ['id' => $homepage_id['identifier']]);
 
         $homepage_code = $statementCode->fetch(\PDO::FETCH_ASSOC);
