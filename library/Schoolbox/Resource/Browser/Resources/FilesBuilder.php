@@ -52,11 +52,9 @@ class FilesBuilder
         $this->componentId = $componentId;
         //get the homepage Id, from the component and confirm it is a files component
         $statement = $this->db->executeQuery("
-            SELECT component_instance.identifier, folder.name FROM component_instance
+            SELECT component_instance.identifier FROM component_instance
                 INNER JOIN component_definition
                     ON component_instance.component_definition_id = component_definition.id
-                INNER JOIN folder
-                    ON folder.id= component_instance.identifier
                 WHERE component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
             ", ['id' => $componentId]);
 
@@ -67,25 +65,7 @@ class FilesBuilder
             throw new \Schoolbox\Mapper\Exception\NotFound();
         }
 
-        /** get folder code if it exists, and add this to the object / array
-         * I'm doing this separately as if there is no code, there is no row in folder_code,
-         * and I could not get a select statement to have a default code value if that has no entries
-        */
-        $statementCode = $this->db->executeQuery("
-            SELECT code FROM folder_code
-            WHERE folder_id = :id
-            AND deleted_at IS NULL LIMIT 1
-            ", ['id' => $homepage_id['identifier']]);
-
-        $homepage_code = $statementCode->fetch(\PDO::FETCH_ASSOC);
-
-        if ($homepage_code === false) {
-            $homepage_id['code'] = null;
-        } else {
-            $homepage_id['code'] = $homepage_code['code'];
-            $homepage_id['name'] .= " (" . $homepage_code['code'] . ")";
-        }
-        return $homepage_id;
+        return $homepage_id['identifier'];
     }
 
 
@@ -143,82 +123,21 @@ class FilesBuilder
      * find the supplied component config, or build from the default if required
      * returns array (sourceId, title, sorting, direction, filter)
      * @param int $componentId
+     * @param int $homepageId
      * @return array componentConfig
      * @throws Mapper\Exception\NotFound
      */
-    public function getComponentConf(int $componentId): array
+    public function getComponentConf(int $componentId, int $homepageId): array
     {
-        /**
-         * Need to get the 'definitions' out of the db for components.
-         * ```
-         * default config object
-         * select component_config_definition.label, component_config_definition.key, component_config_definition.default_value
-         * from component_config_definition
-         * inner join component_definition
-         * on component_definition.id = component_config_definition.component_definition_id
-         * where component_definition.class = 'Component_Homepage_FileListController'
-         * ```
+        //get the instance config.
+        $instanceMapper = \Component_InstanceMapper::getInstance();
+        $instanceConfig = $instanceMapper->findByInstanceId($componentId)->getConfigArray();
 
-         * ```
-         * instance config object
-         * select component_config_definition.label, component_config_definition.key, component_config_instance.value
-         * from component_config_definition
-         * inner join component_config_instance
-         * on component_config_instance.component_config_definition_id = component_config_definition.id
-         * where component_config_instance.component_instance_id = :id
-         * ```
-         */
-
-        $homepage_id = $this->getHomepage($componentId);
-
-        //build default config object / query
-        $defaultComponentConfig = [];
-        $statement = $this->db->executeQuery($this->defaultConf_query);
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $defaultComponentConfig[$row['key']] = [
-            'label' => $row['label'],
-            'default_value' => $row['default_value'],
-            ];
-        }
-
-        //build instance config object / query
-        $query = "
-        SELECT component_config_definition.label, component_config_definition.key, component_config_instance.value, component_instance.identifier
-        FROM component_config_definition
-        INNER JOIN component_config_instance
-                    ON component_config_instance.component_config_definition_id = component_config_definition.id
-        INNER JOIN component_instance
-                    ON component_config_instance.component_instance_id = component_instance.id
-        WHERE component_config_instance.component_instance_id = :id
-         ";
-
-        $statement = $this->db->executeQuery($query, ['id' => $componentId]);
-
-        $instanceComponentConfig = [];
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $instanceComponentConfig['homepage'] = $row['identifier'];
-            $instanceComponentConfig[$row['key']] = [
-                'label' => $row['label'],
-                'value' => $row['value'],
-            ];
-        }
-
-        //build the final merged config between the instance object, and if needed add the defaults.
-        $config = [];
-        $config['homepage'] = $instanceComponentConfig['homepage'] ?: $homepage_id['identifier'];
-
-        foreach ($defaultComponentConfig as $key => $default) {
-            $config[$key] = [
-                'label' => $instanceComponentConfig[$key]['label'] ?: $default['label'],
-                'value' => $instanceComponentConfig[$key]['value'] ?: $default['default_value'],
-            ];
-        }
-        //if there is no config, the source will be empty, so set it now
-        $config['src']['value'] = $config['src']['value'] ?: $config['homepage'];
+        //if there is no source, update to the current homepage
+        $instanceConfig['src']['value'] = $instanceConfig['src']['value'] ?: $homepageId;
 
         //return instance / default config values
-        return $config;
+        return $instanceConfig;
     }
 
     /**

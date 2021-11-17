@@ -102,11 +102,13 @@ class Controller extends AbstractController
     public function showFiles(int $componentID, int $sourceFolderID)
     {
         $filesBuilder = new FilesBuilder($this->database);
+        $folderMapper = Folder\Mapper::getInstance();
         $homepage_id = $filesBuilder->getHomepage($componentID);
+        $homepage = $folderMapper->findById($homepage_id);
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
         $accessSource = $this->getAccess($sourceFolderID);
-        $accessHome = $this->getAccess($homepage_id['identifier']);
+        $accessHome = $this->getAccess($homepage_id);
 
         // special case for root, just let that through to the keeper
         if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {
@@ -117,7 +119,7 @@ class Controller extends AbstractController
         $canEdit = ($accessSource >= UserAccess::ACCESS_WRITE);
 
         //lets get the config for the component
-        $componentConfig = $filesBuilder->getComponentConf($componentID);
+        $componentConfig = $filesBuilder->getComponentConf($componentID, $homepage_id);
 
         //grab all files for component folder
         $files = $filesBuilder->getFolderData($componentConfig['src']['value'], $accessHome);
@@ -142,14 +144,14 @@ class Controller extends AbstractController
            'title'      => $componentConfig['componentname']['value'],
            'data'       => [
                     'canEdit'                   => $canEdit,
-                    'homepage'                  => $homepage_id,
+                    'homepage'                  => $homepage,
                     'filter'                    => $filter,
                     'files'                     => $files,
                     'title'                     => $componentConfig['componentname']['value'],
                     'componentInstanceConfig'   => $componentConfig,
                     'componentID'               => $componentID,
                     'sourceFolderID'            => $sourceFolderID,
-                    'componentFolderId'         => $componentConfig['homepage'],
+                    'componentFolderId'         => $homepage_id,
            ],
         ]);
     }
