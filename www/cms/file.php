@@ -64,7 +64,7 @@ if (is_numeric($this->arg[0])) {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text'  => $folder->getName(),
+            'text'  => $folder->getNameWithCodes(),
             'href'  => "/homepage/{$folder->getId()}",
             'class' => '',
         ],
@@ -124,7 +124,7 @@ if (is_numeric($this->arg[0])) {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text'  => $folder->getName(),
+            'text'  => $folder->getNameWithCodes(),
             'href'  => "/homepage/{$folder->getId()}",
             'class' => '',
         ],
