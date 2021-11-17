@@ -11,7 +11,6 @@ import videojs from 'video.js';
 import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
-import RecordDeviceOptions from '@vue/components/videojs-record/record-device-options';
 import RecordedMedia from '@vue/components/videojs-record/recorded-media';
 import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
 import { getRecordPhotoOptions } from '@js/videojs/videojsOptions';
@@ -19,20 +18,14 @@ import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
 import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@js/record-media/recordMediaErrors';
 import { dataURLtoBlob } from '@js/util/fileUtils';
-import chooseDevice from '@vue/mixins/videojs-record/mixinChooseDevice';
 
 
 export default {
 
     components: {
-        RecordDeviceOptions,
         RecordedMedia,
         OverMediaModal
     },
-
-    mixins: [
-        chooseDevice
-    ],
 
     props: {
         preRecordedData: { //to display an already existing recording on startup
@@ -45,6 +38,7 @@ export default {
         return {
             player: null, //videojs-record instance,
             recordedData: null, //the recorded data that will be passed through to #recored-media
+            isDeviceReady: false, //to toggle the device display
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
@@ -77,6 +71,7 @@ export default {
          * Do we need to request the media device straight away? 
          * If not wait until it's requested - by deleting the pre recorded media recording
          * Otherwise we will just be displaying the existing pre recorded media
+         *
          */
         checkForPreRecordedData () {
             if (this.preRecordedData) {
@@ -86,6 +81,7 @@ export default {
 
         /**
          * Start up the videojs-record instance, which is just videojs with record functionality wrapped around it
+         *
          */
         initVideojsRecord () {
             try {
@@ -98,6 +94,7 @@ export default {
 
         /**
          * videojs is ready, so set up listeners and animate on
+         *
          */
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
@@ -106,10 +103,11 @@ export default {
 
         /**
          * track the events videojs-record offers to manage display
+         *
          */
         initVideojsRecordRecordListeners () {
             this.player.on('deviceReady', this.onDeviceReady);
-            this.player.on('enumerateReady', this.chooseDevice_onEnumerateReady);
+            this.player.on('startRecord', this.onStartRecord);
             this.player.on('finishRecord', this.onFinishRecord);
             this.player.on('error', this.onError);
             this.player.on('deviceError', this.onDeviceError);
@@ -117,18 +115,25 @@ export default {
 
         /**
          * onDeviceReady, dispatch to anyone listening, maybe the parent
+         *
          */
         onDeviceReady () {
+            this.isDeviceReady = true;
             const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); 
-            this.chooseDevice_currentVideoDeviceId = currentDeviceSettings.deviceId;
             this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
-            if (!this.chooseDevice_hasEnumeratedDevices) {
-                this.player.record().enumerateDevices();
-            }
+        },
+
+        /**
+         * onStartRecord
+         *
+         */
+        onStartRecord () {
+            // 
         },
 
         /**
          * the recorded file is ready
+         *
          */
         onFinishRecord () {
             this.recordedVideoReady(this.player.recordedData);
@@ -136,6 +141,7 @@ export default {
 
         /**
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
+         *
          */
         async recordedVideoReady (mediaData) {
             this.recordedData = await dataURLtoBlob(mediaData); //the recorded photo is just a DataURL, so need to set up a Blob 
@@ -147,9 +153,7 @@ export default {
 
         /**
          * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
-         * 
-         * @params { DOMElement }
-         * @params { Object }
+         *
          */
         onError (element, error) {
             this.hasError = true;
@@ -158,6 +162,7 @@ export default {
 
         /**
          * onDeviceError - try and manage as many errors as possible
+         *
          */
         onDeviceError () {
             this.hasError = true;
@@ -172,6 +177,7 @@ export default {
 
         /**
          * ensure everything reset on possible modal re-display
+         *
          */
         destroyVideojs () {
             if (this.player) {
@@ -182,6 +188,7 @@ export default {
 
         /**
          * close the error modal, animating out
+         *
          */
         onCloseErrorModalSelected () {
             this.isOverMediaModalClosing = true;
@@ -189,17 +196,18 @@ export default {
 
         /**
          * it's closed now, so disable the errors to allow trying again
+         *
          */
         onErrorModalClosed () {
             this.hasError = false;
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
-            this.chooseDevice_hasDeviceChangeError = false;
         },
 
         /**
          * confirm deletion of the latest recording, setting up for another recording
+         *
          */
         onRecordedMediaDeleted () {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
@@ -234,6 +242,7 @@ export default {
 
         /**
          * revert back to original setting
+         *
          */
         onOverMediaModalClosed () {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
@@ -251,14 +260,6 @@ export default {
         <div class="media-container media-container-record">
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
-
-        <record-device-options 
-            title="Select a Camera"
-            :current-device-id="chooseDevice_currentVideoDeviceId"
-            :device-list="chooseDevice_videoDeviceList"
-            
-            @on-video-device-change="chooseDevice_onVideoDeviceChange"
-        />
 
         <recorded-media 
             v-if="hasPreRecordedData || hasNewRecording"
@@ -283,7 +284,6 @@ export default {
             <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">The camera appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the camera was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="hasNotSupportedError" class="alert-box alert">Sorry, unable to record a photo. It's likely your browser does not support the required features. If possible please upgrade your browser.</div>
-            <div v-else-if="chooseDevice_hasDeviceChangeError" class="alert-box alert">Sorry, the selected camera cannot be displayed. Please ensure it's functioning properly and try again.</div>
             <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
