@@ -264,14 +264,14 @@ class Controller extends Base
                 $ssh_status = 'Accessible';
             } elseif ($touched_diff < 86400) {
                 $ssh_light  = 'warning';
-                $ssh_status = 'Inaccessible >2hrs';
+                $ssh_status = 'Offline >2hrs';
             } else {
                 $ssh_light  = 'alert';
-                $ssh_status = 'Inaccessible >24hrs';
+                $ssh_status = 'Offline >24hrs';
             }
         } else {
             $ssh_light  = 'alert';
-            $ssh_status = 'Inaccessible';
+            $ssh_status = 'Offline';
         }
 
         // Check RabbitMQ
