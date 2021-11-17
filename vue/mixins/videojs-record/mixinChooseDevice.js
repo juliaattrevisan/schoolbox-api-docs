@@ -1,8 +1,9 @@
 /**
  * Contains the functionality to toggle between devices when there is more than one available
- * Currently used by record-camera-browser.vue and record-photo-browser.vue
+ * Currently used by record-camera-browser.vue
+ * record-photo-browser.vue will hopefully be using it as well as soon as an issue with 
+ * videojs-record is resolved 
  */
-
 
 import { moveArrayItem } from '@js/util/arrayUtils';
 
