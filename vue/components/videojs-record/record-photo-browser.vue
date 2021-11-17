@@ -71,7 +71,6 @@ export default {
          * Do we need to request the media device straight away? 
          * If not wait until it's requested - by deleting the pre recorded media recording
          * Otherwise we will just be displaying the existing pre recorded media
-         *
          */
         checkForPreRecordedData () {
             if (this.preRecordedData) {
@@ -81,7 +80,6 @@ export default {
 
         /**
          * Start up the videojs-record instance, which is just videojs with record functionality wrapped around it
-         *
          */
         initVideojsRecord () {
             try {
@@ -94,7 +92,6 @@ export default {
 
         /**
          * videojs is ready, so set up listeners and animate on
-         *
          */
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
@@ -103,7 +100,6 @@ export default {
 
         /**
          * track the events videojs-record offers to manage display
-         *
          */
         initVideojsRecordRecordListeners () {
             this.player.on('deviceReady', this.onDeviceReady);
@@ -115,7 +111,6 @@ export default {
 
         /**
          * onDeviceReady, dispatch to anyone listening, maybe the parent
-         *
          */
         onDeviceReady () {
             this.isDeviceReady = true;
@@ -125,7 +120,6 @@ export default {
 
         /**
          * onStartRecord
-         *
          */
         onStartRecord () {
             // 
@@ -133,7 +127,6 @@ export default {
 
         /**
          * the recorded file is ready
-         *
          */
         onFinishRecord () {
             this.recordedVideoReady(this.player.recordedData);
@@ -141,7 +134,6 @@ export default {
 
         /**
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
-         *
          */
         async recordedVideoReady (mediaData) {
             this.recordedData = await dataURLtoBlob(mediaData); //the recorded photo is just a DataURL, so need to set up a Blob 
@@ -153,7 +145,6 @@ export default {
 
         /**
          * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
-         *
          */
         onError (element, error) {
             this.hasError = true;
@@ -162,7 +153,6 @@ export default {
 
         /**
          * onDeviceError - try and manage as many errors as possible
-         *
          */
         onDeviceError () {
             this.hasError = true;
@@ -177,7 +167,6 @@ export default {
 
         /**
          * ensure everything reset on possible modal re-display
-         *
          */
         destroyVideojs () {
             if (this.player) {
@@ -188,7 +177,6 @@ export default {
 
         /**
          * close the error modal, animating out
-         *
          */
         onCloseErrorModalSelected () {
             this.isOverMediaModalClosing = true;
@@ -196,7 +184,6 @@ export default {
 
         /**
          * it's closed now, so disable the errors to allow trying again
-         *
          */
         onErrorModalClosed () {
             this.hasError = false;
@@ -207,7 +194,6 @@ export default {
 
         /**
          * confirm deletion of the latest recording, setting up for another recording
-         *
          */
         onRecordedMediaDeleted () {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
@@ -242,7 +228,6 @@ export default {
 
         /**
          * revert back to original setting
-         *
          */
         onOverMediaModalClosed () {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
