@@ -270,7 +270,7 @@ export default {
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the camera was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="hasNotSupportedError" class="alert-box alert">Sorry, unable to record a photo. It's likely your browser does not support the required features. If possible please upgrade your browser.</div>
             <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
-            <button @click.prevent="onCloseErrorModalSelected">Close</button>
+            <button @click.prevent="onCloseErrorModalSelected" @keyup.enter="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
 
     </div>
