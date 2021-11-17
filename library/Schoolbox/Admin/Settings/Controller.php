@@ -96,6 +96,7 @@ class Controller extends ConfigController
         $module = [
             'settings'   => '/adminv2/setting/%s',
             'comms'      => '/adminv2/news',
+            'lti'        => '/adminv2/lti',
             'oauth'      => '/adminv2/oauth',
             'schoolData' => '/adminv2/import/schoolDataImport'
         ];
