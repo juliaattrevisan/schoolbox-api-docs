@@ -14,6 +14,7 @@ use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\Mapper;
 use Schoolbox\Sync\Hydrator\HydratorInterface;
 use Schoolbox\User as InternalUser;
+use Alaress\Rules\Rule;
 
 /**
  * Class Ruleset
@@ -257,7 +258,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
     /**
      * @return Rule[]
      */
-    function getRulesBySequence()
+    public function getRulesBySequence()
     {
         $all = [];
 
