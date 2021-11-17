@@ -65,6 +65,9 @@
         <div class="small-12 large-6 columns">
             <label for="deep_linking_url-{{ identifier }}">
                 Deep Linking URL
+                <span data-tooltip
+                      class="has-tip tip-top hint"
+                      title="Usually, this will be the same as the Launch URL.">?</span>
             </label>
             <input data-lti-version="{{ providerLtiVersion13 }}"
                    id="deep_linking_url-{{ identifier }}"
@@ -87,7 +90,7 @@
                 Public Key
                 <span data-tooltip
                       class="has-tip tip-top hint"
-                      title="Most providers will provide a JSON Web Key Set URL instead of a key; this may be left blank if that URL is provided.">?</span>
+                      title="Most providers will provide a JSON Web Key Set URL instead of directly providing the public key; in this case, this field may be left empty.">?</span>
             </label>
             <textarea data-lti-version="{{ providerLtiVersion13 }}"
                       id="public_key-{{ identifier }}"
