@@ -121,14 +121,15 @@ class Helper
     /**
      * return counts of pastoral events types(and subtypes) for multiple students
      *
-     * @param User            $viewer            the logged-in user that would like to inspect this information
-     * @param Collection      $students          collection of students we want to count the pastoral events
-     * @param Collection|null $typesWhitelist    optional whitelist of pastoral types that should be counted
-     * @param Collection|null $subTypesWhitelist optional whitelist of pastoral subtypes that should be counted
+     * @param User                     $viewer            the logged-in user that would like to inspect this information
+     * @param Collection               $students          collection of students we want to count the pastoral events
+     * @param Collection|null          $typesWhitelist    optional whitelist of pastoral types that should be counted
+     * @param Collection|null          $subTypesWhitelist optional whitelist of pastoral subtypes that should be counted
+     * @param Alaress_Date_Format|null $startDate         date to count records from. 12 months ago, if not provided
      * @return Collection
      * @throws RouteNotFound
      */
-    public function countStudentsEventsByTypes(User $viewer, Collection $students, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null): Collection
+    public function countStudentsEventsByTypes(User $viewer, Collection $students, ?Collection $typesWhitelist = null, ?Collection $subTypesWhitelist = null, ?Alaress_Date_Format $startDate = null): Collection
     {
         /**
          * make sure we are always falling back to a consistent default list of types
@@ -145,7 +146,7 @@ class Helper
         foreach ($students as $student) {
             $output->setOffset(
                 $student->getId(),
-                $this->countStudentEventsByTypes($viewer, $student, $pastoralTypes, $pastoralSubtypes)
+                $this->countStudentEventsByTypes($viewer, $student, $pastoralTypes, $pastoralSubtypes, false, $startDate)
             );
         }
 

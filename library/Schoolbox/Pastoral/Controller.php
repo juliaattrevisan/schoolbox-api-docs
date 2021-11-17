@@ -269,13 +269,19 @@ class Controller extends Base
      * @param Collection $students
      *
      * @throws RouteNotFound
-     * @api GET /pastoral/students/count/{studentIds:[\d\x2c]+}
+     * @api   GET /pastoral/students/count/{studentIds:[\d\x2c]+}
      * @since 21.1
      */
     public function getStudentsCount(Collection $students): void
     {
         $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
-        $output              = $pastoralCountHelper->countStudentsEventsByTypes($this->getUser(), $students);
+        $output              = $pastoralCountHelper->countStudentsEventsByTypes(
+            $this->getUser(),
+            $students,
+            null,
+            null,
+            $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD))
+        );
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));
     }
@@ -326,7 +332,7 @@ class Controller extends Base
         $pageRecords = $this->pastoralDataSource->findRecords($user, $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
 
         $pastoralCountHelper = new PastoralCountHelper($this->router, $this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource, $this->termMapper);
-        $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student, $pastoralCountHelper->getStartDate((int)$this->config->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
+        $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student, $pastoralCountHelper->getStartDate($pastoralCountHelper::COUNT_PERIOD_12MONTHS));
 
         $this->getResponse()->content->set(
             [
