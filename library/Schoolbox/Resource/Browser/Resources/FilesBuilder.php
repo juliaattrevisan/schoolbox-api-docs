@@ -21,16 +21,6 @@ class FilesBuilder
     private int $componentId;
 
     /**
-     * query to get the files component defaults
-     */
-    private string $defaultConf_query = "
-         SELECT component_config_definition.label, component_config_definition.key, component_config_definition.default_value
-         FROM component_config_definition
-         INNER JOIN component_definition
-         ON component_definition.id = component_config_definition.component_definition_id
-         WHERE component_definition.class = 'Component_Homepage_FileListController'";
-
-    /**
      * FilesBuilder constructor.
      *
      * @param IConnector $db
@@ -58,6 +48,7 @@ class FilesBuilder
                 WHERE component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
             ", ['id' => $componentId]);
 
+        /** @var array|bool $homepage_id */
         $homepage_id = $statement->fetch(\PDO::FETCH_ASSOC);
 
         if ($homepage_id === false) {
