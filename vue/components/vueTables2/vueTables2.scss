@@ -86,9 +86,13 @@ $cdn-prefix: "/static";
     }
 }
 
+.VueTables .VuePagination__pagination {
+    margin-left: 1rem; //so the .VuePagination__count has space on the left
+}
+
 .VuePagination__count {
     //curent count
-    margin: 0px 30px 0px 0px;
+    margin: 0px;
     padding: 0px;
 }
 

@@ -102,7 +102,7 @@ export default {
                     edit: ViewAllFilesRowEdit,
                 },
                 texts: {
-                    count: 'Showing {from} to {to} of {count} files|{count} files|One file',
+                    count: '{from}-{to} of {count} files|{count} files|1 file',
                     filterPlaceholder: 'Search files',
                     noResults: 'No matching files',
                 },
