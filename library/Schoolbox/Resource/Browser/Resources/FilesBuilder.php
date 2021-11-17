@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 class FilesBuilder
 {
@@ -66,6 +67,23 @@ class FilesBuilder
             throw new \Schoolbox\Mapper\Exception\NotFound();
         }
 
+        /** get folder code if it exists, and add this to the object / array
+         * I'm doing this separately as if there is no code, there is no row in folder_code,
+         * and I could not get a select statement to have a default code value if that has no entries
+        */
+        $statementCode = $this->db->executeQuery("
+            SELECT code FROM folder_code
+            WHERE folder_id = :id
+            ", ['id' => $homepage_id['identifier']]);
+
+        $homepage_code = $statementCode->fetch(\PDO::FETCH_ASSOC);
+
+        if ($homepage_code === false) {
+            $homepage_id['code'] = null;
+        } else {
+            $homepage_id['code'] = $homepage_code['code'];
+            $homepage_id['name'] .= " (" . $homepage_code['code'] . ")";
+        }
         return $homepage_id;
     }
 
@@ -75,14 +93,18 @@ class FilesBuilder
      * We will assume the user has access to this folder
      * and lets build a nice array of the files
      * @param int $folderId
+     * @param int $folderAccess
      * @return array of files
      */
-    public function getFolderData(int $folderId): array
+    public function getFolderData(int $folderId, int $folderAccess = UserAccess::ACCESS_READ): array
     {
         //get the files, for the source folder
         $fileMapper = \Schoolbox\Resource\File\Mapper::getInstance();
         $fileList = $fileMapper->findForFolders(
             [$folderId],
+            [
+                'getHidden' => $folderAccess >= UserAccess::ACCESS_WRITE,
+            ]
         );
 
         //get return url, for edit page
@@ -102,6 +124,7 @@ class FilesBuilder
                     'description'       => $file->getStorage()->getMimetype()->getDescription(),
                     'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
                 ],
+                'hidden'                => $file->isHidden(),
                 'type'                  => $this->getType($file->getMimetype()),
                 'hash'                  => $file->getHash(),
                 'size'                  => $file->getSize(),

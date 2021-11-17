@@ -120,7 +120,7 @@ class Controller extends AbstractController
         $componentConfig = $filesBuilder->getComponentConf($componentID);
 
         //grab all files for component folder
-        $files = $filesBuilder->getFolderData($componentConfig['src']['value']);
+        $files = $filesBuilder->getFolderData($componentConfig['src']['value'], $accessHome);
 
         //build the filter object
         //weird magic, from the file list component.
