@@ -1,6 +1,9 @@
 /**
  * Shared between each of the Layout components
  */
+
+import axios from 'axios';
+
 export default {
     computed: {
 
