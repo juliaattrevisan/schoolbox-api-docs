@@ -49,6 +49,12 @@ class Inspector extends CliTool\App
     // --instance: override instance ID
     private const OPT_LONG_INSTANCE = 'instance:';
 
+    // --key: only report a particular lock
+    private const OPT_LONG_INSPECT = 'inspect:';
+
+    // --unlock: only unlock a particular lock
+    private const OPT_LONG_UNLOCK = 'unlock:';
+
     private const LOCK_NAMES = [
         ErrorRequeuer::LOCK_NAME      => 'Kami Error Requeuer (./tools/kami/requeue-errors.php)',
         StatusChecker::LOCK_NAME      => 'Kami Status Checker (./tools/kami/check-status.php)',
@@ -82,7 +88,7 @@ class Inspector extends CliTool\App
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP, self::OPT_LONG_INSTANCE,];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_INSTANCE, self::OPT_LONG_INSPECT, self::OPT_LONG_UNLOCK];
     }
 
 
@@ -95,7 +101,16 @@ class Inspector extends CliTool\App
         $green  = self::COLOUR_GREEN;
         $white  = self::COLOUR_WHITE;
         $yellow = self::COLOUR_YELLOW;
-        $help   = "$white
+
+        // Output lock description as well
+        $locks = [];
+        foreach (self::LOCK_NAMES as $lockName => $lockDescription) {
+            $locks[] = $yellow . $lockName . $white;
+            $locks[] = '    ' . $lockDescription;
+        }
+        $locks = implode("\n        ", $locks);
+
+        $help = "$white
 
 NAME:
     Lock inspector
@@ -119,10 +134,23 @@ DESCRIPTION
     $yellow-n$white
         Answer N to all prompts to break a lock: the default behavior if the
         session is not interactive.
+        If explicitly provided, this option conflicts with `$yellow--unlock$white`.
 
     $yellow--instance=INSTANCE_ID$white
         If provided, inspect locks for the given instance.
 
+    $yellow--inspect=KEY$white
+        If provided, only inspect the given lock. The following locks are
+        available:
+        $locks
+
+        This option may be provided more than once to inspect multiple locks.
+
+    $yellow--unlock=KEY$white
+        If provided, only unlock the given lock. This is the equivalent of
+        `$yellow--inspect$white` with the `$yellow-y$white` option.
+        This option may be provided more than once to unlock multiple locks.
+        This option conflicts with `$yellow-n$white` if that option is explicitly provided.
 ";
         \fwrite(STDOUT, $help);
     }
@@ -147,9 +175,35 @@ DESCRIPTION
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
         $this->getLogger()->notice(sprintf('Running for instance "%s"', $instanceId));
 
+        // Verify no conflict between options
+        $unlockFilter     = (array)$this->getOpt(self::OPT_LONG_UNLOCK);
+        $forceInspectOnly = (bool)$this->getOpt(self::OPT_SHORT_ANSWER_NO);
+        if (!empty($unlockFilter) && $forceInspectOnly) {
+            $this->getLogger()->error('`--unlock` option cannot be used with `-n`: exiting');
+            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+        }
+
+        // Verify lock names are correct
+        $inspectFilter = (array)$this->getOpt(self::OPT_LONG_INSPECT);
+        $searchFilter  = array_merge($inspectFilter, $unlockFilter);
+        if (!empty($searchFilter)) {
+            foreach ($searchFilter as $lockName) {
+                if (!isset(self::LOCK_NAMES[$lockName])) {
+                    $this->getLogger()->warning(
+                        sprintf(
+                            'Lock name "%s" provided in `--inspect` or `--unlock` option is not recognised: ignoring',
+                            $lockName,
+                        )
+                    );
+                }
+            }
+        }
 
         // otherwise, report on locks
         foreach (self::LOCK_NAMES as $lockName => $lockDescription) {
+            if (!empty($searchFilter) && !in_array($lockName, $searchFilter)) {
+                continue;
+            }
             $this->getLogger()->notice(sprintf('Testing lock: %s, script: %s', $lockName, $lockDescription));
 
             $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
@@ -187,8 +241,9 @@ DESCRIPTION
                 // Prompt: ask for user input before unlocking
                 // Unlock: forcibly unlock
                 $unlock = false;
-                if ($this->getOpt(self::OPT_SHORT_ANSWER_YES)) {
+                if ($this->getOpt(self::OPT_SHORT_ANSWER_YES) || in_array($lockName, $unlockFilter)) {
                     $unlock = true;
+                    $this->getLogger()->notice('... unlocking automatically');
                 } elseif ($this->getOpt(self::OPT_SHORT_ANSWER_NO)) {
                     $unlock = false;
                 } elseif ($this->isInteractive()) {
