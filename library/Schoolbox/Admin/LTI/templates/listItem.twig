@@ -15,10 +15,13 @@
     </div>
     <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="provider-{{ identifier }}">
         {% include '@adminLti/form.twig' with {
-            provider: provider,
-            providerLtiVersion11: providerLtiVersion11,
-            providerLtiVersion13: providerLtiVersion13,
-            identifier: identifier,
+            provider:              provider,
+            providerLtiVersion11:  providerLtiVersion11,
+            providerLtiVersion13:  providerLtiVersion13,
+            identifier:            identifier,
+            oidcAuthenticationUrl: oidcAuthenticationUrl,
+            oauthAccessTokenUrl:   oauthAccessTokenUrl,
+            jsonWebKeySetUrl:      jsonWebKeySetUrl,
         } only %}
     </div>
     <nav>

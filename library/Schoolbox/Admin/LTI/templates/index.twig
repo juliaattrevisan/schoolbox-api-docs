@@ -23,10 +23,13 @@
             {% for provider in providers %}
             <section>
                 {% include '@adminLti/listItem.twig' with {
-                    provider: provider,
-                    providerLtiVersion11: providerLtiVersion11,
-                    providerLtiVersion13: providerLtiVersion13,
-                    identifier: loop.index0,
+                    provider:              provider,
+                    providerLtiVersion11:  providerLtiVersion11,
+                    providerLtiVersion13:  providerLtiVersion13,
+                    identifier:            loop.index0,
+                    oidcAuthenticationUrl: oidcAuthenticationUrl,
+                    oauthAccessTokenUrl:   oauthAccessTokenUrl,
+                    jsonWebKeySetUrl:      jsonWebKeySetUrl,
                 } only %}
             </section>
             {% endfor %}
@@ -44,9 +47,12 @@
 <div id="addProviderModal" class="reveal-modal" data-reveal aria-labelledby="addProviderModalTitle" aria-hidden="true" role="dialog">
     <h2 id="addProviderModalTitle">Add Provider</h2>
     {% include '@adminLti/form.twig' with {
-        providerLtiVersion11: providerLtiVersion11,
-        providerLtiVersion13: providerLtiVersion13,
-        identifier: providers|length,
+        providerLtiVersion11:  providerLtiVersion11,
+        providerLtiVersion13:  providerLtiVersion13,
+        identifier:            providers|length,
+        oidcAuthenticationUrl: oidcAuthenticationUrl,
+        oauthAccessTokenUrl:   oauthAccessTokenUrl,
+        jsonWebKeySetUrl:      jsonWebKeySetUrl,
     } only %}
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

@@ -35,6 +35,45 @@
 
         {# 1.3 fields #}
         <div {% if not (provider.isLtiVersion13 ?? false) %}class="hide"{% endif %} data-lti-version-section="{{ providerLtiVersion13 }}">
+
+            {# Schoolbox details: copy these from SB to the tool's config #}
+
+            <div class="small-6 columns">
+                <label for="platform_oidc_authentication_url-{{ identifier }}">
+                    Schoolbox OpenID Connect Authentication URL
+                </label>
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="platform_oidc_authentication_url-{{ identifier }}"
+                       type="text"
+                       name="platform_oidc_authentication_url"
+                       value="{{ oidcAuthenticationUrl }}">
+            </div>
+
+            <div class="small-6 columns">
+                <label for="platform_oauth_access_token_url-{{ identifier }}">
+                    Schoolbox oAuth Access Token URL
+                </label>
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="platform_oauth_access_token_url-{{ identifier }}"
+                       type="text"
+                       name="platform_oauth_access_token_url"
+                       value="{{ oauthAccessTokenUrl }}">
+            </div>
+
+            <div class="small-6 columns">
+                <label for="platform_jwks_url-{{ identifier }}">
+                    Schoolbox JSON Web Key Set URL
+                </label>
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="platform_jwks_url-{{ identifier }}"
+                       type="text"
+                       name="platform_jwks_url"
+                       value="{{ jsonWebKeySetUrl }}">
+            </div>
+
             <div class="small-6 columns">
                 <label for="deployment_id-{{ identifier }}">
                     Client/Deployment ID
@@ -46,7 +85,14 @@
                        type="text"
                        name="deployment_id"
                        value="{{ provider.deploymentId ?? '' }}">
+                <p class="meta">
+                    Copy this value into the LTI provider's "Client ID" or "Deployment ID" fields.
+                </p>
             </div>
+
+
+            {# Tool details: copy these from the tool's config to here #}
+
             <div class="small-6 columns">
                 <label for="oidc_initiation_url-{{ identifier }}" class="required">
                     OIDC Initiation URL
