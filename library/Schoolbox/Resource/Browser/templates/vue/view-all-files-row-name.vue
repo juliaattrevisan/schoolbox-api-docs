@@ -13,20 +13,26 @@ export default {
             required: true
         },
     },
-
 }
 </script>
 
 <template>
     <div >
         <a :href="data.url" rel="external" target="_blank">
-            <h3><img class="mime" :src="`/static/${data.mime.url}`" height="32" width="32" :title="data.mime.description"> {{ data.name }}</h3>
+            <h3 :style="{ opacity: data.hidden ? '0.3' : '1' }">
+                <img class="mime" :src="`/static/${data.mime.url}`" height="32" width="32" :title="data.mime.description"> 
+                {{ data.name }}
+            </h3>
         </a>
         <p class="meta">Date modified: {{ data.dateModified.formatted }}</p>
     </div>
 </template>
 
 <style lang="scss" scoped>
+
+a {
+    display: inline-block; //don't stretch the link across the whole wide row
+}
 
 h3 {
     font-size: 0.825rem;
