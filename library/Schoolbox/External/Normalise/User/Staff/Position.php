@@ -10,27 +10,29 @@
 
 namespace Schoolbox\External\Normalise\User\Staff;
 
+use Schoolbox\Collection;
+
 class Position
 {
 
     /**
-     * Job position description
+     * Job position descriptions
      * This is usually a nice human-readable format of a person's position
      * e.g. "Human Resources"
      *
-     * @var string
+     * @var Collection
      */
-    private string $description = '';
+    private Collection $description;
 
 
     /**
-     * Job position code
+     * Job position codes
      * This is some abbreviated format of a person's position
      * e.g. "HR", which is the short format of "Human Resources"
      *
-     * @var string
+     * @var Collection
      */
-    private string $code = '';
+    private Collection $code;
 
 
     /**
@@ -68,19 +70,19 @@ class Position
      */
 
     /**
-     * @return string
+     * @return Collection
      */
-    public function getCode(): string
+    public function getCode(): Collection
     {
         return $this->code;
     }
 
 
     /**
-     * @param string $code
+     * @param Collection $code
      * @return $this
      */
-    public function setCode(string $code): self
+    public function setCode(Collection $code): self
     {
         $this->code = $code;
         return $this;
@@ -88,23 +90,23 @@ class Position
 
 
     /**
-     * Set description
+     * Set descriptions
      *
-     * @param string $description
+     * @param Collection $description
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(Collection $description): self
     {
         $this->description = $description;
         return $this;
     }
 
     /**
-     * Get description
+     * Get descriptions
      *
-     * @return string
+     * @return Collection
      */
-    public function getDescription()
+    public function getDescription(): Collection
     {
         return $this->description;
     }
@@ -115,7 +117,7 @@ class Position
      * @param \Alaress_Date_Format $endDate
      * @return $this
      */
-    public function setEndDate($endDate)
+    public function setEndDate($endDate): self
     {
         $this->endDate = $endDate;
         return $this;
@@ -137,7 +139,7 @@ class Position
      * @param \Alaress_Date_Format $startDate
      * @return $this
      */
-    public function setStartDate($startDate)
+    public function setStartDate($startDate): self
     {
         $this->startDate = $startDate;
         return $this;
@@ -161,10 +163,10 @@ class Position
      * and shouldn't really be here
      *
      * @return string
-     *@deprecated
+     * @deprecated
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->description ?: '';
+        return $this->description ? implode(',', $this->description->getAll()) : '';
     }
 }
