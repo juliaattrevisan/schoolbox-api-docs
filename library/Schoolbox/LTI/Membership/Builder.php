@@ -192,18 +192,25 @@ class Builder implements MembershipServiceServerBuilderInterface
     {
         // Share minimal information by default, as per
         // http://www.imsglobal.org/spec/lti-nrps/v2p0#sharing-of-personal-data
-        // (Not yet sure how to receive data sharing consent)
+        // (Not yet sure how to receive data sharing consent, but TII requires
+        //  at least full name + email)
         $encodedUser = $this->userCodec->encode($user);
         return new Member(
-            new UserIdentity($encodedUser),
+            new UserIdentity(
+                $encodedUser,
+                $user->getFullName(),
+                $user->getEmail(),
+            ),
             MemberInterface::STATUS_ACTIVE,
             [$role],
             // Why must I provide the above as properties below?
             [
-                'user_id' => $encodedUser,
-                'status'  => MemberInterface::STATUS_ACTIVE,
-                'roles'   => [$role],
-            ]
+                'user_id'    => $encodedUser,
+                'status'     => MemberInterface::STATUS_ACTIVE,
+                'roles'      => [$role],
+                'given_name' => $user->getFullName(),
+                'email'      => $user->getEmail(),
+            ],
         );
     }
 
