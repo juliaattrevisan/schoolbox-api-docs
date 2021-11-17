@@ -143,10 +143,10 @@ class Controller extends ConfigController
             $provider = $this->providerMapper->findById($post['id']);
         } else {
             $provider = new Provider();
+            $provider->setLtiVersion($post['lti_version']);
         }
 
         $provider->setName($post['name']);
-        $provider->setLtiVersion($post['lti_version']);
 
         // LTI 1.3 fields
         $provider = $provider
