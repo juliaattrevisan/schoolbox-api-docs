@@ -13,12 +13,28 @@ export default {
             required: true
         },
     },
+
+    mounted () {
+        this.checkForPreviewLinks();
+    },
+
+    methods: {
+
+        /**
+         * Ensure the link uses the pop up modal
+         */
+        checkForPreviewLinks () {
+            $(this.$el.querySelector('[data-plugin="preview"]')).preview();
+        },
+
+    },
+    
 }
 </script>
 
 <template>
-    <div >
-        <a :href="data.url" rel="external" target="_blank">
+    <div>
+        <a data-plugin="preview" :href="data.url" rel="external">
             <h3 :style="{ opacity: data.hidden ? '0.3' : '1' }">
                 <img class="mime" :src="`/static/${data.mime.url}`" height="32" width="32" :title="data.mime.description"> 
                 {{ data.name }}
