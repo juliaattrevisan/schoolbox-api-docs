@@ -60,7 +60,7 @@ export default {
         onResubmissionRequiredChange () {
             const filterParam = this.isResubmissionRequiredChecked ? '' : 'failed'; 
             Event.$emit(`vue-tables.filter::${FilterEvents.RESUBMISSION_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
-            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.RESUBMISSION_REQUIRED)));
+            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.RESUBMISSION_REQUIRED))); //picked up by similarity-report.vue 
         },
 
         /**
@@ -71,7 +71,7 @@ export default {
         onMarkingRequiredChange () {
             const filterParam = this.isMarkingRequiredChecked ? '' : 'pending'; 
             Event.$emit(`vue-tables.filter::${FilterEvents.MARKING_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
-            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.MARKING_REQUIRED)));
+            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.MARKING_REQUIRED))); //picked up by similarity-report.vue 
         },
 
         /**
@@ -82,7 +82,7 @@ export default {
         onReviewedChange () {
             const filterParam = this.isReviewedChecked ? '' : 'reviewed'; 
             Event.$emit(`vue-tables.filter::${FilterEvents.REVIEWED}`, filterParam); //picked up by similarity-report.vue 
-            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.REVIEWED)));
+            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.REVIEWED))); //picked up by similarity-report.vue 
         },
 
     }
