@@ -15,12 +15,8 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $tourMapper = \Schoolbox\Tour\Mapper::getInstance();
-        try {
-            $tour211old    = $tourMapper->findOneByColumn('title', '21.1 Release');
-            $tourMapper->delete($tour211old);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
-        }
+        $tourMapper->deleteByColumn('title', '21.0 Release');
+        $tourMapper->deleteByColumn('title', '21.1 Release');
     }
 };
 
