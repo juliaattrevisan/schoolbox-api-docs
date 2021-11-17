@@ -3,7 +3,6 @@
         <div class="card small-12" data-provider-infocard>
             <h3>
                 {{ provider.name ?? '' }}
-                <span class="label neutral">{{ provider.ltiVersion }}</span>
                 {% if provider.isLtiVersion11 ?? false and provider.url is empty %}
                     <span class="label alert">Provider Disabled - No Launch URL detected</span>
                 {% endif %}
