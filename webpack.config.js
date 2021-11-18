@@ -211,8 +211,9 @@ module.exports = {
         // Pastoral Count Badge
         pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
 
-        // Google Files
+        //Resource
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
+        viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
 
         //Sortable components for homepages
         sortableComponents: './templates/core/homepage/js/sortableComponents.js',
