@@ -311,3 +311,11 @@
 .fc .fc-popover {
     z-index: 1000;
 }
+
+.fc-timegrid-slots table {
+    background: none; //remove the default $white, as we want to see the .fc-day-today background underneath
+}
+
+.fc .fc-timegrid-col.fc-day-today {
+    background-color: rgba(var(--accent-background-r), var(--accent-background-g), var(--accent-background-b), 0.25); //0.25 opacity so you dont lose the time lines
+}
