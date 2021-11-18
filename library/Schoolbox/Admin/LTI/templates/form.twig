@@ -122,7 +122,9 @@
                        type="text"
                        name="platform_oidc_authentication_url"
                        value="{{ oidcAuthenticationUrl }}">
-                <a href="#" class="button icon-copy">Copy</a>
+                <a href="#"
+                   data-clipboard-text="{{ oidcAuthenticationUrl }}"
+                   class="button icon-copy">Copy</a>
             </div>
         </div>
 
@@ -137,7 +139,9 @@
                        type="text"
                        name="platform_oauth_access_token_url"
                        value="{{ oauthAccessTokenUrl }}">
-                <a href="#" class="button icon-copy">Copy</a>
+                <a href="#"
+                   data-clipboard-text="{{ oauthAccessTokenUrl }}"
+                   class="button icon-copy">Copy</a>
             </div>
         </div>
 
@@ -152,7 +156,9 @@
                        type="text"
                        name="platform_jwks_url"
                        value="{{ jsonWebKeySetUrl }}">
-                <a href="#" class="button icon-copy">Copy</a>
+                <a href="#"
+                   data-clipboard-text="{{ jsonWebKeySetUrl }}"
+                   class="button icon-copy">Copy</a>
             </div>
         </div>
 
@@ -168,7 +174,9 @@
                        type="text"
                        name="deployment_id"
                        value="{{ provider.deploymentId ?? '' }}">
-                <a href="#" class="button icon-copy {% if isNew %}disabled{% endif %}">Copy</a>
+                <a href="#"
+                   data-clipboard-text="{{ provider.deploymentId ?? '' }}"
+                   class="button icon-copy {% if isNew %}disabled{% endif %}">Copy</a>
             </div>
         </div>
     </fieldset>

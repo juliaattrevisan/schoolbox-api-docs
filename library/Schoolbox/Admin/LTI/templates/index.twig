@@ -63,6 +63,8 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script type="text/javascript">
     $(function(){
 
@@ -93,13 +95,15 @@
             })
         });
 
+        let $content       = $('#content'),
+            $toast         = $('#toast'),
+            clipboardToast = {text: 'Copied!', css: 'success'};
 
         // Jellytot actions
-        $('#content').on('click', 'a[data-provider-action]', function(event) {
-
+        $content.on('click', 'a[data-provider-action]', function(event) {
             event.preventDefault();
 
-            var button = $(this),
+            let button = $(this),
                 action = button.data('providerAction'),
                 provider   = button.closest('[data-provider]');
 
@@ -120,7 +124,15 @@
                                 $('#errorModal').foundation('reveal', 'open');
                             });
                 }
-            })
+            });
+        });
+
+        // Set up copy of inputs
+        $content.on('click', 'a[data-clipboard-text]', function (event) {
+            event.preventDefault();
+            navigator.clipboard.writeText($(this).attr('data-clipboard-text'));
+            $toast.toastActivate(clipboardToast);
+            $toast.toastTimeout(clipboardToast)
         });
     });
 </script>
