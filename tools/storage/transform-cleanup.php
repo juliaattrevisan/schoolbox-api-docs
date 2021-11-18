@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Image\Transformation;
 use Alaress\Image\Transformation\ITransformFactory;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -42,10 +43,10 @@ $app = new class extends CliTool\App {
     {
         $this->configMapper = ConfigMapper::getInstance();
         $this->imageTransforms = [
-            new \Alaress\Image\Transformation\MyImage(),
-            new \Alaress\Image\Transformation\Storage(),
-            new \Alaress\Image\Transformation\Icon(),
-            new \Alaress\Image\Transformation\Portrait(),
+            new Transformation\MyImage(),
+            new Transformation\Storage(),
+            new Transformation\Icon(),
+            new Transformation\Portrait(),
         ];
     }
 

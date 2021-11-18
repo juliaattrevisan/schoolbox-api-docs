@@ -12,51 +12,23 @@ namespace Schoolbox\Resource\Storage\S3;
 use Alaress_Byte_Format;
 use Alaress\Database as AlaressDatabase;
 use Aws\S3\Exception\S3Exception;
-use Aws\S3\S3Client;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem;
 use League\Flysystem\Filesystem;
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Application\CliTool\AwsS3AppTrait;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
-
-use function array_filter;
-use function array_key_exists;
-use function basename;
-use function closedir;
-use function count;
-use function dirname;
-use function explode;
-use function fclose;
-use function file_exists;
-use function filesize;
-use function fopen;
-use function is_dir;
-use function is_resource;
-use function opendir;
-use function readdir;
-use function realpath;
-use function rmdir;
-use function shell_exec;
-use function sleep;
-use function sprintf;
-use function str_pad;
-use function str_replace;
-use function strlen;
-use function strpos;
-use function trim;
-use function unlink;
-
-use const DIRECTORY_SEPARATOR;
 
 /**
  * Migrates all files from local configured 'storage_dir' to AWS S3
  */
 class Migration extends CliTool\App
 {
+    use AwsS3AppTrait;
+
     /**
      * Configured local storage directory. No trailing slash.
      *
@@ -142,68 +114,13 @@ class Migration extends CliTool\App
         $this->storageDir    = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
         $this->byteFormat    = new Alaress_Byte_Format();
 
-        $this->fileSystemAwsS3 = $this->buildAwsS3FileSystemAndFetchS3Files();
+        $client                = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
+        $s3Bucket              = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
+        $this->filesInS3       = $this->getFilesInS3($this->getLogger(), $client, $s3Bucket);
+        $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
 
         $this->migrateFiles();
         $this->listFailedMigrationPaths();
-    }
-
-    /**
-     * Fetch the keys of all files found in the bucket in an array where the key is the element index
-     *
-     * @param S3Client $s3Client
-     * @param string   $bucketName
-     */
-    private function getFilesInS3(S3Client $s3Client, string $bucketName): void
-    {
-        $this->filesInS3  = [];
-        $this->getLogger()->notice("Fetching file list from S3, this may take a while on large datasets...");
-        foreach ($s3Client->getIterator('ListObjects', ['Bucket' => $bucketName, 'Prefix' => FilesystemFactory::PREFIX_STORAGE]) as $i => $object) {
-            if ($i && $i % 1000 === 0) {
-                $this->getLogger()->debug("Files found in S3: $i...");
-            }
-            $this->filesInS3[$object['Key']] = true;
-        }
-    }
-
-    /**
-     * Build and return an AWS S3 file system, regardless of whether the system is configured to use Local or AWS S3.
-     *
-     * @return Filesystem
-     * @throws InvalidArgumentException
-     */
-    private function buildAwsS3FileSystemAndFetchS3Files(): Filesystem
-    {
-        $s3AccessKey = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
-        $s3Region    = trim($this->getConfig()->get('otfs_s3_region') ?? "");
-        $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
-        $s3Bucket    = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
-
-        $this->getLogger()->debug(sprintf("OTFS Adapter: '%s'", $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER)));
-        $this->getLogger()->debug("S3 Access Key: '$s3AccessKey'");
-        $this->getLogger()->debug(sprintf("S3 Secret Key: '%s'", str_pad("", strlen($s3SecretKey), "*")));
-        $this->getLogger()->debug("S3 Region: '$s3Region'");
-        $this->getLogger()->debug("S3 Version: '$s3Version'");
-        $this->getLogger()->debug("S3 Bucket: '$s3Bucket'");
-
-        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($s3Bucket)) {
-            $this->getLogger()->error("Error: S3 config appears invalid");
-            exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
-        }
-
-        $client = new S3Client([
-            'credentials' => [
-                'key'    => $s3AccessKey,
-                'secret' => $s3SecretKey,
-            ],
-            'region'      => $s3Region,
-            'version'     => $s3Version,
-        ]);
-
-        $this->getFilesInS3($client, $s3Bucket);
-
-        return new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
     }
 
 
