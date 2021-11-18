@@ -1,7 +1,7 @@
 -- These should disappear now, I guess
-DROP TABLE `_deleted_component_config_definition`;
-DROP TABLE `_deleted_component_config_instance`;
-DROP TABLE `_pastoral_report_groups`;
+DROP TABLE IF EXISTS `_deleted_component_config_definition`;
+DROP TABLE IF EXISTS `_deleted_component_config_instance`;
+DROP TABLE IF EXISTS `_pastoral_report_groups`;
 
 -- Unlock Tour tables' columns so we can update their stuff
 SET foreign_key_checks = 0;
@@ -150,6 +150,15 @@ CHANGE COLUMN `uuid` `uuid` VARCHAR(36) CHARACTER SET 'ascii' COLLATE 'ascii_gen
 CHANGE COLUMN `tour_uuid` `tour_uuid` VARCHAR(36) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ;
 ALTER TABLE `tour_trigger`
 ADD CONSTRAINT `tour_trigger_tour_uuid_fk`
+  FOREIGN KEY (`tour_uuid`)
+  REFERENCES `tour` (`uuid`);
+
+ALTER TABLE `tour_audience_role`
+DROP FOREIGN KEY `tour_audience_role_tour_uuid_fk`;
+ALTER TABLE `tour_audience_role`
+CHANGE COLUMN `tour_uuid` `tour_uuid` VARCHAR(36) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ;
+ALTER TABLE `tour_audience_role`
+ADD CONSTRAINT `tour_audience_role_tour_uuid_fk`
   FOREIGN KEY (`tour_uuid`)
   REFERENCES `tour` (`uuid`);
 
