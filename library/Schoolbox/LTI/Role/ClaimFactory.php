@@ -93,9 +93,10 @@ class ClaimFactory
     /**
      * Builds context-level role claims, given an assessment.
      *
-     * In addition to the roles for the assessment's folder:
-     * * instructors have the Mentor role so long as the assessment has
-     *   non-excluded participants
+     * * participants have the Learner role, unless excluded
+     *   (then they have no role)
+     * * instructors have the Instructor role, and also the Mentor role
+     *   so long as the assessment has non-excluded participants
      * * parents have the Mentor role so long as one of their children is a
      *   non-excluded participant in the assessment
      *
@@ -106,24 +107,35 @@ class ClaimFactory
      */
     public function buildContextRolesForAssessment(User $user, IAssessable $assessment): array
     {
-        $folder = $assessment->getBaseContext()->getFolder();
-        $roles  = $this->buildContextRolesForFolder($user, $folder);
-        if ($this->access->isInstructor($user, $folder)) {
-            foreach ($assessment->getAllParticipants() as $participant) {
+        // Participant case
+        $participant = $assessment->getParticipantIfExtant($user);
+        if ($participant) {
+            return $participant->isExcluded()
+                ? []
+                : [self::MEMBERSHIP_ROLE_LEARNER];
+        }
+
+        // Instructor case
+        if ($this->access->isInstructor($user, $assessment->getBaseContext()->getFolder())) {
+            $roles[] = self::MEMBERSHIP_ROLE_INSTRUCTOR;
+            foreach (($assessment->getAllParticipants() ?? []) as $participant) {
                 if (!$participant->isExcluded()) {
                     $roles[] = self::MEMBERSHIP_ROLE_MENTOR;
                     break;
                 }
             }
-        } elseif ($user->getRole()->isParent()) {
-            foreach ($user->getChildren() as $child) {
-                $participant = $assessment->getParticipantIfExtant($child);
-                if ($participant && !$participant->isExcluded()) {
-                    $roles[] = self::MEMBERSHIP_ROLE_MENTOR;
-                    break;
-                }
+            return $roles;
+        }
+
+        // Parent case
+        foreach (($user->getChildren() ?? []) as $child) {
+            $participant = $assessment->getParticipantIfExtant($child);
+            if ($participant && !$participant->isExcluded()) {
+                return [self::MEMBERSHIP_ROLE_MENTOR];
             }
         }
-        return $roles;
+
+        // None of the above
+        return [];
     }
 }

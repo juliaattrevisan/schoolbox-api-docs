@@ -116,8 +116,8 @@ class LaunchFactory
         // TODO determine how roles should be set if $actingUser != $currentUser
         $roleClaimFactory = new RoleClaimFactory($this->access);
         $roles            = array_merge(
-            $roleClaimFactory->buildInstitutionRoles($currentUser),
-            $roleClaimFactory->buildContextRolesForAssessment($currentUser, $assessment),
+            $roleClaimFactory->buildInstitutionRoles($actingUser),
+            $roleClaimFactory->buildContextRolesForAssessment($actingUser, $assessment),
         );
 
         // Build additional claims
@@ -132,7 +132,7 @@ class LaunchFactory
             $registration,
             LtiMessageInterface::LTI_MESSAGE_TYPE_RESOURCE_LINK_REQUEST,
             $assessment->getLtiAssessmentUrl() ?? $assessment->getLtiTool()->getLaunchUrl(),
-            $this->userCodec->encode($currentUser),
+            $this->userCodec->encode($actingUser),
             null,
             array_unique($roles),
             $additionalClaims,
@@ -176,7 +176,7 @@ class LaunchFactory
         // for kids, this won't be anyone
         // for teachers, this will be all participants in the assessment
         $roleScopeMentorClaim = (new RoleScopeMentorClaimFactory($this->access, $this->userCodec))
-            ->buildForAssessment($currentUser, $assessment);
+            ->buildForAssessment($actingUser, $assessment);
         if ($roleScopeMentorClaim) {
             $additionalClaims[] = $roleScopeMentorClaim;
         }

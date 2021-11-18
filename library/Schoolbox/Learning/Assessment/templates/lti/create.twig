@@ -58,7 +58,7 @@
                                 label="{{ tool.name }}"
                                 data-launch-url="{{ tool.launchUrl ?? '' }}"
                                 data-tool-selector-url="{{ tool.deepLinkingUrl
-                                    ? routeLookup('ltiPlatform.getGenerateDeepLinkingRequest', {toolId: tool.id})
+                                    ? routeLookup('ltiPlatformContext.getGenerateDeepLinkingRequestForFolder', {toolId: tool.id, folderId: context.baseContext.folder.id})
                                     : ''
                                 }}"
                                 {{ assessment.ltiTool.id is defined and tool.id == assessment.ltiTool.id ? 'selected="selected"' : '' }}>{{ tool.name }}</option>
@@ -196,10 +196,10 @@
                     $('#ltiAssessmentTitleDisplay').text(title);
                     $('#ltiAssessmentTextDisplay').text(text);
                     $('#custom-fields').val(JSON.stringify(customFields ?? {}));
+                    $('#line-item-score-maximum').val(lineItemScoreMaximum ?? '');
                     if (lineItemResourceId) {
                         // This resource link has a line item, and a resource ID?
                         // Close the modal
-                        $('#line-item-score-maximum').val(lineItemScoreMaximum);
                         $('#line-item-resource-id').val(lineItemResourceId);
                         $toolModal.foundation('reveal', 'close');
                     } else {

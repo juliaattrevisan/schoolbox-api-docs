@@ -32,20 +32,14 @@ class Module extends BaseModule
     {
         // TODO build a resource link launch request for the given tool
 
-        // Build a deep linking request for the given tool
+        // Deep linking request has been moved to context controller
+
         $preloadTool = function ($params) {
             $toolMapper = $this->getMapperFactory()->get(ToolMapper::class);
             return [
                 'tool' => $toolMapper->findById($params['toolId']),
             ];
         };
-        $this->register(
-            self::METHOD_GET,
-            "/deep-linking-request/{toolId}",
-            'getGenerateDeepLinkingRequest',
-            null,
-            $preloadTool,
-        );
 
         // OIDC authentication
         $this->register(self::METHOD_GET, '/oidc/authentication', 'getOidcAuthenticationRequest');
@@ -89,8 +83,6 @@ class Module extends BaseModule
                     'keyChains'         => $injector->lazyGet('lti.keyChains'),
                     'registrations'     => $injector->lazyGet('lti.registrations'),
                     'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
-                    'instance'          => $injector->lazyGet('instance'),
-                    'userCodec'         => $injector->lazyGet('lti.userCodec'),
                     'accessTokenCache'  => $injector->lazyGet('lti.accessTokenCache'),
                 ]
             )
