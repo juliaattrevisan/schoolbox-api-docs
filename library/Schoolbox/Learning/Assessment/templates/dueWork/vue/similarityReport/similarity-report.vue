@@ -225,6 +225,7 @@ export default {
          * So we can ensure that rows that are removed through filters are also removed from the selected rows
          */
         initFilterListeners () {
+            document.addEventListener(FilterEvents.SIMILARITY_SCORE, () => this.onFilterChanged());
             document.addEventListener(FilterEvents.RESUBMISSION_REQUIRED, () => this.onFilterChanged());
             document.addEventListener(FilterEvents.MARKING_REQUIRED, () => this.onFilterChanged());
             document.addEventListener(FilterEvents.REVIEWED, () => this.onFilterChanged());
