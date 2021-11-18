@@ -124,8 +124,8 @@ export default {
                 if (data?.custom?.modifyLink) {
                     // Inject a return URL:
                     // maybe the destination will understand it, maybe it won't
-                    modifyLink = ENDPOINTS.generateUrlFromConst(data?.custom?.modifyLink,null, returnUrl);
-                } else if (metadata?.eventId) {
+                    modifyLink = ENDPOINTS.generateUrlFromConst(data?.custom?.modifyLink, null, returnUrl);
+                } else if (data?.custom?.modifyLink !== false && metadata?.eventId) {
                     // this.returnUrl does not get updated while switching months
                     modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, returnUrl);
                     deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, returnUrl);

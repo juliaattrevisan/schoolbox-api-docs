@@ -80,7 +80,7 @@ class CanSeeParticipation extends AbstractParticipationRule
         }
 
         // Instructors or staffs can always see participants' summary pages
-        if ($accessLevel >= UserAccess::ACCESS_WRITE || $user->getRole()->isStaff()) {
+        if ($accessLevel >= UserAccess::ACCESS_WRITE || ($user->getRole()->isStaff() && $user->getRole()->getViewStudentGrades())) {
             return true;
         }
 
