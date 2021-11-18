@@ -115,49 +115,61 @@
             <label for="platform_oidc_authentication_url-{{ identifier }}">
                 OpenID Connect Authentication URL
             </label>
-            <input readonly
-                   data-lti-version="{{ providerLtiVersion13 }}"
-                   id="platform_oidc_authentication_url-{{ identifier }}"
-                   type="text"
-                   name="platform_oidc_authentication_url"
-                   value="{{ oidcAuthenticationUrl }}">
+            <div class="input-group">
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="platform_oidc_authentication_url-{{ identifier }}"
+                       type="text"
+                       name="platform_oidc_authentication_url"
+                       value="{{ oidcAuthenticationUrl }}">
+                <a href="#" class="button icon-copy">Copy</a>
+            </div>
         </div>
 
         <div class="small-12 large-6 columns">
             <label for="platform_oauth_access_token_url-{{ identifier }}">
                 oAuth Access Token URL
             </label>
-            <input readonly
-                   data-lti-version="{{ providerLtiVersion13 }}"
-                   id="platform_oauth_access_token_url-{{ identifier }}"
-                   type="text"
-                   name="platform_oauth_access_token_url"
-                   value="{{ oauthAccessTokenUrl }}">
+            <div class="input-group">
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="platform_oauth_access_token_url-{{ identifier }}"
+                       type="text"
+                       name="platform_oauth_access_token_url"
+                       value="{{ oauthAccessTokenUrl }}">
+                <a href="#" class="button icon-copy">Copy</a>
+            </div>
         </div>
 
         <div class="small-12 large-6 columns">
             <label for="platform_jwks_url-{{ identifier }}">
                 JSON Web Key Set URL
             </label>
-            <input readonly
-                   data-lti-version="{{ providerLtiVersion13 }}"
-                   id="platform_jwks_url-{{ identifier }}"
-                   type="text"
-                   name="platform_jwks_url"
-                   value="{{ jsonWebKeySetUrl }}">
+            <div class="input-group">
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="platform_jwks_url-{{ identifier }}"
+                       type="text"
+                       name="platform_jwks_url"
+                       value="{{ jsonWebKeySetUrl }}">
+                <a href="#" class="button icon-copy">Copy</a>
+            </div>
         </div>
 
         <div class="small-12 large-6 columns">
             <label for="deployment_id-{{ identifier }}">
                 Client/Deployment ID
             </label>
-            <input readonly
-                   data-lti-version="{{ providerLtiVersion13 }}"
-                   placeholder="(generated on creation)"
-                   id="deployment_id-{{ identifier }}"
-                   type="text"
-                   name="deployment_id"
-                   value="{{ provider.deploymentId ?? '' }}">
+            <div class="input-group">
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       placeholder="(generated on creation)"
+                       id="deployment_id-{{ identifier }}"
+                       type="text"
+                       name="deployment_id"
+                       value="{{ provider.deploymentId ?? '' }}">
+                <a href="#" class="button icon-copy {% if isNew %}disabled{% endif %}">Copy</a>
+            </div>
         </div>
     </fieldset>
 
