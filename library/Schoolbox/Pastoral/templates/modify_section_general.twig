@@ -52,7 +52,7 @@
         <div class="small-12 medium-6 columns">
             <label> Points <input type="number" name="points" size="35" maxlength="100" value="{{ record.points }}"/> </label>
         </div>
-        <div class="small-6 columns">
+        <div class="small-12 medium-6 columns">
             <label> Tags
                 <span class="hint has-tip tip-top" data-tooltip title="Tags can be added to support {{ locale.pastoral }} reports and filtering.">?</span>
                 <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}"> </label>

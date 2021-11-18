@@ -443,6 +443,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the list of news topics to allow categorisation of news.',
                     ],
+                    '/adminv2/lists/pastoral-action'                    => [
+                        'name'        => 'Pastoral Actions',
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
+                        'children'    => [],
+                        'description' => 'Setup the actions of pastoral records.',
+                    ],
                     '/adminv2/lists/pastoral-severity'                => [
                         'name'        => 'Pastoral Record Severity',
                         'visible'     => ($this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $this->configLoader->get('pastoral_severity')),
@@ -472,12 +478,6 @@ class Subnav
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
                         'children'    => [],
                         'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
-                    ],
-                    '/adminv2/lists/pastoral-action'                    => [
-                        'name'        => 'Pastoral Actions',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
-                        'children'    => [],
-                        'description' => 'Setup the actions of pastoral records.',
                     ],
                     '/adminv2/lists/residential-house'                => [
                         'name'        => 'Residential Houses',

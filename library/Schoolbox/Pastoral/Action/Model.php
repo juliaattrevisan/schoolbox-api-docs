@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral\Action;
 
+use JsonSerializable;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
 use Schoolbox\Sequential;
@@ -16,7 +17,7 @@ use Schoolbox\Sequential;
  *
  * @package Schoolbox\Pastoral\Action
  */
-class Model implements ISoftDeletable, Sequential
+class Model implements ISoftDeletable, Sequential, JsonSerializable
 {
     use ModelTraits\Id;
     use ModelTraits\CreatedAtDate;
@@ -70,5 +71,16 @@ class Model implements ISoftDeletable, Sequential
     {
         $this->externalCode = $externalCode;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'   => $this->id,
+            'name' => $this->name,
+        ];
     }
 }

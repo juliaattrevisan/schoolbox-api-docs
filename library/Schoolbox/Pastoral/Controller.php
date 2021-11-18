@@ -1334,9 +1334,11 @@ class Controller extends Base
             }
         }
 
-        // If no actions are set for type/subtype, just get all
-        if (!isset($actions) || $actions->count() === 0) {
+        // If no actions are set for type/subtype, return empty collection
+        if (!isset($actions) && !isset($type) && !isset($subtype)) {
             $actions = $this->pastoralActionMapper->findAll();
+        } elseif (!isset($actions)) {
+            $actions = $this->pastoralActionMapper->createCollection();
         }
 
         $output = [];
