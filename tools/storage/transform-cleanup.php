@@ -5,13 +5,19 @@ declare(strict_types=1);
 
 use Alaress\Image\Transformation;
 use Alaress\Image\Transformation\ITransformFactory;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Application\CliTool\AwsS3AppTrait;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Video\ResourceVideo;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
+
+    use AwsS3AppTrait;
 
     public const LOCK_NAME = 'transform_cleanup';
 
@@ -32,16 +38,27 @@ $app = new class extends CliTool\App {
         ResourceVideo::TRANSCODE,
     ];
 
-    /** @var ITransformFactory[]  */
+    /** @var ITransformFactory[] */
     private array $imageTransforms;
 
-    private int $countOrphanTransformsDeleted = 0;
-    private int $sizeStorageRecovered = 0;
-    private int $countEmptyDirectoriesDeleted = 0;
+    private int $countOrphanTransformsDeleted     = 0;
+    private int $sizeStorageRecovered             = 0;
+    private int $countEmptyDirectoriesDeleted     = 0;
+    private int $countStorageTransformRowsDeleted = 0;
+
+    /**
+     * Configured local storage directory. No trailing slash.
+     *
+     * @var string
+     */
+    private string $storageDir;
+
+    private Filesystem $fileSystemAwsS3;
+
 
     public function __construct()
     {
-        $this->configMapper = ConfigMapper::getInstance();
+        $this->configMapper    = ConfigMapper::getInstance();
         $this->imageTransforms = [
             new Transformation\MyImage(),
             new Transformation\Storage(),
@@ -85,12 +102,29 @@ $app = new class extends CliTool\App {
             $this->getLogger()->notice("[Terminated] Unable to run this tool as another process is currently running.");
             exit;
         }
+        $this->storageDir = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
 
-        $this->cleanupStorageDirectory($this->getConfig()->get('storage_dir'));
+        if ($this->isUsingS3()) {
+            $this->cleanUpS3();
+        } else {
+            $this->cleanupStorageDirectory($this->getConfig()->get('storage_dir'));
+        }
+
         $this->cleanupStorageTransformTable();
         $lock->release();
         $this->registerToolCompletion();
         $this->printResults();
+    }
+
+
+    /**
+     * Returns whether instance is using AWS S3 filesystem
+     *
+     * @return bool
+     */
+    private function isUsingS3(): bool
+    {
+        return $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3;
     }
 
 
@@ -107,7 +141,7 @@ Cleanup orphaned transform files.
 Usage: transform-cleanup.php [--perform]
         --perform   Persist changes
         --lock-timeout   The max amount of time (in seconds) to hold the lock for.
-                         Defaults to {$default}
+                         Defaults to $default
         --force This tool is meant to run one times a day. Adding this arg will let the operator re-run the this tool.
 
 HELP;
@@ -122,6 +156,49 @@ HELP;
     private function hasToolCompleted(): bool
     {
         return $this->getConfig()->get('transform_cleanup_completed');
+    }
+
+    private function cleanUpS3(): void
+    {
+        $client                = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
+        $s3Bucket              = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
+        $filesInS3             = $this->getFilesInS3($this->getLogger(), $client, $s3Bucket);
+        $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
+
+        foreach ($filesInS3 as $key => $_v) {
+            $path     = preg_replace('#^storage/#', '', $key);
+            $fileName = basename($path);
+            if ($this->needsToBeRetained($fileName)) {
+                continue;
+            }
+            $this->deleteRecordFromStorageTransformTable($fileName);
+            $this->deleteTransformFileFromDisk($fileName, $this->fileSystemAwsS3->getSize($path));
+        }
+    }
+
+    /**
+     * Returns whether the specified file should be deleted
+     *
+     * @param string $fileName
+     * @return bool
+     */
+    private function needsToBeRetained(string $fileName): bool
+    {
+        if (!$this->isTransformFile($fileName)) {
+            $this->getLogger()->info("Retaining storage file: '$fileName'");
+            return true;
+        }
+        if ($this->isVideoTransform($fileName)) {
+            $this->getLogger()->info("Retaining video transform: '$fileName'");
+            $this->validTransforms[] = $fileName;
+            return true;
+        }
+        if ($this->isValidImageTransformNameFormat($fileName)) {
+            $this->getLogger()->info("Retaining image transform: '$fileName'");
+            $this->validTransforms[] = $fileName;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -144,51 +221,45 @@ HELP;
                 $this->cleanupStorageDirectory("$dir/$item");
                 $this->cleanupEmptyDirectory($item);
             } else {
-                if(!$this->isTransformFile($item)){
-                    $this->getLogger()->info("Retaining storage file: '$item'");
+                $fileName = $item->getFilename();
+                if ($this->needsToBeRetained($fileName)) {
                     continue;
                 }
-                if($this->isVideoTransform($item)){
-                    $this->getLogger()->info("Retaining video transform: '$item'");
-                    $this->validTransforms[] = $item->getFilename();
-                    continue;
-                }
-                if($this->isValidImageTransformNameFormat($item)){
-                    $this->getLogger()->info("Retaining image transform: '$item'");
-                    $this->validTransforms[] = $item->getFilename();
-                    continue;
-                }
-                $this->deleteRecordFromStorageTransformTable($item);
-                $this->deleteTransformFileFromDisk($item);
+                $this->deleteRecordFromStorageTransformTable($fileName);
+
+                $this->deleteTransformFileFromDisk(
+                    str_replace("$this->storageDir/", '', $item->getPathname()),
+                    $item->getSize()
+                );
             }
         }
     }
 
     /**
-     * @param DirectoryIterator $item
+     * @param string $fileName
      * @return bool
      */
-    private function isTransformFile(DirectoryIterator $item): bool
+    private function isTransformFile(string $fileName): bool
     {
-        return strpos($item->getFilename(), '-') !== false;
+        return strpos($fileName, '-') !== false;
     }
 
     /**
-     * @param DirectoryIterator $item
+     * @param string $fileName
      * @return bool
      */
-    private function isVideoTransform(DirectoryIterator $item): bool
+    private function isVideoTransform(string $fileName): bool
     {
-        return in_array($this->getCacheKeyFromFileName($item->getFilename()), self::VIDEO_TRANSFORMS, true);
+        return in_array($this->getCacheKeyFromFileName($fileName), self::VIDEO_TRANSFORMS, true);
     }
 
     /**
-     * @param DirectoryIterator $item
+     * @param string $fileName
      * @return bool
      */
-    private function isValidImageTransformNameFormat(DirectoryIterator $item): bool
+    private function isValidImageTransformNameFormat(string $fileName): bool
     {
-        $cacheKey = $this->getCacheKeyFromFileName($item->getFilename());
+        $cacheKey = $this->getCacheKeyFromFileName($fileName);
         foreach ($this->imageTransforms as $transform) {
             if ($transform->recognisesCacheKey($cacheKey)) {
                 $this->getLogger()->info("Image Transform recognised: '$cacheKey' ({$transform::getSlug()})");
@@ -218,13 +289,10 @@ HELP;
     }
 
     /**
-     * @param DirectoryIterator $item
-     * @return void
+     * @param string $fileName
      */
-    private function deleteRecordFromStorageTransformTable(DirectoryIterator $item): void
+    private function deleteRecordFromStorageTransformTable(string $fileName): void
     {
-        $fileName = $item->getFilename();
-
         $this->deleteStorageTransformDataByHashAndCacheKey(
             $this->extractFileHashOnly($fileName),
             $this->getCacheKeyFromFileName($fileName),
@@ -232,20 +300,26 @@ HELP;
     }
 
     /**
-     * @param DirectoryIterator $item
+     * @param string $relativePath
+     * @param int    $size
      */
-    private function deleteTransformFileFromDisk(DirectoryIterator $item): void
+    private function deleteTransformFileFromDisk(string $relativePath, int $size): void
     {
-        $verb = $this->perform() ? "Deleted" : "Would delete";
-        $this->getLogger()->notice(sprintf("$verb %s from disk.", $item->getFilename()));
+        $fileName = basename($relativePath);
+        $verb     = $this->perform() ? "Deleted" : "Would delete";
+        $this->getLogger()->notice(sprintf("$verb %s from disk.", $fileName));
 
         $this->countOrphanTransformsDeleted++;
-        $this->sizeStorageRecovered += $item->getSize();
+        $this->sizeStorageRecovered += $size;
         if ($this->perform()) {
             try {
-                unlink($item->getPathInfo() . '/' . $item->getFilename());
+                if ($this->isUsingS3()) {
+                    $this->fileSystemAwsS3->delete($relativePath);
+                } else {
+                    unlink($this->storageDir . "/" . $relativePath);
+                }
             } catch (Exception $e) {
-                $this->getLogger()->error("Unable to delete " . $item->getFilename() . "\n" . $e->getMessage());
+                $this->getLogger()->error("Unable to delete " . $fileName . "\n" . $e->getMessage());
             }
         }
     }
@@ -323,13 +397,13 @@ HELP;
     private function deleteStorageTransformDataByHashAndCacheKey(string $hash, string $cacheKey): void
     {
         $verb = $this->perform() ? "Deleted" : "Would delete";
-
+        $this->countStorageTransformRowsDeleted++;
         if ($this->perform()) {
             try {
                 $this->getDatabaseInternal()->executeQuery(
                     "DELETE FROM storage_transform WHERE hash = :hash AND transform = :transform",
                     [
-                        'hash' => $hash,
+                        'hash'      => $hash,
                         'transform' => $cacheKey,
                     ]
                 );
@@ -356,6 +430,7 @@ HELP;
         $this->getLogger()->notice(sprintf("Storage deleted: %s B", number_format($this->sizeStorageRecovered)));
         $this->getLogger()->notice("Count orphan transforms deleted: {$this->countOrphanTransformsDeleted}");
         $this->getLogger()->notice("Count empty dirs deleted: {$this->countEmptyDirectoriesDeleted}");
+        $this->getLogger()->notice("Count storage transform rows deleted: {$this->countStorageTransformRowsDeleted}");
     }
 };
 
