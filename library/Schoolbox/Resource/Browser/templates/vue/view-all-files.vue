@@ -189,6 +189,9 @@ export default {
 .VueTables__table td {
     padding: 0.25rem 0.5rem 0.25rem 0;
     vertical-align: middle;
+    @media (max-width: 700px) {
+        padding: 0.5rem 0.5rem 0 0;
+    }
 }
 
 .date-modified-td {

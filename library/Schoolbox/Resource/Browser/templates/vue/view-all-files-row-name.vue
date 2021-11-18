@@ -46,10 +46,6 @@ export default {
 
 <style lang="scss" scoped>
 
-a {
-    display: inline-block; //don't stretch the link across the whole wide row
-}
-
 h3 {
     font-size: 0.825rem;
     margin-bottom: 0;
