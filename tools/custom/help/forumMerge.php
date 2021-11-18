@@ -31,9 +31,9 @@ $app = new class extends CliTool\App {
     }
 
     /** @inheritdoc */
-    public function getRequiredProcessUser(): ?string
+    public function runAsRoot(): ?bool
     {
-        return 'www-data';
+        return false;
     }
 
 
@@ -75,6 +75,10 @@ HELP;
         $forums = $threadMapper->findByPredicates($predicate);
 
         $count = $forums->count();
+        if ($count === 0){
+            $this->getLogger()->notice("No Forums found to merge");
+            exit;
+        }
         $this->getLogger()->info("Found ${count} Forum(s)");
 
         //loop through threads
