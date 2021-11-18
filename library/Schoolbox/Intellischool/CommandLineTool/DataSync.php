@@ -51,7 +51,7 @@ class DataSync extends \Schoolbox\Application\CliTool\App
         $deploymentSecret = $this->getConfig()->get('intellischool_deployment_secret');
 
         //confirm the api details are set, as it will error out if they are not set.
-        if ($deploymentId === '' || $deploymentSecret === '') {
+        if ($deploymentId === null || $deploymentSecret === null) {
             $this->getLogger()->critical("Deployment ID or Secret is not set. Please set and re run this script.");
             exit(1);
         }
