@@ -200,6 +200,7 @@ export default {
 
     mounted () {
         this.getTableData();
+        this.initFilterListeners();
     },
 
     methods: {
@@ -218,6 +219,26 @@ export default {
             } finally {
                 this.isDataLoaded = true; //update the display to show the list
             }
+        },
+        
+        /**
+         * So we can ensure that rows that are removed through filters are also removed from the selected rows
+         */
+        initFilterListeners () {
+            document.addEventListener(FilterEvents.RESUBMISSION_REQUIRED, () => this.onFilterChanged());
+            document.addEventListener(FilterEvents.MARKING_REQUIRED, () => this.onFilterChanged());
+            document.addEventListener(FilterEvents.REVIEWED, () => this.onFilterChanged());
+        },
+
+        /**
+         * Pull any rows that are no longer visible out of the selected rows
+         */
+        onFilterChanged () {
+            const filteredRowsIds = this.$refs.table.allFilteredData.map((filteredRow) => filteredRow.id); //is the currently visible list of rows, mapped to just the ids
+            const selectedRowsIds = this.selectedRows.map((selectedRow) => selectedRow.id);
+            const rowsToUnselect = selectedRowsIds.filter((selectedRowId) => !filteredRowsIds.includes(selectedRowId)); //filter out any that aren't in the filtered list 
+            this.$refs.table.unselectRows(rowsToUnselect);
+            this.selectedRows = this.selectedRows.filter((selectedRow) => !rowsToUnselect.includes(selectedRow.id));
         },
 
         /**
@@ -425,10 +446,10 @@ export default {
 }
 
 .button-clear {
-    padding: 0px;
     background: none;
-    vertical-align: baseline;
     font-size: 0.8rem;
+    padding: 0px;
+    vertical-align: baseline;
     &:hover {
         background: none;
     }
