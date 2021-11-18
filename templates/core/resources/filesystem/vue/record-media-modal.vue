@@ -2,11 +2,11 @@
 
 /*
  * To record some media, sits within the SB modal window under 'Record'
- *
  */
 
 import RecordMediaModalMenu from './record-media-modal-menu';
 import RecordAudioOnly from '@vue/components/record/record-audio-only';
+import RecordPhoto from '@vue/components/record/record-photo';
 import RecordCamera from '@vue/components/record/record-camera';
 import RecordScreen from '@vue/components/record/record-screen';
 import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
@@ -22,6 +22,7 @@ export default {
     components: {
         RecordMediaModalMenu, //the initial big menu
         RecordAudioOnly,
+        RecordPhoto,
         RecordCamera,
         RecordScreen,
         OverMediaModal //to slot in upload modal
@@ -82,7 +83,6 @@ export default {
 
         /** 
          * ensure no invalid chars are added to the user added filename
-         *
          */
         newFilename (newValue) {
             this.newFilename = newValue.replace(/[\\/:"*?<>|]+/g, "");
@@ -107,7 +107,6 @@ export default {
 
         /**
          * to be able to press enter to save filename
-         *
          */
         initKeyboardListener () {
             document.addEventListener('keyup', (event) => {
@@ -120,7 +119,6 @@ export default {
 
         /**
          * to close up shop for possible re-display
-         *
          */
         initOnModalClosedListener () {
             document.addEventListener('record-media-modal__onModalClosed', () => {
@@ -130,7 +128,6 @@ export default {
 
         /**
          * Set to ensure the container isn't too big
-         *
          */
         initRatios () {
             this.defaultRatio = 0.5625;
@@ -140,7 +137,6 @@ export default {
         /**
          * To set up appropriate initial height on container, typically keeping the same size as a 16:9 video element 
          * unless otherwise set by say, a mobile phone recorded video requested a larger size to fit a portrait recorded video
-         *
          */
         initContainerHeight () {
             window.addEventListener('resize', this.updateContainerHeight);
@@ -151,7 +147,6 @@ export default {
 
         /**
          * Triggered on window resize
-         *
          */
         updateContainerHeight () {
             if (!this.hasClosed) { //won't be available when the modal has been closed
@@ -185,7 +180,7 @@ export default {
         /**
          * To toggle between the different media types
          *
-         * @params {String}
+         * @params { String }
          */
         onRecordMediaTypeSelected (mediaType) {
             this.currentRecordMediaType = mediaType;
@@ -193,7 +188,8 @@ export default {
 
         /**
          * to upload the recorded data
-         *
+         * 
+         * @params { Object }
          */
         onRecordedMediaReady (recordedData) {
             this.recordedData = recordedData;
@@ -202,9 +198,8 @@ export default {
 
         /**
          * recorded media is no longer available
-         *
          */
-        onRecordedMediaDeleted (recordedData) {
+        onRecordedMediaDeleted () {
             this.canUpload = false; //hide the upload button
             if (this.hasDeviceCapture) { //restore the height to a decent amount, especially if was a phone portrait capture
                 this.currentRatio = this.defaultRatio;
@@ -214,7 +209,6 @@ export default {
 
         /**
          * present the save file name modal to name the file
-         *
          */
         onUploadSelected () {
             this.isFilenameModalActive = true;
@@ -225,7 +219,6 @@ export default {
 
         /**
          * close the filename modal
-         *
          */
         onCloseFilenameModalSelected () {
             this.isOverMediaModalClosing = true;
@@ -233,7 +226,6 @@ export default {
 
         /**
          * close the filename modal, cancel has been selected rather than save
-         *
          */
         onFilenameModalClosed () {
             this.isOverMediaModalClosing = false;
@@ -242,7 +234,6 @@ export default {
 
         /**
          * the user has set a file name and selected save
-         *
          */
         async onSaveFilenameSelected () {
             this.isFilenameModalActive = false;
@@ -255,7 +246,6 @@ export default {
 
         /**
          * currently to check for audio only webms
-         *
          */
         checkRecording () {
             if (this.currentRecordMediaType === recordMediaTypes.AUDIO_ONLY && isOfFileType(this.recordedData.name, 'webm')) { //convert if audio/webm to ogg to ensure SB encoder treats as audio only (rather than video)
@@ -265,7 +255,6 @@ export default {
 
         /** 
          * the video is ready, so upload it up to SchoolBox
-         *
          */
         async uploadMediaAndReturnResponse () {
             try {
@@ -352,7 +341,6 @@ export default {
 
         /**
          * close the error modal, animating out
-         *
          */
         onCloseErrorModalSelected () {
             this.isOverMediaModalClosing = true;
@@ -360,7 +348,6 @@ export default {
 
         /**
          * it's closed now, so disable the errors to allow trying again
-         *
          */
         onErrorModalClosed () {
             this.hasUploadError = false;
@@ -379,7 +366,6 @@ export default {
 
         /**
          * revert back to original setting
-         *
          */
         onOverMediaModalClosed () {
             this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
@@ -406,6 +392,16 @@ export default {
                 <record-audio-only
                     v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
                     :record-media-type="recordMediaTypes.AUDIO_ONLY"
+                    @on-recorded-media-ready="onRecordedMediaReady"
+                    @on-recorded-media-deleted="onRecordedMediaDeleted"
+                    @on-resize="onResize"
+                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-closed="onOverMediaModalClosed"
+                />
+                <record-photo
+                    v-else-if="currentRecordMediaType === recordMediaTypes.PHOTO"
+                    :record-media-type="recordMediaTypes.PHOTO"
+                    @on-device-ready="onDeviceReady"
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"

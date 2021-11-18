@@ -10,10 +10,6 @@ import recordMediaEvents from '@js/record-media/recordMediaEvents';
 export default {
     
     props: {
-        isRecording: {
-            type: Boolean,
-            required: true
-        },
         title: {
             type: String,
             required: true
@@ -25,7 +21,12 @@ export default {
         deviceList: {
             type: Array,
             required: true
-        }
+        },
+        isRecording: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
     },
 
     computed: {
