@@ -12,6 +12,7 @@
 namespace Schoolbox\Sync\Iterator;
 
 use IteratorIterator;
+use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User;
 use Traversable;
 
@@ -75,14 +76,14 @@ class Staff extends IteratorIterator
 
         /* Collate every position into a csv string
          */
-        $positionCodes = $this->columnValuesAsCSV($preStack, 'staff_position_code');
-        $positionDescriptions = $this->columnValuesAsCSV($preStack, 'staff_position');
+        $positionCodes = $this->columnValuesAsArray($preStack, 'staff_position_code');
+        $positionDescriptions = $this->columnValuesAsArray($preStack, 'staff_position');
 
         /* Position - csv strings for multiple positions
          */
         $staff->getMeta()->getPosition()
-            ->setCode($positionCodes)
-            ->setDescription($positionDescriptions);
+            ->setCode(new Collection($positionCodes))
+            ->setDescription(new Collection($positionDescriptions));
 
         /* Campus
          */

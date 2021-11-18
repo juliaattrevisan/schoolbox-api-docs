@@ -190,8 +190,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                         $context['new data'][$property] = $value;
                     } else {
                         if (is_array($value)) {
-                            // not a collection, so we can only accept one value: take the first one
-                            $value = reset($value);
+                            $value = implode(',', $value);
                         }
                         // ensure lack of whitespace
                         $value = trim($value);
@@ -258,7 +257,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
     /**
      * @return Rule[]
      */
-    function getRulesBySequence()
+    public function getRulesBySequence()
     {
         $all = [];
 
