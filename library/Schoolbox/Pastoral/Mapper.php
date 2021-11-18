@@ -86,7 +86,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseMulti('pastoral_id', PastoralAccessMapper::class, 'access', 'access');
         $this->joinsReverseMulti('pastoral_id', PastoralCommentMapper::class, 'comments', 'comments');
         $this->joinsReverseMulti('pastoral_id', PastoralAttachmentMapper::class, 'attachments', 'attachments');
-        $this->joinsVia('pastoral_tags', PastoralTagMapper::class, 'id', 'tag_id', 'pastoral_id', null, null, null, 'tags');
+        $this->joinsReverseMulti('pastoral_id', PastoralTagMapper::class, 'tags', 'tags');
         $this->joinsVia('pastoral_record_action', PastoralActionMapper::class, 'id', 'action_id', 'pastoral_id', null, null, null, 'actions');
         $this->joinsReverseMulti('root_id', PastoralRevisionMapper::class, 'revisions', 'revisions');
 
@@ -157,9 +157,7 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('owner', 'o')},
                         {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('modifiedBy', 'mb')},
-                        {$this->getJoinColumnString('subtype', 'c')},
-                        {$this->getJoinColumnString('pastoral_record_action', 'a')},
-                        {$this->getJoinColumnString('pastoral_tags', 'tg')}
+                        {$this->getJoinColumnString('subtype', 'c')}
         ";
     }
 
@@ -179,8 +177,6 @@ class Mapper extends BaseMapper
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
             INNER JOIN   {$this->getJoinSql('type', '', 't', true)}
             LEFT  JOIN   {$this->getJoinSql('subtype', '', 'c', true)}
-            LEFT  JOIN   {$this->getJoinSql('pastoral_record_action', '', 'a')}
-            LEFT  JOIN   {$this->getJoinSql('pastoral_tags', '', 'tg')}
         ";
     }
 
@@ -288,17 +284,8 @@ class Mapper extends BaseMapper
             $model->setBodyPublic("");
         }
 
-        /** @var \Schoolbox\Pastoral\Tag\Model|null $tag */
-        $tag = $this->hydrateJoin($row, 'pastoral_tags', 'tg');
-        if ($tag && !$model->getTags()->offsetExists($tag->getId())) {
-            $model->getTags()->offsetSet($tag->getId(), $tag);
-        }
-
-        /** @var \Schoolbox\Pastoral\Action\Model|null $action */
-        $action = $this->hydrateJoin($row, 'pastoral_record_action', 'a');
-        if ($action && !$model->getActions()->offsetExists($action->getId())) {
-            $model->getActions()->offsetSet($action->getId(), $action);
-        }
+        $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
+        $model->setActions(PastoralActionMapper::getInstance()->findForRecord($model));
 
         $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId(), [
             'order' => [
