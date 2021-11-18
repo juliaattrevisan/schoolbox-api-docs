@@ -75,7 +75,7 @@ HELP;
         $forums = $threadMapper->findByPredicates($predicate);
 
         $count = $forums->count();
-        if ($count === 0){
+        if ($count === 0) {
             $this->getLogger()->notice("No Forums found to merge");
             exit;
         }
