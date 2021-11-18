@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
@@ -26,6 +29,20 @@ class Controller extends AbstractController
      * @var Resource\LinkMapper
      */
     protected $linkMapper;
+
+    /**
+     * @var IConnector
+     */
+    protected $database;
+
+    /**
+     * Constructor, just using this for the showAll files and FilesBuilder class
+     * @param IConnector $database
+     */
+    public function __construct(IConnector $database)
+    {
+        $this->database = $database;
+    }
 
     // Injectables
 
@@ -73,6 +90,71 @@ class Controller extends AbstractController
         ]);
     }
 
+    /**
+     * GUI display of files within a files component source
+     * @api GET /folder/:componentID/files/:sourceFolderID
+     *
+     * @param int $componentID
+     * @param int $sourceFolderID
+     * @throws Mapper\Exception\NotFound
+     * @throws Mapper\Exception
+     */
+    public function showFiles(int $componentID, int $sourceFolderID)
+    {
+        $filesBuilder = new FilesBuilder($this->database);
+        $folderMapper = Folder\Mapper::getInstance();
+        $homepage_id = $filesBuilder->getHomepage($componentID);
+        $homepage = $folderMapper->findById($homepage_id);
+
+        //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
+        $accessSource = $this->getAccess($sourceFolderID);
+        $accessHome = $this->getAccess($homepage_id);
+
+        // special case for root, just let that through to the keeper
+        if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        }
+
+        //check if user has edit perms on source folder
+        $canEdit = ($accessSource >= UserAccess::ACCESS_WRITE);
+
+        //lets get the config for the component
+        $componentConfig = $filesBuilder->getComponentConf($componentID, $homepage_id);
+
+        //grab all files for component folder
+        $files = $filesBuilder->getFolderData($componentConfig['src']['value'], $accessHome);
+
+        //build the filter object
+        //weird magic, from the file list component.
+        $filterFields       = ['document', 'audio', 'video', 'image', 'other'];
+        $filter             = [];
+        $countFilterFields  = count($filterFields);
+        for ($i = 0; $i < $countFilterFields; $i++) {
+            $j = $componentConfig['filter']['value'] % 2;
+            if ($j) {
+                $filter[] = $filterFields[$i];
+            }
+            $componentConfig['filter']['value'] = (int)$componentConfig['filter']['value'] / 2;
+        }
+
+        //just dump the lot to the page for front end use.
+        //output results
+        $this->getResponse()->content->set([
+           'template'   => '@resourceBrowser/viewAll.twig',
+           'title'      => $componentConfig['componentname']['value'],
+           'data'       => [
+                    'canEdit'                   => $canEdit,
+                    'homepage'                  => $homepage,
+                    'filter'                    => $filter,
+                    'files'                     => $files,
+                    'title'                     => $componentConfig['componentname']['value'],
+                    'componentInstanceConfig'   => $componentConfig,
+                    'componentID'               => $componentID,
+                    'sourceFolderID'            => $sourceFolderID,
+                    'componentFolderId'         => $homepage_id,
+           ],
+        ]);
+    }
 
     /**
      * @param int $folderId

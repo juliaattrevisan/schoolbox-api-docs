@@ -103,14 +103,16 @@
                         <!-- END files -->
                     </ul>
                 </article>
-                <!-- BEGIN component_action -->
+
                 <div class="component-action">
                     <section>
+                        <!-- BEGIN component_action -->
                         <p><a href="/cms/file/new/{FILE_CAT_ID}">Select a file</a> or drag and drop multiple onto this component</p>
-                        <a href="/resources/{FILE_CAT_ID}" class="button">View All Files</a>
+                        <!-- END component_action -->
+                        <a href="/resources/folder/{COMPONENT_INSTANCE_ID}/files/{FILE_CAT_ID}" class="button">View All Files</a>
                     </section>
                 </div>
-                <!-- END component_action -->
+
                 <!-- END source_folder_exists -->
             </section>
             <!-- END has_file -->
