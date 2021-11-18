@@ -19,6 +19,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Url\Factory;
 
 class Controller extends ConfigController
 {
@@ -72,16 +73,20 @@ class Controller extends ConfigController
             $this->router->generate('adminLti.postConfig')
         );
 
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
         $this->getResponse()->content->set(
             [
                 'template' => '@adminLti/index.twig',
                 'data'     => [
-                    'pageCurrent'          => $this->router->generate('adminLti.getIndex'),
-                    'allBreadcrumbs'       => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
-                    'providers'            => $this->providerMapper->findAll(),
-                    'providerLtiVersion11' => Provider::LTI_VERSION_1_1,
-                    'providerLtiVersion13' => Provider::LTI_VERSION_1_3,
-                    'configContext'        => $configContext,
+                    'pageCurrent'           => $this->router->generate('adminLti.getIndex'),
+                    'allBreadcrumbs'        => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
+                    'providers'             => $this->providerMapper->findAll(),
+                    'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
+                    'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
+                    'configContext'         => $configContext,
+                    'oidcAuthenticationUrl' => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOidcAuthenticationRequest')),
+                    'oauthAccessTokenUrl'   => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOauthAccessTokenRequest')),
+                    'jsonWebKeySetUrl'      => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getJsonWebKeySet')),
                 ],
             ]
         );
@@ -138,10 +143,10 @@ class Controller extends ConfigController
             $provider = $this->providerMapper->findById($post['id']);
         } else {
             $provider = new Provider();
+            $provider->setLtiVersion($post['lti_version']);
         }
 
         $provider->setName($post['name']);
-        $provider->setLtiVersion($post['lti_version']);
 
         // LTI 1.3 fields
         $provider = $provider

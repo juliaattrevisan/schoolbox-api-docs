@@ -1,24 +1,23 @@
 <div class="actions-small-2" data-provider>
     <div class="list-item">
         <div class="card small-12" data-provider-infocard>
-            <h3>{{ provider.name ?? '' }}</h3>
-            <p class="meta">
-                {% if provider.isLtiVersion11 ?? false %}
-                    {% if provider.url is empty %}
-                        <span class="gradient-0">Provider Disabled - No Launch URL detected</span>
-                    {% else %}
-                        {{ provider.url ?? ''}}
-                    {% endif %}
+            <h3>
+                {{ provider.name ?? '' }}
+                {% if provider.isLtiVersion11 ?? false and provider.url is empty %}
+                    <span class="label alert">Provider Disabled - No Launch URL detected</span>
                 {% endif %}
-            </p>
+            </h3>
         </div>
     </div>
     <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="provider-{{ identifier }}">
         {% include '@adminLti/form.twig' with {
-            provider: provider,
-            providerLtiVersion11: providerLtiVersion11,
-            providerLtiVersion13: providerLtiVersion13,
-            identifier: identifier,
+            provider:              provider,
+            providerLtiVersion11:  providerLtiVersion11,
+            providerLtiVersion13:  providerLtiVersion13,
+            identifier:            identifier,
+            oidcAuthenticationUrl: oidcAuthenticationUrl,
+            oauthAccessTokenUrl:   oauthAccessTokenUrl,
+            jsonWebKeySetUrl:      jsonWebKeySetUrl,
         } only %}
     </div>
     <nav>
