@@ -498,6 +498,7 @@ BASE;
 
                 // Merge the intermediary PDFs together, then delete them
                 $request = new Gotenberg\MergeRequest($files);
+                $request->addWebhookURLHTTPHeader('SBAuth', $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
                 $pdfGenerator->store($request, $filename);
                 foreach ($files as $file) {
                     unlink($tempDir . '/' . $file->getFileName());
