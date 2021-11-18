@@ -47,11 +47,15 @@ class DataSync extends \Schoolbox\Application\CliTool\App
         $this->setMaxExecutionTime($timeout);
 
         //setup intellischool
-        $deploymentId = $this->getConfig()->get('');
-        $deploymentId = $this->getConfig()->get('');
+        $deploymentId = $this->getConfig()->get('intellischool_deployment_id');
+        $deploymentSecret = $this->getConfig()->get('intellischool_deployment_secret');
 
-        $handler = \Intellischool\SyncHandler::createWithIdAndSecret('deployment_id', 'deployment_secret');
-        $handler = \Intellischool\SyncHandler::createWithOAuth2('$tokenStore', 'your_client_id', 'your_client_secret');
+        //confirm the api details are set, as it will error out if they are not set.
+        if ($deploymentId === '' || $deploymentSecret === '') {
+            $this->getLogger()->critical("Deployment ID or Secret is not set. Please set and re run this script.");
+            exit(1);
+        }
+        $handler = \Intellischool\SyncHandler::createWithIdAndSecret($deploymentId, $deploymentSecret);
 
         $handler->setLogger($this->getLogger());
 
@@ -59,9 +63,8 @@ class DataSync extends \Schoolbox\Application\CliTool\App
         try {
             $handler->doSync();
         } catch (\Exception $e) {
-            $this->getLogger()->critical("It all failed, or just something...", ['message' => $e->getMessage()]);
+            $this->getLogger()->critical($e->getMessage());
         }
-        //do something with the sync
     }
 
     /** @inheritDoc */
@@ -69,6 +72,7 @@ class DataSync extends \Schoolbox\Application\CliTool\App
     {
         return [
             'help',
+            'timeout',
         ];
     }
 
@@ -79,11 +83,10 @@ class DataSync extends \Schoolbox\Application\CliTool\App
     {
         $timeOut           = self::DEFAULT_TIMEOUT;
         echo <<<HELP
-Upload eligible documents into Kami.
+Intellischools server data sync
 
-Usage: upload.php -v[vv] [--perform] [--timeout=21600]
+Usage: dataSync.php -v[vv] [--timeout=21600]
     -v:                  Verbosity level, -vvv: most verbose
-    --perform:           If set, use the prod Kami API and execute real actions (otherwise run in dry-run mode)
     --timeout            Number of seconds after which a pending upload will be assumed failed
                          Defaults to {$timeOut} (6 hrs).
 
