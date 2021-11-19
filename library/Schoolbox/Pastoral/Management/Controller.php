@@ -13,6 +13,7 @@ use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -99,6 +100,7 @@ class Controller extends Base
                 'data'     => [
                     'group'               => $group,
                     'roles'               => $roles,
+                    'moderatorIds'        => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                     'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
                 ],
                 'title'    => 'Update Pastoral Group',

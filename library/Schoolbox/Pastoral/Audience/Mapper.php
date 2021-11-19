@@ -180,6 +180,9 @@ class Mapper extends BaseMapper
     public function getPermissionCallback(): Closure
     {
         return static function (Model $model) {
+            if ($model->getUser() && $model->getUser()->isStaffWithPastoralAccess()) {
+                return true;
+            }
             $role = $model->getRole() ?: ($model->getUser() ? $model->getUser()->getRole() : null);
             if ($role) {
                 return !in_array(Role::PERMISSION_ACCESS_PASTORAL, Role::VALID_PERMISSIONS[$role->getType()]) || $role->getAccessPastoral();

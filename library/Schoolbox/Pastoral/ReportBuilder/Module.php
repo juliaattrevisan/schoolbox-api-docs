@@ -9,6 +9,7 @@
 namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -20,6 +21,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -37,7 +39,17 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $permissionStaff       = new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF);
+        $permissionStaff =
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
+                    new Rule\All(
+                        new Rule\HasRole(Role::STAFF),
+                        new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                    )
+                )
+            );
         $permissionReportOwner = new Rule\All(new IsReportOwner(), $permissionStaff);
 
         $this->registerRoutesArray([
