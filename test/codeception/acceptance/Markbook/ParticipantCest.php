@@ -35,16 +35,6 @@ class ParticipantCest
         // TODO: Delete something already in markbook
     }
 
-//    /**
-//     * Clean up after every test
-//     *
-//     * @param AcceptanceTester $i
-//     */
-//    public function _after(AcceptanceTester $i)
-//    {
-//        $i->logout();
-//    }
-
     /**
      * @param AcceptanceTester $i
      * @throws Exception
@@ -52,7 +42,6 @@ class ParticipantCest
     public function testMarkbookBasic(AcceptanceTester $i)
     {
 
-        $className = Common::CLASS_CHEMISTRY_1_3;
         $classId = Common::CLASS_ID_CHEMISTRY_1_3;
         $student = Common::USER_RACHEL;
         $studentId = Common::USER_ID_RACHEL;
@@ -87,9 +76,6 @@ class ParticipantCest
         // open markbook
         $markbookPage = new MarkbookPage($i);
         $markbookPage->open($classId);
-        $i->click('li[data-component="12"]');
-        $i->click('label[for="filter_selection_12_1"]');
-        $i->click('input#submit_button');
 
         // check the existence
         $markbookPage->canSeeParticipant($teacher);
@@ -109,9 +95,6 @@ class ParticipantCest
 
         // open course mark book
         $markbookPage->open($classId);
-        $i->click('li[data-component="12"]');
-//        $i->click('label[for="filter_selection_12_1"]');
-//        $i->click('input#submit_button');
 
         // check the existence
         $markbookPage->canSeeAssessment($dueworkTitle1);
@@ -119,30 +102,26 @@ class ParticipantCest
         $markbookPage->cantSeeParticipant($teacher);
         // student should remain
         $markbookPage->canSeeParticipant($student);
+        // exclude the user from the duework
+        $i->click($dueworkTitle1);
+        $i->waitForText('Status of ' . $dueworkTitle1);
 
-//        // exclude the user from the duework
-//        $i->click($dueworkTitle1);
-//        $i->waitForText('Status of ' . $dueworkTitle1);
-//
-//        // exclude the user from the task
-//        $i->click(StatusPage::LINK_JELLY_TOT);
-//        $i->click(StatusPage::LINK_MODIFY);
-//
-//        // remove Rachel from participants
-//        $dueworkForm->modifyParticipation($studentId, false, false)
-//            ->update();
-//
-//        // open course mark book
-//        $markbookPage->open($classId);
-//        $i->click('li[data-component="12"]');
-//        $i->click('label[for="filter_selection_12_1"]');
-//        $i->click('input#submit_button');
-//
-//        // check the existence
-//        $markbookPage->canSeeAssessment($dueworkTitle1);
-//        // teacher should disappear
-//        $markbookPage->cantSeeParticipant($teacher);
-//        // student should remain
-//        $markbookPage->canSeeParticipant($student);
+        // exclude the user from the task
+        $i->click(StatusPage::LINK_JELLY_TOT);
+        $i->click(StatusPage::LINK_MODIFY);
+
+        // remove Rachel from participants
+        $dueworkForm->modifyParticipation($studentId, false, false)
+            ->update();
+
+        // open course mark book
+        $markbookPage->open($classId);
+
+        // check the existence
+        $markbookPage->canSeeAssessment($dueworkTitle1);
+        // teacher should disappear
+        $markbookPage->cantSeeParticipant($teacher);
+        // student should remain
+        $markbookPage->canSeeParticipant($student);
     }
 }

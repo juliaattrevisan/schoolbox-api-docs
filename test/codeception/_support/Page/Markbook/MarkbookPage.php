@@ -62,6 +62,16 @@ class MarkbookPage
         // Markbook
         $i->click('#tab-control a.icon-curriculum');
         $i->waitForElement('div[data-loaded="1"]');
+        $i->click('li[data-component="12"]');
+        $i->waitForElement('label[for="filter_selection_12_1"]');
+        $i->click('label[for="filter_selection_12_1"]');
+        sleep(1);
+        $i->click('li[data-component="10"]');
+        $i->waitForElement('label[for="filter_selection_10_open"]');
+        $i->click('label[for="filter_selection_10_open"]');
+        $i->click('li[data-component="10"]');
+        sleep(1);
+        $i->click('input#submit_button');
         return $this;
     }
 
@@ -92,7 +102,7 @@ class MarkbookPage
         $this->tester->cantSee(self::surnameFirst($name), self::REPORT_CONTENT);
     }
 
-    private static function surnameFirst($fullname)
+    private static function surnameFirst($fullname): string
     {
         $name = str_replace(['Mr ', 'Mrs '], '', $fullname);
         $parts = explode(' ', $name);
