@@ -14,10 +14,10 @@ use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
-use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
@@ -42,45 +42,35 @@ class Provisioner
      *
      * @var Ruleset\Factory
      */
-    protected $rulesetFactory;
+    protected Ruleset\Factory $rulesetFactory;
 
     /**
      * A grammar factory - this is used for building the actual hydratable ruleset object.
      *
      * TODO: we shouldn't need both this and $rulesetFactory
-     *
-     * @var Grammar\Factory
      */
-    protected $grammarFactory;
+    protected Grammar\Factory $grammarFactory;
 
     /**
      * A connection to an external database - retrieves users from the external DB.
-     *
-     * @var ISync
      */
-    protected $externalUserSource;
+    protected ISync $externalUserSource;
 
     /**
      * A user mapper - this retrieves user's initial states, and saves them.
-     *
-     * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * A user access mapper - this retrieves the permissions that an existing
      * user has on groups.
-     *
-     * @var UserAccessMapper
      */
-    protected $userAccessMapper;
+    protected UserAccessMapper $userAccessMapper;
 
     /**
      * A logger
-     *
-     * @var LoggerInterface
      */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /**
      * The order in which syncs are to be run.
@@ -88,16 +78,14 @@ class Provisioner
      * The only current requirement is that parents run after students, so that
      * parents may be attached to all their children's campuses.
      *
-     * @var array
+     * @var array<string>
      */
-    protected $runOrder = [Role::STUDENT, Role::STAFF, Role::PARENT,];
+    protected array $runOrder = [Role::STUDENT, Role::STAFF, Role::PARENT,];
 
     /**
-     * A mapper the the logger
-     *
-     * @var Log\Mapper
+     * A mapper for the logger
      */
-    private $logMapper;
+    private Log\Mapper $logMapper;
 
     /**
      * Caches new user's usernames so we can detect multi new users
@@ -105,22 +93,19 @@ class Provisioner
      *
      * Maps 'username' => 'externalId'
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected $newUsernameCache = [];
-
+    protected array $newUsernameCache = [];
 
     /**
-     * @var Folder\Mapper
+     * A mapper for folders.
      */
-    private $folderMapper;
-
+    private Folder\Mapper $folderMapper;
 
     /**
-     * @var Loader
+     * Configuration
      */
-    private $config;
-
+    private IConfigLoader $config;
 
     /**
      * Constructor
@@ -133,7 +118,7 @@ class Provisioner
      * @param Log\Mapper               $logMapper
      * @param UserAccessMapper         $userAccessMapper
      * @param Folder\Mapper            $folderMapper
-     * @param Loader                   $config
+     * @param IConfigLoader            $config
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
@@ -144,7 +129,7 @@ class Provisioner
         Log\Mapper $logMapper,
         UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
-        Loader $config
+        IConfigLoader $config
     ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
