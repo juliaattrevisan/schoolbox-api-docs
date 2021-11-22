@@ -329,6 +329,9 @@ class Controller extends Base
             new FirebasePhpJwt(null, $sessionLength)
         );
 
+        // Try two different token parsers:
+        // * One for the configured oAuth identity provider
+        // * One for Schoolbox itself as the identity provider
         $tokenParser = new TokenParser(
             $this->userMapper,
             $jwtVerifierFactory->build(
