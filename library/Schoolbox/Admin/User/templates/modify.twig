@@ -147,6 +147,7 @@
                                                type="text"
                                                class="required"
                                                name="modusername"
+                                               maxlength="255"
                                                {% if isSchoolboxAdmin %}readonly title="This user's username may not be changed"{% endif %}
                                                value="{{ user.username }}" />
                                     </div>
