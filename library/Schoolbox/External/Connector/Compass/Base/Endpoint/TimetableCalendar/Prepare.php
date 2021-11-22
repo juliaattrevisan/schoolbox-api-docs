@@ -82,18 +82,23 @@ class Prepare implements IStrategy
     public function import(): void
     {
         if ($this->perform) {
-            /* All the eventIds that came from the compass importer
-             */
-            $eventIds = $this->eventSourceMapper->findEventIdsUsingSource(self::EVENT_IMPORT_IDENTIFIER);
-
             $queries = [];
+
+            /* Mark events for deletion to avoid a mega where-in clause
+             */
+            $queries['Event Primer'] = "
+                UPDATE `event` e
+                INNER JOIN event_source s on e.id = s.event_id
+                SET e.updated_at = '0000-00-00 00:00:00'
+                WHERE s.source_name = :sourceName
+            ";
 
             /* Avoid using the eventSourceMapper to delete things via objects etc.
              * It is super super slow for heaps of events, such as a huge compass import
              *
              * Just assassinate them directly
              */
-            $queries['event_attendance'] = '
+            $queries['Event Attendance Relations'] = '
                 DELETE a
                 FROM `event` e
                 INNER JOIN event_attendance a ON a.event_id = e.id
@@ -101,7 +106,7 @@ class Prepare implements IStrategy
                 WHERE s.source_name = :sourceName                 
             ';
 
-            $queries['event_campus'] = '
+            $queries['Event Campus Relations'] = '
                 DELETE c
                 FROM `event` e
                 INNER JOIN event_campus c ON c.event_id = e.id
@@ -109,7 +114,7 @@ class Prepare implements IStrategy
                 WHERE s.source_name = :sourceName                 
             ';
 
-            $queries['event_folder'] = '
+            $queries['Event Folder Relations'] = '
                 DELETE f
                 FROM `event` e
                 INNER JOIN event_folder f ON f.event_id = e.id
@@ -117,7 +122,7 @@ class Prepare implements IStrategy
                 WHERE s.source_name = :sourceName                 
             ';
 
-            $queries['event_role'] = '
+            $queries['Event Role Relations'] = '
                 DELETE r
                 FROM `event` e
                 INNER JOIN event_role r ON r.event_id = e.id
@@ -125,7 +130,7 @@ class Prepare implements IStrategy
                 WHERE s.source_name = :sourceName                 
             ';
 
-            $queries['event_user'] = '
+            $queries['Event User Relations'] = '
                 DELETE u
                 FROM `event` e
                 INNER JOIN event_user u ON u.event_id = e.id
@@ -133,10 +138,15 @@ class Prepare implements IStrategy
                 WHERE s.source_name = :sourceName                 
             ';
 
-            $queries['event_source'] = '
+            $queries['Event Source'] = '
                 DELETE FROM event_source
                 WHERE source_name = :sourceName
             ';
+
+            $queries['Event Detonator'] = "
+                DELETE FROM event
+                WHERE updated_at = '0000-00-00 00:00:00'
+            ";
 
             $this->log->debug(sprintf(
                 'Beginning the great purge of existing events/relations that used event_source: %s',
@@ -161,25 +171,6 @@ class Prepare implements IStrategy
                 ]);
 
                 $this->log->debug('Done.');
-            }
-
-            /* Delete the events themselves
-             */
-            if (\count($eventIds)) {
-                $this->log->debug(sprintf(
-                    'Deleting events that used event_source: %s',
-                    self::EVENT_IMPORT_IDENTIFIER
-                ));
-
-                $ids = implode(',', $eventIds);
-
-                $query = "
-                    DELETE FROM event
-                    WHERE id IN ($ids)
-                ";
-
-                $statement = $this->eventMapper->getDatabase()->prepare($query);
-                $statement->execute();
             }
 
             $this->log->info(sprintf(
