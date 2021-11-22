@@ -26,7 +26,7 @@ export function animateBadgeImage (badgeImage) {
 /**
  * Ensure there's no left over animation if user is moving through the new rewards quickly
  */
-function clearCanvas () {
+export function clearCanvas () {
     const canvasDimensions = getCanvasDimensions();
     const context = getContext();
     context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
