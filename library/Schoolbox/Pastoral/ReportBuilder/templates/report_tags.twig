@@ -78,17 +78,6 @@
                                     {{ record.bodyPublic | purify }}
                                 {% endif %}
 
-                                {# Show any file attachments #}
-                                {% if record.attachments | length %}
-                                    <p class="spaced meta">
-                                        {% for attachment in record.attachments %}
-                                            <a target="_blank"
-                                               href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}">{{ attachment.realname }}</a>
-                                            <br>
-                                        {% endfor %}
-                                    </p>
-                                {% endif %}
-
                                 {% if record.points != 0 or (record.tags | length) > 0 %}
                                     <p class="spaced">
                                         {% if record.points != 0 %}
