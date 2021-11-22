@@ -16,7 +16,6 @@ use Schoolbox\Video\ResourceVideo;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     use AwsS3AppTrait;
 
     public const LOCK_NAME = 'transform_cleanup';
