@@ -14,6 +14,8 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model
 {
+    use ModelTrait\CreatedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -32,7 +34,6 @@ class Model
     /** @var int */
     protected $usersSkipped;
 
-    use ModelTrait\CreatedAtDate;
 
     /** @var Storage\Model */
     protected $storage;
