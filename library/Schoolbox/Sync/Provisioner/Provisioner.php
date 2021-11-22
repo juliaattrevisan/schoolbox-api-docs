@@ -195,8 +195,6 @@ class Provisioner
             if ($ruleset->getConfig()->getEnabled() || $roleType === $forRoleType) {
                 $this->logger->info("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
 
-                $created = $updated = $skipped = $errors = 0;
-
                 try {
                     $externalUsers = $this->getAllExternalUsers($roleType);
                 } catch (\Exception $e) {
@@ -210,8 +208,7 @@ class Provisioner
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {
                         $this->logger->error("Cannot process user: User must have an External ID");
-                        ++$skipped;
-                        ++$errors;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
 
@@ -265,13 +262,11 @@ class Provisioner
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
                         $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
-                        ++$skipped;
                         $this->currentRun->incrementUsersSkipped();
                         continue;
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
                         $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
-                        ++$skipped;
                         $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
@@ -408,7 +403,6 @@ class Provisioner
                                 );
                             }
                         }
-                        ++$skipped;
                         $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
@@ -428,26 +422,29 @@ class Provisioner
                         $this->logger->log($level, $message, $context);
 
                         if ($action === 'update') {
-                            ++$updated;
                             $this->currentRun->incrementUsersUpdated();
                         } else {
-                            ++$created;
                             $this->currentRun->incrementUsersCreated();
                         }
                     } catch (UnexpectedValueException $e) {
                         $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
-                        ++$skipped;
                         $this->currentRun->incrementUsersSkipped();
                         continue;
                     } catch (\Exception $e) {
                         $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
-                        ++$skipped;
                         $this->currentRun->incrementUsersSkipped();
                     }
                 }
 
                 // end of a strat - save the result
-                $this->logger->info("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
+                $this->logger->info(
+                    sprintf(
+                        "SUMMARY: %d users created, %d users updated, %d users skipped",
+                        $this->currentRun->getUsersCreated(),
+                        $this->currentRun->getUsersUpdated(),
+                        $this->currentRun->getUsersSkipped(),
+                    )
+                );
                 $this->logMapper->flush($this->logger, $this->currentRun);
             }
         }
@@ -479,12 +476,9 @@ class Provisioner
         }
         $this->logger->alert($message);
 
-        // Can only flush the log if there's an actual roletype to flush for
+        // Can only flush the log if there's a run to flush
         if (isset($this->currentRun)) {
-            $this->logMapper->flush(
-                $this->logger,
-                $this->currentRun,
-            );
+            $this->logMapper->flush($this->logger, $this->currentRun);
         }
     }
 
