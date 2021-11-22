@@ -18,7 +18,7 @@
 {# If the similarity report policy vars allow you to see further,
  # try and figure out which tool to use: turnitin, plag, or neither
  #}
-{% if turnitinApiEnabled and currentFile.turnitin is defined %}
+{% if turnitinApiEnabled and currentFile.turnitin %}
     {# If the turnitin api was configured then assume we're using that
      # instead of plag (mutually exclusive)
      #}
