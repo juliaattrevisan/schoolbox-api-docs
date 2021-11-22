@@ -172,7 +172,7 @@ HELP;
                 continue;
             }
             $this->deleteRecordFromStorageTransformTable($fileName);
-            $this->deleteTransformFileFromDisk($fileName, $this->fileSystemAwsS3->getSize($path));
+            $this->deleteTransformFileFromDisk($path, $this->fileSystemAwsS3->getSize($path));
         }
     }
 
@@ -348,8 +348,13 @@ HELP;
             if ($this->perform()) {
                 rmdir($item->getRealPath());
             }
-            $this->countEmptyDirectoriesDeleted++;
-            $this->sizeStorageRecovered += $item->getSize();
+
+            try {
+                $this->countEmptyDirectoriesDeleted++;
+                $this->sizeStorageRecovered += $item->getSize();
+            } catch (Exception $e) {
+                // noop
+            }
         } else {
             $this->getLogger()->debug("Retaining non-empty dir: {$item->getRealPath()}");
         }
