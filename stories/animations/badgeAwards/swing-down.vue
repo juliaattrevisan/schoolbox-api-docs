@@ -55,7 +55,7 @@ export default {
                 <canvas :width="canvasWidth" :height="canvasHeight" data-badge-award-canvas></canvas>
             </div>
             <div class="badge-img-container__foreground">
-                <img src="/badge-award-sample.svg" ref="badgeImage" alt="badge sample" />
+                <img src="../../assets/badge-award-sample.svg" ref="badgeImage" alt="badge sample" />
             </div>
         </div>
         <button @click="animateBadgeImage" @keyup.enter="animateBadgeImage">Replay</button>

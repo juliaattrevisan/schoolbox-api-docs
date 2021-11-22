@@ -1,6 +1,6 @@
 {
   "name": "schoolbox",
-  "version": "21.0.0",
+  "version": "21.1.0",
   "author": "Schoolbox Pty Ltd",
   "description": "Schoolbox LMS",
   "dependencies": {
@@ -91,7 +91,6 @@
     "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch --watch-poll=1000",
     "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production",
     "storybook": "start-storybook -s ./stories/assets -p 6006",
-    "build-storybook": "build-storybook",
-    "chromatic": "npx chromatic --project-token=94dbc3b9c383"
+    "build-storybook": "build-storybook"
   }
 }

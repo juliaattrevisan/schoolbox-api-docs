@@ -23,3 +23,6 @@ const Template = (args, { argTypes }) => ({
 });
 
 export const Default = Template.bind({});
+Default.parameters = {
+    controls: { hideNoControlsWarning: true },
+};
