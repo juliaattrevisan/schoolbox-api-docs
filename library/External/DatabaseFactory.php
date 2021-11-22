@@ -7,6 +7,7 @@
  */
 
 use External\IConnector;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -151,7 +152,11 @@ class External_DatabaseFactory
      */
     public function buildMarkbookConnector(IConfigLoader $config): External_MarkbookInterface
     {
-        if ($this->isEnabled($config) && $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
+        if (
+            $this->isEnabled($config) &&
+            $config->get(ConfigMapper::NAME_EXTERNAL_MARKBOOK) &&
+            $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC
+        ) {
             try {
                 return new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'));
             } catch (Alaress\Database\Exception $e) {
