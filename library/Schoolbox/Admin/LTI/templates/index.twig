@@ -13,11 +13,11 @@
             <div class="row actions-small-1">
                 <div class="list-item">
                     <div class="small-12 island">
-                        <h2 class="subheader">LTI Providers</h2>
+                        <h2 class="subheader">LTI Tools</h2>
                     </div>
                 </div>
                 <nav>
-                    <a href="#" data-reveal-id="addProviderModal" class="icon-add" title="Add LTI Provider"></a>
+                    <a href="#" data-reveal-id="addProviderModal" class="icon-add" title="Add LTI Tool"></a>
                 </nav>
             </div>
             {% for provider in providers %}
@@ -37,7 +37,7 @@
             {% if providers is empty %}
                 <div class="empty-state">
                     <i class="icon-lti"></i>
-                    <p>You have no LTI Providers currently installed. Start by <a href="#" data-reveal-id="addProviderModal">adding your first provider</a>.</p>
+                    <p>You have no LTI Tools currently installed. Start by <a href="#" data-reveal-id="addProviderModal">adding your first tool</a>.</p>
                 </div>
             {% endif %}
         </div>
@@ -45,7 +45,7 @@
 </div>
 
 <div id="addProviderModal" class="reveal-modal" data-reveal aria-labelledby="addProviderModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="addProviderModalTitle">Add Provider</h2>
+    <h2 id="addProviderModalTitle">Add Tools</h2>
     {% include '@adminLti/form.twig' with {
         providerLtiVersion11:  providerLtiVersion11,
         providerLtiVersion13:  providerLtiVersion13,
