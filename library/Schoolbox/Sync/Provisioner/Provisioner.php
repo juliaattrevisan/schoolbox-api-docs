@@ -28,6 +28,7 @@ use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
+use Throwable;
 use UnexpectedValueException;
 
 /**
@@ -108,6 +109,21 @@ class Provisioner
     private IConfigLoader $config;
 
     /**
+     * Which role type is _currently_ being provisioned, if any?
+     *
+     * Required so `onInterrupt` knows which role type to write the log for.
+     */
+    private ?string $currentRoleType = null;
+
+    /**
+     * Is the currently running provision performing an update or not?
+     *
+     * @var bool|null true: update, false: dry run, null: unknown or no running
+     *                provision
+     */
+    private ?bool $currentPerformUpdate = null;
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory          $rulesetFactory
@@ -166,20 +182,24 @@ class Provisioner
      */
     public function run($update = false, $forRoleType = null)
     {
+        $this->currentRoleType      = null;
+        $this->currentPerformUpdate = $update;
         foreach ($this->runOrder as $roleType) {
-            if (isset($forRoleType) && $roleType != $forRoleType) {
+            if (isset($forRoleType) && $roleType !== $forRoleType) {
                 // Don't run the provisioner for this role
                 continue;
             }
+
+            $this->currentRoleType = $roleType;
             try {
                 $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
             } catch (\Exception $e) {
                 $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", ['exception' => $e]);
-                $this->logMapper->flush($this->logger);
+                $this->logMapper->flush($this->logger, $roleType, $update);
                 continue;
             }
 
-            if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
+            if ($ruleset->getConfig()->getEnabled() || $roleType === $forRoleType) {
                 $this->logger->info("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
 
                 $created = $updated = $skipped = $errors = 0;
@@ -361,7 +381,7 @@ class Provisioner
                     }
 
 
-                    $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
+                    $originalName = ($action === 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
 
                     if (count($diff)) {
@@ -411,7 +431,7 @@ class Provisioner
 
                         $this->logger->log($level, $message, $context);
 
-                        if ($action == 'update') {
+                        if ($action === 'update') {
                             ++$updated;
                         } else {
                             ++$created;
@@ -428,20 +448,22 @@ class Provisioner
 
                 // end of a strat - save the result
                 $this->logger->info("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
-                $this->logMapper->flush($this->logger);
+                $this->logMapper->flush($this->logger, $roleType, $update);
+                $this->currentRoleType = null;
             }
         }
+        $this->currentPerformUpdate = null;
     }
 
     /**
      * Callback for when UPS processing is interrupted for some reason.
      *
-     * @param int $reason One of the signal constants (SIGTERM, SIGINT, etc.)
-     *                    or an Exception
+     * @param int|Throwable $reason One of the signal constants (SIGTERM, etc.)
+     *                              or a Throwable
      */
     public function onInterrupt($reason = null)
     {
-        if ($reason instanceof \Throwable) {
+        if ($reason instanceof Throwable) {
             $message = sprintf("Execution interrupted by exception:\n%s", $reason->getTraceAsString());
         } else {
             switch ($reason) {
@@ -458,7 +480,15 @@ class Provisioner
             }
         }
         $this->logger->alert($message);
-        $this->logMapper->flush($this->logger);
+
+        // Can only flush the log if there's an actual roletype to flush for
+        if (isset($this->currentRoleType, $this->currentPerformUpdate)) {
+            $this->logMapper->flush(
+                $this->logger,
+                $this->currentRoleType,
+                $this->currentPerformUpdate,
+            );
+        }
     }
 
     /**

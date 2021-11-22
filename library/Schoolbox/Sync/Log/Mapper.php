@@ -122,17 +122,21 @@ class Mapper extends Schoolbox\Mapper
      * This wraps the Cacheable flush result in a Log and persists it
      *
      * @param CacheableLoggerInterface $cache
+     * @param string                   $roleType
      */
-    public function flush(CacheableLoggerInterface $cache)
-    {
+    public function flush(
+        CacheableLoggerInterface $cache,
+        string $roleType,
+        bool $performUpdate
+    ): void {
         $storage = $cache->flushToStorage();
 
         // the run didn't actually happen
-        if ($storage->getSize() == 0) {
+        if ($storage->getSize() === 0) {
             return;
         }
 
-        $logfile = $this->generateModelFromLogfile($storage);
+        $logfile = $this->generateModelFromLogfile($storage, $roleType, $performUpdate);
 
         $this->save($logfile);
     }
@@ -141,29 +145,32 @@ class Mapper extends Schoolbox\Mapper
      * @param Storage\Model $file
      * @return Model
      */
-    protected function generateModelFromLogfile(Storage\Model $file)
-    {
+    protected function generateModelFromLogfile(
+        Storage\Model $file,
+        string $roleType,
+        bool $performUpdate
+    ): Model {
         // default values
         $log = $this->createModel()
                     ->setUsersCreated(0)
                     ->setUsersUpdated(0)
                     ->setUsersSkipped(0)
-                    ->setRoleType(null)
+                    ->setRoleType($roleType)
                     ->setStorage($file)
-                    ->setDry(true);
+                    ->setDry($performUpdate);
 
 
         // this is how we'll check the data
         $checks = [
 
-            // this should be the first line
-            'Commencing' => function ($message, $log) {
-                /** @var Model $log */
-                if (preg_match('`Commencing ([a-z]+) user provision(.*)`', $message, $matches)) {
-                    $log->setRoleType($matches[1])
-                        ->setDry(strpos($matches[2], 'dry') !== false);
-                }
-            },
+//            // this should be the first line
+//            'Commencing' => function ($message, $log) {
+//                /** @var Model $log */
+//                if (preg_match('`Commencing ([a-z]+) user provision(.*)`', $message, $matches)) {
+//                    $log->setRoleType($matches[1])
+//                        ->setDry(strpos($matches[2], 'dry') !== false);
+//                }
+//            },
 
             // this should be the last line
             'SUMMARY:' => function ($message, $log) {
