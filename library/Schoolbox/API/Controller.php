@@ -318,6 +318,20 @@ class Controller extends Base
     {
         $config = $this->getConfigLoader();
 
+        // Attempt to use Schoolbox's JWT decoder.
+        // If that fails, use the configured oAuth provider's decoder instead.
+        // TODO move oAuth provider JWT decoding into the token builder
+        /** @var \Schoolbox\API\Token\Jwt $tokenValidator */
+        $tokenValidator = $this->getDi()->get('user.tokenBuilder');
+        try {
+            $claims = $tokenValidator->decode($jwt);
+            $user   = $this->userMapper->findByUsername($claims['sub']);
+            $this->auth->createSession($user->getUsername(), true);
+            return $user;
+        } catch (\Throwable $e) {
+            // noop: try the oAuth provider's JWT instead
+        }
+
         // TODO DI this once it starts being used in multiple places
         $sessionLength = (int)$config->get('session_length');
         if ($sessionLength <= 0) {
@@ -329,9 +343,6 @@ class Controller extends Base
             new FirebasePhpJwt(null, $sessionLength)
         );
 
-        // Try two different token parsers:
-        // * One for the configured oAuth identity provider
-        // * One for Schoolbox itself as the identity provider
         $tokenParser = new TokenParser(
             $this->userMapper,
             $jwtVerifierFactory->build(
