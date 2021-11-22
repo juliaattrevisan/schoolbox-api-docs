@@ -2,7 +2,7 @@ import BottomDrawer from './bottom-drawer.vue';
 
 // More on default export: https://storybook.js.org/docs/vue/writing-stories/introduction#default-export
 export default {
-    title: 'Schoolbox/Components/Bottom Drawer',
+    title: 'Components/Bottom Drawer',
     component: BottomDrawer,
     // More on argTypes: https://storybook.js.org/docs/vue/api/argtypes
     argTypes: {
