@@ -14,10 +14,10 @@ use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
-use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
@@ -28,6 +28,7 @@ use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
+use Throwable;
 use UnexpectedValueException;
 
 /**
@@ -42,45 +43,35 @@ class Provisioner
      *
      * @var Ruleset\Factory
      */
-    protected $rulesetFactory;
+    protected Ruleset\Factory $rulesetFactory;
 
     /**
      * A grammar factory - this is used for building the actual hydratable ruleset object.
      *
      * TODO: we shouldn't need both this and $rulesetFactory
-     *
-     * @var Grammar\Factory
      */
-    protected $grammarFactory;
+    protected Grammar\Factory $grammarFactory;
 
     /**
      * A connection to an external database - retrieves users from the external DB.
-     *
-     * @var ISync
      */
-    protected $externalUserSource;
+    protected ISync $externalUserSource;
 
     /**
      * A user mapper - this retrieves user's initial states, and saves them.
-     *
-     * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * A user access mapper - this retrieves the permissions that an existing
      * user has on groups.
-     *
-     * @var UserAccessMapper
      */
-    protected $userAccessMapper;
+    protected UserAccessMapper $userAccessMapper;
 
     /**
      * A logger
-     *
-     * @var LoggerInterface
      */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /**
      * The order in which syncs are to be run.
@@ -88,16 +79,14 @@ class Provisioner
      * The only current requirement is that parents run after students, so that
      * parents may be attached to all their children's campuses.
      *
-     * @var array
+     * @var array<string>
      */
-    protected $runOrder = [Role::STUDENT, Role::STAFF, Role::PARENT,];
+    protected array $runOrder = [Role::STUDENT, Role::STAFF, Role::PARENT,];
 
     /**
-     * A mapper the the logger
-     *
-     * @var Log\Mapper
+     * A mapper for the logger
      */
-    private $logMapper;
+    private Log\Mapper $logMapper;
 
     /**
      * Caches new user's usernames so we can detect multi new users
@@ -105,22 +94,24 @@ class Provisioner
      *
      * Maps 'username' => 'externalId'
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected $newUsernameCache = [];
-
+    protected array $newUsernameCache = [];
 
     /**
-     * @var Folder\Mapper
+     * A mapper for folders.
      */
-    private $folderMapper;
-
+    private Folder\Mapper $folderMapper;
 
     /**
-     * @var Loader
+     * Configuration
      */
-    private $config;
+    private IConfigLoader $config;
 
+    /**
+     * A log of the current run.
+     */
+    private ?Log\Model $currentRun = null;
 
     /**
      * Constructor
@@ -133,7 +124,7 @@ class Provisioner
      * @param Log\Mapper               $logMapper
      * @param UserAccessMapper         $userAccessMapper
      * @param Folder\Mapper            $folderMapper
-     * @param Loader                   $config
+     * @param IConfigLoader            $config
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
@@ -144,7 +135,7 @@ class Provisioner
         Log\Mapper $logMapper,
         UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
-        Loader $config
+        IConfigLoader $config
     ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
@@ -182,22 +173,27 @@ class Provisioner
     public function run($update = false, $forRoleType = null)
     {
         foreach ($this->runOrder as $roleType) {
-            if (isset($forRoleType) && $roleType != $forRoleType) {
+            $this->currentRun = $this->logMapper->createModel()
+                ->setDry($update)
+                ->setRoleType($roleType)
+                ->setUsersCreated(0)
+                ->setUsersUpdated(0)
+                ->setUsersSkipped(0);
+            if (isset($forRoleType) && $roleType !== $forRoleType) {
                 // Don't run the provisioner for this role
                 continue;
             }
+
             try {
                 $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
             } catch (\Exception $e) {
                 $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", ['exception' => $e]);
-                $this->logMapper->flush($this->logger);
+                $this->logMapper->flush($this->logger, $this->currentRun);
                 continue;
             }
 
-            if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
+            if ($ruleset->getConfig()->getEnabled() || $roleType === $forRoleType) {
                 $this->logger->info("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
-
-                $created = $updated = $skipped = $errors = 0;
 
                 try {
                     $externalUsers = $this->getAllExternalUsers($roleType);
@@ -212,8 +208,7 @@ class Provisioner
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {
                         $this->logger->error("Cannot process user: User must have an External ID");
-                        ++$skipped;
-                        ++$errors;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
 
@@ -267,12 +262,12 @@ class Provisioner
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
                         $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
-                        ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
                         $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
-                        ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
 
@@ -376,7 +371,7 @@ class Provisioner
                     }
 
 
-                    $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
+                    $originalName = ($action === 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
 
                     if (count($diff)) {
@@ -408,7 +403,7 @@ class Provisioner
                                 );
                             }
                         }
-                        ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
 
@@ -426,24 +421,31 @@ class Provisioner
 
                         $this->logger->log($level, $message, $context);
 
-                        if ($action == 'update') {
-                            ++$updated;
+                        if ($action === 'update') {
+                            $this->currentRun->incrementUsersUpdated();
                         } else {
-                            ++$created;
+                            $this->currentRun->incrementUsersCreated();
                         }
                     } catch (UnexpectedValueException $e) {
                         $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
-                        ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     } catch (\Exception $e) {
                         $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
-                        ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                     }
                 }
 
                 // end of a strat - save the result
-                $this->logger->info("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
-                $this->logMapper->flush($this->logger);
+                $this->logger->info(
+                    sprintf(
+                        "SUMMARY: %d users created, %d users updated, %d users skipped",
+                        $this->currentRun->getUsersCreated(),
+                        $this->currentRun->getUsersUpdated(),
+                        $this->currentRun->getUsersSkipped(),
+                    )
+                );
+                $this->logMapper->flush($this->logger, $this->currentRun);
             }
         }
     }
@@ -451,12 +453,12 @@ class Provisioner
     /**
      * Callback for when UPS processing is interrupted for some reason.
      *
-     * @param int $reason One of the signal constants (SIGTERM, SIGINT, etc.)
-     *                    or an Exception
+     * @param int|Throwable $reason One of the signal constants (SIGTERM, etc.)
+     *                              or a Throwable
      */
     public function onInterrupt($reason = null)
     {
-        if ($reason instanceof \Throwable) {
+        if ($reason instanceof Throwable) {
             $message = sprintf("Execution interrupted by exception:\n%s", $reason->getTraceAsString());
         } else {
             switch ($reason) {
@@ -473,7 +475,11 @@ class Provisioner
             }
         }
         $this->logger->alert($message);
-        $this->logMapper->flush($this->logger);
+
+        // Can only flush the log if there's a run to flush
+        if (isset($this->currentRun)) {
+            $this->logMapper->flush($this->logger, $this->currentRun);
+        }
     }
 
     /**

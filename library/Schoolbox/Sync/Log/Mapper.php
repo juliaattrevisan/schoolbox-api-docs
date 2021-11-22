@@ -122,74 +122,17 @@ class Mapper extends Schoolbox\Mapper
      * This wraps the Cacheable flush result in a Log and persists it
      *
      * @param CacheableLoggerInterface $cache
+     * @param Model                    $log
      */
-    public function flush(CacheableLoggerInterface $cache)
+    public function flush(CacheableLoggerInterface $cache, Model $log): void
     {
         $storage = $cache->flushToStorage();
 
         // the run didn't actually happen
-        if ($storage->getSize() == 0) {
+        if ($storage->getSize() === 0) {
             return;
         }
 
-        $logfile = $this->generateModelFromLogfile($storage);
-
-        $this->save($logfile);
-    }
-
-    /**
-     * @param Storage\Model $file
-     * @return Model
-     */
-    protected function generateModelFromLogfile(Storage\Model $file)
-    {
-        // default values
-        $log = $this->createModel()
-                    ->setUsersCreated(0)
-                    ->setUsersUpdated(0)
-                    ->setUsersSkipped(0)
-                    ->setRoleType(null)
-                    ->setStorage($file)
-                    ->setDry(true);
-
-
-        // this is how we'll check the data
-        $checks = [
-
-            // this should be the first line
-            'Commencing' => function ($message, $log) {
-                /** @var Model $log */
-                if (preg_match('`Commencing ([a-z]+) user provision(.*)`', $message, $matches)) {
-                    $log->setRoleType($matches[1])
-                        ->setDry(strpos($matches[2], 'dry') !== false);
-                }
-            },
-
-            // this should be the last line
-            'SUMMARY:' => function ($message, $log) {
-                /** @var Model $log */
-                if (preg_match('`(\d+) users created, (\d+) users updated, (\d+) users skipped`', $message, $matches)) {
-                    $log->setUsersCreated($matches[1])
-                        ->setUsersUpdated($matches[2])
-                        ->setUsersSkipped($matches[3]);
-                }
-            }
-
-        ];
-
-        // probe the file for some particular datums
-        $fp = $file->readStream();
-
-        // look for our things to extract
-        while ($line = fgets($fp)) {
-            foreach ($checks as $needle => $callback) {
-                if (strpos($line, $needle)) {
-                    $data = json_decode($line, true);
-                    call_user_func($callback, $data['message'], $log);
-                }
-            }
-        }
-
-        return $log;
+        $this->save($log->setStorage($storage));
     }
 }

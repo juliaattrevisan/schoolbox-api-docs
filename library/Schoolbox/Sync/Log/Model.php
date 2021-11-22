@@ -14,6 +14,8 @@ use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model
 {
+    use ModelTrait\CreatedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -32,7 +34,6 @@ class Model
     /** @var int */
     protected $usersSkipped;
 
-    use ModelTrait\CreatedAtDate;
 
     /** @var Storage\Model */
     protected $storage;
@@ -184,6 +185,39 @@ class Model
     public function setStorage($storage)
     {
         $this->storage = $storage;
+        return $this;
+    }
+
+    /**
+     * Shortcut for `$this->setUsersCreated($this->getUsersCreated() + 1)`.
+     *
+     * @return $this
+     */
+    public function incrementUsersCreated(): self
+    {
+        $this->usersCreated++;
+        return $this;
+    }
+
+    /**
+     * Shortcut for `$this->setUsersUpdated($this->getUsersUpdated() + 1)`.
+     *
+     * @return $this
+     */
+    public function incrementUsersUpdated(): self
+    {
+        $this->usersUpdated++;
+        return $this;
+    }
+
+    /**
+     * Shortcut for `$this->setUsersSkipped($this->getUsersSkipped() + 1)`.
+     *
+     * @return $this
+     */
+    public function incrementUsersSkipped(): self
+    {
+        $this->usersSkipped++;
         return $this;
     }
 }
