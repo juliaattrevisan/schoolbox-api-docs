@@ -126,6 +126,9 @@ class FilesBuilder
 
         //if there is no source, update to the current homepage
         $instanceConfig['src']['value'] = $instanceConfig['src']['value'] ?: $homepageId;
+        if ('' === trim($instanceConfig['componentname']['value'])) {
+            $instanceConfig['componentname']['value'] =  $instanceConfig['componentname']['defaultValue'];
+        }
 
         //return instance / default config values
         return $instanceConfig;
