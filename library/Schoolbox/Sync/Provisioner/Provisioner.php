@@ -175,7 +175,7 @@ class Provisioner
         foreach ($this->runOrder as $roleType) {
             $this->currentRun = $this->logMapper->createModel()
                 ->setDry($update)
-                ->setRoleType($forRoleType)
+                ->setRoleType($roleType)
                 ->setUsersCreated(0)
                 ->setUsersUpdated(0)
                 ->setUsersSkipped(0);
