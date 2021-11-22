@@ -344,16 +344,10 @@ HELP;
         if ($this->dirIsEmpty($item->getRealPath())) {
             $verb = $this->perform() ? "Deleted" : "Would delete";
             $this->getLogger()->notice(sprintf("$verb %s empty directory from disk.", $item->getRealPath()));
-
+            $this->countEmptyDirectoriesDeleted++;
+            $this->sizeStorageRecovered += $item->getSize();
             if ($this->perform()) {
                 rmdir($item->getRealPath());
-            }
-
-            try {
-                $this->countEmptyDirectoriesDeleted++;
-                $this->sizeStorageRecovered += $item->getSize();
-            } catch (Exception $e) {
-                // noop
             }
         } else {
             $this->getLogger()->debug("Retaining non-empty dir: {$item->getRealPath()}");
