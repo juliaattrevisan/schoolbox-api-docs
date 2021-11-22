@@ -29,8 +29,8 @@ export default class Star {
      */
     getRandomPastelColour () {
         const randomColour = tinycolor({ r: gsap.utils.random(0, 255), g: gsap.utils.random(0, 255), b: gsap.utils.random(0, 255) });
-        const randomPastelColour = tinycolor.mix(randomColour.saturate(10), tinycolor('white'), 30); //desaturate a bit and mix in white to make it pastel
-        return randomPastelColour.toHexString();
+        // const randomPastelColour = tinycolor.mix(randomColour.saturate(10), tinycolor('white'), 30); //desaturate a bit and mix in white to make it pastel
+        return randomColour.toHexString();
     }
 
     /**

@@ -62,6 +62,7 @@
     "@storybook/manager-webpack5": "^6.3.12",
     "@storybook/vue": "^6.3.12",
     "babel-loader": "^8.2.2",
+    "chromatic": "^6.0.6",
     "core-js": "^3.8.3",
     "css-loader": "^3.6.0",
     "expose-loader": "^2.0.0",
@@ -90,6 +91,7 @@
     "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch --watch-poll=1000",
     "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production",
     "storybook": "start-storybook -s ./stories/assets -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "chromatic": "npx chromatic --project-token=94dbc3b9c383"
   }
 }
