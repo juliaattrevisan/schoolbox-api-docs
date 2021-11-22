@@ -109,19 +109,9 @@ class Provisioner
     private IConfigLoader $config;
 
     /**
-     * Which role type is _currently_ being provisioned, if any?
-     *
-     * Required so `onInterrupt` knows which role type to write the log for.
+     * A log of the current run.
      */
-    private ?string $currentRoleType = null;
-
-    /**
-     * Is the currently running provision performing an update or not?
-     *
-     * @var bool|null true: update, false: dry run, null: unknown or no running
-     *                provision
-     */
-    private ?bool $currentPerformUpdate = null;
+    private ?Log\Model $currentRun = null;
 
     /**
      * Constructor
@@ -182,20 +172,23 @@ class Provisioner
      */
     public function run($update = false, $forRoleType = null)
     {
-        $this->currentRoleType      = null;
-        $this->currentPerformUpdate = $update;
         foreach ($this->runOrder as $roleType) {
+            $this->currentRun = $this->logMapper->createModel()
+                ->setDry($update)
+                ->setRoleType($forRoleType)
+                ->setUsersCreated(0)
+                ->setUsersUpdated(0)
+                ->setUsersSkipped(0);
             if (isset($forRoleType) && $roleType !== $forRoleType) {
                 // Don't run the provisioner for this role
                 continue;
             }
 
-            $this->currentRoleType = $roleType;
             try {
                 $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
             } catch (\Exception $e) {
                 $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", ['exception' => $e]);
-                $this->logMapper->flush($this->logger, $roleType, $update);
+                $this->logMapper->flush($this->logger, $this->currentRun);
                 continue;
             }
 
@@ -273,11 +266,13 @@ class Provisioner
                         $commonContext['action'] = 'skip';
                         $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
                         ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
                         $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
                         ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
 
@@ -414,6 +409,7 @@ class Provisioner
                             }
                         }
                         ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     }
 
@@ -433,26 +429,28 @@ class Provisioner
 
                         if ($action === 'update') {
                             ++$updated;
+                            $this->currentRun->incrementUsersUpdated();
                         } else {
                             ++$created;
+                            $this->currentRun->incrementUsersCreated();
                         }
                     } catch (UnexpectedValueException $e) {
                         $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
                         ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                         continue;
                     } catch (\Exception $e) {
                         $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
                         ++$skipped;
+                        $this->currentRun->incrementUsersSkipped();
                     }
                 }
 
                 // end of a strat - save the result
                 $this->logger->info("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
-                $this->logMapper->flush($this->logger, $roleType, $update);
-                $this->currentRoleType = null;
+                $this->logMapper->flush($this->logger, $this->currentRun);
             }
         }
-        $this->currentPerformUpdate = null;
     }
 
     /**
@@ -482,11 +480,10 @@ class Provisioner
         $this->logger->alert($message);
 
         // Can only flush the log if there's an actual roletype to flush for
-        if (isset($this->currentRoleType, $this->currentPerformUpdate)) {
+        if (isset($this->currentRun)) {
             $this->logMapper->flush(
                 $this->logger,
-                $this->currentRoleType,
-                $this->currentPerformUpdate,
+                $this->currentRun,
             );
         }
     }
