@@ -216,12 +216,14 @@ class Factory
 
         /* Default event owner
          */
-        $defaultOwner = $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+        $credentials = (new Codec\DSN())->decode($this->key);
 
-        if (null === $defaultOwner) {
+        try {
+            $defaultOwner = $this->userMapper->findById($credentials['timetableowner']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $this->log->info(sprintf(
-                'Username %s not found, but we needed that. Exiting',
-                UserMapper::USERNAME_ALARESS_ADMIN
+                'Timetable owner user account %s not found, but we needed that. Exiting',
+                $credentials['timetableowner']
             ));
 
             return new GenericCollection(IStrategy::class);

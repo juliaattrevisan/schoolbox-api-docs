@@ -90,15 +90,17 @@ class Api implements IApi
      * Set up guzzle client
      *
      * @param string $host
-     * @param string $key
+     * @param string $dsn
      * @param int    $timeout
      * @return Client
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    private function initClient(string $host, string $key, int $timeout): Client
+    private function initClient(string $host, string $dsn, int $timeout): Client
     {
+        $credentials = (new Codec\DSN())->decode($dsn);
+
         $headers = [
-            'CompassApiKey' => $key,
+            'CompassApiKey' => $credentials['key'],
             'Content-Type' => 'application/json'
         ];
 
