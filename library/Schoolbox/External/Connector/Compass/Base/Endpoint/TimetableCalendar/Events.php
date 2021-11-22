@@ -435,7 +435,7 @@ class Events implements IStrategy
                             $activity['name'],
                             $activityInstance['start'],
                             $schedule['name'],
-                            $activity['subjectImportIdentifier']
+                            $activity['name']
                         ));
 
                         /* The relationships here are based on actual schoolbox.user accounts existing
@@ -526,13 +526,13 @@ class Events implements IStrategy
             ->setSourceName(Prepare::EVENT_IMPORT_IDENTIFIER)
             ->setGuid($meta['guid']);
 
-        /* Assign Group (homepage/category/folder) relations using $activity['subjectImportIdentifier']
+        /* Assign Group (homepage/category/folder) relations using $activity['name']
          * as the folder code, assigning to individuals if folder code not found
          */
         try {
             /* TODO Improve this with a hashtable lookup, maybe
              */
-            $folder = $this->folderMapper->findByCode($activity['subjectImportIdentifier']);
+            $folder = $this->folderMapper->findByCode($activity['name']);
 
             /* Update the Access Level to GROUP before saving it
              */
@@ -546,10 +546,10 @@ class Events implements IStrategy
             return $this->createGroupEvents($activity, $activityInstance, $event, $folder);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->log->warning(sprintf(
-                'Activity %s Instance on %s: cannot find corresponding folder for subjectImportIdentifier %s. Creating personal events instead',
+                'Activity %s Instance on %s: cannot find corresponding folder for %s. Creating personal events instead',
                 $activity['name'],
                 $activityInstance['start'],
-                $activity['subjectImportIdentifier']
+                $activity['name']
             ));
 
             if ($this->perform) {
