@@ -41,6 +41,7 @@ export default {
 
     data () {
         return {
+            collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 columnsClasses: {
@@ -70,6 +71,15 @@ export default {
                     },
                 ],
                 customSorting: {
+                    name: (ascending) => { //sort name naturally
+                        return (a, b) => {
+                            if (ascending) {
+                                return this.collator.compare(a.name, b.name);
+                            } else {
+                                return this.collator.compare(b.name, a.name);
+                            }
+                        }
+                    },
                     ['dateModified.formatted']: (ascending) => { //sort date modified accurately by the timestamp
                         return (a, b) => {
                             if (ascending) {
@@ -77,7 +87,6 @@ export default {
                             }
                             return a.dateModified.timestamp <= b.dateModified.timestamp ? 1 : -1;
                         }
-
                     },
                 },
                 debounce: 100, //shorter debounce time as data is stored locally
