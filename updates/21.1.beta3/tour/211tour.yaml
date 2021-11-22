@@ -27,5 +27,5 @@ tour:
                   <p>The similarity system has been upgraded to Simcheck by Turninitin. You will now get improved
                   reports that are modifiable. The accuracy has been improved by automatically excluding your worksheets
                   and never matching the student against themselves.</p>
-                  <p><a href='https://help.schoolbox.com.au/homepage/3174'>Find out more via our release notes.</a><br />"
+                  <p><a href='/help/sso/send?returnUrl=/homepage/3174'>Find out more via our release notes.</a><br />"
         class: introjs-newsmodal
