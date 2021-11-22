@@ -9,7 +9,6 @@ import { init } from '../../../library/Schoolbox/Learning/Badge/Award/js/animati
 
 export default {
 
-
     data () {
         return {
             canvasWidth: 0,
@@ -43,7 +42,6 @@ export default {
             init(badgeImage);
         },
 
-
     },
 
 }
@@ -67,8 +65,15 @@ export default {
 <style scoped>
 
 .badge-img-container {
-    width: 972px;
     height: 300px;
+    width: 972px;
+}
+
+button {
+    background: #1EA7FD;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
 }
 
 </style>
