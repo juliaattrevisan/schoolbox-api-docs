@@ -4,11 +4,11 @@
  * Presents all the files within a homepage file component in a filterable table
  */
 
-import filterEvents from './viewAllFilesFilterEvents';
-import ViewAllFilesFilters from './view-all-files-filters';
-import ViewAllFilesRowName from './view-all-files-row-name';
-import ViewAllFilesRowEdit from './view-all-files-row-edit';
-import footerUI from '@vue/components/vueTables2/mixinFooterUI';
+import filterEvents from './viewAllFilesFilterEvents.js';
+import ViewAllFilesFilters from './view-all-files-filters.vue';
+import ViewAllFilesRowName from './view-all-files-row-name.vue';
+import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
+import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
 
 export default {
     
@@ -32,6 +32,10 @@ export default {
         selectedFilters: { //the list of currently selected filters passed through
             type: Array,
             required: true,
+        },
+        canEdit: { //whether the user has permission to modify files
+            type: Boolean,
+            required: true,
         }
     },
 
@@ -41,7 +45,7 @@ export default {
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 columnsClasses: {
                     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
-                    edit: 'edit-td ', //to hide the column for mobile
+                    edit: 'edit-td ', //to specify a width
                 },
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -107,7 +111,7 @@ export default {
                     noResults: 'No matching files',
                 },
             },
-            tableColumns: ['name', 'dateModified.formatted', 'edit'], //the table tableColumns
+            tableColumns: this.getTableColumns(),
         }
     },
 
@@ -123,6 +127,19 @@ export default {
          */
         initTable () {
             this.tableData = this.files;
+        },
+
+        /**
+         * The edit column is only display to those that have permission
+         * 
+         * @returns { Array }
+         */
+        getTableColumns () {
+            const tableColumns = ['name', 'dateModified.formatted'];
+            if (this.canEdit) {
+                tableColumns.push('edit');
+            }
+            return tableColumns;
         },
 
         /**

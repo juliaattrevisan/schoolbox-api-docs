@@ -14,6 +14,7 @@
         :component-instance-config="{{ componentInstanceConfig|json_encode }}"
         :files="{{ files|json_encode }}"
         :selected-filters="{{ filter|json_encode }}"
+        :can-edit="{{ canEdit ? 'true' : 'false' }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/viewAllFiles.js"></script>
