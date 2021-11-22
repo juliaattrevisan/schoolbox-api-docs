@@ -36,23 +36,12 @@ class ParticipantCest
     }
 
     /**
-     * Clean up after every test
-     *
-     * @param AcceptanceTester $i
-     */
-    public function _after(AcceptanceTester $i)
-    {
-        $i->logout();
-    }
-
-    /**
      * @param AcceptanceTester $i
      * @throws Exception
      */
     public function testMarkbookBasic(AcceptanceTester $i)
     {
 
-        $className = Common::CLASS_CHEMISTRY_1_3;
         $classId = Common::CLASS_ID_CHEMISTRY_1_3;
         $student = Common::USER_RACHEL;
         $studentId = Common::USER_ID_RACHEL;
@@ -113,7 +102,6 @@ class ParticipantCest
         $markbookPage->cantSeeParticipant($teacher);
         // student should remain
         $markbookPage->canSeeParticipant($student);
-
         // exclude the user from the duework
         $i->click($dueworkTitle1);
         $i->waitForText('Status of ' . $dueworkTitle1);
