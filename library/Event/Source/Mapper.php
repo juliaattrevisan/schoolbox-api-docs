@@ -51,7 +51,7 @@ class Mapper extends BaseMapper
      * @return array
      * @throws BaseMapper\DefinitionException
      */
-    private function findEventIdsUsingSource($sourceName)
+    public function findEventIdsUsingSource($sourceName)
     {
         $query = "
             SELECT

@@ -578,7 +578,7 @@ class Calendar extends DeprecatedModel
         $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}')";
 
         $access_query = 'AND (
-            (access = ' . EventModel::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
+            (access = ' . EventModel::ACCESS_PERSONAL . " AND (owner = '{$user->getId()}' OR event_user.user_id = '{$user->getId()}'))
             $groupQuery
             OR (access = " . EventModel::ACCESS_CAMPUS . " AND $campusQuery $groupChunk OR owner = '{$user->getId()}')
             $attendance_query

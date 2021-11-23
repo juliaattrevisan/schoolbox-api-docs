@@ -17,6 +17,7 @@ use Schoolbox\Mapper;
  * Maintains relationships between Users and Events via event_user
  * These are a user's personal events
  *
+ * @method Personal createModel()
  * @package Schoolbox\Calendar\Relation
  */
 class PersonalMapper extends Schoolbox\Mapper

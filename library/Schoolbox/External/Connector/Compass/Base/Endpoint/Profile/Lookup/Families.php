@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Profile\Lookup;
 
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 

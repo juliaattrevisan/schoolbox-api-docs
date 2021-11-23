@@ -16,6 +16,7 @@ use Schoolbox;
  * Class EventTypeMapper
  *
  * @package Schoolbox\Calendar
+ * @method EventType createModel()
  * @method EventType hydrate(array $row, $alias = '', $callback = null)
  */
 class EventTypeMapper extends Schoolbox\Mapper

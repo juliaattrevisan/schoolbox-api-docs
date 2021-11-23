@@ -63,4 +63,33 @@ class Helper
 
         return strpos($this->api->getHost(), $school) > -1;
     }
+
+
+    /**
+     * A student has multiple externalIds based on whichever school they're in
+     * These import identifiers are not the same if they're involved in multiple schools
+     * We have to find the external id relevant to the current school (host)
+     *
+     * The IApi conveniently knows this, though
+     *
+     * @param array  $importIdentifiers
+     * @return string|null
+     */
+    public function findExternalId(array $importIdentifiers): ?string
+    {
+        /* Example usage:
+         *
+         * $this->api->getHost()        https://wyndhamchristiancollege-integration-vic.compass.education/api/
+         * $importIdentifier['school']  wyndhamchristiancollege-integration.vic.edu.au
+         *
+         * Commonality:                 wyndhamchristiancollege-integration
+         */
+        foreach ($importIdentifiers as $importIdentifier) {
+            if ($this->matchesHost($importIdentifier['school'])) {
+                return $importIdentifier['importIdentifier'];
+            }
+        }
+
+        return null;
+    }
 }
