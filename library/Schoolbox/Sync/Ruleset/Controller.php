@@ -279,6 +279,7 @@ class Controller extends Base
                     'id' => $logId,
                     'filterBlacklist' => ['rulestring'],
                     'log' => $log,
+                    'pageCurrent' => $this->router->generate('upsRuleset.intro'),
                     'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
                     'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
                 ];
