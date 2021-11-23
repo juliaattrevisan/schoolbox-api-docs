@@ -14,6 +14,11 @@ namespace Schoolbox\External;
 
 use Schoolbox;
 
+/**
+ * @method ClassEntry createModel($idValue = null)
+ * @method ClassEntry findById($identifierValue)
+ * @method ClassEntry findOneByColumn($columnName, $columnValue, array $options = [])
+ */
 class ClassEntryMapper extends Schoolbox\Mapper
 {
 

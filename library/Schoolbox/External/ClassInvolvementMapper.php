@@ -19,6 +19,10 @@ use Schoolbox\Collection;
  * This is only used by the Schoolbox connector.
  *
  * @method Collection|ClassInvolvement[] findAll()
+ * @method ClassInvolvement createModel($idValue = null)
+ * @method ClassInvolvement findById($identifierValue)
+ * @method ClassInvolvement findOneByColumn($columnName, $columnValue, array $options = [])
+
  * @package Schoolbox\External
  */
 class ClassInvolvementMapper extends Schoolbox\Mapper

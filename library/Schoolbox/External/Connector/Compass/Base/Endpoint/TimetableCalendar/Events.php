@@ -16,6 +16,9 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
+use Schoolbox\External\ClassEntry;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -200,6 +203,21 @@ class Events implements IStrategy
      * @var string
      */
     private string $uBound;
+
+
+    /**
+     * A list of people involved in a folder code
+     *
+     * [
+     *     activity name => [
+     *        instance => an instance of sis_class (ClassEntry)
+     *        manifest => a list of people added to sis_class_user (ClassInvolvement)
+     *     ]
+     * ]
+     *
+     * @var array
+     */
+    private array $enrolmentManifest = [];
 
 
     /**
@@ -543,7 +561,7 @@ class Events implements IStrategy
                 $this->eventSourceMapper->save($eventSource);
             }
 
-            return $this->createGroupEvents($activity, $activityInstance, $event, $folder);
+            return $this->createGroupEvents($activity, $activityInstance, $enrolments, $event, $folder);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->log->warning(sprintf(
                 'Activity %s Instance on %s: cannot find corresponding folder for %s. Creating personal events instead',
@@ -569,7 +587,8 @@ class Events implements IStrategy
      *
      * @param array                            $activity
      * @param array                            $activityInstance
-     * @param Event        $event
+     * @param array                            $enrolments
+     * @param Event                            $event
      * @param \Schoolbox\Resource\Folder\Model $folder
      * @return int
      * @throws \PDOException
@@ -579,6 +598,7 @@ class Events implements IStrategy
     private function createGroupEvents(
         array $activity,
         array $activityInstance,
+        array $enrolments,
         Event $event,
         \Schoolbox\Resource\Folder\Model $folder
     ): int {
@@ -596,6 +616,59 @@ class Events implements IStrategy
             $this->relationFolderMapper->save($this->relationFolderMapper->createModel()
                 ->setEventId($event->getId())
                 ->setCategoryId($folder->getId()));
+
+            /* Check if the class record exists;
+             * if it doesn't already exist, spawn it and remember it
+             * then reuse it
+             */
+            if (!isset($this->enrolmentManifest[$activity['name']]['instance'])) {
+                $this->log->debug(sprintf(
+                    'Creating new ClassEntry record for Activity %s Instance on %s',
+                    $activity['name'],
+                    $activityInstance['start'],
+                ));
+
+                $classInstance = ClassEntryMapper::getInstance()->createModel()
+                    ->setName($activity['name'])
+                    ->setCode($activity['name']);
+
+                ClassEntryMapper::getInstance()->save($classInstance);
+
+                $this->enrolmentManifest[$activity['name']]['instance'] = $classInstance;
+            }
+
+            $classInstance = $this->enrolmentManifest[$activity['name']]['instance'];
+
+            /* Install everyone into sis_class* tables so they appear
+             * in the Class List and Class Teachers components in a
+             * homepage; only applies to Group Events
+             *
+             * Make a giant assumption that $activity['name'] contains the
+             * same guys all the time; we don't have a unique identifier for
+             * each activity instance and homepages are aggregated by the
+             * $activity['name'] anyway
+             */
+            foreach (array_merge($enrolments['students'], $enrolments['teachers']) as $externalId) {
+                /* Find out if we already added each person to the sis_class_user schema
+                 * If we already did, skip it
+                 */
+                if (!isset($this->enrolmentManifest[$activity['name']]['manifest'][$externalId])) {
+                    $this->log->debug(sprintf(
+                        'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
+                        $activity['name'],
+                        $activityInstance['start'],
+                        $externalId
+                    ));
+
+                    $classInvolvement = ClassInvolvementMapper::getInstance()->createModel()
+                        ->setClass($classInstance)
+                        ->setExternalId($externalId);
+
+                    ClassInvolvementMapper::getInstance()->save($classInvolvement);
+
+                    $this->enrolmentManifest[$activity['name']]['manifest'][$externalId] = $classInvolvement;
+                }
+            }
         }
 
         /* Created one relationship with $folder

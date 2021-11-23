@@ -148,6 +148,14 @@ class Prepare implements IStrategy
                 WHERE updated_at = '0000-00-00 00:00:00'
             ";
 
+            $queries['SIS Classes'] = "
+                DELETE FROM sis_class
+            ";
+
+            $queries['SIS Class Involvements'] = "
+                DELETE FROM sis_class_user
+            ";
+
             $this->log->debug(sprintf(
                 'Beginning the great purge of existing events/relations that used event_source: %s',
                 self::EVENT_IMPORT_IDENTIFIER
