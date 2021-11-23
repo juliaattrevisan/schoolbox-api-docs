@@ -55,15 +55,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         // Retrieve list of all LTI providers from database
-        // (so far, only 1.1 is supported)
-
-        $providers = $this->providerMapper->findByColumn(
-            'lti_version',
-            ProviderModel::LTI_VERSION_1_1,
-            [
-                'order' => ['name' => 'asc']
-            ]
-        );
+        $providers = $this->providerMapper->findAll();
 
         // Read-only users see nothing at all if no LTI providers exist,
         // or none is set up for this component.

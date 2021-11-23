@@ -37,12 +37,22 @@
                             <p>
                                 {% set foundLearningField = false %}
                                 {% for provider in providers %}
-                                    {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
-                                        {% set learningfieldProviderId = provider.id %}
-                                        <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
-                                        {% set foundLearningField = true %}
-                                    {% else %}
-                                        <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                                    {% if provider.isLtiVersion11 %}
+                                        {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
+                                            {% set learningfieldProviderId = provider.id %}
+                                            <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
+                                            {% set foundLearningField = true %}
+                                        {% else %}
+                                            <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                                        {% endif %}
+                                    {% elseif provider.isLtiVersion13 %}
+                                        {% set hasMultipleUrls = provider.launchUrl and provider.deepLinkingUrl %}
+                                        {% if provider.launchUrl %}
+                                            <button data-provider="{{ provider.id }}">{{ provider.name }}{% if hasMultipleUrls %} (Basic Launch){% endif %}</button>
+                                        {% endif %}
+                                        {% if provider.deepLinkingUrl %}
+                                            <button data-provider="{{ provider.id }}">{{ provider.name }}{% if hasMultipleUrls %} (Picker){% endif %}</button>
+                                        {% endif %}
                                     {% endif %}
                                 {% endfor %}
                             </p>
