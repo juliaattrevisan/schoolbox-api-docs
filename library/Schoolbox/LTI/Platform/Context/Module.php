@@ -11,12 +11,17 @@ namespace Schoolbox\LTI\Platform\Context;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Component_Homepage_Factory;
+use Component_InstanceMapper;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\LTI\Consumer\Controller as ConsumerController;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
+use SitePage;
 
 /**
  * LTI Platform sub-module for contexts.
@@ -43,6 +48,35 @@ class Module extends BaseModule
             function (array $params) {
                 try {
                     return ['folder' => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId'])];
+                } catch (MapperException $e) {
+                    throw new NotFound($e->getMessage());
+                }
+            },
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/folder/{folderId}/launch/component/{componentId}',
+            'getLaunchResourceLinkRequestForFolderAndComponent',
+            null,
+            function (array $params) {
+                try {
+                    /** @var Component_InstanceMapper $componentInstanceMapper */
+                    $componentInstanceMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
+
+                    /** @var SitePage $page */
+                    $page = $this->getInjector()->get('sitePage');
+
+                    $factory           = new Component_Homepage_Factory(new User(), $page);
+                    $componentInstance = $componentInstanceMapper->findByInstanceId($params['componentId']);
+                    $toolId            = $componentInstance
+                        ->getConfigByKey(ConsumerController::COMPONENT_CONFIG_LTI_PROVIDER)
+                        ->getValue();
+
+                    return [
+                        'folder'    => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
+                        'component' => $factory->buildComponent($componentInstance),
+                        'tool'      => $this->getMapperFactory()->get(ToolMapper::class)->findById($toolId),
+                    ];
                 } catch (MapperException $e) {
                     throw new NotFound($e->getMessage());
                 }

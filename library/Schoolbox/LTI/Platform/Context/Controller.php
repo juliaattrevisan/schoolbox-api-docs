@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform\Context;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Component_ControllerAbstract;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
@@ -109,15 +110,41 @@ class Controller extends BaseController
     }
 
     /**
+     * Generate a resource link launch request for the given folder and
+     * component.
+     *
+     * (The component will have a tool within it.)
+     *
+     * @api   GET /lti-platform/context/folder/{folderId}/launch/component/{componentId}
+     * @since 21.1.0
+     *
+     * @param Folder                       $folder
+     * @param Component_ControllerAbstract $component
+     * @param ToolModel                    $tool
+     */
+    public function getLaunchResourceLinkRequestForFolderAndComponent(
+        Folder $folder,
+        Component_ControllerAbstract $component,
+        ToolModel $tool
+    ): void {
+        // Do something with the component
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                ['message' => ''],
+            )
+        );
+    }
+
+    /**
      * Generate a deep linking request for the given folder and tool.
      *
-     * @api   GET /lti-plaform/context/folder/{folderId}/deep-link/{toolId}
+     * @api   GET /lti-platform/context/folder/{folderId}/deep-link/{toolId}
      * @since 21.1.0
      *
      * @param ToolModel $tool
      * @param Folder    $folder
      */
-    public function getGenerateDeepLinkingRequestForFolder(Folder $folder, ToolModel $tool)
+    public function getGenerateDeepLinkingRequestForFolder(Folder $folder, ToolModel $tool): void
     {
         // Find the tool in the list of registrations
         $repository = $this->registrations->find($tool->getDeploymentId());
@@ -182,7 +209,7 @@ class Controller extends BaseController
      * if supplied, that corresponds to an LTI assessment's ID, and the unique
      * membership for that assessment will be supplied instead.
      *
-     * @api   GET /lti-plaform/context/folder/{folderId}/memberships
+     * @api   GET /lti-platform/context/folder/{folderId}/memberships
      * @since 21.1.0
      *
      * @param Folder $folder
