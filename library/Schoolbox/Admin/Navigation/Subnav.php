@@ -377,7 +377,7 @@ class Subnav
                         'description' => 'Configure policy related to continuous reporting, grades, due work, assessment and feedback.',
                     ],
                     '/adminv2/lti'                           => [
-                        'name'        => 'LTI Providers',
+                        'name'        => 'LTI Tools',
                         'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',

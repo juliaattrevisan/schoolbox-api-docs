@@ -4,7 +4,7 @@
             <h3>
                 {{ provider.name ?? '' }}
                 {% if provider.isLtiVersion11 ?? false and provider.url is empty %}
-                    <span class="label alert">Provider Disabled - No Launch URL detected</span>
+                    <span class="label alert">Tool Disabled - No Launch URL detected</span>
                 {% endif %}
             </h3>
         </div>
