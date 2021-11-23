@@ -17,6 +17,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Pastoral;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\Submenu\Flyout;
@@ -256,6 +257,7 @@ class Controller extends Base
                 'roles'           => $roles,
                 'roleUsers'       => $roleUsers,
                 'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
+                'moderatorIds'    => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                 'type'            => $type,
                 'subtype'         => $subType,
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),

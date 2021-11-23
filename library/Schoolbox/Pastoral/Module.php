@@ -62,7 +62,13 @@ class Module extends BaseModule
         $permissionStaff =
             new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF)
+                new Rule\Any(
+                    new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
+                    new Rule\All(
+                        new Rule\HasRole(Role::STAFF),
+                        $permissionPastoralModerator
+                    )
+                )
             );
 
         $permissionParentOfStudent =

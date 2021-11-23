@@ -210,7 +210,7 @@ class Notifier extends AbstractModuleNotifier
                     $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
                     // Only send to parents if parent access is enabled
                     if (
-                        ($user->getRole()->isStaff() && $user->getRole()->getAccessPastoral())
+                        ($user->isStaffWithPastoralAccess())
                         || ($user->getRole()->isParent() && $parentAccessEnabled)
                     ) {
                         $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();

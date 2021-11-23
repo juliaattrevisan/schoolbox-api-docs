@@ -107,7 +107,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
             return new Collection();
         }
         return $this->members->filter(static function (Member\Model $member) {
-            return !$member->getUser()->getRole()->isStaff() || $member->getUser()->getRole()->getAccessPastoral();
+            return !$member->getUser()->getRole()->isStaff() || $member->getUser()->isStaffWithPastoralAccess();
         });
     }
 

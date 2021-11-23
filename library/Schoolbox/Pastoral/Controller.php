@@ -667,6 +667,7 @@ class Controller extends Base
                     'roleUsers'         => $roleUsers,
                     'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
                     'moderator'         => $moderator,
+                    'moderatorIds'      => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                     'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                     'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
                     'audiences'         => $audienceDefaults,

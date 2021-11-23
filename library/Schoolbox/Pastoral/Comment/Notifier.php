@@ -178,15 +178,13 @@ class Notifier extends AbstractModuleNotifier
                 /** @var PastoralGroupMember $member */
                 foreach ($pastoralGroup->getMembers() as $member) {
                     // Only staff should be in pastoral groups
-                    if ($member->getUser()->getRole()->isStaff() && $member->getUser()->getRole()->getAccessPastoral()) {
+                    if ($member->getUser()->isStaffWithPastoralAccess()) {
                         $targetUsers[$member->getUser()->getId()] = $member->getUser();
                     }
                 }
-            } elseif ($pastoralAccess->getUser()) {
+            } elseif ($pastoralAccess->getUser() && $pastoralAccess->getUser()->isStaffWithPastoralAccess()) {
                 // Only staff ever have access to pastoral comments
-                if ($pastoralAccess->getUser()->getRole()->isStaff() && $pastoralAccess->getUser()->getRole()->getAccessPastoral()) {
-                    $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
-                }
+                $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
             }
         }
 

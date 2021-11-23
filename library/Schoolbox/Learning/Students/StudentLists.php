@@ -102,7 +102,7 @@ class StudentLists
         $this->folder            = $folder;
         $this->viewer            = $viewer;
         $this->router            = $router;
-        $this->pastoralIsEnabled = $pastoralIsEnabled && $viewer->getRole()->getAccessPastoral();
+        $this->pastoralIsEnabled = $pastoralIsEnabled && $viewer->isStaffWithPastoralAccess();
         $this->lmsIsEnabled      = $lmsIsEnabled;
         $this->mailIsEnabled     = $mailIsEnabled;
         $this->mailHandle        = $mailHandle;

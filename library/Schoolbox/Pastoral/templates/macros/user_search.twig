@@ -1,4 +1,4 @@
-{% macro modal(guid, title, placeholder, roles, studentId, callbackAdded, callbackUsers, limitRoles, callbackClosed, minimumSearchLength, errorNoResults, errorSearchLength) %}
+{% macro modal(guid, title, placeholder, roles, studentId, callbackAdded, callbackUsers, limitRoles, moderatorIds, callbackClosed, minimumSearchLength, errorNoResults, errorSearchLength) %}
 
     {# Create search modal #}
 
@@ -206,6 +206,11 @@
                     {% else %}
                     let roles = [];
                     {% endif %}
+                    {% if moderatorIds %}
+                    let moderatorIds = [{{ moderatorIds | join(',') | raw }}];
+                    {% else %}
+                    let moderatorIds = [];
+                    {% endif %}
 
                     for (var i = 0; i < results.length; i++) {
 
@@ -215,7 +220,8 @@
 
                         {# Only action this person if they're not already in the group #}
 
-                        if (window.modalInternalUsersAdded['{{ guid }}'][results[i].id] !== true && roles.indexOf(results[i]['role']) >= 0) {
+                        if (window.modalInternalUsersAdded['{{ guid }}'][results[i].id] !== true
+                                && (roles.indexOf(results[i].role) >= 0 || moderatorIds.indexOf(results[i].id) >= 0)) {
 
                             {# Create the HTML markup for the user in the search results #}
 

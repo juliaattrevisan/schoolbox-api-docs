@@ -1465,4 +1465,21 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         // If year is not set, fall back to global config
         return (null === $this->getYear()) || $this->getYear()->getLearningMomentsEnabled();
     }
+
+    /**
+     * Checks basic pastoral access
+     * @return bool
+     */
+    public function isStaffWithPastoralAccess(): bool
+    {
+        if (!$this->getRole()->isStaff()) {
+            return false;
+        }
+        foreach ($this->getAccessList() as $access) {
+            if ($access->getService() === UserAccess::SERVICE_PASTORAL && $access->getAccessLevel() >= UserAccess::ACCESS_READ) {
+                return true;
+            }
+        }
+        return $this->getRole()->getAccessPastoral();
+    }
 }
