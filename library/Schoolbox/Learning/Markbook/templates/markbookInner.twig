@@ -61,6 +61,7 @@
                         <span>Student Average</span>
                     </div>
                 </th>
+                <th> <div><span>Rank</span></div></th>
                 {% for assessment in markbook.assessments %}
                 <th data-assessment="{{ assessment.id }}">
                     <div>
@@ -84,6 +85,7 @@
                 <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
                         {{ weightedMean | default('–') }}
                 </th>
+                <th>-</th>
                 {% for assessment in markbook.assessments %}
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
                     <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
@@ -113,6 +115,7 @@
             {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {writable: writable, markbook: markbook, label: 'Max', key: 'max'} %}
             <tr class="sub-row">
                 <td>Visibility</td>
+                <td>&nbsp;</td>
                 <td>&nbsp;</td>
                 {% for assessment in markbook.assessments %}
                     <td data-assessment="{{ assessment.id }}">
@@ -178,6 +181,16 @@
                            title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('–') }}
                         </a>
                     {% endif %}
+                </td>
+                <td>
+                    {% if weighted[student.id] is defined and meanNormalised %}
+                        {# check if the weighted object exits, and there is / was a mean score #}
+                        {{ weighted[student.id] }}
+                    {% else %}
+                        <span>-</span>
+                    {% endif %}
+                    <br>
+                    ({{ meanNormalised }})
                 </td>
 
                 {% for assessment in markbook.assessments %}

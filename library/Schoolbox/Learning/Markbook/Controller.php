@@ -131,11 +131,17 @@ class Controller extends Base
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
+            /**
+             * need to get an list of the students by id, with their ranking
+             */
+            $weighted = $this->buildWeighting($markbook);
+
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
                     'folder'                => $folder,
+                    'weighted'              => $weighted,
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
@@ -405,5 +411,40 @@ class Controller extends Base
         }
         // Logically should never get to here. It means assessment is due before first term in system starts.
         return false;
+    }
+
+    /**
+     *build student weighting
+     * @param Markbook  $markbook
+     * @return array
+     */
+    private function buildWeighting(Markbook $markbook): array
+    {
+        /**
+         * need to get an list of the students by id, with their ranking
+         */
+        //build basic array (id,weight)
+        $weightedList = [];
+        foreach ($markbook->getStudentStatistics() as $studentId => $studentStatistic) {
+            if ($studentStatistic['meanNormalised'] !== null) {
+                $weightedList[] = [
+                    'id'     => $studentId,
+                    'weight' => $studentStatistic['meanNormalised'],
+                ];
+            }
+        }
+        //sort based on weight
+        //now to work out if same as...
+        usort($weightedList, function($one, $two) {
+            return $one['weight'] <=> $two['weight'];
+        });
+        //flip the array
+        $weighted = [];
+        foreach ($weightedList as $key => $value) {
+            //key +1 so it's not 0 base
+            $weighted[$value['id']] = $key + 1 ;
+        }
+        //return value
+        return $weighted;
     }
 }
