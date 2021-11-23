@@ -38,20 +38,28 @@
                                 {% set foundLearningField = false %}
                                 {% for provider in providers %}
                                     {% if provider.isLtiVersion11 %}
+                                        {# Disgusting hard-coding for a particular provider (present since inception) #}
                                         {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
                                             {% set learningfieldProviderId = provider.id %}
                                             <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
                                             {% set foundLearningField = true %}
                                         {% else %}
-                                            <button data-provider="{{ provider.id }}">{{ provider.name }}</button>
+                                            <button data-provider="{{ provider.id }}"
+                                                    data-provider-version="1.1"
+                                            >{{ provider.name }}</button>
                                         {% endif %}
                                     {% elseif provider.isLtiVersion13 %}
                                         {% set hasMultipleUrls = provider.launchUrl and provider.deepLinkingUrl %}
                                         {% if provider.launchUrl %}
-                                            <button data-provider="{{ provider.id }}">{{ provider.name }}{% if hasMultipleUrls %} (Basic Launch){% endif %}</button>
+                                            <button data-provider="{{ provider.id }}"
+                                                    data-provider-version="1.3"
+                                                    data-provider-launch-url="{{ provider.launchUrl }}"
+                                            >{{ provider.name }}{% if hasMultipleUrls %} (Basic Launch){% endif %}</button>
                                         {% endif %}
                                         {% if provider.deepLinkingUrl %}
-                                            <button data-provider="{{ provider.id }}">{{ provider.name }}{% if hasMultipleUrls %} (Picker){% endif %}</button>
+                                            <button data-provider="{{ provider.id }}"
+                                                    data-provider-version="1.3"
+                                            >{{ provider.name }}{% if hasMultipleUrls %} (Picker){% endif %}</button>
                                         {% endif %}
                                     {% endif %}
                                 {% endfor %}
@@ -67,10 +75,12 @@
                 </section>
             </div>
         </div>
-        <script>
+
+        {% autoescape 'js' %}
+        <script type="text/javascript">
             $(function () {
 
-                var component = $('#component{{ componentInstanceId }}');
+                let component = $('#component{{ componentInstanceId }}');
 
                 {% if foundLearningField %}
                 component.find('[data-provider-learningfield]').click(function () {
@@ -88,7 +98,7 @@
 
                 component.find('[data-provider]').click(function () {
 
-                    var $toaster = $('#lti-toaster{{ componentInstanceId }}');
+                    let $toaster = $('#lti-toaster{{ componentInstanceId }}');
                     $toaster.toastActivate({text: 'Loading LTI Provider...'});
 
                     {# Display a preloader #}
@@ -99,13 +109,23 @@
                     {# When a provider is clicked we need to dynamically update the component and launch the #}
                     {# LTI request in its iframe #}
 
-                    var providerId = $(this).data('provider');
+                    let $this                        = $(this),
+                        providerId                   = $this.attr('data-provider'),
+                        providerVersion              = $this.attr('data-provider-version'),
+                        providerLaunchUrl            = $this.attr('data-provider-launch-url'),
+                        postComponentProviderBaseUrl = '{{ routeLookup('ltiConsumer.postComponentProvider', {
+                            providerId: 'providerId',
+                            componentId: componentInstanceId,
+                        }) }}',
+                        postComponentProviderParams  = {};
+
+                    if (providerVersion === '1.3' && providerLaunchUrl) {
+                        postComponentProviderParams.url = providerLaunchUrl;
+                    }
 
                     $.post(
-                        '{{ routeLookup('ltiConsumer.postComponentProvider', {
-                            providerId: 'providerId',
-                            componentId: componentInstanceId
-                        }) }}'.replace(/providerId/g, providerId)
+                        postComponentProviderBaseUrl.replace(/providerId/g, providerId),
+                        postComponentProviderParams
                     ).done(function (result) {
 
                         {# Hide preloader #}
@@ -123,7 +143,7 @@
                         $('#component-title-{{ componentInstanceId }}').html(result.providerName);
 
                         {# Launch LTI in the iframe and make it visibile #}
-                        var iframe = $('#lti-frame{{ componentInstanceId }}');
+                        let iframe = $('#lti-frame{{ componentInstanceId }}');
 
                         iframe.attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {
                             providerId: 'providerId',
@@ -143,6 +163,7 @@
 
             });
         </script>
+        {% endautoescape %}
 
         <div id="modal-learningfield"
              class="reveal-modal"

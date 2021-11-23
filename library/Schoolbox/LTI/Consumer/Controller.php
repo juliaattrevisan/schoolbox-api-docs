@@ -115,7 +115,12 @@ class Controller extends Base
     }
 
     /**
-     * Silently update component configuration and set the provider it will use
+     * Silently update component configuration and set the provider it will use.
+     *
+     * Works for both LTI 1.1 and 1.3 providers:
+     * * LTI 1.1 will just set the provider and title
+     * * LTI 1.3 basic launch will set the provider, title and URL
+     * * LTI 1.3 picker will just set the provider and title
      *
      * @param Provider                     $provider
      * @param Component_ControllerAbstract $component
