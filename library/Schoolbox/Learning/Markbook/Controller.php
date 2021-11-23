@@ -134,14 +134,15 @@ class Controller extends Base
             /**
              * need to get an list of the students by id, with their ranking
              */
-            $weighted = $this->buildWeighting($markbook);
+            $rank = $this->buildRank($markbook);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
                     'folder'                => $folder,
-                    'weighted'              => $weighted,
+                    'rank'                  => $rank,
+                    'rankEnabled'           => (bool)$this->getConfigLoader()->get('view_rank'),
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
@@ -418,33 +419,38 @@ class Controller extends Base
      * @param Markbook  $markbook
      * @return array
      */
-    private function buildWeighting(Markbook $markbook): array
+    private function buildRank(Markbook $markbook): array
     {
         /**
          * need to get an list of the students by id, with their ranking
          */
         //build basic array (id,weight)
-        $weightedList = [];
+        $rankList = [];
         foreach ($markbook->getStudentStatistics() as $studentId => $studentStatistic) {
             if ($studentStatistic['meanNormalised'] !== null) {
-                $weightedList[] = [
+                $rankList[] = [
                     'id'     => $studentId,
                     'weight' => $studentStatistic['meanNormalised'],
                 ];
             }
         }
         //sort based on weight
-        //now to work out if same as...
-        usort($weightedList, function($one, $two) {
+        //now to work out if same value, set as same value...
+        usort($rankList, function($one, $two) {
             return $one['weight'] <=> $two['weight'];
         });
+
+        //set a rank value to each object
+        foreach ($rankList as $key => $value) {
+
+        }
         //flip the array
-        $weighted = [];
-        foreach ($weightedList as $key => $value) {
+        $rank = [];
+        foreach ($rankList as $key => $value) {
             //key +1 so it's not 0 base
-            $weighted[$value['id']] = $key + 1 ;
+            $rank[$value['id']] = $key + 1 ;
         }
         //return value
-        return $weighted;
+        return $rank;
     }
 }
