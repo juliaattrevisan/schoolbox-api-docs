@@ -428,8 +428,6 @@ class Controller extends Base
 
         //build basic array (id,grade)
         $rankList = [];
-        //build list of all weights with all users who have that weighting
-        $grade = [];
 
         /**
          * go thought all students and grab their normalised grade / weighting
@@ -437,7 +435,6 @@ class Controller extends Base
         */
         foreach ($markbook->getStudentStatistics() as $studentId => $studentStatistic) {
             if ($studentStatistic['meanNormalised'] !== null) {
-                $grade["${studentStatistic['meanNormalised']}"][] = $studentId;
                 $rankList[] = [
                     'id'     => $studentId,
                     'grade' => $studentStatistic['meanNormalised'],
@@ -446,39 +443,25 @@ class Controller extends Base
         }
         //sort based on grade
         usort($rankList, function ($one, $two) {
-            return $one['grade'] <=> $two['grade'];
+            return $two['grade'] <=> $one['grade'];
         });
 
         //set a rank value
         $rankValue = 1;
+        $hiddenRank = 1;
+        $lastStudent['grade'] = '';
         /**
          * iterate over ordered list of ranked students, and actually give them helpful rankings
          * not 42.06, but 5 (you are 5th in the class)
          */
         $rank = [];
         foreach ($rankList as $student) {
-            //check if user has already been ranked
-            if (!in_array($student['id'], array_keys($rank))) {
-                //user has not been ranked
-                //set user id, with rank as value
-                $rank[$student['id']] = $rankValue;
-
-                //check if that grade has more than 1 student associated with it
-                if (sizeof($grade["${student['grade']}"]) > 1) {
-                    /**
-                     * there are multiple users, lets go over them and if they are not the user we just found
-                     * lets add them to the ranking and continue to the next one
-                     */
-                    foreach ($grade[$student['grade']] as $id) {
-                        if ($id !== $student['id']) {
-                            //set those users in new list now, with same rank
-                            $rank[$id] = $rankValue;
-                        }
-                    }
-                }
-                //increment rank
-                $rankValue++;
+            if ($lastStudent['grade'] !== $student['grade']) {
+                $rankValue = $hiddenRank;
             }
+            $rank[$student['id']] = $rankValue;
+            $hiddenRank++;
+            $lastStudent = $student;
         }
         return $rank;
     }
