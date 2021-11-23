@@ -63,6 +63,48 @@
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
+                            <label for="template">Available Actions</label>
+                            <script type="text/javascript"
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
+                            <script type="text/javascript"
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+                            <select data-actions name="actions[]" id="pastoral-actions" multiple></select>
+                        </div>
+                        <script type="text/javascript">
+                            {% autoescape 'js' %}
+
+                            $('#pastoral-actions').selectizeSelector({
+                                multiple: true,
+                                selectize: {
+                                    create: false,
+                                    placeholder: 'Search Actions',
+                                    preload: true,
+                                    persist: true,
+                                    hideSelected: true,
+                                    load: function (query, callback) {
+                                        $.ajax({
+                                    url: '{{ routeLookup('pastoral.getActions') }}',
+                                    type:     'GET',
+                                            dataType: 'json',
+                                            data: {query: query}
+                                        }).done(function (result) {
+                                            callback(result)
+                                        }).fail(function () {
+                                            callback()
+                                        })
+                                    }
+                                },
+                                value: [
+                                    {% for action in typeActions %}
+                                    {'id': '{{ action.id }}', 'name': '{{ action.name | escape('js') }}'},
+                                    {% endfor %}
+                                ]
+                            });
+                            {% endautoescape %}
+                        </script>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
                             <label for="template">General Template</label>
 
                             <p class="meta">

@@ -187,29 +187,41 @@ class Module extends BaseModule
             )
         );
 
+        $permissionActionUpdate = new Rule\Any(
+            $permissionPastoralModerator,
+            new Rule\All(
+                $permissionStaff,
+                $permissionInRecordAudience
+            ),
+        );
+
         // Define routes and assign permissions to them
 
-        $this->registerRoutesArray([
-                                       'GET'  => [
-                                           ''                                                                             => ['getIndex' => $permissionStaff],
-                                           '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
-                                           '/search'                                                                      => ['getSearch' => $permissionStaff],
-                                           '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
-                                           '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentView],
-                                           '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
-                                           '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
-                                           '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionAttachmentView],
-                                           '/student/{studentId:\d+}/record/insert'                                       => ['getStudentRecordInsertForm' => $permissionStaff],
-                                           '/student/{studentId:\d+}/record/{recordId:\d+}/update'                        => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
-                                       ],
-                                       'POST' => [
-                                           '/record/insert'                                        => ['postRecordInsert' => $permissionStaff],
-                                           '/record/{recordId:\d+}/update'                         => ['postRecordUpdate' => $permissionRecordUpdate],
-                                           '/record/{recordId:\d+}/delete'                         => ['postRecordDelete' => $permissionRecordDelete],
-                                           '/record/{recordId:\d+}/comment/insert'                 => ['postCommentInsert' => $permissionCommentInsert],
-                                           '/record/{recordId:\d+}/comment/{commentId:\d+}/delete' => ['postCommentDelete' => $permissionCommentDelete],
-                                       ],
-                                   ]);
+        $this->registerRoutesArray(
+            [
+                'GET'  => [
+                    ''                                                                             => ['getIndex' => $permissionStaff],
+                    '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
+                    '/actions'                                                                     => ['getActions' => $permissionStaff],
+                    '/search'                                                                      => ['getSearch' => $permissionStaff],
+                    '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
+                    '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentView],
+                    '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
+                    '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
+                    '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionAttachmentView],
+                    '/student/{studentId:\d+}/record/insert'                                       => ['getStudentRecordInsertForm' => $permissionStaff],
+                    '/student/{studentId:\d+}/record/{recordId:\d+}/update'                        => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
+                ],
+                'POST' => [
+                    '/record/insert'                                        => ['postRecordInsert' => $permissionStaff],
+                    '/record/{recordId:\d+}/update'                         => ['postRecordUpdate' => $permissionRecordUpdate],
+                    '/record/{recordId:\d+}/delete'                         => ['postRecordDelete' => $permissionRecordDelete],
+                    '/record/{recordId:\d+}/comment/insert'                 => ['postCommentInsert' => $permissionCommentInsert],
+                    '/record/{recordId:\d+}/comment/{commentId:\d+}/delete' => ['postCommentDelete' => $permissionCommentDelete],
+                    '/record/{recordId:\d+}/action/update'                  => ['postActionUpdate' => $permissionActionUpdate],
+                ],
+            ]
+        );
     }
 
 
@@ -226,6 +238,8 @@ class Module extends BaseModule
             'pastoralDataSource'         => $injector->get('pastoralDataSource'),
             'pastoralRevisionDataSource' => $injector->get('pastoralRevisionDataSource'),
             'pastoralAccessMapper'       => PastoralAccessMapper::getInstance(),
+            'pastoralActionMapper'       => \Schoolbox\Pastoral\Action\Mapper::getInstance(),
+            'pastoralRecordActionMapper' => \Schoolbox\Pastoral\RecordAction\Mapper::getInstance(),
             'pastoralAttachmentMapper'   => PastoralAttachmentMapper::getInstance(),
             'pastoralSubTypeMapper'      => PastoralSubTypeMapper::getInstance(),
             'pastoralGroupMapper'        => PastoralGroupMapper::getInstance(),

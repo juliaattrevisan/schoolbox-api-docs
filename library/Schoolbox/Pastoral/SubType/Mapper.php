@@ -42,6 +42,18 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->joinsVia(
+            'pastoral_type_action',
+            \Schoolbox\Pastoral\Action\Mapper::class,
+            'id',
+            'action_id',
+            'subtype_id',
+            null,
+            null,
+            null,
+            'actions'
+        );
+
 //        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }

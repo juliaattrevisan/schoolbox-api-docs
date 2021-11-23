@@ -1493,4 +1493,27 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
         return $exDocClassLookup;
     }
+
+    /**
+     * Gets available pastoral actions
+     * @return array
+     */
+    public function getActionList(): array
+    {
+        $query            = "
+                    SELECT Code
+                    FROM dbo.luPastoralCareActionType
+                    WHERE ActiveFlag = 1
+                      AND Code != ''
+        ";
+        $exDocClass       = $this->getConnector()->executeQuery($query)->fetchAll();
+        $exDocClassLookup = [];
+        foreach ($exDocClass as $docClass) {
+            $exDocClassLookup[$docClass['Code']] = [
+                'key'   => $docClass['Code'],
+                'value' => $docClass['Code'],
+            ];
+        }
+        return $exDocClassLookup;
+    }
 }

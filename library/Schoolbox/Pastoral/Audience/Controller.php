@@ -49,6 +49,11 @@ class Controller extends Base
     private Pastoral\SubType\Mapper $pastoralSubTypeMapper;
 
     /**
+     * @var Pastoral\Action\Mapper
+     */
+    private Pastoral\Action\Mapper $pastoralActionMapper;
+
+    /**
      * Icon mapper: the list of icons is fetched from here.
      */
     private IconMapper $iconMapper;
@@ -72,8 +77,10 @@ class Controller extends Base
      * @param RoleMapper              $roleMapper
      * @param Pastoral\Type\Mapper    $pastoralTypeMapper
      * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
+     * @param Pastoral\Action\Mapper  $pastoralActionMapper
      * @param IconMapper              $iconMapper
      * @param RosettaStone            $rosettaStone
+     * @param ColorFactory            $colorFactory
      */
     public function __construct(
         UserMapper $userMapper,
@@ -82,6 +89,7 @@ class Controller extends Base
         RoleMapper $roleMapper,
         Pastoral\Type\Mapper $pastoralTypeMapper,
         Pastoral\SubType\Mapper $pastoralSubTypeMapper,
+        Pastoral\Action\Mapper $pastoralActionMapper,
         IconMapper $iconMapper,
         RosettaStone $rosettaStone,
         ColorFactory $colorFactory
@@ -92,6 +100,7 @@ class Controller extends Base
         $this->roleMapper             = $roleMapper;
         $this->pastoralTypeMapper     = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
+        $this->pastoralActionMapper = $pastoralActionMapper;
         $this->iconMapper             = $iconMapper;
         $this->rosettaStone           = $rosettaStone;
         $this->colorFactory           = $colorFactory;
@@ -260,6 +269,8 @@ class Controller extends Base
                 'moderatorIds'    => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                 'type'            => $type,
                 'subtype'         => $subType,
+                'actions'         => $this->pastoralActionMapper->findAll(),
+                'typeActions'     => $subType ? $this->pastoralActionMapper->findForSubtype($subType) : $this->pastoralActionMapper->findforType($type),
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
                 'flagColors'  => [
                     'foreground' => $foregroundColor->getAsRgba(),
@@ -320,9 +331,14 @@ class Controller extends Base
     private function postAudienceModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $subType, array $post): void
     {
         $isVisibilityLocked = $post['visibilityLocked'] ? (bool)$post['visibilityLocked'] : false;
+        $actions            =
+            is_array($post['actions'])
+                ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post['actions'])))
+                : $this->pastoralActionMapper->createCollection();
         // Fetch the exiting rules
         if ($subType) {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $subType->getId()]);
+            $subType->setActions($actions);
 
             /* Save the "General Template" content
              */
@@ -339,6 +355,7 @@ class Controller extends Base
             ]);
         } else {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $type->getId()]);
+            $type->setActions($actions);
 
             /* Save the "General Template" content
              */

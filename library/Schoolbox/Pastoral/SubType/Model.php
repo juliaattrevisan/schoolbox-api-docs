@@ -10,8 +10,11 @@ namespace Schoolbox\Pastoral\SubType;
 
 use Alaress\Color\Color;
 use JsonSerializable;
+use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Pastoral\Action\Model as Action;
 use Schoolbox\Pastoral\Type as PastoralType;
 use Schoolbox\Sequential;
 
@@ -66,6 +69,14 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      * Defaults to false, when created from the admin page.
      */
     private bool $visibilityLocked = false;
+
+    /** @var Collection|Action[] */
+    private $actions;
+
+    public function __construct()
+    {
+        $this->actions = new GenericCollection(Action::class);
+    }
 
     /**
      * @param string $name
@@ -206,6 +217,26 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     public function setVisibilityLocked(bool $visibilityLocked): self
     {
         $this->visibilityLocked = $visibilityLocked;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Action[]
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @param Collection|Action[] $actions
+     *
+     * @return self
+     */
+    public function setActions(Collection $actions): self
+    {
+        $this->actions = $actions;
+
         return $this;
     }
 }

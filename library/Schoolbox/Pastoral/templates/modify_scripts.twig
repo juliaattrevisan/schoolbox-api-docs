@@ -51,7 +51,40 @@
             },
             value: [
                 {% for tag in record.tags %}
-                {'id': '{{ tag.name }}', 'name': '{{ tag.name }}'}{% if not loop.last %},{% endif %}
+                {{ tag | json_encode | raw }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+        });
+
+        {# Pastoral Action Selectize #}
+
+        let actionSelectize = $('#pastoral-actions').selectizeSelector({
+            multiple: true,
+            selectize: {
+                create: false,
+                placeholder: 'Search Actions',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('pastoral.getActions') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            typeId: $("#typeId").val(),
+                            subtypeId: $("#subtypeId").val()
+                        },
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+            value: [
+                {% for recordAction in record.recordActions %}
+                {{ recordAction.action | json_encode | raw }}{% if not loop.last %},{% endif %}
                 {% endfor %}
             ]
         });
@@ -144,6 +177,7 @@
 
         $("#typeId,#subtypeId").on('change', function() {
             loadAudience();
+            updateActions();
         });
 
         window.hasChanged = false;
@@ -151,6 +185,40 @@
         $('#table-permission').on('change', '[type=radio]', function () {
             window.hasChanged = true;
         });
+
+        function updateActions() {
+            let typeId = $("#typeId").val();
+            let subtypeId = $("#subtypeId").val();
+            let currents = $('#pastoral-actions').val();
+
+            $.ajax({
+                url: '{{ routeLookup('pastoral.getActions') }}',
+                type: 'GET',
+                dataType: 'json',
+                data: {'typeId': typeId, 'subtypeId': subtypeId}
+            }).done(function (result) {
+                if (actionSelectize[0] === 'undefined') {
+                    return;
+                }
+                actionSelectize[0].selectize.clear();
+                actionSelectize[0].selectize.clearOptions();
+                actionSelectize[0].selectize.addOption([result]);
+                let refreshOptions = false;
+                currents.forEach(function (item) {
+                            actionSelectize[0].selectize.addItem(item);
+                            // If current selection is not in updated available actions, open new options
+                            if ($('#pastoral-actions').val().indexOf(item) < 0) {
+                                refreshOptions = true;
+                            }
+                        }
+                );
+                for (let i = 0; i < currents.length; i++) {
+                }
+                if (refreshOptions) {
+                    actionSelectize[0].selectize.refreshOptions()
+                }
+            })
+        }
 
         function loadAudience() {
             let prevLocked = $("#record-visibility-header").hasClass('icon-locked');

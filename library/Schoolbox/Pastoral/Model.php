@@ -25,9 +25,6 @@ use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-/**
- * @method static GenericCollection|Model[] createCollection()
- */
 class Model implements ISoftDeletable, IModel
 {
     use Id;
@@ -100,6 +97,9 @@ class Model implements ISoftDeletable, IModel
     /** @var Collection|Tag\Model[] */
     private $tags;
 
+    /** @var Collection|RecordAction\Model[] */
+    private $recordActions;
+
     /** @var Collection|Model[] */
     private $relatedRecords;
 
@@ -113,12 +113,13 @@ class Model implements ISoftDeletable, IModel
     public function __construct()
     {
         // TODO tighten collection types
-        $this->access = new Collection();
-        $this->comments = new Collection();
-        $this->attachments = new Collection();
-        $this->tags = new Collection();
-        $this->relatedRecords = new Collection();
-        $this->revisions = new Collection();
+        $this->access                = new Collection();
+        $this->comments              = new Collection();
+        $this->attachments           = new Collection();
+        $this->tags                  = new Collection();
+        $this->recordActions         = new Collection();
+        $this->relatedRecords        = new Collection();
+        $this->revisions             = new Collection();
         $this->parentCommentsAllowed = false;
     }
 
@@ -179,6 +180,26 @@ class Model implements ISoftDeletable, IModel
     public function getTags()
     {
         return $this->tags;
+    }
+
+    /**
+     * @param Collection|RecordAction\Model[] $recordActions
+     *
+     * @return self
+     */
+    public function setRecordActions(Collection $recordActions): self
+    {
+        $this->recordActions = $recordActions;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|RecordAction\Model[]
+     */
+    public function getRecordActions()
+    {
+        return $this->recordActions;
     }
 
     /**

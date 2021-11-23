@@ -1,0 +1,46 @@
+{% if record.recordActions | length > 0 %}
+    <div class="row">
+        <div class="small-12 medium-6 columns island">
+            <h2 class="subheader">Actions</h2>
+            <section>
+                <fieldset class="checklist">
+                    <ul class="option-list">
+                        {% for recordAction in record.recordActions %}
+                            <li>
+                                <input id="action-{{ recordAction.action.id }}" name="actions[]" type="checkbox"
+                                        {{ recordAction.completed ? 'checked="checked"' : '' }}
+                                       data-pastoral-action="{{ recordAction.id }}"/>
+                                <label for="action-{{ recordAction.action.id }}"
+                                        {{ recordAction.completed ? 'class="strike"' : '' }}>{{ recordAction.action.name }}</label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </fieldset>
+            </section>
+        </div>
+    </div>
+    <div id="pastoral-toast" class="toast"></div>
+    <script>
+        $(function () {
+            let toast = $('#pastoral-toast');
+            $('[data-pastoral-action]').on('change', function (event) {
+                toast.toastActivate({text: 'Updating ...'});
+                let checked = 0;
+                if ($(this).is(':checked')) {
+                    $('label[for="' + $(this).attr('id') + '"]').addClass('strike');
+                    checked = 1;
+                } else {
+                    $('label[for="' + $(this).attr('id') + '"]').removeClass('strike');
+                }
+                $.post('{{ routeLookupIfAuthorized('pastoral.postActionUpdate', {recordId: record.id, record: record}) }}', {
+                    recordActionId: $(this).attr('data-pastoral-action'),
+                    checked: checked
+                }).done(function (response) {
+                    toast.toastTimeout({text: 'Action updated.', css: 'success'});
+                }).fail(function () {
+                    toast.toastTimeout({text: 'Could not update action ', css: 'alert'});
+                });
+            });
+        });
+    </script>
+{% endif %}

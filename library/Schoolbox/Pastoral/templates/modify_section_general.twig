@@ -52,10 +52,14 @@
         <div class="small-12 medium-6 columns">
             <label> Points <input type="number" name="points" size="35" maxlength="100" value="{{ record.points }}"/> </label>
         </div>
-        <div class="small-{% if severities | length %}12{% else %}6{% endif %} columns">
+        <div class="small-12 medium-6 columns">
             <label> Tags
                 <span class="hint has-tip tip-top" data-tooltip title="Tags can be added to support {{ locale.pastoral }} reports and filtering.">?</span>
                 <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}"> </label>
+        </div>
+        <div class="small-6 columns">
+            <label> Actions</label>
+            <select data-actions name="actions[]" id="pastoral-actions" multiple></select>
         </div>
         {% if config.pastoral_parent_access %}
         <div class="small-12 columns">

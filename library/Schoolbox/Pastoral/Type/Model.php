@@ -15,6 +15,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\Action\Model as Action;
 use DomainException;
 use Schoolbox\Sequential;
 
@@ -64,10 +65,13 @@ class Model implements ISoftDeletable, Sequential
      */
     private bool $visibilityLocked = false;
 
+    /** @var Collection|Action[] */
+    private $actions;
 
     public function __construct()
     {
         $this->subTypes = new GenericCollection(Pastoral\SubType\Model::class);
+        $this->actions = new GenericCollection(Action::class);
     }
 
 
@@ -219,6 +223,26 @@ class Model implements ISoftDeletable, Sequential
     public function setVisibilityLocked(bool $visibilityLocked): self
     {
         $this->visibilityLocked = $visibilityLocked;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Action[]
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @param Collection|Action[] $actions
+     *
+     * @return self
+     */
+    public function setActions(Collection $actions): self
+    {
+        $this->actions = $actions;
+
         return $this;
     }
 }

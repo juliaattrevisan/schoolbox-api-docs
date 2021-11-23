@@ -127,30 +127,11 @@ class Controller extends Base
 
         $ids    = [];
         $values = [];
-        $fixed  = [];
-        $nulls  = [];
-        $radios = [];
-        $checkboxes = [];
-        // for mandatory text fields
-        $mandatoryValues = [];
 
         // Get the data into some sort of usable format
 
         foreach ($fieldValues as $field => $value) {
-            if (substr($field, 0, 6) == "value-") {
-                $values[substr($field, 6)] = $value;
-            } else if (substr($field, 0, 10) == "mandatory-") {
-                $values[substr($field, 10)] = $value;
-                $mandatoryValues[substr($field, 10)] = $value;
-            } else if (substr($field, 0, 6) == "fixed-") {
-                $fixed[substr($field, 6)] = $value;
-            } else if (substr($field, 0, 5) == "null-") {
-                $nulls[substr($field, 5)] = $value;
-            } else if (substr($field, 0, 6) == "radio-") {
-                $radios[substr($field, 6)] = $value;
-            } else if (substr($field, 0, 9) == "checkbox-") {
-                $checkboxes[substr($field, 9)] = $value;
-            } else if ($field == "id") {
+            if ($field == "id") {
                 $ids = $value;
             } else {
                 // TODO: new format
@@ -170,27 +151,10 @@ class Controller extends Base
                 // Create new record
                 $model = $mapper->createModel();
                 $oldModel = null;
-
-                foreach ($fixed as $field => $value) {
-                    $setter = $mapper->getSetMethodName($field);
-                    if (!method_exists($mapper, $setter)) {
-                        continue;
-                    }
-
-                    if (empty(trim($value))) {
-                        $value = null;
-                    }
-
-                    $model->$setter($value);
-                }
             }
 
             // set literal values
             foreach ($values as $field => $value) {
-                if (array_key_exists($field, $mandatoryValues) && trim($value[$currentIndex] ?? '') === '') {
-                    // do not save this field, if required and empty
-                    continue 2;
-                }
                 $getter = $mapper->getGetMethodName($field);
                 if (!method_exists($model, $getter)) {
                     continue;
@@ -209,46 +173,6 @@ class Controller extends Base
 
                     $model->$setter($value[$currentIndex]);
                 }
-            }
-
-            // Override nullable fields where appropriate
-            foreach ($nulls as $field => $value) {
-                $setter = $mapper->getSetMethodName($field);
-                if (!method_exists($model, $setter)) {
-                    continue;
-                }
-
-                foreach ($value as $index => $_) {
-                    if ($currentIndex == $index) {
-                        $model->$setter(null);
-                    }
-                }
-            }
-
-            // Process any radio buttons for this list
-            foreach ($radios as $field => $index) {
-                $setter = $mapper->getSetMethodName($field);
-                if (!method_exists($model, $setter)) {
-                    continue;
-                }
-
-                // Radio buttons can only be on for one row, so set that row to true and all others to false
-
-                if ($id == $ids[$index]) {
-                    $model->$setter(1);
-                } else {
-                    $model->$setter(0);
-                }
-            }
-
-            //Set checkboxes whose that are checked
-            foreach ($checkboxes as $field => $value) {
-                $setter  = $mapper->getSetMethodName($field);
-                if (!method_exists($model, $setter)) {
-                    continue;
-                }
-                $boolean = (bool)$value[$currentIndex];
-                $model->$setter($boolean);
             }
 
             // Update values if there is changes
@@ -905,6 +829,30 @@ class Controller extends Base
                     'maxLength' => 100,
                     'mandatory' => true,
                     'default'   => '',
+                ],
+            ]
+        ];
+        $return['pastoral-action'] = [
+            'title' => 'Pastoral Actions',
+            'mapper' => Pastoral\Action\Mapper::class,
+            'delete' => true,
+            'deleteWarning' => 'Are you sure?',
+            'fields' => [
+                'name' => [
+                    'caption'   => 'Name',
+                    'width'     => 9,
+                    'maxLength' => 100,
+                    'mandatory' => true,
+                    'default'   => '',
+                ],
+                'externalCode' => [
+                    'caption'   => 'SIS Code',
+                    'width'     => 3,
+                    'lookup'    => $pastoralExternal->getActionList(),
+                    'nullable'  => true,
+                    'mandatory' => false,
+                    'nullable_label' => 'N/A',
+                    'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luDocumentClassification). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
                 ],
             ]
         ];

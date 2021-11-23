@@ -28,6 +28,7 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
+use Schoolbox\Pastoral\RecordAction\Mapper as PastoralRecordActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\User;
@@ -86,6 +87,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseMulti('pastoral_id', PastoralCommentMapper::class, 'comments', 'comments');
         $this->joinsReverseMulti('pastoral_id', PastoralAttachmentMapper::class, 'attachments', 'attachments');
         $this->joinsReverseMulti('pastoral_id', PastoralTagMapper::class, 'tags', 'tags');
+        $this->joinsReverseMulti('pastoral_record_action', PastoralRecordActionMapper::class, 'recordActions', 'recordActions');
         $this->joinsReverseMulti('root_id', PastoralRevisionMapper::class, 'revisions', 'revisions');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
@@ -283,6 +285,8 @@ class Mapper extends BaseMapper
         }
 
         $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
+        $model->setRecordActions($this->getJoinMapper('recordActions')->findByColumn('pastoral_id', $model->getId()));
+
         $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId(), [
             'order' => [
                 'created_at' => 'desc'
