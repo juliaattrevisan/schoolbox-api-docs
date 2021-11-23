@@ -6961,11 +6961,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Access/Mapper.php
 
 		-
-			message: "#^PHPDoc tag @return with type Schoolbox\\\\Pastoral\\\\Model\\|null is not subtype of native type Schoolbox\\\\Pastoral\\\\Comment\\\\Model\\|null\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/AccessLevelCensor.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and string will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Audience/Module.php
@@ -6989,11 +6984,6 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Pastoral/ReportBuilder/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Pastoral\\\\Revision\\\\DataSource\\:\\:findForRecord\\(\\) should return iterable\\<Schoolbox\\\\Pastoral\\\\Revision\\\\Model\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\Pastoral\\\\Model\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Revision/DataSource.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
