@@ -155,7 +155,58 @@ export default {
          * To update the table to show the UI in the footer
          */
         onTableLoaded () {
-            this.$nextTick(() => this.footerUI_update());
+            this.$nextTick(() => {
+                this.footerUI_update();
+                this.initDropZone();
+            });
+        },
+
+        /**
+         * 
+         */
+        initDropZone () {
+            
+            $('#dropzone').fileDrop({
+                wrapClass: 'dragging',
+                previewsContainer: '#view-all-files [data-dz-container]',
+                previewTemplate: '#view-all-files [data-dz-template]',
+                tplWrap: '<li class="dz-preview" />',
+                // refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                // refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
+                dictDefaultMessage: 'You can drag files into this space.',
+                showIfEmpty: false,
+                reloadContent: false,
+                sending: function (file, xhr, formData) {
+                    var desc = file.name.substr(0, file.name.lastIndexOf('.'));
+                    if(desc.length > 0){
+                        formData.append('description', desc);
+                    }
+                    else {
+                        formData.append('description', file.name);
+                    }
+                    formData.append('category', 161);
+                    formData.append('comment', '');
+                    formData.append('hidden', 0);
+                },
+                complete: function (file) {
+                    $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
+                },
+                success: function (file, response) {
+                    var el = $(file.previewElement);
+
+                    el.attr('data-file', response.id)
+                        .removeClass('dz-processing')
+                        .find('span.dz-upload')
+                        .addClass('complete');
+
+                    el.find('[data-dz-status]').text('Success');
+                },
+                error: function (file, response) {
+                    $('.dz-error [data-close]').removeClass('hide');
+                    $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
+                }
+            });
+
         },
 
     },
@@ -166,25 +217,51 @@ export default {
 
 <template>
 
-    <div class="row">
+    <div class="row" id="view-all-files">
 
         <div class="small-12 columns">
 
-            <v-client-table
-                ref="table"
-                :data="tableData"
-                :columns="tableColumns"
-                :options="tableOptions"
-            >
-                <div slot="beforeTable">
-                    <view-all-files-filters 
-                        :selected-filters="selectedFilters"
-                    />
-                </div>
-                <div slot="afterTable">
-                    <div class="VueTables__table-footer" ref="tableFooter"></div>
-                </div>
-            </v-client-table>
+            <div class="dropzone-wrap">
+
+                <form class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
+                    <div class="dz-default dz-message">You can drag files into this space.</div>
+                </form>
+
+                <ul data-dz-template="" class="hide">
+                    <li>
+                        <div class="card small-12">
+                            <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            <img data-dz-thumbnail="" class="mime" src="/static/images/foundation/preloader.gif">
+                            <p data-dz-name=""></p>
+                            <p class="meta" data-dz-status="">Uploading...</p>
+                            <div class="progress dz-progress">
+                                <span class="meter dz-upload" style="width:0;"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                
+                <div data-dz-container=""></div>
+
+                <v-client-table
+                    ref="table"
+                    :data="tableData"
+                    :columns="tableColumns"
+                    :options="tableOptions"
+                >
+                    <div slot="beforeTable">
+                        <view-all-files-filters 
+                            :selected-filters="selectedFilters"
+                        />
+                    </div>
+                    <div slot="afterTable">
+                        <div class="VueTables__table-footer" ref="tableFooter"></div>
+                    </div>
+                </v-client-table>
+
+            </div>
 
         </div>
 
