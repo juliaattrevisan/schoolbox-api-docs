@@ -687,6 +687,7 @@ class Profile implements IStrategy
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function findHouse(UserProfile\Model $studentBaseProfile, array $student): ?string
     {
@@ -697,13 +698,13 @@ class Profile implements IStrategy
         /* Sentral provides endpoints that result in guaranteed failure
          * ie. endpoints to ids that don't exist
          *
-         * Instead of dying irrecoverably, alert with critical log that this record
+         * Instead of dying irrecoverably, alert with warning log that this record
          * might be a bit broken; house can't be found, and will become null
          */
         try {
             $payload = $this->api->retrieveDocument($endpoint);
         } catch (\InvalidArgumentException $e) {
-            $this->log->critical($e->getMessage());
+            $this->log->warning($e->getMessage());
 
             return null;
         }
