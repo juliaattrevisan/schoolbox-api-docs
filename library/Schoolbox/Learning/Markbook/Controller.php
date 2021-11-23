@@ -422,57 +422,64 @@ class Controller extends Base
     private function buildRank(Markbook $markbook): array
     {
         /**
-         * need to get an list of the students by id, with their ranking
+         * need to get a list of the students by id, with their ranking
+         * array(id,rank)
          */
-        //build basic array (id,weight)
+
+        //build basic array (id,grade)
         $rankList = [];
-        $weights = [];
+        //build list of all weights with all users who have that weighting
+        $grade = [];
+
+        /**
+         * go thought all students and grab their normalised grade / weighting
+         * and create a list of all grades / weightings and list the users that have these
+        */
         foreach ($markbook->getStudentStatistics() as $studentId => $studentStatistic) {
             if ($studentStatistic['meanNormalised'] !== null) {
-                $weights["${studentStatistic['meanNormalised']}"][] = $studentId;
+                $grade["${studentStatistic['meanNormalised']}"][] = $studentId;
                 $rankList[] = [
                     'id'     => $studentId,
-                    'weight' => $studentStatistic['meanNormalised'],
+                    'grade' => $studentStatistic['meanNormalised'],
                 ];
             }
         }
-        //sort based on weight
-        //now to work out if same value, set as same value...
+        //sort based on grade
         usort($rankList, function ($one, $two) {
-            return $one['weight'] <=> $two['weight'];
+            return $one['grade'] <=> $two['grade'];
         });
 
-        //set a rank value to each object
+        //set a rank value
         $rankValue = 1;
+        /**
+         * iterate over ordered list of ranked students, and actually give them helpful rankings
+         * not 42.06, but 5 (you are 5th in the class)
+         */
         $rank = [];
         foreach ($rankList as $student) {
-            //check if already in new list
+            //check if user has already been ranked
             if (!in_array($student['id'], array_keys($rank))) {
+                //user has not been ranked
                 //set user id, with rank as value
                 $rank[$student['id']] = $rankValue;
-                //check if other users have the same rank
-                if (sizeof($weights["${student['weight']}"]) > 1) {
-                    foreach ($weights[$student['weight']] as $id) {
+
+                //check if that grade has more than 1 student associated with it
+                if (sizeof($grade["${student['grade']}"]) > 1) {
+                    /**
+                     * there are multiple users, lets go over them and if they are not the user we just found
+                     * lets add them to the ranking and continue to the next one
+                     */
+                    foreach ($grade[$student['grade']] as $id) {
                         if ($id !== $student['id']) {
+                            //set those users in new list now, with same rank
                             $rank[$id] = $rankValue;
                         }
                     }
                 }
-                //set those users in new list now, with same rank
-
                 //increment rank
                 $rankValue++;
             }
         }
-//        //check if there are any duplicated??? how good question
-
-//        //flip the array
-//        $rank = [];
-//        foreach ($rankList as $key => $value) {
-//            //key +1 so it's not 0 base
-//            $rank[$value['id']] = $key + 1 ;
-//        }
-        //return value
         return $rank;
     }
 }
