@@ -29,6 +29,18 @@ class AbstractCSV
     protected $fp;
 
 
+    /** @var bool $viewRank */
+    protected $viewRank;
+
+    /**
+     * constructor, to allow the passing through of the rank config bool
+     * @param bool $viewRank
+     */
+    public function __construct(bool $viewRank)
+    {
+        $this->viewRank = $viewRank;
+    }
+
     /**
      * Opens file to export
      *
@@ -79,6 +91,10 @@ class AbstractCSV
             'Student Last Name',
             'Student Average',
         ];
+        //is rank enabled
+        if ($this->viewRank) {
+            array_push($headings, 'Student Rank');
+        }
         $assessmentTitles = [];
         foreach ($sortedAssessments as $assessment) {
             $assessmentTitles = $this->addHeaders($assessmentTitles, $assessment);

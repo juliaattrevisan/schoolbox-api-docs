@@ -134,7 +134,7 @@ class Controller extends Base
             /**
              * need to get an list of the students by id, with their ranking
              */
-            $rank = $this->buildRank($markbook);
+            $rank = $markbook->getRanking();
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
@@ -307,7 +307,7 @@ class Controller extends Base
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
-        $csvExporter = new Export\CSV();
+        $csvExporter = new Export\CSV((bool)$this->getConfigLoader()->get('view_rank'));
         $csvExporter->export($markbook, sprintf('%s - Class Markbook.csv', $folder->getName()));
         exit;
     }
@@ -412,57 +412,5 @@ class Controller extends Base
         }
         // Logically should never get to here. It means assessment is due before first term in system starts.
         return false;
-    }
-
-    /**
-     *build student weighting
-     * @param Markbook  $markbook
-     * @return array
-     */
-    private function buildRank(Markbook $markbook): array
-    {
-        /**
-         * need to get a list of the students by id, with their ranking
-         * array(id,rank)
-         */
-
-        //build basic array (id,grade)
-        $rankList = [];
-
-        /**
-         * go thought all students and grab their normalised grade / weighting
-         * and create a list of all grades / weightings and list the users that have these
-        */
-        foreach ($markbook->getStudentStatistics() as $studentId => $studentStatistic) {
-            if ($studentStatistic['meanNormalised'] !== null) {
-                $rankList[] = [
-                    'id'     => $studentId,
-                    'grade' => $studentStatistic['meanNormalised'],
-                ];
-            }
-        }
-        //sort based on grade
-        usort($rankList, function ($one, $two) {
-            return $two['grade'] <=> $one['grade'];
-        });
-
-        //set a rank value
-        $rankValue = 1;
-        $hiddenRank = 1;
-        $lastStudent['grade'] = '';
-        /**
-         * iterate over ordered list of ranked students, and actually give them helpful rankings
-         * not 42.06, but 5 (you are 5th in the class)
-         */
-        $rank = [];
-        foreach ($rankList as $student) {
-            if ($lastStudent['grade'] !== $student['grade']) {
-                $rankValue = $hiddenRank;
-            }
-            $rank[$student['id']] = $rankValue;
-            $hiddenRank++;
-            $lastStudent = $student;
-        }
-        return $rank;
     }
 }
