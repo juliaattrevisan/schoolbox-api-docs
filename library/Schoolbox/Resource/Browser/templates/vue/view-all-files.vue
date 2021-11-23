@@ -172,34 +172,29 @@ export default {
             $('#dropzone').fileDrop({
                 previewsContainer: '#view-all-files [data-dz-container]',
                 previewTemplate: '#view-all-files [data-dz-template]',
-                // showIfEmpty: false,
                 reloadContent: false,
                 sending: (file, xhr, formData) => {
-                    const desc = file.name.substr(0, file.name.lastIndexOf('.'));
-                    if (desc.length > 0) {
-                        formData.append('description', desc);
-                    }
-                    else {
-                        formData.append('description', file.name);
-                    }
+                    const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
+                    const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
+                    formData.append('description', uploadDescription);
                     formData.append('category', this.sourceFolderId);
                     formData.append('comment', '');
                     formData.append('hidden', 0);
                 },
                 complete: (file) => {
-                    $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
+                    file.previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
                 },
                 success: (file, response) => {
-                    const previewElement = $(file.previewElement);
-                    previewElement.attr('data-file', response.id)
-                    previewElement.removeClass('dz-processing');
-                    previewElement.find('span.dz-upload');
-                    previewElement.addClass('complete');
-                    previewElement.find('[data-dz-status]').text('Success');
+                    const previewElement = file.previewElement;
+                    previewElement.setAttribute('data-file', response.id);
+                    previewElement.classList.remove('dz-processing');
+                    previewElement.querySelector('span.dz-upload').classList.add('complete');
+                    previewElement.querySelector('[data-dz-status]').textContent = 'Success';
                 },
                 error: (file, response) => {
-                    $('.dz-error [data-close]').removeClass('hide');
-                    $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
+                    document.querySelector('.dz-error [data-close]').classList.remove('hide');
+                    file.previewElement.classList.remove('dz-processing');
+                    file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
                 }
             });
         },
