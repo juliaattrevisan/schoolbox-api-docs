@@ -71,6 +71,7 @@ class CSV extends AbstractCSV
                 $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark);
             }
             $rowHeaders = [$class->getFolder()->getTitle(), '', '', ''];
+            $rank = [];
             if ($this->viewRank) {
                 array_push($rowHeaders, '');
                 $rank = $courseMarkbook->getRanking();
@@ -85,8 +86,6 @@ class CSV extends AbstractCSV
                     isset($studentAverageMarks[$student->getId()]) ? $studentAverageMarks[$student->getId()]['published']['hr'] : '-',
                 ];
                 if ($this->viewRank) {
-                    //$rank may not be defined, but that will only happen if $this->viewRank is false, then this wont run...
-                    /* @phpstan-ignore-next-line */
                     array_push($studentData, $rank[$class->getId()][$student->getId()]);
                 }
                 // Per Assessment

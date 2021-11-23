@@ -128,6 +128,7 @@ class CSV extends AbstractCSV
      */
     private function writeStudents(GenericCollection $sortedAssessments, Markbook $markbook, GenericCollection $students, GenericCollection $participants): void
     {
+        $rank = [];
         if ($this->viewRank) {
             $rank = $markbook->getRanking();
         }
@@ -140,8 +141,6 @@ class CSV extends AbstractCSV
                 $markbook->getStudentStatistics()[$student->getId()]['weightedMean'],
             ];
             if ($this->viewRank) {
-                //$rank may not be defined, but that will only happen if $this->viewRank is false, then this wont run...
-                /* @phpstan-ignore-next-line */
                 array_push($studentRowHeaders, $rank[$student->getId()]);
             }
 
