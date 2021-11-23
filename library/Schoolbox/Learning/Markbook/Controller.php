@@ -426,8 +426,10 @@ class Controller extends Base
          */
         //build basic array (id,weight)
         $rankList = [];
+        $weights = [];
         foreach ($markbook->getStudentStatistics() as $studentId => $studentStatistic) {
             if ($studentStatistic['meanNormalised'] !== null) {
+                $weights["${studentStatistic['meanNormalised']}"][] = $studentId;
                 $rankList[] = [
                     'id'     => $studentId,
                     'weight' => $studentStatistic['meanNormalised'],
@@ -436,20 +438,40 @@ class Controller extends Base
         }
         //sort based on weight
         //now to work out if same value, set as same value...
-        usort($rankList, function($one, $two) {
+        usort($rankList, function ($one, $two) {
             return $one['weight'] <=> $two['weight'];
         });
 
         //set a rank value to each object
-        foreach ($rankList as $key => $value) {
-
-        }
-        //flip the array
+        $rankValue = 1;
         $rank = [];
-        foreach ($rankList as $key => $value) {
-            //key +1 so it's not 0 base
-            $rank[$value['id']] = $key + 1 ;
+        foreach ($rankList as $student) {
+            //check if already in new list
+            if (!in_array($student['id'], array_keys($rank))) {
+                //set user id, with rank as value
+                $rank[$student['id']] = $rankValue;
+                //check if other users have the same rank
+                if (sizeof($weights["${student['weight']}"]) > 1) {
+                    foreach ($weights[$student['weight']] as $id) {
+                        if ($id !== $student['id']) {
+                            $rank[$id] = $rankValue;
+                        }
+                    }
+                }
+                //set those users in new list now, with same rank
+
+                //increment rank
+                $rankValue++;
+            }
         }
+//        //check if there are any duplicated??? how good question
+
+//        //flip the array
+//        $rank = [];
+//        foreach ($rankList as $key => $value) {
+//            //key +1 so it's not 0 base
+//            $rank[$value['id']] = $key + 1 ;
+//        }
         //return value
         return $rank;
     }
