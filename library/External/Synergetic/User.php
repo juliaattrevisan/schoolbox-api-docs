@@ -1373,12 +1373,37 @@ class External_Synergetic_User implements External_UserInterface
         return $relationshipBindings;
     }
 
+
     /**
      * {@inheritDoc}
      * @return array
+     * @throws \Alaress\Database\Exception
      */
     public function getPhotoRedactionList(): array
     {
-        return [];
+        /* We have to invert LegalPhotoWebFlag because ticking it allows
+         * their photo to be used. This might also return multiple rows
+         * for a guy because it's possible to have a set of vPhotos via
+         * the left join; we accommodate that elsewhere via SELECT TOP 1
+         */
+        $query = "
+            SELECT
+                NULL AS id, 
+                StudentPreferred AS firstname, 
+                StudentSurname AS lastname, 
+                StudentYearLevelDescription AS yearLevel,
+                StudentHouseDescription AS house,
+                StudentID AS external_id,
+                CASE WHEN LegalPhotoWebFlag = 1 THEN 0 ELSE 1 END AS photo_redacted,
+                vPhotos.ModifiedDate AS redact_photo_modified_at
+            FROM vStudents
+            LEFT JOIN vPhotos ON vStudents.StudentID = vPhotos.ID
+            WHERE 
+                FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+                FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
+            ORDER BY vPhotos.ModifiedDate DESC
+        ";
+
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 }

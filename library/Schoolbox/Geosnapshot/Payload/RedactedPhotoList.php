@@ -45,36 +45,63 @@ class RedactedPhotoList
         $stack = [];
 
         foreach ($redactedPhotoList as $redactedPhoto) {
-            /* Path to portrait picture and search page - what's this for though?
+            /* Figure out which querystring param to use based on data set,
+             * since live connectors won't come with a user.id we have to use
+             * the external_id variant instead
              */
-            $redactPhotoPath = sprintf(
-                'https:%s/portrait.php?id=%s&size=constrain200',
-                $this->fqdn,
-                $redactedPhoto['id']
-            );
+            if ('' === (string)$redactedPhoto['id']) {
+                $redactPhotoPath = sprintf(
+                    '%s/portrait.php?userId=%s&size=constrain200',
+                    $this->fqdn,
+                    $redactedPhoto['external_id']
+                );
 
-            $profilePhotoPath = sprintf(
-                'https:%s/search/user/%s',
-                $this->fqdn,
-                $redactedPhoto['id']
-            );
+                /* Can't obtain this without an accompanying user id
+                 * We can't guarantee user accounts were created for this, though;
+                 * customised UPS rulesets might preclude their accounts being spawned
+                 */
+                $profilePhotoPath = '';
+            } else {
+                $redactPhotoPath = sprintf(
+                    '%s/portrait.php?id=%s&size=constrain200',
+                    $this->fqdn,
+                    $redactedPhoto['id']
+                );
+
+                $profilePhotoPath = sprintf(
+                    '%s/search/user/%s',
+                    $this->fqdn,
+                    $redactedPhoto['id']
+                );
+            }
+
+            /* Calculate a modified date, where one might not already exist
+             * redacted_at might be null when the user doesn't have a picture in the sis
+             */
+            $redactedAt = '';
+
+            if ('' !== (string)$redactedPhoto['redact_photo_modified_at']) {
+                $redactedAt = gmdate("Y-m-d\TH:i:s\Z", strtotime($redactedPhoto['redact_photo_modified_at']));
+            }
 
             /* Manufacture Geosnapshot-compatible format
-             * user.updated_at is the closest synonym to redact_photo_modified_at
+             * Dedupe anything that might have been duped in connector land due to joins etc.
              */
-            $stack[] = [
-                'ext_id' => $redactedPhoto['external_id'],
-                'redact_photo' => $redactPhotoPath,
-                'redact_photo_modified_at' => gmdate("Y-m-d\TH:i:s\Z", strtotime($redactedPhoto['updated_at'])),
-                'redacted' => (bool)$redactedPhoto['photo_redacted'],
-                'attributes' => [
-                    'year' => $redactedPhoto['yearLevel'],
-                    'house' => $redactedPhoto['house'],
-                    'profile' => $profilePhotoPath,
-                ]
-            ];
+            if (!isset($stack[$redactedPhoto['external_id']])) {
+                $stack[$redactedPhoto['external_id']] = [
+                    'ext_id' => $redactedPhoto['external_id'],
+                    'redact_photo' => $redactPhotoPath,
+                    'redact_photo_modified_at' => $redactedAt,
+                    'redacted' => (bool)$redactedPhoto['photo_redacted'],
+                    'attributes' => [
+                        'year' => $redactedPhoto['yearLevel'],
+                        'house' => $redactedPhoto['house'],
+                        'profile' => $profilePhotoPath,
+                    ]
+                ];
+            }
         }
 
-        return $stack;
+        return array_values($stack);
     }
 }

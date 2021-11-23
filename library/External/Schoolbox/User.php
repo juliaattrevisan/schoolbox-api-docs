@@ -539,18 +539,22 @@ class External_Schoolbox_User implements External_UserInterface
          * alongside their redaction status. This requires UPS to have run successfully
          * to create the user accounts and year level/house assignations (if any exist)
          */
-        $query = '
+        $query = "
             SELECT 
-                u.id, u.firstname, u.lastname, u.updated_at,
-                lyl.name as yearLevel,
+                u.id,
+                u.firstname, 
+                u.lastname, 
+                lyl.name AS yearLevel,
                 h.house,
-                sup.external_id, sups.photo_redacted
+                sup.external_id,
+                sups.photo_redacted,
+                u.updated_at AS redact_photo_modified_at
             FROM sis_user_profile_student sups
             INNER JOIN sis_user_profile sup ON sups.sis_user_profile_id = sup.id
             INNER JOIN `user` u ON sup.external_id = u.synergy_id
             LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
             LEFT JOIN house h ON u.house = h.id
-        ';
+        ";
 
         return $this->internalDatabase->executeQuery($query)->fetchAll();
     }
