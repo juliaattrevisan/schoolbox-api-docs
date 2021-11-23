@@ -21,6 +21,10 @@ export default {
     ],
 
     props: {
+        canEdit: { //whether the user has permission to modify files
+            type: Boolean,
+            required: true,
+        },
         componentInstanceConfig: { //any config used within the homepage component instance, currently used to set initial sorting
             type: Object,
             required: true,
@@ -33,10 +37,10 @@ export default {
             type: Array,
             required: true,
         },
-        canEdit: { //whether the user has permission to modify files
-            type: Boolean,
+        sourceFolderId: { //to know where to upload files to
+            type: Number,
             required: true,
-        }
+        },
     },
 
     data () {
@@ -165,48 +169,39 @@ export default {
          * 
          */
         initDropZone () {
-            
             $('#dropzone').fileDrop({
-                wrapClass: 'dragging',
                 previewsContainer: '#view-all-files [data-dz-container]',
                 previewTemplate: '#view-all-files [data-dz-template]',
-                tplWrap: '<li class="dz-preview" />',
-                // refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                // refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
-                dictDefaultMessage: 'You can drag files into this space.',
-                showIfEmpty: false,
+                // showIfEmpty: false,
                 reloadContent: false,
-                sending: function (file, xhr, formData) {
-                    var desc = file.name.substr(0, file.name.lastIndexOf('.'));
-                    if(desc.length > 0){
+                sending: (file, xhr, formData) => {
+                    const desc = file.name.substr(0, file.name.lastIndexOf('.'));
+                    if (desc.length > 0) {
                         formData.append('description', desc);
                     }
                     else {
                         formData.append('description', file.name);
                     }
-                    formData.append('category', 161);
+                    formData.append('category', this.sourceFolderId);
                     formData.append('comment', '');
                     formData.append('hidden', 0);
                 },
-                complete: function (file) {
+                complete: (file) => {
                     $(file.previewElement).find('[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
                 },
-                success: function (file, response) {
-                    var el = $(file.previewElement);
-
-                    el.attr('data-file', response.id)
-                        .removeClass('dz-processing')
-                        .find('span.dz-upload')
-                        .addClass('complete');
-
-                    el.find('[data-dz-status]').text('Success');
+                success: (file, response) => {
+                    const previewElement = $(file.previewElement);
+                    previewElement.attr('data-file', response.id)
+                    previewElement.removeClass('dz-processing');
+                    previewElement.find('span.dz-upload');
+                    previewElement.addClass('complete');
+                    previewElement.find('[data-dz-status]').text('Success');
                 },
-                error: function (file, response) {
+                error: (file, response) => {
                     $('.dz-error [data-close]').removeClass('hide');
                     $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
                 }
             });
-
         },
 
     },
@@ -227,24 +222,6 @@ export default {
                     <div class="dz-default dz-message">You can drag files into this space.</div>
                 </form>
 
-                <ul data-dz-template="" class="hide">
-                    <li>
-                        <div class="card small-12">
-                            <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                            <img data-dz-thumbnail="" class="mime" src="/static/images/foundation/preloader.gif">
-                            <p data-dz-name=""></p>
-                            <p class="meta" data-dz-status="">Uploading...</p>
-                            <div class="progress dz-progress">
-                                <span class="meter dz-upload" style="width:0;"></span>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                
-                <div data-dz-container=""></div>
-
                 <v-client-table
                     ref="table"
                     :data="tableData"
@@ -257,7 +234,30 @@ export default {
                         />
                     </div>
                     <div slot="afterTable">
+                        <div class="dropped-files-container">
+                            <div data-dz-container=""></div>
+                            <div data-dz-template="" class="hide">
+                                <div>
+                                    <div class="card small-12">
+                                        <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                        <img data-dz-thumbnail="" class="mime" src="/static/images/foundation/preloader.gif" alt="file loading spinner">
+                                        <p data-dz-name=""></p>
+                                        <p class="meta" data-dz-status="">Uploading...</p>
+                                        <div class="progress dz-progress">
+                                            <span class="meter dz-upload" style="width:0;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
+                        <div class="component-action">
+                            <section>
+                                <p><a :href="`/cms/file/new/${this.sourceFolderId}`">Select a file</a> or drag and drop multiple onto this component</p>
+                            </section>
+                        </div>
                     </div>
                 </v-client-table>
 
@@ -311,5 +311,22 @@ export default {
     width: 2.5rem; //keep the edit icon on the right side
 }
 
+.dropped-files-container {
+    background: white;
+    ul li { 
+        list-style-type: none;
+    }
+    .card {
+        background: white;
+    }
+}
+
+.VueTables__table-footer {
+    margin-bottom: 0; //.component action sits underneath
+}
+
+.component-action {
+    margin-bottom: 2rem; //add margin as it's below the table-footer
+}
 
 </style>

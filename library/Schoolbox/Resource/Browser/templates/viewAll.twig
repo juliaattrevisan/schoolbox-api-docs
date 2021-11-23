@@ -1,5 +1,3 @@
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js"></script>
-
 <ul class="breadcrumb">
     <li><a href="/homepage/{{ homepage.id }}">{{ homepage.getNameWithCodes() }}</a></li>
     <li class="active"><span>{{ title }}</span></li>
@@ -13,10 +11,12 @@
 
 <div id="view-all-files-container">
     <view-all-files
+        :can-edit="{{ canEdit ? 'true' : 'false' }}"
         :component-instance-config="{{ componentInstanceConfig|json_encode }}"
         :files="{{ files|json_encode }}"
         :selected-filters="{{ filter|json_encode }}"
-        :can-edit="{{ canEdit ? 'true' : 'false' }}"
+        :source-folder-id="{{ sourceFolderID }}"
     />
 </div>
+<script src="{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/viewAllFiles.js"></script>
