@@ -102,13 +102,22 @@ HELP;
 
             foreach ($payload as $redaction) {
                 if ($redaction['redacted']) {
-                    $this->getLogger()->debug(sprintf(
-                        'external_id %s (year: %s, house: %s) redacted at %s',
-                        $redaction['ext_id'],
-                        $redaction['attributes']['year'] ?: 'null',
-                        $redaction['attributes']['house'] ?: 'null',
-                        $redaction['redact_photo_modified_at']
-                    ));
+                    if ('' === (string)$redaction['redact_photo_modified_at']) {
+                        $this->getLogger()->debug(sprintf(
+                            'external_id %s (year: %s, house: %s) is currently redacted, but did not have a profile pic in the sis',
+                            $redaction['ext_id'],
+                            $redaction['attributes']['year'] ?: 'null',
+                            $redaction['attributes']['house'] ?: 'null'
+                        ));
+                    } else {
+                        $this->getLogger()->debug(sprintf(
+                            'external_id %s (year: %s, house: %s) was redacted at %s',
+                            $redaction['ext_id'],
+                            $redaction['attributes']['year'] ?: 'null',
+                            $redaction['attributes']['house'] ?: 'null',
+                            $redaction['redact_photo_modified_at']
+                        ));
+                    }
                 } else {
                     $numVisible++;
                 }
