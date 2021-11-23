@@ -238,7 +238,9 @@ class Factory implements IFactory
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     PersonalMapper::getInstance(),
                     CategoryMapper::getInstance(),
-                    \Schoolbox\Resource\Folder\Mapper::getInstance()
+                    \Schoolbox\Resource\Folder\Mapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance()
                 ))->produce();
 
             default:

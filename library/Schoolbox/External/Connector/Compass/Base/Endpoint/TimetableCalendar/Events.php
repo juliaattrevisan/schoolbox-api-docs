@@ -190,6 +190,18 @@ class Events implements IStrategy
 
 
     /**
+     * @var ClassEntryMapper
+     */
+    private ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    private ClassInvolvementMapper $classInvolvementMapper;
+
+
+    /**
      * Used for api calls
      *
      * @var string
@@ -234,6 +246,8 @@ class Events implements IStrategy
      * @param PersonalMapper                    $relationPersonalMapper
      * @param CategoryMapper                    $relationFolderMapper
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param ClassEntryMapper                  $classEntryMapper
+     * @param ClassInvolvementMapper            $classInvolvementMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -246,7 +260,9 @@ class Events implements IStrategy
         \Event\Source\Mapper $eventSourceMapper,
         PersonalMapper $relationPersonalMapper,
         CategoryMapper $relationFolderMapper,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper
+        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        ClassEntryMapper $classEntryMapper,
+        ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -260,6 +276,8 @@ class Events implements IStrategy
         $this->relationPersonalMapper = $relationPersonalMapper;
         $this->relationFolderMapper = $relationFolderMapper;
         $this->folderMapper = $folderMapper;
+        $this->classEntryMapper = $classEntryMapper;
+        $this->classInvolvementMapper = $classInvolvementMapper;
 
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
@@ -628,11 +646,11 @@ class Events implements IStrategy
                     $activityInstance['start'],
                 ));
 
-                $classInstance = ClassEntryMapper::getInstance()->createModel()
+                $classInstance = $this->classEntryMapper->createModel()
                     ->setName($activity['name'])
                     ->setCode($activity['name']);
 
-                ClassEntryMapper::getInstance()->save($classInstance);
+                $this->classEntryMapper->save($classInstance);
 
                 $this->enrolmentManifest[$activity['name']]['instance'] = $classInstance;
             }
@@ -660,11 +678,11 @@ class Events implements IStrategy
                         $externalId
                     ));
 
-                    $classInvolvement = ClassInvolvementMapper::getInstance()->createModel()
+                    $classInvolvement = $this->classInvolvementMapper->createModel()
                         ->setClass($classInstance)
                         ->setExternalId($externalId);
 
-                    ClassInvolvementMapper::getInstance()->save($classInvolvement);
+                    $this->classInvolvementMapper->save($classInvolvement);
 
                     $this->enrolmentManifest[$activity['name']]['manifest'][$externalId] = $classInvolvement;
                 }

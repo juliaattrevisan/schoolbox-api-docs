@@ -16,6 +16,8 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\PersonalMapper;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\GenericCollection;
@@ -139,6 +141,18 @@ class Factory
 
 
     /**
+     * @var ClassEntryMapper
+     */
+    private ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    private ClassInvolvementMapper $classInvolvementMapper;
+
+
+    /**
      * Factory constructor.
      *
      * @param LoggerInterface                   $log
@@ -157,6 +171,8 @@ class Factory
      * @param PersonalMapper                    $relationalPersonalMapper
      * @param CategoryMapper                    $relationFolderMapper
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param ClassEntryMapper                  $classEntryMapper
+     * @param ClassInvolvementMapper            $classInvolvementMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -176,7 +192,9 @@ class Factory
         EventTypeMapper $eventTypeMapper,
         PersonalMapper $relationalPersonalMapper,
         CategoryMapper $relationFolderMapper,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper
+        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        ClassEntryMapper $classEntryMapper,
+        ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -200,12 +218,15 @@ class Factory
         $this->relationPersonalMapper = $relationalPersonalMapper;
         $this->relationFolderMapper = $relationFolderMapper;
         $this->folderMapper = $folderMapper;
+        $this->classEntryMapper = $classEntryMapper;
+        $this->classInvolvementMapper = $classInvolvementMapper;
     }
 
 
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
@@ -281,7 +302,9 @@ class Factory
                 $this->eventSourceMapper,
                 $this->relationPersonalMapper,
                 $this->relationFolderMapper,
-                $this->folderMapper
+                $this->folderMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
             ))
             ->add(new ApiCertification(
                 $this->log,
