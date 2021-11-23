@@ -1140,7 +1140,7 @@ class Controller extends Base
                 $record->getAccess()->add($recordAccess);
             }
 
-            // Save actions
+            // Save actions, record actions are compared against luAction id rather than recordAction id.
             $existingRecordActions = $record->getRecordActions()->indexByCallback(
                 static function ($recordAction) {
                     /** @var RecordAction\Model $recordAction */

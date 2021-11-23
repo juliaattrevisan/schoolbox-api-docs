@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
@@ -52,10 +53,10 @@ class AccessLevelCensor
      * @param Collection|Model[] $records A list of pastoral records
      * @param User               $user    The user who is trying to view them
      *
-     * @return Collection|Model[]
+     * @return GenericCollection
      * @throws InsufficientHydrationException
      */
-    public function filterRecordsForUser(Collection $records, User $user): Collection
+    public function filterRecordsForUser(Collection $records, User $user): GenericCollection
     {
         $resultCache     = new Collection();
         $filteredRecords = Model::createCollection();
@@ -169,7 +170,7 @@ class AccessLevelCensor
      * @param Comment\Model $comment A pastoral comment
      * @param User          $user    The user who is trying to view them
      *
-     * @return Model|null
+     * @return Comment\Model|null
      * @throws InsufficientHydrationException
      */
     private function filterCommentForUser(Comment\Model $comment, User $user): ?Comment\Model

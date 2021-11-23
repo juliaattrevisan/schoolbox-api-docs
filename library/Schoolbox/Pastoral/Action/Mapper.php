@@ -9,7 +9,6 @@ namespace Schoolbox\Pastoral\Action;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\SubType\Model as PastoralSubtype;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 
@@ -39,31 +38,6 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteRecordActions']);
-    }
-
-
-    /**
-     * Find a collection of actions associated with pastoral record
-     *
-     * @param Pastoral $pastoral
-     *
-     * @return GenericCollection
-     */
-    public function findForRecord(Pastoral $pastoral): GenericCollection
-    {
-        $statement = $this->getDatabase()->prepare(
-            "
-            {$this->getSelectString()}
-            INNER JOIN      `pastoral_record_action` ON `pastoral_record_action`.`action_id` = `{$this->getTable()}`.`id`
-            WHERE           `pastoral_record_action`.`pastoral_id` = :pastoralId
-            AND             `{$this->getTable()}`.`deleted_at` IS NULL
-            ORDER BY        `sequence`
-        "
-        );
-
-        $statement->execute(['pastoralId' => $pastoral->getId()]);
-
-        return $this->hydrateSelect($statement);
     }
 
     /**
