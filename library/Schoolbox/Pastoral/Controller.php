@@ -114,6 +114,9 @@ class Controller extends Base
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     protected PastoralTypeMapper $pastoralTypeMapper;
 
+    /** @var RecordAction\Mapper $pastoralRecordActionMapper */
+    private RecordAction\Mapper $pastoralRecordActionMapper;
+
     /** @var PastoralUploadQueueMapper $pastoralUploadQueueMapper */
     protected PastoralUploadQueueMapper $pastoralUploadQueueMapper;
 
@@ -153,6 +156,7 @@ class Controller extends Base
      * @param PastoralRevisionDataSource $pastoralRevisionDataSource
      * @param PastoralTagMapper          $pastoralTagMapper
      * @param PastoralActionMapper       $pastoralActionMapper
+     * @param RecordAction\Mapper        $pastoralRecordActionMapper
      * @param PastoralCommentMapper      $pastoralCommentMapper
      * @param PastoralAttachmentMapper   $pastoralAttachmentMapper
      * @param RoleMapper                 $roleMapper
@@ -178,6 +182,7 @@ class Controller extends Base
         PastoralRevisionDataSource $pastoralRevisionDataSource,
         PastoralTagMapper $pastoralTagMapper,
         PastoralActionMapper $pastoralActionMapper,
+        \Schoolbox\Pastoral\RecordAction\Mapper $pastoralRecordActionMapper,
         PastoralCommentMapper $pastoralCommentMapper,
         PastoralAttachmentMapper $pastoralAttachmentMapper,
         RoleMapper $roleMapper,
@@ -205,6 +210,7 @@ class Controller extends Base
         $this->pastoralRevisionDataSource = $pastoralRevisionDataSource;
         $this->pastoralTagMapper          = $pastoralTagMapper;
         $this->pastoralActionMapper       = $pastoralActionMapper;
+        $this->pastoralRecordActionMapper = $pastoralRecordActionMapper;
         $this->pastoralTypeMapper         = $pastoralTypeMapper;
         $this->pastoralUploadQueueMapper  = $pastoralUploadQueueMapper;
         $this->roleMapper                 = $roleMapper;
@@ -1035,6 +1041,9 @@ class Controller extends Base
         // Prepare attachments. No database change yet.
         $newAttachments = $this->prepareAttachments($post);
 
+        // Prepare actions.
+        $newRecordActions = $this->prepareRecordActions($post);
+
         // Now ready to make changes
         $db = $this->pastoralTypeMapper->getDatabase();
         $db->beginTransaction();
@@ -1058,11 +1067,6 @@ class Controller extends Base
                     $record->setParent($parent);
                 }
             }
-            $actions =
-                is_array($post->get('actions'))
-                    ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post->get('actions'))))
-                    : $this->pastoralActionMapper->createCollection();
-            $record->setActions($actions);
 
             // Find student
             try {
@@ -1135,6 +1139,35 @@ class Controller extends Base
                 $this->pastoralAccessMapper->save($recordAccess);
                 $record->getAccess()->add($recordAccess);
             }
+
+            // Save actions
+            $existingRecordActions = $record->getRecordActions()->indexByCallback(
+                static function ($recordAction) {
+                    /** @var RecordAction\Model $recordAction */
+                    return $recordAction->getAction()->getId();
+                }
+            );
+            $record->setRecordActions($this->pastoralRecordActionMapper->createCollection());
+            /** @var RecordAction\Model $action */
+            foreach ($newRecordActions as $action) {
+                // if this action is already set to this record, just put it back
+                if (in_array($action->getAction()->getId(), $existingRecordActions->keys())) {
+                    $record->getRecordActions()->add($existingRecordActions->getOffset($action->getAction()->getId()));
+                } else {
+                    $recordAction = clone $action;
+                    $recordAction->setPastoral($record);
+                    $this->pastoralRecordActionMapper->save($recordAction);
+                    $record->getRecordActions()->add($recordAction);
+                }
+            }
+            // Delete actions no longer exists
+            $removingRecordActions = $existingRecordActions->filter(
+                static function ($action) use ($newRecordActions) {
+                    /** @var RecordAction\Model $action */
+                    return !in_array($action->getAction()->getId(), $newRecordActions->keys());
+                }
+            );
+            $this->pastoralRecordActionMapper->deleteByColumn('id', $removingRecordActions->getPropertyValues('id'));
 
             // preparation
             $oldAttachments       = $this->pastoralAttachmentMapper->findByColumn('pastoral_id', $record->getId());
@@ -1309,6 +1342,27 @@ class Controller extends Base
     }
 
     /**
+     * Returns recordActions from post vars, indexed by luAction id
+     * @param RequestValues $post
+     * @return Collection
+     * @throws MapperException
+     */
+    private function prepareRecordActions(RequestValues $post): Collection
+    {
+        $recordActions = $this->pastoralRecordActionMapper->createCollection();
+        $actions       =
+            is_array($post->get('actions'))
+                ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post->get('actions'))))
+                : $this->pastoralActionMapper->createCollection();
+        foreach ($actions as $action) {
+            /** @var RecordAction\Model $recordAction */
+            $recordAction = $this->pastoralRecordActionMapper->createModel();
+            $recordActions->offsetSet($action->getId(), $recordAction->setAction($action));
+        }
+        return $recordActions;
+    }
+
+    /**
      * Get a list of available actions
      *
      * @api   GET /pastoral/actions
@@ -1350,6 +1404,30 @@ class Controller extends Base
             ];
         }
         $this->getResponse()->content->set($this->buildJsonOutput($output));
+    }
+
+    /**
+     * Update action completion for this record
+     *
+     * @api   POST /record/{recordId:\d+}/action/update
+     * @since 21.1
+     */
+    public function postActionUpdate(): void
+    {
+        $recordActionId = (int)$this->request->post->get('recordActionId');
+        $checked        = (bool)$this->request->post->get('checked');
+
+        $data = [];
+        try {
+            $recordAction = $this->pastoralRecordActionMapper->findById($recordActionId);
+            $recordAction->setCompleted($checked)
+                         ->setUpdatedBy($this->getUser());
+            $this->pastoralRecordActionMapper->save($recordAction);
+        } catch (MapperException $e) {
+            $data['error'] = $e->getMessage();
+            $this->getResponse()->status->setCode(400);
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 }
 

@@ -25,9 +25,6 @@ use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-/**
- * @method static GenericCollection|Model[] createCollection()
- */
 class Model implements ISoftDeletable, IModel
 {
     use Id;
@@ -100,8 +97,8 @@ class Model implements ISoftDeletable, IModel
     /** @var Collection|Tag\Model[] */
     private $tags;
 
-    /** @var Collection|Action\Model[] */
-    private $actions;
+    /** @var Collection|RecordAction\Model[] */
+    private $recordActions;
 
     /** @var Collection|Model[] */
     private $relatedRecords;
@@ -116,13 +113,13 @@ class Model implements ISoftDeletable, IModel
     public function __construct()
     {
         // TODO tighten collection types
-        $this->access = new Collection();
-        $this->comments = new Collection();
-        $this->attachments = new Collection();
-        $this->tags = new Collection();
-        $this->actions = new Collection();
-        $this->relatedRecords = new Collection();
-        $this->revisions = new Collection();
+        $this->access                = new Collection();
+        $this->comments              = new Collection();
+        $this->attachments           = new Collection();
+        $this->tags                  = new Collection();
+        $this->recordActions         = new Collection();
+        $this->relatedRecords        = new Collection();
+        $this->revisions             = new Collection();
         $this->parentCommentsAllowed = false;
     }
 
@@ -186,23 +183,23 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param Collection|Action\Model[] $actions
+     * @param Collection|RecordAction\Model[] $recordActions
      *
      * @return self
      */
-    public function setActions(Collection $actions): self
+    public function setRecordActions(Collection $recordActions): self
     {
-        $this->actions = $actions;
+        $this->recordActions = $recordActions;
 
         return $this;
     }
 
     /**
-     * @return Collection|Action\Model[]
+     * @return Collection|RecordAction\Model[]
      */
-    public function getActions()
+    public function getRecordActions()
     {
-        return $this->actions;
+        return $this->recordActions;
     }
 
     /**

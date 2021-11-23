@@ -30,17 +30,19 @@ CREATE TABLE `pastoral_type_action`
 -- Table to connect pastoral records to pastoral actions
 CREATE TABLE `pastoral_record_action`
 (
-    `id`           int(11) NOT NULL AUTO_INCREMENT,
-    `pastoral_id`  int(11),
-    `action_id`    int(11) NOT NULL,
-    `external_id`  int(11), -- PastoralCareActionsSeq
-    `completed_by` int(10) unsigned,
-    `completed_at` datetime,
+    `id`          int(11) NOT NULL AUTO_INCREMENT,
+    `pastoral_id` int(11),
+    `action_id`   int(11) NOT NULL,
+    `external_id` int(11), -- PastoralCareActionsSeq
+    `completed`   tinyint(1),
+    `updated_by`  int(10) unsigned,
+    `updated_at`  datetime,
+    `deleted_at`  datetime,
     PRIMARY KEY (`id`),
     KEY `fk_pastoral_id_idx` (`pastoral_id`),
     KEY `fk_action_id_idx` (`action_id`),
     CONSTRAINT `fk_pastoral_record_action_pastoral_id` FOREIGN KEY (`pastoral_id`) REFERENCES `pastoral` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT `fk_pastoral_record_action_action_id` FOREIGN KEY (`action_id`) REFERENCES `lu_pastoral_action` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT `fk_pastoral_record_action_completed_by` FOREIGN KEY (`completed_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    CONSTRAINT `fk_pastoral_record_action_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;

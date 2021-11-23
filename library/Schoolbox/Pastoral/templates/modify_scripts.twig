@@ -83,8 +83,8 @@
                 }
             },
             value: [
-                {% for action in record.actions %}
-                {{ action | json_encode | raw }}{% if not loop.last %},{% endif %}
+                {% for recordAction in record.recordActions %}
+                {{ recordAction.action | json_encode | raw }}{% if not loop.last %},{% endif %}
                 {% endfor %}
             ]
         });

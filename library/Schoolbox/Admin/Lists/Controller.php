@@ -836,7 +836,7 @@ class Controller extends Base
             'title' => 'Pastoral Actions',
             'mapper' => Pastoral\Action\Mapper::class,
             'delete' => true,
-            'deleteWarning' => 'Deleting pastoral actions may affect existing reports. Are you sure?',
+            'deleteWarning' => 'Are you sure?',
             'fields' => [
                 'name' => [
                     'caption'   => 'Name',

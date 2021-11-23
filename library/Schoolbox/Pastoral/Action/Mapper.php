@@ -37,6 +37,8 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteRecordActions']);
     }
 
 
@@ -110,6 +112,15 @@ class Mapper extends BaseMapper
         $statement->execute(['pastoralSubtypeId' => $pastoralSubtype->getId()]);
 
         return $this->hydrateSelect($statement);
+    }
+
+    /**
+     * @param Model $model
+     */
+    public function deleteRecordActions(Model $model)
+    {
+        $pastoralRecordActionMapper = \Schoolbox\Pastoral\RecordAction\Mapper::getInstance();
+        $pastoralRecordActionMapper->deleteByColumn('action_id', $model->getId());
     }
 
     /**
