@@ -45,6 +45,7 @@ class Module extends BaseModule
                     'userMapper'     => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'registryMapper' => $this->getMapperFactory()->getLazy(RegistryMapper::class),
                     'serviceMapper'  => $this->getMapperFactory()->getLazy(ServiceMapper::class),
+                    'tokenValidator' => $injector->lazyGet('user.tokenBuilder'),
                 ]
             )
         );
