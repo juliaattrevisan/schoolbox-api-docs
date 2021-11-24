@@ -68,13 +68,12 @@ class Module extends BaseModule
 
                     $factory           = new Component_Homepage_Factory(new User(), $page);
                     $componentInstance = $componentInstanceMapper->findByInstanceId($params['componentId']);
-                    $toolId            = $componentInstance
-                        ->getConfigByKey(ConsumerController::COMPONENT_CONFIG_LTI_PROVIDER)
-                        ->getValue();
+                    $component         = $factory->buildComponent($componentInstance);
+                    $toolId            = $component->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_PROVIDER);
 
                     return [
                         'folder'    => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),
-                        'component' => $factory->buildComponent($componentInstance),
+                        'component' => $component,
                         'tool'      => $this->getMapperFactory()->get(ToolMapper::class)->findById($toolId),
                     ];
                 } catch (MapperException $e) {

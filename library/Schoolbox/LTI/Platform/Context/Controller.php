@@ -12,7 +12,10 @@ namespace Schoolbox\LTI\Platform\Context;
 use Alaress\Web\Controller\Base as BaseController;
 use Component_ControllerAbstract;
 use League\OAuth2\Server\ResourceServer;
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
@@ -24,6 +27,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\LTI\Consumer\Controller as ConsumerController;
 use Schoolbox\LTI\Context\Folder as ContextFolder;
 use Schoolbox\LTI\Membership\Builder;
 use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
@@ -127,10 +131,39 @@ class Controller extends BaseController
         Component_ControllerAbstract $component,
         ToolModel $tool
     ): void {
-        // Do something with the component
+        // Build a launch request
+        $resourceLink = new LtiResourceLink(
+            'component-' . $component->getInstance()->getId(),
+            [
+                'url'   => $component->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_EMBED_URL),
+                'title' => $component->getConfig(ConsumerController::COMPONENT_CONFIG_TITLE),
+            ]
+        );
+
+        // Figure out who's trying to log in: use that to determine their role
+        $roleClaimFactory = new RoleClaimFactory($this->access);
+        $roles            = array_merge(
+            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
+            $roleClaimFactory->buildContextRolesForFolder($this->getUser(), $folder),
+        );
+
+
+        // Build the thing
+        $repository     = $this->registrations->find($tool->getDeploymentId());
+        $messageBuilder = new LtiResourceLinkLaunchRequestBuilder();
+        $message        = $messageBuilder->buildLtiResourceLinkLaunchRequest(
+            $resourceLink,
+            $repository,
+            $this->userCodec->encode($this->getUser()),
+            null,
+            $roles,
+        );
+
+        // Send the request
         $this->response->content->set(
-            $this->buildJsonOutput(
-                ['message' => ''],
+            $this->buildUnthemedHtmlOutput(
+                '@ltiPlatform/messageForm.twig',
+                ['message' => $message],
             )
         );
     }
