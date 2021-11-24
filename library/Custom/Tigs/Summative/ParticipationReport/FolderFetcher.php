@@ -16,6 +16,7 @@ use External_UserInterface;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
 use UnexpectedValueException;
+
 use function explode;
 use function preg_match;
 use function array_filter;
