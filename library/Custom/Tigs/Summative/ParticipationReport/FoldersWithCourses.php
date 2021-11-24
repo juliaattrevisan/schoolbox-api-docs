@@ -57,7 +57,8 @@ class FoldersWithCourses
      *
      * @return array
      */
-    public function find(): array {
+    public function find(): array
+    {
         $statement = $this->folderMapper->getDatabase()->prepare('
             SELECT DISTINCT ci.folder_id
             FROM folder f
