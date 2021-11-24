@@ -9,25 +9,20 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Role;
-
-use function array_filter;
-use function array_map;
-use function array_merge;
-use function count;
-
 use Custom\Tigs\Summative\StudentAttributes;
-
-use function explode;
-use function preg_match;
-
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 use External_UserInterface;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
 use UnexpectedValueException;
+
+use function explode;
+use function preg_match;
+use function array_filter;
+use function array_map;
+use function array_merge;
+use function count;
 
 /**
  * Responsible for fetching the set of folders a student is/was enrolled in
@@ -49,6 +44,12 @@ class FolderFetcher
 
 
     /**
+     * @var FoldersWithCourses
+     */
+    private FoldersWithCourses $foldersWithCourses;
+
+
+    /**
      * @param Folder\Mapper          $folderMapper
      * @param External_UserInterface $externalUser
      */
@@ -60,6 +61,10 @@ class FolderFetcher
         /* A cache for remembering previous class ids
          */
         $this->previousClassIdCache = new PreviousClassIdCache($folderMapper);
+
+        /* A cache for remembering folders with courses
+         */
+        $this->foldersWithCourses = new FoldersWithCourses($folderMapper);
     }
 
 
@@ -129,17 +134,38 @@ class FolderFetcher
             );
         }
 
+        /* This is a human-curated blacklist which specifically excludes folders.
+         * The folders to be excluded are maintained through a user interface, by a human
+         * but the humans can't keep up with the exclusions using this mechanic...
+         */
         $exclusions = array_filter(array_map('\trim', explode(',', $excludedClassCodes ?? '')));
+
+        /* ...which means we programmatically exclude folders that would otherwise be
+         * blacklisted by a human through the ui. We only care about Folders With Courses;
+         * Folders Without Courses can be ignored
+         */
+        $foldersWithCourses = $this->foldersWithCourses->find();
+
         foreach ($folders as $idx => $folder) {
+            /* This folder was blacklisted via human curation
+             */
             if ($this->isFolderExcluded($folder, $exclusions)) {
+                $folders->offsetUnset($idx);
+            }
+
+            /* Only care about folders with course implementations
+             */
+            if (!isset($foldersWithCourses[$folder->getId()])) {
                 $folders->offsetUnset($idx);
             }
         }
 
+        /* Sort alphabetically
+         */
         $folders->indexBy($this->folderMapper->getIdentifierProperty())
-                ->sortByCallback(static function (Folder\Model $a, Folder\Model $b): int {
-                    return \strnatcasecmp($a->getName(), $b->getName());
-                }, true);
+            ->sortByCallback(static function (Folder\Model $a, Folder\Model $b): int {
+                return \strnatcasecmp($a->getName(), $b->getName());
+            }, true);
 
         return $folders;
     }
@@ -185,7 +211,7 @@ class FolderFetcher
     /**
      * @return array
      */
-    public function getPreviouClassIds(): array
+    public function getPreviousClassIds(): array
     {
         return $this->previousClassIdCache->getIds();
     }

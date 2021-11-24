@@ -18,9 +18,6 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use DomainException;
 use External_ClassInterface;
-
-use function implode;
-
 use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\GenericCollection;
@@ -43,6 +40,8 @@ use UnderflowException;
 use UnexpectedValueException;
 use Alaress\Database;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+
+use function implode;
 
 class Controller extends Web\Controller\Base
 {
@@ -457,7 +456,7 @@ class Controller extends Web\Controller\Base
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
         $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $this->getUser(), $roleTypeOverride);
 
-        $previousClassIds = $fetcher->getPreviouClassIds();
+        $previousClassIds = $fetcher->getPreviousClassIds();
 
         $subjects = [];
         foreach ($folders as $folder) {
