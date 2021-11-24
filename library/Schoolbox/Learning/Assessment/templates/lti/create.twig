@@ -125,7 +125,8 @@
                     $resourceLinkMissingUrlModal      = $('#resourceLinkMissingUrlModal'),
                     $toolModal                        = $('#toolModal'),
                     $toolModalIframe                  = $toolModal.find('#toolModalIframe'),
-                    $modals                           = [$resourceLinkMissingLineItemModal, $resourceLinkMissingUrlModal, $toolModal];
+                    $modals                           = [$resourceLinkMissingLineItemModal, $resourceLinkMissingUrlModal, $toolModal],
+                    deepLinkingResponseMessageType    = '{{ deepLinkingResponseMessageType }}';
 
                 // Rig close buttons on modals
                 $modals.forEach($modal => {
@@ -149,32 +150,36 @@
                     // Fill in the form with values from the message data
                     // TODO figure out if optional chaining is supported in all targeted browsers
                     let data         = event.data,
+                        messageType  = data?.messageType,
                         tool         = data?.tool,
                         resourceLink = data?.resourceLinks?.[0];
 
-                    // Look at the first resource link, set values based on that
-                    if (resourceLink) {
-                        // Use the URL in the resource link? otherwise the tool's default launch URL
-                        let url = resourceLink?.url ?? tool?.launchUrl;
-                        if (url) {
-                            useResourceLink(
-                                url,
-                                resourceLink?.title,
-                                resourceLink?.text,
-                                resourceLink?.custom ?? {},
-                                resourceLink?.lineItem?.resourceId,
-                                resourceLink?.lineItem?.scoreMaximum,
-                            );
+                    // Not a deep linking response: ignore this message
+                    if (messageType === deepLinkingResponseMessageType) {
+                        // Look at the first resource link, set values based on that
+                        if (resourceLink) {
+                            // Use the URL in the resource link? otherwise the tool's default launch URL
+                            let url = resourceLink?.url ?? tool?.launchUrl;
+                            if (url) {
+                                useResourceLink(
+                                    url,
+                                    resourceLink?.title,
+                                    resourceLink?.text,
+                                    resourceLink?.custom ?? {},
+                                    resourceLink?.lineItem?.resourceId,
+                                    resourceLink?.lineItem?.scoreMaximum,
+                                );
+                            } else {
+                                // Raise some warning about what was selected not having a URL.
+                                // This should never happen, because either
+                                // * the resource link will have a URL
+                                // * the tool will have a default URL
+                                $resourceLinkMissingUrlModal.foundation('reveal', 'open');
+                            }
                         } else {
-                            // Raise some warning about what was selected not having a URL.
-                            // This should never happen, because either
-                            // * the resource link will have a URL
-                            // * the tool will have a default URL
-                            $resourceLinkMissingUrlModal.foundation('reveal', 'open');
+                            // Nothing was selected: just close the modal
+                            $toolModal.foundation('reveal', 'close');
                         }
-                    } else {
-                        // Nothing was selected: just close the modal
-                        $toolModal.foundation('reveal', 'close');
                     }
                 }
 
