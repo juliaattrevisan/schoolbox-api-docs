@@ -13,9 +13,21 @@
 {% if (recordType == 'public' and access.public) or (recordType == 'private' and access.private) %}
 
     {% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
-    
+    {# {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %} #}
     {# Only users that are able to make comments should see comments #}
     {% if commentInsertRoute %}
+        <pre>{{ dump(comments.getAll()) }}</pre>
+        <div id="pastoral-record-comments-container">
+            <pastoral-record-comments
+                :comments="{{ comments|json_encode }}"
+                {# comment-delete-route="{{ commentDeleteRoute }}" #}
+                comment-heading="{{ commentHeading }}"
+                comment-insert-route="{{ commentInsertRoute }}"
+                :record="{{ record|json_encode }}"
+                record-type="{{ recordType }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordComments.js"></script>
 
         {% if (recordType == 'public' and access.public) %}
         <div id="pastoral-record-comments-container-public">

@@ -23,23 +23,23 @@ export default {
 
     props: {
         commentHeading: {
-            type: String, 
+            type: String,
             required: true,
         },
         commentInsertRoute: {
-            type: String, 
+            type: String,
             required: true,
         },
         initialComments: {
-            type: Array, 
+            type: Array,
             required: true,
         },
         record: {
-            type: Object, 
+            type: Object,
             required: true,
         },
         recordType: {
-            type: String, 
+            type: String,
             required: true,
         },
         siteVersion: {
@@ -86,7 +86,7 @@ export default {
 
 <template>
     <!-- <form method="post" :action="commentInsertRoute">
-        <add-comment-input 
+        <add-comment-input
             :cdn-prefix="cdnPrefix"
             :is-processing="isProcessing"
             :site-version="siteVersion"
@@ -102,7 +102,7 @@ export default {
                     <label>{{ commentHeading }} Comments ({{ comments.length }})</label>
                     <!-- <form method="post" action="{{ commentInsertRoute }}"> -->
                         <!-- <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}"> -->
-                        <add-comment-input 
+                        <add-comment-input
                             :cdn-prefix="cdnPrefix"
                             :is-processing="isProcessing"
                             :site-version="siteVersion"
