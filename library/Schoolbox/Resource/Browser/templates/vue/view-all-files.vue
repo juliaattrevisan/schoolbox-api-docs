@@ -11,7 +11,7 @@ import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
 
 export default {
-    
+
     components: {
         ViewAllFilesFilters
     },
@@ -41,6 +41,10 @@ export default {
             type: Number,
             required: true,
         },
+        componentId: { //the ID of the component for after adding files to build the redirect url
+            type: Number,
+            required: true,
+        }
     },
 
     data () {
@@ -103,7 +107,7 @@ export default {
                     ascending: this.componentInstanceConfig.sortdir.value === 'asc' ? true : false,
                     column: this.componentInstanceConfig.sort.value === 'name' ? 'name' : 'dateModified.formatted',
                 },
-                perPage: 100, 
+                perPage: 100,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
                 sortable: ['name', 'dateModified.formatted'], //the edit column doesn't need to be sortable
@@ -144,7 +148,7 @@ export default {
 
         /**
          * The edit column is only display to those that have permission
-         * 
+         *
          * @returns { Array }
          */
         getTableColumns () {
@@ -166,7 +170,7 @@ export default {
         },
 
         /**
-         * 
+         *
          */
         initDropZone () {
             $('#dropzone').fileDrop({
@@ -177,19 +181,16 @@ export default {
                     const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
                     const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
                     formData.append('description', uploadDescription);
-                    formData.append('category', this.sourceFolderId);
-                    formData.append('comment', '');
-                    formData.append('hidden', 0);
+                    formData.append('folder', this.sourceFolderId);
+                    formData.append('component', this.componentId);
                 },
                 complete: (file) => {
                     file.previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
                 },
                 success: (file, response) => {
+                    this.files.push(response.file);
                     const previewElement = file.previewElement;
-                    previewElement.setAttribute('data-file', response.id);
-                    previewElement.classList.remove('dz-processing');
-                    previewElement.querySelector('span.dz-upload').classList.add('complete');
-                    previewElement.querySelector('[data-dz-status]').textContent = 'Success';
+                    previewElement.remove();
                 },
                 error: (file, response) => {
                     document.querySelector('.dz-error [data-close]').classList.remove('hide');
@@ -213,7 +214,7 @@ export default {
 
             <div class="dropzone-wrap">
 
-                <form class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
+                <form class="dropzone overlay" id="dropzone" :action="`/resources/folder/${this.componentId}/files/${this.sourceFolderId}`" method="post">
                     <div class="dz-default dz-message">You can drag files into this space.</div>
                 </form>
 
@@ -224,7 +225,7 @@ export default {
                     :options="tableOptions"
                 >
                     <div slot="beforeTable">
-                        <view-all-files-filters 
+                        <view-all-files-filters
                             :selected-filters="selectedFilters"
                         />
                     </div>
@@ -272,7 +273,7 @@ export default {
     table-layout: fixed; //to ensure the flex within view-all-files-row-name can shrink all the way down
 }
 
-.VueTables__search { 
+.VueTables__search {
     padding-bottom: 0.5rem; //to put the view-all-files-filters.vue up closer to the search input
 }
 
@@ -308,7 +309,7 @@ export default {
 
 .dropped-files-container {
     background: white;
-    ul li { 
+    ul li {
         list-style-type: none;
     }
     .card {

@@ -79,33 +79,10 @@ class FilesBuilder
             ]
         );
 
-        //get return url, for edit page
-
-        $returnURL = Redirect::encode("/resources/folder/" . $this->componentId . "/files/${folderId}");
-
         //lets build the list folder array, so we don't have to worry about hydration. etc
         $files = [];
         foreach ($fileList as $file) {
-            $files[] = [
-                'name'                  => $file->getTitle(),
-                'id'                    => $file->getId(),
-                'url'                   => '/send.php?id=' . $file->getId(),
-                'mime'                  => [
-                    'mimeType'          => $file->getStorage()->getMimetype()->getMime(),
-                    'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
-                    'description'       => $file->getStorage()->getMimetype()->getDescription(),
-                    'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
-                ],
-                'hidden'                => $file->isHidden(),
-                'type'                  => $this->getType($file->getMimetype()),
-                'hash'                  => $file->getHash(),
-                'size'                  => $file->getSize(),
-                'dateModified'          => [
-                            'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
-                            'formatted' => $file->getModifiedAt()->getShort(),
-                ],
-                'editUrl'              => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "=${returnURL}",
-            ];
+            $files[] = $this->buildFile($file, $this->componentId, $folderId);
         }
         return $files;
     }
@@ -171,5 +148,39 @@ class FilesBuilder
         }
         //else other??
         return "other";
+    }
+
+    /**
+     * Build the return file object, so it is the same for both the getting all files and the uploading a file
+     * @param \Schoolbox\Resource\File\Model $file
+     * @param int                            $componentId
+     * @param int                            $folderId
+     * @return array
+     */
+    public function buildFile(\Schoolbox\Resource\File\Model $file, int $componentId, int $folderId)
+    {
+        //get return url, for edit page
+        $returnURL = Redirect::encode("/resources/folder/${componentId}/files/${folderId}");
+
+        return [
+            'name'                  => $file->getTitle(),
+            'id'                    => $file->getId(),
+            'url'                   => '/send.php?id=' . $file->getId(),
+            'mime'                  => [
+                'mimeType'          => $file->getStorage()->getMimetype()->getMime(),
+                'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
+                'description'       => $file->getStorage()->getMimetype()->getDescription(),
+                'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
+            ],
+            'hidden'                => $file->isHidden(),
+            'type'                  => $this->getType($file->getMimetype()),
+            'hash'                  => $file->getHash(),
+            'size'                  => $file->getSize(),
+            'dateModified'          => [
+                'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
+                'formatted' => $file->getModifiedAt()->getShort(),
+            ],
+            'editUrl'               => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "=${returnURL}",
+        ];
     }
 }

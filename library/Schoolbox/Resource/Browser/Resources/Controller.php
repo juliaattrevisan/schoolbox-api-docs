@@ -18,6 +18,9 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\File\IFile;
 use Schoolbox\Mapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -157,6 +160,92 @@ class Controller extends AbstractController
     }
 
     /**
+     * places uploaded files into the folder, and will return the same format as the get all files object
+     * @param int $componentID
+     * @param int $sourceFolderID
+     * @throws \Exception
+     */
+    public function addFile(int $componentID, int $sourceFolderID)
+    {
+        //general helpers
+        $filesBuilder = new FilesBuilder($this->database);
+        $user = $_SESSION['user'];
+        //description / title
+        $title = (string)($_POST['description'] ?? '');
+
+        //build the filemapper object to accept files
+        try {
+            // if we're editing an existing file, ensure the file exists
+            $file = FileMapper::getInstance()->createModel();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
+        }
+
+        //place file into the storage brown hole
+        // if file was uploaded from File Component / Resource Browser
+        if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            try {
+                // fake this momentarily
+                $file->setFilename($_FILES['file']['name']);
+
+                // do a storage upload, then wrap it in the SBFS file from earlier
+                $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept($_FILES['file']['name'], $_FILES['file']['tmp_name'], false);
+
+                $file->setStorage($storage);
+            } catch (\Exception $e) {
+                /**
+                 *Exceptions could be incorrect mimetype, or file size
+                 */
+                $this->outputException($e, $file);
+            }
+        }
+
+        // set attributes
+
+        $file->setFilename($file->getStorage()->getFilename());
+
+        $file->setTitle($title);
+        $file->setOwner($user);
+        // If not set default to whatever in admin settings
+        $file->setHidden($this->getConfigLoader()->get('file_default_to_hidden'));
+
+        $file->setModifiedAt(\Alaress_Date_Format::now());
+
+        //build the folder object
+        try {
+            // this is the collection we'll be saving
+            $collection = new \Schoolbox\Collection();
+
+            if (Access::GetInstance()->getFolderAccess($user, $sourceFolderID) < UserAccess::ACCESS_WRITE || 0 == $sourceFolderID) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+            }
+
+            //add the new file to the folder object
+            $clone = clone $file;
+            $clone->setFolder(FolderMapper::getInstance()->createModel()->setId($sourceFolderID));
+
+            $collection->add($clone);
+
+            //build the fileID
+            $newFileId = FileMapper::getInstance()->create($collection);
+
+            //build the file format, to be the same
+            $fileData = $filesBuilder->buildFile($collection->last(), $componentID, $sourceFolderID);
+
+            $this->response->status->set(200);
+            $this->response->content->set(
+                $this->buildJsonOutput(
+                    [
+                        'file' => $fileData,
+                    ]
+                )
+            );
+        } catch (\Exception $e) {
+            $this->outputException($e, $file);
+        }
+    }
+
+    /**
      * @param int $folderId
      * @return array
      */
@@ -221,5 +310,26 @@ class Controller extends AbstractController
     {
         // find out if we have access to the requested folder
         return Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId);
+    }
+
+    /**
+     * basic grab from fileForm.php incase there are errors when uploading files to the view all file page
+     * @param \Exception $e
+     * @param IFile     $file
+     */
+    private function outputException(\Exception $e, IFile $file)
+    {
+        // Output errors
+        if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
+            $code = 11;
+        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
+            $code = 10;
+        } else {
+            $code = 9;
+        }
+
+        $msg  = $e->getMessage();
+        http_response_code(400);
+        die(json_encode(array('code' => $code, 'error' => $msg)));
     }
 }
