@@ -35,7 +35,12 @@
 {% if (tileList|length > 0) or editable %}
 <ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list>
     {% for tile in tileList %}
-        {% include '@tile/sub/tile.twig' with {layout: layout, tile: tile, editable: editable} %}
+        {% include '@tile/sub/tile.twig' with {
+            componentId: componentId,
+            layout: layout,
+            tile: tile,
+            editable: editable
+        } %}
     {% endfor %}
 
     {% if editable %}

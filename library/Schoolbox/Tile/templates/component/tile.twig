@@ -23,6 +23,7 @@
 
     {% include '@tile/sub/tileList.twig'
         with {
+            componentId: component.instance.id,
             layout:   component.layout,
             tileList: component.layout.tileList,
             editable: false
