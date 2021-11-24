@@ -117,7 +117,7 @@ class FilesBuilder
      * @param Mimetype $mime
      * @return string
      */
-    private function getType(Mimetype $mime)
+    public static function getType(Mimetype $mime)
     {
         /**
         //get filters from FileMapper

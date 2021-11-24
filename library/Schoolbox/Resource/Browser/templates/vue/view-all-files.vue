@@ -41,10 +41,6 @@ export default {
             type: Number,
             required: true,
         },
-        componentId: { //the ID of the component for after adding files to build the redirect url
-            type: Number,
-            required: true,
-        }
     },
 
     data () {
@@ -181,14 +177,15 @@ export default {
                     const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
                     const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
                     formData.append('description', uploadDescription);
-                    formData.append('folder', this.sourceFolderId);
-                    formData.append('component', this.componentId);
+                    formData.append('category', this.sourceFolderId);
+                    formData.append('comment', '');
+                    formData.append('hidden', 0);
                 },
                 complete: (file) => {
                     file.previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
                 },
                 success: (file, response) => {
-                    this.files.push(response.file);
+                    this.files.push(response);
                     const previewElement = file.previewElement;
                     previewElement.remove();
                 },
@@ -214,7 +211,7 @@ export default {
 
             <div class="dropzone-wrap">
 
-                <form class="dropzone overlay" id="dropzone" :action="`/resources/folder/${this.componentId}/files/${this.sourceFolderId}`" method="post">
+                <form class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
                     <div class="dz-default dz-message">You can drag files into this space.</div>
                 </form>
 
