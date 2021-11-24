@@ -208,7 +208,7 @@
             ? (
                 provider.url
                     ? routeLookup('ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent', {
-                        toolId:   providerId,
+                        toolId:      providerId,
                         componentId: componentInstanceId,
                         folderId:    folderId,
                     })
@@ -218,12 +218,12 @@
                     })
             )
             : routeLookup('ltiConsumer.getLaunch', {
-                providerId: providerId,
+                providerId:  providerId,
                 componentId: componentInstanceId,
-                folderId: folderId
+                folderId:    folderId
             })
         %}
-        <iframe id="ltiFrame{{ componentInstanceId }}"
+        <iframe id="lti-frame{{ componentInstanceId }}"
 
                 {% if provider %}
                 style="height:{{ height }}px;"
@@ -241,31 +241,56 @@
             if (event.data) {
                 // Fill in the component with values from the message data
                 let data         = event.data,
-                    // tool         = data?.tool,
+                    tool         = data?.tool,
                     messageType  = data?.messageType,
                     resourceLink = data?.resourceLinks?.[0];
 
                 // Not a deep linking response: ignore this message
                 if (messageType === deepLinkingResponseMessageType) {
                     // Look at the first resource link, set values based on that
+                    let $iframe = $('#lti-frame{{ componentInstanceId }}');
                     if (resourceLink) {
-                        console.log(data);
-                        // // Use the URL in the resource link? otherwise the tool's default launch URL
-                        // let url = resourceLink?.url ?? tool?.launchUrl;
-                        // if (url) {
-                        //     useResourceLink(
-                        //         url,
-                        //         resourceLink?.title,
-                        //         resourceLink?.text,
-                        //         resourceLink?.custom ?? {},
-                        //         resourceLink?.lineItem?.resourceId,
-                        //         resourceLink?.lineItem?.scoreMaximum,
-                        //     );
-                        // } else {
-                        // }
+                        let url = resourceLink?.url ?? tool?.launchUrl;
+                        if (url) {
+                            // Post to the component configuration
+                            let postComponentProviderBaseUrl = '{{ routeLookup('ltiConsumer.postComponentProvider', {
+                                    providerId:  providerId,
+                                    componentId: componentInstanceId,
+                                }) }}',
+                                postComponentProviderParams = {
+                                    url:    url,
+                                    custom: resourceLink?.custom ?? {},
+                                };
+
+                            $.post(
+                                postComponentProviderBaseUrl,
+                                postComponentProviderParams
+                            ).done(function () {
+                                $iframe.attr(
+                                    'src',
+                                    '{{ routeLookup(
+                                        'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
+                                        {
+                                            toolId:      providerId,
+                                            componentId: componentInstanceId,
+                                            folderId:    folderId,
+                                        }
+                                    ) }}'
+                                );
+                            });
+                        }
                     } else {
-                        // do something else:
-                        // probably just reload the deep linking launch URL
+                        // Just reload the deep linking launch URL
+                        $iframe.attr(
+                            'src',
+                            '{{ routeLookup(
+                                'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
+                                {
+                                    toolId:   providerId,
+                                    folderId: folderId,
+                                }
+                            ) }}'
+                        );
                     }
                 }
             }
