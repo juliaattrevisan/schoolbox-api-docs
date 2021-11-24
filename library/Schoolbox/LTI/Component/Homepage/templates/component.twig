@@ -184,34 +184,6 @@
                         $toaster.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});
                     });
                 });
-
-                // If a picker is launched: need to listen for its message,
-                // and post when it happens
-                let messageHandler = (event) => {
-                    // Fill in the component with values from the message data
-                    let data         = JSON.parse(event.data),
-                        tool         = data?.tool,
-                        resourceLink = data?.resourceLinks?.[0];
-
-                    // Look at the first resource link, set values based on that
-                    if (resourceLink) {
-                        // Use the URL in the resource link? otherwise the tool's default launch URL
-                        let url = resourceLink?.url ?? tool?.launchUrl;
-                        if (url) {
-                            useResourceLink(
-                                url,
-                                resourceLink?.title,
-                                resourceLink?.text,
-                                resourceLink?.custom ?? {},
-                                resourceLink?.lineItem?.resourceId,
-                                resourceLink?.lineItem?.scoreMaximum,
-                            );
-                        } else {
-                        }
-                    }
-                }
-                window.addEventListener('message', messageHandler);
-
             });
         </script>
         {% endautoescape %}
@@ -260,6 +232,47 @@
                 src="{{ src }}" frameborder="0"></iframe>
     {% endif %}
 
+    {% autoescape 'js' %}
+    <script type="text/javascript">
+        let deepLinkingResponseMessageType = '{{ deepLinkingResponseMessageType }}';
+        // If a picker is launched: need to listen for its message,
+        // and update the component's config when it happens
+        let messageHandler = (event) => {
+            if (event.data) {
+                // Fill in the component with values from the message data
+                let data         = event.data,
+                    // tool         = data?.tool,
+                    messageType  = data?.messageType,
+                    resourceLink = data?.resourceLinks?.[0];
+
+                // Not a deep linking response: ignore this message
+                if (messageType === deepLinkingResponseMessageType) {
+                    // Look at the first resource link, set values based on that
+                    if (resourceLink) {
+                        console.log(data);
+                        // // Use the URL in the resource link? otherwise the tool's default launch URL
+                        // let url = resourceLink?.url ?? tool?.launchUrl;
+                        // if (url) {
+                        //     useResourceLink(
+                        //         url,
+                        //         resourceLink?.title,
+                        //         resourceLink?.text,
+                        //         resourceLink?.custom ?? {},
+                        //         resourceLink?.lineItem?.resourceId,
+                        //         resourceLink?.lineItem?.scoreMaximum,
+                        //     );
+                        // } else {
+                        // }
+                    } else {
+                        // do something else:
+                        // probably just reload the deep linking launch URL
+                    }
+                }
+            }
+        }
+        window.addEventListener('message', messageHandler);
+    </script>
+    {% endautoescape %}
 {% endif %}
 
 <div id="lti-toaster{{ componentInstanceId }}" class="toast"></div>

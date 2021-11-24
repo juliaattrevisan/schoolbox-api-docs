@@ -12,8 +12,8 @@ namespace Schoolbox\LTI\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
-use Schoolbox\LTI\Provider\Model as ProviderModel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
@@ -27,8 +27,8 @@ class Controller extends Component_Homepage_ControllerAbstract
      * Injectable constructor
      *
      * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param User               $user
+     * @param SitePage           $sitepage
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
@@ -90,13 +90,14 @@ class Controller extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@lti/component.twig',
             [
-                'componentInstanceId' => $this->getInstance()->getId(),
-                'providerId' => $this->getConfig('ltiprovider'),
-                'providers' => $providers,
-                'provider' => $provider,
-                'folderId' => $this->getContext()->getId(),
-                'height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
-                'user' => $this->getUser()
+                'componentInstanceId'            => $this->getInstance()->getId(),
+                'providerId'                     => $this->getConfig('ltiprovider'),
+                'providers'                      => $providers,
+                'provider'                       => $provider,
+                'folderId'                       => $this->getContext()->getId(),
+                'height'                         => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
+                'user'                           => $this->getUser(),
+                'deepLinkingResponseMessageType' => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
             ]
         );
     }
