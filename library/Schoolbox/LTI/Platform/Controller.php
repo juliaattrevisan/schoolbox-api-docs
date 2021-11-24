@@ -14,6 +14,7 @@ use Http\Factory\Guzzle\ResponseFactory;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
@@ -209,6 +210,7 @@ class Controller extends Base
             $this->buildUnthemedHtmlOutput(
                 '@ltiPlatform/receiveDeepLinkingResponse.twig',
                 [
+                    'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
                     'tool'          => $tool,
                     'resourceLinks' => $resourceLinks,
                 ],

@@ -148,7 +148,7 @@
                 let messageHandler = (event) => {
                     // Fill in the form with values from the message data
                     // TODO figure out if optional chaining is supported in all targeted browsers
-                    let data         = JSON.parse(event.data),
+                    let data         = event.data,
                         tool         = data?.tool,
                         resourceLink = data?.resourceLinks?.[0];
 
