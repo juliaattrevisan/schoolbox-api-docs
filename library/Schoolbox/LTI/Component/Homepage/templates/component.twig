@@ -185,6 +185,33 @@
                     });
                 });
 
+                // If a picker is launched: need to listen for its message,
+                // and post when it happens
+                let messageHandler = (event) => {
+                    // Fill in the component with values from the message data
+                    let data         = JSON.parse(event.data),
+                        tool         = data?.tool,
+                        resourceLink = data?.resourceLinks?.[0];
+
+                    // Look at the first resource link, set values based on that
+                    if (resourceLink) {
+                        // Use the URL in the resource link? otherwise the tool's default launch URL
+                        let url = resourceLink?.url ?? tool?.launchUrl;
+                        if (url) {
+                            useResourceLink(
+                                url,
+                                resourceLink?.title,
+                                resourceLink?.text,
+                                resourceLink?.custom ?? {},
+                                resourceLink?.lineItem?.resourceId,
+                                resourceLink?.lineItem?.scoreMaximum,
+                            );
+                        } else {
+                        }
+                    }
+                }
+                window.addEventListener('message', messageHandler);
+
             });
         </script>
         {% endautoescape %}
