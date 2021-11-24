@@ -74,7 +74,7 @@ class FoldersWithCourses
         $stack = [];
 
         foreach ($statement as $row) {
-            $stack[] = $row['folder_id'];
+            $stack[$row['folder_id']] = $row['folder_id'];
         }
 
         /* Give this as output, but also remember it, because we'll need it later

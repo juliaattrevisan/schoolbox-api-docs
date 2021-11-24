@@ -154,7 +154,7 @@ class FolderFetcher
 
             /* Only care about folders with course implementations
              */
-            if (!isset($foldersWithCourses[$idx])) {
+            if (!isset($foldersWithCourses[$folder->getId()])) {
                 $folders->offsetUnset($idx);
             }
         }
