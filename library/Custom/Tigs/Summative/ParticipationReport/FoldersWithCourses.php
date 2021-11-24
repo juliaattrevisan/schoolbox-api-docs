@@ -59,7 +59,7 @@ class FoldersWithCourses
      */
     public function find(): array
     {
-        $statement = $this->folderMapper->getDatabase()->prepare('
+        $statement = $this->folderMapper->getDatabase()->query('
             SELECT DISTINCT ci.folder_id
             FROM folder f
             INNER JOIN `course_implementation` ci ON f.id = ci.folder_id
