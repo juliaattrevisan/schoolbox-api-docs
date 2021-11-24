@@ -20,4 +20,13 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
     {
         return $this->workTypes->offsetGet('Quiz');
     }
+
+    /**
+     * In the case of newington, we should be capturing the details but we shouldn't be allowing users to submit online.
+     * @inheritDoc
+     */
+    public function getAcceptOnline(string $submissionTypes): bool
+    {
+        return false;
+    }
 }
