@@ -13,7 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Component_ControllerAbstract;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
-use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
@@ -36,6 +36,7 @@ use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\LTI\Util\ServerRequestFactory;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -131,7 +132,7 @@ class Controller extends BaseController
         Component_ControllerAbstract $component,
         ToolModel $tool
     ): void {
-        // Build a launch request
+        // Build a resource link
         $resourceLink = new LtiResourceLink(
             'component-' . $component->getInstance()->getId(),
             [
@@ -140,15 +141,7 @@ class Controller extends BaseController
             ]
         );
 
-        // Figure out who's trying to log in: use that to determine their role
-        $roleClaimFactory = new RoleClaimFactory($this->access);
-        $roles            = array_merge(
-            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
-            $roleClaimFactory->buildContextRolesForFolder($this->getUser(), $folder),
-        );
-
-
-        // Build the thing
+        // Build the launch request for the resource link
         $repository     = $this->registrations->find($tool->getDeploymentId());
         $messageBuilder = new LtiResourceLinkLaunchRequestBuilder();
         $message        = $messageBuilder->buildLtiResourceLinkLaunchRequest(
@@ -156,7 +149,8 @@ class Controller extends BaseController
             $repository,
             $this->userCodec->encode($this->getUser()),
             null,
-            $roles,
+            $this->buildRoles($folder),
+            $this->buildAdditionalClaims($folder),
         );
 
         // Send the request
@@ -201,20 +195,6 @@ class Controller extends BaseController
             false,
         );
 
-        // Figure out who's trying to log in: use that to determine their role
-        $roleClaimFactory = new RoleClaimFactory($this->access);
-        $roles            = array_merge(
-            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
-            $roleClaimFactory->buildContextRolesForFolder($this->getUser(), $folder),
-        );
-
-        // Claim about the context
-        $contextClaimFactory = new ContextFolder\ClaimFactory(new ContextFolder\Codec($baseUrl));
-        $contextClaim        = $contextClaimFactory->buildForFolder($folder);
-
-        // Claim about the platform instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
-
         $builder = new DeepLinkingLaunchRequestBuilder();
         $message = $builder->buildDeepLinkingLaunchRequest(
             $deepLinkingSettings,
@@ -222,8 +202,8 @@ class Controller extends BaseController
             $this->userCodec->encode($this->getUser()),
             null,
             null,
-            $roles,
-            [$platformInstanceClaim, $contextClaim],
+            $this->buildRoles($folder),
+            $this->buildAdditionalClaims($folder),
         );
 
         // Build a DL request to this tool
@@ -285,5 +265,44 @@ class Controller extends BaseController
         $handler = new MembershipServiceServerRequestHandler($builder);
         $server  = new LtiServiceServer($validator, $handler);
         $this->populateResponseFromPsr7Response($server->handle($request));
+    }
+
+    /**
+     * Build the list of roles for an LTI message for this folder.
+     *
+     * @param Folder $folder
+     * @return array
+     * @throws MapperException if somehow finding the context roles for the
+     *                         folder goes wrong
+     */
+    private function buildRoles(Folder $folder): array
+    {
+        $roleClaimFactory = new RoleClaimFactory($this->access);
+        return array_merge(
+            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
+            $roleClaimFactory->buildContextRolesForFolder($this->getUser(), $folder),
+        );
+    }
+
+    /**
+     * Builds the list of additional claims for LTI messages from this folder:
+     * * a context claim for the folder itself
+     * * a platform instance claim for the Schoolbox instance
+     *
+     * @param Folder $folder
+     * @return array<MessagePayloadClaimInterface>
+     */
+    private function buildAdditionalClaims(Folder $folder): array
+    {
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // Claim about the context
+        $contextClaimFactory = new ContextFolder\ClaimFactory(new ContextFolder\Codec($baseUrl));
+        $contextClaim        = $contextClaimFactory->buildForFolder($folder);
+
+        // Claim about the platform instance
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
+
+        return [$contextClaim, $platformInstanceClaim];
     }
 }
