@@ -1,11 +1,11 @@
 {
   "name": "schoolbox",
-  "version": "21.0.0",
+  "version": "21.1.0",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
-      "version": "21.0.0",
+      "version": "21.1.0",
       "license": "UNLICENSED",
       "dependencies": {
         "@andxor/jquery-ui-touch-punch-fix": "1.0.2",
@@ -51,7 +51,7 @@
         "vue": "^2.6.12",
         "vue-resize": "^1.0.0",
         "vue-select": "^3.11.2",
-        "vue-tables-2": "git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git",
+        "vue-tables-2": "github:matfish2/vue-tables-2-private",
         "vuejs-paginate": "2.0.1",
         "vuex": "^3.6.2"
       },
@@ -18122,9 +18122,9 @@
       }
     },
     "node_modules/merge": {
-      "version": "1.2.1",
-      "resolved": "https://registry.npmjs.org/merge/-/merge-1.2.1.tgz",
-      "integrity": "sha512-VjFo4P5Whtj4vsLzsYBu5ayHhoHJ0UqNm7ibvShmbmoz7tGi0vXaoJbGdB+GmDMLUdg8DpQXEIeVDAe8MaABvQ=="
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/merge/-/merge-2.1.1.tgz",
+      "integrity": "sha512-jz+Cfrg9GWOZbQAnDQ4hlVnQky+341Yk5ru8bZSe6sIDTCIg8n9i/u7hSQGSVOF3C7lH6mGtqjkiT9G4wFLL0w=="
     },
     "node_modules/merge-descriptors": {
       "version": "1.0.1",
@@ -24459,12 +24459,12 @@
       }
     },
     "node_modules/vue-pagination-2": {
-      "version": "3.0.8",
-      "resolved": "https://registry.npmjs.org/vue-pagination-2/-/vue-pagination-2-3.0.8.tgz",
-      "integrity": "sha512-vYP0QHuVn163tlylZTUeUjZ8k589+vSYrvDkmC/8c1HMbFY+mSuVryJ8KYuzculVkf2sXwls/rX70DL/sWn+Ng==",
+      "version": "3.0.91",
+      "resolved": "https://registry.npmjs.org/vue-pagination-2/-/vue-pagination-2-3.0.91.tgz",
+      "integrity": "sha512-gmbh6S8e8/WanhteRe4W3dgIOL9b6HuONkQmk6vq1AB8U42nWvc+c30kEbIt2lZ9eTVjE69xDvalHUh9f666wQ==",
       "dependencies": {
         "babel-plugin-add-module-exports": "^0.2.1",
-        "merge": "^1.2.0",
+        "merge": "^2.1.1",
         "vue": ">=2.0.0",
         "vuex": "^2.0.0"
       }
@@ -24504,15 +24504,15 @@
       }
     },
     "node_modules/vue-tables-2": {
-      "version": "2.2.3",
-      "resolved": "git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git#1f500e9f787596b3c2c1e95f8873eea0dda8abf4",
+      "version": "2.3.4",
+      "resolved": "git+ssh://git@github.com/matfish2/vue-tables-2-private.git#7c0cc5102af3354f588a9e0f00d9e26a3cd970bc",
       "license": "MIT",
       "dependencies": {
         "array-intersect": "^0.0.1",
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
         "debounce": "^1.1",
         "lodash.clonedeep": "^4.5.0",
-        "merge": "^1.2.0",
+        "merge": "^2.1.1",
         "vue": "^2.6.10",
         "vue-pagination-2": "^3.0"
       }
@@ -39932,9 +39932,9 @@
       }
     },
     "merge": {
-      "version": "1.2.1",
-      "resolved": "https://registry.npmjs.org/merge/-/merge-1.2.1.tgz",
-      "integrity": "sha512-VjFo4P5Whtj4vsLzsYBu5ayHhoHJ0UqNm7ibvShmbmoz7tGi0vXaoJbGdB+GmDMLUdg8DpQXEIeVDAe8MaABvQ=="
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/merge/-/merge-2.1.1.tgz",
+      "integrity": "sha512-jz+Cfrg9GWOZbQAnDQ4hlVnQky+341Yk5ru8bZSe6sIDTCIg8n9i/u7hSQGSVOF3C7lH6mGtqjkiT9G4wFLL0w=="
     },
     "merge-descriptors": {
       "version": "1.0.1",
@@ -45008,12 +45008,12 @@
       }
     },
     "vue-pagination-2": {
-      "version": "3.0.8",
-      "resolved": "https://registry.npmjs.org/vue-pagination-2/-/vue-pagination-2-3.0.8.tgz",
-      "integrity": "sha512-vYP0QHuVn163tlylZTUeUjZ8k589+vSYrvDkmC/8c1HMbFY+mSuVryJ8KYuzculVkf2sXwls/rX70DL/sWn+Ng==",
+      "version": "3.0.91",
+      "resolved": "https://registry.npmjs.org/vue-pagination-2/-/vue-pagination-2-3.0.91.tgz",
+      "integrity": "sha512-gmbh6S8e8/WanhteRe4W3dgIOL9b6HuONkQmk6vq1AB8U42nWvc+c30kEbIt2lZ9eTVjE69xDvalHUh9f666wQ==",
       "requires": {
         "babel-plugin-add-module-exports": "^0.2.1",
-        "merge": "^1.2.0",
+        "merge": "^2.1.1",
         "vue": ">=2.0.0",
         "vuex": "^2.0.0"
       },
@@ -45054,14 +45054,14 @@
       }
     },
     "vue-tables-2": {
-      "version": "git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git#1f500e9f787596b3c2c1e95f8873eea0dda8abf4",
-      "from": "vue-tables-2@git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git",
+      "version": "git+ssh://git@github.com/matfish2/vue-tables-2-private.git#7c0cc5102af3354f588a9e0f00d9e26a3cd970bc",
+      "from": "vue-tables-2@github:matfish2/vue-tables-2-private",
       "requires": {
         "array-intersect": "^0.0.1",
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
         "debounce": "^1.1",
         "lodash.clonedeep": "^4.5.0",
-        "merge": "^1.2.0",
+        "merge": "^2.1.1",
         "vue": "^2.6.10",
         "vue-pagination-2": "^3.0"
       }

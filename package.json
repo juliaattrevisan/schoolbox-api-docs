@@ -47,7 +47,7 @@
     "vue": "^2.6.12",
     "vue-resize": "^1.0.0",
     "vue-select": "^3.11.2",
-    "vue-tables-2": "git+https://L9rX7xWfp2ZkynRzuZ3zsa6Pbg8@git.xscode.com/matfish2/vue-tables-2.git",
+    "vue-tables-2": "github:matfish2/vue-tables-2-private",
     "vuejs-paginate": "2.0.1",
     "vuex": "^3.6.2"
   },
