@@ -84,9 +84,7 @@
                 isProvider1p3                = providerVersion === '1.3',
                 providerLaunchUrl            = $button.attr('data-provider-launch-url'),
                 postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
-                postComponentProviderParams  = {
-                    context: self.buildComponentContext(),
-                };
+                postComponentProviderParams  = {};
 
             // Display toast
             params.$toast.toastActivate({text: 'Loading LTI Provider...'});
@@ -141,9 +139,12 @@
                 }
 
                 // Launch LTI in the iframe and make it visible
+                // Add context param too
+                launchUrl = new URL(launchUrl.replace(params.providerIdPlaceholder, providerId), window.location);
+                launchUrl.searchParams.append('context', self.buildComponentContext())
                 params.$ltiIframe.attr(
                     'src',
-                    launchUrl.replace(params.providerIdPlaceholder, providerId)
+                    launchUrl.toString()
                 );
                 params.$ltiIframe.show();
             }).fail(function () {
