@@ -628,16 +628,12 @@ class Controller extends Base
 
         /* Events recur until this time
          */
-        $untilDate = null;
-
-        if ('' !== $this->request->post['repeat_until']) {
-            $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
-            /**
-             * the repeat until date must be after the event end date, or set in the future, if it is not, just set it to the event end date
-             */
-            if (($untilDate < $endDate) || $untilDate->isPast()) {
-                $untilDate = $endDate;
-            }
+        $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
+        /**
+         * the repeat until date must be after the event end date, or set in the future, if it is not, just set it to the event end date
+         */
+        if (($untilDate < $endDate) || $untilDate->isPast()) {
+            $untilDate = $endDate;
         }
 
         /* Don't allow start to be after end
