@@ -56,6 +56,18 @@
     };
 
     /**
+     * Build a component context.
+     *
+     * This will be used in `setupMessageListener`, to filter out messages
+     * raised by other components.
+     *
+     * @return {String}
+     */
+    LtiComponent.prototype.buildComponentContext = function () {
+        return 'componentInstance-' + String(this.params.componentInstanceId);
+    }
+
+    /**
      * Set up the LTI component's listener.
      */
     LtiComponent.prototype.setupClickListener = function () {
@@ -73,7 +85,7 @@
                 providerLaunchUrl            = $button.attr('data-provider-launch-url'),
                 postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
                 postComponentProviderParams  = {
-                    context: 'componentInstance-' + String(params.componentInstanceId),
+                    context: self.buildComponentContext(),
                 };
 
             // Display toast
@@ -167,7 +179,8 @@
                         resourceLink = data?.resourceLinks?.[0];
 
                     // Not a deep linking response: ignore this message
-                    if (messageType === self.params.deepLinkingResponseMessageType) {
+                    if (messageType === self.params.deepLinkingResponseMessageType
+                        && context === self.buildComponentContext()) {
                         // Look at the first resource link, set values based on that
                         if (resourceLink) {
                             let url = resourceLink?.url ?? tool?.launchUrl;
