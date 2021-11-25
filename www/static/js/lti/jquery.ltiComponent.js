@@ -82,17 +82,13 @@
                     $toaster.toastTimeout({text:'Component loaded'});
 
                     // Update selected provider name in component configuration settings
-                    // $('#component{{ componentInstanceId }}-ltiprovider').val(providerId);
-                    component.find('input[name="ltiprovider"]').val(providerId);
+                    component.find(':input[name="ltiprovider"]').val(providerId);
 
                     // Update heading
-                    component.find('input[name="componentname"]').val(result.providerName);
+                    component.find(':input[name="componentname"]').val(result.providerName);
 
                     // Update component heading
                     $('#component-title-' + String(actualParams.componentInstanceId)).html(result.providerName);
-
-                    // Launch LTI in the iframe and make it visible
-                    let iframe = actualParams.$ltiIframe;
 
                     // What kind of provider is this?
                     // 1.1: use ltiConsumer.getLaunch
@@ -109,8 +105,13 @@
                             launchUrl = actualParams.lti1p3DeepLinkingUrl;
                         }
                     }
-                    iframe.attr('src', launchUrl.replace(/providerId/g, providerId));
-                    iframe.show();
+
+                    // Launch LTI in the iframe and make it visible
+                    actualParams.$ltiIframe.attr(
+                        'src',
+                        launchUrl.replace(actualParams.providerIdPlaceholder, providerId)
+                    );
+                    actualParams.$ltiIframe.show();
                 }).fail(function () {
                     // This shouldn't happen, but just in case something goes wrong
                     actualParams.$ltiSelectProvider.show();

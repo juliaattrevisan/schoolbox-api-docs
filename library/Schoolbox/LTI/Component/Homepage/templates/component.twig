@@ -77,8 +77,6 @@
             </div>
         </div>
 
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/lti/jquery.ltiComponent.js"></script>
-
         {% autoescape 'js' %}
         <script type="text/javascript">
             $(function () {
@@ -112,7 +110,7 @@
                         routeLookup(
                             'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
                             {
-                                providerId:  providerId ?: providerIdPlaceholder,
+                                toolId:      providerId ?: providerIdPlaceholder,
                                 componentId: componentInstanceId,
                                 folderId:    folderId,
                             }
@@ -122,8 +120,8 @@
                         routeLookup(
                             'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
                             {
-                                providerId: providerId ?: providerIdPlaceholder,
-                                folderId:   folderId,
+                                toolId:   providerId ?: providerIdPlaceholder,
+                                folderId: folderId,
                             }
                         )
                     }}',
@@ -269,3 +267,4 @@
 {% endif %}
 
 <div id="lti-toaster{{ componentInstanceId }}" class="toast"></div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/lti/jquery.ltiComponent.js"></script>
