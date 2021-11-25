@@ -9,6 +9,8 @@ import ViewAllFilesFilters from './view-all-files-filters.vue';
 import ViewAllFilesRowName from './view-all-files-row-name.vue';
 import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
+import { gsap } from 'gsap/all';
+
 
 export default {
 
@@ -48,6 +50,12 @@ export default {
             collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+                cellClasses: {
+                    name: [ {
+                        class: 'new-file-upload',
+                        condition: (row) => row.isNew === true
+                    } ],
+                },
                 columnsClasses: {
                     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
                     edit: 'edit-td ', //to specify a width
@@ -139,7 +147,7 @@ export default {
          * Populate the table with the files list
          */
         initTable () {
-            this.tableData = this.files;
+            this.tableData = this.files.map((file) => file = { ...file, isNew: false } ); //add isNew so can differentiate newly uploaded files
         },
 
         /**
@@ -166,7 +174,7 @@ export default {
         },
 
         /**
-         *
+         * To be able to drag and drop files straight onto the table
          */
         initDropZone () {
             $('#dropzone').fileDrop({
@@ -174,32 +182,73 @@ export default {
                 previewTemplate: '#view-all-files [data-dz-template]',
                 reloadContent: false,
                 sending: (file, xhr, formData) => {
-                    const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
-                    const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
-                    formData.append('description', uploadDescription);
-                    formData.append('category', this.sourceFolderId);
-                    formData.append('comment', '');
-                    formData.append('hidden', 0);
-                },
-                complete: (file) => {
-                    file.previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
+                    this.appendFormData(file, formData);
                 },
                 success: (file, response) => {
-                    /**
-                     * when you go to the edit link, theis needs a returnUrl so the edit page knows where to send the user after they have edited/deleted the file
-                     * we shall append this here to all newly uploaded files
-                     */
-                    response.editUrl  = response.editUrl + '?returnUrl=' + encodeURIComponent(btoa(window.location.pathname));
-                    this.files.push(response);
-                    const previewElement = file.previewElement;
-                    previewElement.remove();
+                    this.displayFileUploadSuccess(file);
+                    this.addFileToTable(response);
                 },
                 error: (file, response) => {
-                    document.querySelector('.dz-error [data-close]').classList.remove('hide');
-                    file.previewElement.classList.remove('dz-processing');
-                    file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
+                    this.displayFileUploadError(file, response);
                 }
             });
+        },
+
+        /**
+         * Add the extra properties required for the /fileForm.php endpoint
+         *
+         * @param { Object }
+         * @param { FormData }
+         */
+        appendFormData (file, formData) {
+            const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
+            const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
+            formData.append('description', uploadDescription);
+            formData.append('category', this.sourceFolderId);
+            formData.append('comment', '');
+            formData.append('hidden', 0);
+        },
+
+        /**
+         * Update the display to notify of success and animate it out
+         *
+         * @param { Object }
+         */
+        displayFileUploadSuccess (file) {
+            const previewElement = file.previewElement;
+            previewElement.classList.remove('dz-processing');
+            previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
+            previewElement.querySelector('span.dz-upload').classList.add('complete');
+            previewElement.querySelector('[data-dz-status]').textContent = 'Success';
+            previewElement.style.overflow = 'hidden';
+            gsap.to(previewElement, {
+                height: 0,
+                delay: 1,
+                duration: 0.5,
+                onComplete: () => previewElement.remove()
+            } );
+        },
+
+        /**
+         * Add the new file into the table
+         *
+         * @param { Object }
+         */
+        addFileToTable (response) {
+            const responseWithIsNew = { ...response, isNew: true };
+            this.tableData = [...this.tableData, responseWithIsNew];
+        },
+
+        /**
+         * Add the new file into the table
+         *
+         * @param { Object }
+         * @param { Object }
+         */
+        displayFileUploadError (file, response) {
+            document.querySelector('.dz-error [data-close]').classList.remove('hide');
+            file.previewElement.classList.remove('dz-processing');
+            file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
         },
 
     },
@@ -235,7 +284,7 @@ export default {
                         <div class="dropped-files-container">
                             <div data-dz-container=""></div>
                             <div data-dz-template="" class="hide">
-                                <div>
+                                <div data-dz-template-item>
                                     <div class="card small-12">
                                         <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
                                             <span aria-hidden="true">×</span>
@@ -325,6 +374,21 @@ export default {
 
 .component-action {
     margin-bottom: 2rem; //add margin as it's below the table-footer
+}
+
+.new-file-upload {
+    animation-duration: 1s;
+    animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.close-button { //move to be more inline with the edit icons
+    right: 1.25rem;
+    top: 0.25rem;
 }
 
 </style>
