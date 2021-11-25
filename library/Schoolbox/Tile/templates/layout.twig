@@ -325,8 +325,13 @@
                     <div class="row">
                         <div class="small-12 columns">
                             <div class="toast" data-alert data-relation="save-label"></div>
+                            {# This below usage seems weird, but ids and css rules can't begin
+                             # with an int; the "component-" prefix is added whenever you
+                             # include this tileList fragment. This stops it from starting
+                             # with an int
+                             #}
                             {% include '@tile/sub/tileList.twig' with {
-                                componentId: 0,
+                                componentId: '',
                                 layout:   item,
                                 tileList: item.tileList,
                                 editable: true

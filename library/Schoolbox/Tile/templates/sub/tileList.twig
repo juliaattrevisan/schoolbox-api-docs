@@ -36,7 +36,7 @@
 <ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list>
     {% for tile in tileList %}
         {% include '@tile/sub/tile.twig' with {
-            componentId: componentId,
+            componentId: 'component' ~ componentId,
             layout: layout,
             tile: tile,
             editable: editable
