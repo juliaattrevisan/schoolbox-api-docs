@@ -60,7 +60,6 @@ if (PHP_SAPI === 'cli') {
             break;
         }
     }
-    header('X-Puppet-Cert-Name: ' . getenv('puppet_cert_name'));
 }
 define('INSTANCE_ID_LIST', array_keys($instances));
 define('INSTANCE_ID', $instanceId);
