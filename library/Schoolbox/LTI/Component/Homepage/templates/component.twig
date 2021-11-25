@@ -76,12 +76,67 @@
             </div>
         </div>
 
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/lti/jquery.ltiComponent.js"></script>
+
+        {% autoescape 'js' %}
+        <script type="text/javascript">
+            $(function () {
+                $('#component{{ componentInstanceId }}').ltiComponent({
+                    componentInstanceId: '{{ componentInstanceId }}',
+                    $toast: $('#lti-toaster{{ componentInstanceId }}'),
+                    $ltiSelectProvider: $('#lti-select-provider{{ componentInstanceId }}'),
+                    $ltiSelectPreloader: $('#lti-select-provider{{ componentInstanceId }}'),
+                    $ltiIframe: $('#lti-frame{{ componentInstanceId }}'),
+                    postComponentProviderBaseUrl: '{{
+                        routeLookup(
+                            'ltiConsumer.postComponentProvider',
+                            {
+                                providerId: 'providerId',
+                                componentId: componentInstanceId,
+                            }
+                        )
+                    }}',
+                    lti1p1LaunchUrl: '{{
+                        routeLookup(
+                            'ltiConsumer.getLaunch',
+                            {
+                                providerId:  'providerId',
+                                componentId: componentInstanceId,
+                                folderId:    folderId
+                            }
+                        )
+                    }}',
+                    lti1p3LaunchUrl: '{{
+                        routeLookup(
+                            'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
+                            {
+                                toolId:      'providerId',
+                                componentId: componentInstanceId,
+                                folderId:    folderId,
+                            }
+                        )
+                    }}',
+                    lti1p3DeepLinkingUrl: '{{
+                        routeLookup(
+                            'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
+                            {
+                                toolId:   'providerId',
+                                folderId: folderId,
+                            }
+                        )
+                    }}',
+                });
+            });
+        </script>
+        {% endautoescape %}
+
         {% autoescape 'js' %}
         <script type="text/javascript">
             $(function () {
 
                 let component = $('#component{{ componentInstanceId }}');
 
+                // More disgusting hard-coding for a particular provider
                 {% if foundLearningField %}
                 component.find('[data-provider-learningfield]').click(function () {
 
@@ -96,94 +151,94 @@
                 });
                 {% endif %}
 
-                component.find('[data-provider]').click(function () {
+                {#component.find('[data-provider]').click(function () {#}
 
-                    let $toaster = $('#lti-toaster{{ componentInstanceId }}');
-                    $toaster.toastActivate({text: 'Loading LTI Provider...'});
+                {#    let $toaster = $('#lti-toaster{{ componentInstanceId }}');#}
+                {#    $toaster.toastActivate({text: 'Loading LTI Provider...'});#}
 
-                    {# Display a preloader #}
+                {#    #}{# Display a preloader #}
 
-                    $('#lti-select-provider{{ componentInstanceId }}').hide();
-                    $('#lti-select-preloader{{ componentInstanceId }}').show();
+                {#    $('#lti-select-provider{{ componentInstanceId }}').hide();#}
+                {#    $('#lti-select-preloader{{ componentInstanceId }}').show();#}
 
-                    {# When a provider is clicked we need to dynamically update the component and launch the #}
-                    {# LTI request in its iframe #}
+                {#    #}{# When a provider is clicked we need to dynamically update the component and launch the #}
+                {#    #}{# LTI request in its iframe #}
 
-                    let $this                        = $(this),
-                        providerId                   = $this.attr('data-provider'),
-                        providerVersion              = $this.attr('data-provider-version'),
-                        isProvider1p1                = providerVersion === '1.1',
-                        isProvider1p3                = providerVersion === '1.3',
-                        providerLaunchUrl            = $this.attr('data-provider-launch-url'),
-                        postComponentProviderBaseUrl = '{{ routeLookup('ltiConsumer.postComponentProvider', {
-                            providerId: 'providerId',
-                            componentId: componentInstanceId,
-                        }) }}',
-                        postComponentProviderParams  = {};
+                {#    let $this                        = $(this),#}
+                {#        providerId                   = $this.attr('data-provider'),#}
+                {#        providerVersion              = $this.attr('data-provider-version'),#}
+                {#        isProvider1p1                = providerVersion === '1.1',#}
+                {#        isProvider1p3                = providerVersion === '1.3',#}
+                {#        providerLaunchUrl            = $this.attr('data-provider-launch-url'),#}
+                {#        postComponentProviderBaseUrl = '{{ routeLookup('ltiConsumer.postComponentProvider', {#}
+                {#            providerId: 'providerId',#}
+                {#            componentId: componentInstanceId,#}
+                {#        }) }}',#}
+                {#        postComponentProviderParams  = {};#}
 
-                    if (isProvider1p3 && providerLaunchUrl) {
-                        postComponentProviderParams.url = providerLaunchUrl;
-                    }
+                {#    if (isProvider1p3 && providerLaunchUrl) {#}
+                {#        postComponentProviderParams.url = providerLaunchUrl;#}
+                {#    }#}
 
-                    $.post(
-                        postComponentProviderBaseUrl.replace(/providerId/g, providerId),
-                        postComponentProviderParams
-                    ).done(function (result) {
+                {#    $.post(#}
+                {#        postComponentProviderBaseUrl.replace(/providerId/g, providerId),#}
+                {#        postComponentProviderParams#}
+                {#    ).done(function (result) {#}
 
-                        {# Hide preloader #}
-                        $('#lti-select-preloader{{ componentInstanceId }}').hide();
+                {#        #}{# Hide preloader #}
+                {#        $('#lti-select-preloader{{ componentInstanceId }}').hide();#}
 
-                        $toaster.toastTimeout({text:'Component loaded'});
+                {#        $toaster.toastTimeout({text:'Component loaded'});#}
 
-                        {# Update selected provider name in component configuration settings #}
-                        $('#component{{ componentInstanceId }}-ltiprovider').val(providerId);
+                {#        #}{# Update selected provider name in component configuration settings #}
+                {#        $('#component{{ componentInstanceId }}-ltiprovider').val(providerId);#}
 
-                        {# Update heading #}
-                        component.find('input[name="componentname"]').val(result.providerName);
+                {#        #}{# Update heading #}
+                {#        component.find('input[name="componentname"]').val(result.providerName);#}
 
-                        {# Update component heading #}
-                        $('#component-title-{{ componentInstanceId }}').html(result.providerName);
+                {#        #}{# Update component heading #}
+                {#        $('#component-title-{{ componentInstanceId }}').html(result.providerName);#}
 
-                        {# Launch LTI in the iframe and make it visible #}
-                        let iframe = $('#lti-frame{{ componentInstanceId }}');
+                {#        #}{# Launch LTI in the iframe and make it visible #}
+                {#        let iframe = $('#lti-frame{{ componentInstanceId }}');#}
 
-                        // What kind of provider is this?
-                        // 1.1: use ltiConsumer.getLaunch
-                        // 1.3 with a URL: use ltiPlatformContext.getLaunchResourceLinkRequestForFolder
-                        //                 (include custom parameters)
-                        // 1.3 with no URL: use ltiPlatformContext.getGenerateDeepLinkingRequestForFolder
-                        let launchUrl = '';
-                        if (isProvider1p1) {
-                            launchUrl = '{{ routeLookup('ltiConsumer.getLaunch', {
-                                providerId:  'providerId',
-                                componentId: componentInstanceId,
-                                folderId:    folderId
-                            }) }}';
-                        } else if (isProvider1p3) {
-                            if (result.url) {
-                                launchUrl = '{{ routeLookup('ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent', {
-                                    toolId:      'providerId',
-                                    componentId: componentInstanceId,
-                                    folderId:    folderId,
-                                }) }}';
-                            } else {
-                                launchUrl = '{{ routeLookup('ltiPlatformContext.getGenerateDeepLinkingRequestForFolder', {
-                                    toolId:   'providerId',
-                                    folderId: folderId,
-                                }) }}';
-                            }
-                        }
-                        iframe.attr('src', launchUrl.replace(/providerId/g, providerId));
+                {#        // What kind of provider is this?#}
+                {#        // 1.1: use ltiConsumer.getLaunch#}
+                {#        // 1.3 with a URL: use ltiPlatformContext.getLaunchResourceLinkRequestForFolder#}
+                {#        //                 (include custom parameters)#}
+                {#        // 1.3 with no URL: use ltiPlatformContext.getGenerateDeepLinkingRequestForFolder#}
+                {#        let launchUrl = '';#}
+                {#        if (isProvider1p1) {#}
+                {#            launchUrl = '{{ routeLookup('ltiConsumer.getLaunch', {#}
+                {#                providerId:  'providerId',#}
+                {#                componentId: componentInstanceId,#}
+                {#                folderId:    folderId#}
+                {#            }) }}';#}
+                {#        } else if (isProvider1p3) {#}
+                {#            if (result.url) {#}
+                {#                launchUrl = '{{ routeLookup('ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent', {#}
+                {#                    toolId:      'providerId',#}
+                {#                    componentId: componentInstanceId,#}
+                {#                    folderId:    folderId,#}
+                {#                }) }}';#}
+                {#            } else {#}
+                {#                launchUrl = '{{ routeLookup('ltiPlatformContext.getGenerateDeepLinkingRequestForFolder', {#}
+                {#                    toolId:   'providerId',#}
+                {#                    folderId: folderId,#}
+                {#                }) }}';#}
+                {#            }#}
+                {#        }#}
+                {#        iframe.attr('src', launchUrl.replace(/providerId/g, providerId));#}
 
-                        iframe.show();
-                    }).fail(function () {
-                        {# This shouldn't happen, but just in case something goes wrong #}
-                        $('#lti-select-preloader{{ componentInstanceId }}').hide();
-                        $('#lti-select-provider{{ componentInstanceId }}').show();
+                {#        iframe.show();#}
+                {#    }).fail(function () {#}
+                {#        #}{# This shouldn't happen, but just in case something goes wrong #}
+                {#        $('#lti-select-preloader{{ componentInstanceId }}').hide();#}
+                {#        $('#lti-select-provider{{ componentInstanceId }}').show();#}
 
-                        $toaster.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});
-                    });
-                });
+                {#        $toaster.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});#}
+                {#    });#}
+                {#});#}
             });
         </script>
         {% endautoescape %}
@@ -204,6 +259,7 @@
         <iframe id="lti-frame{{ componentInstanceId }}" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
 
     {% else %}
+        {# Another possible case: what if the deep linking request returned a... link? #}
         {% set src = (provider and provider.isLtiVersion13)
             ? (
                 provider.url
@@ -234,26 +290,27 @@
 
     {% autoescape 'js' %}
     <script type="text/javascript">
-        let deepLinkingResponseMessageType = '{{ deepLinkingResponseMessageType }}';
         // If a picker is launched: need to listen for its message,
         // and update the component's config when it happens
-        let messageHandler = (event) => {
-            if (event.data) {
-                // Fill in the component with values from the message data
-                let data         = event.data,
-                    tool         = data?.tool,
-                    messageType  = data?.messageType,
-                    resourceLink = data?.resourceLinks?.[0];
+        window.addEventListener(
+            'message',
+            (event) => {
+                if (event.data) {
+                    // Fill in the component with values from the message data
+                    let data         = event.data,
+                        tool         = data?.tool,
+                        messageType  = data?.messageType,
+                        resourceLink = data?.resourceLinks?.[0];
 
-                // Not a deep linking response: ignore this message
-                if (messageType === deepLinkingResponseMessageType) {
-                    // Look at the first resource link, set values based on that
-                    let $iframe = $('#lti-frame{{ componentInstanceId }}');
-                    if (resourceLink) {
-                        let url = resourceLink?.url ?? tool?.launchUrl;
-                        if (url) {
-                            // Post to the component configuration
-                            let postComponentProviderBaseUrl = '{{ routeLookup('ltiConsumer.postComponentProvider', {
+                    // Not a deep linking response: ignore this message
+                    if (messageType === '{{ deepLinkingResponseMessageType }}') {
+                        // Look at the first resource link, set values based on that
+                        let $iframe = $('#lti-frame{{ componentInstanceId }}');
+                        if (resourceLink) {
+                            let url = resourceLink?.url ?? tool?.launchUrl;
+                            if (url) {
+                                // Post to the component configuration
+                                let postComponentProviderBaseUrl = '{{ routeLookup('ltiConsumer.postComponentProvider', {
                                     providerId:  providerId,
                                     componentId: componentInstanceId,
                                 }) }}',
@@ -262,40 +319,40 @@
                                     custom: resourceLink?.custom ?? {},
                                 };
 
-                            $.post(
-                                postComponentProviderBaseUrl,
-                                postComponentProviderParams
-                            ).done(function () {
-                                $iframe.attr(
-                                    'src',
-                                    '{{ routeLookup(
-                                        'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
-                                        {
-                                            toolId:      providerId,
-                                            componentId: componentInstanceId,
-                                            folderId:    folderId,
-                                        }
-                                    ) }}'
-                                );
-                            });
+                                $.post(
+                                    postComponentProviderBaseUrl,
+                                    postComponentProviderParams
+                                ).done(function () {
+                                    $iframe.attr(
+                                        'src',
+                                        '{{ routeLookup(
+                                            'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
+                                            {
+                                                toolId:      providerId,
+                                                componentId: componentInstanceId,
+                                                folderId:    folderId,
+                                            }
+                                        ) }}'
+                                    );
+                                });
+                            }
+                        } else {
+                            // Just reload the deep linking launch URL
+                            $iframe.attr(
+                                'src',
+                                '{{ routeLookup(
+                                    'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
+                                    {
+                                        toolId:   providerId,
+                                        folderId: folderId,
+                                    }
+                                ) }}'
+                            );
                         }
-                    } else {
-                        // Just reload the deep linking launch URL
-                        $iframe.attr(
-                            'src',
-                            '{{ routeLookup(
-                                'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
-                                {
-                                    toolId:   providerId,
-                                    folderId: folderId,
-                                }
-                            ) }}'
-                        );
                     }
                 }
             }
-        }
-        window.addEventListener('message', messageHandler);
+        );
     </script>
     {% endautoescape %}
 {% endif %}
