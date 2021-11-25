@@ -190,7 +190,7 @@ class Controller extends BaseController
     /**
      * Generate a deep linking request for the given folder and tool.
      *
-     * @api   GET /lti-platform/context/folder/{folderId}/deep-link/{toolId}
+     * @api   GET /lti-platform/context//folder/{folderId}/deep-linking-request/{toolId}
      * @since 21.1.0
      *
      * @param ToolModel $tool
@@ -231,7 +231,7 @@ class Controller extends BaseController
             null,
             null,
             $this->buildRoles($folder),
-            $this->buildAdditionalClaims($folder, [], $this->getUser()),
+            $this->buildAdditionalClaims($folder, null, null),
         );
 
         // Build a DL request to this tool
