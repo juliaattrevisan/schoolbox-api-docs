@@ -1,9 +1,6 @@
 <?php
 
 /**
- * LTI homepage component
- *
- * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -13,16 +10,27 @@ namespace Schoolbox\LTI\Component\Homepage;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use Schoolbox\LTI\Consumer\Controller as ConsumerController;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
 
+/**
+ * LTI homepage component
+ */
 class Controller extends Component_Homepage_ControllerAbstract
 {
-    /** @var ProviderMapper */
-    private $providerMapper;
+    public const COMPONENT_CONFIG_TITLE = 'componentname';
+    public const COMPONENT_CONFIG_LTI_PROVIDER = 'ltiprovider';
+    public const COMPONENT_CONFIG_LTI_EMBED_URL = 'url';
+    public const COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS = 'description';
+    public const COMPONENT_CONFIG_HEIGHT = 'pixel';
+
+    /**
+     * LTI tool (f.k.a. provider) mapper, for fetching the tool to use to
+     * display this component's content.
+     */
+    private ProviderMapper $providerMapper;
 
     /**
      * Injectable constructor
@@ -92,15 +100,15 @@ class Controller extends Component_Homepage_ControllerAbstract
             '@lti/component.twig',
             [
                 'componentInstanceId'            => $this->getInstance()->getId(),
-                'providerId'                     => $this->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_PROVIDER),
-                'embedUrl'                       => $this->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_EMBED_URL),
+                'providerId'                     => $this->getConfig(self::COMPONENT_CONFIG_LTI_PROVIDER),
+                'embedUrl'                       => $this->getConfig(self::COMPONENT_CONFIG_LTI_EMBED_URL),
                 'providers'                      => $providers,
                 'provider'                       => $provider,
                 'folderId'                       => $this->getContext()->getId(),
                 'height'                         => preg_replace(
                     "/[^0-9]/",
                     "",
-                    $this->getConfig(ConsumerController::COMPONENT_CONFIG_HEIGHT),
+                    $this->getConfig(self::COMPONENT_CONFIG_HEIGHT),
                 ),
                 'user'                           => $this->getUser(),
                 'deepLinkingResponseMessageType' => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
