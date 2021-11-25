@@ -138,6 +138,9 @@ class Controller extends Base
         if (isset($post['url'])) {
             $this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_EMBED_URL, $post['url']);
         }
+        if (isset($post['custom'])) {
+            $this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS, $post['custom']);
+        }
 
         $this->getResponse()->content->set([
             'format' => 'json',

@@ -119,6 +119,9 @@
                 // Update heading
                 self.$element.find(':input[name="componentname"]').val(result.providerName);
 
+                // Update URL (even if it's empty)
+                self.$element.find(':input[name="url"]').val(result.url);
+
                 // Update component heading
                 $('#component-title-' + String(params.componentInstanceId)).html(result.providerName);
 
@@ -216,8 +219,12 @@
             postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
             postComponentProviderParams  = {
                 url:    url,
-                custom: resourceLink?.custom ?? {},
+                custom: JSON.stringify(resourceLink?.custom ?? {}),
             };
+
+        // Update URL and custom fields (even if empty)
+        this.$element.find(':input[name="description"]').val(postComponentProviderParams.custom);
+        this.$element.find(':input[name="url"]').val(url);
 
         $.post(
             postComponentProviderBaseUrl.replace(
