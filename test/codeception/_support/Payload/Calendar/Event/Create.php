@@ -40,7 +40,7 @@ class Create extends Request
         $this->setFormParam('startDate', $eventDate);
         $this->setFormParam('endDate', $eventDate);
         $this->setFormParam('repeat', '');
-        $this->setFormParam('repeat_until', '');
+        $this->setFormParam('repeat_until', $eventDate);
         $this->setFormParam('type', '1');
         $this->setFormParam('location', 'Automated test location');
         $this->setFormParam('detail', '<p>Automated test description</p>');
