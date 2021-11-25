@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Platform\Context;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Component_ControllerAbstract;
+use JsonException;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
@@ -29,6 +30,7 @@ use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\LTI\Consumer\Controller as ConsumerController;
 use Schoolbox\LTI\Context\Folder as ContextFolder;
+use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Membership\Builder;
 use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
@@ -41,6 +43,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Url\Factory;
+use Schoolbox\User;
 
 /**
  * LTI platform controller for context requests.
@@ -141,6 +144,22 @@ class Controller extends BaseController
             ]
         );
 
+        // Handle custom claims
+        $componentCustomClaims = [];
+        try {
+            $componentCustomClaims = json_decode(
+                $component->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+        } catch (JsonException $e) {
+            // noop
+        }
+        if (!is_array($componentCustomClaims)) {
+            $componentCustomClaims = [];
+        }
+
         // Build the launch request for the resource link
         $repository     = $this->registrations->find($tool->getDeploymentId());
         $messageBuilder = new LtiResourceLinkLaunchRequestBuilder();
@@ -150,8 +169,14 @@ class Controller extends BaseController
             $this->userCodec->encode($this->getUser()),
             null,
             $this->buildRoles($folder),
-            $this->buildAdditionalClaims($folder),
+            $this->buildAdditionalClaims(
+                $folder,
+                $componentCustomClaims,
+                $this->getUser(),
+            ),
         );
+
+        // Custom claims for component:
 
         // Send the request
         $this->response->content->set(
@@ -206,7 +231,7 @@ class Controller extends BaseController
             null,
             null,
             $this->buildRoles($folder),
-            $this->buildAdditionalClaims($folder),
+            $this->buildAdditionalClaims($folder, [], $this->getUser()),
         );
 
         // Build a DL request to this tool
@@ -292,10 +317,12 @@ class Controller extends BaseController
      * * a context claim for the folder itself
      * * a platform instance claim for the Schoolbox instance
      *
-     * @param Folder $folder
+     * @param Folder     $folder
+     * @param array|null $customClaims If provided, use these custom claims
+     * @param User|null  $user         If provided, add user to custom claims
      * @return array<MessagePayloadClaimInterface>
      */
-    private function buildAdditionalClaims(Folder $folder): array
+    private function buildAdditionalClaims(Folder $folder, ?array $customClaims, ?User $user): array
     {
         $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
 
@@ -306,6 +333,23 @@ class Controller extends BaseController
         // Claim about the platform instance
         $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
 
-        return [$contextClaim, $platformInstanceClaim];
+        $claims = [$contextClaim, $platformInstanceClaim];
+
+        // Custom claims for the component
+        $customClaimFactory = new CustomClaimFactory();
+        $customClaimFactory = $customClaimFactory
+            ->withContext($contextClaim)
+            ->withPlatformInstance($platformInstanceClaim);
+        if (isset($user)) {
+            $customClaimFactory = $customClaimFactory
+                ->withUser($user)
+                ->withActualUser($user);
+        }
+        $customClaim = $customClaimFactory->build($customClaims);
+        if (isset($customClaim)) {
+            $claims[] = $customClaim;
+        }
+
+        return $claims;
     }
 }
