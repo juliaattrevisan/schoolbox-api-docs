@@ -11,6 +11,8 @@ import ViewAllFilesRowName from './view-all-files-row-name.vue';
 import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer.vue';
+import Toast from '@vue/components/toast.vue';
+import RevealModal from '@vue/components/reveal-modal.vue';
 import { gsap } from 'gsap/all';
 
 
@@ -19,6 +21,8 @@ export default {
     components: {
         ViewAllFilesFilters,
         BottomDrawer,
+        Toast,
+        RevealModal,
     },
 
     mixins: [
@@ -338,6 +342,10 @@ export default {
 
 
 
+
+
+
+
         /**
          * to keep track of selected rows
          */
@@ -347,6 +355,59 @@ export default {
                 this.hasSelectedShiftKey = true;
             }
         },
+
+        /**
+         * To confirm/cancel selected users deletion
+         */
+        onDeleteFilesSelected () {
+            this.$refs.deleteModal.open();
+        },
+
+        /**
+         * Delete the selected users, informing of deletion and clearing them from the table list as well
+         *
+         */
+        async onConfirmDeleteFilesSelected () {
+            // this.$refs.toast.activate('Deleting...');
+            // try {
+            //     await axios.post(this.action, this.getFormData());
+            //     this.$refs.toast.timeout('Deleted', true, 2000);
+            //     this.$refs.deleteModal.close();
+            //     this.rows = this.getUpdatedRowsAfterUserDeletion();
+            //     this.clearRows();
+            //     this.$refs.table.resetSelectedRows();
+            // } catch (error) {
+            //     this.$refs.toast.timeout('Unable to delete', false, 2000);
+            // }    
+        },
+
+        /**
+         * Set up a deleted users array to POST
+         *
+         * @returns {FormData}
+         */
+        // getFormData () {
+        //     const usersToDeleteIDList = this.selectedRows.map(row => row.id);
+        //     const formData = new FormData();
+        //     usersToDeleteIDList.forEach((item) => {
+        //         formData.append('users[]', item);
+        //     });
+        //     return formData;
+        // },
+
+        /**
+         * To update the row display after deletion
+         *
+         * @returns {Array}
+         */
+        // getUpdatedRowsAfterUserDeletion () {
+        //     return this.rows.filter((row) => {
+        //         if (this.selectedRows.some(rowToDelete => rowToDelete.id === row.id)) { //pull out any deleted rows, those rows that are in selectedRows, which have just been deleted
+        //             return false;
+        //         }
+        //         return true;
+        //     });
+        // },
 
         /**
          * clear the selection after deletion
@@ -365,7 +426,7 @@ export default {
         /**
          * To confirm/cancel selected users deletion
          */
-        onClearUsersToSelected () {
+        onClearFilesSelected () {
             this.clearRows();
             this.$refs.table.resetSelectedRows();
         },
@@ -433,17 +494,28 @@ export default {
 
             </div>
 
-        </div>
+            <toast ref="toast"></toast>
 
-        <bottom-drawer :showDrawer="selectedRowsCount > 0">
-            <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
-            <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
-            <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
-            <div class="modal-actions">
-                <button @click.prevent="onDeleteFilesSelected" class="button submit icon-delete">Delete Files</button>
-                <button @click.prevent="onDownloadFilesSelected" class="button submit icon-download">Download Files</button>
-            </div>
-        </bottom-drawer>
+            <reveal-modal ref="deleteModal">
+                <h2>Please Confirm</h2>
+                <p>Are you sure you wish to delete the selected files?</p>
+                <ul class="flex-list buttons">
+                    <li><button @click.prevent="onConfirmDeleteFilesSelected" class="button submit">Delete</button></li>
+                    <li><button @click.prevent="onCancelDeleteFilesSelected" class="button">Cancel</button></li>
+                </ul>
+            </reveal-modal>
+
+            <bottom-drawer :showDrawer="selectedRowsCount > 0">
+                <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
+                <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple files</span>
+                <button @click.prevent="onClearFilesSelected" class="button-clear">Clear file selection</button>
+                <ul class="flex-list buttons">
+                    <li><button @click.prevent="onDeleteFilesSelected" class="button submit icon-delete">Delete {{ selectedRowsCountWithRowName }}</button></li>
+                    <li><button @click.prevent="onDownloadFilesSelected" class="button submit icon-download">Download {{ selectedRowsCountWithRowName }}</button></li>
+                </ul>
+            </bottom-drawer>
+
+        </div>
 
     </div>
 
@@ -548,12 +620,8 @@ export default {
     background: none;
     vertical-align: baseline;
     font-size: 0.8rem;
-}
-
-.modal-actions {
-    display: flex;
-    button {
-        margin: 0 1px;
+    &:hover {
+        background: none;
     }
 }
 
