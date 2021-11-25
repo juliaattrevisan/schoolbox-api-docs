@@ -20,10 +20,29 @@ use SitePage;
  */
 class Controller extends Component_Homepage_ControllerAbstract
 {
+    /**
+     * Component config: title
+     */
     public const COMPONENT_CONFIG_TITLE = 'componentname';
+
+    /**
+     * Component config: LTI provider ID
+     */
     public const COMPONENT_CONFIG_LTI_PROVIDER = 'ltiprovider';
+
+    /**
+     * Component config: embed URL
+     */
     public const COMPONENT_CONFIG_LTI_EMBED_URL = 'url';
+
+    /**
+     * Component config: description
+     */
     public const COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS = 'description';
+
+    /**
+     * Component config: height
+     */
     public const COMPONENT_CONFIG_HEIGHT = 'pixel';
 
     /**

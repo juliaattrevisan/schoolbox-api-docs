@@ -14,7 +14,7 @@ use Aura\Di\ContainerInterface;
 use Component_Homepage_Factory;
 use Component_InstanceMapper;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\LTI\Consumer\Controller as ConsumerController;
+use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -69,7 +69,7 @@ class Module extends BaseModule
                     $factory           = new Component_Homepage_Factory(new User(), $page);
                     $componentInstance = $componentInstanceMapper->findByInstanceId($params['componentId']);
                     $component         = $factory->buildComponent($componentInstance);
-                    $toolId            = $component->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_PROVIDER);
+                    $toolId            = $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER);
 
                     return [
                         'folder'    => $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']),

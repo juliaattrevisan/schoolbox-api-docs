@@ -28,7 +28,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\LTI\Consumer\Controller as ConsumerController;
+use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
 use Schoolbox\LTI\Context\Folder as ContextFolder;
 use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Membership\Builder;
@@ -139,8 +139,8 @@ class Controller extends BaseController
         $resourceLink = new LtiResourceLink(
             'component-' . $component->getInstance()->getId(),
             [
-                'url'   => $component->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_EMBED_URL),
-                'title' => $component->getConfig(ConsumerController::COMPONENT_CONFIG_TITLE),
+                'url'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL),
+                'title' => $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE),
             ]
         );
 
@@ -148,7 +148,7 @@ class Controller extends BaseController
         $componentCustomClaims = [];
         try {
             $componentCustomClaims = json_decode(
-                $component->getConfig(ConsumerController::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS),
+                $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS),
                 true,
                 512,
                 JSON_THROW_ON_ERROR
