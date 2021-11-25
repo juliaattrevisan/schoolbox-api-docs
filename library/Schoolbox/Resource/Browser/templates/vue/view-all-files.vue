@@ -223,7 +223,7 @@ export default {
         },
 
         /**
-         * To Oonly show those files within the currently filtered list
+         * To only show those files within the currently filtered list
          */
         initFilterDisplay () {
             if (!this.selectedFilters.includes(fileTypes.DOCUMENT)) {
@@ -370,11 +370,10 @@ export default {
         async onConfirmDeleteFilesSelected () {
             this.$refs.toast.activate('Deleting...');
             try {
-                // await axios.post(this.action, this.getFormData());
-                // await Promise.all(this.getFetches());
+                await Promise.all(this.getFetches());
                 this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
-                // this.rows = this.getUpdatedRowsAfterUserDeletion();
+                this.tableData = this.getUpdatedRowsAfterUserDeletion();
                 this.clearRows();
                 this.$refs.table.resetSelectedRows();
             } catch (error) {
@@ -388,44 +387,44 @@ export default {
          *
          * @returns { Array }
          */
-        // getFetches () {
-        //     const fetchList = [];
-        //     this.selectedRows.forEach((row) => {
-        //         fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
-        //             method: 'POST',
-        //             body: this.getFormData(),
-        //         }));
-        //     });
-        //     return fetchList;
-        // },
+        getFetches () {
+            const fetchList = [];
+            this.selectedRows.forEach((row) => {
+                fetchList.push(fetch(`/cms/fileForm.php?${this.getURLSearchParams(row)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }));
+            });
+            return fetchList;
+        },
 
         /**
          * Set up a deleted users array to POST
          *
-         * @returns {FormData}
+         * @returns { URLSearchParams }
          */
-        // getFormData () {
-        //     const usersToDeleteIDList = this.selectedRows.map(row => row.id);
-        //     const formData = new FormData();
-        //     usersToDeleteIDList.forEach((item) => {
-        //         formData.append('users[]', item);
-        //     });
-        //     return formData;
-        // },
+        getURLSearchParams (row) {
+            return new URLSearchParams({
+                ajax: '1',
+                delete: row.id,
+            });
+        },
 
         /**
          * To update the row display after deletion
          *
-         * @returns {Array}
+         * @returns { Array }
          */
-        // getUpdatedRowsAfterUserDeletion () {
-        //     return this.rows.filter((row) => {
-        //         if (this.selectedRows.some(rowToDelete => rowToDelete.id === row.id)) { //pull out any deleted rows, those rows that are in selectedRows, which have just been deleted
-        //             return false;
-        //         }
-        //         return true;
-        //     });
-        // },
+        getUpdatedRowsAfterUserDeletion () {
+            return this.tableData.filter((file) => {
+                if (this.selectedRows.some((rowToDelete) => rowToDelete.id === file.id)) { //pull out any deleted rows, those rows that are in selectedRows, which have just been deleted
+                    return false;
+                }
+                return true;
+            });
+        },
 
         /**
          * clear the selection after deletion
