@@ -67,6 +67,7 @@ class AllFields extends Base
         $model = $this->setScalar($array, 'goalExpiry', $model, 'setGoalExpiry');
         $model = $this->setFile($array, 'image', $model, 'setImage', $this->collectorFactory);
         $model = $this->setScalar($array, 'allow-as-goal', $model, 'setAllowAsGoal');
+        $model = $this->setScalar($array, 'animate', $model, 'setAnimate');
         $model = $this->setModel(
             $array,
             'category',

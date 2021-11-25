@@ -68,6 +68,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses('animate', self::TYPE_BOOLEAN);
 
         $this->joinsVia(
             'badge_year_level',

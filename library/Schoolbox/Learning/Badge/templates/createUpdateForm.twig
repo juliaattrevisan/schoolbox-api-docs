@@ -172,6 +172,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="small-12 columns">
+                        <label for="badge-animate">Animate Badge on Achievement</label>
+                        <div class="switch">
+                            <input id="badge-animate" type="checkbox" name="animate" {% if badge.animate %}checked="checked"{% endif %}>
+                            <label for="badge-animate">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
                 </fieldset>
                 <fieldset class="content">
                     {% set allowAsGoal = not badge or badge.allowAsGoal %}
@@ -369,6 +379,7 @@
                         'icon': formData.get('icon'),
                         'image': formData.get('image'),
                         'allow-as-goal': !!formData.get('allow-as-goal'),
+                        'animate': !!formData.get('animate'),
                         'category': null,
                         'tags': [],
                         'badge-avatar-selector': formData.get('badge-avatar-selector')
