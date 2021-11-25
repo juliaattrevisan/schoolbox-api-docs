@@ -129,7 +129,7 @@ class ClaimFactory
      */
     public function build(?array $customFields): ?Claim
     {
-        if (empty($customFields)) {
+        if (!isset($customFields)) {
             return null;
         }
         return new Claim(
