@@ -257,7 +257,8 @@ elseif (is_numeric($_GET['delete'])) {
     }
     $encodedReturnUrl = $_GET[Redirect::RETURN_URL] ?? null;
     if (!$encodedReturnUrl) {
-        $page::backToTheFuture(1);
+        //the file has just been deleted, don't go back there, go to the page before that...
+        $page::backToTheFuture(2);
     } else {
         SitePage::localRedir(Redirect::decode($encodedReturnUrl));
     }
