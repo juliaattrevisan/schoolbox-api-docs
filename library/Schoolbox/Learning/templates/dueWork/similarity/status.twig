@@ -19,22 +19,34 @@
  # try and figure out which tool to use: turnitin, plag, or neither
  #}
 {% if turnitinApiEnabled %}
-    {# If the turnitin api was configured then assume we're using that
-     # instead of plag (mutually exclusive)
-     #}
-    {% include '@learning/dueWork/turnitin/status.twig' with {
-        assessment:   assessment,
-        response:     response,
-        participant:  participant,
-        currentFile:  currentFile
-    } only %}
+    {% if currentFile.turnitin %}
+        {# If the turnitin api was configured then assume we're using that
+         # unless there is no turnitin file, then check if there is a plagscan file
+         #}
+        {% include '@learning/dueWork/turnitin/status.twig' with {
+            assessment:   assessment,
+            response:     response,
+            participant:  participant,
+            currentFile:  currentFile
+        } only %}
+    {% elseif currentFile.plagscan %}
+        {# if turnitin is enabled, plag will be disabled (most likely),
+         # but if there is no turnitin file. Check if there is an old plag file
+         # if that file does exist, display it for historical reasons
+         #}
+        {% include '@learning/dueWork/plagscan/status.twig' with {
+            currentFile: currentFile
+        } %}
+    {% endif %}
 {% elseif plagscanApiEnabled %}
     {# If the plagscan api was configured then assume we're using that
-     # instead of turnitin (mutually exclusive)
+     # instead of turnitin (this here is mutually exclusive)
      #}
     {% include '@learning/dueWork/plagscan/status.twig' with {
         currentFile: currentFile
     } %}
 {% endif %}
 
-{# You might not be using either similiarity checkers; do nothing #}
+{# You might not be using either similiarity checkers; do nothing,
+ # I don't care if there are old plag files, nothing is enabled, show nothing.
+ #}
