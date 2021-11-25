@@ -1,6 +1,6 @@
-{% set baseStyle="#tile-"~tile.id %}
+{% set baseStyle = "#"~componentId~"-tile-"~tile.id %}
 <style type="text/css">
-.tile#tile-{{ tile.id|e('css') }} {
+.tile#{{ componentId }}-tile-{{ tile.id|e('css') }} {
     {% if tile.backgroundColor %}
     background-color: rgba(
         {{ tile.backgroundColor.red|e('css') }},
@@ -15,8 +15,8 @@
 }
 
 {% if tile.hoverColor %}
-.tile#tile-{{ tile.id|e('css') }} .tile-link:hover,
-.tile#tile-{{ tile.id|e('css') }} .edit:hover {
+.tile#{{ componentId }}-tile-{{ tile.id|e('css') }} .tile-link:hover,
+.tile#{{ componentId }}-tile-{{ tile.id|e('css') }} .edit:hover {
     background-color: rgba(
         {{ tile.hoverColor.red|e('css') }},
         {{ tile.hoverColor.green|e('css') }},
@@ -26,7 +26,7 @@
 }
 {% endif %}
 
-.tile#tile-{{ tile.id|e('css') }} .title {
+.tile#{{ componentId }}-tile-{{ tile.id|e('css') }} .title {
     color: rgba(
         {{ tile.titleColor.red|e('css') }},
         {{ tile.titleColor.green|e('css') }},
@@ -49,7 +49,7 @@
         // Constrain font size based on width of tile
         $(function() {
             var resizeTitles = function() {
-                $('#tile-{{ tile.id }}').tileResize({minSize: {{ tile.getTitleTextMinSize()/100 }}, maxSize: {{ tile.getTitleTextMaxSize()/100 }}, unit: 'rem'});
+                $('#{{ componentId }}-tile-{{ tile.id }}').tileResize({minSize: {{ tile.getTitleTextMinSize()/100 }}, maxSize: {{ tile.getTitleTextMaxSize()/100 }}, unit: 'rem'});
             };
             resizeTitles();
             $(window).resize(resizeTitles);
@@ -59,7 +59,7 @@
 
 <li data-tile
     class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
-    id="tile-{{ tile.id|e('html_attr') }}">
+    id="{{ componentId }}-tile-{{ tile.id|e('html_attr') }}">
     <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
 
     {% if tile.link %}
