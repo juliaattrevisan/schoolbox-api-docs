@@ -4,6 +4,8 @@
  * Presents all the files within a homepage file component in a filterable table
  */
 
+import { Event } from 'vue-tables-2';
+import fileTypes from './viewAllFilesFileTypes.js';
 import filterEvents from './viewAllFilesFilterEvents.js';
 import ViewAllFilesFilters from './view-all-files-filters.vue';
 import ViewAllFilesRowName from './view-all-files-row-name.vue';
@@ -35,7 +37,7 @@ export default {
             type: Array,
             required: true,
         },
-        selectedFilters: { //the list of currently selected filters passed through
+        presetFilters: { //the list of currently selected filters passed through
             type: Array,
             required: true,
         },
@@ -48,6 +50,7 @@ export default {
     data () {
         return {
             collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
+            selectedFilters: [],
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 cellClasses: {
@@ -136,9 +139,14 @@ export default {
         }
     },
 
+    created () {
+        this.selectedFilters = [...this.presetFilters];
+    },
+
     mounted () {
         this.initTable();
         this.onTableLoaded();
+        this.initFilterDisplay();
     },
 
     methods: {
@@ -171,6 +179,43 @@ export default {
                 this.footerUI_update();
                 this.initDropZone();
             });
+        },
+
+        /**
+         * To Oonly show those files within the currently filtered list
+         */
+        initFilterDisplay () {
+            if (!this.selectedFilters.includes(fileTypes.DOCUMENT)) {
+                Event.$emit(`vue-tables.filter::${filterEvents.DOCUMENT_CHECKED}`, fileTypes.DOCUMENT);
+            }
+            if (!this.selectedFilters.includes(fileTypes.AUDIO)) {
+                Event.$emit(`vue-tables.filter::${filterEvents.AUDIO_CHECKED}`, fileTypes.AUDIO);
+            }
+            if (!this.selectedFilters.includes(fileTypes.VIDEO)) {
+                Event.$emit(`vue-tables.filter::${filterEvents.VIDEO_CHECKED}`, fileTypes.VIDEO);
+            }
+            if (!this.selectedFilters.includes(fileTypes.IMAGE)) {
+                Event.$emit(`vue-tables.filter::${filterEvents.IMAGE_CHECKED}`, fileTypes.IMAGE);
+            }
+            if (!this.selectedFilters.includes(fileTypes.OTHER)) {
+                Event.$emit(`vue-tables.filter::${filterEvents.OTHER_CHECKED}`, fileTypes.OTHER);
+            }
+        },
+
+        /**
+         * Add/remove from selectedFilters and fire an event for the table
+         *
+         * @param { String }
+         * @param { String }
+         */
+        onFilterChange (filterEvent, fileType) {
+            if (this.selectedFilters.includes(fileType)) {
+                this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== fileType);
+            } else {
+                this.selectedFilters = [...this.selectedFilters, fileType];
+            }
+            const filterParam = this.selectedFilters.includes(fileType) ? '' : fileType ;
+            Event.$emit(`vue-tables.filter::${filterEvent}`, filterParam);
         },
 
         /**
@@ -240,7 +285,7 @@ export default {
         },
 
         /**
-         * Add the new file into the table
+         * Can't upload the file, so notify the reason and show the close button
          *
          * @param { Object }
          * @param { Object }
@@ -278,6 +323,7 @@ export default {
                     <div slot="beforeTable">
                         <view-all-files-filters
                             :selected-filters="selectedFilters"
+                            @on-filter-change="onFilterChange"
                         />
                     </div>
                     <div slot="afterTable">
