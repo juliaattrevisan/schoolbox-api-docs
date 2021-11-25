@@ -199,9 +199,9 @@
                         </td>
                         {% if rankEnabled %}
                             <td>
-                                {% if rank[courseImpl.id][student.id] is defined and publishedNormMark %}
+                                {% if rank[student.id] is defined and publishedNormMark %}
                                     {# check if the rank object exits, and there is / was a mean score #}
-                                    {{ rank[courseImpl.id][student.id] }}
+                                    {{ rank[student.id] }}
                                 {% else %}
                                     <span>-</span>
                                 {% endif %}

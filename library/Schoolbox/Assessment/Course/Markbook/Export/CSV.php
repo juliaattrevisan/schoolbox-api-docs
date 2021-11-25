@@ -86,7 +86,7 @@ class CSV extends AbstractCSV
                     isset($studentAverageMarks[$student->getId()]) ? $studentAverageMarks[$student->getId()]['published']['hr'] : '-',
                 ];
                 if ($this->viewRank) {
-                    array_push($studentData, $rank[$class->getId()][$student->getId()]);
+                    array_push($studentData, $rank[$student->getId()]);
                 }
                 // Per Assessment
                 $assessmentData = [];
