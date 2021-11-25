@@ -422,4 +422,55 @@ class Markbook
         $this->assessments->sortByCallback($comparator->getCallable());
         return $this;
     }
+
+    /**
+     *build student weighting
+     * @return array
+     */
+    public function getRanking(): array
+    {
+        /**
+         * need to get a list of the students by id, with their ranking
+         * array(id,rank)
+         */
+
+        //build basic array (id,grade)
+        $rankList = [];
+
+        /**
+         * go thought all students and grab their normalised grade / weighting
+         * and create a list of all grades / weightings and list the users that have these
+         */
+        foreach ($this->studentStatistics as $studentId => $studentStatistic) {
+            if ($studentStatistic['meanNormalised'] !== null) {
+                $rankList[] = [
+                    'id'     => $studentId,
+                    'grade' => $studentStatistic['meanNormalised'],
+                ];
+            }
+        }
+        //sort based on grade
+        usort($rankList, function ($one, $two) {
+            return $two['grade'] <=> $one['grade'];
+        });
+
+        //set a rank value
+        $rankValue = 1;
+        $hiddenRank = 1;
+        $lastStudent['grade'] = '';
+        /**
+         * iterate over ordered list of ranked students, and actually give them helpful rankings
+         * not 42.06, but 5 (you are 5th in the class)
+         */
+        $rank = [];
+        foreach ($rankList as $student) {
+            if ($lastStudent['grade'] !== $student['grade']) {
+                $rankValue = $hiddenRank;
+            }
+            $rank[$student['id']] = $rankValue;
+            $hiddenRank++;
+            $lastStudent = $student;
+        }
+        return $rank;
+    }
 }

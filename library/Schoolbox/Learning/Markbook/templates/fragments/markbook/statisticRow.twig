@@ -1,6 +1,9 @@
 <tr class="sub-row" data-sub-table-row data-hidable-columns>
     <td>{{ label }}</td>
     <td>&nbsp;</td>
+    {% if rankEnabled %}
+    <td>&nbsp;</td>
+    {% endif %}
     {% for assessment in markbook.assessments  %}
     <td data-assessment="{{ assessment.id }}" class="student-grade-cell">
         {% if markbook.assessmentStatistics[assessment.id][key] is defined and writable[assessment.id] is defined %}

@@ -61,6 +61,13 @@
                         <span>Student Average</span>
                     </div>
                 </th>
+                {% if rankEnabled %}
+                <th>
+                    <div>
+                        <span>Rank</span>
+                    </div>
+                </th>
+                {% endif %}
                 {% for assessment in markbook.assessments %}
                 <th data-assessment="{{ assessment.id }}">
                     <div>
@@ -84,6 +91,9 @@
                 <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
                         {{ weightedMean | default('–') }}
                 </th>
+                {% if rankEnabled %}
+                <th>-</th>
+                {% endif %}
                 {% for assessment in markbook.assessments %}
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
                     <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
@@ -114,6 +124,9 @@
             <tr class="sub-row">
                 <td>Visibility</td>
                 <td>&nbsp;</td>
+                {% if rankEnabled %}
+                <td>&nbsp;</td>
+                {% endif %}
                 {% for assessment in markbook.assessments %}
                     <td data-assessment="{{ assessment.id }}">
                         {% if assessment is not task %}
@@ -179,6 +192,16 @@
                         </a>
                     {% endif %}
                 </td>
+                {% if rankEnabled %}
+                <td>
+                    {% if rank[student.id] is defined and meanNormalised %}
+                        {# check if the rank object exits, and there is / was a mean score #}
+                        {{ rank[student.id] }}
+                    {% else %}
+                        <span>-</span>
+                    {% endif %}
+                </td>
+                {% endif %}
 
                 {% for assessment in markbook.assessments %}
                     {% set participant = assessment.getParticipantIfExtant(student) %}

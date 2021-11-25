@@ -186,7 +186,7 @@ class Controller extends WebController\Base
         $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
         $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
-        $csvExporter = new CSV();
+        $csvExporter = new CSV((bool)$this->getConfigLoader()->get('view_rank'));
         $csvExporter->export($courseMarkbook, $courseSpec->getTitle() . ' - Markbook.csv');
         exit;
     }
@@ -217,9 +217,16 @@ class Controller extends WebController\Base
             $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
+            /**
+             * need to get an list of the students by id, with their ranking
+             */
+            $rank = $courseMarkbook->getRanking();
+
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@courseMarkbook/courseMarkbookInner.twig', [
+                    'rank'                    => $rank,
+                    'rankEnabled'             => (bool)$this->getConfigLoader()->get('view_rank'),
                     'courseSpec'              => $courseSpec,
                     'collapsedAssessments'    => $courseMarkbook->getCollapsedAssessments(),
                     'unitSpecs'               => $courseMarkbook->getUnitSpecs(),

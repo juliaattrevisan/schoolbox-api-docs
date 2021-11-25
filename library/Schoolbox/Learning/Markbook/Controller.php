@@ -131,11 +131,18 @@ class Controller extends Base
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
+            /**
+             * need to get an list of the students by id, with their ranking
+             */
+            $rank = $markbook->getRanking();
+
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
                     'folder'                => $folder,
+                    'rank'                  => $rank,
+                    'rankEnabled'           => (bool)$this->getConfigLoader()->get('view_rank'),
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                     'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
@@ -300,7 +307,7 @@ class Controller extends Base
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
-        $csvExporter = new Export\CSV();
+        $csvExporter = new Export\CSV((bool)$this->getConfigLoader()->get('view_rank'));
         $csvExporter->export($markbook, sprintf('%s - Class Markbook.csv', $folder->getName()));
         exit;
     }
