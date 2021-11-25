@@ -347,7 +347,7 @@ export default {
 
 
         /**
-         * to keep track of selected rows
+         * To keep track of selected rows
          */
         onRowSelected (event) {
             this.selectedRows = event;
@@ -368,18 +368,36 @@ export default {
          *
          */
         async onConfirmDeleteFilesSelected () {
-            // this.$refs.toast.activate('Deleting...');
-            // try {
-            //     await axios.post(this.action, this.getFormData());
-            //     this.$refs.toast.timeout('Deleted', true, 2000);
-            //     this.$refs.deleteModal.close();
-            //     this.rows = this.getUpdatedRowsAfterUserDeletion();
-            //     this.clearRows();
-            //     this.$refs.table.resetSelectedRows();
-            // } catch (error) {
-            //     this.$refs.toast.timeout('Unable to delete', false, 2000);
-            // }    
+            this.$refs.toast.activate('Deleting...');
+            try {
+                // await axios.post(this.action, this.getFormData());
+                // await Promise.all(this.getFetches());
+                this.$refs.toast.timeout('Deleted', true, 2000);
+                this.$refs.deleteModal.close();
+                // this.rows = this.getUpdatedRowsAfterUserDeletion();
+                this.clearRows();
+                this.$refs.table.resetSelectedRows();
+            } catch (error) {
+                this.$refs.toast.timeout('Unable to delete', false, 2000);
+            }    
         },
+
+        /**
+         * To update all the marked submissions in parallel
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+         *
+         * @returns { Array }
+         */
+        // getFetches () {
+        //     const fetchList = [];
+        //     this.selectedRows.forEach((row) => {
+        //         fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
+        //             method: 'POST',
+        //             body: this.getFormData(),
+        //         }));
+        //     });
+        //     return fetchList;
+        // },
 
         /**
          * Set up a deleted users array to POST
@@ -419,7 +437,7 @@ export default {
         /**
          * Cancel the the selected users deletion
          */
-        onCancelDeleteUsersSelected () {
+        onCancelDeleteFilesSelected () {
             this.$refs.deleteModal.close();
         },
 
