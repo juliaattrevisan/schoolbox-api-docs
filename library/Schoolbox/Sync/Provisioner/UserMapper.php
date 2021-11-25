@@ -103,36 +103,4 @@ class UserMapper extends SchoolboxMapper
             }
         }
     }
-
-    /**
-     * Generates diff for UPS log
-     * @param User      $objectA
-     * @param User|null $objectB
-     * @param int[]     $keys
-     * @return array
-     */
-    public function diffForLog($objectA, $objectB = null, $keys = [0, 1]): array
-    {
-        /** @var Schoolbox\YearLevel\Mapper $yearLevelMapper */
-        $yearLevelMapper = $this->getJoinMapper('year');
-        try {
-            $diff = parent::diff($objectA, $objectB, $keys);
-        } catch (Schoolbox\Mapper\Exception $e) {
-            return [];
-        }
-        if (key_exists('year', $diff) && is_array($diff['year'])) {
-            foreach ($diff['year'] as $key => $yearLevelId) {
-                if (null === $yearLevelId) {
-                    continue;
-                }
-                try {
-                    $yearLevel = $yearLevelMapper->findById($yearLevelId);
-                } catch (Schoolbox\Mapper\Exception $e) {
-                    continue;
-                }
-                $diff['year'][$key] = sprintf('name: %s id: %d', $yearLevel->getName(), $yearLevel->getId());
-            }
-        }
-        return $diff;
-    }
 }
