@@ -632,9 +632,10 @@ class Controller extends Base
 
         if ('' !== $this->request->post['repeat_until']) {
             $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
-            //make sure the until date is after the event end date, or is at least in the future from today
+            /**
+             * the repeat until date must be after the event end date, or set in the future, if it is not, just set it to the event end date
+             */
             if (($untilDate < $endDate) || $untilDate->isPast()) {
-                //if until is before the end date or in the past, set it to the end date, it can't be null, there are later issues.
                 $untilDate = $endDate;
             }
         }
