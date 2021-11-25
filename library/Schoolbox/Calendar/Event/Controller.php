@@ -616,14 +616,6 @@ class Controller extends Base
             $publishDate = Alaress_Date_Format::newLocal($this->request->post['publishDate']);
         }
 
-        /* Events recur until this time
-         */
-        $untilDate = null;
-
-        if ('' !== $this->request->post['repeat_until']) {
-            $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
-        }
-
         /* Start and end dates
          */
         if ($allDay === Event::ALL_DAY) {
@@ -632,6 +624,20 @@ class Controller extends Base
         } else {
             $startDate = Alaress_Date_Format::newLocal($this->request->post['startDate']);
             $endDate   = Alaress_Date_Format::newLocal($this->request->post['endDate']);
+        }
+
+        /* All events recur, due to the dropdown "Repeat" always being set.
+         *
+         * Events recur at least 1 time (Single Event) or N times based on
+         * the other dropdown options. This value is preopulated in the ui
+         * and will always contain a date
+         */
+        $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
+        /**
+         * the repeat until date must be after the event end date, or set in the future, if it is not, just set it to the event end date
+         */
+        if (($untilDate < $endDate) || $untilDate->isPast()) {
+            $untilDate = $endDate;
         }
 
         /* Don't allow start to be after end
