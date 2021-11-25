@@ -173,9 +173,10 @@
                         </div>
                     </div>
                     <div class="small-12 columns">
+                        {% set animate = not badge or badge.animate %}
                         <label for="badge-animate">Animate Badge on Achievement</label>
                         <div class="switch">
-                            <input id="badge-animate" type="checkbox" name="animate" {% if badge.animate %}checked="checked"{% endif %}>
+                            <input id="badge-animate" type="checkbox" name="animate" {% if animate %}checked="checked"{% endif %}>
                             <label for="badge-animate">
                                 <span>On</span>
                                 <span>Off</span>
