@@ -23,6 +23,7 @@
 {% else %}
 
     {% set learningfieldProviderId = '' %}
+    {% set providerIdPlaceholder   = 'providerIdPlaceholder' %}
 
     {% if providerId is empty %}
         <div id="lti-select-provider{{ componentInstanceId }}" class="row" data-collapsable="true" data-collapse-state="uncollapsed">
@@ -87,11 +88,12 @@
                     $ltiSelectProvider: $('#lti-select-provider{{ componentInstanceId }}'),
                     $ltiSelectPreloader: $('#lti-select-provider{{ componentInstanceId }}'),
                     $ltiIframe: $('#lti-frame{{ componentInstanceId }}'),
+                    providerIdPlaceholder: '{{ providerIdPlaceholder }}',
                     postComponentProviderBaseUrl: '{{
                         routeLookup(
                             'ltiConsumer.postComponentProvider',
                             {
-                                providerId: 'providerId',
+                                providerId:  providerId ?: providerIdPlaceholder,
                                 componentId: componentInstanceId,
                             }
                         )
@@ -100,7 +102,7 @@
                         routeLookup(
                             'ltiConsumer.getLaunch',
                             {
-                                providerId:  'providerId',
+                                providerId:  providerId ?: providerIdPlaceholder,
                                 componentId: componentInstanceId,
                                 folderId:    folderId
                             }
@@ -110,7 +112,7 @@
                         routeLookup(
                             'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
                             {
-                                toolId:      'providerId',
+                                providerId:  providerId ?: providerIdPlaceholder,
                                 componentId: componentInstanceId,
                                 folderId:    folderId,
                             }
@@ -120,8 +122,8 @@
                         routeLookup(
                             'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
                             {
-                                toolId:   'providerId',
-                                folderId: folderId,
+                                providerId: providerId ?: providerIdPlaceholder,
+                                folderId:   folderId,
                             }
                         )
                     }}',

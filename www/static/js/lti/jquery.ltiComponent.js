@@ -19,6 +19,10 @@
         // The LTI iframe
         $ltiIframe: $(),
 
+        // Provider ID placeholder: required when generating a URL when the LTI
+        // tool is not yet selected
+        providerIdPlaceholder: '',
+
         // URLS:
 
         // The URL to post to to update the component's configuration
@@ -66,7 +70,10 @@
                 }
 
                 $.post(
-                    postComponentProviderBaseUrl.replace(/providerId/g, providerId),
+                    postComponentProviderBaseUrl.replace(
+                        actualParams.providerIdPlaceholder,
+                        providerId
+                    ),
                     postComponentProviderParams
                 ).done(function (result) {
                     // Hide preloader
