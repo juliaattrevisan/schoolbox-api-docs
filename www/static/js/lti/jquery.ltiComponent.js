@@ -135,15 +135,106 @@
                 params.$toast.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});
             });
         });
+    };
+
+    /**
+     * Select a deep link.
+     *
+     * @param {Number} providerId
+     * @param {String} url
+     * @param {Object} resourceLink
+     */
+    LtiComponent.prototype.deepLinkSelect = function (providerId, url, resourceLink) {
+        // Post to the component configuration
+        let params                       = this.params,
+            postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
+            postComponentProviderParams  = {
+                url:    url,
+                custom: resourceLink?.custom ?? {},
+            };
+
+        $.post(
+            postComponentProviderBaseUrl.replace(
+                params.providerIdPlaceholder,
+                String(providerId)
+            ),
+            postComponentProviderParams
+        ).done(function () {
+            params.$ltiIframe.attr(
+                'src',
+                params.lti1p3LaunchUrl.replace(
+                    params.providerIdPlaceholder,
+                    String(providerId)
+                )
+            );
+        });
+    };
+
+    /**
+     * Cancel the deep link selection.
+     *
+     * @param {Number} providerId
+     */
+    LtiComponent.prototype.deepLinkCancel = function (providerId) {
+        this.params.$ltiIframe.attr(
+            'src',
+            this.params.lti1p3DeepLinkingUrl.replace(
+                this.params.providerIdPlaceholder,
+                String(providerId)
+            )
+        )
+    };
+
+    /**
+     * Find all LTI component objects in `$elements`.
+     *
+     * @param {jQuery} $elements
+     * @return {LtiComponent[]}
+     */
+    LtiComponent.findLtiComponents = function ($elements) {
+        let result = [];
+        $($elements).each(function () {
+            let ltiComponent = $(this).data('ltiComponent');
+            if (ltiComponent instanceof LtiComponent) {
+                result.push(ltiComponent);
+            }
+        });
+        return result;
     }
 
+    /**
+     * jQuery plugin for setting up LTI components.
+     *
+     * @param {Object} params
+     */
     $.fn.ltiComponent = function (params) {
-        // let actualParams = $.extend({}, defaultParams, params);
         $(this).each(function () {
             let $component      = $(this),
                 componentObject = new LtiComponent($component, params);
             $component.data('ltiComponent', componentObject);
             componentObject.setupListeners();
         });
+    };
+
+    /**
+     * jQuery plugin for selecting a deep link.
+     *
+     * @param {Number} providerId
+     * @param {String} url
+     * @param {Object} resourceLink
+     */
+    $.fn.ltiComponentDeepLinkSelect = function (providerId, url, resourceLink) {
+        LtiComponent.findLtiComponents(this)
+            .forEach(v => v.deepLinkSelect(providerId, url, resourceLink));
+    };
+
+    /**
+     * jQuery plugin for cancelling a deep link selection.
+     *
+     * @param {Number} providerId
+     */
+    $.fn.ltiComponentDeepLinkCancel = function (providerId) {
+        LtiComponent.findLtiComponents(this)
+            .forEach(v => v.deepLinkCancel(providerId));
     };
 })(jQuery);

@@ -160,55 +160,19 @@
                     // Not a deep linking response: ignore this message
                     if (messageType === '{{ deepLinkingResponseMessageType }}') {
                         // Look at the first resource link, set values based on that
-                        let $iframe = $('#lti-frame{{ componentInstanceId }}');
                         if (resourceLink) {
-                            {#$('#component{{ componentInstanceId }}').ltiComponent(#}
-                            {#    'deepLinkSelect',#}
-                            {#    resourceLink,#}
-                            {#    tool,#}
-                            {#);#}
                             let url = resourceLink?.url ?? tool?.launchUrl;
                             if (url) {
-                                // Post to the component configuration
-                                let postComponentProviderBaseUrl = '{{ routeLookup('ltiConsumer.postComponentProvider', {
-                                    providerId:  providerId,
-                                    componentId: componentInstanceId,
-                                }) }}',
-                                postComponentProviderParams = {
-                                    url:    url,
-                                    custom: resourceLink?.custom ?? {},
-                                };
-
-                                $.post(
-                                    postComponentProviderBaseUrl,
-                                    postComponentProviderParams
-                                ).done(function () {
-                                    $iframe.attr(
-                                        'src',
-                                        '{{ routeLookup(
-                                            'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
-                                            {
-                                                toolId:      providerId,
-                                                componentId: componentInstanceId,
-                                                folderId:    folderId,
-                                            }
-                                        ) }}'
-                                    );
-                                });
+                                // Select the deep link, otherwise cancel?
+                                $('#component{{ componentInstanceId }}').ltiComponentDeepLinkSelect(
+                                    tool?.id,
+                                    url,
+                                    resourceLink,
+                                );
                             }
                         } else {
                             // Just reload the deep linking launch URL
-                            {#$('#component{{ componentInstanceId }}').ltiComponent('deepLinkCancel');#}
-                            $iframe.attr(
-                                'src',
-                                '{{ routeLookup(
-                                    'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
-                                    {
-                                        toolId:   providerId,
-                                        folderId: folderId,
-                                    }
-                                ) }}'
-                            );
+                            $('#component{{ componentInstanceId }}').ltiComponentDeepLinkCancel('{{ providerId }}');
                         }
                     }
                 }
@@ -243,33 +207,33 @@
                 )
                 }}',
                 lti1p1LaunchUrl: '{{
-                routeLookup(
-                    'ltiConsumer.getLaunch',
-                    {
-                        providerId:  providerId ?: providerIdPlaceholder,
-                        componentId: componentInstanceId,
-                        folderId:    folderId
-                    }
-                )
+                    routeLookup(
+                        'ltiConsumer.getLaunch',
+                        {
+                            providerId:  providerId ?: providerIdPlaceholder,
+                            componentId: componentInstanceId,
+                            folderId:    folderId
+                        }
+                    )
                 }}',
                 lti1p3LaunchUrl: '{{
-                routeLookup(
-                    'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
-                    {
-                        toolId:      providerId ?: providerIdPlaceholder,
-                        componentId: componentInstanceId,
-                        folderId:    folderId,
-                    }
-                )
+                    routeLookup(
+                        'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
+                        {
+                            toolId:      providerId ?: providerIdPlaceholder,
+                            componentId: componentInstanceId,
+                            folderId:    folderId,
+                        }
+                    )
                 }}',
                 lti1p3DeepLinkingUrl: '{{
-                routeLookup(
-                    'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
-                    {
-                        toolId:   providerId ?: providerIdPlaceholder,
-                        folderId: folderId,
-                    }
-                )
+                    routeLookup(
+                        'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
+                        {
+                            toolId:   providerId ?: providerIdPlaceholder,
+                            folderId: folderId,
+                        }
+                    )
                 }}',
             });
         });
