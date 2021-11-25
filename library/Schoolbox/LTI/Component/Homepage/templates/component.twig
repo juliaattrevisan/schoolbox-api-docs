@@ -21,9 +21,6 @@
     </div>
 
 {% else %}
-
-    {% set learningfieldProviderId = '' %}
-
     {% if providerId is empty %}
         <div id="lti-select-provider{{ componentInstanceId }}" class="row" data-collapsable="true" data-collapse-state="uncollapsed">
             <div class="small-12 island">
@@ -35,19 +32,11 @@
                                 interact with.
                             </p>
                             <p>
-                                {% set foundLearningField = false %}
                                 {% for provider in providers %}
                                     {% if provider.isLtiVersion11 %}
-                                        {# Disgusting hard-coding for a particular provider (present since inception) #}
-                                        {% if provider.url == 'https://bc.vitalsource.com/books/book' %}
-                                            {% set learningfieldProviderId = provider.id %}
-                                            <button data-reveal-id="modal-learningfield">{{ provider.name }}</button>
-                                            {% set foundLearningField = true %}
-                                        {% else %}
-                                            <button data-provider="{{ provider.id }}"
-                                                    data-provider-version="1.1"
-                                            >{{ provider.name }}</button>
-                                        {% endif %}
+                                        <button data-provider="{{ provider.id }}"
+                                                data-provider-version="1.1"
+                                        >{{ provider.name }}</button>
                                     {% elseif provider.isLtiVersion13 %}
                                         {% set hasMultipleUrls = provider.launchUrl and provider.deepLinkingUrl %}
                                         {% if provider.launchUrl %}
@@ -68,47 +57,13 @@
                 </section>
             </div>
         </div>
+
         <div id="lti-select-preloader{{ componentInstanceId }}" style="display:none;">
             <div class="small-12 island">
                 <section class="content">
                     <div class="loader"></div>
                 </section>
             </div>
-        </div>
-
-        {% autoescape 'js' %}
-        <script type="text/javascript">
-            $(function () {
-                // More disgusting hard-coding for a particular provider
-                {% if foundLearningField %}
-                let component = $('#component{{ componentInstanceId }}');
-                component.find('[data-provider-learningfield]').click(function () {
-
-                    $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {
-                        providerId: 'providerId',
-                        componentId: componentInstanceId
-                    }) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
-                        url: $('#learningfieldUrl').val()
-                    }).done(function () {
-                        window.location.reload();
-                    });
-                });
-                {% endif %}
-            });
-        </script>
-        {% endautoescape %}
-
-        <div id="modal-learningfield"
-             class="reveal-modal"
-             data-reveal aria-labelledby="modalTitle"
-             aria-hidden="true"
-             role="dialog">
-            <p class="lead">Book Source</p>
-            <p>Please copy/paste the URL of the resource you want to embed below.</p>
-            <input type="text" id="learningfieldUrl"
-                   placeholder="(e.g. https://bookshelf.vitalsource.com/books/LF9781740813518/pageid/152)">
-            <button data-provider-learningfield="learningfieldProviderId">Save</button>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
         <iframe id="lti-frame{{ componentInstanceId }}" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
