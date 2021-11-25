@@ -70,25 +70,40 @@
 
     {% else %}
         {# Another possible case: what if the deep linking request returned a... link? #}
-        {% set src = (provider and provider.isLtiVersion13)
-            ? (
-                provider.url
-                    ? routeLookup('ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent', {
+        {% if provider and provider.isLtiVersion13 %}
+            {##
+             # Has a URL been selected?
+             # If so use the launch URL, otherwise show the deep link request
+             #}
+            {% if provider.url %}
+                {% set src = routeLookup(
+                    'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
+                    {
                         toolId:      providerId,
                         componentId: componentInstanceId,
                         folderId:    folderId,
-                    })
-                    : routeLookup('ltiPlatformContext.getGenerateDeepLinkingRequestForFolder', {
+                    }
+                ) %}
+            {% else %}
+                {% set src = routeLookup(
+                    'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
+                    {
                         toolId:   providerId,
                         folderId: folderId,
-                    })
-            )
-            : routeLookup('ltiConsumer.getLaunch', {
-                providerId:  providerId,
-                componentId: componentInstanceId,
-                folderId:    folderId
-            })
-        %}
+                    }
+                ) %}
+            {% endif %}
+        {% else %}
+            {# Use the LTI 1.1 launch URL #}
+            {% set src = routeLookup(
+                'ltiConsumer.getLaunch',
+                {
+                    providerId:  providerId,
+                    componentId: componentInstanceId,
+                    folderId:    folderId,
+                }
+            ) %}
+        {% endif %}
         <iframe id="lti-frame{{ componentInstanceId }}"
 
                 {% if provider %}
