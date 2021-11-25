@@ -210,6 +210,7 @@ class Controller extends Base
             $this->buildUnthemedHtmlOutput(
                 '@ltiPlatform/receiveDeepLinkingResponse.twig',
                 [
+                    'context'       => $this->request->query->get('context'),
                     'messageType'   => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
                     'tool'          => $tool,
                     'resourceLinks' => $resourceLinks,

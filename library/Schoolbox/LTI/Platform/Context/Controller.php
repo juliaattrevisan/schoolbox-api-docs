@@ -183,6 +183,9 @@ class Controller extends BaseController
             ->setPath(
                 $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
             )
+            // If a context was passed in the query string:
+            // add it to the return URL
+            ->setQuery(['context' => $this->request->query->get('context')])
             ->toString();
 
         // Standard deep linking settings

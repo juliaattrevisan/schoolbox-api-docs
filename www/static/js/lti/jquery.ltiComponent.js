@@ -161,6 +161,7 @@
                 if (event.data) {
                     // Fill in the component with values from the message data
                     let data         = event.data,
+                        context      = data?.context,
                         tool         = data?.tool,
                         messageType  = data?.messageType,
                         resourceLink = data?.resourceLinks?.[0];
