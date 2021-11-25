@@ -17,10 +17,13 @@ class Update extends Request
 {
     use PostTrait;
 
-    var $event;
+    private Calendar\Event $event;
 
     public function __construct(Calendar\Event $event)
     {
+
+        $eventTimestamp = time();
+        $eventDate      = date('d/m/Y', $eventTimestamp);
         $this->event = $event;
         $this->setReferer("/calendar/event/" . $this->event->getId() . "/modify");
 
@@ -35,7 +38,7 @@ class Update extends Request
         $this->setFormParam('startDate', $event->getStartDateTime()->getUsingFormat('d/m/Y'));
         $this->setFormParam('endDate', $event->getEndDateTime()->getUsingFormat('d/m/Y'));
         $this->setFormParam('repeat', '');
-        $this->setFormParam('repeat_until', '');
+        $this->setFormParam('repeat_until', $eventDate);
         $this->setFormParam('type', $event->getType()->getId());
         $this->setFormParam('location', $event->getLocation());
         $this->setFormParam('detail', $event->getDetail());
