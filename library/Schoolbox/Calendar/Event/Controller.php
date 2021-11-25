@@ -626,7 +626,11 @@ class Controller extends Base
             $endDate   = Alaress_Date_Format::newLocal($this->request->post['endDate']);
         }
 
-        /* Events recur until this time
+        /* All events recur, due to the dropdown "Repeat" always being set.
+         *
+         * Events recur at least 1 time (Single Event) or N times based on
+         * the other dropdown options. This value is preopulated in the ui
+         * and will always contain a date
          */
         $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
         /**
