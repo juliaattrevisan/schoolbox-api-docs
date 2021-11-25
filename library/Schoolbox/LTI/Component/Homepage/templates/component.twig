@@ -75,7 +75,7 @@
              # Has a URL been selected?
              # If so use the launch URL, otherwise show the deep link request
              #}
-            {% if provider.url %}
+            {% if embedUrl %}
                 {% set src = routeLookup(
                     'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
                     {
