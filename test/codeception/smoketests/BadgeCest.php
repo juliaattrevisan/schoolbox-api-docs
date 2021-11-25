@@ -47,7 +47,7 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $achievementExpiry, $goalExpiry);
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, true, $achievementExpiry, $goalExpiry);
         $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
 
         #WHEN
@@ -85,7 +85,7 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $achievementExpiry, $goalExpiry);
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, true, $achievementExpiry, $goalExpiry);
         $badgePayload->setFormParam('image', $json_reply['hash'] . ":cat.png");
         $i->amGoingTo('Send request to create a badge');
         $i->sendRequest($badgePayload);
@@ -98,7 +98,7 @@ class BadgeCest
         $name               = 'Badge Name Automation API Smoke Test updated with allow as a goal on' . $timestamp;
         $achievementExpiry  = BadgeModel::EXPIRY_WEEK;
         $goalExpiry         = BadgeModel::EXPIRY_YEAR;
-        $badgeModifyPayload = new Payload\Badge\Modify($badge->getId(), $badgeavatarselector, $category, $body, $name, true, $achievementExpiry, $goalExpiry);
+        $badgeModifyPayload = new Payload\Badge\Modify($badge->getId(), $badgeavatarselector, $category, $body, $name, true, false, $achievementExpiry, $goalExpiry);
         $badgeModifyPayload->setFormParam('image', $json_reply['hash']);
         $i->amGoingTo('Send request to update a badge');
         $i->sendRequest($badgeModifyPayload);
@@ -133,7 +133,7 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $achievementExpiry, $goalExpiry);
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, true, $achievementExpiry, $goalExpiry);
         $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
         $i->amGoingTo('Send request to create a badge');
         $i->sendRequest($badgePayload);
