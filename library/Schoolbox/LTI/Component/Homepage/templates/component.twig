@@ -142,44 +142,6 @@
 
                 src="{{ src }}" frameborder="0"></iframe>
     {% endif %}
-
-    {% autoescape 'js' %}
-    <script type="text/javascript">
-        // If a picker is launched: need to listen for its message,
-        // and update the component's config when it happens
-        window.addEventListener(
-            'message',
-            (event) => {
-                if (event.data) {
-                    // Fill in the component with values from the message data
-                    let data         = event.data,
-                        tool         = data?.tool,
-                        messageType  = data?.messageType,
-                        resourceLink = data?.resourceLinks?.[0];
-
-                    // Not a deep linking response: ignore this message
-                    if (messageType === '{{ deepLinkingResponseMessageType }}') {
-                        // Look at the first resource link, set values based on that
-                        if (resourceLink) {
-                            let url = resourceLink?.url ?? tool?.launchUrl;
-                            if (url) {
-                                // Select the deep link, otherwise cancel?
-                                $('#component{{ componentInstanceId }}').ltiComponentDeepLinkSelect(
-                                    tool?.id,
-                                    url,
-                                    resourceLink,
-                                );
-                            }
-                        } else {
-                            // Just reload the deep linking launch URL
-                            $('#component{{ componentInstanceId }}').ltiComponentDeepLinkCancel('{{ providerId }}');
-                        }
-                    }
-                }
-            }
-        );
-    </script>
-    {% endautoescape %}
 {% endif %}
 
 <div id="lti-toaster{{ componentInstanceId }}" class="toast"></div>

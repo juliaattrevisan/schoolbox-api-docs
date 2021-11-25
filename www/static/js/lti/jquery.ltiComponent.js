@@ -23,6 +23,10 @@
         // tool is not yet selected
         providerIdPlaceholder: '',
 
+        // Deep linking response message type:
+        // defaults to LTI 1.3 deep linking response message type
+        deepLinkingResponseMessageType: 'LtiDeepLinkingResponse',
+
         // URLS:
 
         // The URL to post to to update the component's configuration
@@ -52,11 +56,11 @@
     };
 
     /**
-     * Set up the LTI component's listeners.
+     * Set up the LTI component's listener.
      */
-    LtiComponent.prototype.setupListeners = function () {
+    LtiComponent.prototype.setupClickListener = function () {
         let self = this;
-        self.$element.find('[data-provider]').on('click.ltiComponent', function () {
+        self.$element.on('click.ltiComponent', '[data-provider]', function () {
             // When a provider is clicked:
             // we need to dynamically update the component and launch the LTI
             // request in its iframe.
@@ -68,7 +72,9 @@
                 isProvider1p3                = providerVersion === '1.3',
                 providerLaunchUrl            = $button.attr('data-provider-launch-url'),
                 postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
-                postComponentProviderParams  = {};
+                postComponentProviderParams  = {
+                    context: 'componentInstance-' + String(params.componentInstanceId),
+                };
 
             // Display toast
             params.$toast.toastActivate({text: 'Loading LTI Provider...'});
@@ -135,6 +141,51 @@
                 params.$toast.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});
             });
         });
+    };
+
+    /**
+     * Set up the LTI component's message listener, for when a deep link is
+     * selected.
+     */
+    LtiComponent.prototype.setupMessageListener = function () {
+        let self = this;
+        window.addEventListener(
+            'message',
+            (event) => {
+                // Only process this message if:
+                // * it has data
+                // * its message type is a deep linking response
+                // * its context is appropriate for this component
+                //   (required so that multiple LTI components don't trigger the
+                //    same event)
+                if (event.data) {
+                    // Fill in the component with values from the message data
+                    let data         = event.data,
+                        tool         = data?.tool,
+                        messageType  = data?.messageType,
+                        resourceLink = data?.resourceLinks?.[0];
+
+                    // Not a deep linking response: ignore this message
+                    if (messageType === self.params.deepLinkingResponseMessageType) {
+                        // Look at the first resource link, set values based on that
+                        if (resourceLink) {
+                            let url = resourceLink?.url ?? tool?.launchUrl;
+                            if (url) {
+                                // Select the deep link, otherwise cancel?
+                                self.deepLinkSelect(
+                                    tool?.id,
+                                    url,
+                                    resourceLink,
+                                );
+                            }
+                        } else {
+                            // Just reload the deep linking launch URL
+                            self.deepLinkCancel(tool.id);
+                        }
+                    }
+                }
+            }
+        );
     };
 
     /**
@@ -212,7 +263,8 @@
             let $component      = $(this),
                 componentObject = new LtiComponent($component, params);
             $component.data('ltiComponent', componentObject);
-            componentObject.setupListeners();
+            componentObject.setupClickListener();
+            componentObject.setupMessageListener();
         });
     };
 
