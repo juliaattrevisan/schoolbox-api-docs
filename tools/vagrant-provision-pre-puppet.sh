@@ -123,6 +123,7 @@ if [[ -z $extra_hostname ]]; then
   fi
   tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt
   tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-vagrantx-private.key
+  tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/chain.pem > /etc/nginx/certs/schoolbox-vagrantx-intermediate.crt
 else
   # Download wildcard cert
   filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
@@ -144,6 +145,7 @@ else
   fi
   tar xzfO $cache_dir/$filename dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt
   tar xzfO $cache_dir/$filename dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-vagrantx-private.key
+  tar xzfO $cache_dir/$filename dev.schoolbox.cloud/chain.pem > /etc/nginx/certs/schoolbox-vagrantx-intermediate.crt
 fi
 
 # Remove old style named cert/key
