@@ -249,8 +249,8 @@ export default {
             <h3 class="selected-count"><em>{{ selectedStudentsCount }} selected</em></h3>
             <button @click.prevent="onClearStudentSelection" @keyup.enter="onClearStudentSelection" class="button-clear">Clear selection</button>
             <div class="modal-actions">
-                <a :href="getUrl('goal')" title="Set goal" class="button submit icon-goal">Set goal</a>
-                <a :href="getUrl('achievement')" title="Award achievement" class="button submit icon-achievement">Award achievement</a>
+                <a :href="getUrl('goal')" title="Set goal" class="button icon-goal">Set goal</a>
+                <a :href="getUrl('achievement')" title="Award achievement" class="button icon-achievement">Award achievement</a>
             </div>
         </bottom-drawer>
 

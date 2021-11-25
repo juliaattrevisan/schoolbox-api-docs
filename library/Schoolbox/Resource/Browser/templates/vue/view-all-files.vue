@@ -6,18 +6,19 @@
 
 import { Event } from 'vue-tables-2';
 import fileTypes from './viewAllFilesFileTypes.js';
-import filterEvents from './viewAllFilesFilterEvents.js';
 import ViewAllFilesFilters from './view-all-files-filters.vue';
 import ViewAllFilesRowName from './view-all-files-row-name.vue';
 import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
+import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer.vue';
 import { gsap } from 'gsap/all';
 
 
 export default {
 
     components: {
-        ViewAllFilesFilters
+        ViewAllFilesFilters,
+        BottomDrawer,
     },
 
     mixins: [
@@ -49,7 +50,6 @@ export default {
 
     data () {
         return {
-            collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
             selectedFilters: [],
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
@@ -65,23 +65,23 @@ export default {
                 },
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
-                        name: filterEvents.DOCUMENT_CHECKED,
+                        name: fileTypes.DOCUMENT,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.AUDIO_CHECKED,
+                        name: fileTypes.AUDIO,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.VIDEO_CHECKED,
+                        name: fileTypes.VIDEO,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.IMAGE_CHECKED,
+                        name: fileTypes.IMAGE,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.OTHER_CHECKED,
+                        name: fileTypes.OTHER,
                         callback: (row, query) => row.type !== query
                     },
                 ],
@@ -117,6 +117,9 @@ export default {
                 perPage: 100,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
+                selectable: {
+                    mode: 'multiple' //to enable multi-select
+                },
                 sortable: ['name', 'dateModified.formatted'], //the edit column doesn't need to be sortable
                 sortIcon: {
                     is: 'glyphicon-sort',
@@ -136,7 +139,41 @@ export default {
                 },
             },
             tableColumns: this.getTableColumns(),
+            collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
+            selectedRows: [], //keep track of which rows could be deleted/downloaded
+            singleRowName: 'file',
+            pluralRowName: 'files',
+            isShiftKeySelected: false, //to multi-select fields
+            hasSelectedShiftKey: false, //to hide a UI note
         }
+    },
+
+    computed: {
+
+        /**
+         * To track how many are selected
+         *
+         * @returns { Number }
+         */
+        selectedRowsCount () {
+            return this.selectedRows.length;
+        },
+
+        /**
+         * For proper count display, eg: '1 user' / '4 users'
+         *
+         * @returns { String }
+         */
+        selectedRowsCountWithRowName () {
+            if (this.selectedRowsCount === 0) {
+                return 'No ' + this.singleRowName;
+            } else if (this.selectedRowsCount === 1) {
+                return this.selectedRowsCount + ' ' + this.singleRowName;
+            } else {
+                return this.selectedRowsCount + ' ' + this.pluralRowName;
+            }
+        },
+
     },
 
     created () {
@@ -186,19 +223,19 @@ export default {
          */
         initFilterDisplay () {
             if (!this.selectedFilters.includes(fileTypes.DOCUMENT)) {
-                Event.$emit(`vue-tables.filter::${filterEvents.DOCUMENT_CHECKED}`, fileTypes.DOCUMENT);
+                Event.$emit(`vue-tables.filter::${fileTypes.DOCUMENT}`, fileTypes.DOCUMENT);
             }
             if (!this.selectedFilters.includes(fileTypes.AUDIO)) {
-                Event.$emit(`vue-tables.filter::${filterEvents.AUDIO_CHECKED}`, fileTypes.AUDIO);
+                Event.$emit(`vue-tables.filter::${fileTypes.AUDIO}`, fileTypes.AUDIO);
             }
             if (!this.selectedFilters.includes(fileTypes.VIDEO)) {
-                Event.$emit(`vue-tables.filter::${filterEvents.VIDEO_CHECKED}`, fileTypes.VIDEO);
+                Event.$emit(`vue-tables.filter::${fileTypes.VIDEO}`, fileTypes.VIDEO);
             }
             if (!this.selectedFilters.includes(fileTypes.IMAGE)) {
-                Event.$emit(`vue-tables.filter::${filterEvents.IMAGE_CHECKED}`, fileTypes.IMAGE);
+                Event.$emit(`vue-tables.filter::${fileTypes.IMAGE}`, fileTypes.IMAGE);
             }
             if (!this.selectedFilters.includes(fileTypes.OTHER)) {
-                Event.$emit(`vue-tables.filter::${filterEvents.OTHER_CHECKED}`, fileTypes.OTHER);
+                Event.$emit(`vue-tables.filter::${fileTypes.OTHER}`, fileTypes.OTHER);
             }
         },
 
@@ -206,16 +243,15 @@ export default {
          * Add/remove from selectedFilters and fire an event for the table
          *
          * @param { String }
-         * @param { String }
          */
-        onFilterChange (filterEvent, fileType) {
+        onFilterChange (fileType) {
             if (this.selectedFilters.includes(fileType)) {
                 this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== fileType);
             } else {
                 this.selectedFilters = [...this.selectedFilters, fileType];
             }
             const filterParam = this.selectedFilters.includes(fileType) ? '' : fileType ;
-            Event.$emit(`vue-tables.filter::${filterEvent}`, filterParam);
+            Event.$emit(`vue-tables.filter::${fileType}`, filterParam);
         },
 
         /**
@@ -279,9 +315,13 @@ export default {
          *
          * @param { Object }
          */
-        addFileToTable (response) {
-            const responseWithIsNew = { ...response, isNew: true };
-            this.tableData = [...this.tableData, responseWithIsNew];
+        addFileToTable (file) {
+            if (!this.selectedFilters.includes(file.type)) {
+                this.selectedFilters = [...this.selectedFilters, file.type];
+                Event.$emit(`vue-tables.filter::${file.type}`, '');
+            }
+            const fileWithIsNew = { ...file, isNew: true };
+            this.tableData = [...this.tableData, fileWithIsNew];
         },
 
         /**
@@ -295,6 +335,42 @@ export default {
             file.previewElement.classList.remove('dz-processing');
             file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
         },
+
+
+
+        /**
+         * to keep track of selected rows
+         */
+        onRowSelected (event) {
+            this.selectedRows = event;
+            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+                this.hasSelectedShiftKey = true;
+            }
+        },
+
+        /**
+         * clear the selection after deletion
+         */
+        clearRows () {
+            this.selectedRows = [];
+        },
+
+        /**
+         * Cancel the the selected users deletion
+         */
+        onCancelDeleteUsersSelected () {
+            this.$refs.deleteModal.close();
+        },
+
+        /**
+         * To confirm/cancel selected users deletion
+         */
+        onClearUsersToSelected () {
+            this.clearRows();
+            this.$refs.table.resetSelectedRows();
+        },
+
+
 
     },
 
@@ -319,6 +395,7 @@ export default {
                     :data="tableData"
                     :columns="tableColumns"
                     :options="tableOptions"
+                    @select="onRowSelected"
                 >
                     <div slot="beforeTable">
                         <view-all-files-filters
@@ -358,6 +435,16 @@ export default {
 
         </div>
 
+        <bottom-drawer :showDrawer="selectedRowsCount > 0">
+            <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
+            <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
+            <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
+            <div class="modal-actions">
+                <button @click.prevent="onDeleteFilesSelected" class="button submit icon-delete">Delete Files</button>
+                <button @click.prevent="onDownloadFilesSelected" class="button submit icon-download">Download Files</button>
+            </div>
+        </bottom-drawer>
+
     </div>
 
 </template>
@@ -382,12 +469,16 @@ export default {
     margin-bottom: 0; //to put the view-all-files-filters.vue up closer to the search input
 }
 
-.VueTables__table td {
-    padding: 0.25rem 0.5rem 0.25rem 0;
+.VueTables__table td, .VueTables__select-all {
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
     vertical-align: middle;
     @media (max-width: 700px) {
         padding: 0.5rem 0.5rem 0 0;
     }
+}
+
+.VueTables__select-row {
+    width: 30px;
 }
 
 .date-modified-td {
@@ -435,6 +526,35 @@ export default {
 .close-button { //move to be more inline with the edit icons
     right: 1.25rem;
     top: 0.25rem;
+}
+
+.selected-count {
+    margin-right: 1rem;
+}
+
+.button-clear, .button-delete, .selected-count {
+    display: inline-block;
+}
+
+.shift-select-note {
+    color: #9a9a9a;
+    margin-right: 1rem;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.button-clear {
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
+}
+
+.modal-actions {
+    display: flex;
+    button {
+        margin: 0 1px;
+    }
 }
 
 </style>

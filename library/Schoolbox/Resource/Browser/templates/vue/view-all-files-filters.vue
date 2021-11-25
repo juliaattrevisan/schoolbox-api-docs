@@ -6,7 +6,6 @@
  */
 
 import fileTypes from './viewAllFilesFileTypes.js';
-import filterEvents from './viewAllFilesFilterEvents.js';
 
 export default {
 
@@ -57,17 +56,16 @@ export default {
     },
 
     created () {
-        this.filterEvents = filterEvents; //to be able to reference the types within the <template>
         this.fileTypes = fileTypes; //to be able to reference the types within the <template>
     },
-    
+
     methods: {
         
         /**
          * Notify view-all-files.vue of the change so it can add/remove from selectedFilters
          */
-        onFilterChange (filterEvent, fileType) {
-            this.$emit('on-filter-change', filterEvent, fileType); //picked up by view-all-files.vue 
+        onFilterChange (fileType) {
+            this.$emit('on-filter-change', fileType); //picked up by view-all-files.vue 
         },
 
     }
@@ -82,23 +80,23 @@ export default {
 
             <ul class="option-list">
                 <li>
-                    <input type="checkbox" id="document-toggle" :checked="isDocumentChecked" @change="onFilterChange(filterEvents.DOCUMENT_CHECKED, fileTypes.DOCUMENT)">
+                    <input type="checkbox" id="document-toggle" :checked="isDocumentChecked" @change="onFilterChange(fileTypes.DOCUMENT)">
                     <label for="document-toggle">Document</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="audio-toggle" :checked="isAudioChecked" @change="onFilterChange(filterEvents.AUDIO_CHECKED, fileTypes.AUDIO)">
+                    <input type="checkbox" id="audio-toggle" :checked="isAudioChecked" @change="onFilterChange(fileTypes.AUDIO)">
                     <label for="audio-toggle">Audio</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="video-toggle" :checked="isVideoChecked" @change="onFilterChange(filterEvents.VIDEO_CHECKED, fileTypes.VIDEO)">
+                    <input type="checkbox" id="video-toggle" :checked="isVideoChecked" @change="onFilterChange(fileTypes.VIDEO)">
                     <label for="video-toggle">Video</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="image-toggle" :checked="isImageChecked" @change="onFilterChange(filterEvents.IMAGE_CHECKED, fileTypes.IMAGE)">
+                    <input type="checkbox" id="image-toggle" :checked="isImageChecked" @change="onFilterChange(fileTypes.IMAGE)">
                     <label for="image-toggle">Image</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="other-toggle" :checked="isOtherChecked" @change="onFilterChange(filterEvents.OTHER_CHECKED, fileTypes.OTHER)">
+                    <input type="checkbox" id="other-toggle" :checked="isOtherChecked" @change="onFilterChange(fileTypes.OTHER)">
                     <label for="other-toggle">Other</label>
                 </li>
             </ul>
