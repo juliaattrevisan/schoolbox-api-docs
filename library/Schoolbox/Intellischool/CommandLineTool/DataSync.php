@@ -51,7 +51,11 @@ class DataSync extends \Schoolbox\Application\CliTool\App
         $deploymentSecret = $this->getConfig()->get('intellischool_deployment_secret');
 
         //confirm the api details are set, as it will error out if they are not set.
-        if ($deploymentId === null || $deploymentSecret === null) {
+        /**
+         * if a user un-sets the values in admin it can show as '' not null,
+         * so lets say the value is a string so if it is null it will show cast to ''
+         */
+        if ('' === trim((string)$deploymentId) || '' === trim((string)$deploymentSecret)) {
             $this->getLogger()->critical("Deployment ID or Secret is not set. Please set and re run this script.");
             exit(1);
         }
@@ -72,7 +76,7 @@ class DataSync extends \Schoolbox\Application\CliTool\App
     {
         return [
             'help',
-            'timeout',
+            'timeout:',
         ];
     }
 
@@ -82,13 +86,18 @@ class DataSync extends \Schoolbox\Application\CliTool\App
     private function displayHelp(): void
     {
         $timeOut           = self::DEFAULT_TIMEOUT;
+
+        /* https://stackoverflow.com/questions/3172332/convert-seconds-to-hourminutesecond
+                */
+        $duration = floor($timeOut / 3600) . gmdate(":i:s", $timeOut % 3600);
+
         echo <<<HELP
 Intellischools server data sync
 
-Usage: dataSync.php -v[vv] [--timeout=21600]
-    -v:                  Verbosity level, -vvv: most verbose
-    --timeout            Number of seconds after which a pending upload will be assumed failed
-                         Defaults to {$timeOut} (6 hrs).
+Usage: dataSync.php -v[vv] [--timeout:21600]
+    -v                   Verbosity level, -vvv most verbose
+    --timeout:           Number of seconds after which a pending jobs will be assumed failed
+                         Defaults to {$timeOut} ({$duration} hrs).
 
 HELP;
     }
