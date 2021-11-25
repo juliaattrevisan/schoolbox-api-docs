@@ -23,7 +23,6 @@
 {% else %}
 
     {% set learningfieldProviderId = '' %}
-    {% set providerIdPlaceholder   = 'providerIdPlaceholder' %}
 
     {% if providerId is empty %}
         <div id="lti-select-provider{{ componentInstanceId }}" class="row" data-collapsable="true" data-collapse-state="uncollapsed">
@@ -76,59 +75,6 @@
                 </section>
             </div>
         </div>
-
-        {% autoescape 'js' %}
-        <script type="text/javascript">
-            $(function () {
-                $('#component{{ componentInstanceId }}').ltiComponent({
-                    componentInstanceId: '{{ componentInstanceId }}',
-                    $toast: $('#lti-toaster{{ componentInstanceId }}'),
-                    $ltiSelectProvider: $('#lti-select-provider{{ componentInstanceId }}'),
-                    $ltiSelectPreloader: $('#lti-select-provider{{ componentInstanceId }}'),
-                    $ltiIframe: $('#lti-frame{{ componentInstanceId }}'),
-                    providerIdPlaceholder: '{{ providerIdPlaceholder }}',
-                    postComponentProviderBaseUrl: '{{
-                        routeLookup(
-                            'ltiConsumer.postComponentProvider',
-                            {
-                                providerId:  providerId ?: providerIdPlaceholder,
-                                componentId: componentInstanceId,
-                            }
-                        )
-                    }}',
-                    lti1p1LaunchUrl: '{{
-                        routeLookup(
-                            'ltiConsumer.getLaunch',
-                            {
-                                providerId:  providerId ?: providerIdPlaceholder,
-                                componentId: componentInstanceId,
-                                folderId:    folderId
-                            }
-                        )
-                    }}',
-                    lti1p3LaunchUrl: '{{
-                        routeLookup(
-                            'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
-                            {
-                                toolId:      providerId ?: providerIdPlaceholder,
-                                componentId: componentInstanceId,
-                                folderId:    folderId,
-                            }
-                        )
-                    }}',
-                    lti1p3DeepLinkingUrl: '{{
-                        routeLookup(
-                            'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
-                            {
-                                toolId:   providerId ?: providerIdPlaceholder,
-                                folderId: folderId,
-                            }
-                        )
-                    }}',
-                });
-            });
-        </script>
-        {% endautoescape %}
 
         {% autoescape 'js' %}
         <script type="text/javascript">
@@ -216,6 +162,11 @@
                         // Look at the first resource link, set values based on that
                         let $iframe = $('#lti-frame{{ componentInstanceId }}');
                         if (resourceLink) {
+                            {#$('#component{{ componentInstanceId }}').ltiComponent(#}
+                            {#    'deepLinkSelect',#}
+                            {#    resourceLink,#}
+                            {#    tool,#}
+                            {#);#}
                             let url = resourceLink?.url ?? tool?.launchUrl;
                             if (url) {
                                 // Post to the component configuration
@@ -247,6 +198,7 @@
                             }
                         } else {
                             // Just reload the deep linking launch URL
+                            {#$('#component{{ componentInstanceId }}').ltiComponent('deepLinkCancel');#}
                             $iframe.attr(
                                 'src',
                                 '{{ routeLookup(
@@ -267,4 +219,59 @@
 {% endif %}
 
 <div id="lti-toaster{{ componentInstanceId }}" class="toast"></div>
+
+{# LTI component JS configuration #}
+{% set providerIdPlaceholder   = 'providerIdPlaceholder' %}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/lti/jquery.ltiComponent.js"></script>
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            $('#component{{ componentInstanceId }}').ltiComponent({
+                componentInstanceId: '{{ componentInstanceId }}',
+                $toast: $('#lti-toaster{{ componentInstanceId }}'),
+                $ltiSelectProvider: $('#lti-select-provider{{ componentInstanceId }}'),
+                $ltiSelectPreloader: $('#lti-select-provider{{ componentInstanceId }}'),
+                $ltiIframe: $('#lti-frame{{ componentInstanceId }}'),
+                providerIdPlaceholder: '{{ providerIdPlaceholder }}',
+                postComponentProviderBaseUrl: '{{
+                routeLookup(
+                    'ltiConsumer.postComponentProvider',
+                    {
+                        providerId:  providerId ?: providerIdPlaceholder,
+                        componentId: componentInstanceId,
+                    }
+                )
+                }}',
+                lti1p1LaunchUrl: '{{
+                routeLookup(
+                    'ltiConsumer.getLaunch',
+                    {
+                        providerId:  providerId ?: providerIdPlaceholder,
+                        componentId: componentInstanceId,
+                        folderId:    folderId
+                    }
+                )
+                }}',
+                lti1p3LaunchUrl: '{{
+                routeLookup(
+                    'ltiPlatformContext.getLaunchResourceLinkRequestForFolderAndComponent',
+                    {
+                        toolId:      providerId ?: providerIdPlaceholder,
+                        componentId: componentInstanceId,
+                        folderId:    folderId,
+                    }
+                )
+                }}',
+                lti1p3DeepLinkingUrl: '{{
+                routeLookup(
+                    'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
+                    {
+                        toolId:   providerId ?: providerIdPlaceholder,
+                        folderId: folderId,
+                    }
+                )
+                }}',
+            });
+        });
+    </script>
+{% endautoescape %}
