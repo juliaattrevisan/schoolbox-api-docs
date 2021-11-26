@@ -9,10 +9,8 @@ import fileTypes from './viewAllFilesFileTypes.js';
 import ViewAllFilesFilters from './view-all-files-filters.vue';
 import ViewAllFilesRowName from './view-all-files-row-name.vue';
 import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
+import ViewAllFilesDeleteFiles from './view-all-files-delete-files.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer.vue';
-import Toast from '@vue/components/toast.vue';
-import RevealModal from '@vue/components/reveal-modal.vue';
 import { gsap } from 'gsap/all';
 
 
@@ -20,9 +18,7 @@ export default {
 
     components: {
         ViewAllFilesFilters,
-        BottomDrawer,
-        Toast,
-        RevealModal,
+        ViewAllFilesDeleteFiles,
     },
 
     mixins: [
@@ -57,12 +53,6 @@ export default {
             selectedFilters: [],
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-                cellClasses: {
-                    name: [ {
-                        class: 'new-file-upload',
-                        condition: (row) => row.isNew === true
-                    } ],
-                },
                 columnsClasses: {
                     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
                     edit: 'edit-td ', //to specify a width
@@ -121,6 +111,9 @@ export default {
                 perPage: 100,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
+                rowClassCallback: (row) => { //to differentiate newly uploaded files so it's clear where they've been placed in the table
+                    return row.isNew ? 'new-file-upload' : '';
+                },
                 selectable: {
                     mode: 'multiple' //to enable multi-select
                 },
@@ -144,40 +137,10 @@ export default {
             },
             tableColumns: this.getTableColumns(),
             collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
-            selectedRows: [], //keep track of which rows could be deleted/downloaded
-            singleRowName: 'file',
-            pluralRowName: 'files',
+            selectedFiles: [], //keep track of which rows could be deleted/downloaded
             isShiftKeySelected: false, //to multi-select fields
             hasSelectedShiftKey: false, //to hide a UI note
         }
-    },
-
-    computed: {
-
-        /**
-         * To track how many are selected
-         *
-         * @returns { Number }
-         */
-        selectedRowsCount () {
-            return this.selectedRows.length;
-        },
-
-        /**
-         * For proper count display, eg: '1 user' / '4 users'
-         *
-         * @returns { String }
-         */
-        selectedRowsCountWithRowName () {
-            if (this.selectedRowsCount === 0) {
-                return 'No ' + this.singleRowName;
-            } else if (this.selectedRowsCount === 1) {
-                return this.selectedRowsCount + ' ' + this.singleRowName;
-            } else {
-                return this.selectedRowsCount + ' ' + this.pluralRowName;
-            }
-        },
-
     },
 
     created () {
@@ -185,12 +148,29 @@ export default {
     },
 
     mounted () {
+        this.initShiftKeyDetection();
         this.initTable();
         this.onTableLoaded();
         this.initFilterDisplay();
     },
 
     methods: {
+
+        /**
+         * To hide a UI note informing of shift-selection once pressed once
+         */
+        initShiftKeyDetection () {
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = true;
+                }
+            });
+            document.addEventListener('keyup', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = false;
+                }
+            });
+        },
 
         /**
          * Populate the table with the files list
@@ -200,7 +180,7 @@ export default {
         },
 
         /**
-         * The edit column is only display to those that have permission
+         * The edit column is only displayed to those that have permission
          *
          * @returns { Array }
          */
@@ -256,6 +236,11 @@ export default {
             }
             const filterParam = this.selectedFilters.includes(fileType) ? '' : fileType ;
             Event.$emit(`vue-tables.filter::${fileType}`, filterParam);
+            this.$nextTick(() => {
+                this.tableData.forEach((file) => {
+                    file.isNew = false;
+                })
+            });
         },
 
         /**
@@ -271,7 +256,9 @@ export default {
                 },
                 success: (file, response) => {
                     this.displayFileUploadSuccess(file);
+                    this.checkFileFilterIsActive(response);
                     this.addFileToTable(response);
+                    this.$refs.table.resetQuery();
                 },
                 error: (file, response) => {
                     this.displayFileUploadError(file, response);
@@ -315,15 +302,25 @@ export default {
         },
 
         /**
+         * For example, ensure the Image filter is active if a jpeg is dropped in
+         * Otherwise when the file is uploaded it just looks like the file dissapears
+         * as it's not in the currently filtered list
+         *
+         * @param { Object }
+         */
+        checkFileFilterIsActive (file) {
+            if (!this.selectedFilters.includes(file.type)) {
+                this.selectedFilters = [...this.selectedFilters, file.type];
+                Event.$emit(`vue-tables.filter::${file.type}`, '');
+            }
+        },
+
+        /**
          * Add the new file into the table
          *
          * @param { Object }
          */
         addFileToTable (file) {
-            if (!this.selectedFilters.includes(file.type)) {
-                this.selectedFilters = [...this.selectedFilters, file.type];
-                Event.$emit(`vue-tables.filter::${file.type}`, '');
-            }
             const fileWithIsNew = { ...file, isNew: true };
             this.tableData = [...this.tableData, fileWithIsNew];
         },
@@ -342,74 +339,22 @@ export default {
 
 
 
-
-
-
-
         /**
          * To keep track of selected rows
          */
         onRowSelected (event) {
-            this.selectedRows = event;
-            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+            this.selectedFiles = event;
+            if (this.selectedFiles.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
                 this.hasSelectedShiftKey = true;
             }
         },
 
         /**
-         * To confirm/cancel selected users deletion
+         * Files have been deleted, so clear them from the table and clear the selection
          */
-        onDeleteFilesSelected () {
-            this.$refs.deleteModal.open();
-        },
-
-        /**
-         * Delete the selected users, informing of deletion and clearing them from the table list as well
-         *
-         */
-        async onConfirmDeleteFilesSelected () {
-            this.$refs.toast.activate('Deleting...');
-            try {
-                await Promise.all(this.getFetches());
-                this.$refs.toast.timeout('Deleted', true, 2000);
-                this.$refs.deleteModal.close();
-                this.tableData = this.getUpdatedRowsAfterUserDeletion();
-                this.clearRows();
-                this.$refs.table.resetSelectedRows();
-            } catch (error) {
-                this.$refs.toast.timeout('Unable to delete', false, 2000);
-            }    
-        },
-
-        /**
-         * To update all the marked submissions in parallel
-         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-         *
-         * @returns { Array }
-         */
-        getFetches () {
-            const fetchList = [];
-            this.selectedRows.forEach((row) => {
-                fetchList.push(fetch(`/cms/fileForm.php?${this.getURLSearchParams(row)}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                }));
-            });
-            return fetchList;
-        },
-
-        /**
-         * Set up a deleted users array to POST
-         *
-         * @returns { URLSearchParams }
-         */
-        getURLSearchParams (row) {
-            return new URLSearchParams({
-                ajax: '1',
-                delete: row.id,
-            });
+        onFilesDeleted () {
+            this.tableData = this.getUpdatedRowsAfterUserDeletion();
+            this.clearRowSelection();
         },
 
         /**
@@ -419,7 +364,7 @@ export default {
          */
         getUpdatedRowsAfterUserDeletion () {
             return this.tableData.filter((file) => {
-                if (this.selectedRows.some((rowToDelete) => rowToDelete.id === file.id)) { //pull out any deleted rows, those rows that are in selectedRows, which have just been deleted
+                if (this.selectedFiles.some((rowToDelete) => rowToDelete.id === file.id)) { //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
                     return false;
                 }
                 return true;
@@ -427,27 +372,12 @@ export default {
         },
 
         /**
-         * clear the selection after deletion
+         * Clear the selection
          */
-        clearRows () {
-            this.selectedRows = [];
-        },
-
-        /**
-         * Cancel the the selected users deletion
-         */
-        onCancelDeleteFilesSelected () {
-            this.$refs.deleteModal.close();
-        },
-
-        /**
-         * To confirm/cancel selected users deletion
-         */
-        onClearFilesSelected () {
-            this.clearRows();
+        clearRowSelection () {
+            this.selectedFiles = [];
             this.$refs.table.resetSelectedRows();
         },
-
 
 
     },
@@ -511,26 +441,13 @@ export default {
 
             </div>
 
-            <toast ref="toast"></toast>
-
-            <reveal-modal ref="deleteModal">
-                <h2>Please Confirm</h2>
-                <p>Are you sure you wish to delete the selected files?</p>
-                <ul class="flex-list buttons">
-                    <li><button @click.prevent="onConfirmDeleteFilesSelected" class="button submit">Delete</button></li>
-                    <li><button @click.prevent="onCancelDeleteFilesSelected" class="button">Cancel</button></li>
-                </ul>
-            </reveal-modal>
-
-            <bottom-drawer :showDrawer="selectedRowsCount > 0">
-                <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
-                <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple files</span>
-                <button @click.prevent="onClearFilesSelected" class="button-clear">Clear file selection</button>
-                <ul class="flex-list buttons">
-                    <li><button @click.prevent="onDeleteFilesSelected" class="button submit icon-delete">Delete {{ selectedRowsCountWithRowName }}</button></li>
-                    <li><button @click.prevent="onDownloadFilesSelected" class="button submit icon-download">Download {{ selectedRowsCountWithRowName }}</button></li>
-                </ul>
-            </bottom-drawer>
+            <view-all-files-delete-files
+                :selected-files="selectedFiles"
+                :is-shift-key-selected="isShiftKeySelected"
+                :has-selected-shift-key="hasSelectedShiftKey"
+                @on-files-deleted="onFilesDeleted"
+                @on-selection-cleared="clearRowSelection"
+            />
 
         </div>
 
@@ -604,6 +521,7 @@ export default {
 
 .new-file-upload {
     animation-duration: 1s;
+    animation-iteration-count: 1;
     animation-name: fadeIn;
 }
 
@@ -615,31 +533,6 @@ export default {
 .close-button { //move to be more inline with the edit icons
     right: 1.25rem;
     top: 0.25rem;
-}
-
-.selected-count {
-    margin-right: 1rem;
-}
-
-.button-clear, .button-delete, .selected-count {
-    display: inline-block;
-}
-
-.shift-select-note {
-    color: #9a9a9a;
-    margin-right: 1rem;
-    font-size: 13px;
-    font-style: italic;
-}
-
-.button-clear {
-    padding: 0px;
-    background: none;
-    vertical-align: baseline;
-    font-size: 0.8rem;
-    &:hover {
-        background: none;
-    }
 }
 
 </style>
