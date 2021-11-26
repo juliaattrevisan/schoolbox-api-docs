@@ -42,6 +42,9 @@ MAILTO="support@schoolbox.com.au"
 # Turnitin reporter - every 10min
 */10 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/report.php >> /var/lib/schoolbox/cache/logs/turnitin.log 2>&1
 
+# Geosnapshot Redactions - daily at 8:08pm I guess
+8 20 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/geosnapshot/redaction.php --perform >> /var/lib/schoolbox/cache/logs/geosnapshot.log 2>&1
+
 # Etherpad - sync back to MySQL - every hour
 0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
 

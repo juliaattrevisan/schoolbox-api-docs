@@ -558,4 +558,14 @@ class External_Denbigh_User implements External_UserInterface
     {
         return [];
     }
+
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

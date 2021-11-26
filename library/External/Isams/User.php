@@ -452,4 +452,13 @@ class External_Isams_User implements External_UserInterface
         ";
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
+
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
+    public function getPhotoRedactionList(): array
+    {
+        return [];
+    }
 }

@@ -12,6 +12,7 @@ namespace Schoolbox\Geosnapshot;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
+use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
 
@@ -29,6 +30,14 @@ class Api
      * POST to this endpoint
      */
     private const GEOSNAPSHOT_ENDPOINT = 'https://geosnapshot.com/api/v1/embeds/org_photos';
+
+
+    /**
+     * A list of guys whose photos have been redacted, along with some other metadata
+     *
+     * POST to this endpoint
+     */
+    private const GEOSNAPSHOT_ENDPOINT_REDACTION = 'https://geosnapshot.com/api/v1/master_participants';
 
 
     /**
@@ -71,6 +80,7 @@ class Api
     {
         $headers = [
             'X-API-KEY' => $this->apiKey,
+            'Accept' => '*/*'
         ];
 
         return new Client([
@@ -97,7 +107,7 @@ class Api
      */
     public function retrieveStudentPhotos(User $viewee): array
     {
-        return $this->retrieve((new StudentPhoto())->build($viewee));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto())->build($viewee));
     }
 
 
@@ -116,14 +126,15 @@ class Api
      */
     public function retrieveEventPhotos(string $eventName): array
     {
-        return $this->retrieve((new EventPhoto())->build($eventName));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName));
     }
 
 
     /**
-     * Send a payload to the endpoint
+     * Tell Geosnapshot about guys whose photos have been redacted
      *
-     * @param array $payload
+     * @param string $fqdn
+     * @param array  $externalRedactionList
      * @return array
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -131,7 +142,27 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    private function retrieve(array $payload): array
+    public function transmitRedactionPhotos(string $fqdn, array $externalRedactionList): array
+    {
+        $payload = (new RedactedPhotoList($fqdn))->build($externalRedactionList);
+
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT_REDACTION, $payload);
+    }
+
+
+    /**
+     * Send a payload to the endpoint
+     *
+     * @param string $endpoint
+     * @param array  $payload
+     * @return array
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    private function retrieve(string $endpoint, array $payload): array
     {
         /* Remember it if we need to inspect it for some reason
          */
@@ -143,17 +174,30 @@ class Api
          *
          * https://docs.guzzlephp.org/en/latest/request-options.html#json
          */
-        $response = $this->build()->request('POST', self::GEOSNAPSHOT_ENDPOINT, [
+        $response = $this->build()->request('POST', $endpoint, [
             RequestOptions::JSON => $payload
         ]);
 
         /* Responds with this tuple: {"url":"https://geosnapshot.com/e/schoolbox-office-re-opening-from-iso-to-posh"}
          */
-        if ((int)$response->getStatusCode() === 200) {
+        if ($response->getStatusCode() === 200) {
+            /* Geosnapshot endpoints sometimes just echo back an empty string
+             * which is un-json_decodable - just return empty array I guess
+             */
+            if ('' === $response->getBody()->getContents()) {
+                return [];
+            }
+
+            /* Try to decode whatever json payload was given back
+             */
             return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         }
 
-        throw new \DomainException('Geosnapshot: Invalid response from Geosnapshot; could not decode json response');
+        throw new \DomainException(sprintf(
+            'Geosnapshot: Invalid response from Geosnapshot - could not decode json. %s %s',
+            $response->getStatusCode(),
+            $response->getReasonPhrase()
+        ));
     }
 
 
