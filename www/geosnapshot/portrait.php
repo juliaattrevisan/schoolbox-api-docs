@@ -26,6 +26,10 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
+/* All geosnapshot pictures are constrain200 transformation
+ */
+const TRANSFORM_KEY = 'constrain200';
+
 /* Check that the headers matched what we expected
  */
 $headers = getallheaders();
@@ -34,7 +38,7 @@ $headers = getallheaders();
 $config = $kernel->getDependencyInjector()->get('config');
 
 if ($config->get('geosnapshot_redaction_key') !== $headers['X-Api-Key']) {
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
+    SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 404);
     exit;
 }
 
@@ -42,7 +46,7 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CAC
 $kernel->getShutdownHandler()->registerFunction(
     new ResourceLimitExceededHandler(function () {
         header('Cache-Control: no-store');
-        SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', 504);
+        SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 504);
     }),
     ShutdownHandler::PRIORITY_HIGHEST,
 );
@@ -58,7 +62,7 @@ try {
         $user = $userMapper->findByExternalId($_GET['userId']);
     }
 } catch (\Schoolbox\Mapper\Exception $e) {
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
+    SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY);
     exit;
 }
 
@@ -77,7 +81,7 @@ try {
     $fileSystem = $storageModel->getFilesystem();
 
     $portrait  = new Image\Transformation\Portrait();
-    $cacheKey  = (isset($_GET['size'])) ? $portrait->getCacheKey($_GET['size']) : null;
+    $cacheKey  = $portrait->getCacheKey(TRANSFORM_KEY);
 
     if (
         $fileSystem instanceof Filesystem &&
@@ -97,23 +101,23 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $image = new Image\Processor($storageModel, $cacheKey, $portrait->retrieve($_GET['size']));
+    $image = new Image\Processor($storageModel, $cacheKey, $portrait->retrieve(TRANSFORM_KEY));
     $image->load()->stream();
 } catch (ConcurrentTransformationException $e) {
     // This transformation is already being processed.
     $kernel->outputResourceBeingProcessedHeader();
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], $e->getHttpStatusCode());
+    SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, $e->getHttpStatusCode());
 } catch (\RuntimeException $e) {
     /* When you cannot access the requested image (access denied)
     */
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
+    SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 403);
 } catch (\InvalidArgumentException $e) {
     /* Image/Portrait not found
     */
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
+    SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 404);
 } catch (Exception $e) {
     /* All other exceptions
     * BadMethodCallException
     */
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
+    SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY);
 }
