@@ -9,15 +9,16 @@ import fileTypes from './viewAllFilesFileTypes.js';
 import ViewAllFilesFilters from './view-all-files-filters.vue';
 import ViewAllFilesRowName from './view-all-files-row-name.vue';
 import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
+import ViewAllFilesDropzone from './view-all-files-dropzone.vue';
 import ViewAllFilesDeleteFiles from './view-all-files-delete-files.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
-import { gsap } from 'gsap/all';
 
 
 export default {
 
     components: {
         ViewAllFilesFilters,
+        ViewAllFilesDropzone,
         ViewAllFilesDeleteFiles,
     },
 
@@ -115,7 +116,7 @@ export default {
                     return row.isNew ? 'new-file-upload' : '';
                 },
                 selectable: {
-                    mode: 'multiple' //to enable multi-select
+                    mode: this.canEdit ? 'multiple' : '' //to enable multi-select for those with permission
                 },
                 sortable: ['name', 'dateModified.formatted'], //the edit column doesn't need to be sortable
                 sortIcon: {
@@ -150,11 +151,22 @@ export default {
     mounted () {
         this.initShiftKeyDetection();
         this.initTable();
-        this.onTableLoaded();
-        this.initFilterDisplay();
     },
 
     methods: {
+
+        /**
+         * The edit column is only displayed to those that have permission
+         *
+         * @returns { Array }
+         */
+        getTableColumns () {
+            const tableColumns = ['name', 'dateModified.formatted'];
+            if (this.canEdit) {
+                tableColumns.push('edit');
+            }
+            return tableColumns;
+        },
 
         /**
          * To hide a UI note informing of shift-selection once pressed once
@@ -177,19 +189,7 @@ export default {
          */
         initTable () {
             this.tableData = this.files.map((file) => file = { ...file, isNew: false } ); //add isNew so can differentiate newly uploaded files
-        },
-
-        /**
-         * The edit column is only displayed to those that have permission
-         *
-         * @returns { Array }
-         */
-        getTableColumns () {
-            const tableColumns = ['name', 'dateModified.formatted'];
-            if (this.canEdit) {
-                tableColumns.push('edit');
-            }
-            return tableColumns;
+            this.onTableLoaded();
         },
 
         /**
@@ -198,7 +198,10 @@ export default {
         onTableLoaded () {
             this.$nextTick(() => {
                 this.footerUI_update();
-                this.initDropZone();
+                this.initFilterDisplay();
+                if (this.canEdit) {
+                    this.$refs.dropzone.initDropzone();
+                }
             });
         },
 
@@ -224,18 +227,58 @@ export default {
         },
 
         /**
+         * To keep track of selected rows
+         */
+        onRowSelected (event) {
+            this.selectedFiles = event;
+            if (this.selectedFiles.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+                this.hasSelectedShiftKey = true;
+            }
+        },
+
+        /**
          * Add/remove from selectedFilters and fire an event for the table
          *
          * @param { String }
          */
         onFilterChange (fileType) {
+            this.updateSelectedFilters(fileType);
+            this.dispatchFilterEvent(fileType);
+            this.markAllFilesAsOld();
+        },
+
+        /**
+         * Add/remove from selectedFilters
+         *
+         * @param { String }
+         */
+        updateSelectedFilters (fileType) {
             if (this.selectedFilters.includes(fileType)) {
                 this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== fileType);
             } else {
                 this.selectedFilters = [...this.selectedFilters, fileType];
             }
+        },
+
+        /**
+         * Modify what's displayed in the table, showing or hiding a filter type
+         * depending on whether it's in the selected filters
+         *
+         * @param { String }
+         */
+        dispatchFilterEvent (fileType) {
             const filterParam = this.selectedFilters.includes(fileType) ? '' : fileType ;
             Event.$emit(`vue-tables.filter::${fileType}`, filterParam);
+        },
+
+        /**
+         * Perform on any further user interaction, like updating filters, sorting or searching
+         * Otherwise the animation used to clearly show where new files have been added will be
+         * replayed on any state change
+         *
+         * @param { Object }
+         */
+        markAllFilesAsOld () {
             this.$nextTick(() => {
                 this.tableData.forEach((file) => {
                     file.isNew = false;
@@ -244,61 +287,15 @@ export default {
         },
 
         /**
-         * To be able to drag and drop files straight onto the table
-         */
-        initDropZone () {
-            $('#dropzone').fileDrop({
-                previewsContainer: '#view-all-files [data-dz-container]',
-                previewTemplate: '#view-all-files [data-dz-template]',
-                reloadContent: false,
-                sending: (file, xhr, formData) => {
-                    this.appendFormData(file, formData);
-                },
-                success: (file, response) => {
-                    this.displayFileUploadSuccess(file);
-                    this.checkFileFilterIsActive(response);
-                    this.addFileToTable(response);
-                    this.$refs.table.resetQuery();
-                },
-                error: (file, response) => {
-                    this.displayFileUploadError(file, response);
-                }
-            });
-        },
-
-        /**
-         * Add the extra properties required for the /fileForm.php endpoint
-         *
-         * @param { Object }
-         * @param { FormData }
-         */
-        appendFormData (file, formData) {
-            const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
-            const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
-            formData.append('description', uploadDescription);
-            formData.append('category', this.sourceFolderId);
-            formData.append('comment', '');
-            formData.append('hidden', 0);
-        },
-
-        /**
-         * Update the display to notify of success and animate it out
+         * Add the file to the table, ensuring it's visible by
+         * checking on the relevant filter if not already active
          *
          * @param { Object }
          */
-        displayFileUploadSuccess (file) {
-            const previewElement = file.previewElement;
-            previewElement.classList.remove('dz-processing');
-            previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
-            previewElement.querySelector('span.dz-upload').classList.add('complete');
-            previewElement.querySelector('[data-dz-status]').textContent = 'Success';
-            previewElement.style.overflow = 'hidden';
-            gsap.to(previewElement, {
-                height: 0,
-                delay: 1,
-                duration: 0.5,
-                onComplete: () => previewElement.remove()
-            } );
+        onFileSuccess (file) {
+            this.checkFileFilterIsActive(file);
+            this.addFileToTable(file);
+            this.$refs.table.resetQuery();
         },
 
         /**
@@ -323,30 +320,6 @@ export default {
         addFileToTable (file) {
             const fileWithIsNew = { ...file, isNew: true };
             this.tableData = [...this.tableData, fileWithIsNew];
-        },
-
-        /**
-         * Can't upload the file, so notify the reason and show the close button
-         *
-         * @param { Object }
-         * @param { Object }
-         */
-        displayFileUploadError (file, response) {
-            document.querySelector('.dz-error [data-close]').classList.remove('hide');
-            file.previewElement.classList.remove('dz-processing');
-            file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
-        },
-
-
-
-        /**
-         * To keep track of selected rows
-         */
-        onRowSelected (event) {
-            this.selectedFiles = event;
-            if (this.selectedFiles.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
-                this.hasSelectedShiftKey = true;
-            }
         },
 
         /**
@@ -394,7 +367,7 @@ export default {
 
             <div class="dropzone-wrap">
 
-                <form class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
+                <form v-if="canEdit" class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
                     <div class="dz-default dz-message">You can drag files into this space.</div>
                 </form>
 
@@ -404,6 +377,8 @@ export default {
                     :columns="tableColumns"
                     :options="tableOptions"
                     @select="onRowSelected"
+                    @filter="markAllFilesAsOld"
+                    @sorted="markAllFilesAsOld"
                 >
                     <div slot="beforeTable">
                         <view-all-files-filters
@@ -412,24 +387,13 @@ export default {
                         />
                     </div>
                     <div slot="afterTable">
-                        <div class="dropped-files-container">
-                            <div data-dz-container=""></div>
-                            <div data-dz-template="" class="hide">
-                                <div data-dz-template-item>
-                                    <div class="card small-12">
-                                        <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                        <img data-dz-thumbnail="" class="mime" src="/static/images/foundation/preloader.gif" alt="file loading spinner">
-                                        <p data-dz-name=""></p>
-                                        <p class="meta" data-dz-status="">Uploading...</p>
-                                        <div class="progress dz-progress">
-                                            <span class="meter dz-upload" style="width:0;"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <view-all-files-dropzone
+                            v-if="canEdit"
+                            ref="dropzone"
+                            dropzone-selector="#dropzone"
+                            :source-folder-id="sourceFolderId"
+                            @on-file-uploaded="onFileSuccess"
+                        />
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
                         <div class="component-action">
                             <section>
@@ -442,6 +406,7 @@ export default {
             </div>
 
             <view-all-files-delete-files
+                v-if="canEdit"
                 :selected-files="selectedFiles"
                 :is-shift-key-selected="isShiftKeySelected"
                 :has-selected-shift-key="hasSelectedShiftKey"
@@ -457,6 +422,7 @@ export default {
 
 <style lang="scss">
 
+@import 'www/static/css/foundation/utils/_colors.scss';
 @import '@vue/components/vueTables2/vueTables2';
 
 .VueTables table {
@@ -501,16 +467,6 @@ export default {
     width: 2.5rem; //keep the edit icon on the right side
 }
 
-.dropped-files-container {
-    background: white;
-    ul li {
-        list-style-type: none;
-    }
-    .card {
-        background: white;
-    }
-}
-
 .VueTables__table-footer {
     margin-bottom: 0; //.component action sits underneath
 }
@@ -519,20 +475,15 @@ export default {
     margin-bottom: 2rem; //add margin as it's below the table-footer
 }
 
-.new-file-upload {
-    animation-duration: 1s;
+.VueTables__table tr.new-file-upload { //have to be pretty specific to overwrite foundation rules...
+    animation-duration: 2s;
     animation-iteration-count: 1;
-    animation-name: fadeIn;
+    animation-name: fadeOutBackgroundColour;
 }
 
-@keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-.close-button { //move to be more inline with the edit icons
-    right: 1.25rem;
-    top: 0.25rem;
+@keyframes fadeOutBackgroundColour {
+    0% { background-color: $success-color; }
+    100% { background-color: white; }
 }
 
 </style>
