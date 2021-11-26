@@ -805,6 +805,15 @@ class External_Tass_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * TASS doesn't support Redactions natively in the app;
+     * schools can do it with user-defined fields but we
+     * would need them to all do it the same way
+     *
+     * (we haven't figured that out yet)
+     *
+     * Therefore, for now, tass redactions are not supported
+     *
      * @return array
      */
     public function getPhotoRedactionList(): array
