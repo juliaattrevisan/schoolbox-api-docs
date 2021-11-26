@@ -8,6 +8,7 @@
 
 namespace Schoolbox\LTI\Provider;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -52,5 +53,41 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Find all LTI tools which can be used to select content for a homepage
+     * component.
+     *
+     * @return GenericCollection|Model[]
+     */
+    public function findAllAvailableForComponent(): GenericCollection
+    {
+        return $this->findByPredicates(
+            $this->getPredicateBuilder()
+                 ->any(
+                     $this->getPredicateBuilder()
+                          ->equals('lti_version', Model::LTI_VERSION_1_1)
+                          ->all(
+                              $this->getPredicateBuilder()
+                                   ->equals('lti_version', Model::LTI_VERSION_1_3)
+                                   ->isTrue('available_for_component')
+                          )
+                 )
+        );
+    }
+
+    /**
+     * Find all LTI tools which can be used to select content for an assessment.
+     *
+     * @return GenericCollection|Model[]
+     */
+    public function findAllAvailableForAssessment(): GenericCollection
+    {
+        return $this->findByPredicates(
+            $this->getPredicateBuilder()
+                 ->equals('lti_version', Model::LTI_VERSION_1_3)
+                 ->isTrue('available_for_assessment')
+        );
     }
 }
