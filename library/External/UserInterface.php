@@ -179,6 +179,18 @@ interface External_UserInterface extends External\IConnector
     /**
      * Get a list of all the students and their photo redaction flag
      *
+     * Returns a stack of tuples, each of which has the following keys:
+     * (id is the user id from schoolbox.user)
+     *
+     * id
+     * firstname
+     * lastname
+     * yearLevel
+     * house
+     * external_id
+     * photo_redacted
+     * redact_photo_modified_at
+     *
      * @return array
      */
     public function getPhotoRedactionList(): array;
