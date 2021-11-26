@@ -53,7 +53,9 @@ export default {
         },
         selectedBadges: { //to know which badges are currently selected
             type: Array,
-            default: [],
+            default() {
+                return []
+            },
         },
     },
 
@@ -224,9 +226,9 @@ export default {
 
         /**
          * To ensure it's unchecked when 'Clear Selection' is selected in #badge-list-form
-         * 
+         *
          * @returns { Boolean }
-         * 
+         *
          * @returns { Boolean }
          */
         isInSelectedBadges (badgeId) {
@@ -235,8 +237,8 @@ export default {
 
         /**
          * To notify of badge selection change
-         * 
-         * @params { Boolean } 
+         *
+         * @params { Boolean }
          */
         onBadgeSelected (badge, isChecked) {
             this.$emit('on-badge-selected', badge, isChecked);
@@ -344,7 +346,7 @@ export default {
         </reveal-modal>
 
         <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
-            <badge-award 
+            <badge-award
                 v-if="currentBadge"
                 :key="'awardAchievement-' + String(currentBadge.id)"
                 :badge="currentBadge"
@@ -372,7 +374,7 @@ export default {
         </reveal-modal>
 
         <reveal-modal size="medium" ref="setAsGoalModal" :closeOnBackgroundClick="false">
-            <badge-award 
+            <badge-award
                 v-if="currentBadge"
                 :key="'setGoal-' + String(currentBadge.id)"
                 :badge="currentBadge"
