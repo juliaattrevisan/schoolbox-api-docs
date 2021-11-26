@@ -2,8 +2,8 @@ INSERT INTO `config`
 (name, value, title, description, field_id, options, type_id, editable, hidden, required, module, sequence)
 VALUES ('pastoral_action_enable',
         0,
-        'Enable Pastoral Action',
-        'If toggled ON, action will be available to be added to pastoral records.',
+        'Enable Pastoral Actions',
+        'If toggled ON, staff may add followup actions to pastoral records',
         (SELECT id FROM lu_config_field WHERE field = 'boolean'),
         NULL,
         (SELECT id FROM lu_config_type WHERE type = 'Pastoral Care'),
