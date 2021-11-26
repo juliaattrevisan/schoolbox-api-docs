@@ -102,7 +102,7 @@ class Controller extends Base
      * @api GET /adminv2/ups/{rulesetId}
      * @param string $rulesetId
      */
-    public function read($rulesetId)
+    public function read(string $rulesetId)
     {
 
         /* Produce Twig template data based on Role
@@ -131,7 +131,7 @@ class Controller extends Base
         }
 
         $twigData['pageCurrent'] = $this->router->generate('upsRuleset.intro');
-        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro'));
+        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
 
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',

@@ -13,14 +13,11 @@ namespace Schoolbox\Sync\Ruleset;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Alaress\Redis;
 use Aura\Di;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
 use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule

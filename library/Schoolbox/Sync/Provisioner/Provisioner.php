@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
 use Schoolbox\GenericCollection;
@@ -25,9 +26,11 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
+use Schoolbox\YearLevel\Mapper;
 use Throwable;
 use UnexpectedValueException;
 
@@ -114,6 +117,12 @@ class Provisioner
     private ?Log\Model $currentRun = null;
 
     /**
+     * Cache names
+     * @var array
+     */
+    private array $idToNameMap = [];
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory          $rulesetFactory
@@ -172,6 +181,7 @@ class Provisioner
      */
     public function run($update = false, $forRoleType = null)
     {
+        $this->prepareForLog();
         foreach ($this->runOrder as $roleType) {
             $this->currentRun = $this->logMapper->createModel()
                 ->setDry($update)
@@ -377,7 +387,7 @@ class Provisioner
                     if (count($diff)) {
                         $level = Logger::NOTICE;
                         $message = $update ? "$originalName $action" : "$originalName would have been {$action}d";
-                        $context = array_merge($commonContext, ['diff' => $diff]);
+                        $context = array_merge($commonContext, ['diff' => $this->formatForLog($diff)]);
                     } else {
                         // The user hasn't been changed: still, they've been
                         // seen by UPS so their updated at time should update.
@@ -554,5 +564,67 @@ class Provisioner
             $this->newUsernameCache[$internalUser->getUsername()] = $internalUser->getExternalId();
         }
         return true;
+    }
+
+    /**
+     * Cache lookups for log
+     */
+    private function prepareForLog(): void
+    {
+        /** @var Mapper $yearLevelMapper */
+        $yearLevelMapper           = $this->userMapper->getJoinMapper('year');
+        $yearLevels                = $yearLevelMapper->findAll();
+        $this->idToNameMap['year'] = array_combine($yearLevels->getPropertyValues('id'), $yearLevels->getPropertyValues('name'));
+
+        /** @var CampusMapper $campusMapper */
+        $campusMapper                          = $this->userMapper->getJoinMapper('userCampus');
+        $campuses                              = $campusMapper->findAll();
+        $this->idToNameMap['campusCollection'] = array_combine($campuses->getPropertyValues('id'), $campuses->getPropertyValues('name'));
+
+        /** @var RoleMapper $roleMapper */
+        $roleMapper                = $this->userMapper->getJoinMapper('role');
+        $roles                     = $roleMapper->findAll();
+        $this->idToNameMap['role'] = array_combine($roles->getPropertyValues('id'), $roles->getPropertyValues('name'));
+
+        /** @var \HouseMapper $schoolHouseMapper */
+        $schoolHouseMapper                = $this->userMapper->getJoinMapper('schoolHouse');
+        $houses                           = $schoolHouseMapper->findAll();
+        $this->idToNameMap['schoolHouse'] = array_combine($houses->getPropertyValues('id'), $houses->getPropertyValues('house'));
+
+        /** @var \HouseResidentialMapper $residentialHouseMapper */
+        $residentialHouseMapper                = $this->userMapper->getJoinMapper('residentialHouse');
+        $houses                                = $residentialHouseMapper->findAll();
+        $this->idToNameMap['residentialHouse'] = array_combine($houses->getPropertyValues('id'), $houses->getPropertyValues('house'));
+    }
+
+    /**
+     * Generates diff for UPS log
+     * @param array $diff
+     * @return array
+     */
+    private function formatForLog(array $diff): array
+    {
+        foreach (array_keys($this->idToNameMap) as $col) {
+            if (key_exists($col, $diff) && is_array($diff[$col])) {
+                foreach ($diff[$col] as $key => $ids) {
+                    $formatted = [];
+                    if (null === $ids) {
+                        continue;
+                    }
+                    // convert single id to array... for campus ids is array, for house ids is single value
+                    if (!is_array($ids)) {
+                        $ids = [$ids];
+                    }
+                    foreach ($ids as $id) {
+                        if (!isset($this->idToNameMap[$col][$id])) {
+                            continue;
+                        }
+                        $formatted[] = $this->idToNameMap[$col][$id];
+                    }
+                    $diff[$col][$key] = implode(',', $formatted);
+                }
+            }
+        }
+        return $diff;
     }
 }

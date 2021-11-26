@@ -20,6 +20,8 @@ use Schoolbox\IConfigLoader;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+use function count;
+
 /**
  * Class Subnav
  *
@@ -527,7 +529,7 @@ class Subnav
             '/adminv2/setting/Modules'                => [
                 'name'       => 'Modules',
                 'visible'    => true,
-                'searchable' => false,
+                'searchable' => true,
                 'children'   => [
                     '/adminv2/setting/Modules'         => [
                         'name'        => 'Home',
@@ -571,7 +573,7 @@ class Subnav
             '/adminv2/messages'                       => [
                 'name'       => 'Notifications',
                 'visible'    => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
-                'searchable' => false,
+                'searchable' => true,
                 'children'   => [
                     '/adminv2/messages'           => [
                         'name'        => 'Home',
@@ -814,7 +816,7 @@ class Subnav
             '/adminv2/user'                           => [
                 'name'       => 'User Management',
                 'visible'    => true,
-                'searchable' => false,
+                'searchable' => true,
                 'children'   => [
                     '/adminv2/user'                 => [
                         'name'        => 'Home',
@@ -867,7 +869,20 @@ class Subnav
                     '/adminv2/ups'                  => [
                         'name'        => 'User Provisioning System',
                         'visible'     => true,
-                        'children'    => [],
+                        'children'    => [
+                            '/adminv2/ups/student'                  => [
+                                'name'        => 'Student',
+                                'children'    => [],
+                            ],
+                            '/adminv2/ups/parent'                  => [
+                                'name'        => 'Parent',
+                                'children'    => [],
+                            ],
+                            '/adminv2/ups/staff'                  => [
+                                'name'        => 'Staff',
+                                'children'    => [],
+                            ],
+                        ],
                         'description' => 'Configure automatic user account creation and updates from your school database (SIS).',
                     ],
                 ],
@@ -901,7 +916,7 @@ class Subnav
                 $pageCurrent = $parentUrl;
             }
 
-            if (\count($parentData['children'])) {
+            if (count($parentData['children'])) {
                 foreach ($parentData['children'] as $childUrl => $childData) {
                     if ($childUrl === $url) {
                         $pageCurrent = $parentUrl;
@@ -958,39 +973,46 @@ class Subnav
     public function generateBreadcrumbs(string $url, ?string $overrideUrl = null, ?string $overrideName = null): array
     {
         $allCrumbs = [
-            ['Administration', '/adminv2/home']
+            ['Administration', '/adminv2/home'],
         ];
-
         foreach ($this->generate() as $parentUrl => $parentData) {
-            $parentHasBreadcrumbLink = $parentData['hasBreadcrumbLink'] ?? true;
-            if ($parentUrl === $url) {
-                $allCrumbs[] = [$parentData['name'], $parentHasBreadcrumbLink ? $parentUrl : null];
-            }
-
-            if (\count($parentData['children'])) {
-                foreach ($parentData['children'] as $childUrl => $childData) {
-                    if ($childUrl === $url) {
-                        /* parentUrl is sometimes the same as a childUrl
-                         * and manifest twice in the breadcrumb trail; we only
-                         * need the parent node if it was different to its child node
-                         */
-                        if ($parentUrl !== $url) {
-                            $allCrumbs[] = [$parentData['name'], $parentHasBreadcrumbLink ? $parentUrl : null];
-                        }
-
-                        $childHasBreadcrumbLink = $childData['hasBreadcrumbLink'] ?? true;
-                        $allCrumbs[] = [
-                            $overrideName ?? $childData['name'],
-                            $overrideUrl ?? ($childHasBreadcrumbLink ? $childUrl : null),
-                        ];
-                    }
-                }
-            }
+            $allCrumbs = array_merge($allCrumbs, $this->generateBreadcrumbsSub($parentUrl, $parentData, $url, $overrideUrl, $overrideName));
         }
-
         return $allCrumbs;
     }
 
+    /**
+     * @param string      $parentUrl
+     * @param array       $parentData
+     * @param string      $url
+     * @param string|null $overrideUrl
+     * @param string|null $overrideName
+     * @return array
+     */
+    private function generateBreadcrumbsSub(string $parentUrl, array $parentData, string $url, ?string $overrideUrl = null, ?string $overrideName = null): array
+    {
+        $allCrumbs               = [];
+        $parentHasBreadcrumbLink = $parentData['searchable'] ?? true;
+        if ($parentUrl === $url) {
+            $allCrumbs[] = [
+                $overrideName ?? $parentData['name'],
+                $overrideUrl ?? ($parentHasBreadcrumbLink ? $parentUrl : null),
+            ];
+        }
+
+        if (count($parentData['children'])) {
+            foreach ($parentData['children'] as $childUrl => $childData) {
+                $childCrumb = $this->generateBreadcrumbsSub($childUrl, $childData, $url, $overrideUrl, $overrideName);
+                if ($childCrumb) {
+                    if ($parentUrl !== $childUrl) {
+                        $allCrumbs[] = [$parentData['name'], $parentHasBreadcrumbLink ? $parentUrl : null];
+                    }
+                    $allCrumbs = array_merge($allCrumbs, $childCrumb);
+                }
+            }
+        }
+        return $allCrumbs;
+    }
 
     /**
      * Shank a breadcrumbs html right into a phplib
