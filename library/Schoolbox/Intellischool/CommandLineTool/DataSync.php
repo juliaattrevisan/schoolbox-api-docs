@@ -57,6 +57,7 @@ class DataSync extends \Schoolbox\Application\CliTool\App
          */
         if ('' === trim((string)$deploymentId) || '' === trim((string)$deploymentSecret)) {
             $this->getLogger()->info("Deployment ID or Secret is not set. Please set and re run this script.");
+            $lock->release();
             exit(1);
         }
         $handler = \Intellischool\SyncHandler::createWithIdAndSecret($deploymentId, $deploymentSecret);
