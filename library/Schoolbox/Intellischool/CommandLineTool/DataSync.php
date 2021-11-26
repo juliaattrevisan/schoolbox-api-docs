@@ -56,7 +56,7 @@ class DataSync extends \Schoolbox\Application\CliTool\App
          * so lets say the value is a string so if it is null it will show cast to ''
          */
         if ('' === trim((string)$deploymentId) || '' === trim((string)$deploymentSecret)) {
-            $this->getLogger()->critical("Deployment ID or Secret is not set. Please set and re run this script.");
+            $this->getLogger()->info("Deployment ID or Secret is not set. Please set and re run this script.");
             exit(1);
         }
         $handler = \Intellischool\SyncHandler::createWithIdAndSecret($deploymentId, $deploymentSecret);
@@ -68,7 +68,9 @@ class DataSync extends \Schoolbox\Application\CliTool\App
             $handler->doSync();
         } catch (\Exception $e) {
             $this->getLogger()->critical($e->getMessage());
+            $lock->release();
         }
+        $lock->release();
     }
 
     /** @inheritDoc */
