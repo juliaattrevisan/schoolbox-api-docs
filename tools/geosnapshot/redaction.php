@@ -112,7 +112,6 @@ HELP;
                     $redaction['yearLevel'] ?: 'null',
                     $redaction['house'] ?: 'null',
                     $lastModified
-
                 ));
             } else {
                 $this->getLogger()->debug(sprintf(
