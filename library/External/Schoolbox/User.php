@@ -548,12 +548,13 @@ class External_Schoolbox_User implements External_UserInterface
                 h.house,
                 sup.external_id,
                 sups.photo_redacted,
-                u.updated_at AS redact_photo_modified_at
+                s.uploaded_on AS redact_photo_modified_at
             FROM sis_user_profile_student sups
             INNER JOIN sis_user_profile sup ON sups.sis_user_profile_id = sup.id
             INNER JOIN `user` u ON sup.external_id = u.synergy_id
             LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
             LEFT JOIN house h ON u.house = h.id
+            LEFT JOIN storage s ON u.portrait_hash = s.hash
         ";
 
         return $this->internalDatabase->executeQuery($query)->fetchAll();
