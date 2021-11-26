@@ -51,7 +51,7 @@ class RedactedPhotoList
              */
             if ('' === (string)$redactedPhoto['id']) {
                 $redactPhotoPath = sprintf(
-                    '%s/portrait.php?userId=%s&size=constrain200',
+                    '%s/geosnapshot/portrait.php?userId=%s&size=constrain200',
                     $this->fqdn,
                     $redactedPhoto['external_id']
                 );
@@ -63,7 +63,7 @@ class RedactedPhotoList
                 $profilePhotoPath = '';
             } else {
                 $redactPhotoPath = sprintf(
-                    '%s/portrait.php?id=%s&size=constrain200',
+                    '%s/geosnapshot/portrait.php?id=%s&size=constrain200',
                     $this->fqdn,
                     $redactedPhoto['id']
                 );
