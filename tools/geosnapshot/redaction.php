@@ -96,38 +96,45 @@ HELP;
         /* Generate a list of guys who are about to be redacted
          * Normally the api would quietly compile this and transmit it
          */
-        if (!$this->perform()) {
-            $payload = (new RedactedPhotoList($fqdn))->build($redactionList);
-            $numVisible = 0;
+        $numVisible = 0;
 
-            foreach ($payload as $redaction) {
-                if ($redaction['redacted']) {
-                    if ('' === (string)$redaction['redact_photo_modified_at']) {
-                        $this->getLogger()->debug(sprintf(
-                            'external_id %s (year: %s, house: %s) is currently redacted, but did not have a profile pic in the sis',
-                            $redaction['ext_id'],
-                            $redaction['attributes']['year'] ?: 'null',
-                            $redaction['attributes']['house'] ?: 'null'
-                        ));
-                    } else {
-                        $this->getLogger()->debug(sprintf(
-                            'external_id %s (year: %s, house: %s) was redacted at %s',
-                            $redaction['ext_id'],
-                            $redaction['attributes']['year'] ?: 'null',
-                            $redaction['attributes']['house'] ?: 'null',
-                            $redaction['redact_photo_modified_at']
-                        ));
-                    }
-                } else {
-                    $numVisible++;
-                }
+        foreach ($redactionList as $redaction) {
+            $lastModified = '' !== (string)$redaction['redact_photo_modified_at'] ? $redaction['redact_photo_modified_at'] : 'null';
+
+            /* The current redaction state of affairs for each guy
+             */
+            if ($redaction['photo_redacted']) {
+                $this->getLogger()->debug(sprintf(
+                    '%s %s (external_id: %s, year: %s, house: %s) portrait is hidden (redacted) - last modified at: %s',
+                    $redaction['firstname'],
+                    $redaction['lastname'],
+                    $redaction['external_id'],
+                    $redaction['yearLevel'] ?: 'null',
+                    $redaction['house'] ?: 'null',
+                    $lastModified
+
+                ));
+            } else {
+                $this->getLogger()->debug(sprintf(
+                    '%s %s (external_id: %s, year: %s, house: %s) portrait is visible - last modified at: %s',
+                    $redaction['firstname'],
+                    $redaction['lastname'],
+                    $redaction['external_id'],
+                    $redaction['yearLevel'] ?: 'null',
+                    $redaction['house'] ?: 'null',
+                    $lastModified
+                ));
+
+                $numVisible++;
             }
+        }
 
-            $this->getLogger()->debug(sprintf(
-                '%s human(s) have visible photos (they are not redacted)',
-                $numVisible
-            ));
+        $this->getLogger()->debug(sprintf(
+            '%s human(s) have visible photos (they are not redacted)',
+            $numVisible
+        ));
 
+        if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         } else {
             /* Perform transmission
