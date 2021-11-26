@@ -134,6 +134,7 @@ class ModelToArray
                 : null,
             'icon'              => $model->getIcon(),
             'allowAsGoal'       => $model->getAllowAsGoal(),
+            'animate'           => $model->getAnimate(),
             'category'          => $category
                 ? [
                     'id'   => $category->getId(),

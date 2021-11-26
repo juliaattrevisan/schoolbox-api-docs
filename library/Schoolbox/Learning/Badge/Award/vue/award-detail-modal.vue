@@ -116,8 +116,8 @@ export default {
 
         /**
          * The <canvas> element (that shows the stars) requires accurate width/height to function properly.
-         * As the canvas is within a modal, it's not currently in the dom, so we have to wait until 
-         * the foundation modal has displayed it, so we can ensure its dimensions are up to date. 
+         * As the canvas is within a modal, it's not currently in the dom, so we have to wait until
+         * the foundation modal has displayed it, so we can ensure its dimensions are up to date.
          */
         onModalCheck () {
             const canvasDimensions = this.$refs.badgeImgContainer.getBoundingClientRect();
@@ -144,17 +144,18 @@ export default {
 
         /**
          * To determine whether we should show the animation
-         * 
+         *
          * @returns { Boolean }
          */
         canAnimateBadgeImage () {
             return this.award.viewedOn === null //hasn't been looked at before
                 && this.award.recipient.id === window.schoolboxUser.id //is the awarded user
-                && this.award.isGoal === false; //has been awarded
+                && this.award.isGoal === false //has been awarded
+                && this.award.badge.animate === true; //badge can be animated
         },
 
         /**
-         * This badge or another could have been animated, in which case we'll ensure 
+         * This badge or another could have been animated, in which case we'll ensure
          * it displays as expected when the user re-opens the modal window after
          * closing it the first time.
          */
@@ -164,7 +165,7 @@ export default {
         },
 
         /**
-         * animate the badge and notify that it's been viewed so 
+         * animate the badge and notify that it's been viewed so
          * it won't be animated again
          */
         animateBadgeImage () {

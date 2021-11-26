@@ -30,6 +30,7 @@ class MutableFieldsOnly extends AllFields
         'icon'              => true,
         'image'             => true,
         'allow-as-goal'     => true,
+        'animate'           => true,
         'category'          => true,
         'tags'              => true,
         'yearLevelIds'      => true,

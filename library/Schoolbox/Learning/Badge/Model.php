@@ -149,6 +149,11 @@ class Model implements ISoftDeletable
      */
     private User $updatedBy;
 
+    /**
+     * Can the Badge be animated?
+     * Apparently flying stars isn't what people want for a detention badge...
+     */
+    private bool $animate;
 
     /**
      * @return string
@@ -409,5 +414,23 @@ class Model implements ISoftDeletable
     {
         $this->updatedBy = $updatedBy;
         return $this;
+    }
+
+    /**
+     * @param bool $animate
+     * @return $this
+     */
+    public function setAnimate(bool $animate): self
+    {
+        $this->animate = $animate;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAnimate(): bool
+    {
+        return $this->animate;
     }
 }

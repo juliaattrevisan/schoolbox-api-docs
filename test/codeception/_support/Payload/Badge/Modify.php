@@ -19,6 +19,7 @@ class Modify extends \Payload\Request
         string $body,
         string $name,
         bool $allowasgoal,
+        bool $animate,
         ?int $achievementExpiry,
         ?int $goalExpiry
     ) {
@@ -31,6 +32,7 @@ class Modify extends \Payload\Request
         $this->setFormParam('name', $name);
         $this->setFormParam('achievementExpiry', $achievementExpiry);
         $this->setFormParam('goalExpiry', $goalExpiry);
+        $this->setFormParam('animate', $animate);
 
         $this->setHeader('content-type', 'application/json');
     }
