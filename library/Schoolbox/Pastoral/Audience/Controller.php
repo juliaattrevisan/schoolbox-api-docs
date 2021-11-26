@@ -13,6 +13,7 @@ use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
@@ -338,6 +339,9 @@ class Controller extends Base
         // Fetch the exiting rules
         if ($subType) {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $subType->getId()]);
+            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $actions = $this->pastoralActionMapper->findForSubtype($subType);
+            }
             $subType->setActions($actions);
 
             /* Save the "General Template" content
@@ -355,6 +359,9 @@ class Controller extends Base
             ]);
         } else {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $type->getId()]);
+            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $actions = $this->pastoralActionMapper->findForType($type);
+            }
             $type->setActions($actions);
 
             /* Save the "General Template" content

@@ -1,4 +1,4 @@
-{% if record.recordActions | length > 0 %}
+{% if config.pastoral_action_enable and (record.recordActions | length) > 0 %}
     <div class="row">
         <div class="small-12 medium-6 columns island">
             <h2 class="subheader">Actions</h2>

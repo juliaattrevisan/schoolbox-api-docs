@@ -57,10 +57,12 @@
                 <span class="hint has-tip tip-top" data-tooltip title="Tags can be added to support {{ locale.pastoral }} reports and filtering.">?</span>
                 <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}"> </label>
         </div>
+        {% if config.pastoral_action_enable %}
         <div class="small-6 columns">
             <label> Actions</label>
             <select data-actions name="actions[]" id="pastoral-actions" multiple></select>
         </div>
+        {% endif %}
         {% if config.pastoral_parent_access %}
         <div class="small-12 columns">
             <label for="parent-comments-allowed">Allow Parents to Comment <span class="hint has-tip tip-top" data-tooltip title="When toggled to ‘ON’, parent(s) of this student will be able to comment on this record.">?</span></label>

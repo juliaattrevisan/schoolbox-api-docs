@@ -390,7 +390,7 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/lists/achievement-category'     => [
+            '/adminv2/lists/achievement-category' => [
                 'name'       => 'Lists',
                 'visible'    => true,
                 'searchable' => false,
@@ -443,9 +443,10 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the list of news topics to allow categorisation of news.',
                     ],
-                    '/adminv2/lists/pastoral-action'                    => [
+                    '/adminv2/lists/pastoral-action'                  => [
                         'name'        => 'Pastoral Actions',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                            && $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
                         'children'    => [],
                         'description' => 'Setup the actions of pastoral records.',
                     ],
