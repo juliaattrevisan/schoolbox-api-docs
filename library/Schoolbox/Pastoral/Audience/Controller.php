@@ -13,7 +13,6 @@ use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
