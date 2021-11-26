@@ -40,7 +40,7 @@ class Installer implements IPackageInstall
             $badge->setAchievementExpiry(Badge\Model::EXPIRY_NEVER);
             $badge->setGoalExpiry(Badge\Model::EXPIRY_NEVER);
             $badge->setAllowAsGoal((bool)$row['Goal']);
-            $badge->setAnimate(false);
+            $badge->setAnimate(true);
 
             $curriculumCodes = explode(',', $row['Curriculum']);
             $nodeCollection  = new GenericCollection(Node\Model::class);

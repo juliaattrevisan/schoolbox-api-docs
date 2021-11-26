@@ -97,7 +97,7 @@ class Installer implements IPackageInstall
                 ->setCurriculumNodes($nodeCollection)
                 ->setCreatedBy($user)
                 ->setUpdatedBy($user)
-                ->setAnimate(false);
+                ->setAnimate(true);
 
             $badgeMapper->save($badge);
         }

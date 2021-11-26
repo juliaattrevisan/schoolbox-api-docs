@@ -41,7 +41,7 @@ class Installer implements IPackageInstall
             $badge->setAchievementExpiry(Badge\Model::EXPIRY_NEVER);
             $badge->setGoalExpiry(Badge\Model::EXPIRY_NEVER);
             $badge->setAllowAsGoal((bool)$row['Goal']);
-            $badge->setAnimate(false);
+            $badge->setAnimate(true);
 
             if ($row['Year']) {
                 $yearMapper = YearLevel\Mapper::getInstance();
