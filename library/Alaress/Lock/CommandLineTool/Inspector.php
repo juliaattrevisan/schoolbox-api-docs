@@ -25,6 +25,7 @@ use Schoolbox\Learning\Turnitin\Cli\GroupTool;
 use Schoolbox\Learning\Turnitin\Cli\RetrofitTool;
 use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Video\CommandLineTool\Processor;
+use Schoolbox\Intellischool\CommandLineTool\DataSync;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
@@ -72,6 +73,9 @@ class Inspector extends CliTool\App
         ReportTool::TURNITIN_LOCK_NAME   => 'Turnitin Report Generator (./tools/turnitin/report.php)',
         RetrofitTool::TURNITIN_LOCK_NAME => 'Turnitin File Retrofitter (./tools/turnitin/retrofit.php)',
         CleanserTool::TURNITIN_LOCK_NAME => 'Turnitin Group Cleanser (./tools/turnitin/cleanser.php)',
+
+        //Intellischool CLI tool
+        DataSync::LOCK_NAME      =>  'Intellischool Sync Handler (./tools/intellischool/dataSync.php)',
     ];
 
 

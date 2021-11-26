@@ -124,7 +124,8 @@
         "lsolesen/pel": "^0.9.10",
         "ext-ldap": "*",
         "oat-sa/lib-lti1p3-deep-linking": "^4.0",
-        "oat-sa/lib-lti1p3-nrps": "^7.0"
+        "oat-sa/lib-lti1p3-nrps": "^7.0",
+        "intelliscl/sdk": "0.2.0.4-beta"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
