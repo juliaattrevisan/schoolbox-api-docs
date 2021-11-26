@@ -156,7 +156,17 @@ class Controller extends ConfigController
             ->setLaunchUrl($post['launch_url'])
             ->setDeepLinkingUrl($post['deep_linking_url'])
             ->setJwksUrl($post['jwks_url'])
-            ->setPublicKey($post['public_key']);
+            ->setPublicKey($post['public_key'])
+            ->setAvailableForComponent(
+                $provider->isLtiVersion11()
+                    ? true
+                    : $post->getBool('available_for_component', false)
+            )
+            ->setAvailableForAssessment(
+                $provider->isLtiVersion11()
+                    ? false
+                    : $post->getBool('available_for_assessment', false)
+            );
 
         // LTI 1.1 fields, including XML
         $provider = $provider

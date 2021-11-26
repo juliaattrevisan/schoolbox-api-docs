@@ -10,8 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform\Context;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Component_ControllerAbstract;
+use JsonException;
 use League\OAuth2\Server\ResourceServer;
+use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
@@ -23,7 +28,9 @@ use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
 use Schoolbox\LTI\Context\Folder as ContextFolder;
+use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Membership\Builder;
 use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
@@ -31,10 +38,12 @@ use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\LTI\Util\ServerRequestFactory;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Url\Factory;
+use Schoolbox\User;
 
 /**
  * LTI platform controller for context requests.
@@ -109,15 +118,85 @@ class Controller extends BaseController
     }
 
     /**
+     * Generate a resource link launch request for the given folder and
+     * component.
+     *
+     * (The component will have a tool within it.)
+     *
+     * @api   GET /lti-platform/context/folder/{folderId}/launch/component/{componentId}
+     * @since 21.1.0
+     *
+     * @param Folder                       $folder
+     * @param Component_ControllerAbstract $component
+     * @param ToolModel                    $tool
+     */
+    public function getLaunchResourceLinkRequestForFolderAndComponent(
+        Folder $folder,
+        Component_ControllerAbstract $component,
+        ToolModel $tool
+    ): void {
+        // Build a resource link
+        $resourceLink = new LtiResourceLink(
+            'component-' . $component->getInstance()->getId(),
+            [
+                'url'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL),
+                'title' => $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE),
+            ]
+        );
+
+        // Handle custom claims
+        $componentCustomClaims = [];
+        try {
+            $componentCustomClaims = json_decode(
+                $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+        } catch (JsonException $e) {
+            // noop
+        }
+        if (!is_array($componentCustomClaims)) {
+            $componentCustomClaims = [];
+        }
+
+        // Build the launch request for the resource link
+        $repository     = $this->registrations->find($tool->getDeploymentId());
+        $messageBuilder = new LtiResourceLinkLaunchRequestBuilder();
+        $message        = $messageBuilder->buildLtiResourceLinkLaunchRequest(
+            $resourceLink,
+            $repository,
+            $this->userCodec->encode($this->getUser()),
+            null,
+            $this->buildRoles($folder),
+            $this->buildAdditionalClaims(
+                $folder,
+                $componentCustomClaims,
+                $this->getUser(),
+            ),
+        );
+
+        // Custom claims for component:
+
+        // Send the request
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@ltiPlatform/messageForm.twig',
+                ['message' => $message],
+            )
+        );
+    }
+
+    /**
      * Generate a deep linking request for the given folder and tool.
      *
-     * @api   GET /lti-plaform/context/folder/{folderId}/deep-link/{toolId}
+     * @api   GET /lti-platform/context//folder/{folderId}/deep-linking-request/{toolId}
      * @since 21.1.0
      *
      * @param ToolModel $tool
      * @param Folder    $folder
      */
-    public function getGenerateDeepLinkingRequestForFolder(Folder $folder, ToolModel $tool)
+    public function getGenerateDeepLinkingRequestForFolder(Folder $folder, ToolModel $tool): void
     {
         // Find the tool in the list of registrations
         $repository = $this->registrations->find($tool->getDeploymentId());
@@ -129,6 +208,9 @@ class Controller extends BaseController
             ->setPath(
                 $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
             )
+            // If a context was passed in the query string:
+            // add it to the return URL
+            ->setQuery(['context' => $this->request->query->get('context')])
             ->toString();
 
         // Standard deep linking settings
@@ -141,20 +223,6 @@ class Controller extends BaseController
             false,
         );
 
-        // Figure out who's trying to log in: use that to determine their role
-        $roleClaimFactory = new RoleClaimFactory($this->access);
-        $roles            = array_merge(
-            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
-            $roleClaimFactory->buildContextRolesForFolder($this->getUser(), $folder),
-        );
-
-        // Claim about the context
-        $contextClaimFactory = new ContextFolder\ClaimFactory(new ContextFolder\Codec($baseUrl));
-        $contextClaim        = $contextClaimFactory->buildForFolder($folder);
-
-        // Claim about the platform instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
-
         $builder = new DeepLinkingLaunchRequestBuilder();
         $message = $builder->buildDeepLinkingLaunchRequest(
             $deepLinkingSettings,
@@ -162,8 +230,8 @@ class Controller extends BaseController
             $this->userCodec->encode($this->getUser()),
             null,
             null,
-            $roles,
-            [$platformInstanceClaim, $contextClaim],
+            $this->buildRoles($folder),
+            $this->buildAdditionalClaims($folder, null, null),
         );
 
         // Build a DL request to this tool
@@ -182,7 +250,7 @@ class Controller extends BaseController
      * if supplied, that corresponds to an LTI assessment's ID, and the unique
      * membership for that assessment will be supplied instead.
      *
-     * @api   GET /lti-plaform/context/folder/{folderId}/memberships
+     * @api   GET /lti-platform/context/folder/{folderId}/memberships
      * @since 21.1.0
      *
      * @param Folder $folder
@@ -225,5 +293,63 @@ class Controller extends BaseController
         $handler = new MembershipServiceServerRequestHandler($builder);
         $server  = new LtiServiceServer($validator, $handler);
         $this->populateResponseFromPsr7Response($server->handle($request));
+    }
+
+    /**
+     * Build the list of roles for an LTI message for this folder.
+     *
+     * @param Folder $folder
+     * @return array
+     * @throws MapperException if somehow finding the context roles for the
+     *                         folder goes wrong
+     */
+    private function buildRoles(Folder $folder): array
+    {
+        $roleClaimFactory = new RoleClaimFactory($this->access);
+        return array_merge(
+            $roleClaimFactory->buildInstitutionRoles($this->getUser()),
+            $roleClaimFactory->buildContextRolesForFolder($this->getUser(), $folder),
+        );
+    }
+
+    /**
+     * Builds the list of additional claims for LTI messages from this folder:
+     * * a context claim for the folder itself
+     * * a platform instance claim for the Schoolbox instance
+     *
+     * @param Folder     $folder
+     * @param array|null $customClaims If provided, use these custom claims
+     * @param User|null  $user         If provided, add user to custom claims
+     * @return array<MessagePayloadClaimInterface>
+     */
+    private function buildAdditionalClaims(Folder $folder, ?array $customClaims, ?User $user): array
+    {
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // Claim about the context
+        $contextClaimFactory = new ContextFolder\ClaimFactory(new ContextFolder\Codec($baseUrl));
+        $contextClaim        = $contextClaimFactory->buildForFolder($folder);
+
+        // Claim about the platform instance
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
+
+        $claims = [$contextClaim, $platformInstanceClaim];
+
+        // Custom claims for the component
+        $customClaimFactory = new CustomClaimFactory();
+        $customClaimFactory = $customClaimFactory
+            ->withContext($contextClaim)
+            ->withPlatformInstance($platformInstanceClaim);
+        if (isset($user)) {
+            $customClaimFactory = $customClaimFactory
+                ->withUser($user)
+                ->withActualUser($user);
+        }
+        $customClaim = $customClaimFactory->build($customClaims);
+        if (isset($customClaim)) {
+            $claims[] = $customClaim;
+        }
+
+        return $claims;
     }
 }

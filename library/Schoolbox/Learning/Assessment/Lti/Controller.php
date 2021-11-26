@@ -146,15 +146,11 @@ class Controller extends Assessment\Controller
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         return [
-            'acceptingResponses' => true,
-            'ltiTools'           => $this->ltiToolMapper->findByColumn(
-                'lti_version',
-                LtiTool\Model::LTI_VERSION_1_3,
-            )->filter(function (LtiTool\Model $model) {
-                // Only LTI tools with a deep linking or launch URL are supported,
-                // otherwise there's no way to select content for them.
-                return $model->getDeepLinkingUrl() || $model->getLaunchUrl();
-            })->sortNaturally('name'),
+            // The message handler only accepts deep linking responses
+            'deepLinkingResponseMessageType' => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
+            'acceptingResponses'             => true,
+            'ltiTools'                       => $this->ltiToolMapper->findAllAvailableForAssessment()
+                                                                    ->sortNaturally('name'),
         ];
     }
 

@@ -1,9 +1,6 @@
 <?php
 
 /**
- * LTI homepage component
- *
- * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -12,23 +9,54 @@ namespace Schoolbox\LTI\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
-use Schoolbox\LTI\Provider\Model as ProviderModel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
 
+/**
+ * LTI homepage component
+ */
 class Controller extends Component_Homepage_ControllerAbstract
 {
-    /** @var ProviderMapper */
-    private $providerMapper;
+    /**
+     * Component config: title
+     */
+    public const COMPONENT_CONFIG_TITLE = 'componentname';
+
+    /**
+     * Component config: LTI provider ID
+     */
+    public const COMPONENT_CONFIG_LTI_PROVIDER = 'ltiprovider';
+
+    /**
+     * Component config: embed URL
+     */
+    public const COMPONENT_CONFIG_LTI_EMBED_URL = 'url';
+
+    /**
+     * Component config: description
+     */
+    public const COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS = 'description';
+
+    /**
+     * Component config: height
+     */
+    public const COMPONENT_CONFIG_HEIGHT = 'pixel';
+
+    /**
+     * LTI tool (f.k.a. provider) mapper, for fetching the tool to use to
+     * display this component's content.
+     */
+    private ProviderMapper $providerMapper;
 
     /**
      * Injectable constructor
      *
      * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param User               $user
+     * @param SitePage           $sitepage
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
@@ -54,16 +82,8 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Retrieve list of all LTI providers from database
-        // (so far, only 1.1 is supported)
-
-        $providers = $this->providerMapper->findByColumn(
-            'lti_version',
-            ProviderModel::LTI_VERSION_1_1,
-            [
-                'order' => ['name' => 'asc']
-            ]
-        );
+        // Retrieve list of LTI providers usable in components from database
+        $providers = $this->providerMapper->findAllAvailableForComponent();
 
         // Read-only users see nothing at all if no LTI providers exist,
         // or none is set up for this component.
@@ -98,13 +118,19 @@ class Controller extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@lti/component.twig',
             [
-                'componentInstanceId' => $this->getInstance()->getId(),
-                'providerId' => $this->getConfig('ltiprovider'),
-                'providers' => $providers,
-                'provider' => $provider,
-                'folderId' => $this->getContext()->getId(),
-                'height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
-                'user' => $this->getUser()
+                'componentInstanceId'            => $this->getInstance()->getId(),
+                'providerId'                     => $this->getConfig(self::COMPONENT_CONFIG_LTI_PROVIDER),
+                'embedUrl'                       => $this->getConfig(self::COMPONENT_CONFIG_LTI_EMBED_URL),
+                'providers'                      => $providers,
+                'provider'                       => $provider,
+                'folderId'                       => $this->getContext()->getId(),
+                'height'                         => preg_replace(
+                    "/[^0-9]/",
+                    "",
+                    $this->getConfig(self::COMPONENT_CONFIG_HEIGHT),
+                ),
+                'user'                           => $this->getUser(),
+                'deepLinkingResponseMessageType' => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
             ]
         );
     }

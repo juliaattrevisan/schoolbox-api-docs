@@ -145,6 +145,20 @@ class Model implements ISoftDeletable
     private ?string $publicKey;
 
     /**
+     * LTI 1.3: is this tool usable within the "Embed Learning Tool" component?
+     *
+     * This is irrelevant for 1.1, because 1.1 can _only_ be used on components.
+     */
+    private ?bool $availableForComponent;
+
+    /**
+     * LTI 1.3: is this tool usable within third-party assessments?
+     *
+     * This is irrelevant for 1.1, because 1.1 cannot be used on assessments.
+     */
+    private ?bool $availableForAssessment;
+
+    /**
      * LTI 1.1: likely intended to store custom fields as defined within the XML
      * configuration: currently unused.
      */
@@ -383,6 +397,42 @@ class Model implements ISoftDeletable
     public function setPublicKey(?string $publicKey): self
     {
         $this->publicKey = $publicKey;
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getAvailableForComponent(): ?bool
+    {
+        return $this->availableForComponent;
+    }
+
+    /**
+     * @param bool|null $availableForComponent
+     * @return $this
+     */
+    public function setAvailableForComponent(?bool $availableForComponent): self
+    {
+        $this->availableForComponent = $availableForComponent;
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getAvailableForAssessment(): ?bool
+    {
+        return $this->availableForAssessment;
+    }
+
+    /**
+     * @param bool|null $availableForAssessment
+     * @return $this
+     */
+    public function setAvailableForAssessment(?bool $availableForAssessment): self
+    {
+        $this->availableForAssessment = $availableForAssessment;
         return $this;
     }
 

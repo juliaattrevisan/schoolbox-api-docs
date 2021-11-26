@@ -21,6 +21,7 @@ use Component_ControllerAbstract;
 use DateTime;
 use Exception;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -57,12 +58,38 @@ class Controller extends Base
     const LTI_MEDIA_TYPE_LINK = 'application/vnd.ims.lti.v1.ltilink';
 
     /**
-     * Component config
+     * Component config: title
+     *
+     * @deprecated moved to `Schoolbox\LTI\Component\Homepage\Controller`
      */
     const COMPONENT_CONFIG_TITLE = 'componentname';
+
+    /**
+     * Component config: LTI provider ID
+     *
+     * @deprecated moved to `Schoolbox\LTI\Component\Homepage\Controller`
+     */
     const COMPONENT_CONFIG_LTI_PROVIDER = 'ltiprovider';
+
+    /**
+     * Component config: embed URL
+     *
+     * @deprecated moved to `Schoolbox\LTI\Component\Homepage\Controller`
+     */
     const COMPONENT_CONFIG_LTI_EMBED_URL = 'url';
+
+    /**
+     * Component config: description
+     *
+     * @deprecated moved to `Schoolbox\LTI\Component\Homepage\Controller`
+     */
     const COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS = 'description';
+
+    /**
+     * Component config: height
+     *
+     * @deprecated moved to `Schoolbox\LTI\Component\Homepage\Controller`
+     */
     const COMPONENT_CONFIG_HEIGHT = 'pixel';
 
     /**
@@ -115,7 +142,12 @@ class Controller extends Base
     }
 
     /**
-     * Silently update component configuration and set the provider it will use
+     * Silently update component configuration and set the provider it will use.
+     *
+     * Works for both LTI 1.1 and 1.3 providers:
+     * * LTI 1.1 will just set the provider and title
+     * * LTI 1.3 basic launch will set the provider, title and URL
+     * * LTI 1.3 picker will just set the provider and title
      *
      * @param Provider                     $provider
      * @param Component_ControllerAbstract $component
@@ -127,11 +159,14 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        $this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_PROVIDER, $provider->getId());
-        $this->updateComponentValue($component, self::COMPONENT_CONFIG_TITLE, $provider->getName());
+        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER, $provider->getId());
+        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $provider->getName());
 
         if (isset($post['url'])) {
-            $this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_EMBED_URL, $post['url']);
+            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $post['url']);
+        }
+        if (isset($post['custom'])) {
+            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS, $post['custom']);
         }
 
         $this->getResponse()->content->set([
@@ -255,16 +290,16 @@ class Controller extends Base
 
         // Update the component with the target URL
 
-        $this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_EMBED_URL, $targetUrl);
+        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $targetUrl);
 
         // Update the component with the title (assuming we found one)
 
         if (isset($title)) {
             if (strlen(trim($title)) > 0) {
-                $this->updateComponentValue($component, self::COMPONENT_CONFIG_TITLE, $title);
+                $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $title);
             }
         } else {
-            $title = $component->getConfig(self::COMPONENT_CONFIG_TITLE);
+            $title = $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE);
         }
 
         // Redirect to the target URL
@@ -283,7 +318,7 @@ class Controller extends Base
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
                 'url'            => $targetUrl,
-                'height'         => $component->getConfig(self::COMPONENT_CONFIG_HEIGHT),
+                'height'         => $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
         ]);
@@ -347,7 +382,7 @@ class Controller extends Base
 
         // Check if the LTI component is a picker and already has a resource URL specified
 
-        $embedUrl = trim($component->getConfig(self::COMPONENT_CONFIG_LTI_EMBED_URL));
+        $embedUrl = trim($component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL));
 
         // ---------------------------------------------------------------------------------------------------
         // Create array to hold launch data
@@ -392,7 +427,7 @@ class Controller extends Base
 
         $launch_data = array_merge($launch_data, [
             'resource_link_id'                       => $folder->getId() . '_' . $component->getInstance()->getId(),
-            'resource_link_title'                    => $component->getConfig(self::COMPONENT_CONFIG_TITLE),
+            'resource_link_title'                    => $component->getConfig(LtiComponent::COMPONENT_CONFIG_TITLE),
             'resource_link_description'              => '',
             'user_id'                                => $this->user->getId(),
             'user_image'                             => $this->getUserPortraitUrl($this->user),
@@ -452,7 +487,7 @@ class Controller extends Base
         // ---------------------------------------------------------------------------------------------------
 
         if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
-            $custom = $component->getConfig(self::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS);
+            $custom = $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS);
 
             preg_match('/\/books\/([A-Z0-9]+)\//i', $custom, $matches);
             $launch_data['custom_vbid'] = $matches[1];
@@ -550,15 +585,15 @@ class Controller extends Base
         // Update the component configuration with any details we are able to retrieve
 
         if (!empty($title)) {
-            $this->updateComponentValue($component, self::COMPONENT_CONFIG_TITLE, $title);
+            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $title);
         }
 
         if (!empty($url)) {
-            $this->updateComponentValue($component, self::COMPONENT_CONFIG_LTI_EMBED_URL, $url);
+            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $url);
         }
 
         if (!empty($height)) {
-            $this->updateComponentValue($component, self::COMPONENT_CONFIG_HEIGHT, $height);
+            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_HEIGHT, $height);
         }
 
         // Rather than just redirecting the iframe directly to the requested resource we need to do a bit

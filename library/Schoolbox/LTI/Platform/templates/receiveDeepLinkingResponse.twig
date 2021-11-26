@@ -8,6 +8,8 @@
     <title>LTI Platform: Receive Deep Linking Response</title>
 
     {% set payload = {
+        messageType: messageType,
+        context: context,
         tool:          {
             id: tool.id,
             launchUrl: tool.launchUrl,
@@ -17,7 +19,10 @@
     {% autoescape 'js' %}
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
-            window.top.postMessage(JSON.stringify({{ payload | json_encode | raw }}), window.location.origin);
+            window.top.postMessage(
+                {{ payload | json_encode | raw }},
+                window.location.origin
+            );
         });
     </script>
     {% endautoescape %}
