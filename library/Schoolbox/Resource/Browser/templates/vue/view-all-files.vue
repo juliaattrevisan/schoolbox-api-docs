@@ -185,6 +185,11 @@ export default {
                     file.previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
                 },
                 success: (file, response) => {
+                    /**
+                     * when you go to the edit link, theis needs a returnUrl so the edit page knows where to send the user after they have edited/deleted the file
+                     * we shall append this here to all newly uploaded files
+                     */
+                    response.editUrl  = response.editUrl + '?returnUrl=' + encodeURIComponent(btoa(window.location.pathname));
                     this.files.push(response);
                     const previewElement = file.previewElement;
                     previewElement.remove();
