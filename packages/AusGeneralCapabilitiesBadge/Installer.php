@@ -96,7 +96,8 @@ class Installer implements IPackageInstall
                 ->setYearLevels($yearList)
                 ->setCurriculumNodes($nodeCollection)
                 ->setCreatedBy($user)
-                ->setUpdatedBy($user);
+                ->setUpdatedBy($user)
+                ->setAnimate(false);
 
             $badgeMapper->save($badge);
         }
