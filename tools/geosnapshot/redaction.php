@@ -139,7 +139,7 @@ HELP;
             /* Perform transmission
              */
             (new Api($this->getConfig()->get('geosnapshot_api_key')))
-                ->retrieveRedactionPhotos($fqdn, $redactionList);
+                ->transmitRedactionPhotos($fqdn, $redactionList);
         }
     }
 

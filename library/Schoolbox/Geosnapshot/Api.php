@@ -142,7 +142,7 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveRedactionPhotos(string $fqdn, array $externalRedactionList): array
+    public function transmitRedactionPhotos(string $fqdn, array $externalRedactionList): array
     {
         $payload = (new RedactedPhotoList($fqdn))->build($externalRedactionList);
 
