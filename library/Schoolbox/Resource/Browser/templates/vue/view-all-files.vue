@@ -293,6 +293,11 @@ export default {
          * @param { Object }
          */
         onFileSuccess (file) {
+            /**
+             * when you go to the edit link, this needs a returnUrl so the edit page knows where to send the user after they have edited/deleted the file
+             * we shall append this here to all newly uploaded files
+             */
+            file.editUrl = file.editUrl + '?returnUrl=' + encodeURIComponent(btoa(window.location.pathname));
             this.checkFileFilterIsActive(file);
             this.addFileToTable(file);
             this.$refs.table.resetQuery();
