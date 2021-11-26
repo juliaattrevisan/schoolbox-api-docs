@@ -57,6 +57,7 @@
         });
 
         {# Pastoral Action Selectize #}
+        {% if config.pastoral_action_enable %}
 
         let actionSelectize = $('#pastoral-actions').selectizeSelector({
             multiple: true,
@@ -88,6 +89,8 @@
                 {% endfor %}
             ]
         });
+
+        {% endif %}
 
         {# Delete Button For Existing Records #}
 
@@ -187,6 +190,7 @@
         });
 
         function updateActions() {
+            {% if config.pastoral_action_enable %}
             let typeId = $("#typeId").val();
             let subtypeId = $("#subtypeId").val();
             let currents = $('#pastoral-actions').val();
@@ -218,6 +222,7 @@
                     actionSelectize[0].selectize.refreshOptions()
                 }
             })
+            {% endif %}
         }
 
         function loadAudience() {

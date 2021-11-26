@@ -1141,33 +1141,35 @@ class Controller extends Base
             }
 
             // Save actions, record actions are compared against luAction id rather than recordAction id.
-            $existingRecordActions = $record->getRecordActions()->indexByCallback(
-                static function ($recordAction) {
-                    /** @var RecordAction\Model $recordAction */
-                    return $recordAction->getAction()->getId();
+            if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $existingRecordActions = $record->getRecordActions()->indexByCallback(
+                    static function ($recordAction) {
+                        /** @var RecordAction\Model $recordAction */
+                        return $recordAction->getAction()->getId();
+                    }
+                );
+                $record->setRecordActions($this->pastoralRecordActionMapper->createCollection());
+                /** @var RecordAction\Model $action */
+                foreach ($newRecordActions as $action) {
+                    // if this action is already set to this record, just put it back
+                    if (in_array($action->getAction()->getId(), $existingRecordActions->keys())) {
+                        $record->getRecordActions()->add($existingRecordActions->getOffset($action->getAction()->getId()));
+                    } else {
+                        $recordAction = clone $action;
+                        $recordAction->setPastoral($record);
+                        $this->pastoralRecordActionMapper->save($recordAction);
+                        $record->getRecordActions()->add($recordAction);
+                    }
                 }
-            );
-            $record->setRecordActions($this->pastoralRecordActionMapper->createCollection());
-            /** @var RecordAction\Model $action */
-            foreach ($newRecordActions as $action) {
-                // if this action is already set to this record, just put it back
-                if (in_array($action->getAction()->getId(), $existingRecordActions->keys())) {
-                    $record->getRecordActions()->add($existingRecordActions->getOffset($action->getAction()->getId()));
-                } else {
-                    $recordAction = clone $action;
-                    $recordAction->setPastoral($record);
-                    $this->pastoralRecordActionMapper->save($recordAction);
-                    $record->getRecordActions()->add($recordAction);
-                }
+                // Delete actions no longer exists
+                $removingRecordActions = $existingRecordActions->filter(
+                    static function ($action) use ($newRecordActions) {
+                        /** @var RecordAction\Model $action */
+                        return !in_array($action->getAction()->getId(), $newRecordActions->keys());
+                    }
+                );
+                $this->pastoralRecordActionMapper->deleteByColumn('id', $removingRecordActions->getPropertyValues('id'));
             }
-            // Delete actions no longer exists
-            $removingRecordActions = $existingRecordActions->filter(
-                static function ($action) use ($newRecordActions) {
-                    /** @var RecordAction\Model $action */
-                    return !in_array($action->getAction()->getId(), $newRecordActions->keys());
-                }
-            );
-            $this->pastoralRecordActionMapper->deleteByColumn('id', $removingRecordActions->getPropertyValues('id'));
 
             // preparation
             $oldAttachments       = $this->pastoralAttachmentMapper->findByColumn('pastoral_id', $record->getId());
@@ -1350,6 +1352,10 @@ class Controller extends Base
     private function prepareRecordActions(RequestValues $post): Collection
     {
         $recordActions = $this->pastoralRecordActionMapper->createCollection();
+        if (!$this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+            return $recordActions;
+        }
+
         $actions       =
             is_array($post->get('actions'))
                 ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post->get('actions'))))

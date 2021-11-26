@@ -30,6 +30,7 @@ config:
   pastoral_page_visible: {hide: false}
   pastoral_create_tag_enable: {hide: false}
   pastoral_flag_count_period: {hide: false}
+  pastoral_action_enable: {hide: false}
 
   #Boarder Leave
   debug_email_address: {hide: true}
