@@ -88,7 +88,8 @@ export default {
         displayFileUploadError (file, response) {
             this.$el.querySelector('.dz-error [data-close]').classList.remove('hide');
             file.previewElement.classList.remove('dz-processing');
-            file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
+            const errorMessage = response.error ? response.error : response; //the error message can be in either place
+            file.previewElement.querySelector('[data-dz-status]').textContent = errorMessage;
         },
 
     }

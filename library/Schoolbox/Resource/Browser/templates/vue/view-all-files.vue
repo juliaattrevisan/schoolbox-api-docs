@@ -341,6 +341,7 @@ export default {
             if (!this.selectedFilters.includes(file.type)) {
                 this.selectedFilters = [...this.selectedFilters, file.type];
                 Event.$emit(`vue-tables.filter::${file.type}`, '');
+                this.updateSessionStorage();
             }
         },
 
@@ -364,6 +365,7 @@ export default {
          */
         onFilesDeleted () {
             this.tableData = this.getUpdatedRowsAfterUserDeletion();
+            this.markAllFilesAsOld();
             this.clearRowSelection();
         },
 
