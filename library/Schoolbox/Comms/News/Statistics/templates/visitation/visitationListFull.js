@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VisitationListFull from './visitation-list-full';
-import { ClientTable } from 'vue-tables-2';
+import { ClientTable } from 'vue-tables-2-premium';
 
 Vue.use(ClientTable);
 

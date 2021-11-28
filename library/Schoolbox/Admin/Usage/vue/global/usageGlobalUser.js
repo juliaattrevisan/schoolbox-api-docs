@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { ClientTable } from 'vue-tables-2';
+import { ClientTable } from 'vue-tables-2-premium';
 import UsageGlobalUser from './user';
 
 Vue.use(ClientTable);
