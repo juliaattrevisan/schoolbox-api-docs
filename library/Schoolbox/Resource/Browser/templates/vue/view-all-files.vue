@@ -13,6 +13,8 @@ import ViewAllFilesDropzone from './view-all-files-dropzone.vue';
 import ViewAllFilesDeleteFiles from './view-all-files-delete-files.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
 
+const SB_SELECTED_FILTERS_STORAGE = 'sb_viewAllFilesSelectedFilters'
+
 
 export default {
 
@@ -145,7 +147,7 @@ export default {
     },
 
     created () {
-        this.selectedFilters = [...this.presetFilters];
+        this.initSelectedFilters();
     },
 
     mounted () {
@@ -166,6 +168,26 @@ export default {
                 tableColumns.push('edit');
             }
             return tableColumns;
+        },
+
+        /**
+         * Check if the filters are stored in session storage
+         */
+        initSelectedFilters () {
+            this.selectedFiltersStorage = `${SB_SELECTED_FILTERS_STORAGE}_${this.sourceFolderId}`;
+            if (sessionStorage.getItem(this.selectedFiltersStorage)) {
+                this.selectedFilters = this.getFiltersSessionStorage();
+            } else {
+                this.selectedFilters = [...this.presetFilters];
+            }
+        },
+
+        /**
+         * pull the filters from local storage
+         */
+        getFiltersSessionStorage () {
+            const filtersSessionStorage = sessionStorage.getItem(this.selectedFiltersStorage);
+            return filtersSessionStorage.split(',');
         },
 
         /**
@@ -244,6 +266,7 @@ export default {
         onFilterChange (fileType) {
             this.updateSelectedFilters(fileType);
             this.dispatchFilterEvent(fileType);
+            this.updateSessionStorage();
             this.markAllFilesAsOld();
         },
 
@@ -272,6 +295,15 @@ export default {
         },
 
         /**
+         * Save the modified filters in the session storage to allow returning to the correct
+         * selected files if returning to the page from editing a file
+         */
+        updateSessionStorage () {
+            const selectedFiltersAsString = this.selectedFilters.join(',');
+            sessionStorage.setItem(this.selectedFiltersStorage, selectedFiltersAsString);
+        },
+
+        /**
          * Perform on any further user interaction, like updating filters, sorting or searching
          * Otherwise the animation used to clearly show where new files have been added will be
          * replayed on any state change
@@ -293,11 +325,6 @@ export default {
          * @param { Object }
          */
         onFileSuccess (file) {
-            /**
-             * when you go to the edit link, this needs a returnUrl so the edit page knows where to send the user after they have edited/deleted the file
-             * we shall append this here to all newly uploaded files
-             */
-            file.editUrl = file.editUrl + '?returnUrl=' + encodeURIComponent(btoa(window.location.pathname));
             this.checkFileFilterIsActive(file);
             this.addFileToTable(file);
             this.$refs.table.resetQuery();
@@ -305,7 +332,7 @@ export default {
 
         /**
          * For example, ensure the Image filter is active if a jpeg is dropped in
-         * Otherwise when the file is uploaded it just looks like the file dissapears
+         * Otherwise when the file is uploaded it just looks like the file disappears
          * as it's not in the currently filtered list
          *
          * @param { Object }
@@ -318,13 +345,18 @@ export default {
         },
 
         /**
-         * Add the new file into the table
+         * Add the new file into the table, marking it as new to allow the file to animate into the table to show its now
+         * And add returnUrl so the edit page knows where to send the user after they have edited/deleted the file
          *
          * @param { Object }
          */
         addFileToTable (file) {
-            const fileWithIsNew = { ...file, isNew: true };
-            this.tableData = [...this.tableData, fileWithIsNew];
+            const newFile = {
+                ...file,
+                isNew: true,
+                editUrl: `${file.editUrl}?returnUrl=${encodeURIComponent(btoa(window.location.pathname))}`
+            };
+            this.tableData = [...this.tableData, newFile];
         },
 
         /**
