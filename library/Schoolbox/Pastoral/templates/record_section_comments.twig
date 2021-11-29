@@ -18,7 +18,7 @@
     {% if commentInsertRoute %}
         <pre>{{ dump(comments.getAll()) }}</pre>
         <div id="pastoral-record-comments-container">
-            <pastoral-record-comments 
+            <pastoral-record-comments
                 :comments="{{ comments|json_encode }}"
                 {# comment-delete-route="{{ commentDeleteRoute }}" #}
                 comment-heading="{{ commentHeading }}"
@@ -53,19 +53,19 @@
                                 <li class="actions-small-1">
                                     <div class="list-item">
                                         <div class="small-12 compact card">
-                                            {% if comment.owner.isDeleted() %}
+                                            {% if comment.owner.isDeleted %}
                                                 {{ profile.imageSquare64(comment.owner) }}
                                                 <p>
                                                     {{ comment.owner.fullName }}
                                                 </p>
-                                                <span class="pipe meta" title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
+                                                <span class="pipe meta" title="{{ comment.createdAt }}">{{ comment.createdAt }}</span>
                                             {% else %}
                                                 <a href="{{ profile.link(comment.owner) }}" title="View Profile">
                                                     {{ profile.imageSquare64(comment.owner) }}
                                                     <p>
                                                         {{ comment.owner.fullName }}
                                                     </p>
-                                                    <span class="pipe meta" title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
+                                                    <span class="pipe meta" title="{{ comment.createdAt }}">{{ comment.createdAt }}</span>
                                                 </a>
                                             {%  endif %}
                                         </div>
