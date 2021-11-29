@@ -1,0 +1,28 @@
+<div id='component-{{ componentInstanceId }}' class='component-container canvas-assignments' data-component>
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Canvas Assignments</h2>
+            <section>
+                <ul class="information-list">
+                    {% if assignments | length %}
+                        {%  for assignment in assignments %}
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12 wrap-down">
+                                    <p>
+                                        {{ assignment.context_code }} <a href="{{ assignment.html_url }}">{{ assignment.title }}</a>
+                                    </p>
+                                    <p class="meta">Due: <time>{{ assignment.end_at|date("d/m/y H:m") }}</time></p>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                    <li>No Assignments Due</li>
+                    {% endif %}
+                </ul>
+            </section>
+        </div>
+    </div>
+</div>
