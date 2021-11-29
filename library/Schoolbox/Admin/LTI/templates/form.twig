@@ -138,6 +138,24 @@
                 These details are read-only, and need to be copied into your LTI tool's configuration.
             </p>
         </div>
+
+        <div class="small-12 large-6 columns">
+            <label for="platform_issuer-{{ identifier }}">
+                Issuer
+            </label>
+            <div class="input-group">
+                <input readonly
+                       data-lti-version="{{ providerLtiVersion13 }}"
+                       id="platform_issuer-{{ identifier }}"
+                       type="text"
+                       name="platform_issuer"
+                       value="{{ issuer }}">
+                <a href="#"
+                   data-clipboard-text="{{ issuer }}"
+                   class="button icon-copy">Copy</a>
+            </div>
+        </div>
+
         <div class="small-12 large-6 columns">
             <label for="platform_oidc_authentication_url-{{ identifier }}">
                 OpenID Connect Authentication URL
