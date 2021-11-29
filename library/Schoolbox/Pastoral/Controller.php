@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
@@ -497,7 +498,10 @@ class Controller extends Base
             }
         }
 
-        $commentsTranslator = new Comment\Translator\ModelToArray(new User\Translator\Author\ModelToArray());
+        $commentsTranslator = new Comment\Translator\ModelToArray(
+            new User\Translator\Author\ModelToArray(),
+            new ScrubAdapter(),
+        );
         $commentsPublic     = $record->getComments()->filterBy('private', false);
         $commentsPrivate    = $record->getComments()->filterBy('private', true);
 

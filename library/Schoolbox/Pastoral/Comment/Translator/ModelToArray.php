@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Comment\Translator;
 
+use Alaress\HTMLPurifier\IPurifier;
 use Schoolbox\Pastoral\Comment\Model;
 
 /**
@@ -23,13 +24,19 @@ class ModelToArray
     private $userTranslator;
 
     /**
+     * HTML purifier adapter
+     */
+    private IPurifier $purifier;
+
+    /**
      * Constructor
      *
      * @param callable $userTranslator
      */
-    public function __construct(callable $userTranslator)
+    public function __construct(callable $userTranslator, IPurifier $purifier)
     {
         $this->userTranslator = $userTranslator;
+        $this->purifier       = $purifier;
     }
 
     /**
@@ -48,7 +55,7 @@ class ModelToArray
                 'student' => call_user_func($this->userTranslator, $model->getPastoral()->getStudent()),
             ],
             'owner'        => call_user_func($this->userTranslator, $model->getOwner()),
-            'body'         => $model->getBody(),
+            'body'         => $this->purifier->purify($model->getBody()),
             'externalCode' => $model->getExternalCode(),
             'createdAt'    => $model->getCreatedAt() && !$model->getCreatedAt()->isNull()
                 ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM)
@@ -56,6 +63,7 @@ class ModelToArray
             'updatedAt'    => $model->getUpdatedAt() && !$model->getUpdatedAt()->isNull()
                 ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM)
                 : null,
+            'isDeleted'    => $model->isDeleted(),
             'private'      => $model->getPrivate(),
         ];
     }
