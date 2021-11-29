@@ -4,7 +4,7 @@
  * Presents all the files within a homepage file component in a filterable table
  */
 
-import { Event } from 'vue-tables-2';
+import { Event } from 'vue-tables-2-premium';
 import fileTypes from './viewAllFilesFileTypes.js';
 import ViewAllFilesFilters from './view-all-files-filters.vue';
 import ViewAllFilesRowName from './view-all-files-row-name.vue';
@@ -45,7 +45,7 @@ export default {
             type: Array,
             required: true,
         },
-        referrer: { //
+        referrer: { //to know whether we are coming from 'component' or elsewhere
             type: String,
             required: true,
         },
@@ -150,6 +150,21 @@ export default {
         }
     },
 
+    computed: {
+
+        /**
+         * Whether there's saved session storage and we aren't coming
+         * from the component (as the component settings take precedence)
+         *
+         * @returns { Boolean }
+         */
+        useSessionStorage () {
+            return sessionStorage.getItem(this.selectedFiltersStorage) 
+                   && this.referrer !== 'component';
+        }
+
+    },
+
     created () {
         this.initSelectedFilters();
     },
@@ -179,7 +194,7 @@ export default {
          */
         initSelectedFilters () {
             this.selectedFiltersStorage = `${SB_SELECTED_FILTERS_STORAGE}_${this.sourceFolderId}`;
-            if (sessionStorage.getItem(this.selectedFiltersStorage)) {
+            if (this.useSessionStorage) {
                 this.selectedFilters = this.getFiltersSessionStorage();
             } else {
                 this.selectedFilters = [...this.presetFilters];
@@ -506,7 +521,8 @@ export default {
     }
 }
 
-.edit-td {
+.VueTables__table .edit-td {
+    padding-left: 0; //bring it inline with the right side border
     width: 2.5rem; //keep the edit icon on the right side
 }
 
