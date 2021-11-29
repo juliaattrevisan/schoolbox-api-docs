@@ -497,8 +497,9 @@ class Controller extends Base
             }
         }
 
-        $commentsPublic  = $record->getComments()->filterBy('private', false);
-        $commentsPrivate = $record->getComments()->filterBy('private', true);
+        $commentsTranslator = new Comment\Translator\ModelToArray(new User\Translator\Author\ModelToArray());
+        $commentsPublic     = $record->getComments()->filterBy('private', false);
+        $commentsPrivate    = $record->getComments()->filterBy('private', true);
 
         $attachmentsPublic  = $record->getAttachments()->filterBy('private', false);
         $attachmentsPrivate = $record->getAttachments()->filterBy('private', true);
@@ -518,8 +519,8 @@ class Controller extends Base
                     'record'             => $record,
                     'attachmentsPublic'  => $attachmentsPublic,
                     'attachmentsPrivate' => $attachmentsPrivate,
-                    'commentsPublic'     => $commentsPublic,
-                    'commentsPrivate'    => $commentsPrivate,
+                    'commentsPublic'     => $commentsPublic->map($commentsTranslator),
+                    'commentsPrivate'    => $commentsPrivate->map($commentsTranslator),
                     'moderator'          => $moderator,
                     'user'               => $this->getUser(),
                     'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
