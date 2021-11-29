@@ -30,7 +30,24 @@ class External_Tass_AttendanceLink implements External_AttendanceLinkInterface
     public function getAttendanceLink(string $classCode, ?string $campus, ?string $fileType, array $attendancePeriods, ?int $currentPeriod, Alaress_Date_Format $time, GenericCollection $campusList, int $campusId, ?string $externalId, int $dayNumber): string
     {
         [$year, $subject, $class] = explode('-', $classCode);
-        [$cmpCode, $timetableCode] = explode('-', $campusList->getBy('id', $campusId)->getExtTimetableCode());
+
+        /* External Timetable Code exists in two formats:
+         * $cmpyCode-$timetableCode (two data points hyphen-separated, in a live connector)
+         * $timetableCode           (one data point, in suds tass)
+         *
+         * Detect which of these formats is currently being used and mine out the
+         * timetableCode accordingly. I'm not sure why the first variant exists;
+         * it seems like the way tass does tass things
+         *
+         * Anyway, accommodate both strains of the tass disease
+         */
+        $ext = $campusList->getBy('id', $campusId)->getExtTimetableCode();
+
+        if (stripos($ext, '-') > -1) {
+            [$cmpCode, $timetableCode] = explode('-', $campusList->getBy('id', $campusId)->getExtTimetableCode());
+        } else {
+            $timetableCode = $ext;
+        }
 
         /* Example given by BTAC = [
                 "target":      "teacher.rollcall",
