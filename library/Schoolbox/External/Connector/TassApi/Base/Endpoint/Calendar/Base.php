@@ -18,7 +18,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * Class Base
@@ -283,6 +282,20 @@ class Base
             ['start_date' => $this->from->getUsingFormat('d/m/Y'), 'end_date' => $this->to->getUsingFormat('d/m/Y')],
             Api::VERSION_2
         );
+
+        /* This might be null, or buggy
+         * Exit early in that scenario
+         */
+        if (null === $tassEvents) {
+            $this->log->warning(sprintf(
+                '%s (%s - %s) returned null; no events found. Skipping',
+                $this->endpoint,
+                $this->from->getUsingFormat('d/m/Y'),
+                $this->to->getUsingFormat('d/m/Y')
+            ));
+
+            return;
+        }
 
         $this->log->info(sprintf(
             'Found %s events at endpoint %s between %s and %s',
