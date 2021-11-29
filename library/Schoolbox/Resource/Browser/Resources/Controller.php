@@ -140,12 +140,18 @@ class Controller extends AbstractController
             $componentConfig['filter']['value'] = (int)$componentConfig['filter']['value'] / 2;
         }
 
+        //grab the referrer so the saved filters can be recalled only when returning from the edit page
+        $referrer = 'component';
+        if (str_contains($_SERVER['HTTP_REFERER'], 'cms/file')) {
+            $referrer = 'edit';
+        }
         //just dump the lot to the page for front end use.
         //output results
         $this->getResponse()->content->set([
            'template'   => '@resourceBrowser/viewAll.twig',
            'title'      => $componentConfig['componentname']['value'],
            'data'       => [
+                    'referrer'                  => $referrer,
                     'canEdit'                   => $canEdit,
                     'homepage'                  => $homepage,
                     'filter'                    => $filter,
