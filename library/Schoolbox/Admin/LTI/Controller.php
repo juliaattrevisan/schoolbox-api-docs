@@ -84,6 +84,7 @@ class Controller extends ConfigController
                     'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
                     'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
                     'configContext'         => $configContext,
+                    'issuer'                => $baseUrl->toString(),
                     'oidcAuthenticationUrl' => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOidcAuthenticationRequest')),
                     'oauthAccessTokenUrl'   => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOauthAccessTokenRequest')),
                     'jsonWebKeySetUrl'      => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getJsonWebKeySet')),
