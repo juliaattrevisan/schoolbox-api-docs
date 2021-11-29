@@ -45,6 +45,10 @@ export default {
             type: Array,
             required: true,
         },
+        referrer: { //
+            type: String,
+            required: true,
+        },
         sourceFolderId: { //to know where to upload files to
             type: Number,
             required: true,
