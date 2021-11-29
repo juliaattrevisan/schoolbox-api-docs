@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import { debounce } from "lodash";
 import BadgeImage from '../../vue/badge-image';
 import RevealModal from '@vue/components/reveal-modal'
 import toastMixin from '@vue/components/toast-mixin';
@@ -136,7 +137,7 @@ export default {
         /**
          * Perform async request and load results into component
          */
-        search: _.debounce(function(loading, query, vm) {
+        search: debounce(function(loading, query, vm) {
             axios.get(this.badge._links.goalRecipients, {
                 params: {
                     query: query

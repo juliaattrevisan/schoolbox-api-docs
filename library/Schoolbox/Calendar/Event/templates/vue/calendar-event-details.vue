@@ -2,6 +2,7 @@
     import AudiencesModal   from './audiences-modal';
     import qs               from 'qs';
     import axios            from "axios";
+    import { debounce }     from "lodash";
 
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
      */
@@ -492,7 +493,7 @@
             /**
              * Perform async request and load results into component
              */
-            search: _.debounce(function(loading, query, vm) {
+            search: debounce(function(loading, query, vm) {
                 axios.get(ENDPOINTS.URL_SELECTIZE, {
                     params: {
                         query: query,

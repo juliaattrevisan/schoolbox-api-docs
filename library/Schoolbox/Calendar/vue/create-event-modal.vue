@@ -1,8 +1,9 @@
 <script>
 
 import RevealModal from '@vue/components/reveal-modal'
-import axios       from 'axios'
-import {ENDPOINTS} from '@schoolboxCalendarEvent/endpoints';
+import axios from 'axios'
+import { debounce } from 'lodash';
+import { ENDPOINTS } from '@schoolboxCalendarEvent/endpoints';
 
 /* Vue select
     */
@@ -146,7 +147,7 @@ export default {
         /**
          * Perform async request and load results into component
          */
-        search: _.debounce(function(loading, query, vm) {
+        search: debounce(function(loading, query, vm) {
             axios.get(ENDPOINTS.URL_SELECTIZE, {
                 params: {
                     query: query,
