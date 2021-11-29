@@ -4,7 +4,7 @@
  * Contains the similarity report filters, score and status
  */
 
-import { Event } from 'vue-tables-2';
+import { Event } from 'vue-tables-2-premium';
 import FilterEvents from './similarityReportFilterEvents';
 
 export default {
