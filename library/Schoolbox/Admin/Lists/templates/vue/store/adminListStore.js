@@ -1,7 +1,8 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex'
-import { cloneDeep, orderBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import orderBy from 'lodash/orderBy';
 import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, UPDATE_SELECTED_POP_OUT_NAME,
          ADD_ROW, DELETE_ROW_PROMPT, DELETE_ROW_CONFIRMED, 
          OPEN_POP_UP, CLOSE_POP_UP, UPDATE_SEQUENCE } from './adminListMutationTypes';

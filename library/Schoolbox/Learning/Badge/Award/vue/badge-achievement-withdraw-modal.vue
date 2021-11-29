@@ -1,6 +1,6 @@
 <script>
 import axios from "axios";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import BadgeImage from '../../vue/badge-image';
 import RevealModal from '@vue/components/reveal-modal'
 import toastMixin from '@vue/components/toast-mixin';

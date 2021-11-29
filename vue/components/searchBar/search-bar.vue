@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import ResultMeta from './search-bar-results-meta';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 export default {
 

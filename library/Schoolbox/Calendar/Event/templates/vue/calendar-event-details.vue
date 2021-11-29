@@ -1,8 +1,8 @@
 <script>
-    import AudiencesModal   from './audiences-modal';
-    import qs               from 'qs';
-    import axios            from "axios";
-    import { debounce }     from "lodash";
+    import AudiencesModal from './audiences-modal';
+    import qs from 'qs';
+    import axios from "axios";
+    import debounce from "lodash/debounce";
 
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
      */

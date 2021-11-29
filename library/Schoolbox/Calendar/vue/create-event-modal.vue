@@ -2,7 +2,7 @@
 
 import RevealModal from '@vue/components/reveal-modal'
 import axios from 'axios'
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { ENDPOINTS } from '@schoolboxCalendarEvent/endpoints';
 
 /* Vue select
