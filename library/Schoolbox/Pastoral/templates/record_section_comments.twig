@@ -16,7 +16,6 @@
     {# {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %} #}
     {# Only users that are able to make comments should see comments #}
     {% if commentInsertRoute %}
-        <pre>{{ dump(comments.getAll()) }}</pre>
         <div id="pastoral-record-comments-container">
             <pastoral-record-comments
                 :comments="{{ comments|json_encode }}"

@@ -13,13 +13,13 @@ export default {
  
     data () {
         return {
-            cKEditor_isCKEditorLoading: false,
-            cKEditor_isCKEditorLoaded: false,
+            isCKEditorLoading: false,
+            isCKEditorLoaded: false,
         }
     },
 
     beforeCreate () {
-        this.cKEditor_uniqueId = __uniqueId.toString();
+        this.uniqueId = __uniqueId.toString();
         __uniqueId += 1;
     },
 
@@ -30,8 +30,8 @@ export default {
          *
          * @returns { String }
          */
-        cKEditor_getAddCommentButtonText () {
-            if (this.cKEditor_isCKEditorLoading) return 'Loading';
+        getAddCommentButtonText () {
+            if (this.isCKEditorLoading) return 'Loading';
             else return 'Add a comment'
         },
 
@@ -40,8 +40,8 @@ export default {
          *
          * @returns { Object }
          */
-        cKEditor_getStyles () {
-            return this.cKEditor_isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' };
+        getStyles () {
+            return this.isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' };
         },
 
         /**
@@ -49,7 +49,7 @@ export default {
          *
          * @returns {Boolean}
          */
-        cKEditor_isPostCommentDisabled () {
+        isPostCommentDisabled () {
             if (this.newComment.trim() === '' || this.isProcessing) {
                 return true;
             } else {
@@ -66,9 +66,9 @@ export default {
          * 
          * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
          */
-        async cKEditor_init (editorType) {
+        async init (editorType) {
             try {
-                this.cKEditor_isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+                this.isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
                 if (__isFirstCKEditorLoad) {
                     await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
                     await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
@@ -76,7 +76,7 @@ export default {
                 }
                 $.fn.alaressEditor(this.getConfigOptions(editorType));
             } catch (error) {
-                this.cKEditor_isCKEditorLoading = false; 
+                this.isCKEditorLoading = false; 
                 this.$refs.toast.timeout('Loading comment box failed', false, 5000);
             }
         },
@@ -105,14 +105,14 @@ export default {
          */
         getVueSpecificConfig () {
             return {
-                targetElements: $(`#comment-${this.cKEditor_uniqueId}`),
+                targetElements: $(`#comment-${this.uniqueId}`),
                 on: {
                     change: () => { // Bind the content of CKEditor into the comment model on change
-                        this.newComment = CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].getData(); 
+                        this.newComment = CKEDITOR.instances[`comment-${this.uniqueId}`].getData(); 
                     },
                     instanceReady: () => { //can display the loaded CKEditor now
-                        this.cKEditor_isCKEditorLoading = false;
-                        this.cKEditor_isCKEditorLoaded = true;
+                        this.isCKEditorLoading = false;
+                        this.isCKEditorLoaded = true;
                     }
                 }
             }
