@@ -125,7 +125,7 @@ module.exports = {
             './www/static/js/tour/tour.js',
 
             // Lodash
-            './node_modules/lodash/lodash.js',
+            // './node_modules/lodash/lodash.js',
 
             // MS Immersive Reader
             './www/static/js/immersive-reader.js',
@@ -254,13 +254,13 @@ module.exports = {
                     exposes: { globalName: 'dayjs', override: true }
                 },
             },
-            {
-                test: require.resolve('lodash'),
-                loader: 'expose-loader',
-                options: {
-                    exposes: { globalName: '_', override: true }
-                },
-            },
+            // {
+            //     test: require.resolve('lodash'),
+            //     loader: 'expose-loader',
+            //     options: {
+            //         exposes: { globalName: '_', override: true }
+            //     },
+            // },
             {
                 test: require.resolve('intro.js'),
                 loader: 'expose-loader',

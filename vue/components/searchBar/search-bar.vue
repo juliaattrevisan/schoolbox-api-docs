@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import ResultMeta from './search-bar-results-meta';
+import { debounce } from 'lodash';
 
 export default {
 
@@ -134,7 +135,7 @@ export default {
          * Submit the current query, using underscore.js _debounce to accommodate for key presses 
          * so not sending on every key press
          */
-        filterResults: _.debounce(function () {
+        filterResults: debounce(function () {
             axios.get(this.paths.searchEndpoint + this.keyword).then((response) => {
                 this.totalCount = response.data.totalCount;
                 this.results = response.data.results;
