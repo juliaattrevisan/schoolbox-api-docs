@@ -60,7 +60,12 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
         );
 
         //get userId
-        $userId = '124933';//$this->getUser()->getExternalId();
+        $userId = $this->getUser()->getExternalId();
+        $userId = '124933';
+
+        if ($userId === null) {
+            return false;
+        }
         //get date 30 days in the future
         $endDate = gmdate(DATE_ISO8601, date_create('+1 Month')->getTimestamp());
 
@@ -145,8 +150,8 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
 
         //get calendar events for the current user
         try {
-//            $this->assignments = $connector->executeCanvasDataCmd("/api/v1/users/sis_user_id:${userId}/calendar_events", [
-            $assignments = $connector->executeCanvasDataCmd("/api/v1/calendar_events", [
+            $assignments = $connector->executeCanvasDataCmd("/api/v1/users/sis_user_id:${userId}/calendar_events", [
+//            $assignments = $connector->executeCanvasDataCmd("/api/v1/calendar_events", [
 //            $assignments = $connector->executeCanvasDataCmd("/api/v1/accounts/85397/scopes", [
                 'end_date'  => $endDate,
                 'type'      => 'assignment',
