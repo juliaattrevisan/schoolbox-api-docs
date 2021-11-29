@@ -39,6 +39,7 @@ class ModelToArray extends User\Translator\ModelToArray
             'firstName' => $user->getFirstname(),
             'lastName'  => $user->getLastname(),
             'fullName'  => $user->getFullName(),
+            'isDeleted' => $user->isDeleted(),
         ];
     }
 }
