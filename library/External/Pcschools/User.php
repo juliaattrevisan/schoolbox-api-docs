@@ -83,7 +83,7 @@ class External_Pcschools_User implements External_UserInterface
                 'trim',
                 explode(',', $this->getDatabase()->getOne('SELECT BOARDERCODES FROM SYSFILE'))
             );
-            $row['StudentBoarder'] = in_array($row['StudentBoarder'], $boarderCodes);
+            $row['StudentBoarder'] = in_array($row['StudentBoarder'], $boarderCodes) ? 'Y' : 'N';
         }
         return $row;
     }
