@@ -101,6 +101,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         );
 
         $this->hasJoin(
+            'source',
+            [
+                'multiple'  => true,
+                'mapper'    => Source\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'article_id',
+            ]
+        );
+
+        $this->hasJoin(
             'files',
             [
                 'multiple'  => true,
@@ -128,7 +138,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 {$this->getJoinColumnString('rejector', 'r')},
                 {$this->getJoinColumnString('featureImage', 'fi')},
                 {$this->getJoinColumnString('featureImage.allowedFileExtension', 'afe')},
-                {$this->getJoinColumnString('discussionThread', 'dt')}
+                {$this->getJoinColumnString('discussionThread', 'dt')},
+                {$this->getJoinColumnString('source', 's')}
         ";
     }
 
@@ -150,6 +161,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             LEFT JOIN {$this->getJoinSql('featureImage', null, 'fi')}
             LEFT JOIN {$this->getJoinSql('featureImage.allowedFileExtension', 'fi', 'afe', true)}
             LEFT JOIN {$this->getJoinSql('discussionThread', null, 'dt', true)}
+            LEFT JOIN {$this->getJoinSql('source', null, 's', true)}
         ";
     }
 
@@ -182,6 +194,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         /** @var MimetypeMapper $mimeTypeMapper */
         $mimeTypeMapper = $this->getJoinMapper('featureImage.allowedFileExtension');
+
+        /** @var Source\Mapper $sourceMapper */
+        $sourceMapper = $this->getJoinMapper('source');
 
         $collection = $this->createCollection();
 
@@ -216,6 +231,14 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
                 if ($discussionThread) {
                     $article->setDiscussionThread($discussionThread);
+                }
+
+                /* If this has event source data, bolt that on
+                 */
+                $source = $this->hydrateJoin($row, 'source', 's');
+
+                if ($source) {
+                    $article->setSource($source);
                 }
             }
 
