@@ -28,6 +28,11 @@ export default {
             type: String,
             required: true,
         },
+        presetUniqueId: { //currently for when the comment boxes are in completely different js bundles, as __uniqueId wouldn't increment in this case
+            type: String,
+            required: false,
+            default: '',
+        },
     },
 
    data () {
@@ -38,9 +43,13 @@ export default {
         }
     },
 
-    beforeCreate () {
-        this.uniqueId = __uniqueId.toString();
-        __uniqueId += 1;
+    created () {
+        if (this.presetUniqueId === '') {
+            this.uniqueId = __uniqueId.toString();
+            __uniqueId += 1;
+        } else {
+            this.uniqueId = this.presetUniqueId;
+        }
     },
 
     computed: {

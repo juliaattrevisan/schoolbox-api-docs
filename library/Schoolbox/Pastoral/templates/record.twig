@@ -138,7 +138,6 @@
 
 {# Only staff can ever see the other information things #}
 {% if user.role.isStaff %}
-    {% include '@pastoral/record_section_comments_script.twig'%}
 
     {# Record revision history #}
     {% include '@pastoral/record_section_revisions.twig' %}
