@@ -1,6 +1,6 @@
 <?php
 
-use External\Canvas\Sync\Connector;
+use External\Canvas\API;
 use Schoolbox\Config\ConfigMapper;
 
 /**
@@ -53,7 +53,7 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
             return false;
         }
 
-        $connector =  new Connector(
+        $connection =  new API(
             $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
             $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_SECRET),
             $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL)
@@ -62,12 +62,13 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
         //get userId
         $userId = $this->getUser()->getExternalId();
         $userId = '124933';
+        $userId = '6252194';
 
         if ($userId === null) {
             return false;
         }
         //get date 30 days in the future
-        $endDate = gmdate(DATE_ISO8601, date_create('+1 Month')->getTimestamp());
+        $endDate = gmdate("Y-m-d\TH:i:s", date_create('+1 Month')->getTimestamp());
 
 
         /** test assignments for the user */
@@ -147,19 +148,136 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
             "important_dates" => false
 
         ];
+        $this->assignments[] = [
+            "title" => 'Assignment -deleted',
+            "context_code" => 'English_34',
+            "html_url" => 'https://localhost',
+            "end_at" => "2021-11-29",
+            'workflow_state' => "deleted",
+        ];
+        $this->assignments[] = [
+            "title" => 'Assignment deleted',
+            "context_code" => 'English_34',
+            "html_url" => 'https://localhost',
+            "end_at" => "2021-11-29",
+            'workflow_state' => "deleted",
+        ];
+        $this->assignments[] = [
+            "title" => 'Assignment for english - book review',
+            "context_code" => 'English_34',
+            "html_url" => 'https://localhost',
+            "end_at" => "2021-11-29",
+            'workflow_state' => "published",
+        ];
+        $this->assignments[] = [
+            "title" => 'Assignment',
+            "context_code" => 'English_34',
+            "html_url" => 'https://localhost',
+            "end_at" => "2021-11-29",
+            'workflow_state' => "published",
+        ];
+        $this->assignments[] = [
+            "title" => 'Assignment',
+            "context_code" => 'English_34',
+            "html_url" => 'https://localhost',
+            "end_at" => "2021-11-29",
+            'workflow_state' => "published",
+        ];$this->assignments[] = [
+            "title" => 'Assignment',
+            "context_code" => 'English_34',
+            "html_url" => 'https://localhost',
+            "end_at" => "2021-11-29",
+            'workflow_state' => "published",
+        ];
+        $this->assignments[] = [
+            "title" => 'Assignment',
+            "context_code" => 'English_34',
+            "html_url" => 'https://localhost',
+            "end_at" => "2021-11-29",
+            'workflow_state' => "published",
+        ];//10?
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];//15
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];$this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];
+//        $this->assignments[] = [
+//            "title" => 'Assignment',
+//            "context_code" => 'English_34',
+//            "html_url" => 'https://localhost',
+//            "end_at" => "2021-11-29",
+//            'workflow_state' => "published",
+//        ];//20
 
         //get calendar events for the current user
-        try {
-            $assignments = $connector->executeCanvasDataCmd("/api/v1/users/sis_user_id:${userId}/calendar_events", [
-//            $assignments = $connector->executeCanvasDataCmd("/api/v1/calendar_events", [
-//            $assignments = $connector->executeCanvasDataCmd("/api/v1/accounts/85397/scopes", [
-                'end_date'  => $endDate,
-                'type'      => 'assignment',
-            ]);
-            $this->assignments = json_decode($assignments, true);
-        } catch (\Throwable $e) {
-            $this->assignments = [];
-        }
+//        try {
+////            $assignments = $connection->executeCanvasDataCmd("/api/v1/calendar_events", [
+////            $assignments = $connection->executeCanvasDataCmd("/api/v1/accounts/85397/scopes", [
+//            $assignments = $connection->request("/api/v1/users/${userId}/calendar_events", [
+//                'end_date'  => $endDate,
+//                'type'      => 'assignment',
+//            ]);
+//            $this->assignments = json_decode($assignments, true);
+//        } catch (\Throwable $e) {
+//            $this->assignments = [];
+//        }
 
         return true;
     }

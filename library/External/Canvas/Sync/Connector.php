@@ -34,18 +34,14 @@ class Connector
     /** @var string */
     private $apiSecret;
 
-    /** @var string */
-    private $apiHost;
-
     /**
      * @param string $apiKey
      * @param string $apiSecret
      */
-    public function __construct(string $apiKey, string $apiSecret, string $apiHost = 'api.inshosteddata.com')
+    public function __construct(string $apiKey, string $apiSecret)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
-        $this->apiHost = $apiHost;
     }
 
 
@@ -84,10 +80,10 @@ class Connector
      * @throws RuntimeException if unable to read or an error occurs while reading.
      * @throws InvalidArgumentException If Guzzle client instantiated with invalid handler
      */
-    public function executeCanvasDataCmd(string $command, array $queryParams = []): string
+    private function executeCanvasDataCmd(string $command, array $queryParams = []): string
     {
-        $timestamp = gmdate(DATE_ISO8601);
-        $url = 'https://' . $this->apiHost . $command;
+        $timestamp = gmdate(DATE_RFC7231);
+        $url = 'https://' . self::API_HOST . $command;
 
         // Generate signature
         $hmac = $this->getHmacSignature($timestamp, $command, $queryParams);
@@ -100,7 +96,6 @@ class Connector
 
         try {
             $response = $client->request('GET', $url, [RequestOptions::HEADERS => $options, RequestOptions::QUERY => $queryParams]);
-//            $response = $client->request('GET', 'https://canvas.newington.nsw.edu.au/api/v1/accounts/85397/scopes', [RequestOptions::HEADERS => $options);
         } catch (GuzzleException $e) {
             throw new External\Exception("Unable to get $url: {$e->getMessage()}");
         }
