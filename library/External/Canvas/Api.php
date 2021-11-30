@@ -14,7 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Schoolbox\External;
 
-class API
+class Api
 {
     /** @var string */
     private $apiKey;

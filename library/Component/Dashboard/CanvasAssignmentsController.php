@@ -1,6 +1,6 @@
 <?php
 
-use External\Canvas\API;
+use External\Canvas\Api;
 use Schoolbox\Config\ConfigMapper;
 
 /**
@@ -53,7 +53,7 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
             return false;
         }
 
-        $connection =  new API(
+        $connection =  new Api(
             $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
             $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_SECRET),
             $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL)
