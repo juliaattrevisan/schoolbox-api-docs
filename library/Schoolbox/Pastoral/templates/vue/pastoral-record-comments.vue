@@ -4,15 +4,15 @@
  * To add comments to an existing pastoral record
  */
 
-import cKEditor from '@vue/mixins/ckeditor/mixinCKEditor.js';
-import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes.js';
+// import cKEditor from '@vue/mixins/ckeditor/mixinCKEditor.js';
+// import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes.js';
 
 
 export default {
 
-    mixins: [
-        cKEditor,
-    ],
+    // mixins: [
+    //     cKEditor,
+    // ],
 
     props: {
         comments: {

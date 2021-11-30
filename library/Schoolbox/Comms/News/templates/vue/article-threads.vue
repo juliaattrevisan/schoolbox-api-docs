@@ -6,8 +6,7 @@ import toastMixin from '@vue/components/toast-mixin';
 import RevealModal from '@vue/components/reveal-modal';
 import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
-// import cKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
-// import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
+
 
 export default {
 
@@ -16,12 +15,11 @@ export default {
     components: {
         MediaArticle,
         RevealModal,
-        AddCommentInput
+        AddCommentInput,
     },
 
     mixins: [
         cdnPrefixMixin,
-        // cKEditor,
         toastMixin
     ],
 
