@@ -13,84 +13,37 @@
 {% if (recordType == 'public' and access.public) or (recordType == 'private' and access.private) %}
 
     {% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
-    {# {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %} #}
+    
     {# Only users that are able to make comments should see comments #}
     {% if commentInsertRoute %}
-        <div id="comments">
-            <div class="row">
-                <div class="small-12 island">
-                    <section class="content no-margin hide-for-print">
-                        <label>{{ commentHeading }} Comments ({{ comments|length }})</label>
-                        {% if (recordType == 'public' and access.public) %}
-                        <div id="pastoral-record-comments-container-public">
-                            <pastoral-record-comments
-                                cdn-prefix="{{ CDN_PREFIX }}"
-                                comment-heading="{{ commentHeading }}"
-                                comment-insert-route="{{ commentInsertRoute }}"
-                                :initial-comments="{{ comments|json_encode }}"
-                                :record="{{ record|json_encode }}"
-                                record-type="{{ recordType }}"
-                                site-version="{{ config.site_version }}"
-                            />
-                        </div>
-                        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPublic.js"></script>
-                        {% elseif (recordType == 'private' and access.private) %}
-                        <div id="pastoral-record-comments-container-private">
-                            <pastoral-record-comments
-                                cdn-prefix="{{ CDN_PREFIX }}"
-                                comment-heading="{{ commentHeading }}"
-                                comment-insert-route="{{ commentInsertRoute }}"
-                                :initial-comments="{{ comments|json_encode }}"
-                                :record="{{ record|json_encode }}"
-                                record-type="{{ recordType }}"
-                                site-version="{{ config.site_version }}"
-                            />
-                        </div>
-                        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPrivate.js"></script>
-                        {% endif %}
-                    </section>
 
-                    {% if comments | length > 0 %}
-                    <hr class="no-margin" />
-
-                    <section class="discussion">
-                        <ul class="information-list">
-                            {% for comment in comments %}
-                                <li class="actions-small-1">
-                                    <div class="list-item">
-                                        <div class="small-12 compact card">
-                                            {% if comment.owner.isDeleted %}
-                                                {{ profile.imageSquare64(comment.owner) }}
-                                                <p>
-                                                    {{ comment.owner.fullName }}
-                                                </p>
-                                                <span class="pipe meta" title="{{ comment.createdAt }}">{{ comment.createdAt }}</span>
-                                            {% else %}
-                                                <a href="{{ profile.link(comment.owner) }}" title="View Profile">
-                                                    {{ profile.imageSquare64(comment.owner) }}
-                                                    <p>
-                                                        {{ comment.owner.fullName }}
-                                                    </p>
-                                                    <span class="pipe meta" title="{{ comment.createdAt }}">{{ comment.createdAt }}</span>
-                                                </a>
-                                            {%  endif %}
-                                        </div>
-                                        <article>{{ comment.body | purify }}</article>
-                                    </div>
-                                    <nav>
-                                        {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
-                                        {% if commentDeleteRoute %}
-                                            <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
-                                        {% endif %}
-                                    </nav>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                    {% endif %}
-                </div>
-            </div>
+        {% if (recordType == 'public' and access.public) %}
+        <div id="pastoral-record-comments-container-public">
+            <pastoral-record-comments
+                cdn-prefix="{{ CDN_PREFIX }}"
+                comment-heading="{{ commentHeading }}"
+                comment-insert-route="{{ commentInsertRoute }}"
+                :initial-comments="{{ comments|json_encode }}"
+                :record="{{ record|json_encode }}"
+                record-type="{{ recordType }}"
+                site-version="{{ config.site_version }}"
+            />
         </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPublic.js"></script>
+        {% elseif (recordType == 'private' and access.private) %}
+        <div id="pastoral-record-comments-container-private">
+            <pastoral-record-comments
+                cdn-prefix="{{ CDN_PREFIX }}"
+                comment-heading="{{ commentHeading }}"
+                comment-insert-route="{{ commentInsertRoute }}"
+                :initial-comments="{{ comments|json_encode }}"
+                :record="{{ record|json_encode }}"
+                record-type="{{ recordType }}"
+                site-version="{{ config.site_version }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPrivate.js"></script>
+        {% endif %}
 
     {% endif %}
 
