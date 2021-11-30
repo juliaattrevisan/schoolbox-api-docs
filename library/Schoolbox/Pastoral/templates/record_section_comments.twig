@@ -16,17 +16,36 @@
     {# {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %} #}
     {# Only users that are able to make comments should see comments #}
     {% if commentInsertRoute %}
-        <div id="pastoral-record-comments-container">
+        
+        {% if (recordType == 'public' and access.public) %}
+        <div id="pastoral-record-comments-container-public">
             <pastoral-record-comments
-                :comments="{{ comments|json_encode }}"
+                cdn-prefix="{{ CDN_PREFIX }}"
+                {# :comments="{{ comments|json_encode }}" #}
                 {# comment-delete-route="{{ commentDeleteRoute }}" #}
-                comment-heading="{{ commentHeading }}"
-                comment-insert-route="{{ commentInsertRoute }}"
-                :record="{{ record|json_encode }}"
-                record-type="{{ recordType }}"
+                {# comment-heading="{{ commentHeading }}" #}
+                {# comment-insert-route="{{ commentInsertRoute }}" #}
+                {# :record="{{ record|json_encode }}" #}
+                {# record-type="{{ recordType }}" #}
+                site-version="{{ config.site_version }}"
             />
         </div>
-        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordComments.js"></script>
+        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPublic.js"></script>
+        {% elseif (recordType == 'private' and access.private) %}
+        <div id="pastoral-record-comments-container-private">
+            <pastoral-record-comments
+                cdn-prefix="{{ CDN_PREFIX }}"
+                {# :comments="{{ comments|json_encode }}" #}
+                {# comment-delete-route="{{ commentDeleteRoute }}" #}
+                {# comment-heading="{{ commentHeading }}" #}
+                {# comment-insert-route="{{ commentInsertRoute }}" #}
+                {# :record="{{ record|json_encode }}" #}
+                {# record-type="{{ recordType }}" #}
+                site-version="{{ config.site_version }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPrivate.js"></script>
+        {% endif %}
 
         <div id="comments">
             <div class="row">
@@ -113,7 +132,7 @@
                         }
                     }
                 });
-            });
+            }); 
         </script>
 
     {% endif %}

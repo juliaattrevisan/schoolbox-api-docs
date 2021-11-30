@@ -46,7 +46,6 @@ export default {
             showLoadMoreButton: false,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
-            // newComment: '',
             isProcessing: false,
             showCommentsSection: false,
             isInitialLoad: true,

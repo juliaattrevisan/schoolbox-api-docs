@@ -1,7 +1,8 @@
 <script>
 
 /**
- * 
+ * Lazy load the CKEditor instance on demand and pass through the current comment 
+ * to the parent. 
  */
 
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids

@@ -51,7 +51,6 @@ export default {
     data() {
         return {
             commentThread: this.thread,
-            newComment: '',
             isProcessing: false,
             commentIndexToDelete: null
         }
@@ -161,9 +160,10 @@ export default {
 
         /**
          * Posts a comment to this thread.
-         *
          * If there's no thread yet: this method will create one, and then
          * post the comment to it.
+         * 
+         * @param { String }
          */
         postComment(newComment) {
             // maybe there's not a thread at all. If not: create one, then post
