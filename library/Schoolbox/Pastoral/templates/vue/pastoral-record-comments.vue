@@ -33,6 +33,10 @@ export default {
             type: String,
             required: true,
         },
+        deleteCommentRoute: {
+            type: String, 
+            required: true,
+        },
         initialComments: {
             type: Array,
             required: true,
@@ -55,7 +59,7 @@ export default {
         return {
             comments: [],
             isProcessing: false,
-            commentIdToDelete: null
+            commentToDelete: null
         }
     },
 
@@ -117,35 +121,30 @@ export default {
          *
          * @param { Number }
          */
-        showDeleteModal (commentId) {
-            this.commentIdToDelete = commentId;
+        showDeleteModal (commentToDelete) {
+            this.commentToDelete = commentToDelete;
             this.$refs.deleteModal.open();
         },
 
         /**
          * Deletes the comment with the given id within the thread.
          */
-        deleteComment () {
-            // $('[data-delete-comment]').click(function (event) {
-            //     event.preventDefault();
-            //     deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
-            //         'recordId': 'recordId',
-            //         'commentId': 'commentId'
-            //     }) }}';
-            //     $(this).confirmDialog({
-            //         text: 'Are you sure you want to delete this comment?',
-            //         confirmLabel: 'Delete',
-            //         confirmEvent: function () {
-            //             $.post(
-            //                 deleteCommentRoute
-            //                     .replace(/recordId/g, {{ record.id }})
-            //                     .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
-            //             ).done(function () {
-            //                 $(event.target).closest('li').remove();
-            //             });
-            //         }
-            //     });
-            // });
+        async deleteComment () {
+            this.isProcessing = true;
+            try {
+                this.$refs.toast.activate('Deleting comment...');
+                await fetch(`/pastoral/record/${this.commentToDelete.pastoral.id}/comment/${this.commentToDelete.id}/delete`, {
+                    method: 'POST'
+                });
+                this.comments = this.comments.filter((comment) => comment.id !== this.commentToDelete.id); //pull out from the comment list
+                this.$refs.toast.timeout('Comment deleted', true, 2000);
+            } catch (error) {
+                console.warn(error);
+                this.$refs.toast.timeout('Unable to delete comment', false, 2000);
+            } finally {
+                this.$refs.deleteModal.close();
+                this.isProcessing = false;
+            }
         },
 
         /**
@@ -211,7 +210,7 @@ export default {
                             </div>
                             <nav>
                                 <!-- <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a> -->
-                                <a @click.prevent="showDeleteModal(comment.id)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
+                                <a @click.prevent="showDeleteModal(comment)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
                             </nav>
                             <media-article v-html="comment.body"></media-article>
                         </li>

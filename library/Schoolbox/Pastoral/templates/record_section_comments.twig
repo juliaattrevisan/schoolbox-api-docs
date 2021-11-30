@@ -13,16 +13,18 @@
 {% if (recordType == 'public' and access.public) or (recordType == 'private' and access.private) %}
 
     {% set commentInsertRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id}) %}
-    {# {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %} #}
+    {% set deleteCommentRoute = routeLookupIfAuthorized('pastoral.postCommentDelete') %}
+
     {# Only users that are able to make comments should see comments #}
     {% if commentInsertRoute %}
-    
+
         {% if (recordType == 'public' and access.public) %}
         <div id="pastoral-record-comments-container-public">
             <pastoral-record-comments
                 cdn-prefix="{{ CDN_PREFIX }}"
                 comment-heading="{{ commentHeading }}"
                 comment-insert-route="{{ commentInsertRoute }}"
+                delete-comment-route="{{ deleteCommentRoute }}"
                 :initial-comments="{{ comments|json_encode }}"
                 :record="{{ record|json_encode }}"
                 record-type="{{ recordType }}"
@@ -36,6 +38,7 @@
                 cdn-prefix="{{ CDN_PREFIX }}"
                 comment-heading="{{ commentHeading }}"
                 comment-insert-route="{{ commentInsertRoute }}"
+                delete-comment-route="{{ deleteCommentRoute }}"
                 :initial-comments="{{ comments|json_encode }}"
                 :record="{{ record|json_encode }}"
                 record-type="{{ recordType }}"
