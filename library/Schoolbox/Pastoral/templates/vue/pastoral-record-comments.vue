@@ -55,7 +55,7 @@ export default {
         return {
             comments: [],
             isProcessing: false,
-            commentIndexToDelete: null
+            commentIdToDelete: null
         }
     },
 
@@ -117,17 +117,15 @@ export default {
          *
          * @param { Number }
          */
-        showDeleteModal (index) {
-            this.commentIndexToDelete = index;
+        showDeleteModal (commentId) {
+            this.commentIdToDelete = commentId;
             this.$refs.deleteModal.open();
         },
 
         /**
-         * Deletes the comment at the given index within the thread.
-         *
-         * @param { Number }
+         * Deletes the comment with the given id within the thread.
          */
-        deleteComment (index) {
+        deleteComment () {
             // $('[data-delete-comment]').click(function (event) {
             //     event.preventDefault();
             //     deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
@@ -201,7 +199,7 @@ export default {
 
                 <section class="discussion">
                     <ul class="information-list">
-                        <li v-for="(comment, index) in comments" :key="comment.id" class="actions-small-1">
+                        <li v-for="comment in comments" :key="comment.id" class="actions-small-1">
                            <div class="list-item">
                                 <div class="card compact small-12">
                                     <a :href="comment.owner._links.profile" title="View Profile">
@@ -213,7 +211,7 @@ export default {
                             </div>
                             <nav>
                                 <!-- <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a> -->
-                                <a @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
+                                <a @click.prevent="showDeleteModal(comment.id)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
                             </nav>
                             <media-article v-html="comment.body"></media-article>
                         </li>
@@ -231,7 +229,7 @@ export default {
                     <h2>Please confirm</h2>
                     <p>Are you sure you want to delete this comment?</p>
                     <ul class="flex-list buttons">
-                        <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">Delete</a></li>
+                        <li><a @click.prevent="deleteComment" class="button submit">Delete</a></li>
                         <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
                     </ul>
                 </template>
