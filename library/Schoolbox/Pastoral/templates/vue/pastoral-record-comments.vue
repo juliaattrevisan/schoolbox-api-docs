@@ -7,7 +7,6 @@
 import Toast from '@vue/components/toast';
 import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
-import cloneDeep from 'lodash/cloneDeep';
 
 
 export default {
@@ -56,7 +55,7 @@ export default {
     },
 
     mounted () {
-        this.comments = cloneDeep(this.initialComments);
+        this.comments = [...this.initialComments];
     },
 
     methods: {
