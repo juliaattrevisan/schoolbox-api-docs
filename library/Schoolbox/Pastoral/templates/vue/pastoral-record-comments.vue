@@ -1,7 +1,8 @@
 <script>
 
 /**
- * To add comments to an existing pastoral record
+ * To add and view/delete comments on an existing pastoral record
+ * This component manages both 'public' and 'private' recordTypes
  */
 
 import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
@@ -25,7 +26,7 @@ export default {
     ],
 
     props: {
-        commentHeading: {
+        commentHeading: { //can be either 'General' or 'Confidential'
             type: String,
             required: true,
         },
@@ -33,23 +34,19 @@ export default {
             type: String,
             required: true,
         },
-        deleteCommentRoute: {
-            type: String, 
-            required: true,
-        },
-        initialComments: {
+        initialComments: { //to display the comment list
             type: Array,
             required: true,
         },
-        record: {
+        record: { //to know where to post comments to
             type: Object,
             required: true,
         },
-        recordType: {
+        recordType: { //can be either 'public' or 'private'
             type: String,
             required: true,
         },
-        siteVersion: {
+        siteVersion: { //for cache busting the ckeditor load
             type: String,
             required: true
         }
@@ -58,13 +55,13 @@ export default {
     data () {
         return {
             comments: [],
-            isProcessing: false,
+            isProcessing: false, //so can't rapid fire clicks on the submit button
             commentToDelete: null
         }
     },
 
     mounted () {
-        this.comments = [...this.initialComments];
+        this.comments = [...this.initialComments]; //as we could be manipulating the comments further, store as data
     },
 
     methods: {
@@ -100,7 +97,7 @@ export default {
         },
 
         /**
-         *
+         *To send with the postComment request
          *
          * @returns { FormData }
          */
@@ -117,7 +114,7 @@ export default {
 
         /**
          * Opens the delete modal: pressing the Confirm button in the modal will
-         * delete that comment.
+         * delete the chosen comment
          *
          * @param { Number }
          */
@@ -176,13 +173,17 @@ export default {
 </script>
 
 <template>
-    <div id="comments">
 
-        <div class="row">
+    <div class="feed-comments small-12 columns">
 
-            <div class="small-12 island">
-                <section class="content no-margin hide-for-print">
-                    <label>{{ commentHeading }} Comments ({{ comments.length }})</label>
+        <div class="small-12 island">
+
+            <section class="discussion">
+
+                <div class="discussion-threads">
+
+                    <p class="comment-count">{{ commentHeading }} Comments ({{ comments.length }})</p>
+
                     <add-comment-input
                         :cdn-prefix="cdnPrefix"
                         :is-processing="isProcessing"
@@ -191,15 +192,10 @@ export default {
                         @on-load-error="onLoadError"
                         @on-post-comment="postComment"
                     />
-                </section>
 
-                <template v-if="comments.length > 0">
-                <hr class="no-margin" />
-
-                <section class="discussion">
                     <ul class="information-list">
                         <li v-for="comment in comments" :key="comment.id" class="actions-small-1">
-                           <div class="list-item">
+                            <div class="list-item">
                                 <div class="card compact small-12">
                                     <a :href="comment.owner._links.profile" title="View Profile">
                                         <img :src="comment.owner._links.avatar" title="profile photo">
@@ -215,84 +211,26 @@ export default {
                             <media-article v-html="comment.body"></media-article>
                         </li>
                     </ul>
-                </section>
 
-                </template>
+                </div>
 
-            </div>
-
-            <toast ref="toast"></toast>
-
-            <reveal-modal ref="deleteModal">
-                <template>
-                    <h2>Please confirm</h2>
-                    <p>Are you sure you want to delete this comment?</p>
-                    <ul class="flex-list buttons">
-                        <li><a @click.prevent="deleteComment" class="button submit">Delete</a></li>
-                        <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
-                    </ul>
-                </template>
-            </reveal-modal>
+            </section>
 
         </div>
+
+        <toast ref="toast"></toast>
+
+        <reveal-modal ref="deleteModal">
+            <h2>Please confirm</h2>
+            <p>Are you sure you want to delete this comment?</p>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="deleteComment" class="button submit">Delete</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
+            </ul>
+        </reveal-modal>
 
     </div>
-    <!-- <div id="comments">
-        <div class="row">
-            <div class="small-12 island">
-                <section class="content no-margin hide-for-print">
-                    <label>{{ commentHeading }} Comments ({{ comments|length }})</label>
-                    <form method="post" action="{{ commentInsertRoute }}">
-                        <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
-                        <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add a comment"></textarea>
-                        {% if recordType == 'private' %}
-                            <input type="hidden" name="comment_private" value="1"/>
-                        {% endif %}
-                        <input disabled data-comment-insert-{{ recordType }} type="submit" value="Post comment">
-                    </form>
-                </section>
 
-                {% if comments | length > 0 %}
-                <hr class="no-margin" />
-
-                <section class="discussion">
-                    <ul class="information-list">
-                        {% for comment in comments %}
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="small-12 compact card">
-                                        {% if comment.owner.isDeleted() %}
-                                            {{ profile.imageSquare64(comment.owner) }}
-                                            <p>
-                                                {{ comment.owner.fullName }}
-                                            </p>
-                                            <span class="pipe meta" title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
-                                        {% else %}
-                                            <a href="{{ profile.link(comment.owner) }}" title="View Profile">
-                                                {{ profile.imageSquare64(comment.owner) }}
-                                                <p>
-                                                    {{ comment.owner.fullName }}
-                                                </p>
-                                                <span class="pipe meta" title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
-                                            </a>
-                                        {%  endif %}
-                                    </div>
-                                    <article>{{ comment.body | purify }}</article>
-                                </div>
-                                <nav>
-                                    {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
-                                    {% if commentDeleteRoute %}
-                                        <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
-                                    {% endif %}
-                                </nav>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-                {% endif %}
-            </div>
-        </div>
-    </div> -->
 </template>
 
 <style scoped>
