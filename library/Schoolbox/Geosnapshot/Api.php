@@ -184,13 +184,14 @@ class Api
             /* Geosnapshot endpoints sometimes just echo back an empty string
              * which is un-json_decodable - just return empty array I guess
              */
-            if ('' === $response->getBody()->getContents()) {
+            $content = $response->getBody()->getContents();
+            if ('' === $content) {
                 return [];
             }
 
             /* Try to decode whatever json payload was given back
              */
-            return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         }
 
         throw new \DomainException(sprintf(
