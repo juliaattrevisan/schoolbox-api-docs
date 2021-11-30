@@ -683,7 +683,7 @@ class QuizTest extends TestCase
             ->setAssessable($quiz)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setSubmittedAt(new \Alaress_Date_NullDate())
+            ->setSubmittedAt(null)
             ->setCreatedAt($time)
             ->setUpdatedAt($time);
 
@@ -693,7 +693,7 @@ class QuizTest extends TestCase
             ->setAssessable($quiz)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setSubmittedAt(new \Alaress_Date_NullDate())
+            ->setSubmittedAt(null)
             ->setCreatedAt($time)
             ->setUpdatedAt($time);
 

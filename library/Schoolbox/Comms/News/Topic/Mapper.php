@@ -74,10 +74,7 @@ class Mapper extends \Schoolbox\Mapper
     public function updateSlug(Model $topic): bool
     {
         // It won't appear in the UI
-        if (
-            empty($topic->getName()) ||
-            $topic->getDeletedAt() && (!$topic->getDeletedAt()->isnull() || !($topic->getDeletedAt() instanceof \Alaress_Date_NullDate))
-        ) {
+        if (empty($topic->getName()) || $topic->getDeletedAt()) {
             $topic->setSlug(null);
             return true;
         }

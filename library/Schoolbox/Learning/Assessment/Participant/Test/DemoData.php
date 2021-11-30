@@ -539,7 +539,7 @@ class DemoData
         $participant0 = $linker->createAndLinkParticipant(self::getDemoStudent('0'), $dueWorkPlan);
         $feedback0    = (new Feedback())
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new Alaress_Date_NullDate())
+            ->setPublishedAt(null)
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setResubmissionRequired(true);
         $participant0->getAllFeedbacks()->add($feedback0);
@@ -590,7 +590,7 @@ class DemoData
         // User 4 - unpublished response, only feedback requires resubmit
         $participant4 = $linker->createAndLinkParticipant(self::getDemoStudent('4'), $dueWorkPlan);
         $response4    = (new Response())
-            ->setSubmittedAt(new Alaress_Date_NullDate())
+            ->setSubmittedAt(null)
             ->setUpdatedAt(Alaress_Date_Format::now());
         $feedback4    = (new Feedback())
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
@@ -623,7 +623,7 @@ class DemoData
             ->setUpdatedAt(Alaress_Date_Format::now())
             ->setResubmissionRequired(true);
         $response6    = (new Response())
-            ->setSubmittedAt(new Alaress_Date_NullDate())
+            ->setSubmittedAt(null)
             ->setUpdatedAt(Alaress_Date_Format::now()->addSeconds(1));
         $participant6->getAllFeedbacks()->add($feedback6);
         $participant6->getAllResponses()->add($response6);
