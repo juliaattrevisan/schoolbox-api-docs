@@ -48,7 +48,7 @@
                                     </a>
                                     <p class="meta">
                                         Created by
-                                        {% if group.user.deletedAt.isNull %}
+                                        {% if not group.user.deletedAt %}
                                             <a href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
                                         {% else %}
                                             {{ group.user.fullName }}

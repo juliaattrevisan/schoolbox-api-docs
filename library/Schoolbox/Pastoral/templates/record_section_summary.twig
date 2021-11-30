@@ -9,7 +9,7 @@
             <dl class="profile">
                 <dt class="small-4 medium-3 columns">Created By:</dt>
                 <dd class="small-8 medium-9 columns">
-                    {% if record.owner.deletedAt.isNull %}
+                    {% if not record.owner.deletedAt %}
                         <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
                     {% else %}
                         {{ record.owner.fullName }}
