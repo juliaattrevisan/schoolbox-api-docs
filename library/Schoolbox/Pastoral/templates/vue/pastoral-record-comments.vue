@@ -7,6 +7,7 @@
 import Toast from '@vue/components/toast';
 import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import cloneDeep from 'lodash/cloneDeep';
 
 
 export default {
@@ -21,10 +22,26 @@ export default {
     ],
 
     props: {
-        // comments: {
-        //     type: Array, 
-        //     required: true,
-        // },
+        commentHeading: {
+            type: String, 
+            required: true,
+        },
+        commentInsertRoute: {
+            type: String, 
+            required: true,
+        },
+        initialComments: {
+            type: Array, 
+            required: true,
+        },
+        record: {
+            type: Object, 
+            required: true,
+        },
+        recordType: {
+            type: String, 
+            required: true,
+        },
         siteVersion: {
             type: String,
             required: true
@@ -33,12 +50,13 @@ export default {
 
     data () {
         return {
+            comments: [],
             isProcessing: false,
         }
     },
 
     mounted () {
-        // console.warn('oi');
+        this.comments = cloneDeep(this.initialComments);
     },
 
     methods: {
@@ -67,13 +85,16 @@ export default {
 </script>
 
 <template>
-    <add-comment-input 
-        :cdn-prefix="cdnPrefix"
-        :is-processing="isProcessing"
-        :site-version="siteVersion"
-        @on-load-error="onLoadError"
-        @on-post-comment="postComment"
-    />
+    <form method="post" :action="commentInsertRoute">
+        <add-comment-input 
+            :cdn-prefix="cdnPrefix"
+            :is-processing="isProcessing"
+            :site-version="siteVersion"
+            @on-load-error="onLoadError"
+            @on-post-comment="postComment"
+        />
+        <input v-if="recordType === 'private'" type="hidden" name="comment_private" value="1" />
+    </form>
 </template>
 
 <style scoped>
