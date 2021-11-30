@@ -267,17 +267,17 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
 //        ];//20
 
         //get calendar events for the current user
-//        try {
-////            $assignments = $connection->executeCanvasDataCmd("/api/v1/calendar_events", [
-////            $assignments = $connection->executeCanvasDataCmd("/api/v1/accounts/85397/scopes", [
-//            $assignments = $connection->request("/api/v1/users/${userId}/calendar_events", [
-//                'end_date'  => $endDate,
-//                'type'      => 'assignment',
-//            ]);
-//            $this->assignments = json_decode($assignments, true);
-//        } catch (\Throwable $e) {
-//            $this->assignments = [];
-//        }
+        try {
+//            $assignments = $connection->executeCanvasDataCmd("/api/v1/calendar_events", [
+//            $assignments = $connection->executeCanvasDataCmd("/api/v1/accounts/85397/scopes", [
+            $assignments = $connection->tryPayload('get', "/api/v1/users/${userId}/calendar_events", [
+                'end_date'  => $endDate,
+                'type'      => 'assignment',
+            ]);
+            $this->assignments = json_decode($assignments, true);
+        } catch (\Throwable $e) {
+            $this->assignments = [];
+        }
 
         return true;
     }
