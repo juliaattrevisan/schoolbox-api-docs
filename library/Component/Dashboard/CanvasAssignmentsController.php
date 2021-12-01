@@ -1,6 +1,6 @@
 <?php
 
-use External\Canvas\Api;
+use Schoolbox\External\Connector\Canvas\Base\Endpoint\Api;
 use Schoolbox\Config\ConfigMapper;
 
 /**
@@ -54,9 +54,8 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
         }
 
         $connection =  new Api(
-            $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
-            $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_SECRET),
-            $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL)
+            $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL),
+            $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_KEY)
         );
 
         //get userId
@@ -268,7 +267,7 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
 
         //get calendar events for the current user
         try {
-            $this->assignments = $connection->tryPayload('get', "/api/v1/users/${userId}/calendar_events", [
+            $this->assignments = $connection->retrieveDocument('get', "/api/v1/users/${userId}/calendar_events", [
                 'end_date'  => $endDate,
                 'type'      => 'assignment',
             ]);
