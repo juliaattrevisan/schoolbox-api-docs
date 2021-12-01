@@ -29,8 +29,8 @@ class Api
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
      *
-     * Sometimes tass endpoints fail for no obvious reason and trying again seems
-     * to work - instead of doing it manually, try insisting programmatically
+     * in case canvas fails for no obvious reason, try again to see if that
+     * works - instead of doing it manually, try insisting programmatically
      * waiting NAP_TIMEOUT seconds between each attempt
      */
     private const NAP_TIMEOUT = 3;
@@ -103,13 +103,11 @@ class Api
         $lastGuzzleError = '';
         $fails = 0;
 
-        /* Try multiple times in case tass dies for a random reason
+        /* Try multiple times in case canvas dies for a random reason
          */
         while ($fails < self::NUM_RETRY) {
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              *
-             * I don't think tass plays in the same reality as most other people
-             * and they might broadcast error states in a successful payload one day
              */
             try {
                 $path = sprintf("%s/%s", $this->host, $route);
@@ -131,6 +129,30 @@ class Api
              */
             if ($response->getStatusCode() === 200) {
                 return json_decode($response->getBody()->getContents(), true);
+            }
+
+            /* check if it was a permission error,
+             * if it was lets throw that now.
+             * it may be the developer key is not set for the account
+             * https://canvas.instructure.com/doc/api/file.developer_keys.html#how-do-management-features-function
+             */
+            if (401 === $response->getStatusCode()) {
+                throw new RuntimeException(sprintf(
+                    'No Permission %s: %s %s. Payload: %s',
+                    $method,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    base64_encode(json_encode([
+                        /* These were requested by suds
+                        */
+                        'method' => $method,
+                        'route' => $route,
+
+                        /* This was generated and sent to canvas
+                        */
+                        'queryArgs' => $queryArgs
+                    ], JSON_THROW_ON_ERROR))
+                ), $response->getStatusCode());
             }
 
             /* We got a response but it's broken
@@ -166,7 +188,7 @@ class Api
                          'method' => $method,
                          'route' => $route,
 
-                         /* This was generated and sent to tass
+                         /* This was generated and sent to canvas
                           */
                         'queryArgs' => $queryArgs
                     ], JSON_THROW_ON_ERROR))
