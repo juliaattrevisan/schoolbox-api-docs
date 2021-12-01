@@ -206,9 +206,7 @@ class ListController extends Web\Controller\Base
                 $this->getConfigLoader(),
                 $this->getRequest()->server->get('HTTP_HOST'),
                 $this->router
-            ))->generateConfigKey($assessment, $this->getUser()),
-            $assessment,
-            $this->getUser()
+            ))->generateConfigKey($assessment, $this->getUser())
         );
     }
 

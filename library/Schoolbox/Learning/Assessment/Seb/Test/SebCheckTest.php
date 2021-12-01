@@ -35,6 +35,7 @@ class SebCheckTest extends TestCase
         string $configKey,
         bool $expected
     ): void {
+        $_GET['sebkey'] = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? '';
         $outcome = (new ValidSebCheck())->isSatisfiedBy(
             $serverSuperglobal,
             $browserExamKey,
@@ -66,7 +67,7 @@ class SebCheckTest extends TestCase
                     'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'HTTP_USER_AGENT' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
                     'HTTP_X_SAFEEXAMBROWSER_REQUESTHASH' => '041548824a66d177c583ec2f584f2fc9b9a85db8d2b5662988228dfd80d9242a',
-                    'HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH' => '0bb0159178965de00b16032d9d3569b10cd386087da40ff2fd082a5db5b7b970',
+                    'HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH' => '8c75e60739c0c4088552b8022bde7361ee60de68c2e1c2ce7bcfc3d9975e9751',
                     'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
                     'HTTP_SEC_CH_UA_MOBILE' => '?0',
                     'HTTP_SEC_CH_UA' => '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
@@ -91,7 +92,7 @@ class SebCheckTest extends TestCase
                     'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'HTTP_USER_AGENT' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
                     'HTTP_X_SAFEEXAMBROWSER_REQUESTHASH' => '041548824a66d177c583ec2f584f2fc9b9a85db8d2b5662988228dfd80d9242a',
-                    'HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH' => '0bb0159178965de00b16032d9d3569b10cd386087da40ff2fd082a5db5b7b970',
+                    'HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH' => '8c75e60739c0c4088552b8022bde7361ee60de68c2e1c2ce7bcfc3d9975e9751',
                     'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
                     'HTTP_SEC_CH_UA_MOBILE' => '?0',
                     'HTTP_SEC_CH_UA' => '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
@@ -108,27 +109,28 @@ class SebCheckTest extends TestCase
 
             /* Both Keys weren't provided
              */
-            'Invalid SEB, bek missing' => [
-                [
-                    'HTTP_SEC_FETCH_USER' => '?1',
-                    'HTTP_SEC_FETCH_MODE' => 'navigate',
-                    'HTTP_SEC_FETCH_SITE' => 'same-origin',
-                    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                    'HTTP_USER_AGENT' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
-                    'HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH' => '0bb0159178965de00b16032d9d3569b10cd386087da40ff2fd082a5db5b7b970',
-                    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
-                    'HTTP_SEC_CH_UA_MOBILE' => '?0',
-                    'HTTP_SEC_CH_UA' => '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
-                    'HTTP_CACHE_CONTROL' => 'no-cache',
-                    'HTTP_PRAGMA' => 'no-cache',
-                    'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
-                    'REDIRECT_STATUS' => '200',
-                    'REQUEST_URI' => '/test'
-                ],
-                'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
-                'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f',
-                false
-            ],
+            // TODO: disabling this test as we are not evaluating HTTP_X_SAFEEXAMBROWSER_REQUESTHASH at the moment
+//            'Invalid SEB, bek missing' => [
+//                [
+//                    'HTTP_SEC_FETCH_USER' => '?1',
+//                    'HTTP_SEC_FETCH_MODE' => 'navigate',
+//                    'HTTP_SEC_FETCH_SITE' => 'same-origin',
+//                    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+//                    'HTTP_USER_AGENT' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
+//                    'HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH' => '8c75e60739c0c4088552b8022bde7361ee60de68c2e1c2ce7bcfc3d9975e9751',
+//                    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
+//                    'HTTP_SEC_CH_UA_MOBILE' => '?0',
+//                    'HTTP_SEC_CH_UA' => '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+//                    'HTTP_CACHE_CONTROL' => 'no-cache',
+//                    'HTTP_PRAGMA' => 'no-cache',
+//                    'HTTP_HOST' => 'vagrant.dev.schoolbox.cloud',
+//                    'REDIRECT_STATUS' => '200',
+//                    'REQUEST_URI' => '/test'
+//                ],
+//                'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
+//                'f9d93416762f74970cc7313659e986e9d1518066fb861029d418413661029d2f',
+//                false
+//            ],
 
             'Invalid SEB, config key missing' => [
                 [
