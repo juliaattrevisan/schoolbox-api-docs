@@ -17,6 +17,7 @@ use CFPropertyList\CFPropertyList;
 use CFPropertyList\CFString;
 use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\User;
 
 /**
  * Generate an xml payload for the given IAssessable
@@ -107,10 +108,11 @@ class Payload
      * Generate a seb config, ready to go, for the assessment
      *
      * @param IAssessable $assessment
+     * @param User        $user
      * @return string
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function generate(IAssessable $assessment): string
+    public function generate(IAssessable $assessment, User $user): string
     {
         /* The domain of our schoolbox instance. We need this so students can get past the
          * login screen since we can establish a filtered url https://domain/login*
@@ -124,8 +126,12 @@ class Payload
          *  "Router $router" to "string $route" instead, and have the aura pages generate
          *  the $route and pass it instead of doing it internally
          */
-        $startUrl = $domain . $this->router->generate('learningAssessment.getAssessment', [
-            'assessmentId' => $assessment->getId()
+        $assessmentUrl = $domain . $this->router->generate('learningAssessment.getAssessment', [
+                'assessmentId' => $assessment->getId()
+            ]);
+        $startUrl = $domain . $this->router->generate('learningAssessment.getSummaryViaSeb', [
+            'assessmentId' => $assessment->getId(),
+            'studentId' => $user->getId()
         ]);
 
         $exitUrl = $domain . '/homepage/' . $assessment->getContext()->getFolder()->getId();
@@ -139,6 +145,7 @@ class Payload
          */
         $whitelistUrls = [
             "{$domain}/login*",
+            "{$assessmentUrl}*",
             "{$startUrl}*",
             "{$domain}/assess/*",
             "{$domain}/storage/fetch.php*",
@@ -148,10 +155,14 @@ class Payload
 
         if ($this->config->get('saml_enabled')) {
             $whitelistUrls[] = "{$domain}/saml*";
-            $urlSso          = parse_url(trim($this->config->get('saml_sso_url')));
-            $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/*";
-            $urlIdp          = parse_url(trim($this->config->get('saml_idp_metadata_url')));
-            $whitelistUrls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/*";
+            if (trim($this->config->get('saml_sso_url')) !== '') {
+                $urlSso          = parse_url(trim($this->config->get('saml_sso_url')));
+                $whitelistUrls[] = "{$urlSso['scheme']}://{$urlSso['host']}/*";
+            }
+            if (trim($this->config->get('saml_idp_metadata_url')) !== '') {
+                $urlIdp          = parse_url(trim($this->config->get('saml_idp_metadata_url')));
+                $whitelistUrls[] = "{$urlIdp['scheme']}://{$urlIdp['host']}/*";
+            }
         }
 
         if ($this->config->get('seb_whitelist')) {
@@ -192,13 +203,14 @@ class Payload
      * Generate hash of the dynamic xml for this assessment
      *
      * @param IAssessable $assessment
+     * @param User        $user
      * @return string
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \CFPropertyList\IOException
      * @throws \CFPropertyList\PListException
      * @throws \DOMException
      */
-    public function generateConfigKey(IAssessable $assessment): string
+    public function generateConfigKey(IAssessable $assessment, User $user): string
     {
 
         /* Generate the hash which is concatenated onto the start url,
@@ -213,7 +225,7 @@ class Payload
          * there's something else missing in v3.3.0 of seb and what
          * I've got going here
          */
-        return $this->hash($this->generate($assessment));
+        return $this->hash($this->generate($assessment, $user));
     }
 
 

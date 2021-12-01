@@ -156,7 +156,7 @@ class ListController extends Web\Controller\Base
             $this->router
         );
 
-        $contents = $sebPayload->generate($assessment);
+        $contents = $sebPayload->generate($assessment, $this->getUser());
 
         /* Send as a downloadable file
          */
@@ -206,7 +206,9 @@ class ListController extends Web\Controller\Base
                 $this->getConfigLoader(),
                 $this->getRequest()->server->get('HTTP_HOST'),
                 $this->router
-            ))->generateConfigKey($assessment)
+            ))->generateConfigKey($assessment, $this->getUser()),
+            $assessment,
+            $this->getUser()
         );
     }
 

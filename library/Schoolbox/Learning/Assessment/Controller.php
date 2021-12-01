@@ -16,7 +16,6 @@ use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
-use Schoolbox\Assessment\Course\Import\DataTransferObject;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
@@ -27,6 +26,7 @@ use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
@@ -159,6 +159,31 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $this->redirect($parentUrl ?: $defaultUrl);
+    }
+
+
+    /**
+     * Redirect the standard assessment URL to a user specific version with SEB key
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @throws RouteNotFound
+     * @since 211
+     * @api   GET /learning/assessments/:assessmentId/:userId/seb
+     */
+    public function getSummaryViaSeb(IAssessable $assessment, User $student): void
+    {
+        $defaultUrl = $this->getRouter()->generate(
+            'learningAssessment.getSummary',
+            [
+                'assessmentId' => $assessment->getId(),
+                'studentId'    => $student->getId(),
+            ]
+        );
+
+        if ($_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']) {
+            $defaultUrl .= '?sebkey=' . $_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'];
+        }
+        $this->redirect($defaultUrl);
     }
 
 

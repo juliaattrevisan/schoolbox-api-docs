@@ -178,6 +178,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
 
         $this->register('GET', "$assRoute/$studentParam", 'getSummary', $canViewSummary, $preloadParticipant); // s || p
+        $this->register('GET', "$assRoute/$studentParam/seb", 'getSummaryViaSeb', null, $preloadParticipant); // s || p
         $this->register('GET', "$assRoute/$studentParam/submit", 'getCreateResponseForm', $canSubmit, $preloadParticipant); // p
         $this->register('POST', "$assRoute/$studentParam/submit", 'postCreateResponse', $canSubmit, $preloadParticipant); // p
         $this->register('POST', "$assRoute/$studentParam/received", 'postStatusAcknowledge', $canAckSubmission, $preloadParticipant); // p
