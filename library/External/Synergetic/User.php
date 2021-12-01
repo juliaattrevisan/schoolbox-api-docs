@@ -892,8 +892,8 @@ class External_Synergetic_User implements External_UserInterface
                                   StudentClasses.FileSemester = :currentSemester AND
                                   StudentClasses.FileYear = :currentYear
                 LEFT JOIN         luFileType ON StudentClasses.FileType = luFileType.Code
-                WHERE             StudentClasses.StartDate <= getdate() AND
-                                  (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+                WHERE             StudentClasses.StartDate <= CAST(GETDATE() AS DATE) AND
+                                  (StudentClasses.StopDate >= CAST(GETDATE() AS DATE) OR StudentClasses.StopDate IS NULL)
                                   {$allowedFileTypesSql}
                 ORDER BY          luFileType.Description ASC,
                                   SubjectClasses.Description ASC,
@@ -1070,8 +1070,8 @@ class External_Synergetic_User implements External_UserInterface
                         {$join}
             WHERE       vStaff.ActiveFlag = 1 AND
                         StaffCategoryDescription <> 'Staff on leave' AND
-                        (JobPositions.StaffJobPositionStartDate < GETDATE() OR JobPositions.StaffJobPositionStartDate IS NULL) AND
-                        (JobPositions.StaffJobPositionEndDate > GETDATE() OR JobPositions.StaffJobPositionEndDate IS NULL)
+                        (JobPositions.StaffJobPositionStartDate <= CAST(GETDATE() AS DATE) OR JobPositions.StaffJobPositionStartDate IS NULL) AND
+                        (JobPositions.StaffJobPositionEndDate >= CAST(GETDATE() AS DATE) OR JobPositions.StaffJobPositionEndDate IS NULL)
                         {$filter}
             ORDER BY    vStaff.StaffSurname
         ";
@@ -1388,9 +1388,9 @@ class External_Synergetic_User implements External_UserInterface
          */
         $query = "
             SELECT
-                NULL AS id, 
-                StudentPreferred AS firstname, 
-                StudentSurname AS lastname, 
+                NULL AS id,
+                StudentPreferred AS firstname,
+                StudentSurname AS lastname,
                 StudentYearLevelDescription AS yearLevel,
                 StudentHouseDescription AS house,
                 StudentID AS external_id,
@@ -1398,8 +1398,8 @@ class External_Synergetic_User implements External_UserInterface
                 vPhotos.ModifiedDate AS redact_photo_modified_at
             FROM vStudents
             LEFT JOIN vPhotos ON vStudents.StudentID = vPhotos.ID
-            WHERE 
-                FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+            WHERE
+                FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                 FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
             ORDER BY vPhotos.ModifiedDate DESC
         ";

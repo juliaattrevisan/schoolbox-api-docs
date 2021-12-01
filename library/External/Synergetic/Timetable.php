@@ -758,8 +758,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 Timetable.DayNumber = {$dayNumber} AND
                 Timetable.TimetableGroup = '$campusString' AND
                 {$allowedFileTypeSql}
-                StudentClasses.StartDate <= getdate() AND
-                (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL))
+                StudentClasses.StartDate <= CAST(GETDATE() AS DATE) AND
+                (StudentClasses.StopDate >= CAST(GETDATE() AS DATE) OR StudentClasses.StopDate IS NULL))
                 ORDER BY Timetable.PeriodNumber";
         } else {
             $query = "SELECT Timetable.Room, SubjectClasses.Description,
@@ -840,7 +840,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         Timetable.TimetableGroup = {$campusString} AND
                         {$allowedFileTypesSql}
                         (StudentClasses.ID = {$externalUserId}))
-                        AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+                        AND StudentClasses.StartDate <= CAST(GETDATE() AS DATE) AND (StudentClasses.StopDate >= CAST(GETDATE() AS DATE) OR StudentClasses.StopDate IS NULL)
                         AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . '
                     ORDER BY Timetable.PeriodNumber, Timetable.DayNumber';
         } else {

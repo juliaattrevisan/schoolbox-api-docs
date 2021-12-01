@@ -74,7 +74,7 @@ class Sync extends Base implements ISync
                 FROM student AS s
                 LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
                 WHERE s.cmpy_code = :companyCode
-                AND   (s.dol IS NULL OR s.dol >= getdate())
+                AND   (s.dol IS NULL OR s.dol >= CAST(GETDATE() AS DATE))
             ",
             ['companyCode' => $this->companyCode]
         );

@@ -204,8 +204,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                                 AND ttmast.tt_id = :timetableCode
                                 AND studsub.stud_code = :externalId
                                 AND day_code = :dayNumber
-                                AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
-                                AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
+                                AND (studsub.from_date <= CAST(GETDATE() AS DATE) OR studsub.from_date IS NULL)
+                                AND (studsub.to_date >= CAST(GETDATE() AS DATE) OR studsub.to_date IS NULL)
                         ORDER BY prd_code';
         } else {
             $query = 'SELECT room_code, tch_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
@@ -298,8 +298,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                                     AND ttmast.cmpy_code = :cmpyCode
                                     AND ttmast.tt_id = :timetableCode
                                     AND studsub.stud_code = :externalId
-                                    AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
-                                    AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
+                                    AND (studsub.from_date <= CAST(GETDATE() AS DATE) OR studsub.from_date IS NULL)
+                                    AND (studsub.to_date >= CAST(GETDATE() AS DATE) OR studsub.to_date IS NULL)
                             ORDER BY prd_code, day_code';
         } else {
             $query = 'SELECT room_code, tch_code, day_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc

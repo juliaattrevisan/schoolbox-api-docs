@@ -46,8 +46,8 @@ class External_Synergetic_Smcs_Class extends External_Synergetic_Class
         WHERE $classQuery
             AND (StudentClasses.FileYear={$fileYear})
             AND (StudentClasses.FileSemester={$fileSemester})
-            AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
-            AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+            AND (StudentClasses.StartDate <= CAST(GETDATE() AS DATE) OR StudentClasses.StartDate IS NULL)
+            AND (StudentClasses.StopDate >= CAST(GETDATE() AS DATE) OR StudentClasses.StopDate IS NULL)
         ORDER BY StudentClasses.StudentSurname, StudentClasses.StudentPreferred";
 
         return $this->clearInvalidValues(

@@ -444,8 +444,8 @@ class External_Tass_User implements External_UserInterface
                     WHERE studsub.stud_code = {$this->database->legacyQuote($externalId)}
                     AND semester = {$this->database->legacyQuote($this->getCurrentSemester($externalId))}
                     AND yr_study = {$this->database->legacyQuote($this->getCurrentYear($externalId))}
-                    AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
-                    AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
+                    AND (studsub.from_date <= CAST(GETDATE() AS DATE) OR studsub.from_date IS NULL)
+                    AND (studsub.to_date >= CAST(GETDATE() AS DATE) OR studsub.to_date IS NULL)
                     ORDER BY studsub.sub_code ASC, studsub.class ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
@@ -528,7 +528,7 @@ class External_Tass_User implements External_UserInterface
                 LEFT JOIN student as s
                     ON p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-                    AND (s.dol IS NULL OR s.dol >= getdate())
+                    AND (s.dol IS NULL OR s.dol >= CAST(GETDATE() AS DATE))
                 WHERE sf.par_code = {$this->database->legacyQuote($parentCode)}
                 AND   sf.sfa_num  = {$this->database->legacyQuote($parentNum)}
             ";
@@ -573,7 +573,7 @@ class External_Tass_User implements External_UserInterface
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
                 WHERE s.par_code = {$this->database->legacyQuote($id)}
-                AND (s.dol IS NULL OR s.dol >= getdate())
+                AND (s.dol IS NULL OR s.dol >= CAST(GETDATE() AS DATE))
             ";
             $params = [];
             if ($commrules) {
