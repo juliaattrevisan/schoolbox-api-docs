@@ -8,14 +8,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Comment\Translator;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\GetRouteIfAuthorized;
 use Alaress\HTMLPurifier\IPurifier;
+use Aura\Router\Router;
 use Schoolbox\Pastoral\Comment\Model;
+use Schoolbox\User;
 
 /**
  * Model-to-array translator for pastoral comments.
  */
 class ModelToArray
 {
+    use GetRouteIfAuthorized;
+
     /**
      * User translator, for translating the comment's owner.
      *
@@ -24,18 +30,30 @@ class ModelToArray
     private $userTranslator;
 
     /**
-     * HTML purifier adapter
+     * HTML purifier adapter, for sanitizing the body of the comment.
      */
     private IPurifier $purifier;
 
     /**
      * Constructor
      *
-     * @param callable $userTranslator
+     * @param callable   $userTranslator
+     * @param Router     $router
+     * @param Authorizer $authorizer
+     * @param User       $currentUser
+     * @param IPurifier  $purifier
      */
-    public function __construct(callable $userTranslator, IPurifier $purifier)
-    {
+    public function __construct(
+        callable $userTranslator,
+        Router $router,
+        Authorizer $authorizer,
+        User $currentUser,
+        IPurifier $purifier
+    ) {
         $this->userTranslator = $userTranslator;
+        $this->router         = $router;
+        $this->authorizer     = $authorizer;
+        $this->currentUser    = $currentUser;
         $this->purifier       = $purifier;
     }
 
@@ -65,6 +83,17 @@ class ModelToArray
                 : null,
             'isDeleted'    => $model->isDeleted(),
             'private'      => $model->getPrivate(),
+            '_links'       => [
+                'delete' => $this->getRouteIfAuthorized(
+                    'pastoral.postCommentDelete',
+                    [
+                        'record'    => $model->getPastoral(),
+                        'recordId'  => $model->getPastoral()->getId(),
+                        'comment'   => $model,
+                        'commentId' => $model->getId(),
+                    ],
+                ),
+            ],
         ];
     }
 }

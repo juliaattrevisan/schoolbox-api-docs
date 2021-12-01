@@ -500,6 +500,9 @@ class Controller extends Base
 
         $commentsTranslator = new Comment\Translator\ModelToArray(
             new User\Translator\Author\ModelToArray(),
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
             new ScrubAdapter(),
         );
         $commentsPublic     = $record->getComments()->filterBy('private', false);
