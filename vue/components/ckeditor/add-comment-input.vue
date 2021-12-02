@@ -141,7 +141,6 @@ export default {
          */
         getVueSpecificConfig () {
             return {
-                targetElements: $(`#comment-${this.uniqueId}`),
                 on: {
                     change: () => { // Bind the content of CKEditor into the comment model on change
                         this.newComment = CKEDITOR.instances[`comment-${this.uniqueId}`].getData(); 
@@ -150,7 +149,9 @@ export default {
                         this.isCKEditorLoading = false;
                         this.isCKEditorLoaded = true;
                     }
-                }
+                },
+                startupFocus: true,
+                targetElements: $(`#comment-${this.uniqueId}`),
             }
         },
 

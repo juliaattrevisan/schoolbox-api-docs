@@ -56,7 +56,7 @@ export default {
         }
     },
 
-    mounted () {
+    created () {
         this.comments = [...this.initialComments]; //as we could be manipulating the comments further, store as data
     },
 
@@ -188,8 +188,8 @@ export default {
                         @on-post-comment="postComment"
                     />
 
-                    <ul class="information-list">
-                        <li v-for="comment in comments" :key="comment.id" class="actions-small-1">
+                    <transition-group class="information-list" name="list-complete" tag="ul">    
+                        <li v-for="comment in comments" :key="comment.id" class="actions-small-1 list-complete-item">
                             <div class="list-item">
                                 <div class="card compact small-12">
                                     <a :href="comment.owner._links.profile" title="View Profile">
@@ -204,7 +204,7 @@ export default {
                             </nav>
                             <media-article v-html="comment.body"></media-article>
                         </li>
-                    </ul>
+                    </transition-group>
 
                 </div>
 
@@ -228,5 +228,18 @@ export default {
 </template>
 
 <style scoped>
+
+.list-complete-item {
+    transition: opacity 0.5s, transform 0.5s;
+}
+
+.list-complete-enter, .list-complete-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.list-complete-leave-active {
+    position: absolute;
+}
 
 </style>
