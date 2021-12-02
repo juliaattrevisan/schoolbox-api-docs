@@ -730,16 +730,12 @@ class Controller extends Base
     public function postCommentInsert(): void
     {
         $post = $this->getRequest()->post;
-//        $hash = '';
-
         try {
             $record = $this->pastoralDataSource->findById($this->getUser(), $post['pastoral_id']);
 
             if (!empty(trim($post["comment_body"]))) {
                 // Insert the comment to the internal database
-
                 $comment = $this->pastoralCommentMapper->createModel();
-
                 $comment->setPastoral($record);
                 $comment->setBody(trim($post["comment_body"]));
                 $comment->setOwner($this->getUser());
@@ -747,7 +743,6 @@ class Controller extends Base
                 $this->pastoralCommentMapper->save($comment);
 
                 // Insert the comment to the external database
-
                 $pastoralExternal = new External_Pastoral();
                 $pastoralExternal->createComment($comment);
 
@@ -757,22 +752,9 @@ class Controller extends Base
                         call_user_func($this->pastoralCommentTranslator, $comment)
                     )
                 );
-
-//                /* If you posted a confidential comment, go back and open the confidential tab
-//                 */
-//                $hash = "#{$comment->getPanel()}";
+            } else {
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
             }
-
-//            // Go back to pastoral record
-//            $this->getResponse()->redirect->afterPost(
-//                $this->getrouter()->generate(
-//                    'pastoral.getStudentRecord',
-//                    [
-//                        'studentId' => $post['student_id'],
-//                        'recordId'  => $record->getId(),
-//                    ]
-//                ) . $hash
-//            );
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
