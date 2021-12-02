@@ -17,6 +17,7 @@ use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -180,8 +181,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]
         );
 
-        if ($_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']) {
-            $defaultUrl .= '?sebkey=' . $_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'];
+        if ($this->getRequest()->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH')) {
+            $sebPayload = new Payload(
+                $this->getConfigLoader(),
+                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->router
+            );
+
+            $onetimeKey = $sebPayload->getOneTimeKey($assessment->getId(), $student->getId(), $this->getRequest()->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'));
+
+//            $defaultUrl .= '?sebkey=' . $_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'];
+            $defaultUrl .= sprintf('?%s=%s', $sebPayload::ONETIME_KEY, $onetimeKey);
         }
         $this->redirect($defaultUrl);
     }

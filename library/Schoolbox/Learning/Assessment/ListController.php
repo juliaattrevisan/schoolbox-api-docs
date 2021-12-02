@@ -16,7 +16,6 @@ use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
 use LogicException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -194,6 +193,11 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
+        $sebPayload = new SebPayload(
+            $this->getConfigLoader(),
+            $this->getRequest()->server->get('HTTP_HOST'),
+            $this->router
+        );
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
             $this->getRequest()->server->getArrayCopy(),
             /* Don't worry about the Browser Exam Key for now
@@ -202,11 +206,8 @@ class ListController extends Web\Controller\Base
             'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
             /* Generate a config key hash from the xml that guards this assessment url
              */
-            (new SebPayload(
-                $this->getConfigLoader(),
-                $this->getRequest()->server->get('HTTP_HOST'),
-                $this->router
-            ))->generateConfigKey($assessment, $this->getUser())
+            $sebPayload->generateConfigKey($assessment, $this->getUser()),
+            $sebPayload->getConfigKeyHash($assessment->getId(), $this->getUser()->getId(), $this->request->query->get($sebPayload::ONETIME_KEY))
         );
     }
 

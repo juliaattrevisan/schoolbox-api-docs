@@ -15,7 +15,7 @@ use CFPropertyList\CFDate;
 use CFPropertyList\CFDictionary;
 use CFPropertyList\CFPropertyList;
 use CFPropertyList\CFString;
-use Schoolbox\Config\Loader;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
@@ -78,24 +78,28 @@ class Payload
     private Router $router;
 
     /**
-     * @var Loader
+     * @var IConfigLoader
      */
-    private Loader $config;
+    private IConfigLoader $config;
 
     /**
      * A random 4 character unicode string to replace backslashes during json_encode.
      */
     private const BACKSLASH_SUBSTITUTE = "ؼҷҍԴ";
 
+    /**
+     * request parameter name to pass onetime key
+     */
+    public const ONETIME_KEY = 'sebKey';
 
     /**
      * Constructor.
      *
-     * @param Loader $config
+     * @param IConfigLoader $config
      * @param string $host
      * @param Router $router
      */
-    public function __construct(Loader $config, string $host, Router $router)
+    public function __construct(IConfigLoader $config, string $host, Router $router)
     {
         $this->saltBasis = (string)$config->get('site_school_code');
         $this->host = $host;
@@ -228,6 +232,57 @@ class Payload
         return $this->hash($this->generate($assessment, $user));
     }
 
+    /**
+     * Store configKeyHash in a tmp file and return one time key for the tmp file
+     * @param int    $assessmentId
+     * @param int    $userId
+     * @param string $configKeyHash HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH
+     * @return string
+     */
+    public function getOneTimeKey(int $assessmentId, int $userId, string $configKeyHash): string
+    {
+        $onetimeKey     = uniqid((string)mt_rand());
+        $sebKeyFileName = $this->getConfigKeyHashFileName($assessmentId, $userId, $onetimeKey);
+        $fp             = fopen($sebKeyFileName, 'w');
+        fputs($fp, $configKeyHash);
+        fclose($fp);
+        return $onetimeKey;
+    }
+
+    /**
+     * Read tmp file storing configKeyHash and return it
+     * @param int         $assessmentId
+     * @param int         $userId
+     * @param string|null $onetimeKey
+     * @return string|null
+     */
+    public function getConfigKeyHash(int $assessmentId, int $userId, ?string $onetimeKey): ?string
+    {
+        if (!$onetimeKey) {
+            return null;
+        }
+
+        $fileName = $this->getConfigKeyHashFileName($assessmentId, $userId, $onetimeKey);
+        if (file_exists($fileName)) {
+            $configKeyHash = file_get_contents($fileName);
+            unlink($fileName);
+            if ($configKeyHash) {
+                return $configKeyHash;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param int    $assessmentId
+     * @param int    $userId
+     * @param string $onetimeKey
+     * @return string
+     */
+    private function getConfigKeyHashFileName(int $assessmentId, int $userId, string $onetimeKey): string
+    {
+        return sprintf("/tmp/sebKey_%s_%d_%d_%d", $this->host, $assessmentId, $userId, $onetimeKey);
+    }
 
     /**
      * Hash an xml into whatever format was required
