@@ -22,6 +22,7 @@ Usage:
 } only %}
 
 {% autoescape 'js' %}
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js"></script>
     <script type="text/javascript">
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function() {
