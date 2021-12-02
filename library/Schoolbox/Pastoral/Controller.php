@@ -139,36 +139,42 @@ class Controller extends Base
     /** TermMapper */
     private TermMapper $termMapper;
 
+    /**
+     * Pastoral comment translator
+     */
+    private Comment\Translator\ModelToArray $pastoralCommentTranslator;
+
     const ATTACHZONE_PRIVATE = 'private';
     const ATTACHZONE_PUBLIC  = 'public';
 
     /**
      * Constructor
      *
-     * @param IConfigLoader              $config
-     * @param FileMapper                 $fileMapper
-     * @param PastoralDataSource         $pastoralDataSource
-     * @param UserAccessMapper           $userAccessMapper
-     * @param PastoralAuditMapper        $pastoralAuditMapper
-     * @param PastoralSubTypeMapper      $pastoralSubTypeMapper
-     * @param PastoralTypeMapper         $pastoralTypeMapper
-     * @param PastoralUploadQueueMapper  $pastoralUploadQueueMapper
-     * @param PastoralSeverityMapper     $pastoralSeverityMapper
-     * @param PastoralRevisionDataSource $pastoralRevisionDataSource
-     * @param PastoralTagMapper          $pastoralTagMapper
-     * @param PastoralActionMapper       $pastoralActionMapper
-     * @param RecordAction\Mapper        $pastoralRecordActionMapper
-     * @param PastoralCommentMapper      $pastoralCommentMapper
-     * @param PastoralAttachmentMapper   $pastoralAttachmentMapper
-     * @param RoleMapper                 $roleMapper
-     * @param UserMapper                 $userMapper
-     * @param PastoralAccessMapper       $pastoralAccessMapper
-     * @param PastoralGroupMapper        $pastoralGroupMapper
-     * @param PastoralGroupMemberMapper  $pastoralGroupMemberMapper
-     * @param ErrorMapper                $errorMapper
-     * @param PastoralReportMapper       $pastoralReportMapper
-     * @param Audience\Mapper            $audienceMapper ;
-     * @param TermMapper                 $termMapper
+     * @param IConfigLoader                   $config
+     * @param FileMapper                      $fileMapper
+     * @param PastoralDataSource              $pastoralDataSource
+     * @param UserAccessMapper                $userAccessMapper
+     * @param PastoralAuditMapper             $pastoralAuditMapper
+     * @param PastoralSubTypeMapper           $pastoralSubTypeMapper
+     * @param PastoralTypeMapper              $pastoralTypeMapper
+     * @param PastoralUploadQueueMapper       $pastoralUploadQueueMapper
+     * @param PastoralSeverityMapper          $pastoralSeverityMapper
+     * @param PastoralRevisionDataSource      $pastoralRevisionDataSource
+     * @param PastoralTagMapper               $pastoralTagMapper
+     * @param PastoralActionMapper            $pastoralActionMapper
+     * @param RecordAction\Mapper             $pastoralRecordActionMapper
+     * @param PastoralCommentMapper           $pastoralCommentMapper
+     * @param PastoralAttachmentMapper        $pastoralAttachmentMapper
+     * @param RoleMapper                      $roleMapper
+     * @param UserMapper                      $userMapper
+     * @param PastoralAccessMapper            $pastoralAccessMapper
+     * @param PastoralGroupMapper             $pastoralGroupMapper
+     * @param PastoralGroupMemberMapper       $pastoralGroupMemberMapper
+     * @param ErrorMapper                     $errorMapper
+     * @param PastoralReportMapper            $pastoralReportMapper
+     * @param Audience\Mapper                 $audienceMapper
+     * @param TermMapper                      $termMapper
+     * @param Comment\Translator\ModelToArray $pastoralCommentTranslator
      */
     public function __construct(
         IConfigLoader $config,
@@ -194,7 +200,8 @@ class Controller extends Base
         ErrorMapper $errorMapper,
         PastoralReportMapper $pastoralReportMapper,
         Audience\Mapper $audienceMapper,
-        TermMapper $termMapper
+        TermMapper $termMapper,
+        Comment\Translator\ModelToArray $pastoralCommentTranslator
     ) {
         $this->config                     = $config;
         $this->errorMapper                = $errorMapper;
@@ -220,6 +227,7 @@ class Controller extends Base
         $this->pastoralReportMapper       = $pastoralReportMapper;
         $this->audienceMapper             = $audienceMapper;
         $this->termMapper                 = $termMapper;
+        $this->pastoralCommentTranslator  = $pastoralCommentTranslator;
     }
 
 
@@ -498,13 +506,6 @@ class Controller extends Base
             }
         }
 
-        $commentsTranslator = new Comment\Translator\ModelToArray(
-            new User\Translator\Author\ModelToArray(),
-            $this->router,
-            $this->authorizer,
-            $this->getUser(),
-            new ScrubAdapter(),
-        );
         $commentsPublic     = $record->getComments()->filterBy('private', false);
         $commentsPrivate    = $record->getComments()->filterBy('private', true);
 
@@ -526,8 +527,8 @@ class Controller extends Base
                     'record'             => $record,
                     'attachmentsPublic'  => $attachmentsPublic,
                     'attachmentsPrivate' => $attachmentsPrivate,
-                    'commentsPublic'     => $commentsPublic->map($commentsTranslator)->reindex(),
-                    'commentsPrivate'    => $commentsPrivate->map($commentsTranslator)->reindex(),
+                    'commentsPublic'     => $commentsPublic->map($this->pastoralCommentTranslator)->reindex(),
+                    'commentsPrivate'    => $commentsPrivate->map($this->pastoralCommentTranslator)->reindex(),
                     'moderator'          => $moderator,
                     'user'               => $this->getUser(),
                     'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
