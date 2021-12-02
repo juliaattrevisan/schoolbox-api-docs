@@ -136,7 +136,7 @@ class ConfigMapper extends Mapper
     public const NAME_JWT_LEEWAY      = 'jwt_leeway';
     public const NAME_ETHERPAD_HOST   = 'etherpad_host';
 
-    public const NAME_SITE_VERSION = 'site_version';
+    public const NAME_SITE_PACKAGE = 'site_package';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
     public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
 
