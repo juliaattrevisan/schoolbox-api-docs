@@ -723,40 +723,35 @@ class Controller extends Base
     /**
      * Add a comment to a pastoral record
      *
+     * @param Model $record
+     *
      * @throws SchoolboxException
-     * @throws RouteNotFound
      * @throws Exception
      */
-    public function postCommentInsert(): void
+    public function postCommentInsert(Model $record): void
     {
         $post = $this->getRequest()->post;
-        try {
-            $record = $this->pastoralDataSource->findById($this->getUser(), $post['pastoral_id']);
+        if (!empty(trim($post["comment_body"]))) {
+            // Insert the comment to the internal database
+            $comment = $this->pastoralCommentMapper->createModel();
+            $comment->setPastoral($record);
+            $comment->setBody(trim($post["comment_body"]));
+            $comment->setOwner($this->getUser());
+            $comment->setPrivate($post["comment_private"]);
+            $this->pastoralCommentMapper->save($comment);
 
-            if (!empty(trim($post["comment_body"]))) {
-                // Insert the comment to the internal database
-                $comment = $this->pastoralCommentMapper->createModel();
-                $comment->setPastoral($record);
-                $comment->setBody(trim($post["comment_body"]));
-                $comment->setOwner($this->getUser());
-                $comment->setPrivate($post["comment_private"]);
-                $this->pastoralCommentMapper->save($comment);
+            // Insert the comment to the external database
+            $pastoralExternal = new External_Pastoral();
+            $pastoralExternal->createComment($comment);
 
-                // Insert the comment to the external database
-                $pastoralExternal = new External_Pastoral();
-                $pastoralExternal->createComment($comment);
-
-                // Post a JSON response
-                $this->response->content->set(
-                    $this->buildJsonOutput(
-                        call_user_func($this->pastoralCommentTranslator, $comment)
-                    )
-                );
-            } else {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-            }
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+            // Post a JSON response
+            $this->response->content->set(
+                $this->buildJsonOutput(
+                    call_user_func($this->pastoralCommentTranslator, $comment)
+                )
+            );
+        } else {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
 
