@@ -730,7 +730,7 @@ class Controller extends Base
     public function postCommentInsert(): void
     {
         $post = $this->getRequest()->post;
-        $hash = '';
+//        $hash = '';
 
         try {
             $record = $this->pastoralDataSource->findById($this->getUser(), $post['pastoral_id']);
@@ -751,21 +751,28 @@ class Controller extends Base
                 $pastoralExternal = new External_Pastoral();
                 $pastoralExternal->createComment($comment);
 
-                /* If you posted a confidential comment, go back and open the confidential tab
-                 */
-                $hash = "#{$comment->getPanel()}";
+                // Post a JSON response
+                $this->response->content->set(
+                    $this->buildJsonOutput(
+                        call_user_func($this->pastoralCommentTranslator, $comment)
+                    )
+                );
+
+//                /* If you posted a confidential comment, go back and open the confidential tab
+//                 */
+//                $hash = "#{$comment->getPanel()}";
             }
 
-            // Go back to pastoral record
-            $this->getResponse()->redirect->afterPost(
-                $this->getrouter()->generate(
-                    'pastoral.getStudentRecord',
-                    [
-                        'studentId' => $post['student_id'],
-                        'recordId'  => $record->getId(),
-                    ]
-                ) . $hash
-            );
+//            // Go back to pastoral record
+//            $this->getResponse()->redirect->afterPost(
+//                $this->getrouter()->generate(
+//                    'pastoral.getStudentRecord',
+//                    [
+//                        'studentId' => $post['student_id'],
+//                        'recordId'  => $record->getId(),
+//                    ]
+//                ) . $hash
+//            );
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
