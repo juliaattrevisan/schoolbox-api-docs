@@ -670,6 +670,9 @@ class Kernel extends WebKernelAbstract
         $sessionHandler = new \Session();
         $sessionHandler->create($user->getUsername());
 
+        // Also: override the DI user with this user?
+        $this->di->set('user', $user);
+
         // Restore or destroy the session when all is done
         $this->getShutdownHandler()->registerFunction(
             function () use ($sessionHandler, $currentSessionData) {
