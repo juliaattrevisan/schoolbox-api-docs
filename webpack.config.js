@@ -82,10 +82,6 @@ module.exports = {
             // Confirm Dialog
             './www/static/js/popup/jquery.confirm-dialog.js',
 
-            // Data tables
-            './node_modules/datatables.net/js/jquery.dataTables.js',
-            './node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
-
             // Toasts, popups to notify something has happened
             './www/static/js/popup/jquery.toast-timeout.js',
 
@@ -140,6 +136,13 @@ module.exports = {
                 // homepage editing
                 './www/static/js/masonry/jquery.masonry.js',
                 './www/static/js/masonry/jquery.masonry.spectrum.js'
+            ],
+            dependOn: 'main' //ensures jQuery is loaded prior
+        },
+        dataTables: {
+            import: [
+                './node_modules/datatables.net/js/jquery.dataTables.js',
+                './node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
