@@ -38,10 +38,6 @@ export default {
             type: Array,
             required: true,
         },
-        pastoralId: { //to know where to post comments to
-            type: Number,
-            required: true,
-        },
         recordType: { //can be either 'public' or 'private'
             type: String,
             required: true,
@@ -74,7 +70,7 @@ export default {
         },
 
         /**
-         * Post a comment
+         * Post a comment and add it into the list if successful, otherwise display error
          *
          * @param { String }
          */
@@ -98,7 +94,7 @@ export default {
         },
 
         /**
-         *To send with the postComment request
+         * To send with the postComment request
          *
          * @returns { FormData }
          */
@@ -204,7 +200,7 @@ export default {
                                 </div>
                             </div>
                             <nav v-if="comment._links.delete">
-                                <a @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
+                                <a @click.prevent="showDeleteModal(comment)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
                             </nav>
                             <media-article v-html="comment.body"></media-article>
                         </li>
