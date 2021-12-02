@@ -86,7 +86,12 @@ export default {
                     method: 'POST',
                     body: this.getPostCommentFormData(newComment),
                 });
-                //put the new comment into the top of the list
+
+                // Put the new comment into the top of the list
+                const json = await response.json();
+                this.comments.unshift(json);
+
+                // Toast
                 this.$refs.toast.timeout('Comment posted', true, 2000);
             } catch (error) {
                 console.warn(error);
