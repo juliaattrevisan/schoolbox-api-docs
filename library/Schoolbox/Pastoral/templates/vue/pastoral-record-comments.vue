@@ -38,8 +38,8 @@ export default {
             type: Array,
             required: true,
         },
-        record: { //to know where to post comments to
-            type: Object,
+        pastoralId: { //to know where to post comments to
+            type: Number,
             required: true,
         },
         recordType: { //can be either 'public' or 'private'
@@ -86,12 +86,8 @@ export default {
                     method: 'POST',
                     body: this.getPostCommentFormData(newComment),
                 });
-
-                // Put the new comment into the top of the list
-                const json = await response.json();
-                this.comments.unshift(json);
-
-                // Toast
+                const addedComment = await response.json();
+                this.comments = [addedComment, ...this.comments];
                 this.$refs.toast.timeout('Comment posted', true, 2000);
             } catch (error) {
                 console.warn(error);
@@ -109,8 +105,6 @@ export default {
         getPostCommentFormData (newComment) {
             const formData = new FormData();
             formData.append('comment_body', newComment);
-            formData.append('pastoral_id', '6');
-            formData.append('student_id', '13');
             if (this.recordType === 'private') {
                formData.append('comment_private', '1');
             }
@@ -135,7 +129,7 @@ export default {
             this.isProcessing = true;
             try {
                 this.$refs.toast.activate('Deleting comment...');
-                await fetch(`/pastoral/record/${this.commentToDelete.pastoral.id}/comment/${this.commentToDelete.id}/delete`, {
+                await fetch(this.commentToDelete._links.delete, {
                     method: 'POST'
                 });
                 this.comments = this.comments.filter((comment) => comment.id !== this.commentToDelete.id); //pull out from the comment list
@@ -209,9 +203,8 @@ export default {
                                     </a>
                                 </div>
                             </div>
-                            <nav>
-                                <!-- <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a> -->
-                                <a @click.prevent="showDeleteModal(comment)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
+                            <nav v-if="comment._links.delete">
+                                <a @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
                             </nav>
                             <media-article v-html="comment.body"></media-article>
                         </li>

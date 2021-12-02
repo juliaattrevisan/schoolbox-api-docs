@@ -25,7 +25,7 @@
                 comment-heading="{{ commentHeading }}"
                 comment-insert-route="{{ commentInsertRoute }}"
                 :initial-comments="{{ comments|json_encode }}"
-                :record="{{ record|json_encode }}"
+                :pastoral-id="{{ record.id }}"
                 record-type="{{ recordType }}"
                 site-version="{{ config.site_version }}"
             />
@@ -38,7 +38,7 @@
                 comment-heading="{{ commentHeading }}"
                 comment-insert-route="{{ commentInsertRoute }}"
                 :initial-comments="{{ comments|json_encode }}"
-                :record="{{ record|json_encode }}"
+                :pastoral-id="{{ record.id }}"
                 record-type="{{ recordType }}"
                 site-version="{{ config.site_version }}"
             />
