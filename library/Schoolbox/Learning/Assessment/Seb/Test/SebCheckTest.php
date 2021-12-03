@@ -35,11 +35,12 @@ class SebCheckTest extends TestCase
         string $configKey,
         bool $expected
     ): void {
-        $_GET['sebkey'] = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? '';
+        $actualConfig = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? '';
         $outcome = (new ValidSebCheck())->isSatisfiedBy(
             $serverSuperglobal,
             $browserExamKey,
-            $configKey
+            $configKey,
+            $actualConfig
         );
 
         /* There are other assertions that you can try (ctrl-click to follow)
