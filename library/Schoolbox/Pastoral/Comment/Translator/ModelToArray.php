@@ -75,9 +75,14 @@ class ModelToArray
             'owner'        => call_user_func($this->userTranslator, $model->getOwner()),
             'body'         => $this->purifier->purify($model->getBody()),
             'externalCode' => $model->getExternalCode(),
+            // For now we don't trust that createdAt isn't null.
+            // This will disappear once `Alaress_Date_NullDate`
+            // (and likely `Alaress_Date_Format` itself) disappears.
+            // @phpstan-ignore-next-line
             'createdAt'    => $model->getCreatedAt() && !$model->getCreatedAt()->isNull()
                 ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM)
                 : null,
+            // @phpstan-ignore-next-line
             'updatedAt'    => $model->getUpdatedAt() && !$model->getUpdatedAt()->isNull()
                 ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM)
                 : null,
