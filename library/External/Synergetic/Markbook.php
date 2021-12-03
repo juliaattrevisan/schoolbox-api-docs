@@ -157,13 +157,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        if (
-            $this->insertMarkbooksIfNotExists(
-                $assessment,
-                $folderCodes,
-                $this->getSystemFileYear(),
-                $this->getSystemFileSemester()
-            )
+        if ($this->insertMarkbooksIfNotExists(
+            $assessment,
+            $folderCodes,
+            $this->getSystemFileYear(),
+            $this->getSystemFileSemester()
+        )
         ) {
             return true;
         } else {
@@ -338,12 +337,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param IFeedback $feedback
      * @return bool
      * @throws \Alaress\Database\Exception
-     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws UnderflowException
      */
     public function syncFeedback(IFeedback $feedback): bool
     {
         if (!$this->isSyncable($feedback->getAssessable())) {
-            return false;
+            throw new InvalidArgumentException('Unable to sync this assessment type because it is a specification or unsupported');
         }
 
         $student = $feedback->getReviewee();
@@ -353,13 +353,17 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // * Student's ID is invalid
         // * Marker's ID is invalid
         if (!$this->isExternalIdValid($student->getExternalId())) {
-            return false;
+            throw new InvalidArgumentException('Student (' . $student->getUsername() . ') has an invalid external ID: ' . $student->getExternalId());
         }
         if (!$this->isExternalIdValid($marker->getExternalId())) {
-            return false;
+            throw new InvalidArgumentException('Provider of feedback (' . $marker->getUsername() . ') has invalid external ID: ' . $marker->getExternalId());
         }
 
-        return $this->setActivityMark($feedback);
+        if ($this->setActivityMark($feedback)) {
+            return true;
+        } else {
+            throw new UnderflowException('Nothing was sync because student not enrolled in class: '.$feedback->getAssessable()->getBaseContext()->getFolder()->getCodeString());
+        }
     }
 
 
@@ -591,12 +595,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
             // Ignore markbooks if the student is not involved in them
-            if (
-                !in_array(
-                    $this->normalizeClassCode($assessmentRemote['ClassCode']),
-                    $markbookFolderCodes,
-                    true
-                )
+            if (!in_array(
+                $this->normalizeClassCode($assessmentRemote['ClassCode']),
+                $markbookFolderCodes,
+                true
+            )
             ) {
                 continue;
             }
@@ -875,15 +878,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $resultType           = $this->getResultType($activity);
         $isCreated            = false;
         foreach ($codesNotInRemote as $folderCode) {
-            if (
-                $this->insertStaffMarkbook(
-                    $activity,
-                    $owner,
-                    $folderCode,
-                    $resultType,
-                    $fileYear,
-                    $fileSemester
-                )
+            if ($this->insertStaffMarkbook(
+                $activity,
+                $owner,
+                $folderCode,
+                $resultType,
+                $fileYear,
+                $fileSemester
+            )
             ) {
                 $isCreated = true;
             }
