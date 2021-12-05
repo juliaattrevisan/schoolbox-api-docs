@@ -116,6 +116,11 @@
         </section>
         {% if isEditable %}
             <input type="submit" value="Save"/>
+            <div id="save-admin-settings-container">
+                <save-admin-settings
+                />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
         {% endif %}
     </form>
 </div>

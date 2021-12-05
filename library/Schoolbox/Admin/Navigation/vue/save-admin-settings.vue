@@ -5,9 +5,19 @@
  * and ajax rather than the entire page refresh
  */
 
+import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+
 export default {
 
-   
+    components: {
+        BottomDrawer
+    },
+
+    data () {
+        return { 
+            hasFormDataChange: false,
+        }
+    },
 
 }
 
