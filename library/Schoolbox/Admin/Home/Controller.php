@@ -692,7 +692,7 @@ class Controller extends Base
             STREAM_CLIENT_CONNECT,
             $streamContext
         );
-        $response = @stream_context_get_params($client);
+        $response = stream_context_get_params($client);
         $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
 
         // Check cert is issued by LetsEncrypt for exact hostname
