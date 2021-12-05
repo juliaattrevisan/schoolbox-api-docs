@@ -34,6 +34,7 @@ use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 use Schoolbox\Version\Version;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
 use Schoolbox\Notif\MQ;
+use Schoolbox\Url\Factory;
 use UnexpectedValueException;
 
 use function array_column;
@@ -681,8 +682,10 @@ class Controller extends Base
             ]
         );
         $timeout = 4.0;
+        $host = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $host = str_replace('https://', '', $host);
         $client = stream_socket_client(
-            sprintf("ssl://%s:443", $_SERVER['HTTP_HOST']),
+            sprintf('ssl://%s:443', $host),
             $errorNumber,
             $errorDescription,
             $timeout,
@@ -698,7 +701,7 @@ class Controller extends Base
             $isCustomCert = true;
         } else {
             // Does not contain exact match
-            $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $_SERVER['HTTP_HOST']) === false;
+            $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $host) === false;
         }
 
         return [
