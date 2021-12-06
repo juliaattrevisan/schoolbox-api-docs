@@ -152,11 +152,102 @@ class Specification
                 }
             ],
 
-
             /**
              * Timetable nodes
              */
+            [
+                'name' => 'Timetable Definition Compiler: timetables/timetable-calendar-date...',
+                'func' => function() {
+                    $errorMessage = '';
+                    $result = true;
 
+                    try {
+                        $monday = date('Y-m-d', strtotime('monday this week'));
+                        $friday = date('Y-m-d', strtotime('friday this week'));
+
+                        $this->api->retrieveDocument("timetables/timetable-calendar-date?from={$monday}&to={$friday}&limit=1");
+                    } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                        $errorMessage = $e->getMessage();
+                        $result = false;
+                    }
+
+                    return [
+                        'errorMessage' => $errorMessage,
+                        'result' => $result
+                    ];
+                }
+            ],
+            [
+                'name' => 'Timetable Period In Day: timetables/timetable-period-in-day',
+                'func' => function() {
+                    $errorMessage = '';
+                    $result = true;
+
+                    try {
+                        $this->api->retrieveDocument("timetables/timetable-period-in-day");
+                    } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                        $errorMessage = $e->getMessage();
+                        $result = false;
+                    }
+
+                    return [
+                        'errorMessage' => $errorMessage,
+                        'result' => $result
+                    ];
+                }
+            ],
+            [
+                'name' => 'Student Timetable: timetables/student/.../timetable-lessons...',
+                'func' => function() {
+                    $errorMessage = '';
+                    $result = true;
+
+                    try {
+                        $monday = date('Y-m-d', strtotime('monday this week'));
+                        $friday = date('Y-m-d', strtotime('friday this week'));
+
+                        $students = $this->api->retrieveDocument('enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=1');
+
+                        $student = $students['data'][0];
+
+                        $this->api->retrieveDocument("timetables/student/{$student['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
+                    } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                        $errorMessage = $e->getMessage();
+                        $result = false;
+                    }
+
+                    return [
+                        'errorMessage' => $errorMessage,
+                        'result' => $result
+                    ];
+                }
+            ],
+            [
+                'name' => 'Staff Timetable: timetables/staff/.../timetable-lessons...',
+                'func' => function() {
+                    $errorMessage = '';
+                    $result = true;
+
+                    try {
+                        $monday = date('Y-m-d', strtotime('monday this week'));
+                        $friday = date('Y-m-d', strtotime('friday this week'));
+
+                        $staffs = $this->api->retrieveDocument('enrolments/staff?include=person,qualifications,employments&limit=1');
+
+                        $staff = $staffs['data'][0];
+
+                        $this->api->retrieveDocument("timetables/staff/{$staff['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
+                    } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                        $errorMessage = $e->getMessage();
+                        $result = false;
+                    }
+
+                    return [
+                        'errorMessage' => $errorMessage,
+                        'result' => $result
+                    ];
+                }
+            ],
         ];
 
         $endpoints = [];
