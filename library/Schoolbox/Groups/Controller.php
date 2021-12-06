@@ -17,7 +17,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RerouteOverride;
 
@@ -36,9 +35,8 @@ class Controller extends BaseController
         //displaying included information (notification / favorite)
 
         //helpers
-        $groupMapper  = GroupMapper::getInstance();
-        $folderMapper = Folder\Mapper::getInstance();
-        $accessMapper = UserAccessMapper::getInstance();
+        $groupMapper      = GroupMapper::getInstance();
+        $accessMapper     = UserAccessMapper::getInstance();
         $userAccessMapper = UserAccessMapper::getInstance();
 
         /** @var \Schoolbox\User $user */
@@ -58,8 +56,8 @@ class Controller extends BaseController
         // Fetch the logged in user's write access groups to exclude from the lists.
         //user who has write access, is already a member of the group?
         $userWriteGroupIds = [];
-        $userGroups = $accessMapper->findAllForUser($user);
-        $userWriteGroups = $userGroups->filter(function (UserAccess $element) {
+        $userGroups        = $accessMapper->findAllForUser($user);
+        $userWriteGroups   = $userGroups->filter(function (UserAccess $element) {
             return $element->getAccessLevel() >= UserAccess::ACCESS_WRITE;
         });
 
@@ -72,8 +70,8 @@ class Controller extends BaseController
 
         //build notifications
         $followmentHelp = new \Schoolbox\Realtime\Controller();
-        $service = UserAccess::SERVICE_HOMEPAGE;
-        $muted = [
+        $service        = UserAccess::SERVICE_HOMEPAGE;
+        $muted          = [
             'unfollow' => $this->getUser()->getId(),
             'disabled' => 0,
         ];
@@ -94,11 +92,11 @@ class Controller extends BaseController
         }
 
         // build output array
-        $userAccess = [];
+        $userAccess     = [];
         $possibleGroups = [];
         foreach ($groups as $group) {
             $folderId = $group->getFolder()->getId();
-            $folder = $group->getFolder();
+            $folder   = $group->getFolder();
             if (!in_array($folderId, $userWriteGroupIds)) {
                 //will follow by default, check that user is actually in that group when checking if they are following
                 $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
@@ -112,14 +110,14 @@ class Controller extends BaseController
                 //favourite
                 $favourite = in_array($folderId, $favourites);
 
-                $tmp                = [
-                    'id'            => $folderId,
-                    'name'          => $group->getFolder()->getName(),
-                    'enrolment'     => $enrollment,
-                    'colour'        => $folder->getColour(),
-                    'coverImage'    => $folder->getCoverImage(),
-                    'follow'        => $follow,
-                    'favourite'     => $favourite,
+                $tmp              = [
+                    'id'         => $folderId,
+                    'name'       => $group->getFolder()->getName(),
+                    'enrolment'  => $enrollment,
+                    'colour'     => $folder->getColour(),
+                    'coverImage' => $folder->getCoverImage(),
+                    'follow'     => $follow,
+                    'favourite'  => $favourite,
                 ];
                 $possibleGroups[] = $tmp;
                 try {
@@ -132,10 +130,12 @@ class Controller extends BaseController
 
         //send to frontend
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@groups/groups.twig', [
-            'groupList'           => $possibleGroups,
-            'userAccess'          => $userAccess
-        ]));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@groups/groups.twig', [
+                'groupList'  => $possibleGroups,
+                'userAccess' => $userAccess,
+            ])
+        );
     }
 
     /**
