@@ -112,9 +112,6 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
         foreach ($files as $storage) {
             $mail->attach($storage->readStream(), $storage->getBasename(), $storage->getMime());
         }
-//    } catch (Swift_IoException $e) {
-//        error(9, $e->getMessage() . ': ' . $basename);
-//        exit; // shut UP, storm.
     } catch (\Schoolbox\Mapper\Exception | FileNotFoundException $e) {
         error(41);
         exit; // shut UP, storm.
