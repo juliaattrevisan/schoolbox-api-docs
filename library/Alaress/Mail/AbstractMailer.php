@@ -217,9 +217,9 @@ abstract class AbstractMailer implements IMailer
      */
     public function encodeBase64()
     {
-        // TODO figure out what to do with this
-        $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
-        $this->email->setEncoder($encoder);
+//        // TODO figure out what to do with this
+//        $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
+//        $this->email->setEncoder($encoder);
     }
 
     /**
