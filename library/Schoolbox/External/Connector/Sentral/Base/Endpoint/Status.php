@@ -21,9 +21,9 @@ class Status implements IStatus
 {
 
     /**
-     * @var Api
+     * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
@@ -31,6 +31,8 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function __construct(string $host, string $key)
     {
@@ -45,7 +47,13 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
-        return false;
+        $today = date('Y-m-d');
+
+        $nextUrl = "enrolments/academic-period?date={$today}&limit=1";
+
+        $this->api->retrieveDocument($nextUrl);
+
+        return true;
     }
 
 
