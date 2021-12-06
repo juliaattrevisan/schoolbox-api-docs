@@ -11,22 +11,18 @@ namespace Alaress\Mail;
 
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
-use Schoolbox\Config\Loader as ConfigLoader;
-
-use function count;
-
 use Psr\Log\LoggerInterface;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Swift_Attachment;
-use Swift_EmbeddedFile;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_RfcComplianceException;
-use Swift_SmtpTransport;
-use Swift_SwiftException;
-use Swift_Transport;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
+use function count;
 use function trim;
 
 abstract class AbstractMailer implements IMailer
@@ -44,7 +40,7 @@ abstract class AbstractMailer implements IMailer
     /**
      * Instance of mail transporter.
      *
-     * @var Swift_Transport
+     * @var TransportInterface
      */
     protected static $transport;
 
@@ -108,27 +104,27 @@ abstract class AbstractMailer implements IMailer
         if (\is_array($to)) {
             if ($to['email']) {
                 //Assume one dimensional array
-                $this->email->addTo($to['email'], $to['name'] ?? null);
+                $this->email->addTo(new Address($to['email'], $to['name'] ?? ''));
             } else {
                 if ($to['name']) {
-                    //Name only, can't send email
-                    throw new Swift_RfcComplianceException("No email address supplied.");
+                    // Name only, can't send email
+                    throw new RfcComplianceException("No email address supplied.");
                 } else {
-                    //Assume two dimensional array
+                    // Assume two dimensional array
                     foreach ($to as $email) {
-                        $this->email->addTo($email['email'], $email['name'] ?? null);
+                        $this->email->addTo(new Address($email['email'], $email['name'] ?? ''));
                     }
                 }
             }
         } else {
-            $this->email->setTo(self::parseAddressString($to)[self::KEY_VALID]);
+            $this->email->addTo(self::parseAddressString($to)[self::KEY_VALID]);
         }
     }
 
 
     public function setSubject($subject)
     {
-        $this->email->setSubject($subject);
+        $this->email->subject($subject);
     }
 
 
@@ -138,8 +134,8 @@ abstract class AbstractMailer implements IMailer
      */
     public function setFrom(string $email, string $name = '')
     {
-        $this->email->setFrom($email, $name);
-        $this->email->setReturnPath($email);
+        $this->email->from(new Address($email, $name));
+        $this->email->returnPath($email);
     }
 
 
@@ -151,7 +147,7 @@ abstract class AbstractMailer implements IMailer
      */
     public function setReplyTo($email, string $name = '')
     {
-        $this->email->setReplyTo($email, $name);
+        $this->email->replyTo(new Address($email, $name));
     }
 
 
@@ -175,16 +171,18 @@ abstract class AbstractMailer implements IMailer
 
     public function addFile($file, $type = 'text/plain', $filename = '', $isFile = true)
     {
-        //add attachment to email
+        // add attachment to email
         if ($isFile) {
-            $attachment = Swift_Attachment::fromPath($file, $type);
+            $this->email->attachFromPath($file, $filename, $type);
+//            $attachment = Swift_Attachment::fromPath($file, $type);
         } else {
-            $attachment = new Swift_Attachment($file, null, $type);
+            $this->email->attach($file, $filename, $type);
+//            $attachment = new Swift_Attachment($file, null, $type);
         }
-        if ($filename) {
-            $attachment->setFilename($filename);
-        }
-        $this->email->attach($attachment);
+//        if ($filename) {
+//            $attachment->setFilename($filename);
+//        }
+//        $this->email->attach($attachment);
     }
 
 
@@ -192,7 +190,7 @@ abstract class AbstractMailer implements IMailer
     {
         //add inline image to email
         // Returns a string so its source can be used later
-        return $this->email->embed(Swift_EmbeddedFile::fromPath($file)->setContentType($type));
+        return $this->email->embed($file, null, $type);
     }
 
 
@@ -217,6 +215,7 @@ abstract class AbstractMailer implements IMailer
      */
     public function encodeBase64()
     {
+        // TODO figure out what to do with this
         $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
         $this->email->setEncoder($encoder);
     }
@@ -225,7 +224,7 @@ abstract class AbstractMailer implements IMailer
      * Attempts to send the email constructed by this class. Returns mailing success or failure.
      *
      * @param string $to
-     * @throws Swift_SwiftException
+     * @throws TransportExceptionInterface
      * @return bool
      */
     public function send($to = '')
@@ -236,8 +235,8 @@ abstract class AbstractMailer implements IMailer
         }
 
         // construct body and set headers
-        $this->email->plain($this->composePlain(), null, 'utf-8');
-        $this->email->addPart($this->composeHTML(), 'text/html', 'utf-8');
+        $this->email->text($this->composePlain());
+        $this->email->html($this->composeHTML());
         foreach ($this->headers as $name => $value) {
             $this->email->getHeaders()->addTextHeader($name, $value);
         }
@@ -246,8 +245,8 @@ abstract class AbstractMailer implements IMailer
             return $this->trySend(self::MAX_RETRIES);
         } catch (IOException $e) {
             return $this->trySend();
-        } catch (Swift_SwiftException $e) {
-            throw new Swift_SwiftException("Failed to send email", $e->getCode(), $e);
+        } catch (TransportExceptionInterface $e) {
+            throw new TransportException("Failed to send email", $e->getCode(), $e);
         }
     }
 
@@ -261,31 +260,35 @@ abstract class AbstractMailer implements IMailer
     public function sendToBlackhole()
     {
         // construct body and set headers
-        $this->email->plain($this->composePlain(), null, 'utf-8');
-        $this->email->addPart($this->composeHTML(), 'text/html', 'utf-8');
+        $this->email->text($this->composePlain());
+        $this->email->html($this->composeHTML());
         foreach ($this->headers as $name => $value) {
             $this->email->getHeaders()->addTextHeader($name, $value);
         }
-        $mailer = new \Swift_NullTransport();
-        $mailer->send($this->email);
+        $mailer = new NullTransport();
+        try {
+            $mailer->send($this->email);
+        } catch (TransportExceptionInterface $e) {
+            // noop: who cares, it's blackholed
+        }
     }
 
 
     /**
      * @param int  $retries
      * @param bool $reinitialise
-     * @throws \Exception
      * @return bool
+     * @throws TransportExceptionInterface if not send after `$retries` attempts
      */
     private function trySend($retries = 0, $reinitialise = false)
     {
         // create transport and send email
         try {
-            $mailer = new \Symfony\Component\Mailer\MailerInterface(self::getSwiftTransport($reinitialise));
+            $mailer = new \Symfony\Component\Mailer\Mailer(self::getSwiftTransport($reinitialise));
             $this->configureSwiftMailer($mailer);
 
             $mailer->send($this->email);
-        } catch (\Exception $e) {
+        } catch (TransportExceptionInterface $e) {
             $retriesMsg = $retries == 1 ? 'retry remains' : 'retries remain';
             // this means "mail server went away"
             $errMsg = sprintf('Internal Mailing %s occurred (%d %s): %s', \get_class($e), $retries, $retriesMsg, $e->getMessage());
@@ -319,12 +322,11 @@ abstract class AbstractMailer implements IMailer
     /**
      * @param IConfigLoader $conf
      * @param bool          $reinitialise
-     * @return Swift_Transport
-     * @throws Swift_SwiftException if SMTP isn't configured
+     * @return TransportInterface
      */
     public static function getConfiguredSwiftTransport($conf, $reinitialise = false)
     {
-        if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
+        if (!(self::$transport instanceof TransportInterface) || $reinitialise) {
             if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
                 self::$transport = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport(
                     $conf->get('mail_smtp_host'),
@@ -340,7 +342,7 @@ abstract class AbstractMailer implements IMailer
                     self::$transport->setPassword($conf->get('mail_smtp_password'));
                 }
             } else {
-                self::$transport = new \Swift_NullTransport();
+                self::$transport = new NullTransport();
             }
         }
         return self::$transport;
@@ -348,7 +350,7 @@ abstract class AbstractMailer implements IMailer
 
     /**
      * @param bool $reinitialise
-     * @return Swift_Transport
+     * @return TransportInterface
      */
     public static function getSwiftTransport($reinitialise = false)
     {
