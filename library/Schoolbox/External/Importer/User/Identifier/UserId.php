@@ -23,7 +23,7 @@ class UserId implements IdentifierInterface
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * Constructor
@@ -38,7 +38,7 @@ class UserId implements IdentifierInterface
     /**
      * @inheritdoc
      */
-    public function accept($row)
+    public function accept(array $row): bool
     {
         return trim($row['Schoolbox User ID'] ?? '') !== '';
     }
@@ -46,7 +46,7 @@ class UserId implements IdentifierInterface
     /**
      * @inheritdoc
      */
-    public function retrieve($row)
+    public function retrieve(array $row): \Schoolbox\User
     {
         $userId = $row['Schoolbox User ID'];
         try {

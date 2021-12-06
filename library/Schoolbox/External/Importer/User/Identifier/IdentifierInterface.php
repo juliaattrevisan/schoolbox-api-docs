@@ -24,7 +24,7 @@ interface IdentifierInterface
      * @param  array $row
      * @return bool
      */
-    public function accept($row);
+    public function accept(array $row): bool;
 
     /**
      * Retrieves a user from this row.
@@ -33,7 +33,7 @@ interface IdentifierInterface
      *
      * @param  array $row
      * @return User
-     * @throws \Exception if no user was retrievable
+     * @throws \RuntimeException if no user was retrievable
      */
-    public function retrieve($row);
+    public function retrieve(array $row): User;
 }
