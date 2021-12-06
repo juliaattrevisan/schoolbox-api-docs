@@ -16,7 +16,7 @@ export default {
     },
 
     props: {
-        formId: {
+        formId: { //the id of the form to listen to changes to
             type: String,
             required: true,
             default: 'settings',
