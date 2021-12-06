@@ -203,10 +203,38 @@ class Specification
                     $result = true;
 
                     try {
+                        /* Brief reimplementation of academic period id retrieval
+
+                         * There is hopefully a student in one of the prescribed academic period ids
+                         * who has a timetable, in the first 10 we selected
+                         *
+                         * Otherwise this might always show something about missing timeviews
+                         */
+                        $ids = [];
+                        $date = date('Y-m-d');
+
+                        $nextUrl = "enrolments/academic-period?date={$date}&limit=200";
+
+                        for ($i = 0; $nextUrl && $i < 3; $i++) {
+                            $payload = $this->api->retrieveDocument($nextUrl);
+
+                            foreach ($payload['data'] as $row) {
+                                $ids[] = $row['id'];
+                            }
+
+                            /* Prepare for next page if it exists
+                             */
+                            $nextUrl = $payload['links']['next'] ?? null;
+                        }
+
+                        /* Pass this as a csv arg
+                         */
+                        $academicPeriodIds = implode(',', $ids);
+
                         $monday = date('Y-m-d', strtotime('monday this week'));
                         $friday = date('Y-m-d', strtotime('friday this week'));
 
-                        $students = $this->api->retrieveDocument('enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=10');
+                        $students = $this->api->retrieveDocument("enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=10");
 
                         /* Guess a 10-person payload
                          * Try to find someone with a timetable; sentral refers to this as a "timeview information"
