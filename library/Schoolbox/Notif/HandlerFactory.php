@@ -202,7 +202,7 @@ class HandlerFactory
             $this->conf->get('mail_from_name')
         ];
 
-        $mail = new Swift_Message($title, null, 'text/plain', 'utf-8');
+        $mail = new \Symfony\Component\Mime\Email($title, null, 'text/plain', 'utf-8');
 
         try {
             $mail->setTo($to);
@@ -221,7 +221,7 @@ class HandlerFactory
         }
 
         return new SwiftMailerHandler(
-            new Swift_Mailer(
+            new \Symfony\Component\Mailer\MailerInterface(
                 $this->swift
             ),
             $mail,

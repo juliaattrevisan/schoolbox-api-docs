@@ -23,7 +23,7 @@ $page->initSession();
 
 function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoader $config)
 {
-    $mail = new Swift_Message();
+    $mail = new \Symfony\Component\Mime\Email();
 
     //get users email address to use in from field
     $email = new Email($_SESSION['user']->getEmail());
@@ -101,7 +101,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     }
 
     $converter = new Alaress\Html\ToText($message);
-    $mail->setBody($converter->getText(), null, 'utf-8');
+    $mail->plain($converter->getText(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
     $basename = '';
@@ -127,7 +127,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     }
 
     try {
-        $mailer = new Swift_Mailer(Mailer::getSwiftTransport());
+        $mailer = new \Symfony\Component\Mailer\MailerInterface(Mailer::getSwiftTransport());
         $mailer->send($mail);
     } catch (Exception $ex) {
         error(9, $ex->getMessage());

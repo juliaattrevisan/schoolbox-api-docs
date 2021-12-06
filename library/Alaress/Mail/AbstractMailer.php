@@ -54,7 +54,7 @@ abstract class AbstractMailer implements IMailer
     protected static $conf;
 
 
-    /** @var Swift_Message */
+    /** @var \Symfony\Component\Mime\Email */
     protected $email;
 
     /**
@@ -77,7 +77,7 @@ abstract class AbstractMailer implements IMailer
      */
     public function __construct($template, $subject = '', $to = '', $host = '')
     {
-        $this->email = new Swift_Message();
+        $this->email = new \Symfony\Component\Mime\Email();
         $this->setFrom(self::getConfig()->get('mail_from_address'), self::getConfig()->get('mail_from_name'));
 
         //setup header
@@ -236,7 +236,7 @@ abstract class AbstractMailer implements IMailer
         }
 
         // construct body and set headers
-        $this->email->setBody($this->composePlain(), null, 'utf-8');
+        $this->email->plain($this->composePlain(), null, 'utf-8');
         $this->email->addPart($this->composeHTML(), 'text/html', 'utf-8');
         foreach ($this->headers as $name => $value) {
             $this->email->getHeaders()->addTextHeader($name, $value);
@@ -261,7 +261,7 @@ abstract class AbstractMailer implements IMailer
     public function sendToBlackhole()
     {
         // construct body and set headers
-        $this->email->setBody($this->composePlain(), null, 'utf-8');
+        $this->email->plain($this->composePlain(), null, 'utf-8');
         $this->email->addPart($this->composeHTML(), 'text/html', 'utf-8');
         foreach ($this->headers as $name => $value) {
             $this->email->getHeaders()->addTextHeader($name, $value);
@@ -281,7 +281,7 @@ abstract class AbstractMailer implements IMailer
     {
         // create transport and send email
         try {
-            $mailer = new Swift_Mailer(self::getSwiftTransport($reinitialise));
+            $mailer = new \Symfony\Component\Mailer\MailerInterface(self::getSwiftTransport($reinitialise));
             $this->configureSwiftMailer($mailer);
 
             $mailer->send($this->email);
@@ -308,7 +308,7 @@ abstract class AbstractMailer implements IMailer
     /**
      * Configure the given Swift_Mailer object prior to sending the email
      *
-     * @param Swift_Mailer $mailer
+     * @param \Symfony\Component\Mailer\MailerInterface $mailer
      */
     protected function configureSwiftMailer($mailer)
     {
@@ -326,7 +326,7 @@ abstract class AbstractMailer implements IMailer
     {
         if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
             if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
-                self::$transport = new Swift_SmtpTransport(
+                self::$transport = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport(
                     $conf->get('mail_smtp_host'),
                     $conf->get('mail_smtp_port')
                 );
