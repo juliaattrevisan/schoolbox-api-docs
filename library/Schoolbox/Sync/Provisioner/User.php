@@ -8,9 +8,7 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
-use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -27,7 +25,7 @@ class User extends SchoolboxUser
      *
      * @var array
      */
-    protected $accessRemoveList = [];
+    protected array $accessRemoveList = [];
 
     /**
      * A list of campus instances to remove for this
@@ -35,7 +33,7 @@ class User extends SchoolboxUser
      *
      * @var array
      */
-    protected $campusRemoveList = [];
+    protected array $campusRemoveList = [];
 
 
     /**
@@ -44,7 +42,7 @@ class User extends SchoolboxUser
      *
      * @var array
      */
-    private $userAccessMutations = [];
+    private array $userAccessMutations = [];
 
 
     /**
@@ -53,7 +51,7 @@ class User extends SchoolboxUser
      *
      * @return array
      */
-    public function getUserAccessRead()
+    public function getUserAccessRead(): array
     {
         return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_READ)->getColumnValues('serviceIdentifier');
     }
@@ -63,7 +61,7 @@ class User extends SchoolboxUser
      *
      * @param array $userAccessRead
      */
-    public function setUserAccessRead($userAccessRead)
+    public function setUserAccessRead(array $userAccessRead): void
     {
         /* Add it to the list of things to process later
          */
@@ -80,7 +78,7 @@ class User extends SchoolboxUser
      *
      * @return array
      */
-    public function getUserAccessWrite()
+    public function getUserAccessWrite(): array
     {
         return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_WRITE)->getColumnValues('serviceIdentifier');
     }
@@ -90,7 +88,7 @@ class User extends SchoolboxUser
      *
      * @param array $userAccessWrite
      */
-    public function setUserAccessWrite($userAccessWrite)
+    public function setUserAccessWrite(array $userAccessWrite): void
     {
         /* Add it to the list of things to process later
          */
@@ -106,7 +104,7 @@ class User extends SchoolboxUser
      *
      * @return array
      */
-    public function getUserAccessRemove()
+    public function getUserAccessRemove(): array
     {
         return $this->accessRemoveList;
     }
@@ -116,7 +114,7 @@ class User extends SchoolboxUser
      *
      * @param array $userAccessRemove
      */
-    public function setUserAccessRemove($userAccessRemove)
+    public function setUserAccessRemove(array$userAccessRemove): void
     {
         /* Add it to the list of things to process later
          */
@@ -132,7 +130,7 @@ class User extends SchoolboxUser
      *
      * @return array
      */
-    public function getCampusCollectionRemove()
+    public function getCampusCollectionRemove(): array
     {
         return $this->campusRemoveList;
     }
@@ -160,7 +158,7 @@ class User extends SchoolboxUser
      * @param array $campusCollectionRemove
      * @throws \UnexpectedValueException
      */
-    public function setCampusCollectionRemove($campusCollectionRemove)
+    public function setCampusCollectionRemove(array $campusCollectionRemove): void
     {
         $newCampusCollection = CampusMapper::getInstance()->createCollection();
         foreach ($this->getCampusCollection() as $existingCampus) {
