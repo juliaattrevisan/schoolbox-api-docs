@@ -24,7 +24,7 @@
         "@microsoft/immersive-reader-sdk": "^1.1.0",
         "axios": "0.21.2",
         "clipboard": "^2.0.6",
-        "datatables.net": "1.10.22",
+        "datatables.net": "1.11.3",
         "datatables.net-fixedcolumns": "3.2.2",
         "dayjs": "^1.10.7",
         "dropzone": "5.7.2",
@@ -13363,9 +13363,10 @@
       "dev": true
     },
     "node_modules/datatables.net": {
-      "version": "1.10.22",
-      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.10.22.tgz",
-      "integrity": "sha512-ujn8GvkQIBYzYH54XY7OrI0Zb35TKRd9ABYfbnXgBfwTGIFT6UsmXrfHU5Yk+MSDoF0sDu2TB+31V6c+zUZ0Pw==",
+      "version": "1.11.3",
+      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.11.3.tgz",
+      "integrity": "sha512-VMj5qEaTebpNurySkM6jy6sGpl+s6onPK8xJhYr296R/vUBnz1+id16NVqNf9z5aR076OGcpGHCuiTuy4E05oQ==",
+      "license": "MIT",
       "dependencies": {
         "jquery": ">=1.7"
       }
@@ -36165,9 +36166,9 @@
       "dev": true
     },
     "datatables.net": {
-      "version": "1.10.22",
-      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.10.22.tgz",
-      "integrity": "sha512-ujn8GvkQIBYzYH54XY7OrI0Zb35TKRd9ABYfbnXgBfwTGIFT6UsmXrfHU5Yk+MSDoF0sDu2TB+31V6c+zUZ0Pw==",
+      "version": "1.11.3",
+      "resolved": "https://registry.npmjs.org/datatables.net/-/datatables.net-1.11.3.tgz",
+      "integrity": "sha512-VMj5qEaTebpNurySkM6jy6sGpl+s6onPK8xJhYr296R/vUBnz1+id16NVqNf9z5aR076OGcpGHCuiTuy4E05oQ==",
       "requires": {
         "jquery": ">=1.7"
       }
