@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\Mime\Exception\RfcComplianceException;
+
 /**
  * Leave_Core_Notice_Parent_Abstract
  *
@@ -100,7 +102,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
                     // Ensure the current user has a valid email too
                     try {
                         $this->getEmail()->setFromAsCurrentUser();
-                    } catch (Swift_SwiftException $e) {
+                    } catch (RfcComplianceException $e) {
                         // noop - falls back to whatever the default address is
                     }
                     $this->getEmail()->send($email->getEmail());

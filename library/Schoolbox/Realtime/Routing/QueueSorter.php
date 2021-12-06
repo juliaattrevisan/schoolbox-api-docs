@@ -21,7 +21,7 @@ use Schoolbox\Realtime\Routing\Filter\FilterException;
 use Schoolbox\Realtime\Routing\Filter\FilterInterface;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Swift_RfcComplianceException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class QueueSorter implements FilterInterface
 {
@@ -145,7 +145,7 @@ class QueueSorter implements FilterInterface
                 )
             );
             return true;
-        } catch (Swift_RfcComplianceException $e) {
+        } catch (RfcComplianceException $e) {
             $this->log->warning($e->getMessage());
         } catch (PDOException $e) {
             // this needs to be escalated

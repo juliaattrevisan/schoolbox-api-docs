@@ -16,8 +16,8 @@ use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Swift_RfcComplianceException;
-use Swift_SwiftException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Twig\Error\RuntimeError;
 use UnderflowException;
 
@@ -57,7 +57,7 @@ class Mailer
      * @param string         $template
      * @param string         $subject
      * @param int            $sortDir
-     * @throws Swift_RfcComplianceException
+     * @throws RfcComplianceException
      * @throws UnderflowException
      * @return bool
      */
@@ -66,7 +66,7 @@ class Mailer
         $address = trim($recipient->getEmail());
 
         if (empty($address)) {
-            throw new Swift_RfcComplianceException("Empty address for user {$recipient->getId()}");
+            throw new RfcComplianceException("Empty address for user {$recipient->getId()}");
         }
 
         // format rfc2822
@@ -100,7 +100,7 @@ class Mailer
                 $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getReplyToIds());
                 // do NOT format rcf2822, because swift mailer
                 $email->setReplyTo($this->getReplyTo($effectors));
-            } catch (Swift_RfcComplianceException $e) {
+            } catch (RfcComplianceException $e) {
                 $this->log->warning('Error applying reply-to: ' . $e->getMessage());
             }
         }
@@ -118,7 +118,7 @@ class Mailer
             }
 
             $this->log->warning("Failed to email to $address");
-        } catch (Swift_SwiftException $e) {
+        } catch (TransportExceptionInterface $e) {
             $this->log->warning(get_class($e) . ': ' . $e->getMessage(), ['exception' => $e]);
         } catch (RuntimeError $e) {
             $this->log->error(get_class($e) . ': ' . $e->getMessage(), ['exception' => $e]);

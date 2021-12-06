@@ -14,7 +14,7 @@ use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Queue\QueueInterface;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\User;
-use Swift_RfcComplianceException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use UnderflowException;
 
 class Email implements QueueInterface
@@ -83,7 +83,7 @@ class Email implements QueueInterface
      * Push the given instance onto this queue
      *
      * @param Instance $instance
-     * @throws Swift_RfcComplianceException
+     * @throws RfcComplianceException
      * @throws UnderflowException
      * @return void
      */

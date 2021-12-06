@@ -11,13 +11,12 @@ namespace Schoolbox\Notif;
 
 use Alaress\Lumberjack;
 use ConfigFallback;
-use Database;
 use Mailer;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
-use Swift_Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class Notifactory
 {
@@ -25,7 +24,7 @@ class Notifactory
     /** @var IConfigLoader */
     protected $conf;
 
-    /** @var Swift_Transport */
+    /** @var TransportInterface */
     protected $swift;
 
     /** @var LoggerInterface */
@@ -48,11 +47,13 @@ class Notifactory
 
 
     /**
-     * @param IConfigLoader   $configLoader
-     * @param Swift_Transport $swift
-     * @param LoggerInterface $log
+     * Constructor
+     *
+     * @param IConfigLoader|null      $configLoader
+     * @param TransportInterface|null $swift
+     * @param LoggerInterface|null    $log
      */
-    public function __construct(IConfigLoader $configLoader = null, Swift_Transport $swift = null, LoggerInterface $log = null)
+    public function __construct(IConfigLoader $configLoader = null, TransportInterface $swift = null, LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
         $this->setSwiftTransport($swift);
@@ -109,10 +110,10 @@ class Notifactory
 
 
     /**
-     * @param Swift_Transport $swift
+     * @param TransportInterface $swift
      * @return self
      */
-    public function setSwiftTransport(Swift_Transport $swift = null)
+    public function setSwiftTransport(TransportInterface $swift = null)
     {
         $this->swift = $swift ?: Mailer::getConfiguredSwiftTransport($this->conf, true);
         return $this;

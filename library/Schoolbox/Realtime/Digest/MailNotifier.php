@@ -20,7 +20,7 @@ use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Swift_RfcComplianceException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use UnderflowException;
 
 class MailNotifier extends WorkNotifier
@@ -83,7 +83,7 @@ class MailNotifier extends WorkNotifier
                     $this->conf->get('digest_subject'),
                     $dir
                 );
-            } catch (Swift_RfcComplianceException $e) {
+            } catch (RfcComplianceException $e) {
                 $this->log()->warning($e->getMessage(), [ 'exception' => $e ]);
             } catch (UnderflowException $e) {
                 $this->log()->debug("{$user->getUsername()} has nothing to digest");

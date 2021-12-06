@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface as Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
-use Swift_SwiftException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 /**
  * Base class for rubric repair scripts.
@@ -392,7 +392,7 @@ abstract class Base extends CliTool\App
             $mailer->setContext($context);
             try {
                 $mailer->send($mailto);
-            } catch (Swift_SwiftException $e) {
+            } catch (TransportExceptionInterface $e) {
                 $this->log->error(sprintf('Could not send mail to "%s"', $mailto));
             }
         }

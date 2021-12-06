@@ -127,7 +127,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     }
 
     try {
-        $mailer = new \Symfony\Component\Mailer\MailerInterface(Mailer::getSwiftTransport());
+        $mailer = new \Symfony\Component\Mailer\Mailer(Mailer::getSwiftTransport());
         $mailer->send($mail);
     } catch (Exception $ex) {
         error(9, $ex->getMessage());
