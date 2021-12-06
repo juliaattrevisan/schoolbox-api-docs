@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69fc497342be83467f1afb7a5c21ca29",
+    "content-hash": "3412cec4f08937c2905256173889fbb5",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -50,6 +50,74 @@
                 "source": "https://github.com/0x46616c6b/etherpad-lite-client/tree/v0.7.0"
             },
             "time": "2021-02-23T19:17:50+00:00"
+        },
+        {
+            "name": "apple/apn-push",
+            "version": "v3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ZhukV/AppleApnPush.git",
+                "reference": "1ec73d8342821f0e606a60aab77add7172e2c5aa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ZhukV/AppleApnPush/zipball/1ec73d8342821f0e606a60aab77add7172e2c5aa",
+                "reference": "1ec73d8342821f0e606a60aab77add7172e2c5aa",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": "^7.1 | ^8.0"
+            },
+            "require-dev": {
+                "escapestudios/symfony2-coding-standard": "~3.0",
+                "phpmetrics/phpmetrics": "^2.0",
+                "phpunit/phpunit": "^8.0 | ^9.0",
+                "psr/simple-cache": "~1.0",
+                "web-token/jwt-key-mgmt": "~2.0",
+                "web-token/jwt-signature": "~2.0"
+            },
+            "suggest": {
+                "spomky-labs/jose": "Allow using JSON Web Token for authenticating in Provider (do not work with PHP 7.2).",
+                "web-token/jwt-key-mgmt": "Allow using JSON Web Token for authenticating in Provider.",
+                "web-token/jwt-signature": "Allow using JSON Web Token for authenticating in Provider."
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "name": "apple/apn-push",
+                    "url": "https://github.com/ZhukV/AppleApnPush"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Apple\\ApnPush\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vitaliy Zhuk",
+                    "email": "zhuk2205@gmail.com"
+                }
+            ],
+            "description": "Push notifications to Apple devices",
+            "homepage": "https://github.com/ZhukV/AppleApnPush",
+            "keywords": [
+                "apn",
+                "apple",
+                "notifications",
+                "push"
+            ],
+            "support": {
+                "issues": "https://github.com/ZhukV/AppleApnPush/issues",
+                "source": "https://github.com/ZhukV/AppleApnPush/tree/v3.1.2"
+            },
+            "time": "2021-09-27T14:56:58+00:00"
         },
         {
             "name": "aura/di",
@@ -14441,7 +14509,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.4",
+        "php": "^7.4 || ^8.0",
         "ext-redis": "*",
         "ext-readline": "*",
         "ext-zip": "*",

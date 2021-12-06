@@ -125,7 +125,8 @@
         "ext-ldap": "*",
         "oat-sa/lib-lti1p3-deep-linking": "^4.0",
         "oat-sa/lib-lti1p3-nrps": "^7.0",
-        "intelliscl/sdk": "0.2.0.4-beta"
+        "intelliscl/sdk": "0.2.0.4-beta",
+        "apple/apn-push": "^3.1"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
