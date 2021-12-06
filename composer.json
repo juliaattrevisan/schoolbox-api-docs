@@ -131,7 +131,6 @@
         "lox/xhprof": "dev-master",
         "codeception/codeception": "^4.1",
         "phpunit/phpunit": "~9.0",
-        "fzaninotto/faker": "^1.8",
         "phpstan/phpstan": "^0.12.0",
         "roave/security-advisories": "dev-master",
         "brianium/paratest": "^6.0",
@@ -143,6 +142,7 @@
         "codeception/module-cli": "^1.1",
         "codeception/module-rest": "^1.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-        "codeception/module-phpbrowser": "^1.0"
+        "codeception/module-phpbrowser": "^1.0",
+        "fakerphp/faker": "^1.17"
     }
 }
