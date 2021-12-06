@@ -5,9 +5,9 @@ import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
+import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
-import cKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
-import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
+
 
 export default {
 
@@ -15,12 +15,12 @@ export default {
         MediaArticle,
         Storage,
         Toast,
-        RevealModal
+        RevealModal,
+        AddCommentInput,
     },
 
     mixins: [
         cdnPrefixMixin,
-        cKEditor
     ],
 
     props: {
@@ -51,7 +51,6 @@ export default {
     data() {
         return {
             commentThread: this.thread,
-            newComment: '',
             isProcessing: false,
             commentIndexToDelete: null
         }
@@ -152,14 +151,21 @@ export default {
             }
         },
 
+        /**
+         * Comment input failed to load, so show error
+         */
+        onLoadError () {
+            this.$refs.toast.timeout('Loading comment box failed', false, 5000);
+        },
 
         /**
          * Posts a comment to this thread.
-         *
          * If there's no thread yet: this method will create one, and then
          * post the comment to it.
+         * 
+         * @param { String }
          */
-        postComment() {
+        postComment(newComment) {
             // maybe there's not a thread at all. If not: create one, then post
             let prePromise = Promise.resolve();
 
@@ -186,15 +192,13 @@ export default {
                     })
             }
             prePromise
-                .then(() => axios.post(this.commentThread._links.createComment.href, {content: this.newComment}))
+                .then(() => axios.post(this.commentThread._links.createComment.href, {content: newComment}))
                 .then((response) => {
                     // Update the comment count, add the new comment to the
                     // thread, clear the pending comment box
                     this.commentThread.children.metadata.count += 1;
                     this.commentThread.children.data.unshift(response.data);
                     this.$refs.toast.timeout('Comment posted', true, 2000);
-                    this.newComment = '';
-                    CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
                 })
                 .catch(() => this.$refs.toast.timeout('Comment post failed', false, 5000))
                 .finally(() => this.isProcessing = false)
@@ -269,13 +273,13 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="onAddCommentSelected">{{ cKEditor_getAddCommentButtonText }}</button>
-                    <div :style="cKEditor_getStyles">
-                        <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
-                        <a class="button submit"
-                            @click="postComment"
-                            :disabled="cKEditor_isPostCommentDisabled">Post comment</a>
-                    </div>
+                    <add-comment-input 
+                        :cdn-prefix="cdnPrefix"
+                        :is-processing="isProcessing"
+                        :site-version="siteVersion"
+                        @on-load-error="onLoadError"
+                        @on-post-comment="postComment"
+                    />
                 </template>
                 <template v-if="hasComments">
                     <ul class="information-list">

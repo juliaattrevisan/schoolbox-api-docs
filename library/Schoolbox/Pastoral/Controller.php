@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
@@ -138,36 +139,42 @@ class Controller extends Base
     /** TermMapper */
     private TermMapper $termMapper;
 
+    /**
+     * Pastoral comment translator
+     */
+    private Comment\Translator\ModelToArray $pastoralCommentTranslator;
+
     const ATTACHZONE_PRIVATE = 'private';
     const ATTACHZONE_PUBLIC  = 'public';
 
     /**
      * Constructor
      *
-     * @param IConfigLoader              $config
-     * @param FileMapper                 $fileMapper
-     * @param PastoralDataSource         $pastoralDataSource
-     * @param UserAccessMapper           $userAccessMapper
-     * @param PastoralAuditMapper        $pastoralAuditMapper
-     * @param PastoralSubTypeMapper      $pastoralSubTypeMapper
-     * @param PastoralTypeMapper         $pastoralTypeMapper
-     * @param PastoralUploadQueueMapper  $pastoralUploadQueueMapper
-     * @param PastoralSeverityMapper     $pastoralSeverityMapper
-     * @param PastoralRevisionDataSource $pastoralRevisionDataSource
-     * @param PastoralTagMapper          $pastoralTagMapper
-     * @param PastoralActionMapper       $pastoralActionMapper
-     * @param RecordAction\Mapper        $pastoralRecordActionMapper
-     * @param PastoralCommentMapper      $pastoralCommentMapper
-     * @param PastoralAttachmentMapper   $pastoralAttachmentMapper
-     * @param RoleMapper                 $roleMapper
-     * @param UserMapper                 $userMapper
-     * @param PastoralAccessMapper       $pastoralAccessMapper
-     * @param PastoralGroupMapper        $pastoralGroupMapper
-     * @param PastoralGroupMemberMapper  $pastoralGroupMemberMapper
-     * @param ErrorMapper                $errorMapper
-     * @param PastoralReportMapper       $pastoralReportMapper
-     * @param Audience\Mapper            $audienceMapper ;
-     * @param TermMapper                 $termMapper
+     * @param IConfigLoader                   $config
+     * @param FileMapper                      $fileMapper
+     * @param PastoralDataSource              $pastoralDataSource
+     * @param UserAccessMapper                $userAccessMapper
+     * @param PastoralAuditMapper             $pastoralAuditMapper
+     * @param PastoralSubTypeMapper           $pastoralSubTypeMapper
+     * @param PastoralTypeMapper              $pastoralTypeMapper
+     * @param PastoralUploadQueueMapper       $pastoralUploadQueueMapper
+     * @param PastoralSeverityMapper          $pastoralSeverityMapper
+     * @param PastoralRevisionDataSource      $pastoralRevisionDataSource
+     * @param PastoralTagMapper               $pastoralTagMapper
+     * @param PastoralActionMapper            $pastoralActionMapper
+     * @param RecordAction\Mapper             $pastoralRecordActionMapper
+     * @param PastoralCommentMapper           $pastoralCommentMapper
+     * @param PastoralAttachmentMapper        $pastoralAttachmentMapper
+     * @param RoleMapper                      $roleMapper
+     * @param UserMapper                      $userMapper
+     * @param PastoralAccessMapper            $pastoralAccessMapper
+     * @param PastoralGroupMapper             $pastoralGroupMapper
+     * @param PastoralGroupMemberMapper       $pastoralGroupMemberMapper
+     * @param ErrorMapper                     $errorMapper
+     * @param PastoralReportMapper            $pastoralReportMapper
+     * @param Audience\Mapper                 $audienceMapper
+     * @param TermMapper                      $termMapper
+     * @param Comment\Translator\ModelToArray $pastoralCommentTranslator
      */
     public function __construct(
         IConfigLoader $config,
@@ -193,7 +200,8 @@ class Controller extends Base
         ErrorMapper $errorMapper,
         PastoralReportMapper $pastoralReportMapper,
         Audience\Mapper $audienceMapper,
-        TermMapper $termMapper
+        TermMapper $termMapper,
+        Comment\Translator\ModelToArray $pastoralCommentTranslator
     ) {
         $this->config                     = $config;
         $this->errorMapper                = $errorMapper;
@@ -219,6 +227,7 @@ class Controller extends Base
         $this->pastoralReportMapper       = $pastoralReportMapper;
         $this->audienceMapper             = $audienceMapper;
         $this->termMapper                 = $termMapper;
+        $this->pastoralCommentTranslator  = $pastoralCommentTranslator;
     }
 
 
@@ -497,8 +506,8 @@ class Controller extends Base
             }
         }
 
-        $commentsPublic  = $record->getComments()->filterBy('private', false);
-        $commentsPrivate = $record->getComments()->filterBy('private', true);
+        $commentsPublic     = $record->getComments()->filterBy('private', false);
+        $commentsPrivate    = $record->getComments()->filterBy('private', true);
 
         $attachmentsPublic  = $record->getAttachments()->filterBy('private', false);
         $attachmentsPrivate = $record->getAttachments()->filterBy('private', true);
@@ -518,8 +527,8 @@ class Controller extends Base
                     'record'             => $record,
                     'attachmentsPublic'  => $attachmentsPublic,
                     'attachmentsPrivate' => $attachmentsPrivate,
-                    'commentsPublic'     => $commentsPublic,
-                    'commentsPrivate'    => $commentsPrivate,
+                    'commentsPublic'     => $commentsPublic->map($this->pastoralCommentTranslator)->reindex(),
+                    'commentsPrivate'    => $commentsPrivate->map($this->pastoralCommentTranslator)->reindex(),
                     'moderator'          => $moderator,
                     'user'               => $this->getUser(),
                     'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
@@ -714,51 +723,35 @@ class Controller extends Base
     /**
      * Add a comment to a pastoral record
      *
+     * @param Model $record
+     *
      * @throws SchoolboxException
-     * @throws RouteNotFound
      * @throws Exception
      */
-    public function postCommentInsert(): void
+    public function postCommentInsert(Model $record): void
     {
         $post = $this->getRequest()->post;
-        $hash = '';
+        if (!empty(trim($post["comment_body"]))) {
+            // Insert the comment to the internal database
+            $comment = $this->pastoralCommentMapper->createModel();
+            $comment->setPastoral($record);
+            $comment->setBody(trim($post["comment_body"]));
+            $comment->setOwner($this->getUser());
+            $comment->setPrivate($post["comment_private"]);
+            $this->pastoralCommentMapper->save($comment);
 
-        try {
-            $record = $this->pastoralDataSource->findById($this->getUser(), $post['pastoral_id']);
+            // Insert the comment to the external database
+            $pastoralExternal = new External_Pastoral();
+            $pastoralExternal->createComment($comment);
 
-            if (!empty(trim($post["comment_body"]))) {
-                // Insert the comment to the internal database
-
-                $comment = $this->pastoralCommentMapper->createModel();
-
-                $comment->setPastoral($record);
-                $comment->setBody(trim($post["comment_body"]));
-                $comment->setOwner($this->getUser());
-                $comment->setPrivate($post["comment_private"]);
-                $this->pastoralCommentMapper->save($comment);
-
-                // Insert the comment to the external database
-
-                $pastoralExternal = new External_Pastoral();
-                $pastoralExternal->createComment($comment);
-
-                /* If you posted a confidential comment, go back and open the confidential tab
-                 */
-                $hash = "#{$comment->getPanel()}";
-            }
-
-            // Go back to pastoral record
-            $this->getResponse()->redirect->afterPost(
-                $this->getrouter()->generate(
-                    'pastoral.getStudentRecord',
-                    [
-                        'studentId' => $post['student_id'],
-                        'recordId'  => $record->getId(),
-                    ]
-                ) . $hash
+            // Post a JSON response
+            $this->response->content->set(
+                $this->buildJsonOutput(
+                    call_user_func($this->pastoralCommentTranslator, $comment)
+                )
             );
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+        } else {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
 

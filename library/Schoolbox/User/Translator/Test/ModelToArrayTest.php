@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\User\Translator\Test;
 
+use Alaress_Date_Format;
 use House;
 use HouseResidential;
 use PHPUnit\Framework\TestCase;
@@ -62,6 +63,7 @@ class ModelToArrayTest extends TestCase
             'altEmail'         => null,
             'positionTitle'    => null,
             'yearLevel'        => null,
+            'isDeleted'        => false,
             'isBoarder'        => false,
             'flags'            => [
                 'showWebmailTab'         => null,
@@ -174,6 +176,7 @@ class ModelToArrayTest extends TestCase
                     'id'   => 1,
                     'name' => 'Year 12',
                 ],
+                'isDeleted'        => false,
                 'isBoarder'        => true,
                 'flags'            => [
                     'showWebmailTab'         => false,
@@ -240,6 +243,16 @@ class ModelToArrayTest extends TestCase
                 ->setUsername('test')
                 ->setLocalEmail(true),
             $derivedEmail,
+        ];
+
+        // Deleted user
+        $deletedUser              = $emptyResponse;
+        $deletedUser['isDeleted'] = true;
+        yield 'deleted user' => [
+            (new User())
+                ->setConfigLoader($configLoader)
+                ->setDeletedAt(Alaress_Date_Format::now()),
+            $deletedUser,
         ];
     }
 

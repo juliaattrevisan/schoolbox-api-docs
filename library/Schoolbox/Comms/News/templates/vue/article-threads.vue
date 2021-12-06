@@ -4,9 +4,9 @@ import axios from 'axios';
 import MediaArticle from '@vue/components/media-article';
 import toastMixin from '@vue/components/toast-mixin';
 import RevealModal from '@vue/components/reveal-modal';
+import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
-import cKEditor from '@vue/mixins/ckeditor/mixinCKEditor';
-import { EDITOR_CONFIG_FOR_COMMENTS } from '@js/editor/editorConfigTypes';
+
 
 export default {
 
@@ -14,12 +14,12 @@ export default {
 
     components: {
         MediaArticle,
-        RevealModal
+        RevealModal,
+        AddCommentInput,
     },
 
     mixins: [
         cdnPrefixMixin,
-        cKEditor,
         toastMixin
     ],
 
@@ -46,7 +46,6 @@ export default {
             showLoadMoreButton: false,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
-            newComment: '',
             isProcessing: false,
             showCommentsSection: false,
             isInitialLoad: true,
@@ -54,12 +53,6 @@ export default {
                 'X-Requested-With' : 'XMLHttpRequest'
             },
         }
-    },
-
-    computed: {
-
-
-
     },
 
     mounted () {
@@ -197,29 +190,27 @@ export default {
         },
 
         /**
-         * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
+         * Comment input failed to load, so show error
          */
-        onAddCommentSelected () {
-            this.cKEditor_init(EDITOR_CONFIG_FOR_COMMENTS);
+        onLoadError () {
+            this.$refs.toast.timeout('Loading comment box failed', false, 5000);
         },
 
         /**
          * Post a comment
          *
+         *  @param { String }
          */
-        postComment () {
+        postComment (newComment) {
             this.isProcessing = true;
             this.toastActivate('Posting comment...');
 
             axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
-                content: this.newComment
+                content: newComment
             }).then((response) => {
 
                 this.comments.unshift(response.data);
                 this.totalCommentsCount++;
-
-                this.newComment = '';
-                CKEDITOR.instances[`comment-${this.cKEditor_uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
 
                 this.toastSuccess('Comment has been added');
 
@@ -231,7 +222,6 @@ export default {
             });
 
         },
-
 
         /**
          * Opens the delete modal: pressing the Confirm button in the modal will
@@ -320,13 +310,13 @@ export default {
                 <template v-if="!isInitialLoad">
                     <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
-                            <button class="btn-show-ckeditor" v-show="!cKEditor_isCKEditorLoaded" @click.once="onAddCommentSelected">{{ cKEditor_getAddCommentButtonText }}</button>
-                            <div :style="cKEditor_getStyles">
-                                <textarea :id="`comment-${cKEditor_uniqueId}`" rows="4"></textarea>
-                                <a class="button submit"
-                                    @click="postComment"
-                                    :disabled="cKEditor_isPostCommentDisabled">Post comment</a>
-                            </div>
+                            <add-comment-input 
+                                :cdn-prefix="cdnPrefix"
+                                :is-processing="isProcessing"
+                                :site-version="siteVersion"
+                                @on-load-error="onLoadError"
+                                @on-post-comment="postComment"
+                            />
                         </template>
                         <template v-else>
                             <div data-alert="" class="alert-box">

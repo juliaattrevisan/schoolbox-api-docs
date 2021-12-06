@@ -10,8 +10,10 @@ namespace Schoolbox\Pastoral;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Rule\HasServicePermission;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -226,8 +228,10 @@ class Module extends BaseModule
 
 
     /**
-     * {@inheritdoc}
+     * @param Container $injector
+     *
      * @throws InvalidArgumentException If invalid mapper name is specified
+     * @throws \Aura\Di\Exception\ServiceNotFound if a service wasn't found
      */
     public function initControllers(ContainerInterface $injector)
     {
@@ -238,8 +242,8 @@ class Module extends BaseModule
             'pastoralDataSource'         => $injector->get('pastoralDataSource'),
             'pastoralRevisionDataSource' => $injector->get('pastoralRevisionDataSource'),
             'pastoralAccessMapper'       => PastoralAccessMapper::getInstance(),
-            'pastoralActionMapper'       => \Schoolbox\Pastoral\Action\Mapper::getInstance(),
-            'pastoralRecordActionMapper' => \Schoolbox\Pastoral\RecordAction\Mapper::getInstance(),
+            'pastoralActionMapper'       => Action\Mapper::getInstance(),
+            'pastoralRecordActionMapper' => RecordAction\Mapper::getInstance(),
             'pastoralAttachmentMapper'   => PastoralAttachmentMapper::getInstance(),
             'pastoralSubTypeMapper'      => PastoralSubTypeMapper::getInstance(),
             'pastoralGroupMapper'        => PastoralGroupMapper::getInstance(),
@@ -254,6 +258,16 @@ class Module extends BaseModule
             'userAccessMapper'           => UserAccessMapper::getInstance(),
             'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
             'termMapper'                 => $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Term\Mapper::class),
+            'pastoralRecordTranslator'   => '',
+            'pastoralCommentTranslator'  => $injector->lazy(function () use ($injector) {
+                return new Comment\Translator\ModelToArray(
+                    new User\Translator\Author\ModelToArray(),
+                    $injector->get('router'),
+                    $injector->get('authorizer'),
+                    $injector->get('user'),
+                    new ScrubAdapter(),
+                );
+            }),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

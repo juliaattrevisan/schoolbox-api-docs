@@ -211,8 +211,10 @@ module.exports = {
         // Class
         classList: './library/Schoolbox/Learning/vue/classList.js',
 
-        // Pastoral Count Badge
+        // Pastoral
         pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
+        pastoralRecordCommentsPublic: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js',
+        pastoralRecordCommentsPrivate: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js',
 
         //Resource
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',

@@ -1,15 +1,13 @@
-<style>
-.content {
-    width: 600px;
-}
-</style>
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <div id="record-media-modal">
-                <record-media-modal />
-            </div>
-            <script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/recordMediaModal.js?v={{ config.site_version }}"></script>
-        </section>
-    </div>
+<div id="pastoral-record-comments-container">
+    <pastoral-record-comments
+        cdn-prefix="{{ CDN_PREFIX }}"
+        {# :comments="{{ comments|json_encode }}" #}
+        {# comment-delete-route="{{ commentDeleteRoute }}" #}
+        {# comment-heading="{{ commentHeading }}" #}
+        {# comment-insert-route="{{ commentInsertRoute }}" #}
+        {# :record="{{ record|json_encode }}" #}
+        {# record-type="{{ recordType }}" #}
+        site-version="{{ config.site_version }}"
+    />
 </div>
+<script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordComments.js"></script>
