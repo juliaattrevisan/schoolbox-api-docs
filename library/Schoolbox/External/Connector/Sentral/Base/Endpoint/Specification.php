@@ -45,6 +45,11 @@ class Specification
      */
     public function check(): array
     {
+        /* Sentral endpoints sometimes require other endpoints' results first
+         *
+         * They vary too much, so I put them into anon functions so they can
+         * output the result of multiple api requests synonymously
+         */
         $paths = [
 
             /**
@@ -57,10 +62,9 @@ class Specification
                     $result = true;
 
                     try {
-                        $this->api->retrieveDocument(sprintf(
-                            'enrolments/academic-period?date=%s&limit=1',
-                            date('Y-m-d')
-                        ));
+                        $date = date('Y-m-d');
+
+                        $this->api->retrieveDocument("enrolments/academic-period?date={$date}&limit=1");
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
                         $errorMessage = $e->getMessage();
                         $result = false;
@@ -72,7 +76,6 @@ class Specification
                     ];
                 }
             ],
-
             [
                 'name' => 'Students: enrolments/student...',
                 'func' => function() {
@@ -80,9 +83,7 @@ class Specification
                     $result = true;
 
                     try {
-                        $this->api->retrieveDocument(sprintf(
-                            'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=1',
-                        ));
+                        $this->api->retrieveDocument('enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=1');
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
                         $errorMessage = $e->getMessage();
                         $result = false;
@@ -105,17 +106,13 @@ class Specification
                     $result = true;
 
                     try {
-                        $students = $this->api->retrieveDocument(sprintf(
-                            'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=1',
-                        ));
+                        $students = $this->api->retrieveDocument('enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=1');
 
                         $student = $students['data'][0];
 
                         $contacts = $student['relationships']['contacts']['data'];
 
-                        $this->api->retrieveDocument(sprintf(
-                            "enrolments/person/{$contacts[0]['attributes']['personId']}?include=phoneNumbers"
-                        ));
+                        $this->api->retrieveDocument("enrolments/person/{$contacts[0]['attributes']['personId']}?include=phoneNumbers");
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
                         $errorMessage = $e->getMessage();
                         $result = false;
@@ -138,15 +135,11 @@ class Specification
                     $result = true;
 
                     try {
-                        $staffs = $this->api->retrieveDocument(sprintf(
-                            'enrolments/staff?include=person,qualifications,employments&limit=1',
-                        ));
+                        $staffs = $this->api->retrieveDocument('enrolments/staff?include=person,qualifications,employments&limit=1');
 
                         $staff = $staffs['data'][0];
 
-                        $this->api->retrieveDocument(sprintf(
-                            "enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers"
-                        ));
+                        $this->api->retrieveDocument("enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers");
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
                         $errorMessage = $e->getMessage();
                         $result = false;
