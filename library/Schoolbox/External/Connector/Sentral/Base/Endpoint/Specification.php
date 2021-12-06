@@ -206,11 +206,19 @@ class Specification
                         $monday = date('Y-m-d', strtotime('monday this week'));
                         $friday = date('Y-m-d', strtotime('friday this week'));
 
-                        $students = $this->api->retrieveDocument('enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=1');
+                        $students = $this->api->retrieveDocument('enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=10');
 
-                        $student = $students['data'][0];
-
-                        $this->api->retrieveDocument("timetables/student/{$student['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
+                        /* Guess a 10-person payload
+                         * Try to find someone with a timetable; sentral refers to this as a "timeview information"
+                         */
+                        foreach ($students as $student) {
+                            try {
+                                $this->api->retrieveDocument("timetables/student/{$student['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
+                                break;
+                            } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                                continue;
+                            }
+                        }
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
                         $errorMessage = $e->getMessage();
                         $result = false;
@@ -232,11 +240,20 @@ class Specification
                         $monday = date('Y-m-d', strtotime('monday this week'));
                         $friday = date('Y-m-d', strtotime('friday this week'));
 
-                        $staffs = $this->api->retrieveDocument('enrolments/staff?include=person,qualifications,employments&limit=1');
+                        $staffs = $this->api->retrieveDocument('enrolments/staff?include=person,qualifications,employments&limit=10');
 
-                        $staff = $staffs['data'][0];
-
-                        $this->api->retrieveDocument("timetables/staff/{$staff['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
+                        /* Guess a 10-person payload
+                         * Try to find someone with a timetable; sentral refers to this as a "registered timeview information"
+                         * Yes, this message is slightly different to the students' timetable error
+                         */
+                        foreach ($staffs as $staff) {
+                            try {
+                                $this->api->retrieveDocument("timetables/staff/{$staff['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
+                                break;
+                            } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                                continue;
+                            }
+                        }
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
                         $errorMessage = $e->getMessage();
                         $result = false;
