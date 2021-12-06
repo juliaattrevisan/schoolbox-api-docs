@@ -57,7 +57,7 @@ class Specification
              */
             [
                 'name' => 'Academic Period: enrolments/academic-period...',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
@@ -78,7 +78,7 @@ class Specification
             ],
             [
                 'name' => 'Students: enrolments/student...',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
@@ -101,7 +101,7 @@ class Specification
              */
             [
                 'name' => 'Parents: enrolments/person/...',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
@@ -130,7 +130,7 @@ class Specification
              */
             [
                 'name' => 'Staff: enrolments/staff...',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
@@ -157,7 +157,7 @@ class Specification
              */
             [
                 'name' => 'Timetable Definition Compiler: timetables/timetable-calendar-date...',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
@@ -179,7 +179,7 @@ class Specification
             ],
             [
                 'name' => 'Timetable Period In Day: timetables/timetable-period-in-day',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
@@ -198,7 +198,7 @@ class Specification
             ],
             [
                 'name' => 'Student Timetable: timetables/student/.../timetable-lessons...',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
@@ -232,7 +232,7 @@ class Specification
             ],
             [
                 'name' => 'Staff Timetable: timetables/staff/.../timetable-lessons...',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
