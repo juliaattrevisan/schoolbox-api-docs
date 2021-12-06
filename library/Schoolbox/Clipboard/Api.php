@@ -12,7 +12,6 @@ namespace Schoolbox\Clipboard;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 
-
 /**
  * Class Api
  *
@@ -45,6 +44,12 @@ class Api implements IApi
 
 
     /**
+     * @var ApiUsage
+     */
+    private ApiUsage $apiUsage;
+
+
+    /**
      * @var Client
      */
     private Client $client;
@@ -60,6 +65,11 @@ class Api implements IApi
     public function __construct(string $host, string $authorizationToken)
     {
         $this->client = $this->initClient($host, $authorizationToken, self::DEFAULT_TIMEOUT);
+
+        /* Record some stats about api usage
+         * Turn this into an Observer pattern if you want to record more details
+         */
+        $this->apiUsage = new ApiUsage();
     }
 
 
@@ -103,9 +113,9 @@ class Api implements IApi
     {
         $response = null;
 
-//        /* Record endpoint usage
-//         */
-//        $this->apiUsage->record($method);
+        /* Record endpoint usage
+         */
+        $this->apiUsage->record($endpoint);
 
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
@@ -177,5 +187,15 @@ class Api implements IApi
          * was being requested, so I guess you ended up here
          */
         throw new \DomainException('Could not access server, or bad json payload returned.', 0, $e ?? null);
+    }
+
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage
+    {
+        return $this->apiUsage;
     }
 }
