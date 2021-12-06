@@ -236,8 +236,18 @@ class User extends AbstractImporter
         foreach ($this->reader as $i => $row) {
             // Step 1: identify user
             $user = $this->retrieveUser($row);
+
+            /* retrieveUser performs a set of checks for a way to identify someone -
+             * someone can be identified by any of the following fields which are
+             * optional in the csv import:
+             *
+             * external id, username, user id
+             *
+             * Users have to be identified by one of those fields. When they can't,
+             * null is returned.
+             */
             if (!$user instanceof UserModel) {
-                $this->log->warning('User could not be identified - skipping');
+                $this->log->warning('User could not be identified by any of the following fields: external id, user id or username - skipping');
                 continue;
             }
 
@@ -251,7 +261,6 @@ class User extends AbstractImporter
 
             // Step 3: update user based on fields
             $userResult->setUser($this->hydrateUser($row, $user));
-
 
             // Step 4: save user
             if ($userResult->isUserDeleted()) {
