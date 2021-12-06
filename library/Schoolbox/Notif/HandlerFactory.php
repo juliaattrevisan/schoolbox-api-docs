@@ -13,13 +13,14 @@ use InvalidArgumentException;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use RuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Handler\MySQLHandler;
+use Schoolbox\Notif\Handler\SymfonyMailerHandler;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
@@ -191,9 +192,9 @@ class HandlerFactory
      * @param string|array $from
      * @param int $severity
      * @param bool $bubble
-     * @return SwiftMailerHandler
+     * @return SymfonyMailerHandler
      */
-    protected function createMailHandler($title, $severity, $bubble = true, $to = null, $from = null)
+    protected function createMailHandler($title, $severity, $bubble = true, $to = null, $from = null): SymfonyMailerHandler
     {
         $to   = $to ?: $this->conf->get('mail_support_address');
         $from = $from ?: [
@@ -220,10 +221,8 @@ class HandlerFactory
             $mail->from(new Address(self::FALLBACK_EMAIL));
         }
 
-        return new SwiftMailerHandler(
-            new \Symfony\Component\Mailer\Mailer(
-                $this->swift
-            ),
+        return new SymfonyMailerHandler(
+            new Mailer($this->swift),
             $mail,
             $severity,
             $bubble
