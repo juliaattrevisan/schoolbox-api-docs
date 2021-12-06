@@ -14,6 +14,9 @@ use Swift_IoException;
  * Class AttachmentStream
  *
  * Enables large (~100MB+) attachments without OOM errors.
+ *
+ * @deprecated should not be required as `\Symfony\Component\Mime\Email::attach`
+ *             accepts a resource.
  */
 class AttachmentStream implements \Swift_OutputByteStream
 {

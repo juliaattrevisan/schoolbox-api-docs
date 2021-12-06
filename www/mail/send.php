@@ -11,8 +11,9 @@ use Alaress\Mail\AbstractMailer;
 use League\Flysystem\FileNotFoundException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Alaress\Mail\AttachmentStream;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Address;
 
 require_once __DIR__ . "/../../conf/core/require.php";
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -29,8 +30,8 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     $email = new Email($_SESSION['user']->getEmail());
 
     if ($email->isValid()) {
-        $mail->addFrom($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
-        $mail->addReplyTo($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
+        $mail->addFrom(new Address($_SESSION['user']->getEmail(), $_SESSION['user']->formatName()));
+        $mail->addReplyTo(new Address($_SESSION['user']->getEmail(), $_SESSION['user']->formatName()));
     } else {
         error(42);
     }
@@ -40,11 +41,11 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
         $userMapper = new \Schoolbox\UserMapper();
 
         try {
-            $toUser = $userMapper->findByID($to);
+            $toUser = $userMapper->findById($to);
             $email = new Email($toUser->getEmail());
 
             if ($email->isValid()) {
-                $mail->addTo($toUser->getEmail());
+                $mail->addTo(new Address($toUser->getEmail()));
             } else {
                 error(9, 'Your email address is not valid.');
             }
@@ -56,7 +57,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
 
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
-                $mail->addTo($address, $name);
+                $mail->addTo(new Address($address, $name));
             } catch (Exception $e) {
                 error(9, 'Email address "' . $address . '" is not valid.');
             }
@@ -67,21 +68,21 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     //put the users email in the to field
     if (!stristr($to, '@') && ($bcc || $cc)) {
         try {
-            $mail->addTo($_SESSION['user']->getEmail(), $to);
+            $mail->addTo(new Address($_SESSION['user']->getEmail(), $to));
         } catch (Exception $e) {
             error(9, 'Your email address is not valid.');
         }
     }
 
     //create email header
-    $mail->setSubject($subject);
+    $mail->subject($subject);
 
     if (strrchr($cc, '@')) {
         $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($cc));
 
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
-                $mail->addCc($address, $name);
+                $mail->addCc(new Address($address, $name));
             } catch (Exception $e) {
                 error(9, 'Email address "' . $address . '" is not valid.');
             }
@@ -93,7 +94,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
 
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
-                $mail->addBcc($address, $name);
+                $mail->addBcc(new Address($address, $name));
             } catch (Exception $e) {
                 error(9, 'Email address "' . $address . '" is not valid.');
             }
@@ -101,23 +102,19 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     }
 
     $converter = new Alaress\Html\ToText($message);
-    $mail->plain($converter->getText(), null, 'utf-8');
-    $mail->addPart($message, 'text/html', 'utf-8');
+    $mail->text($converter->getText());
+    $mail->html($message);
 
-    $basename = '';
     try {
         $factory = new CollectorFactory();
         $files = $factory->build($attachments)->getAll();
 
         foreach ($files as $storage) {
-            $stream   = new AttachmentStream($storage->readStream());
-            $basename = $storage->getBasename();
-            $attach   = new Swift_Attachment($stream, $basename, $storage->getMime());
-            $mail->attach($attach);
+            $mail->attach($storage->readStream(), $storage->getBasename(), $storage->getMime());
         }
-    } catch (Swift_IoException $e) {
-        error(9, $e->getMessage() . ': ' . $basename);
-        exit; // shut UP, storm.
+//    } catch (Swift_IoException $e) {
+//        error(9, $e->getMessage() . ': ' . $basename);
+//        exit; // shut UP, storm.
     } catch (\Schoolbox\Mapper\Exception | FileNotFoundException $e) {
         error(41);
         exit; // shut UP, storm.
@@ -129,7 +126,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     try {
         $mailer = new \Symfony\Component\Mailer\Mailer(Mailer::getSwiftTransport());
         $mailer->send($mail);
-    } catch (Exception $ex) {
+    } catch (TransportExceptionInterface $ex) {
         error(9, $ex->getMessage());
     }
 }
