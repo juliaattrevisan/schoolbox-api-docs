@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Sync\Provisioner;
@@ -24,6 +26,7 @@ class ValidUser
      * @var array
      */
     private array $newUsernameCache;
+
 
     /**
      * @param \Schoolbox\UserMapper $userMapper
@@ -72,7 +75,6 @@ class ValidUser
      */
     protected function verifyUniqueNewUserUsername(\Schoolbox\User $internalUser): bool
     {
-
         // Is this a new user?
         if (null === $internalUser->getId()) {
             // Have we already created a new user with this username?
@@ -88,6 +90,7 @@ class ValidUser
             // New username is unique. Add to cache
             $this->newUsernameCache[$internalUser->getUsername()] = $internalUser->getExternalId();
         }
+
         return true;
     }
 }
