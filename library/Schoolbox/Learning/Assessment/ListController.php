@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
@@ -149,10 +150,13 @@ class ListController extends Web\Controller\Base
      */
     public function getSebConfig(IAssessable $assessment): void
     {
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
         $sebPayload = new SebPayload(
             $this->getConfigLoader(),
             $this->getRequest()->server->get('HTTP_HOST'),
-            $this->router
+            $this->router,
+            $database
         );
 
         $contents = $sebPayload->generate($assessment, $this->getUser());
@@ -193,10 +197,13 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
         $sebPayload = new SebPayload(
             $this->getConfigLoader(),
             $this->getRequest()->server->get('HTTP_HOST'),
-            $this->router
+            $this->router,
+            $database
         );
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
             $this->getRequest()->server->getArrayCopy(),
