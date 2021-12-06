@@ -140,11 +140,19 @@ class Controller extends BaseController
 
     /**
      * edit's a users enrolment into a group
+     * @param Module $groupId
      *
      * @api POST /mygroup/{groupId:\d+}/edit
      */
-    public function postMyGroup(int $groupId)
+    public function postMyGroup(Module $groupId)
     {
+        /**
+         * post should contain:
+         * group id
+         * action (add, remove, edit)
+         * subscribe/notifications (true, false)
+         * favourite (true, false)
+         */
         //get group object
 
         //add / remove user from group
