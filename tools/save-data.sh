@@ -130,6 +130,27 @@ parse_args(){
   fi
 }
 
+# Check we are saving data from a stable release point
+check_is_stable(){
+  cd /vagrant || exit 1
+  tag=$(git log --oneline --decorate -n 1 | grep -oE 'tag: [0-9a-zA-Z.-]+')
+  if [[ -n $tag ]]; then
+    echo "Branch HEAD appears to be stable. $tag"
+  else
+    git log --oneline --decorate -n 1
+    echo "It appears your branch HEAD is not tagged as stable."
+    echo "Saving from unstable is dangerous as update scripts may subsequently be merged into this release."
+    echo "These update scripts will fail to run if deployed to an instance already at this release"
+    read -r -p "Continue? [y/n]: " choice
+    while ! [[ $choice =~ [ynYN] ]]; do
+      read -r -p "Invalid choice. Please enter 'y' or 'n': " choice
+    done
+    if [[ $choice =~ [nN] ]]; then
+      exit
+    fi
+  fi
+}
+
 # Additional cleaning for initial datasets
 cleanup_initial_dataset(){
   if [ -n "$initial" ]; then
@@ -237,6 +258,7 @@ upload_tarball(){
 main(){
   check_run_as_root
   parse_args "$@"
+  check_is_stable
   log "Saving data as: '$dataset.tar.gz'";
   mkdir -p $CACHE_DIR;
   cleanup_initial_dataset
