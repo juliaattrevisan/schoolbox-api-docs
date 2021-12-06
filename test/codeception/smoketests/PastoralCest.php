@@ -121,9 +121,7 @@ class PastoralCest
         $i->sendRequest($pastoralCommentPayload);
 
         #THEN
-        $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}#panel-general");
-
+        $i->seeResponseCodeIs(200);
         #WHEN
         $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
         $pastoralCommentPayload->setPrivateComment('A very private comment');
@@ -131,9 +129,7 @@ class PastoralCest
         $i->sendRequest($pastoralCommentPayload);
 
         #THEN
-        $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}#panel-confidential");
-
+        $i->seeResponseCodeIs(200);
         #WHEN
         $i->sendGET($i->grabHttpHeader('location'));
         $i->seeResponseCodeIs(200);
