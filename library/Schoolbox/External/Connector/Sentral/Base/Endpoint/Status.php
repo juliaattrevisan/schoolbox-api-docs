@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -19,10 +20,17 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 class Status implements IStatus
 {
 
+
     /**
-     * @var IApi
+     * @var string
      */
-    private IApi $api;
+    private string $host;
+
+
+    /**
+     * @var string
+     */
+    private string $key;
 
 
     /**
@@ -35,7 +43,8 @@ class Status implements IStatus
      */
     public function __construct(string $host, string $key)
     {
-        $this->api = new Api($host, $key);
+        $this->host = $host;
+        $this->key = $key;
     }
 
 
@@ -45,14 +54,14 @@ class Status implements IStatus
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
+     * @throws \DomainException
      */
     public function isReachable(): bool
     {
         $today = date('Y-m-d');
-
         $nextUrl = "enrolments/academic-period?date={$today}&limit=1";
 
-        $this->api->retrieveDocument($nextUrl);
+        (new Api($this->host, $this->key))->retrieveDocument($nextUrl);
 
         return true;
     }
@@ -62,10 +71,21 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws \InvalidArgumentException
      */
     public function getReport(): array
     {
-        $specification = new Specification($this->api);
+        try {
+            $api = new Api($this->host, $this->key);
+        } catch (\DomainException $e) {
+            return [[
+                'message' => 'Cannot access api endpoint',
+                'reason' => $e->getMessage(),
+                'status' => ISpecification::STATUS_ERROR
+            ]];
+        }
+
+        $specification = new Specification($api);
 
         return $specification->check();
     }
