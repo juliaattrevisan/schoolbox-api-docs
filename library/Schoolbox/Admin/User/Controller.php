@@ -482,6 +482,7 @@ class Controller extends Base
 
         try {
             $userAccess = new UserAccess();
+            $userAccess->setFavourite(false);
             $userAccess->setService(UserAccess::SERVICE_HOMEPAGE);
             $userAccess->setUser($user);
             $userAccess->setAccessLevel($post['type']);
@@ -504,6 +505,7 @@ class Controller extends Base
 
         try {
             $userAccess = new UserAccess();
+            $userAccess->setFavourite(false);
             $userAccess->setService($post['service']);
             $userAccess->setUser($user);
             $userAccess->setAccessLevel($post['type']);

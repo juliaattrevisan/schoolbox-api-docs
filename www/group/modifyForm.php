@@ -22,6 +22,7 @@ $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 $uaMapper = UserAccessMapper::getInstance();
 $ua = new UserAccess();
 $ua->setService(UserAccess::SERVICE_HOMEPAGE);
+$ua->setFavourite(false);
 
 $catMapper = FolderMapper::getInstance();
 $userMapper = UserMapper::getInstance();
@@ -198,6 +199,7 @@ if (!empty($_POST['accessLevel'])) {
         $user = new User();
         $user->setId($userId);
         $ua = new UserAccess();
+        $ua->setFavourite(false);
         if ($accessLevel == UserAccess::ACCESS_FULL) {
             //check if member is allowed to become a owner
             if (!$groupHandler->allowOwner($userId)) {

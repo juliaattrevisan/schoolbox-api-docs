@@ -54,6 +54,7 @@ class UserAccessMapper extends Mapper
         $this->uses('service', self::TYPE_INTEGER);
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
+        $this->uses('favourite', self::TYPE_BOOLEAN, null, 'favourite');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'calculateUserSubscription' ]);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
@@ -193,6 +194,7 @@ class UserAccessMapper extends Mapper
             $ua = new UserAccess();
 
             $ua->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setFavourite(false)
                 ->setServiceIdentifier($folder->getId())
                 ->setUser($user);
 
@@ -507,5 +509,25 @@ class UserAccessMapper extends Mapper
             $userCollection->add($user);
         }
         return $userCollection;
+    }
+
+    /**
+     * Get favourite for userID
+     * @param User $user
+     * @return array
+     */
+    public function getFavourites(User $user): array
+    {
+        $favourites = [];
+        $userAccess = $this->findByColumnList(array(
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            'uid' => $user->getId(),
+            'favourite' => 1,
+        ));
+
+        foreach ($userAccess as $row) {
+            $favourites[] = $row->getServiceIdentifier();
+        }
+        return $favourites;
     }
 }

@@ -39,6 +39,8 @@ class Controller extends BaseController
         $groupMapper  = GroupMapper::getInstance();
         $folderMapper = Folder\Mapper::getInstance();
         $accessMapper = UserAccessMapper::getInstance();
+        $userAccessMapper = UserAccessMapper::getInstance();
+
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
 
@@ -66,7 +68,9 @@ class Controller extends BaseController
         }
 
         //check if notifications or favourites
-        //build favourites
+        $favourites = $userAccessMapper->getFavourites($user);
+
+        //build notifications
         $followmentHelp = new \Schoolbox\Realtime\Controller();
         $service = UserAccess::SERVICE_HOMEPAGE;
         $muted = [
@@ -97,7 +101,7 @@ class Controller extends BaseController
             $folder = $group->getFolder();
             if (!in_array($folderId, $userWriteGroupIds)) {
                 //will follow by default, check that user is actually in that group when checking if they are following
-                $follow = (!(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled'])) && $userPerms[$folderId]);
+                $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
 
                 //get enrolment, could be enrolled, can join, or pending
                 $enrollment = $userPerms[$folderId] ? 'enrolled' : 'not enrolled';
@@ -105,13 +109,17 @@ class Controller extends BaseController
                     $enrollment = 'pending';
                 }
 
-                $tmp              = [
-                    'id'        => $folderId,
-                    'name'     => $group->getFolder()->getName(),
-                    'enrolment' => $enrollment,
-                    'colour'    => $folder->getColour(),
-                    'coverImage' => $folder->getCoverImage(),
-                    'follow'    => $follow,
+                //favourite
+                $favourite = in_array($folderId, $favourites);
+
+                $tmp                = [
+                    'id'            => $folderId,
+                    'name'          => $group->getFolder()->getName(),
+                    'enrolment'     => $enrollment,
+                    'colour'        => $folder->getColour(),
+                    'coverImage'    => $folder->getCoverImage(),
+                    'follow'        => $follow,
+                    'favourite'     => $favourite,
                 ];
                 $possibleGroups[] = $tmp;
                 try {

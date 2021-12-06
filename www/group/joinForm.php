@@ -53,6 +53,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
     } catch (Mapper\Exception $e) {
         $ua = new UserAccess();
         $ua->setUser($user)
+            ->setFavourite(false)
             ->setAccessLevel(UserAccess::ACCESS_DENY)
             ->setService(UserAccess::SERVICE_HOMEPAGE)
             ->setServiceIdentifier($groupId);
@@ -90,6 +91,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
             // since the Mapper can't automagically do it for this Model
             $model = new UserAccess();
             $model->setUser($user)
+                ->setFavourite(false)
                 ->setAccessLevel(UserAccess::ACCESS_DENY)
                 ->setService(UserAccess::SERVICE_HOMEPAGE)
                 ->setServiceIdentifier($groupId);
