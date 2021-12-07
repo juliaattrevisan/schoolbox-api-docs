@@ -30,7 +30,7 @@ class External_Synergetic_Class implements External_ClassInterface
     /**
      * Constructor
      */
-    function __construct()
+    public function __construct()
     {
         $this->database = Factory::getInstanceExternal();
         $this->setExternalUser(new External_User('synergetic'));
@@ -144,8 +144,8 @@ class External_Synergetic_Class implements External_ClassInterface
         WHERE $classQuery
             AND (StudentClasses.FileYear={$fileYear})
             AND (StudentClasses.FileSemester={$fileSemester})
-            AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
-            AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+            AND (StudentClasses.StartDate <= CAST(GETDATE() AS DATE) OR StudentClasses.StartDate IS NULL)
+            AND (StudentClasses.StopDate >= CAST(GETDATE() AS DATE) OR StudentClasses.StopDate IS NULL)
             AND NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) > 0)
             {$allowedFileTypeSql}
         ORDER BY vStudentsAll.StudentSurname, vStudentsAll.StudentPreferred";

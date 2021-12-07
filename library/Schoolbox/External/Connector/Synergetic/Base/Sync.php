@@ -215,8 +215,8 @@ class Sync extends Base implements ISync
             LEFT JOIN       dbo.luYearLevel ON luYearLevel.Code = vStaff.StaffYearLevel AND luYearLevel.Campus = vStaff.StaffCampus
             LEFT JOIN       dbo.Community ON Community.ID = vStaff.StaffID
             LEFT JOIN       dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID AND
-                            (JobPositions.StaffJobPositionStartDate < GETDATE() OR JobPositions.StaffJobPositionStartDate IS NULL) AND
-                            (JobPositions.StaffJobPositionEndDate > GETDATE() OR JobPositions.StaffJobPositionEndDate IS NULL)
+                            (JobPositions.StaffJobPositionStartDate <= CAST(GETDATE() AS DATE) OR JobPositions.StaffJobPositionStartDate IS NULL) AND
+                            (JobPositions.StaffJobPositionEndDate >= CAST(GETDATE() AS DATE) OR JobPositions.StaffJobPositionEndDate IS NULL)
             LEFT JOIN       dbo.vCommunityAddresses vCommunity ON vStaff.StaffID = vCommunity.ID
             WHERE           ActiveFlag = 1 AND
                             vStaff.StaffRegistrationType != 'STDNT'

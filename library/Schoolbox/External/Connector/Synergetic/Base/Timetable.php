@@ -112,8 +112,8 @@ class Timetable extends Base implements ITimetable
                                 Semester.SystemCurrentFlag = 1
 
                 LEFT JOIN       luFileType ON StudentClasses.FileType = luFileType.Code
-                WHERE           StudentClasses.StartDate <= getdate() AND
-                                (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+                WHERE           StudentClasses.StartDate <= CAST(GETDATE() AS DATE) AND
+                                (StudentClasses.StopDate >= CAST(GETDATE() AS DATE) OR StudentClasses.StopDate IS NULL)
                 ORDER BY        SubjectClasses.FileType ASC,
                                 SubjectClasses.Description ASC
 
