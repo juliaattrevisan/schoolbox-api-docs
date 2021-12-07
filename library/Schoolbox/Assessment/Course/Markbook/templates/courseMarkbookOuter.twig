@@ -5,6 +5,7 @@ Usage:
 #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}
@@ -22,7 +23,6 @@ Usage:
 } only %}
 
 {% autoescape 'js' %}
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js"></script>
     <script type="text/javascript">
         $(function() {
             $('#{{ reportContentId }}').on('filterContentLoaded', function() {
