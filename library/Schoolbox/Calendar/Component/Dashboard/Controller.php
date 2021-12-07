@@ -33,6 +33,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        /* TODO: Move this whole chunk to the calendar config
+         */
+
         /* TODO: Groups and Campus probably can remain empty
          */
         $groups = (new Group($this->getUser(), \Schoolbox\Resource\Folder\Mapper::getInstance()))->generate();
