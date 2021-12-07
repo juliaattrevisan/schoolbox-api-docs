@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import filesize from 'filesize';
 
 export default {
@@ -62,40 +61,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        let self = this;
-
-        /* Show skeleton
-         */
-        this.loading = true;
-
-        /* Fetch payload asynchronously
-         */
-        let request = {
-            url: self.endpoint,
-            method: 'get',
-            responseType: 'json'
-        }
-
-        /* Only works if the adapter is non-aws
-         */
-        axios.request(request)
-            .then(function (response) {
-
-                /* Load into vue component
-                 */
-                self.allData = response.data;
-            })
-            .catch(error => {
-                if (error.response) {
-                    self.loading = false;
-                }
-            })
-            .then(function () {
-
-                /* Hide skeleton
-                 */
-                self.loading = false;
-            });
+        this.getData();
     },
 
     /**
@@ -113,6 +79,27 @@ export default {
     methods: {
 
         /**
+         * Display the chart once the data has been loaded
+         */
+        async getData () {
+            this.loading = true;
+            try {
+                const response = await fetch(this.endpoint, {
+                    body: JSON.stringify(this.gradeGroups), 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                this.allData = await response.json();
+            } catch (error) {
+                console.warn(error);
+                this.loading = false;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
          * Wrapper for this filesize library
          *
          * @param size
@@ -121,6 +108,7 @@ export default {
         filesize: function(size) {
             return filesize(size);
         }
+
     }
 }
 </script>
