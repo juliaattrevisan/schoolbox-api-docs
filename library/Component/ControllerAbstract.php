@@ -591,7 +591,17 @@ abstract class Component_ControllerAbstract
         $templateFile = "component/config/$key.html";
 
         $page->setFile($key, $templateFile);
-        $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
+
+        /* We've never stored a json in a config value before; Scrub injects
+         * stuff that causes json_decode to fail; for now, provide a special case
+         * Not sure whether we worry too much about scrubbing Dashboard component
+         * configs, but until I have a smarter answer, this will have to do for now
+         */
+        if ($conf instanceof \Component_Config_CalendarFilter) {
+            $conf->parse($page, $key, $key, $params['value'], $this);
+        } else {
+            $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
+        }
 
         $page->parse('CONFIG_ELEMENT_CONTENT', $key);
         $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');

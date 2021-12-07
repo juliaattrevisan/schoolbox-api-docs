@@ -25,8 +25,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
      */
     public function dehydrate($value, Component_ControllerAbstract $controller)
     {
-        new \Alaress_Probe($value);
-        return json_encode($value, JSON_THROW_ON_ERROR);
+        return json_encode($value, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
     }
 
 
@@ -37,6 +36,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
      * @param                                   $configValue
      * @param Component_ControllerAbstract|null $component
      * @return void
+     * @throws JsonException
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
@@ -46,20 +46,20 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         $eventTypes = (new EventType(\Schoolbox\Calendar\EventTypeMapper::getInstance()))->generate();
         $sources = (new SourceList(\Calendar_Api_Config_Mapper::getInstance(), new \Calendar\Api\ModuleChecker(\Schoolbox\Config\Loader::getInstance())))->generate();
 
-        /* This came out of the db
+        /* Init $settings struct
          */
         $settings = [
             'eventType' => [],
-            'sources' => []
+            'sources' => [],
         ];
 
-//        [
-//            'sources' => [1,2,3],
-//            'eventType' => [4,5,6]
-//        ];
-
+        /* This came out of the db
+         *
+         * Note that Scrub::text() on a json encoded string will inject chars that
+         * prevent it from being json_decoded (will result in Syntax Error exception)
+         */
         if ('' !== (string)$configValue) {
-            $settings = json_decode($configValue);
+            $settings = json_decode($configValue, true, 512, JSON_THROW_ON_ERROR);
         }
 
         /* phpliberty island
@@ -68,13 +68,10 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         $page->setVar('calendarfilter_eventtype_block', '');
 
         foreach ($eventTypes->getData() as $eventType) {
-            /* TODO Decide if this eventType was selected from persisted data
-             */
-
             $page->setVar([
                 'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $eventType['id'],
                 'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => $eventType['name'],
-                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => ''//in_array($eventType['id'], $settings['eventType'], true) ? 'checked="checked"' : '',
+                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['eventType'][$eventType['id']] ? 'checked="checked"' : '',
             ]);
 
             $page->parse('calendarfilter_eventtype_block', 'calendarfilter_eventtype', true);
@@ -84,13 +81,10 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         $page->setVar('calendarfilter_source_block', '');
 
         foreach ($sources->getData() as $source) {
-            /* TODO Decide if this source was selected from persisted data
-             */
-
             $page->setVar([
                 'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $source['id'],
                 'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => $source['name'],
-                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => ''//in_array($source['id'], $settings['source'], true) ? 'checked="checked"' : '',
+                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['source'][$source['id']] ? 'checked="checked"' : '',
             ]);
 
             $page->parse('calendarfilter_source_block', 'calendarfilter_source', true);
