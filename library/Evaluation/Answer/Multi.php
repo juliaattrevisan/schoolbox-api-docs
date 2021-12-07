@@ -352,7 +352,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 
             /* Indicate this is a correct answer
              */
-            if ($currentAnswer->attributes()->fraction > 0) {
+            if ((int)$currentAnswer->attributes()->fraction > 0) {
                 $answer['correct'] = 1;
             }
 

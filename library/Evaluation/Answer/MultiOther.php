@@ -359,6 +359,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
      */
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
+        $allAnswers = [];
         foreach ($xmlObj->answer as $currentAnswer) {
             /* Set up data object in accordance with $this->create();
              */
@@ -368,7 +369,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
 
             /* Indicate this is a correct answer
              */
-            if ($currentAnswer->attributes()->fraction > 0) {
+            if ((int)$currentAnswer->attributes()->fraction > 0) {
                 $answer['correct'] = 1;
             }
 
