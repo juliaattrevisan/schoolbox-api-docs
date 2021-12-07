@@ -157,12 +157,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        if ($this->insertMarkbooksIfNotExists(
-            $assessment,
-            $folderCodes,
-            $this->getSystemFileYear(),
-            $this->getSystemFileSemester()
-        )
+        if (
+            $this->insertMarkbooksIfNotExists(
+                $assessment,
+                $folderCodes,
+                $this->getSystemFileYear(),
+                $this->getSystemFileSemester()
+            )
         ) {
             return true;
         } else {
@@ -359,11 +360,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             throw new InvalidArgumentException('Provider of feedback (' . $marker->getUsername() . ') has invalid external ID: ' . $marker->getExternalId());
         }
 
-        if ($this->setActivityMark($feedback)) {
-            return true;
-        } else {
-            throw new UnderflowException('Nothing was sync because student not enrolled in class: '.$feedback->getAssessable()->getBaseContext()->getFolder()->getCodeString());
-        }
+        return $this->setActivityMark($feedback);
     }
 
 
@@ -590,16 +587,23 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $assessmentRemoteList = $this->getSynergeticMarkbookList($activity, $studentFileYear, $studentFileSemester);
 
+        if (!count($assessmentRemoteList)) {
+            throw new UnderflowException('Unable to find assessment:  ' .
+                                         $this->getMarkbookIdentifier($activity) . ' in ' .
+                                         implode(',', $markbookFolderCodes));
+        }
+
         $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText));
 
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
             // Ignore markbooks if the student is not involved in them
-            if (!in_array(
-                $this->normalizeClassCode($assessmentRemote['ClassCode']),
-                $markbookFolderCodes,
-                true
-            )
+            if (
+                !in_array(
+                    $this->normalizeClassCode($assessmentRemote['ClassCode']),
+                    $markbookFolderCodes,
+                    true
+                )
             ) {
                 continue;
             }
@@ -878,14 +882,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $resultType           = $this->getResultType($activity);
         $isCreated            = false;
         foreach ($codesNotInRemote as $folderCode) {
-            if ($this->insertStaffMarkbook(
-                $activity,
-                $owner,
-                $folderCode,
-                $resultType,
-                $fileYear,
-                $fileSemester
-            )
+            if (
+                $this->insertStaffMarkbook(
+                    $activity,
+                    $owner,
+                    $folderCode,
+                    $resultType,
+                    $fileYear,
+                    $fileSemester
+                )
             ) {
                 $isCreated = true;
             }
