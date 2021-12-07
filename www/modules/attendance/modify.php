@@ -9,7 +9,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Web\Router\RouterFactory;
 use Schoolbox\Campus;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -108,7 +107,7 @@ if (!strlen($date)) {
 }
 
 foreach ($attendancePeriods as $attendancePeriod) {
-    if ($attendancePeriod < 0 || $attendancePeriod > 100 || !preg_match('/^\d+$/', $attendancePeriod)) {
+    if ($attendancePeriod < 0 || $attendancePeriod > 255 || !preg_match('/^\d+$/', $attendancePeriod)) {
         $this->error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
     }
 }
