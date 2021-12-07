@@ -10,11 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
-use Schoolbox\Calendar\Config\Campus;
 use Schoolbox\Calendar\Config\EventType;
 use Schoolbox\Calendar\Config\Filter;
-use Schoolbox\Calendar\Config\Group;
 use Schoolbox\Calendar\Config\SourceList;
+use Schoolbox\Collection;
 
 /**
  * Dashboard calendar component.
@@ -26,20 +25,13 @@ class Controller extends Component_Dashboard_ControllerAbstract
      *
      * @return bool
      * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
+     * @throws \JsonException
      */
     public function renderTemplate($templateHandle)
     {
-        /* TODO: Move this whole chunk to the calendar config
-         */
-
-        /* TODO: Groups and Campus probably can remain empty
-         */
-        $groups = (new Group($this->getUser(), \Schoolbox\Resource\Folder\Mapper::getInstance()))->generate();
-        $campus = (new Campus($this->getUser(), \Schoolbox\CampusMapper::getInstance()))->generate();
 
         /* These are the available options from which you can chooze
          */
@@ -66,7 +58,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         /* Shank them into the filter class which does filter things
          */
-        $filters = (new Filter($settings))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
+        $filters = (new Filter($settings))->generate(new Collection(), new Collection(), $eventType->getData(), $sourceList->getData());
 
         return $this->renderTwigTemplate(
             $templateHandle,
