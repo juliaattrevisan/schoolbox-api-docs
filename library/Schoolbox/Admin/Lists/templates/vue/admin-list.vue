@@ -55,7 +55,7 @@ export default {
             loadedData: state => state.loadedData,
             rows: state => state.rows,
             selectedRow: state => state.selectedRow,
-            isPopOutOpen: state => state.isPopOutOpen
+            isPopOutOpen: state => state.isPopOutOpen,
         }),
 
         ...mapGetters([
@@ -112,12 +112,19 @@ export default {
          * Init the sortable feature
          */
         initSortable () {
-            if (this.loadedData.isSortable) {
+            if (this.loadedData.isSortable && this.rows.length > 0) {
                 this.$nextTick(() => {
                     $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
                 });
             }
         }, 
+
+        /**
+         * As the list wasn't visible, check for sortable feature again
+         */
+        onListAfterEnter () {
+            this.initSortable();
+        },
 
         /**
          * Ensure there's enough height in the container so the pop out doesn't get cut off
@@ -133,7 +140,7 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          */
-        onBeforeEnter (row) {
+        onRowBeforeEnter (row) {
             gsap.set(row, { height: 0 } );
         },
 
@@ -143,7 +150,7 @@ export default {
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
          */
-        onEnter (row, done) {
+        onRowEnter (row, done) {
             gsap.to(row, 0.3, { height: 'auto', onComplete: done } );
         },
 
@@ -153,7 +160,7 @@ export default {
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
          */
-        onLeave (row, done) {
+        onRowLeave (row, done) {
             gsap.to(row, 0.3, { height: 0, onComplete: done } );
         },
 
@@ -170,7 +177,7 @@ export default {
         
             <div class="small-12 island">
                 
-                <transition name="fade" mode="out-in">
+                <transition name="fade" mode="out-in" @after-enter="onListAfterEnter">
                     
                     <admin-list-no-rows v-if="rows.length === 0" key="empty-list" />
 
@@ -190,9 +197,9 @@ export default {
                                     v-bind:css="false"
                                     data-sortable 
                                     data-list
-                                    @before-enter="onBeforeEnter"
-                                    @enter="onEnter"
-                                    @leave="onLeave"
+                                    @before-enter="onRowBeforeEnter"
+                                    @enter="onRowEnter"
+                                    @leave="onRowLeave"
                                 >    
                                     <admin-list-row
                                         v-for="(row, index) in rows"
@@ -271,8 +278,8 @@ export default {
 <style lang="scss" scoped>
 
 .list-container { //so rows aren't shown when animating on/off on add/remove
-    position: relative;
     overflow: hidden;
+    position: relative;
 }
 
 .information-list {
@@ -284,10 +291,10 @@ export default {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .3s;
+    transition: opacity 0.3s;
 }
 .fade-enter, .fade-leave-to {
-  opacity: 0;
+    opacity: 0;
 }
 
 </style>
