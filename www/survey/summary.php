@@ -66,6 +66,7 @@ $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'delete_quiz', 'delete_quiz_block');
 $this->setBlock(TEMPLATE_content, 'delete_survey', 'delete_survey_block');
+$this->setBlock(TEMPLATE_content, 'view_results_link', 'view_results_link_block');
 $this->setTitle('Assessment: ' . Scrub::text($survey['title']));
 $survey['description'] = trim($survey['description']);
 if (empty($survey['description'])) {
@@ -80,6 +81,8 @@ $this->setVar(array(
 ));
 $this->setVar('delete_quiz_block', '');
 $this->parse('delete_survey_block', 'delete_survey');
+$this->parse('view_results_link_block', 'view_results_link');
+
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs();

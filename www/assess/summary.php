@@ -18,6 +18,7 @@ $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
 $groupHandler = new Group();
 
+/** @var SitePage $this */
 $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($assess['assess_id']);
@@ -100,6 +101,7 @@ $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'delete_quiz', 'delete_quiz_block');
 $this->setBlock(TEMPLATE_content, 'delete_survey', 'delete_survey_block');
+$this->setBlock(TEMPLATE_content, 'view_results_link', 'view_results_link_block');
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
 $assess['description'] = trim($assess['description']);
@@ -119,6 +121,12 @@ $this->setVar(array(
 
 $this->parse('delete_quiz_block', 'delete_quiz');
 $this->setVar('delete_survey_block', '');
+
+if ($assessment->isImplementation()) {
+    $this->parse('view_results_link_block', 'view_results_link');
+} else {
+    $this->setVar('view_results_link_block', '');
+}
 
 /* Render out breadcrumbs
  */
