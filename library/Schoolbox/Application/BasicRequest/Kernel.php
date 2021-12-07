@@ -196,6 +196,8 @@ class Kernel extends WebKernelAbstract
         $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
         $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
         $sentryClient  = null;
+        // `$sentryToken` and `$sentryProject` are never defined in PHPStan
+        /** @phpstan-ignore-next-line */
         if (\strlen($sentryToken) && \strlen($sentryProject)) {
             try {
                 /** @var Instance $sb */
