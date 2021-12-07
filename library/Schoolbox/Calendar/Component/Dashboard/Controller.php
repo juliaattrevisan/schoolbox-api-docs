@@ -46,13 +46,27 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $eventType = (new EventType(\Schoolbox\Calendar\EventTypeMapper::getInstance()))->generate();
         $sourceList = (new SourceList(\Calendar_Api_Config_Mapper::getInstance(), new \Calendar\Api\ModuleChecker($this->getConfigLoader())))->generate();
 
-        /* TODO Get these from the component config
+        /* This came out of the db
+         *
+         * Note that Scrub::text() on a json encoded string will inject chars that
+         * prevent it from being json_decoded (will result in Syntax Error exception)
          */
-        $persistedFilters = null;
+        $configValue = $this->getConfig()['calendarFilter'];
+
+        /* Init $settings struct
+         */
+        $settings = [
+            'eventType' => [],
+            'sources' => [],
+        ];
+
+        if ('' !== (string)$configValue) {
+            $settings = json_decode($configValue, true, 512, JSON_THROW_ON_ERROR);
+        }
 
         /* Shank them into the filter class which does filter things
          */
-        $filters = (new Filter($persistedFilters))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
+        $filters = (new Filter($settings))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
 
         return $this->renderTwigTemplate(
             $templateHandle,
