@@ -23,7 +23,7 @@
 <div id="calendar-{{ component.instance.id }}">
     <calendar-component
         :instance-id="{{ component.instance.id }}"
-        :title="{{ locale.calendar.proper }}"
+        title="{{ component.config.componentname }}"
     />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/calendarComponent.js?v={{ config.site_version }}"></script>

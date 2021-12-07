@@ -28,19 +28,12 @@ export default {
     },
 
     props: {
-        instanceId: {
-            type: Number,
-            required: true,
-            default: () => {
-                return 0;
-            }
-        },
         title: {
             type: String,
             required: true,
             default: () => {
                 /* This is a default string that should never appear
-                 * It should always be using the compnent config's componentName value
+                 * It should always be using the component config's componentName value
                  */
                 return 'Calendar';
             }
