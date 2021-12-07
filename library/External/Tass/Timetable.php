@@ -149,7 +149,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
 
-    function getLastDay($date, Campus $campus)
+    public function getLastDay($date, Campus $campus)
     {
 
         $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';

@@ -30,7 +30,7 @@ class External_Synergetic_Class implements External_ClassInterface
     /**
      * Constructor
      */
-    function __construct()
+    public function __construct()
     {
         $this->database = Factory::getInstanceExternal();
         $this->setExternalUser(new External_User('synergetic'));
