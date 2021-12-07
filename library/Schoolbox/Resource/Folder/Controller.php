@@ -492,7 +492,7 @@ class Controller extends BaseController
         // Cover image
         if ($coverImage) {
             try {
-                $folder->setCoverImage((new CollectorFactory())->build($coverImage ? [$coverImage] : [])->getFirst());
+                $folder->setCoverImage((new CollectorFactory())->build([$coverImage])->getFirst());
             } catch (ResourceException $e) {
                 // noop - retain current attachment
                 trigger_error("Unable to build folder cover image", E_USER_WARNING);
