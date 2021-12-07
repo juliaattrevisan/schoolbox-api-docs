@@ -37,6 +37,10 @@ export default {
                  */
                 return 'Calendar';
             }
+        },
+        selectedFilters: {
+            type: Object,
+            required: true
         }
     },
 
@@ -77,6 +81,7 @@ export default {
     },
 
     beforeMount () {
+        console.log(this.selectedFilters);
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, listPlugin, adaptivePlugin ],
