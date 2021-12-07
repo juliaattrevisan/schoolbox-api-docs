@@ -109,7 +109,7 @@
                     <td colspan="8">
                         <p class="subheading">Comments</p>
                         {% for term, commentData in entriesAndResults.comments[year].courses[courseName].terms %}
-                            {% if commentData.comment|length %}
+                            {% if (commentData.comment ?? '')|length %}
                                 <p>Term {{ term }} - {{ commentData.comment }}&mdash;{{ macro.renderTeachers(commentData.teachers) }}</p>
                             {% endif %}
                         {% endfor %}
