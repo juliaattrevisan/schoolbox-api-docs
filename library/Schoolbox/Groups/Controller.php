@@ -226,7 +226,8 @@ class Controller extends BaseController
             'group'     => $groupId,
             'user'      => $user->getId(),
             'favourite' => $userGroup->getFavourite(),
-            'followList' => $followingList,
+            'following' => in_array($groupId, $followingList),
+            'access'    => $userGroup->getService(),
         ]));
     }
 }
