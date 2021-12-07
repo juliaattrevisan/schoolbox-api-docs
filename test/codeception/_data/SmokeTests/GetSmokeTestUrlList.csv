@@ -1,5 +1,13 @@
 Admin,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/home
 Admin,Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
+Admin,User Management Activity Report,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all
+Admin,User Management Login Log,https://vagrant.dev.schoolbox.cloud/adminv2/reports/login/all
+Admin,User Management Schoolbox Help All,https://vagrant.dev.schoolbox.cloud/adminv2/shaps
+Admin,User Management Schoolbox Help Provisioned,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/provisioned
+Admin,User Management Schoolbox Help Not Provisioned,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/unprovisioned
+Admin,User Management Schoolbox Help Search,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/search
+Admin,User Management Schoolbox Help Courses,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/courses
+Admin,User Management Remove Users,https://vagrant.dev.schoolbox.cloud/adminv2/user/stale
 Admin,Create a user,https://vagrant.dev.schoolbox.cloud/adminv2/user/create
 Admin,Go to service permissions,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions
 Admin,Go to bulk modify,https://vagrant.dev.schoolbox.cloud/adminv2/user/bulk/modify
@@ -20,23 +28,40 @@ Admin,Configure security,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Sec
 Admin,Configure skin,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Config
 Admin,Configure Terminology,https://vagrant.dev.schoolbox.cloud/adminv2/terminology
 Admin,Import a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar
+Admin,Import a calendar calendar/import,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import
 Admin,Subscibe to a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe
 Admin,Cleanup calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup
 Admin,Bulk add folders,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder
 Admin,Rollover folders,https://vagrant.dev.schoolbox.cloud/adminv2/rollover
 Admin,Setup grades,https://vagrant.dev.schoolbox.cloud/adminv2/grades
-Admin,Setup rubric resultset,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results
+Admin,LMS LMS Policy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy
+Admin,Setup rubric result set,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results
 Admin,Configure terms,https://vagrant.dev.schoolbox.cloud/adminv2/terms
 Admin,Configure course builder,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder
 Admin,Setup notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages
 Admin,Configure notification delivery,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure
 Admin,Configure student notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure/student
 Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/messages/apps
+Admin,System Settings 3rd Party Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services
+Admin,System Settings Debugging,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging
+Admin,System Settings Email,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Email
+Admin,System Settings External DB,https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB
+Admin,System Settings LDAP,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LDAP
+Admin,System Settings Localisation,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Localisation
 Admin,Configure oAuth providers,https://vagrant.dev.schoolbox.cloud/adminv2/oauth
+Admin,System Settings Paths,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Paths
+Admin,System Settings Policy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Policy
+Admin,System Settings Proxy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Proxy
+Admin,System Settings SAML,https://vagrant.dev.schoolbox.cloud/adminv2/setting/SAML
+Admin,System Settings Security,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security
+Admin,System Settings Site,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Site
 Admin,Review registered push apps,https://vagrant.dev.schoolbox.cloud/adminv2/messages/puush
 Admin,Review role list,https://vagrant.dev.schoolbox.cloud/adminv2/lists
+Admin,Lists Badge Category,https://vagrant.dev.schoolbox.cloud/adminv2/lists/achievement-category
 Admin,Review house list,https://vagrant.dev.schoolbox.cloud/adminv2/lists/house
+Admin,Lists Learning Moments,https://vagrant.dev.schoolbox.cloud/adminv2/lists/evidence-tag
 Admin,Review residential houses,https://vagrant.dev.schoolbox.cloud/adminv2/lists/residential-house
+Admin,Lists Roles,https://vagrant.dev.schoolbox.cloud/adminv2/lists/roles
 Admin,Review drives list,https://vagrant.dev.schoolbox.cloud/adminv2/lists/webdav
 Admin,Review campus list,https://vagrant.dev.schoolbox.cloud/adminv2/lists/campus
 Admin,Review event types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/event-type
@@ -45,6 +70,7 @@ Admin,Review submission types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/
 Admin,Review submission states,https://vagrant.dev.schoolbox.cloud/adminv2/lists/submission-errors
 Admin,Review components,https://vagrant.dev.schoolbox.cloud/adminv2/lists/component-definition
 Admin,Review timetable colours,https://vagrant.dev.schoolbox.cloud/adminv2/lists/timetable-colour
+Admin,Lists User Titles,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title
 Admin,Review pastoral types,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type
 Admin,Review pastoral subtypes,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category
 Admin,Review pastoral sis docs,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification
@@ -53,15 +79,41 @@ Admin,Review pastoral tags,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pas
 Admin,Review year levels,https://vagrant.dev.schoolbox.cloud/adminv2/lists/year-levels
 Admin,Setup LTI provider,https://vagrant.dev.schoolbox.cloud/adminv2/lti
 Admin,View storage usage,https://vagrant.dev.schoolbox.cloud/adminv2/usage
+Admin,Resources Settings,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Resources
+Admin,Resources Restore,https://vagrant.dev.schoolbox.cloud/adminv2/restore
 Admin,Review engagement,https://vagrant.dev.schoolbox.cloud/adminv2/engagement
+Admin,Engagement Collaboration,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/collaboration
+Admin,Engagement Component Usage,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/components
+Admin,Engagement Due Work,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/dueWork
+Admin,Engagement Files,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/files
+Admin,Engagement Media,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/fileTypes
+Admin,Engagement Links,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/links
+Admin,Engagement Login,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/login
+Admin,Engagement Mobile Apps,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/mobile
+Admin,Engagement News Posted,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/news
+Admin,Engagement Quizzes,https://vagrant.dev.schoolbox.cloud/adminv2/engagement/index/quiz
+Admin,Config filters,https://vagrant.dev.schoolbox.cloud/adminv2/filters
+Admin,Filters Assessment Calendar,https://vagrant.dev.schoolbox.cloud/adminv2/filters/assessmentCal
+Admin,Filters Badge List,https://vagrant.dev.schoolbox.cloud/adminv2/filters/badgeList
+Admin,Filters Badge Report,https://vagrant.dev.schoolbox.cloud/adminv2/filters/awardList
+Admin,Filters Class Markbook,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classMarkbook
+Admin,Filters Course Markbook,https://vagrant.dev.schoolbox.cloud/adminv2/filters/courseMarkbook
+Admin,Filters Upcoming Due Work,https://vagrant.dev.schoolbox.cloud/adminv2/filters/dueWorkCal
+Admin,Filters Grades,https://vagrant.dev.schoolbox.cloud/adminv2/filters/grades
+Admin,Filters Pending Assessments,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending
+Admin,Filters Rubric Markbook,https://vagrant.dev.schoolbox.cloud/adminv2/filters/rubricMarkbook
 Admin,Setup UPS rules,https://vagrant.dev.schoolbox.cloud/adminv2/ups
 Admin,Setup UPS rules for students,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student
+Admin,User Management User Provisioning System Parent,https://vagrant.dev.schoolbox.cloud/adminv2/ups/parent
+Admin,User Management User Provisioning System Staff,https://vagrant.dev.schoolbox.cloud/adminv2/ups/staff
 Admin,View Media Queue,https://vagrant.dev.schoolbox.cloud/adminv2/video
 Admin,Import users,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount
 Admin,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload
-Admin,Config filters,https://vagrant.dev.schoolbox.cloud/adminv2/filters
-Admin,Configure filters on pending assessment,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending
-Admin,Configre feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
+Admin,Modules Home,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules
+Admin,Modules Board Leave,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Board+Leave
+Admin,Configure feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
+Admin,Modules Package,https://vagrant.dev.schoolbox.cloud/adminv2/package
+Admin,Modules Pastoral Care,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Pastoral+Care
 Admin,Import school data,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport
 Admin,Import import pastoral,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral
 Admin,Import timetable Structure,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure
