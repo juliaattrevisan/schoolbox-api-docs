@@ -425,7 +425,7 @@ class Model implements ISoftDeletable
         // calling classes to figure out.
         trigger_error(
             sprintf('Assessment #%d has no sub-object: this is likely a data issue', $this->id),
-            E_USER_WARNING
+            E_USER_NOTICE
         );
         return null;
     }
