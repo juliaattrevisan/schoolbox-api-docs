@@ -16,11 +16,14 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Config;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Realtime\Message\RoutePermissionMapper;
+use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RerouteOverride;
-
+use Schoolbox\RoleMapper;
 use function in_array;
 
 class Controller extends BaseController
@@ -215,17 +218,15 @@ class Controller extends BaseController
 
         //subscribe/remove notifications
         //build notifications
-        $followmentHelp = new \Schoolbox\Realtime\Controller();
+        $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
         $following = $this->getRequest()->post['follow'] ? 1 : 0;
-        $followingList = $followmentHelp->getConfig()->persistFollow($user, [$groupId => $following]);
-        //follow array[groupId]=bool(follow)
-////        $realtimeConfig = new Config(null, null, null, null);
-//        $followingList = Config::persistFollow($user, [$groupId => $following]);
+        $followingList = $realtimeConfig->persistFollow($user, [$groupId => $following]);
 
         return $this->getResponse()->content->set($this->buildJsonOutput([
             'group'     => $groupId,
             'user'      => $user->getId(),
             'favourite' => $userGroup->getFavourite(),
+            'followList' => $followingList,
         ]));
     }
 }
