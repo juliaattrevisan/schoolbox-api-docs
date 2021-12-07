@@ -311,7 +311,7 @@ class ResultBuilder
     {
         return [
             'id'       => $id,
-            'mimetype' => $this->faker->mimeType,
+            'mimetype' => $this->faker->mimeType(),
             'name'     => $this->faker->words,
             'size'     => $this->faker->numberBetween(1000, 100000),
             'url'      => $this->faker->imageUrl(800, 600),
