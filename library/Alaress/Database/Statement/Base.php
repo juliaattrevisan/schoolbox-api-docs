@@ -263,10 +263,9 @@ abstract class Base implements IStatement
                 case PDO::PARAM_NULL:
                     return 'PARAM_NULL';
                 case PDO::PARAM_STR:
+                default:
                     return 'PARAM_STR';
             }
         }
-
-        return $type;
     }
 }
