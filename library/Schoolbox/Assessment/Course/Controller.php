@@ -823,7 +823,7 @@ class Controller extends Base\Base
      * @param int      $parentId
      * @param array    $curriculumCodeIds
      * @param bool     $inherit            Whether to inherit permissions
-     * @param int|null $templateId
+     * @param int      $templateId
      * @param array    $rolePermissions    Maps role to permission level
      * @param bool     $recursePermissions If true && user is SU, applies 'inherit' to entire subtree
      * @param array    $classCodes
