@@ -93,7 +93,6 @@ export default {
             this.loading = true;
             try {
                 const response = await fetch(this.endpoint, {
-                    body: JSON.stringify(this.gradeGroups), 
                     headers: {
                         'Content-Type': 'application/json',
                     },
