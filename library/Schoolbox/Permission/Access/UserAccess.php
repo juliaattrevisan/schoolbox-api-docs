@@ -142,7 +142,7 @@ class UserAccess implements IModel
     protected $accessLevel;
 
     /** @var bool */
-    protected bool $favourite;
+    protected bool $favourite = false;
 
 
     /**

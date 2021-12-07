@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Config;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
@@ -37,7 +38,6 @@ class Controller extends BaseController
         //helpers
         $groupMapper      = GroupMapper::getInstance();
         $accessMapper     = UserAccessMapper::getInstance();
-        $userAccessMapper = UserAccessMapper::getInstance();
 
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
@@ -66,7 +66,7 @@ class Controller extends BaseController
         }
 
         //check if notifications or favourites
-        $favourites = $userAccessMapper->getFavourites($user);
+        $favourites = $accessMapper->getFavourites($user);
 
         //build notifications
         $followmentHelp = new \Schoolbox\Realtime\Controller();
@@ -140,27 +140,69 @@ class Controller extends BaseController
 
     /**
      * edit's a users enrolment into a group
-     * @param Module $groupId
+     * @param int $groupId
      *
      * @api POST /mygroup/{groupId:\d+}/edit
      */
-    public function postMyGroup(Module $groupId)
+    public function postMyGroup(int $groupId)
     {
+        //helpers
+        $accessMapper     = UserAccessMapper::getInstance();
+
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
         /**
          * post should contain:
          * group id
          * action (add, remove, edit)
          * subscribe/notifications (true, false)
          * favourite (true, false)
+         *
+         * need to check for the existence of the user/group relationship then modify it, or create a new entry
          */
         //get group object
+        $group = false;
 
+        try {
+            $group = $accessMapper->findOneByColumnList([
+                'uid' => $user->getId(),
+                'sid' => $groupId,
+            ]);
+        } catch (MapperException\NotFound $e) {
+            $group = new UserAccess();
+            $group->setServiceIdentifier($groupId)
+                ->setUser($user)
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setFavourite(false);
+        }
         //add / remove user from group
+        if ($this->getRequest()->post['action'] === 'delete') {
+            $accessMapper->delete($group);
+            return $this->getResponse()->content->set($this->buildJsonOutput([
+                'group'     => $groupId,
+                'user'      => $user->getId(),
+                'action'    => 'delete'
+            ]));
+        }
 
+        //must be edit functions
         //make/remove favourite
+        $group->setFavourite($this->getRequest()->post['favourite']);
+
+        //save group object
+        $accessMapper->save($group);
 
         //subscribe/remove notifications
+        //follow array[groupId]=bool(follow)
+//        $following = $this->getRequest()->post['follow'] ? 1 : 0;
+////        $realtimeConfig = new Config(null, null, null, null);
+//        $followingList = Config::persistFollow($user, [$groupId => $following]);
 
-        return $groupId;
+        return $this->getResponse()->content->set($this->buildJsonOutput([
+            'group'     => $groupId,
+            'user'      => $user->getId(),
+            'favourite' => $group->getFavourite(),
+        ]));
     }
 }
