@@ -106,7 +106,7 @@
 {% for userId, currentTally in effort.allEffort %}
 {
     info: "{{ currentTally.user.fullname }}",
-    uid: '{{ currentTally.user.externalId }}',
+    uid: '{{ currentTally.user.id }}',
     value: [{{ currentTally.hits }},{{ currentTally.average }}]{% if not loop.last %},
 {% endif %}
 }{% if not loop.last %},
