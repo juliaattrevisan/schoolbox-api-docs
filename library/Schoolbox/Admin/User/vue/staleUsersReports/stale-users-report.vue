@@ -9,7 +9,6 @@
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
-import axios from 'axios';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
 export default {
@@ -163,10 +162,8 @@ export default {
          */
         async loadRows () {
             try {
-                // const response = await axios.get(this.src);
                 const response = await fetch(this.src);
-                const responseData = await response.json();
-                this.rows = responseData;
+                this.rows = await response.json();
                 this.hasRowsLoaded = true;
             } catch (error) {
                 this.hasLoadError = true; //display error note in the DOM
@@ -204,7 +201,10 @@ export default {
         async onConfirmDeleteUsersSelected () {
             this.$refs.toast.activate('Deleting...');
             try {
-                await axios.post(this.action, this.getFormData());
+                await fetch(this.action, {
+                    method: 'POST',
+                    body: this.getFormData(),
+                });
                 this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
                 this.rows = this.getUpdatedRowsAfterUserDeletion();
