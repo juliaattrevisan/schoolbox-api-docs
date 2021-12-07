@@ -11,6 +11,7 @@ namespace Schoolbox\Calendar;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Di\Exception;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Calendar\Api\ModuleChecker;
@@ -156,7 +157,16 @@ class Controller extends Base
         $campus       = (new Campus($user, $this->campusMapper))->generate();
         $eventType    = (new EventType($this->eventTypeMapper))->generate();
         $sourceList   = (new SourceList($this->calApiConfigMapper, $this->moduleChecker))->generate();
-        $filters      = (new Filter($this->getSession()))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
+
+        /* Get the current session vars that store the Filter settings
+         */
+        try {
+            $persistedFilters = $this->session->get('calendarFilter');
+        } catch (Exception $e) {
+            throw new Exception\ServiceNotFound();
+        }
+
+        $filters = (new Filter($persistedFilters))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
 
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->userMapper->getCalendarView($this->getUser()->getId())]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
