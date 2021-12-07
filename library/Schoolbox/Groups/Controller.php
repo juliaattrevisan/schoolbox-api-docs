@@ -44,6 +44,8 @@ class Controller extends BaseController
 
         //get list of all possible groups
         $groups = $groupMapper->findByColumn('type', [Group::FREE_GROUP, Group::MODERATED_GROUP]);
+        //get list of all groups, will filter out the private and not member
+//        $groups = $groupMapper->findAll();
 
         //check if user is currently member
         // Get the perms for user - including DENY (semantically PENDING) access
@@ -94,9 +96,16 @@ class Controller extends BaseController
         // build output array
         $userAccess     = [];
         $possibleGroups = [];
+        /* @var Group $group */
         foreach ($groups as $group) {
             $folderId = $group->getFolder()->getId();
             $folder   = $group->getFolder();
+
+            if ($group->isPrivate() && !$userPerms[$folderId]) {
+                // private group and the user is not a member, don't show.
+                continue;
+            }
+
             if (!in_array($folderId, $userWriteGroupIds)) {
                 //will follow by default, check that user is actually in that group when checking if they are following
                 $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
@@ -118,6 +127,7 @@ class Controller extends BaseController
                     'coverImage' => $folder->getCoverImage(),
                     'follow'     => $follow,
                     'favourite'  => $favourite,
+                    'type'       => $group->getType(),
                 ];
                 $possibleGroups[] = $tmp;
                 try {
@@ -147,11 +157,14 @@ class Controller extends BaseController
     public function postMyGroup(int $groupId)
     {
         //helpers
-        $accessMapper     = UserAccessMapper::getInstance();
+        $accessMapper   = UserAccessMapper::getInstance();
+        $groupMapper    = GroupMapper::getInstance();
 
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
 
+        /* @var Group $group */
+        $group = $groupMapper->findById($groupId);
         /**
          * post should contain:
          * group id
@@ -162,23 +175,30 @@ class Controller extends BaseController
          * need to check for the existence of the user/group relationship then modify it, or create a new entry
          */
         //get group object
-        $group = false;
+        $userGroup = false;
 
         try {
-            $group = $accessMapper->findOneByColumnList([
+            $userGroup = $accessMapper->findOneByColumnList([
                 'uid' => $user->getId(),
                 'sid' => $groupId,
             ]);
         } catch (MapperException\NotFound $e) {
-            $group = new UserAccess();
-            $group->setServiceIdentifier($groupId)
+            $userGroup = new UserAccess();
+            $userGroup->setServiceIdentifier($groupId)
                 ->setUser($user)
                 ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
                 ->setFavourite(false);
+            if ($group->isFree()) {
+                $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
+            }
         }
         //add / remove user from group
-        if ($this->getRequest()->post['action'] === 'delete') {
-            $accessMapper->delete($group);
+        if ('delete' === $this->getRequest()->post['action']) {
+            if ($group->isPrivate()) {
+                return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'No Permission to leave group']));
+            }
+            $accessMapper->delete($userGroup);
             return $this->getResponse()->content->set($this->buildJsonOutput([
                 'group'     => $groupId,
                 'user'      => $user->getId(),
@@ -188,21 +208,24 @@ class Controller extends BaseController
 
         //must be edit functions
         //make/remove favourite
-        $group->setFavourite($this->getRequest()->post['favourite']);
+        $userGroup->setFavourite($this->getRequest()->post['favourite']);
 
         //save group object
-        $accessMapper->save($group);
+        $accessMapper->save($userGroup);
 
         //subscribe/remove notifications
+        //build notifications
+        $followmentHelp = new \Schoolbox\Realtime\Controller();
+        $following = $this->getRequest()->post['follow'] ? 1 : 0;
+        $followingList = $followmentHelp->getConfig()->persistFollow($user, [$groupId => $following]);
         //follow array[groupId]=bool(follow)
-//        $following = $this->getRequest()->post['follow'] ? 1 : 0;
 ////        $realtimeConfig = new Config(null, null, null, null);
 //        $followingList = Config::persistFollow($user, [$groupId => $following]);
 
         return $this->getResponse()->content->set($this->buildJsonOutput([
             'group'     => $groupId,
             'user'      => $user->getId(),
-            'favourite' => $group->getFavourite(),
+            'favourite' => $userGroup->getFavourite(),
         ]));
     }
 }
