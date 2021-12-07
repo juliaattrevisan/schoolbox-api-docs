@@ -648,19 +648,18 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                /* This answer is correct
-                 */
                 if ($currentAnswer->correct) {
+                    /* This answer is correct
+                     */
                     $page->setVar([
                         'ANSWER_OPTION_STATUS' => '',
                         'ANSWER_ICON_CLASS'    => '',
                         'ANSWER_ICON_TITLE'    => '',
                         'ANSWER_CHECKED'       => 'checked',
                     ]);
-                }
-                /* This answer is not correct
-                 */
-                else {
+                } else {
+                    /* This answer is not correct
+                     */
                     $page->setVar([
                         'ANSWER_OPTION_STATUS' => '',
                         'ANSWER_ICON_CLASS'    => '',
