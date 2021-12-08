@@ -163,7 +163,7 @@ class EventConnector extends EventMapper
      * @throws DefinitionException
      * @throws \InvalidArgumentException
      */
-    public function getDayEvents($startTimestamp, $endTimestamp): Collection
+    public function getDayEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -214,6 +214,15 @@ class EventConnector extends EventMapper
             ];
         }
 
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         * TODO: Replace injections with something less injecty
+         */
+        $queryEventTypes = '';
+
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $queryEventTypes = ' AND e.type IN (' . implode(',', $allowedEventTypes) . ')';
+        }
+        
         /* Ram in all the pieces
          */
         $query = "
@@ -252,6 +261,7 @@ class EventConnector extends EventMapper
                 DATE(e.start_datetime) <= :endDate
                 AND eotc_metadata.status_id != :rejected
                 AND e.deleted_at IS NULL
+                {$queryEventTypes}
             ORDER BY e.start_datetime, e.end_datetime
         ";
 
