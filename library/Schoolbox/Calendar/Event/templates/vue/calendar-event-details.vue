@@ -1,7 +1,5 @@
 <script>
     import AudiencesModal from './audiences-modal';
-    import qs from 'qs';
-    import axios from 'axios';
     import debounce from 'lodash/debounce';
 
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
@@ -322,54 +320,18 @@
                  */
                 this.isTransacting = true;
 
-                /* A toast - to your valour, my sword, and our victory together
-                 */
                 const toast = $('[data-toast]');
                 toast.toastActivate({
                     text: 'Updating invitation...'
                 });
 
-                // axios.request(request)
-                //         .then(function (response) {
-
-                //             /* Update data with the result from async request
-                //              */
-                //             self.currentAttendanceStatus = status;
-                //             self.updateCountsFromPayload(response.data);
-                //             self.guests = response.data.attendees.guests;
-
-                //             toast.toastTimeout({
-                //                 text: 'Invitation successfully updated',
-                //                 css: 'success'
-                //             });
-                //         })
-                //         .catch(error => {
-                //             if (error.response) {
-                //                 toast.toastTimeout({
-                //                     text: 'Unable to update invitation. ' + error.response.data.message,
-                //                     css: 'alert'
-                //                 });
-                //             }
-                //         })
-                //         .then(function (response) {
-
-                //             /* Reset flag
-                //              */
-                //             self.isTransacting = false;
-                //         });
-
                 try {
                     const response = await fetch(endpoint, {
                         method: 'POST', 
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
                     });
                     const responseData = await response.json();
                     
-                    /* Update data with the result from async request
-                     */
-                    this.currentAttendanceStatus = status;
+                    this.currentAttendanceStatus = status; //Update data with the result from async request
                     this.updateCountsFromPayload(responseData);
                     this.guests = responseData.attendees.guests;
 
@@ -435,8 +397,8 @@
 
                 /* To invite others, you must
                  *   - be a staff member or the config var lets you invite others
-                 *   - be able to edit the event (you're its author)
                  *   - have available places
+                 *   - be able to edit the event (you're its author)
                  */
                 if (this.canInvite && this.canModify()) {
                     if ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax)) {
@@ -505,14 +467,13 @@
              * Perform async request and load results into component
              */
             search: debounce(function(loading, query, vm) {
-                axios.get(ENDPOINTS.URL_SELECTIZE, {
-                    params: {
-                        query: query,
-                        groupID: 0
-                    }
-                })
-                .then(function(response) {
-                    vm.options = response.data;
+                fetch(ENDPOINTS.URL_SELECTIZE + '?' + new URLSearchParams({
+                    query: query,
+                    groupID: 0
+                }))
+                .then((response) => response.json())
+                .then((data) => {
+                    vm.options = data;
                     loading(false);
                 });
             }, 350),
