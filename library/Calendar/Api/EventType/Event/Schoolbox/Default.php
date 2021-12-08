@@ -35,9 +35,9 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
      *
      * @return \Calendar\Event\Collection
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
-        $collection = $this->getEventsFromCalendarHandler($startTimestamp, $endTimestamp);
+        $collection = $this->getEventsFromCalendarHandler($startTimestamp, $endTimestamp, $allowedEventTypes);
 
         /* Give the calendar_connector id so this event knows where it came from
          * This allows you to create an event detail screen in Mobile
@@ -60,13 +60,23 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
      *
      * @return \Calendar\Event\Collection
      */
-    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp)
+    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp, ?array $allowedEventTypes = null)
     {
+        /* Manufacture a special $filters array
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        $filter = [];
+
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $filter['typeSet'] = $allowedEventTypes;
+        }
+
         return $this->getCalendarHandler()->getDayEvents(
             $this->getUser(),
             $this->getViewer(),
             $startTimestamp,
-            $endTimestamp
+            $endTimestamp,
+            $filter
         );
     }
 

@@ -555,6 +555,14 @@ class Calendar extends DeprecatedModel
             $filter_query[] = 'type = ' . intval($filter['type']);
         }
 
+        /* Filter to specific event types
+         * TODO: Replace injections with something less injecty
+         * TODO: Enforce int types on typeSet
+         */
+        if ($filter['typeSet']) {
+            $filter_query[] = 'type IN (' . implode(',', $filter['typeSet']) . ')';
+        }
+
         if ($filter['personal']) {
             $filter_query[] = 'access = ' . EventModel::ACCESS_PERSONAL;
             $filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);
