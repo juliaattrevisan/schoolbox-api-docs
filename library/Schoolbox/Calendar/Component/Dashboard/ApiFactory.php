@@ -77,7 +77,7 @@ class ApiFactory
      * @param User  $viewer
      * @param array $schosenSubscriptions
      * @param array $chosenEventTypes
-     * @return array
+     * @return \Calendar_Api_EventType_Interface
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
@@ -86,7 +86,7 @@ class ApiFactory
         User $viewer,
         array $schosenSubscriptions,
         array $chosenEventTypes
-    ): array {
+    ): \Calendar_Api_EventType_Interface {
 
         /* Get a list of instance-enabled subscriptions; these are sources of data
          * and are activated/deactivated here:
@@ -109,8 +109,6 @@ class ApiFactory
          */
         foreach ($subscriptions as $subscription) {
             if ($schosenSubscriptions[$subscription->getId()]) {
-                /* Generate a classname from the connector's info
-                 */
                 $availableSubscriptionConfigs[] = $subscription;
             }
         }
@@ -118,13 +116,13 @@ class ApiFactory
         /* Mine out the classes that spawn events from connector config and pile
          * them into a set of (connector id, subscription classname) tuples
          */
-        $classes = [];
+        $composite = new \Calendar_Api_Composite();
 
         foreach ($availableSubscriptionConfigs as $availableSubscriptionConfig) {
-            $classes[] = $this->factory->produceFromConfig($availableSubscriptionConfig, $viewee, $viewer);
+            $composite->add($this->factory->produceFromConfig($availableSubscriptionConfig, $viewee, $viewer));
         }
 
-        return $classes;
+        return $composite;
 
         /* For each subscription still surviving, have it generate its events
          * but only retrieve events that possessed at least one of the luEventTypes
