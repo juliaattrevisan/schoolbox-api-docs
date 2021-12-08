@@ -25,15 +25,17 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
      */
     private $api = [];
 
+
     /**
      * Get day events
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     * @internal param $currentDay
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return Collection
+     * @internal param $currentDay
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         $result = new Collection();
 
