@@ -134,7 +134,7 @@
             </label>
             <select data-lti-version="{{ providerLtiVersion13 }}"
                     id="target1p3-{{ identifier }}"
-                    name="target">
+                    name="target1p3">
                 <option {% if provider is defined and provider.isTargetIframe %}selected{% endif %}
                         value="{{ providerTargetIframe }}">Iframe</option>
                 <option {% if provider is defined and provider.isTargetWindow %}selected{% endif %}
@@ -310,7 +310,7 @@
             </label>
             <select data-lti-version="{{ providerLtiVersion11 }}"
                     id="target1p1-{{ identifier }}"
-                    name="target">
+                    name="target1p1">
                 <option {% if provider is defined and provider.isTargetIframe %}selected{% endif %}
                         value="{{ providerTargetIframe }}">Iframe</option>
                 <option {% if provider is defined and provider.isTargetWindow %}selected{% endif %}
