@@ -81,8 +81,8 @@ class PrefixGenerator
             return ($baseUrl ?? '') . self::LOCAL_PREFIX;
         }
         return str_replace(
-            '{site_version}',
-            $this->config->get(ConfigMapper::NAME_SITE_VERSION),
+            '{site_package}',
+            $this->config->get(ConfigMapper::NAME_SITE_PACKAGE),
             $this->config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_PREFIX),
         );
     }
