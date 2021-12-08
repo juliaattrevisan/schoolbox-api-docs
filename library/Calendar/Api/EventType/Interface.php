@@ -17,14 +17,19 @@ interface Calendar_Api_EventType_Interface
 {
 
     /**
-     * @param int $startTimestamp
-     * @param int $endTimestamp
+     * Get a set of event instances
+     *
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return Calendar\Event\Collection
      */
-    public function getEvents($startTimestamp, $endTimestamp);
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection;
 
 
     /**
+     * Get a single event
+     *
      * @param int $eventId
      * @todo What does this return?
      */
