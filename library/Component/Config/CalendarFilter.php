@@ -1,7 +1,11 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as AlaressDatabaseException;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\Calendar\Component\Dashboard\ApiFactory;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 
 /**
  * These are the checkbox selections that superusers can tick
@@ -40,9 +44,30 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
 
+        $di = $page->getDi();
+
+        try {
+            /** @var IConnector $databaseExternal */
+            $databaseExternal = $di->get('databaseExternal');
+        } catch (AlaressDatabaseException $e) {
+            $databaseExternal = null;
+        }
+
+        /** @var AssessmentDataSource $assessmentDataSource */
+        $assessmentDataSource  = $di->get('assessmentDataSource');
+        /** @var IConfigLoader $config */
+        $config = $di->get('config');
+
+        $factory = (new ApiFactory(
+            $assessmentDataSource,
+            new ModuleChecker($config),
+            $config,
+            $databaseExternal
+        ));
+
         /* These are the available options from which you can chooze
          */
-        $subscriptions = (new ApiFactory(new ModuleChecker(new \Schoolbox\Config\Loader())))->generateAvailableSubscriptions();
+        $subscriptions = $factory->generateAvailableSubscriptions();
         $eventTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
 
         /* Init $settings struct
