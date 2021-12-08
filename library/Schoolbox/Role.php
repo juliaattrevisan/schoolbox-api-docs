@@ -140,6 +140,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
             self::PERMISSION_CHANGE_PASSWORD,
         ],
         self::GUEST   => [
+            self::PERMISSION_CHANGE_PASSWORD,
         ],
     ];
 
