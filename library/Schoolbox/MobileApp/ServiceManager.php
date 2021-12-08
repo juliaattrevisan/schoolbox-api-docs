@@ -216,12 +216,12 @@ class ServiceManager implements IServiceManager
                         throw new Mapper\Exception('No PEM certificate given for APNS service.');
                     }
 
-                    return new Cloud\Apple\APNS(
+                    return new Cloud\Apple\ApnService(
                         $this->registryMapper,
                         $identifier,
-                        Apns\Client\Message::PRODUCTION_URI,
+                        $this->appTitle,
                         $this->getPemPath($storageObj),
-                        $key
+                        $key,
                     );
 
                 case Registry::PROVIDER_GOOGLE:

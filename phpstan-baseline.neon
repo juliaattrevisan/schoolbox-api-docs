@@ -216,11 +216,6 @@ parameters:
 			path: library/Alaress/Database/Statement/Base.php
 
 		-
-			message: "#^Method Alaress\\\\Database\\\\Statement\\\\Base\\:\\:getDataTypeName\\(\\) should return string but returns int\\.$#"
-			count: 1
-			path: library/Alaress/Database/Statement/Base.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Transactor\\\\Base\\:\\:implicitCommit\\(\\)\\.$#"
 			count: 9
 			path: library/Alaress/Database/Transactor/Test/TransactorTest.php
@@ -257,11 +252,6 @@ parameters:
 
 		-
 			message: "#^Call to function is_null\\(\\) with DateTimeZone will always evaluate to false\\.$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^Cannot call method setTimezone\\(\\) on DateTimeInterface\\|false\\.$#"
 			count: 1
 			path: library/Alaress/Date/Format.php
 
@@ -1956,11 +1946,6 @@ parameters:
 			path: library/Evaluation/Answer/MultiOther.php
 
 		-
-			message: "#^Variable \\$allAnswers might not be defined\\.$#"
-			count: 1
-			path: library/Evaluation/Answer/MultiOther.php
-
-		-
 			message: "#^Variable \\$existingAnswer might not be defined\\.$#"
 			count: 1
 			path: library/Evaluation/Answer/MultiOther.php
@@ -1972,11 +1957,6 @@ parameters:
 
 		-
 			message: "#^Return type \\(void\\) of method Evaluation_Answer_Radio\\:\\:update\\(\\) should be compatible with return type \\(bool\\) of method DeprecatedModel\\:\\:update\\(\\)$#"
-			count: 1
-			path: library/Evaluation/Answer/Radio.php
-
-		-
-			message: "#^Variable \\$allAnswers might not be defined\\.$#"
 			count: 1
 			path: library/Evaluation/Answer/Radio.php
 
@@ -2663,11 +2643,6 @@ parameters:
 		-
 			message: "#^Cannot access offset 'filter' on bool\\.$#"
 			count: 1
-			path: library/MyFile.php
-
-		-
-			message: "#^Cannot access offset 'filter' on true\\.$#"
-			count: 5
 			path: library/MyFile.php
 
 		-
@@ -7212,11 +7187,6 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Ratchet\\\\ConnectionInterface\\:\\:\\$remoteAddress\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
-			message: "#^Cannot assign offset string to string\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/Pipe.php
 

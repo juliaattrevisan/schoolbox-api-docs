@@ -105,8 +105,9 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
 
         $key = $this->key;
 
-        while ($line = trim($this->client->lpop($key))) {
+        while (($line = $this->client->lpop($key)) !== null) {
             // ensure every line has something on it
+            $line = trim($line);
             if (strlen($line)) {
                 fputs($fp, "$line\n");
             }

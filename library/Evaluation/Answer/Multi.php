@@ -352,7 +352,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 
             /* Indicate this is a correct answer
              */
-            if ($currentAnswer->attributes()->fraction > 0) {
+            if ((int)$currentAnswer->attributes()->fraction > 0) {
                 $answer['correct'] = 1;
             }
 
@@ -570,22 +570,21 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 $validResponseExists = $existing['response'] && is_array($existingAnswer);
                 $selectedByRespondent = $validResponseExists && in_array($currentAnswer->value, $existingAnswer);
 
-                /* This answer is correct
-                 */
                 if ($currentAnswer->correct) {
-                    /* The respondent chose the correct answer
+                    /* This answer is correct
                      */
                     if ($selectedByRespondent) {
+                        /* The respondent chose the correct answer
+                         */
                         $page->setVar([
                             'ANSWER_OPTION_STATUS' => 'evaluation-correct-answer-option',
                             'ANSWER_ICON_CLASS'    => 'evaluation-correct-answer-icon',
                             'ANSWER_ICON_TITLE'    => 'Respondent chose correctly',
                             'ANSWER_CHECKED'       => 'checked',
                         ]);
-                    }
-                    /* The respondent did not choose the correct answer
-                     */
-                    else {
+                    } else {
+                        /* The respondent did not choose the correct answer
+                         */
                         $page->setVar([
                             'ANSWER_OPTION_STATUS' => 'evaluation-unselected-answer-option',
                             'ANSWER_ICON_CLASS'    => 'evaluation-unselected-answer-icon',
@@ -593,23 +592,21 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                             'ANSWER_CHECKED'       => ''
                         ]);
                     }
-                }
-                /* This answer is not correct
-                 */
-                else {
-                    /* The respondent chose this answer
+                } else {
+                    /* This answer is not correct
                      */
                     if ($selectedByRespondent) {
+                        /* The respondent chose this answer
+                         */
                         $page->setVar([
                             'ANSWER_OPTION_STATUS' => 'evaluation-incorrect-answer-option',
                             'ANSWER_ICON_CLASS'    => 'evaluation-incorrect-answer-icon',
                             'ANSWER_ICON_TITLE'    => 'Respondent chose an incorrect answer',
                             'ANSWER_CHECKED'       => 'checked',
                         ]);
-                    }
-                    /* The respondent didn't choose this answer
-                     */
-                    else {
+                    } else {
+                        /* The respondent didn't choose this answer
+                         */
                         $page->setVar([
                             'ANSWER_OPTION_STATUS' => '',
                             'ANSWER_ICON_CLASS'    => '',
@@ -651,19 +648,18 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                /* This answer is correct
-                 */
                 if ($currentAnswer->correct) {
+                    /* This answer is correct
+                     */
                     $page->setVar([
                         'ANSWER_OPTION_STATUS' => '',
                         'ANSWER_ICON_CLASS'    => '',
                         'ANSWER_ICON_TITLE'    => '',
                         'ANSWER_CHECKED'       => 'checked',
                     ]);
-                }
-                /* This answer is not correct
-                 */
-                else {
+                } else {
+                    /* This answer is not correct
+                     */
                     $page->setVar([
                         'ANSWER_OPTION_STATUS' => '',
                         'ANSWER_ICON_CLASS'    => '',

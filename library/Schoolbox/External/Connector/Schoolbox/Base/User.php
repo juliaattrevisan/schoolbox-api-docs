@@ -720,7 +720,7 @@ class User extends Base implements IUser
         $campusNames = explode(chr(0x1E), $studentRow['campusNames']);
         $campusCodes = explode(chr(0x1E), $studentRow['campusCodes']);
 
-        if (count($campusIds) > 0) {
+        if ($studentRow['campusIds'] !== '') {
             $campusCollection = new Collection();
 
             for ($i = 0; $i < count($campusIds); $i++) {
@@ -745,7 +745,7 @@ class User extends Base implements IUser
 
         $guardianIds = explode(chr(0x1E), $studentRow['guardianIds']);
 
-        if (count($guardianIds) > 0) {
+        if ($studentRow['guardianIds'] !== '') {
             $guardianCollection = new Collection();
 
             for ($i = 0; $i < count($guardianIds); $i++) {
@@ -824,7 +824,7 @@ class User extends Base implements IUser
         $campusNames = explode(chr(0x1E), $staffRow['campusNames']);
         $campusCodes = explode(chr(0x1E), $staffRow['campusCodes']);
 
-        if (count($campusIds) > 0) {
+        if ($staffRow['campusIds'] !== '') {
             $campusCollection = new Collection();
 
             for ($i = 0; $i < count($campusIds); $i++) {
@@ -900,7 +900,7 @@ class User extends Base implements IUser
         $campusNames = explode(chr(0x1E), $guardianRow['campusNames']);
         $campusCodes = explode(chr(0x1E), $guardianRow['campusCodes']);
 
-        if (count($campusIds) > 0) {
+        if ($guardianRow['campusIds'] !== '') {
             $campusCollection = new Collection();
 
             for ($i = 0; $i < count($campusIds); $i++) {
@@ -925,7 +925,7 @@ class User extends Base implements IUser
 
         $studentIds = explode(chr(0x1E), $guardianRow['studentIds']);
 
-        if (count($studentIds) > 0) {
+        if ($guardianRow['studentIds'] !== '') {
             $studentCollection = new Collection();
 
             for ($i = 0; $i < count($studentIds); $i++) {

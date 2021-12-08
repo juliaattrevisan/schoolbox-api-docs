@@ -427,7 +427,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             /* Only add attachments if the option is on,
                              * and there's an externalId
                              */
-                            if ($importAttachments && null !== $pastoralRecord->getExternalId() && \strlen($pastoralRecord->getExternalId())) {
+                            if ($importAttachments && null !== $pastoralRecord->getExternalId()) {
                                 // Import attachments from Synergetic DocMan
 
                                 $queryDocuments = $this->connector->getQueryIterator("

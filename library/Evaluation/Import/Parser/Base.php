@@ -63,12 +63,12 @@ abstract class Base implements IParser
         // allowresit (not allow_resit).
         // if allowresit is true, or is not unspecified:
         // max_attempts = 0 (unlimited), otherwise 1.
-        $maxAttempts = (int)$this->xml->maxattempts;
+        $maxAttempts = (string)$this->xml->maxattempts;
         if (strlen($maxAttempts) === 0) {
             $allowResit = (string)$this->xml->allowresit;
             $maxAttempts = ($allowResit || strlen($allowResit) === 0) ? 0 : 1;
         }
-        return $maxAttempts;
+        return (int)$maxAttempts;
     }
 
     /**
