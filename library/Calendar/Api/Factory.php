@@ -29,9 +29,9 @@ class Calendar_Api_Factory
     /**
      * A list of all the possible event types to display
      *
-     * @var array
+     * @var array|null
      */
-    private $allTypes = [];
+    private ?array $allTypes = null;
 
     /**
      * A data source for assessments.
@@ -45,6 +45,12 @@ class Calendar_Api_Factory
 
     /** @var IConfigLoader */
     private $configLoader;
+
+    /**
+     * @var ModuleChecker
+     */
+    private ModuleChecker $moduleChecker;
+
 
     /**
      * Constructor
@@ -61,29 +67,51 @@ class Calendar_Api_Factory
         IConnector $databaseExternal = null
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
-        $this->databaseExternal     = $databaseExternal;
-        $this->configLoader         = $config;
+        $this->databaseExternal = $databaseExternal;
+        $this->configLoader = $config;
+        $this->moduleChecker = $moduleChecker;
 
-        $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        $this->generateAvailableSubscriptions();
+    }
 
-        /* These configs are base64-encode()'d to get around a weird issue with unserialize
-         * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
+
+    /**
+     * Get a list of all the calendar subscriptions that were enabled
+     *
+     * @return array
+     */
+    public function generateAvailableSubscriptions(): array
+    {
+        /* Only compute this once
          */
-        foreach ($allConfigRecords as $currentConfig) {
-            $config = $currentConfig->decodeConfig();
+        if (null === $this->allTypes) {
+            $this->allTypes = [];
 
-            try {
-                if ($moduleChecker->isEnabled($config)) {
-                    /* Update $config so it knows the calendar_connector id from whence it came
-                     * This is used in produce() and passed to each unique/default implementation
-                     */
-                    $config->setId($currentConfig->getId());
-                    $this->allTypes[] = $config;
+            $allConfigRecords = \Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+
+            /* These configs are base64-encode()'d to get around a weird issue with unserialize
+             * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
+             */
+            foreach ($allConfigRecords as $currentConfig) {
+                $config = $currentConfig->decodeConfig();
+
+                try {
+
+                    if ($this->moduleChecker->isEnabled($config)) {
+                        /* Update $config so it knows the calendar_connector id from whence it came
+                         * This is used in produce() and passed to each unique/default implementation
+                         */
+                        $config->setId($currentConfig->getId());
+
+                        $this->allTypes[] = $config;
+                    }
+                } catch (\TypeError $e) {
+                    // I will not buy this record; it is scratched
                 }
-            } catch (\TypeError $e) {
-                // I will not buy this record; it is scratched
             }
         }
+
+        return $this->allTypes;
     }
 
 
@@ -137,7 +165,7 @@ class Calendar_Api_Factory
      * @throws InvalidArgumentException If the item can't be built
      * @throws UnexpectedValueException If unable to build the external event factory
      */
-    private function produceFromConfig($config, User $user, User $viewer): Calendar_Api_EventType_Interface
+    public function produceFromConfig($config, User $user, User $viewer): Calendar_Api_EventType_Interface
     {
         $className   = "Calendar_Api_EventType_{$config->getEventType()}_{$config->getConnectorClass()}_Default";
         $connectorId = $config->getId();

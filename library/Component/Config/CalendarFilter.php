@@ -49,7 +49,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
          */
         $settings = [
             'eventType' => [],
-            'sources' => [],
+            'source' => [],
         ];
 
         /* This came out of the db

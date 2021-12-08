@@ -7,7 +7,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Component\Dashboard;
 
+use Alaress\Database\Connector\IConnector;
 use Calendar\Api\ModuleChecker;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\User;
+
 
 /**
  * Class ApiFactory
@@ -20,67 +25,40 @@ class ApiFactory
 {
 
     /**
-     * A list of all the possible event types to display
-     *
-     * @var array|null
+     * @var \Calendar_Api_Factory
      */
-    private ?array $allTypes = null;
-
-
-    /**
-     * @var ModuleChecker
-     */
-    private ModuleChecker $moduleChecker;
+    private \Calendar_Api_Factory $factory;
 
 
     /**
      * Constructor
      */
-    public function __construct(ModuleChecker $moduleChecker)
-    {
-        $this->moduleChecker = $moduleChecker;
+    public function __construct(
+        Assessment\MapperProxy $assessmentDataSource,
+        ModuleChecker $moduleChecker,
+        IConfigLoader $config,
+        IConnector $databaseExternal = null
+    ) {
+        /* Utilises the behaviours of the existing Calendar Api Factory
+         */
+        $this->factory = new \Calendar_Api_Factory(
+            $assessmentDataSource,
+            $moduleChecker,
+            $config,
+            $databaseExternal
+        );
     }
 
 
     /**
      * Get a list of all the calendar subscriptions that were enabled
+     * Pass-through to the existing Factory which can already do this
      *
      * @return array
      */
     public function generateAvailableSubscriptions(): array
     {
-        /* Only compute this once
-         */
-        if (null === $this->allTypes) {
-            $this->allTypes = [];
-
-            $allConfigRecords = \Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
-
-            /* These configs are base64-encode()'d to get around a weird issue with unserialize
-             * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
-             */
-            foreach ($allConfigRecords as $currentConfig) {
-                $config = $currentConfig->decodeConfig();
-
-                try {
-                    /* Also check if the module was enabled as part of a Plan
-                     * Some modules won't be available in the current schoolbox Plan
-                     */
-                    if ($this->moduleChecker->isEnabled($config)) {
-                        /* Update $config so it knows the calendar_connector id from whence it came
-                         * This is used in produce() and passed to each unique/default implementation
-                         */
-                        $config->setId($currentConfig->getId());
-
-                        $this->allTypes[] = $config;
-                    }
-                } catch (\TypeError $e) {
-                    // I will not buy this record; it is scratched
-                }
-            }
-        }
-
-        return $this->allTypes;
+        return $this->factory->generateAvailableSubscriptions();
     }
 
 
@@ -95,22 +73,58 @@ class ApiFactory
      * These allow events from a subscription to masquerade as a user-defined
      * event type. These user-defined event types should be respected, if extant
      *
-     * @param array $eventTypes
-     * @return void
+     * @param User  $viewee
+     * @param User  $viewer
+     * @param array $schosenSubscriptions
+     * @param array $chosenEventTypes
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
-    public function generateFilteredApi(array $subscriptions, array $eventTypes)
-    {
+    public function generateFilteredApi(
+        User $viewee,
+        User $viewer,
+        array $schosenSubscriptions,
+        array $chosenEventTypes
+    ): array {
 
         /* Get a list of instance-enabled subscriptions; these are sources of data
          * and are activated/deactivated here:
          *
          * https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe
          */
+        $subscriptions = $this->generateAvailableSubscriptions();
 
         /* Filter that list of enabled subscriptions with the ones that were
          * enabled via the component configuration checkboxes; this creates
          * a subset of what could be made available
          */
+        $availableSubscriptionConfigs = [];
+
+        /* Note: you can't delete subscriptions, so this assumption about
+         * the array keys existing should hold
+         *
+         * Otherwise,
+         * if (isset(chosenSubscriptions[subscriptionId]) && ...
+         */
+        foreach ($subscriptions as $subscription) {
+            if ($schosenSubscriptions[$subscription->getId()]) {
+                /* Generate a classname from the connector's info
+                 */
+                $availableSubscriptionConfigs[] = $subscription;
+            }
+        }
+
+        /* Mine out the classes that spawn events from connector config and pile
+         * them into a set of (connector id, subscription classname) tuples
+         */
+        $classes = [];
+
+        foreach ($availableSubscriptionConfigs as $availableSubscriptionConfig) {
+            $classes[] = $this->factory->produceFromConfig($availableSubscriptionConfig, $viewee, $viewer);
+        }
+
+        return $classes;
 
         /* For each subscription still surviving, have it generate its events
          * but only retrieve events that possessed at least one of the luEventTypes
@@ -118,7 +132,7 @@ class ApiFactory
          */
 
         /* This produces the intersection of eventTypes x subscriptions such that
-         * the events produces equate to: "out of the enabled subscriptions specifeid
+         * the events produces equate to: "out of the enabled subscriptions specified
          * by the component config, give me all the events that have an luEventType
          * listed in $eventTypes"
          *
@@ -126,8 +140,5 @@ class ApiFactory
          * reduces load on server to generate the data (could be a billion events)
          * and is generally faster since there are multiple calendar components now
          */
-
-        foreach ($subscriptions as $subscription) {
-        }
     }
 }
