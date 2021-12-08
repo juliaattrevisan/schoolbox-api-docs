@@ -83,6 +83,12 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
         } catch (Schoolbox\Mapper\Exception $e) {
+            /* TODO Repair assumption about default luEventType id
+             *  You can't really make this assumption, because someone could have
+             *  soft-deleted the first luEventType record; arbitrarily assigning 1
+             *  could put events into a deleted event type; instead, you could get
+             *  the full set, then pop the first of its elements
+             */
             $eventType = 1;
         }
 
