@@ -441,7 +441,7 @@ class Controller extends Base
             'context_title'                          => $folder->getName(),
             'context_label'                          => $folder->getCodeString(),
             'launch_presentation_locale'             => 'en-US',
-            'launch_presentation_document_target'    => 'iframe',
+            'launch_presentation_document_target'    => $provider->getTarget(),
             'launch_presentation_return_url'         => $launchPresentationReturnUrl,
             'ext_content_return_types'               => $returnTypes,
             'ext_content_return_url'                 => $extContentReturnUrl,
@@ -480,20 +480,6 @@ class Controller extends Base
                         'providerId'  => $provider->getId(),
                     ]),
             ]);
-        }
-
-        // ---------------------------------------------------------------------------------------------------
-        // Learning Field custom URL mangling
-        // ---------------------------------------------------------------------------------------------------
-
-        if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
-            $custom = $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS);
-
-            preg_match('/\/books\/([A-Z0-9]+)\//i', $custom, $matches);
-            $launch_data['custom_vbid'] = $matches[1];
-
-            preg_match('/\/pageid\/(.*)/i', $custom, $matches);
-            $launch_data['custom_book_location'] = 'pageid/' . $matches[1];
         }
 
         // ---------------------------------------------------------------------------------------------------
