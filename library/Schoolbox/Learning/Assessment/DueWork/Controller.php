@@ -1233,34 +1233,38 @@ class Controller extends Assessment\Controller
                  */
                 $plagscanMapper = PlagscanMapper::getInstance();
 
-        /* Plagscans should only spawn upon saving a Submitted IResponse instance
-         * This screen is shared between self-reflection and non-self-reflection steps
-         * Self-reflection's plagscan stubs saving .......happens elsewhere
-         * Similarity Check must be enabled
-         */
-        if ($isFinal && $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-            foreach ($response->getAllFiles() as $currentFile) {
-                if (!$currentFile->getEditableInline()) {
-                    $plagscanMapper->saveNewPlagscanStub($currentFile);
-                }
-            }
-        }
-
-        /* Asynchronously shove it into plagscan so we don't make the user wait ages
-         * for it to read 1 byte at a time >_<
-         */
-        $this->getResponse()->content->set(
-            [
-                'format'     => 'noContent',
-                'postOutput' => [
-                    function () use ($plagscanMapper, $isFinal, $reviewRoute, $response, $assessment) {
-                        if ($isFinal && $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-                            foreach ($response->getAllFiles() as $currentFile) {
-                                $filename = $plagscanMapper->plagscanFilename($currentFile);
-
-                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                /* Plagscans should only spawn upon saving a Submitted IResponse instance
+                 * This screen is shared between self-reflection and non-self-reflection steps
+                 * Self-reflection's plagscan stubs saving .......happens elsewhere
+                 * Similarity Check must be enabled
+                 */
+                if ($isFinal && $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+                    foreach ($response->getAllFiles() as $currentFile) {
+                        if (!$currentFile->getEditableInline()) {
+                            $plagscanMapper->saveNewPlagscanStub($currentFile);
+                        }
                     }
-                };
+                }
+
+                /* Asynchronously shove it into plagscan so we don't make the user wait ages
+                 * for it to read 1 byte at a time >_<
+                 */
+                $this->getResponse()->content->set(
+                    [
+                        'format' => 'noContent',
+                        'postOutput' => [
+                            function () use ($plagscanMapper, $isFinal, $reviewRoute, $response, $assessment) {
+                                if ($isFinal && $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+                                    foreach ($response->getAllFiles() as $currentFile) {
+                                        $filename = $plagscanMapper->plagscanFilename($currentFile);
+
+                                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                                    }
+                                }
+                            },
+                        ],
+                    ]
+                );
             }
         }
 
