@@ -66,15 +66,18 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
         }
     }
 
+
     /**
      * Get day events from this data source
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
-     * @return Collection|Calendar_Event_Type_ResourceBooking[]
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
+     * @return Collection
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
 
         // If I can't moderate anything - don't even bother looking.
@@ -92,7 +95,8 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
             $startTimestamp,
             $endTimestamp,
             $this->getStatus(),
-            $params
+            $params,
+            $allowedEventTypes
         );
         $converter  = new Booking\Util\EventConverter();
         $collection = new Collection();

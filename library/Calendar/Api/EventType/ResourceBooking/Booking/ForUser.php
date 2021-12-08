@@ -21,14 +21,15 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
      *
      * @return Collection
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         // Get all items out of booking mapper that I am the owner of.
         $bookings = $this->getBookingMapper()->findForOwner(
             $this->getUser()->getId(),
             $startTimestamp,
             $endTimestamp,
-            $this->getStatus()
+            $this->getStatus(),
+            $allowedEventTypes
         );
         $collection = new Collection();
         foreach ($bookings as $booking) {

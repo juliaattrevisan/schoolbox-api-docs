@@ -39,19 +39,22 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Ap
     /**
      * Get day events from this data source
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return Collection
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         // Get all items out of booking mapper for this resource.
         $bookings = $this->getBookingMapper()->findForResource(
             $this->resourceIds,
             $startTimestamp,
             $endTimestamp,
-            $this->getStatus()
+            $this->getStatus(),
+            $allowedEventTypes
         );
         $collection = new Collection();
         foreach ($bookings as $booking) {
