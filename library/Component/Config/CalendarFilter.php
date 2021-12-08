@@ -82,7 +82,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         foreach ($subscriptions as $subscription) {
             $page->setVar([
                 'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $subscription->getId(),
-                'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => sprintf('%s (%s) in %s', $subscription->getLabel(), $subscription->getDefaultLabel(), $subscription->getEventType()),
+                'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => sprintf('%s (%s)', $subscription->getLabel(), $subscription->getDefaultLabel()),
                 'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['source'][$subscription->getId()] ? 'checked="checked"' : '',
             ]);
 
