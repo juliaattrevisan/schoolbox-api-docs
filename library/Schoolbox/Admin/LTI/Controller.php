@@ -83,6 +83,8 @@ class Controller extends ConfigController
                     'providers'             => $this->providerMapper->findAll(),
                     'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
                     'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
+                    'providerTargetIframe'  => Provider::TARGET_IFRAME,
+                    'providerTargetWindow'  => Provider::TARGET_WINDOW,
                     'configContext'         => $configContext,
                     'issuer'                => $baseUrl->toString(),
                     'oidcAuthenticationUrl' => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOidcAuthenticationRequest')),

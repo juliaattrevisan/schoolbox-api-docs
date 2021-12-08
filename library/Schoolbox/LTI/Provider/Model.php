@@ -42,6 +42,21 @@ class Model implements ISoftDeletable
     public const LTI_VERSIONS = [self::LTI_VERSION_1_1, self::LTI_VERSION_1_3];
 
     /**
+     * Target: iframe
+     */
+    public const TARGET_IFRAME = 'iframe';
+
+    /**
+     * Target: new window target
+     */
+    public const TARGET_WINDOW = 'window';
+
+    /**
+     * Available targets
+     */
+    public const TARGETS = [self::TARGET_IFRAME, self::TARGET_WINDOW];
+
+    /**
      * DB representation of basic launch type.
      *
      * @var string
@@ -80,6 +95,14 @@ class Model implements ISoftDeletable
      * deployment to this tool when it is invoked.
      */
     private string $deploymentId = '';
+
+    /**
+     * The tool's launch target: where will a resource link launched from this
+     * tool be loaded in?
+     *
+     * Must be one of the values in `self::TARGETS`.
+     */
+    private string $target = self::TARGET_IFRAME;
 
     /**
      * LTI 1.3: the client ID of this tool.
@@ -221,6 +244,26 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Is this tool's launch target an iframe?
+     *
+     * @return bool
+     */
+    public function isTargetIframe(): bool
+    {
+        return $this->target === self::TARGET_IFRAME;
+    }
+
+    /**
+     * Is this tool's launch target a new tab/window?
+     *
+     * @return bool
+     */
+    public function isTargetWindow(): bool
+    {
+        return $this->target === self::TARGET_WINDOW;
+    }
+
+    /**
      * @return string
      */
     public function getName(): string
@@ -271,6 +314,24 @@ class Model implements ISoftDeletable
     public function setDeploymentId(string $deploymentId): self
     {
         $this->deploymentId = $deploymentId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTarget(): string
+    {
+        return $this->target;
+    }
+
+    /**
+     * @param string $target
+     * @return $this
+     */
+    public function setTarget(string $target): self
+    {
+        $this->target = $target;
         return $this;
     }
 
