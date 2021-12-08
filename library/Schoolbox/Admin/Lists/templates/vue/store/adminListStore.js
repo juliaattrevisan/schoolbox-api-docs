@@ -1,6 +1,8 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex'
+import cloneDeep from 'lodash/cloneDeep';
+import orderBy from 'lodash/orderBy';
 import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, UPDATE_SELECTED_POP_OUT_NAME,
          ADD_ROW, DELETE_ROW_PROMPT, DELETE_ROW_CONFIRMED, 
          OPEN_POP_UP, CLOSE_POP_UP, UPDATE_SEQUENCE } from './adminListMutationTypes';
@@ -61,8 +63,8 @@ export default new Vuex.Store({
          */
         [UPDATE_LOADED_DATA] (state, loadedData) {
             state.loadedData = Object.freeze(loadedData); //freeze the loaded data to ensure it's not changed
-            const loadedRows = _.cloneDeep(state.loadedData.rows); //cloneDeep is from underscore.js
-            const sortedRows = _.orderBy(loadedRows, 'sequence', 'asc'); //orderBy is from underscore.js, to display according to sequence
+            const loadedRows = cloneDeep(state.loadedData.rows); //cloneDeep is from underscore.js
+            const sortedRows = orderBy(loadedRows, 'sequence', 'asc'); //orderBy is from underscore.js, to display according to sequence
             sortedRows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
             state.rows = sortedRows;
         },
