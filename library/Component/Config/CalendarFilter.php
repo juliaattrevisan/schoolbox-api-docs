@@ -1,8 +1,7 @@
 <?php
 
-use Schoolbox\Calendar\Config\EventType;
-use Schoolbox\Calendar\Config\Filter;
-use Schoolbox\Calendar\Config\SourceList;
+use Calendar\Api\ModuleChecker;
+use Schoolbox\Calendar\Component\Dashboard\ApiFactory;
 
 /**
  * These are the checkbox selections that superusers can tick
@@ -43,8 +42,8 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
 
         /* These are the available options from which you can chooze
          */
-        $eventTypes = (new EventType(\Schoolbox\Calendar\EventTypeMapper::getInstance()))->generate();
-        $sources = (new SourceList(\Calendar_Api_Config_Mapper::getInstance(), new \Calendar\Api\ModuleChecker(\Schoolbox\Config\Loader::getInstance())))->generate();
+        $subscriptions = (new ApiFactory(new ModuleChecker(new \Schoolbox\Config\Loader())))->generateAvailableSubscriptions();
+        $eventTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
 
         /* Init $settings struct
          */
@@ -67,11 +66,11 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         $page->setBlock($keyblock, 'calendarfilter_eventtype', 'calendarfilter_eventtype_block');
         $page->setVar('calendarfilter_eventtype_block', '');
 
-        foreach ($eventTypes->getData() as $eventType) {
+        foreach ($eventTypes as $eventType) {
             $page->setVar([
-                'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $eventType['id'],
-                'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => $eventType['name'],
-                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['eventType'][$eventType['id']] ? 'checked="checked"' : '',
+                'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $eventType->getId(),
+                'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => $eventType->getType(),
+                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['eventType'][$eventType->getId()] ? 'checked="checked"' : '',
             ]);
 
             $page->parse('calendarfilter_eventtype_block', 'calendarfilter_eventtype', true);
@@ -80,33 +79,15 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         $page->setBlock($keyblock, 'calendarfilter_source', 'calendarfilter_source_block');
         $page->setVar('calendarfilter_source_block', '');
 
-        foreach ($sources->getData() as $source) {
+        foreach ($subscriptions as $subscription) {
             $page->setVar([
-                'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $source['id'],
-                'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => $source['name'],
-                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['source'][$source['id']] ? 'checked="checked"' : '',
+                'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $subscription->getId(),
+                'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => sprintf('%s (%s) in %s', $subscription->getLabel(), $subscription->getDefaultLabel(), $subscription->getEventType()),
+                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['source'][$subscription->getId()] ? 'checked="checked"' : '',
             ]);
 
             $page->parse('calendarfilter_source_block', 'calendarfilter_source', true);
         }
-
-
-//        /* TODO Get these from the component config
-//         */
-//        $persistedFilters = null;
-//
-//        /* Shank them into the filter class which does filter things
-//         */
-//        $filters = (new Filter($persistedFilters))->generate(
-//            new \Schoolbox\Collection(),
-//            new \Schoolbox\Collection(),
-//            $eventType->getData(),
-//            $sourceList->getData()
-//        );
-//
-//        new \Alaress_Probe($eventType->getData());
-//
-//        $page->setVar('COMPONENT_CONFIG_NAME', $configValue);
     }
 }
 
