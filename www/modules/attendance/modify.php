@@ -10,6 +10,7 @@
  */
 
 use Schoolbox\Campus;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
@@ -365,7 +366,7 @@ if ($class) {
                 array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
-            if ($configLoader->get('show_attendance_flags')) {
+            if ($configLoader->get(ConfigMapper::NAME_SHOW_ATTENDANCE_FLAGS)) {
                 //Let's render out some flags
                 //Only the flags defined in the keys will be rendered
                 $flags = [
@@ -429,11 +430,17 @@ if ($class) {
             $this->setVar('reason_options_block', '');
         }
 
-        $this->setVar([
-                          'ALL_STUDENT_IDS'      => json_encode($schoolboxStudentIds),
-                          'PASTORAL_STUDENT_URL' => "/pastoral/student/{studentId}?type={typeId}&subtype={subTypeId}",
-                          'PASTORAL_ENABLED'     => json_encode((bool)($configLoader->get('pastoral_enabled') && $_SESSION['user']->getRole()->getAccessPastoral())),
-                      ]);
+        $this->setVar(
+            [
+                'ALL_STUDENT_IDS'      => json_encode($schoolboxStudentIds),
+                'PASTORAL_STUDENT_URL' => "/pastoral/student/{studentId}?type={typeId}&subtype={subTypeId}",
+                'PASTORAL_ENABLED'     => json_encode(
+                    $configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                    && $_SESSION['user']->getRole()->getAccessPastoral()
+                    && $configLoader->get(ConfigMapper::NAME_SHOW_ATTENDANCE_FLAGS)
+                ),
+            ]
+        );
 
 
         $folderMapper = FolderMapper::getInstance();
