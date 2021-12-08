@@ -212,52 +212,48 @@
              * @param id        the user's id
              * @param fullname  the user's name
              */
-            rsvpCreate(id, fullname) {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
+            async rsvpCreate (id, fullname) {
 
-                let request = {
-                    url: ENDPOINTS.createAttendancePath(this.event.id),
-                    data:  qs.stringify({guests: id}),
-                    method: 'post',
-                    responseType: 'json'
-                }
-
-                /* A toast - to your valour, my sword, and our victory together
-                 */
+                const toast = $('[data-toast]');
                 toast.toastActivate({
                     text: 'Creating invitation...'
                 });
 
-                axios.request(request)
-                        .then(function (response) {
-
-                            /* Update data with the result from async request
-                             */
-                            self.updateCountsFromPayload(response.data);
-                            self.guests = response.data.attendees.guests;
-
-                            toast.toastTimeout({
-                                text: fullname + ' has been invited',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to invite ' + fullname + '; please try again.',
-                                    css: 'alert'
-                                });
-                            }
-                        })
-                        .then(function() {
-
-                            /* Clear selection after async outcome
-                             */
-                            self.selected = [];
+                try {
+                    const response = await fetch(ENDPOINTS.createAttendancePath(this.event.id), {
+                        method: 'POST', 
+                        body: this.getRsvpCreateFormData(id), 
+                    });
+                    const responseData = await response.json();
+                    this.updateCountsFromPayload(responseData);
+                    this.guests = responseData.attendees.guests;
+                    toast.toastTimeout({
+                        text: `${fullname} has been invited`,
+                        css: 'success'
+                    });
+                } catch (error) {
+                    if (error.response) {
+                        toast.toastTimeout({
+                            text: `Unable to invite ${fullname}; please try again.`,
+                            css: 'alert'
                         });
+                    }
+                } finally {
+                    this.selected = [];
+                }
+
             },
 
+            /**
+             * Get the form data
+             *
+             * @param id        the user's id
+             */
+            getRsvpCreateFormData (id) {
+                const formData = new FormData();
+                formData.append('guests', id);
+                return formData;
+            },
 
             /**
              * Remove an invitation
@@ -265,64 +261,54 @@
              * @param id    the user's id
              * @param name  the user's name
              */
-            rsvpDelete(id, name) {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
+            async rsvpDelete (id, name) {
 
-                let request = {
-                    url: ENDPOINTS.rsvpDeletePath(this.event.id),
-                    data:  qs.stringify({userId: id}),
-                    method: 'post',
-                    responseType: 'json'
-                }
-
-                /* A toast - to your valour, my sword, and our victory together
-                 */
+                const toast = $('[data-toast]');
                 toast.toastActivate({
                     text: 'Removing invitation...'
                 });
 
-                axios.request(request)
-                        .then(function (response) {
-                            let userId = response.data.currentUser.user.id;
+                try {
+                    const response = await fetch(ENDPOINTS.rsvpDeletePath(this.event.id), {
+                        method: 'POST', 
+                        body: this.getRsvpDeleteFormData(id), 
+                    });
+                    const responseData = await response.json();
+                    const userId = responseData.currentUser.user.id;
 
-                            for (let i = 0; i < self.guests.length; i++) {
-                                if (self.guests[i].id === id) {
+                    this.guests = this.guests.filter((guest) => guest.id !== id); //to remove the guest from the list
 
-                                    /* Remove invitation from list
-                                     */
-                                    self.guests.splice(i, 1);
+                    if (id === userId) { //If you removed yourself from the list, reset your currentAttendanceStatus to null
+                        this.currentAttendanceStatus = null;
+                    }
 
-                                    /* If you removed yourself from the list,
-                                     * reset your currentAttendanceStatus to null
-                                     */
-                                    if (id === userId) {
-                                        self.currentAttendanceStatus = null;
-                                    }
+                    this.updateCountsFromPayload(responseData); //Update data with the result from async request
 
-                                    break;
-                                }
-                            }
-
-                            /* Update data with the result from async request
-                             */
-                            self.updateCountsFromPayload(response.data);
-
-                            toast.toastTimeout({
-                                text: name + ' has been uninvited',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to uninvite ' + name + '; please try again.',
-                                    css: 'alert'
-                                });
-                            }
+                    toast.toastTimeout({
+                        text: `${name} has been uninvited`,
+                        css: 'success'
+                    });
+                } catch (error) {
+                    if (error.response) {
+                        toast.toastTimeout({
+                            text: `Unable to uninvite ${fullname}; please try again.`,
+                            css: 'alert'
                         });
+                    }
+                }
+
             },
 
+            /**
+             * Get the form data
+             *
+             * @param id        the user's id
+             */
+            getRsvpDeleteFormData (id) {
+                const formData = new FormData();
+                formData.append('userId', id);
+                return formData;
+            },
 
             /**
              * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
@@ -330,54 +316,79 @@
              * @param status    the new status
              * @param endpoint  the endpoint to send this new status
              */
-            rsvp(status, endpoint) {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
-
+            async rsvp (status, endpoint) {
+                
                 /* Set a flag to prevent async spammage
                  */
-                self.isTransacting = true;
-
-                let request = {
-                    url: endpoint,
-                    method: 'post',
-                    responseType: 'json'
-                }
+                this.isTransacting = true;
 
                 /* A toast - to your valour, my sword, and our victory together
                  */
+                const toast = $('[data-toast]');
                 toast.toastActivate({
                     text: 'Updating invitation...'
                 });
 
-                axios.request(request)
-                        .then(function (response) {
+                // axios.request(request)
+                //         .then(function (response) {
 
-                            /* Update data with the result from async request
-                             */
-                            self.currentAttendanceStatus = status;
-                            self.updateCountsFromPayload(response.data);
-                            self.guests = response.data.attendees.guests;
+                //             /* Update data with the result from async request
+                //              */
+                //             self.currentAttendanceStatus = status;
+                //             self.updateCountsFromPayload(response.data);
+                //             self.guests = response.data.attendees.guests;
 
-                            toast.toastTimeout({
-                                text: 'Invitation successfully updated',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to update invitation. ' + error.response.data.message,
-                                    css: 'alert'
-                                });
-                            }
-                        })
-                        .then(function (response) {
+                //             toast.toastTimeout({
+                //                 text: 'Invitation successfully updated',
+                //                 css: 'success'
+                //             });
+                //         })
+                //         .catch(error => {
+                //             if (error.response) {
+                //                 toast.toastTimeout({
+                //                     text: 'Unable to update invitation. ' + error.response.data.message,
+                //                     css: 'alert'
+                //                 });
+                //             }
+                //         })
+                //         .then(function (response) {
 
-                            /* Reset flag
-                             */
-                            self.isTransacting = false;
+                //             /* Reset flag
+                //              */
+                //             self.isTransacting = false;
+                //         });
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST', 
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const responseData = await response.json();
+                    
+                    /* Update data with the result from async request
+                     */
+                    this.currentAttendanceStatus = status;
+                    this.updateCountsFromPayload(responseData);
+                    this.guests = responseData.attendees.guests;
+
+                    toast.toastTimeout({
+                        text: 'Invitation successfully updated',
+                        css: 'success'
+                    });
+
+                } catch (error) {
+                    if (error.response) {
+                        toast.toastTimeout({
+                            text: `Unable to update invitation. ${error.response.data.message}`,
+                            css: 'alert'
                         });
+                    }
+                } finally {
+                    this.isTransacting = false;
+                }
+
             },
 
 
