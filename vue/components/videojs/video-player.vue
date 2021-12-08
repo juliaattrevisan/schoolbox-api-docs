@@ -5,7 +5,6 @@
  *
  */
 
-import axios from 'axios';
 import 'video.js/dist/video-js.css';
 import videojs from 'video.js';
 import { gsap } from 'gsap/all';
@@ -87,8 +86,11 @@ export default {
          */
         async checkIsVideoEncoding () {
             try {
-                const response = await axios.get('/storage/checkVideoStatus.php', this.getFormData());
-                const videoStatus = response.data.status;
+                const response = await fetch('/storage/checkVideoStatus.php?' + new URLSearchParams({
+                    hash: this.hash
+                }));
+                const responseData = await response.json();
+                const videoStatus = responseData.status;
                 if (videoStatus === 'pending' || videoStatus === 'processing') {
                     return true;
                 } else {
@@ -96,19 +98,6 @@ export default {
                 }
             } catch (error) {
                 console.warn(error);
-            }
-        },
-        
-        /**
-         * What to send in the GET request
-         *
-         * @returns { Object }
-         */
-        getFormData () {
-            return {
-                params: {
-                    hash: this.hash
-                }
             }
         },
 
