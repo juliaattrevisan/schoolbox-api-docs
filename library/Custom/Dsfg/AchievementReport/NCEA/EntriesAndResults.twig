@@ -104,7 +104,7 @@
                  # A list of comments per subject, ordered by Term
                  # Only show this section if there are comments to display
                  #}
-                {% if entriesAndResults.comments[year].courses[courseName].terms|length %}
+                {% if (entriesAndResults.comments[year].courses[courseName].terms ?? [])|length %}
                 <tr>
                     <td colspan="8">
                         <p class="subheading">Comments</p>
