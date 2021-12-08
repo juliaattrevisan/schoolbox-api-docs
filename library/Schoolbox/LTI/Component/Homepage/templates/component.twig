@@ -36,6 +36,7 @@
                                     {% if provider.isLtiVersion11 %}
                                         <button data-provider="{{ provider.id }}"
                                                 data-provider-version="1.1"
+                                                data-provider-target="{{ provider.target }}"
                                         >{{ provider.name }}</button>
                                     {% elseif provider.isLtiVersion13 %}
                                         {% set hasMultipleUrls = provider.launchUrl and provider.deepLinkingUrl %}
@@ -43,11 +44,13 @@
                                             <button data-provider="{{ provider.id }}"
                                                     data-provider-version="1.3"
                                                     data-provider-launch-url="{{ provider.launchUrl }}"
+                                                    data-provider-target="{{ provider.target }}"
                                             >{{ provider.name }}{% if hasMultipleUrls %} (Basic Launch){% endif %}</button>
                                         {% endif %}
                                         {% if provider.deepLinkingUrl %}
                                             <button data-provider="{{ provider.id }}"
                                                     data-provider-version="1.3"
+                                                    data-provider-target="{{ provider.target }}"
                                             >{{ provider.name }}{% if hasMultipleUrls %} (Picker){% endif %}</button>
                                         {% endif %}
                                     {% endif %}
@@ -66,7 +69,17 @@
             </div>
         </div>
 
-        <iframe id="lti-frame{{ componentInstanceId }}" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
+        <iframe id="lti-frame{{ componentInstanceId }}"
+                style="height: {{ height }}px; display: none"
+                src="about:blank" frameborder="0">
+        </iframe>
+        <a id="lti-link{{ componentInstanceId }}"
+           href="#"
+           target="_blank"
+           style="display: none"
+           class="button full-width">
+            Launch LTI tool
+        </a>
 
     {% else %}
         {# Another possible case: what if the deep linking request returned a... link? #}
@@ -104,20 +117,30 @@
                 }
             ) %}
         {% endif %}
-        <iframe id="lti-frame{{ componentInstanceId }}"
 
-                {% if provider %}
-                style="height:{{ height }}px;"
-                {% endif %}
-
-                src="{{ src }}?context=componentInstance-{{ componentInstanceId }}" frameborder="0"></iframe>
+        {# Is this supposed to launch in an iframe, or a window? #}
+        {% if provider.isTargetIframe %}
+            <iframe id="lti-frame{{ componentInstanceId }}"
+                    {% if provider %}
+                    style="height: {{ height }}px;"
+                    {% endif %}
+                    src="{{ src }}?context=componentInstance-{{ componentInstanceId }}"
+                    frameborder="0"></iframe>
+        {% elseif provider.isTargetWindow %}
+            <a id="lti-link{{ componentInstanceId }}"
+               target="_blank"
+               href="{{ src }}?context=componentInstance-{{ componentInstanceId }}"
+               class="button full-width">
+                Launch LTI tool
+            </a>
+        {% endif %}
     {% endif %}
 {% endif %}
 
 <div id="lti-toaster{{ componentInstanceId }}" class="toast"></div>
 
 {# LTI component JS configuration #}
-{% set providerIdPlaceholder   = 'providerIdPlaceholder' %}
+{% set providerIdPlaceholder = 'providerIdPlaceholder' %}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/lti/jquery.ltiComponent.js"></script>
 {% autoescape 'js' %}
     <script type="text/javascript">
@@ -127,6 +150,7 @@
                 $toast: $('#lti-toaster{{ componentInstanceId }}'),
                 $ltiSelectProvider: $('#lti-select-provider{{ componentInstanceId }}'),
                 $ltiSelectPreloader: $('#lti-select-provider{{ componentInstanceId }}'),
+                $ltiLink: $('#lti-link{{ componentInstanceId }}'),
                 $ltiIframe: $('#lti-frame{{ componentInstanceId }}'),
                 providerIdPlaceholder: '{{ providerIdPlaceholder }}',
                 postComponentProviderBaseUrl: '{{
