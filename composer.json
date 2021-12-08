@@ -58,7 +58,6 @@
         "twig/twig": "~3.3.0",
         "swiftmailer/swiftmailer": "^6.3.0",
         "maximebf/debugbar": "^1.17.3",
-        "shareworks/xml-security": "dev-master",
         "predis/predis": "^1.0",
         "monolog/monolog": "^2.3.5",
         "league/flysystem": "~1.1.3",
