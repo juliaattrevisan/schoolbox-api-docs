@@ -266,6 +266,10 @@ class Controller extends Base
             $feedback = $this->processFeedback($participant, $post, $reviewRoute, $mostRecentFeedback, $response);
             $this->processRubric($participant, $post, $feedback);
 
+            // TODO determine how necessary this block is
+            // This block was removed in the original d-baker PR,
+            // but it's changed in the meantime.
+            // I'm not sure if it's required or not: I've left it in for now.
             if ($isSelfAssessment && !$response->isSubmitted() && $this->getRequest()->post->get('publish')) {
                 $response->setSubmittedAt(\Alaress_Date_Format::now());
 

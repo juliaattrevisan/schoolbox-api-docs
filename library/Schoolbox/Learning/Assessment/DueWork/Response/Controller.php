@@ -104,6 +104,11 @@ class Controller extends Base
     /**
      * Get the contents of a particular $response for the purposes of Self Reflection
      *
+     * TODO determine how necessary this method is
+     * This method was removed in the original d-baker PR,
+     * but it's changed in the meantime.
+     * I'm not sure if it's required or not: I've left it in for now.
+     *
      * @api   GET /learning/assessments/:assessmentId/:studentId/responses/self/:responseId
      * @since 18.0
      *
