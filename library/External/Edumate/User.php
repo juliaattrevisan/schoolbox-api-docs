@@ -300,7 +300,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             $sql = "
                 SELECT C.CLASS_CODE AS CODE, CLASS AS NAME, TC.CLASS_TYPE AS CLASSTYPE
                 FROM SCHOOLBOX_TEACHERCLASS TC
-                LEFT JOIN SCHOOLBOX_CLASSES C ON TC.CLASS_CODE = C.CLASS_CODE
+                JOIN SCHOOLBOX_CLASSES C ON TC.CLASS_CODE = C.CLASS_CODE
                 WHERE TC.STAFF_NUMBER = :id
                 ORDER BY CLASS_TYPE, NAME
             ";
@@ -309,7 +309,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
                 $sql = "
                 SELECT C.CLASS_CODE AS CODE, CLASS AS NAME, CLASS_TYPE AS CLASSTYPE
                 FROM SCHOOLBOX_STUDENTCLASS SC
-                LEFT JOIN SCHOOLBOX_CLASSES C ON SC.CLASS_CODE = C.CLASS_CODE
+                JOIN SCHOOLBOX_CLASSES C ON SC.CLASS_CODE = C.CLASS_CODE
                 WHERE SC.STUDENT_NUMBER = :id
                 ORDER BY CLASS_TYPE, NAME
             ";
