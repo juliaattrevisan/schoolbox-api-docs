@@ -95,7 +95,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         /* Do a detection on $allowedEventTypes, if provided and meaningful
          */
         if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
-            if (!\in_array($defaultEventType, $allowedEventTypes, true)) {
+            if (!\in_array((int)$defaultEventType, $allowedEventTypes, true)) {
                 return $stack;
             }
         }

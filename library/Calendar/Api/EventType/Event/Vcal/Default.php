@@ -62,16 +62,17 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         return array();
     }
 
+
     /**
      * Get day events from this data source
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
-     * @internal param $currentDay
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return Collection
+     * @internal param $currentDay
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         return $this->getFilteredEventCollection(
             function ($currentEvent) use ($startTimestamp, $endTimestamp) {
@@ -101,7 +102,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                 return (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp));
             },
             $startTimestamp,
-            $endTimestamp
+            $endTimestamp,
+            null,
+            $allowedEventTypes
         );
     }
 
@@ -144,7 +147,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $filterFunction,
         $startTimestamp = null,
         $endTimestamp = null,
-        $limit = null
+        $limit = null,
+        ?array $allowedEventTypes = null
     ) {
 
         $collection = new Collection();
@@ -154,10 +158,18 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
         /* Check URL is set, and it's a vCal connector */
         if (!$decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
-            return new Collection();
+            return $collection;
         }
         if (!$decodedConfig->getUrl()) {
-            return new Collection();
+            return $collection;
+        }
+
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            if (!\in_array((int)$decodedConfig->getLuEventType(), $allowedEventTypes, true)) {
+                return $collection;
+            }
         }
 
         /* Check permissions - if you can view these events according to the Permissions
