@@ -182,7 +182,7 @@ export default {
                 const response = await fetch(this.currentBadge._links.delete, {
                     method: 'DELETE',
                 });
-                //this is to prevent 'Fetch finished loading' in the console, as nothing is retuned and Fetch currently doesn't like that with DELETE
+                //this is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that with DELETE
                 await response.text(); 
                 this.data = [];
                 this.$nextTick(() => {

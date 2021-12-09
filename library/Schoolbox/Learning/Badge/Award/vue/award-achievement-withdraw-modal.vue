@@ -1,8 +1,7 @@
 <script>
-import axios from "axios";
+
 import BadgeImage from './../../vue/badge-image';
 import RevealModal from '@vue/components/reveal-modal'
-import qs from 'qs';
 import toastMixin from '@vue/components/toast-mixin';
 
 export default {
@@ -97,50 +96,57 @@ export default {
         /**
          * Perform withdrawal
          */
-        withdraw() {
-            let self = this;
+        async withdraw() {
 
-            /* Access the withdraw endpoint, grab the awards for the user
-             */
-            let request = {
-                url: this.award._links.achievementWithdraw,
-                data: qs.stringify({userIds: [this.award.recipient.id]}),
-                method: 'post',
-                responseType: 'json'
+            this.toastActivate('Withdrawing achievement...');
+            try {
+                const response = await fetch(this.award._links.achievementWithdraw, {
+                    method: 'POST',
+                    body: this.getFormData(this.award.recipient.id),
+                });
+                
+                /* This is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that
+                 */
+                await response.text(); 
+
+                /* Send bat signal to the parent component
+                 */
+                this.$emit('withdraw-complete');
+
+                /* Close this modal
+                 */
+                this.close();
+
+                /* Pop toast
+                 */
+                this.toastSuccess('Withdraw complete');
+            } catch (error) {
+                if (error.response) {
+                    if (400 === error.response.status) {
+                        /* Goal prevents achievement from being withdrawn
+                         */
+                        self.toastError('Unable to withdraw achievement; a goal might exist and should be withdrawn first.');
+                    } else {
+                        /* Generic error
+                         */
+                        self.toastError('Unable to withdraw achievement; please try again.');
+                    }
+                }
+            } finally {
+                this.loading = false;
             }
 
-            /* A toast - to your valour, my sword, and our victory together
-             */
-            self.toastActivate('Withdrawing achievement...');
+        },
 
-            axios.request(request)
-                .then(response => {
-                    /* Send bat signal to the parent component
-                     */
-                    this.$emit('withdraw-complete');
+        /**
+         * Put in the award id to withdraw
+         */
+        getFormData (userId) {
+            const formData = new FormData();
+            formData.append('userIds[0]', userId);
+            return formData;
+        },
 
-                    /* Close this modal
-                     */
-                    self.close();
-
-                    /* Pop toast
-                     */
-                    self.toastSuccess('Withdraw complete');
-                })
-                .catch(error => {
-                    if (error.response) {
-                        if (400 === error.response.status) {
-                            /* Goal prevents achievement from being withdrawn
-                             */
-                            self.toastError('Unable to withdraw achievement; a goal might exist and should be withdrawn first.');
-                        } else {
-                            /* Generic error
-                             */
-                            self.toastError('Unable to withdraw achievement; please try again.');
-                        }
-                    }
-                });
-        }
     }
 }
 </script>
