@@ -7,7 +7,9 @@
  */
 
 use Alaress\Database\Exception;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Html2Text\Html2Text;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -22,6 +24,7 @@ use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
 use Schoolbox\Pastoral\Log\Model as PastoralLog;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Pastoral\RecordAction\Mapper as RecordActionMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
@@ -563,9 +566,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function syncPastoral(Pastoral $pastoral): bool
     {
-        /** @var Pastoral $pastoral */
-        $pastoral = $this->reloadModel($pastoral);
-
         if (!$this->isExternalCodeValid($pastoral)) {
             return false;
         }
@@ -695,6 +695,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 // Export the permissions/audience of the pastoral record to Synergetic
 
                 $this->updatePastoralCareContacts($pastoral);
+                if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                    $this->updateActions($pastoral);
+                }
 
                 if (!$inOuterTransaction) {
                     $this->connector->commit();
@@ -775,6 +778,111 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     }
 
     /**
+     * Inserts actions to Synergetic
+     * - Actions, which can be selected in the dropdown, depend on selected Type. (doesn't seem to have concept of completion)
+     * - luPastoralCareActionType table defines list of actions that are available in the system.
+     * - luPastoralCareAction table associates Types and Categories (subtype in SB) to Action Types.
+     * - PastoralCareActions table holds relationship between PastoralCareSeq and luPastoralCareActionSeq.
+     * @param Pastoral $pastoral
+     * @throws MapperException
+     */
+    private function updateActions(Pastoral $pastoral)
+    {
+        // Find PastoralCareTypeCode from associated actions and store pastoral_record_action.id => PastoralCareActionTypeCode
+        $recordActionTypeCodes = [];
+        foreach ($pastoral->getRecordActions() as $recordAction) {
+            if ($recordAction->getAction()->getExternalCode()) {
+                $recordActionTypeCodes[$recordAction->getId()] = $recordAction->getAction()->getExternalCode();
+            }
+        }
+
+        // If no PastoralCareTypeCode found, do nothing
+        if (empty($recordActionTypeCodes)) {
+            return;
+        }
+
+
+        // Find luPastoralCareActionSeq from
+        //   type (PastoralCareTypeCode), subtype (PastoralCareCategoryCode) and action above
+        // which is not yet associated with this record
+        $actionCodeBindings = PredicateBuilder::getArrayBindings($recordActionTypeCodes, 'actionCode');
+
+        $query  = "
+            SELECT PastoralCareActionsSeq,
+                   luPastoralCareAction.luPastoralCareActionSeq,
+                   PastoralCareActionTypeCode
+            FROM luPastoralCareAction
+            LEFT JOIN PastoralCareActions
+              ON PastoralCareActions.luPastoralCareActionSeq = luPastoralCareAction.luPastoralCareActionSeq
+              AND PastoralCareSeq = :PastoralCareSeq
+            WHERE PastoralCareTypeCode = :PastoralCareTypeCode
+              AND PastoralCareCategoryCode = :PastoralCareCategoryCode
+              AND PastoralCareActionTypeCode IN ({$actionCodeBindings['placeholders']})
+              AND PastoralCareSeq IS NULL
+        ";
+        $params = [
+            'PastoralCareTypeCode'     => $pastoral->getType()->getExternalCode(),
+            'PastoralCareCategoryCode' => $pastoral->getSubType()->getExternalCode(),
+            'PastoralCareSeq'          => $pastoral->getExternalId(),
+        ];
+        $params = array_merge($params, $actionCodeBindings['bindings']);
+
+        $luPastoralCareActions = $this->connector->executeQuery($query, $params)->fetchAll();
+        // No valid action found
+        if (empty($luPastoralCareActions)) {
+            return;
+        }
+
+        // Insert new actionSeqs (not removing, as we don't want to remove actions created via Synergetic
+        $newSeqs    = array_column($luPastoralCareActions, 'luPastoralCareActionSeq');
+        $indexOrder = max(array_map('intval', array_column($luPastoralCareActions, 'IndexOrder')));
+
+        $insertQuery = "
+            INSERT INTO PastoralCareActions (PastoralCareSeq, luPastoralCareActionSeq, IndexOrder)
+                 VALUES (
+                             :PastoralCareSeq,
+                             :luPastoralCareActionSeq,
+                             COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareActions WHERE PastoralCareSeq = :PastoralCareSeq2), 1)
+                         )
+                 ";
+        foreach ($newSeqs as $newSeq) {
+            $insertParams = [
+                'PastoralCareSeq'         => $pastoral->getExternalId(),
+                'PastoralCareSeq2'        => $pastoral->getExternalId(),
+                'luPastoralCareActionSeq' => $newSeq,
+            ];
+            $this->connector->executeQuery($insertQuery, $insertParams);
+        }
+
+        // Get PastoralCareActionSeq and update SB pastoral record action external_id
+        $newSeqBindings = PredicateBuilder::getArrayBindings($newSeqs, 'newSeqs');
+        $codeToSeqMap   = array_combine(array_column($luPastoralCareActions, 'PastoralCareActionTypeCode'), $newSeqs);
+
+        $selectQuery        = "
+            SELECT PastoralCareActionsSeq, luPastoralCareActionSeq
+              FROM PastoralCareActions
+              WHERE PastoralCareSeq = :PastoralCareSeq
+                AND luPastoralCareActionSeq IN ({$newSeqBindings['placeholders']})
+        ";
+        $selectParams       = array_merge(['PastoralCareSeq' => $pastoral->getExternalId()], $newSeqBindings['bindings']);
+        $insertedActionSeqs = $this->connector->executeQuery($selectQuery, $selectParams)->fetchAll();
+        $insertedActionSeqs = array_combine(
+            array_column($insertedActionSeqs, 'luPastoralCareActionSeq'),
+            array_column($insertedActionSeqs, 'PastoralCareActionsSeq')
+        );
+
+        /** @var RecordActionMapper $recordActionMapper */
+        $recordActionMapper = $this->pastoralMapper->getJoinMapper('recordActions');
+        foreach ($pastoral->getRecordActions() as $recordAction) {
+            if (key_exists($recordAction->getAction()->getExternalCode(), $codeToSeqMap)) {
+                $luPastoralCareActionSeq = $codeToSeqMap[$recordAction->getAction()->getExternalCode()];
+                $recordAction->setExternalId($insertedActionSeqs[$luPastoralCareActionSeq]);
+                $recordActionMapper->save($recordAction);
+            }
+        }
+    }
+
+    /**
      * @param int|null $externalId
      * @return boolean
      */
@@ -826,12 +934,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function createComment(PastoralComment $comment): bool
     {
-        // Annoyingly the use of self::COLUMN_CREATED_TIMESTAMP does not populate the model with the creation date after saving
-        // so we need to reload the model from the database to get the date it was created
         try {
-            /** @var PastoralComment $comment */
-            $comment = $this->reloadModel($comment);
-
             /** @var Pastoral $pastoral */
             $pastoral = $this->pastoralMapper->findById($comment->getPastoral()->getId());
 
@@ -1298,41 +1401,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         return $params;
-    }
-
-    /**
-     * This is an ugly hack...
-     * Annoyingly the use of self::COLUMN_UPDATED_TIMESTAMP does not repopulate the model with the updated date after
-     * saving so this just reloads the object passed from the database to get the date it was modified
-     *
-     * @param object $object
-     *
-     * @return object
-     * @throws ExternalException
-     * @throws MapperException
-     * @throws MapperException\Deleted
-     */
-    private function reloadModel($object)
-    {
-        if ($object == null) {
-            return $object;
-        }
-
-        $modelClass = get_class($object);
-
-        // Grab an instance of the objects mapper
-
-        /** @var string $mapperClass */
-        $mapperClass = str_replace('Model', 'Mapper', $modelClass);
-
-        if (!class_exists($mapperClass) || $mapperClass == $modelClass) {
-            throw new ExternalException("Unable to locate mapper for object ({$mapperClass})");
-        }
-
-        /** @var BaseMapper $mapperInstance */
-        $mapperInstance = call_user_func($mapperClass . '::getInstance');
-
-        return $mapperInstance->findOneByColumn($mapperInstance->getIdentifierColumn(), $object->getId(), ['cache' => false]);
     }
 
     /**
