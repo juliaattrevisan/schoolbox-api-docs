@@ -1,6 +1,5 @@
 <script>
 
-import axios from 'axios';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import BadgeAward from "../Award/vue/badgeAward";
@@ -176,22 +175,25 @@ export default {
         /**
          * Perform delete
          */
-        deleteBadge () {
+        async deleteBadge () {
             this.$refs.toast.activate('Deleting badge...');
-            let newData = this.data.filter((v) => v.id !== this.currentBadge.id);
-            axios.delete(this.currentBadge._links.delete)
-                .then(() => {
-                    this.data = [];
-                    this.$refs.toast.timeout('Badge successfully deleted', true);
-                    this.$nextTick(() => {
-                        this.data = newData;
-                        this.metadata.count -= 1;
-                    });
-                })
-                .catch(() => this.$refs.toast.timeout('Failed to delete badge', false))
-                .finally(() => {
-                    this.closeDeleteModal()
-                })
+            const newData = this.data.filter((v) => v.id !== this.currentBadge.id);
+            // @TODO - need the backend to return something to avoid 'Fetch failed loading: DELETE'
+            try {
+                await fetch(this.currentBadge._links.delete, {
+                    method: 'DELETE',
+                });
+                this.data = [];
+                this.$nextTick(() => {
+                    this.data = newData;
+                    this.metadata.count -= 1;
+                });
+                this.$refs.toast.timeout('Badge successfully deleted', true);
+            } catch (error) {
+                this.$refs.toast.timeout('Failed to delete badge', false);
+            } finally {
+                this.closeDeleteModal();
+            }
         },
 
         /**
