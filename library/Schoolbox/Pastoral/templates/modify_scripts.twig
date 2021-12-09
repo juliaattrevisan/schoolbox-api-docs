@@ -280,7 +280,9 @@
             updateVisibility();
         }
 
+        {% if record.id == 0 %}
         loadAudience();
+        {% endif %}
 });
 </script>
 <script>
