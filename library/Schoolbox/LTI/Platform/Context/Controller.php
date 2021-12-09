@@ -218,7 +218,7 @@ class Controller extends BaseController
         $deepLinkingSettings = new DeepLinkingSettings(
             $returnUrl,
             [LtiResourceLinkInterface::TYPE,],
-            ['window', 'iframe'],
+            [$tool->getTarget(),],
             null,
             false,
             false,
