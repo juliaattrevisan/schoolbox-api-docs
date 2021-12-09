@@ -7,8 +7,8 @@
 
 <div id="assessment-empty-state-{{ component_id }}" class="empty-state {% if assessables is not empty %}hide{% endif %}">
     <i class="{{ icon }}"></i>
-
-    {% if readOnly ?? false %}
+    {# if user does not have createRoute(create assessments) they should still be able to view their results for the assessment #}
+    {% if readOnly ?? false or not createRoute %}
         <p>
             {% block studentMessage %}
                 There are no assessments to complete at this time.

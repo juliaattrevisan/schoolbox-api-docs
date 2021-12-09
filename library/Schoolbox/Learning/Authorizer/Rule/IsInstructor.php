@@ -72,17 +72,17 @@ class IsInstructor extends AbstractParticipationRule
         }
 
         /*
-         * If the user only has READ access via group permissions, they are not permitted as an instructor
-         * but check if they have WRITE access via the group, and allow them through
+         * If the user (staff) only has READ access via group permissions, they are not permitted as an instructor
+         * [SA-10536] "This will assist with schools being able to offer professional development to their staff without exposing assessment data to people they do not want."
+         * For staff specifically, if they are in a group as Read only, this will be their permission even if they have folder write access.
          */
         foreach ($user->getAccessList() as $access) {
             if (
                 $access->getService() == UserAccess::SERVICE_HOMEPAGE
+                && $access->getAccessLevel() == UserAccess::ACCESS_READ
                 && $access->getServiceIdentifier() == $folder->getId()
+                && $user->getRole()->isStaff()
             ) {
-                if ($access->getAccessLevel() == UserAccess::ACCESS_WRITE) {
-                    break;
-                }
                 throw new Failure\Unauthorized();
             }
         }
