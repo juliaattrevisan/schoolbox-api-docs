@@ -305,6 +305,53 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Opens a page which launches the LTI assessment's resource link, within
+     * the context of an instructor.
+     * (This should be the status page for the assessment within the LTI tool.)
+     *
+     * The launch method depends on the assessment's LTI tool's target:
+     * * iframe: launch within an iframe
+     * * window: redirect directly to the launch
+     *
+     * @api   GET /learning/assessments/:assessmentId/lti/status
+     * @since 22.0.0
+     *
+     * @param Model $assessment
+     */
+    public function getLtiStatusLaunch(Model $assessment): void
+    {
+        // Just redirect to the tool if opening in a new window
+        if ($assessment->getLtiTool()->isTargetWindow()) {
+            $this->getLaunchAssessmentAsInstructor($assessment);
+            return;
+        }
+
+        // Show the tool in an iframe
+        $breadcrumbs = $this->getBakery()
+            ->produceFromAssessment($assessment, $this->getUser())
+            ->add([
+                $assessment->getTitle(),
+                $this->getRouteIfAuthorized(
+                    'learningAssessment.getStatus',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'assessment'   => $assessment,
+                    ]
+                )
+            ])
+            ->add(['View in LTI Tool', '']);
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningAssessment/lti/ltiStatus.twig',
+                [
+                    'assessment'  => $assessment,
+                    'breadcrumbs' => $breadcrumbs,
+                ]
+            )
+        );
+    }
+
+    /**
      * Launches this LTI assessment's resource link, within the context of an
      * instructor.
      *

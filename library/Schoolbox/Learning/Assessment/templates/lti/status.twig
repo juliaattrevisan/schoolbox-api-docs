@@ -24,10 +24,11 @@
 
 {% block headerOptions %}
     <li>
+        {# Launch link depends on whether the tool opens in an iframe or not #}
         <a class="icon-lti"
-           target="_blank"
+           {% if assessment.ltiTool.isTargetWindow %}target="_blank"{% endif %}
            href="{{ routeLookupIfAuthorized(
-               'learningAssessment.getLaunchAssessmentAsInstructor',
+               'learningAssessment.getLtiStatusLaunch',
                {
                    assessment:   assessment,
                    assessmentId: assessment.id,
