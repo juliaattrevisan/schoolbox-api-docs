@@ -27,14 +27,22 @@ SitePage::extendExecutionTime();
 
 /** @var Calendar_Api_Factory $factory */
 $factory  = $this->getDi()->get('calendarApiFactory');
+
+/* If folderId was a querystring param, produce a specific set of subscriptions
+ */
+if (isset($_GET['folderId'])) {
+    $api = $factory->produceForFolderId((int)$_GET['folderId'], $user, $viewer);
+} else {
+    $api = $factory->produceForUser($user, $viewer);
+}
+
 $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $this->getDi()->get('authorizer'),
     $this->getDi()->get('router'),
     $user,
     $viewer,
-    $factory,
+    $api,
     new ModuleChecker(ConfigLoader::getInstance()),
-    isset($_GET['folderId']) ? (int)$_GET['folderId'] : null
 );
 
 $calendar->render();
