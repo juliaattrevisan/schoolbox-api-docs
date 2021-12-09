@@ -15,7 +15,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\User;
 
-
 /**
  * Class ApiFactory
  *

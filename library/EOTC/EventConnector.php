@@ -185,17 +185,15 @@ class EventConnector extends EventMapper
                 'endDate' => $endDate,
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
-        }
-
-        /* For all other user types:
-         * Only show events where $user is either staff or student attendee
-         *
-         * This saves us from having to subquery these attendees separately,
-         * by initially only getting events that are relevant to $user
-         *
-         * Skip Rejected events
-         */
-        else {
+        } else {
+            /* For all other user types:
+             * Only show events where $user is either staff or student attendee
+             *
+             * This saves us from having to subquery these attendees separately,
+             * by initially only getting events that are relevant to $user
+             *
+             * Skip Rejected events
+             */
             $querySelect = "
                 eotc_metadata_student.user_id as studentUserId,
                 eotc_metadata_staff.user_id as staffUserId,
