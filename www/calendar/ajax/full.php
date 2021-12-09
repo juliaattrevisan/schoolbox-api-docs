@@ -25,18 +25,42 @@ try {
 // Calendar generation could take a while
 SitePage::extendExecutionTime();
 
+/* Find a set of allowed event types by which to filter
+ */
+$allowedEventTypes = null;
+
 if (isset($_GET['componentInstanceId'])) {
-    /* TODO Mine this from the component instance id's config options
+    /* This particular method gives me the configs that I can use
      */
-    $settings = [
-        'eventType',
-        'source'
-    ];
+    $instance = Component_InstanceMapper::getInstance()->findByInstanceId((int)$_GET['componentInstanceId']);
+
+    /* No instance? No trabajo
+     *
+     * This might happen if you partially sync from live to dev when both environments are very different
+     * causing a dev environment to look for data that doesn't exist; bad update or broken data might
+     * also cause this kind of scenario. Just exit with an empty payload in that circumstance
+     */
+    if (!$instance) {
+        echo '[]';
+        exit();
+    }
+
+    $settings = json_decode($instance->getConfigByKey('calendarFilter')->getValue(), true, 512, JSON_THROW_ON_ERROR);
 
     /* If componentInstanceId was a querystring param, mine its config options to see what
      * event types were allowed and filter on that result set
      */
     $api = $this->getDi()->get('calendarDashboardApiFactory')->produceFilteredApi($user, $viewer, $settings['source']);
+
+    /* Figure out the allowed event types as well; compile them into a stack
+     */
+    $allowedEventTypes = [];
+
+    foreach ($settings['eventType'] as $id => $val) {
+        if ((int)$val) {
+            $allowedEventTypes[] = (int)$id;
+        }
+    }
 } elseif (isset($_GET['folderId'])) {
     /* If folderId was a querystring param, produce a specific set of subscriptions
      */
@@ -46,10 +70,6 @@ if (isset($_GET['componentInstanceId'])) {
      */
     $api = $this->getDi()->get('calendarApiFactory')->produceForUser($user, $viewer);
 }
-
-/* Find a set of allowed event types by which to filter
- */
-$allowedEventTypes = null;
 
 $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $this->getDi()->get('authorizer'),
