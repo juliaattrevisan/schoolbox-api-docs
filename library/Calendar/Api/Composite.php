@@ -23,7 +23,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
      *
      * @var Calendar_Api_EventType_Interface[]
      */
-    private $api = [];
+    private array $api = [];
 
 
     /**
@@ -40,7 +40,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
         $result = new Collection();
 
         foreach ($this->api as $currentApi) {
-            $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
+            $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp, $allowedEventTypes));
         }
 
         $result->sort();
@@ -54,7 +54,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
      * @param int $eventId
      * @return EventInterface
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): EventInterface
     {
         $result = new Collection();
 
@@ -70,7 +70,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
      *
      * @param Calendar_Api_EventType_Interface $api
      */
-    public function add($api)
+    public function add(Calendar_Api_EventType_Interface $api): void
     {
         $this->api[] = $api;
     }

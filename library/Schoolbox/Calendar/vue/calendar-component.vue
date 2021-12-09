@@ -28,6 +28,10 @@ export default {
     },
 
     props: {
+        componentInstanceId: {
+            type: Number,
+            required: false,
+        },
         title: {
             type: String,
             required: true,
@@ -37,10 +41,6 @@ export default {
                  */
                 return 'Calendar';
             }
-        },
-        selectedFilters: {
-            type: Object,
-            required: true
         }
     },
 
@@ -81,7 +81,6 @@ export default {
     },
 
     beforeMount () {
-        console.log(this.selectedFilters);
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, listPlugin, adaptivePlugin ],
@@ -173,6 +172,7 @@ export default {
                         end:      Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                         userId:   this.config.userId,
                         folderId: this.config.folderId,
+                        componentInstanceId: this.componentInstanceId
                     }
                 }
             ).then((response) => {

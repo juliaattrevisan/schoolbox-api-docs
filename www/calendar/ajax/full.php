@@ -29,7 +29,7 @@ SitePage::extendExecutionTime();
  */
 $allowedEventTypes = null;
 
-if (isset($_GET['componentInstanceId'])) {
+if (isset($_GET['componentInstanceId']) && (int)$_GET['componentInstanceId']) {
     /* This particular method gives me the configs that I can use
      */
     $instance = Component_InstanceMapper::getInstance()->findByInstanceId((int)$_GET['componentInstanceId']);
@@ -47,11 +47,6 @@ if (isset($_GET['componentInstanceId'])) {
 
     $settings = json_decode($instance->getConfigByKey('calendarFilter')->getValue(), true, 512, JSON_THROW_ON_ERROR);
 
-    /* If componentInstanceId was a querystring param, mine its config options to see what
-     * event types were allowed and filter on that result set
-     */
-    $api = $this->getDi()->get('calendarDashboardApiFactory')->produceFilteredApi($user, $viewer, $settings['source']);
-
     /* Figure out the allowed event types as well; compile them into a stack
      */
     $allowedEventTypes = [];
@@ -61,6 +56,11 @@ if (isset($_GET['componentInstanceId'])) {
             $allowedEventTypes[] = (int)$id;
         }
     }
+
+    /* If componentInstanceId was a querystring param, mine its config options to see what
+     * event types were allowed and filter on that result set
+     */
+    $api = $this->getDi()->get('calendarDashboardApiFactory')->produceFilteredApi($user, $viewer, $settings['source']);
 } elseif (isset($_GET['folderId'])) {
     /* If folderId was a querystring param, produce a specific set of subscriptions
      */
