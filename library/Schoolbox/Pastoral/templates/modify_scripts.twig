@@ -226,6 +226,10 @@
         }
 
         function loadAudience() {
+            if (window.hasChanged) {
+                return;
+            };
+
             let prevLocked = $("#record-visibility-header").hasClass('icon-locked');
             let visibilityLocked;
             let typeId = $("#typeId").val();
@@ -282,6 +286,8 @@
 
         {% if record.id == 0 %}
         loadAudience();
+        {% else %}
+        window.hasChanged = true;
         {% endif %}
 });
 </script>
