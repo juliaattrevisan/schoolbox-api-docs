@@ -1,5 +1,4 @@
 <script>
-import axios from "axios";
 import AwardDetailModal from './award-detail-modal';
 import AchievementWithdrawModal from "./award-achievement-withdraw-modal";
 import BadgeImage from './../../vue/badge-image';
@@ -105,22 +104,13 @@ export default {
          *
          * @param award
          */
-        awardAchievement(award) {
-          let self = this;
-
-          let request = {
-            url: award._links.goalAward,
-            data: {users: [award.recipient]},
-            method: 'post',
-            responseType: 'json'
-          }
-
-          self.toastActivate('Awarding...');
-          axios
-              .request(request)
-              .then(() => {
-                self.toastSuccess('Achievement awarded');
-
+        async awardAchievement(award) {
+            try {
+                await fetch(award._links.goalAward, {
+                    method: 'POST',
+                    body: JSON.stringify({ users: [award.recipient] })
+                });
+                this.toastSuccess('Achievement awarded');
                 /* Temporarily replaced implementation of self.updateAwards()
                  * goal-feed.vue can't tell achievement-feed.vue to update itself; they don't
                  * share a common parent. They're entirely separate vue apps. An action inside
@@ -130,9 +120,9 @@ export default {
                  * The forced reload will cause achievement-feed to seem updated, for now
                  */
                 window.location.reload();
-              })
-              .catch(() => self.toastError('Failed to award achievement'))
-
+            } catch (error) {
+                this.toastError('Failed to award achievement');
+            }
         },
 
         /**
@@ -166,19 +156,17 @@ export default {
         /**
          * Fetch the list of awards
          */
-        updateAwards() {
-            let self = this;
-
+        async updateAwards() {
             /* Access the feed endpoint, grab the awards for the user
              */
-            axios.get(this.config.routes.getAwardFeed, {})
-                .then(response => {
-                    self.data = [];
-                    self.$nextTick(() => {
-                        self.data = response.data;
-                    });
-                })
-                .finally(() => this.loading = false);
+            try {
+                const response = await fetch(this.config.routes.getAwardFeed);
+                this.data = await response.json();
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.loading = false;
+            }   
         },
 
         /**
