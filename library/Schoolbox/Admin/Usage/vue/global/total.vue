@@ -98,7 +98,7 @@ export default {
                 const values = this.allData.map((item) => parseInt(item.size));
                 this.chartOptions = this.getChartOptions(values);
             } catch (error) {
-                this.loading = false;
+                console.warn(error);
             } finally {
                 this.loading = false;
             }
@@ -107,7 +107,6 @@ export default {
         /**
          * To setup the HighCharts config options
          * 
-         * @param { Array }
          * @param { Array }
          * 
          * @returns { Object }
@@ -128,7 +127,7 @@ export default {
                 plotOptions: {
                     bar: {
                         /* https://stackoverflow.com/questions/25721067/highchart-data-label-issue-in-bar-chart
-                            */
+                         */
                         dataLabels: {
                             enabled: true,
                             formatter: function() {

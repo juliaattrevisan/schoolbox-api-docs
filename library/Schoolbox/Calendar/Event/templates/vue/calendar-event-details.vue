@@ -223,21 +223,20 @@
                         body: this.getRsvpCreateFormData(id), 
                     });
                     const responseData = await response.json();
-                    this.updateCountsFromPayload(responseData);
+                    this.updateCountsFromPayload(responseData); //Update data with the result from async request
                     this.guests = responseData.attendees.guests;
                     toast.toastTimeout({
                         text: `${fullname} has been invited`,
                         css: 'success'
                     });
                 } catch (error) {
-                    if (error.response) {
-                        toast.toastTimeout({
-                            text: `Unable to invite ${fullname}; please try again.`,
-                            css: 'alert'
-                        });
-                    }
+                    toast.toastTimeout({
+                        text: `Unable to invite ${fullname}; please try again.`,
+                        css: 'alert'
+                    });
+                    console.warn(error);
                 } finally {
-                    this.selected = [];
+                    this.selected = []; //Clear selection after async outcome
                 }
 
             },
@@ -287,12 +286,11 @@
                         css: 'success'
                     });
                 } catch (error) {
-                    if (error.response) {
-                        toast.toastTimeout({
-                            text: `Unable to uninvite ${fullname}; please try again.`,
-                            css: 'alert'
-                        });
-                    }
+                    toast.toastTimeout({
+                        text: `Unable to uninvite ${fullname}; please try again.`,
+                        css: 'alert'
+                    });
+                    console.warn(error);
                 }
 
             },
@@ -316,9 +314,7 @@
              */
             async rsvp (status, endpoint) {
                 
-                /* Set a flag to prevent async spammage
-                 */
-                this.isTransacting = true;
+                this.isTransacting = true; //Set a flag to prevent async spammage
 
                 const toast = $('[data-toast]');
                 toast.toastActivate({
@@ -341,14 +337,13 @@
                     });
 
                 } catch (error) {
-                    if (error.response) {
-                        toast.toastTimeout({
-                            text: `Unable to update invitation. ${error.response.data.message}`,
-                            css: 'alert'
-                        });
-                    }
+                    toast.toastTimeout({
+                        text: 'Unable to update invitation.',
+                        css: 'alert'
+                    });
+                    console.warn(error);
                 } finally {
-                    this.isTransacting = false;
+                    this.isTransacting = false; //Reset flag
                 }
 
             },

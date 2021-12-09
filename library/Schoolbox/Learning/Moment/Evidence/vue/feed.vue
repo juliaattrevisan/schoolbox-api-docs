@@ -84,9 +84,10 @@ export default {
                 const response = await fetch(this.config.routes.getFeed + '?' + new URLSearchParams(params));
                 const responseData = await response.json();
                 this.data = this.data.concat(responseData.data ? responseData.data : [])
-                this.metadata.count  = responseData.metadata?.count ? responseData.metadata.count  : 0;
+                this.metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
                 this.metadata.cursor = responseData.metadata?.cursor ? responseData.metadata.cursor : null;
             } catch (error) {
+                console.warn(error);
                 this.loading = false;
             } finally {
                 this.showSkeletonLoader = false

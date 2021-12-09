@@ -121,6 +121,7 @@ export default {
                  */
                 window.location.reload();
             } catch (error) {
+                console.warn(error);
                 this.toastError('Failed to award achievement');
             }
         },

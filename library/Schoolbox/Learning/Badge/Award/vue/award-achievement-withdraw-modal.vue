@@ -132,6 +132,7 @@ export default {
                         self.toastError('Unable to withdraw achievement; please try again.');
                     }
                 }
+                console.warn(error);
             } finally {
                 this.loading = false;
             }

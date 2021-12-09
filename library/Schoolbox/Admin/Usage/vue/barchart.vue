@@ -102,7 +102,7 @@ export default {
                 const categories = this.allData.map((item) => item.label);
                 this.chartOptions = this.getChartOptions(values, categories);
             } catch (error) {
-                this.loading = false;
+                console.warn(error);
             } finally {
                 this.loading = false;
             }

@@ -93,7 +93,6 @@ export default {
                 this.allData = await response.json();
             } catch (error) {
                 console.warn(error);
-                this.loading = false;
             } finally {
                 this.loading = false;
             }
