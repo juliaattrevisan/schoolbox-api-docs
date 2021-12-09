@@ -45,7 +45,17 @@ if (isset($_GET['componentInstanceId']) && (int)$_GET['componentInstanceId']) {
         exit();
     }
 
-    $settings = json_decode($instance->getConfigByKey('calendarFilter')->getValue(), true, 512, JSON_THROW_ON_ERROR);
+    /* If you can't decode the config, use a default struct
+     * The encoding might be bad, tainted, or null/nonexistent to begin with
+     */
+    try {
+        $settings = json_decode($instance->getConfigByKey('calendarFilter')->getValue(), true, 512, JSON_THROW_ON_ERROR);
+    } catch (JsonException $e) {
+        $settings = [
+            'eventType' => [],
+            'source' => []
+        ];
+    }
 
     /* Figure out the allowed event types as well; compile them into a stack
      */
