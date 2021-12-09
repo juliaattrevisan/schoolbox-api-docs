@@ -1,6 +1,5 @@
 <script>
 
-import axios from 'axios';
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 
 export default {
@@ -272,58 +271,43 @@ export default {
 
             return self.getStudentsPastoralCountsUrl.replace("{studentIds}", self.allStudentIds.join(','));
         },
-        getStudents: function () {
-            let self = this,
-                studentLists = new Promise(function (resolve) {
-                    axios.get(self.getStudentListsEndpoint)
-                        .then(function (response) {
-                            // Set all students to checked by default
-                            self.studentLists = response.data
-                                .map(function (student) {
-                                    student.isChecked = true;
-                                    return student;
-                                });
-                            resolve();
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        })
-                        .finally(function () {
-                            // Hide skeleton loader and show class list table
-                            self.showSkeletonLoader = false;
-                        });
+        async getStudents () {
+
+            try {
+                const response = await fetch(this.getStudentListsEndpoint);
+                this.studentLists = await response.json();
+                this.studentLists = this.studentLists.map((student) => { // Set all students to checked by default
+                    student.isChecked = true;
+                    return student;
                 });
+            } catch (error) {
+                console.warn(error);
+            } 
 
             /**
              * immediately check to see if we need to grab pastoral count information
              */
-            studentLists.then(function () {
-                //pastoral is disabled, theres no need to load in pastoral counts
-                if (!self.pastoralEnabled) {
-                    return;
-                }
+            //pastoral is disabled, theres no need to load in pastoral counts
+            if (!this.pastoralEnabled) {
+                this.showSkeletonLoader = false;
+                return;
+            }
+            
+            try {
+                const pastoralCountsResponse = await fetch(this.getStudentsPastoralCountsEndpoint());
+                this.studentPastoralCounts = await pastoralCountsResponse.json();
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.showSkeletonLoader = false; // Hide skeleton loader and show class list table
+            }    
 
-                axios.get(self.getStudentsPastoralCountsEndpoint())
-                    .then(function (response) {
-                        self.studentPastoralCounts = response.data
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
-                    .finally(function () {
-                        // Hide skeleton loader and show class list table
-                        self.showSkeletonLoader = false;
-                    });
-            });
-
-            studentLists.then(function () {
-                setTimeout(function () {
-                    self.studentsCheckboxElements = document.getElementsByName('students[]');
-                    self.groupsCheckboxElements = document.getElementsByName('groups[]');
-                    // Remove actions placeholder once everything is ready
-                    self.actionsPlaceholder = false;
-                }, 100);
-            });
+            setTimeout(() => {
+                this.studentsCheckboxElements = document.getElementsByName('students[]');
+                this.groupsCheckboxElements = document.getElementsByName('groups[]');
+                // Remove actions placeholder once everything is ready
+                this.actionsPlaceholder = false;
+            }, 100);
         },
         sendEmail: function () {
             let self = this;
