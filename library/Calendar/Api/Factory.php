@@ -96,7 +96,6 @@ class Calendar_Api_Factory
                 $config = $currentConfig->decodeConfig();
 
                 try {
-
                     if ($this->moduleChecker->isEnabled($config)) {
                         /* Update $config so it knows the calendar_connector id from whence it came
                          * This is used in produce() and passed to each unique/default implementation

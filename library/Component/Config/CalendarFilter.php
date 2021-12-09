@@ -115,4 +115,3 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         }
     }
 }
-

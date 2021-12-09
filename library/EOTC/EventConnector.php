@@ -186,6 +186,7 @@ class EventConnector extends EventMapper
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
         }
+
         /* For all other user types:
          * Only show events where $user is either staff or student attendee
          *
@@ -222,7 +223,7 @@ class EventConnector extends EventMapper
         if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
             $queryEventTypes = ' AND e.type IN (' . implode(',', $allowedEventTypes) . ')';
         }
-        
+
         /* Ram in all the pieces
          */
         $query = "
