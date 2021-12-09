@@ -177,6 +177,16 @@ class Controller extends BaseController
          *
          * need to check for the existence of the user/group relationship then modify it, or create a new entry
          */
+        //check post to confirm everything is there
+        $post = $this->getRequest()->post->getArrayCopy();
+
+        if (
+            !isset($post['action'])
+            || !isset($post['follow'])
+            || !isset($post['favourite'])
+        ) {
+            return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
+        }
         //get group object
         $userGroup = false;
 
@@ -197,7 +207,7 @@ class Controller extends BaseController
             }
         }
         //add / remove user from group
-        if ('delete' === $this->getRequest()->post['action']) {
+        if ('delete' === $post['action']) {
             if ($group->isPrivate()) {
                 return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'No Permission to leave group']));
             }
@@ -211,7 +221,7 @@ class Controller extends BaseController
 
         //must be edit functions
         //make/remove favourite
-        $userGroup->setFavourite($this->getRequest()->post['favourite']);
+        $userGroup->setFavourite((bool)$post['favourite']);
 
         //save group object
         $accessMapper->save($userGroup);
@@ -219,7 +229,7 @@ class Controller extends BaseController
         //subscribe/remove notifications
         //build notifications
         $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
-        $following = $this->getRequest()->post['follow'] ? 1 : 0;
+        $following = $post['follow'] ? 1 : 0;
         $followingList = $realtimeConfig->persistFollow($user, [$groupId => $following]);
 
         return $this->getResponse()->content->set($this->buildJsonOutput([
