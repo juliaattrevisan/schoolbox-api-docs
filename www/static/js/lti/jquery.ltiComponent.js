@@ -7,6 +7,10 @@
         // The component instance ID
         componentInstanceId: null,
 
+        // The component title bar:
+        // update this with the selected LTI content's title
+        $componentTitle: $(),
+
         // The toaster
         $toast: $(),
 
@@ -134,7 +138,7 @@
             self.$element.find(':input[name="url"]').val(result.url);
 
             // Update component heading
-            $('#component-title-' + String(params.componentInstanceId)).html(result.providerName);
+            params.$componentTitle.text(result.providerName);
 
             // What kind of provider is this?
             // 1.1: use ltiConsumer.getLaunch
@@ -241,13 +245,18 @@
         let params                       = this.params,
             postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
             postComponentProviderParams  = {
-                url:    url,
-                custom: JSON.stringify(resourceLink?.custom ?? {}),
+                url:           url,
+                description:   JSON.stringify(resourceLink?.custom ?? {}),
+                componentname: resourceLink?.title,
             };
 
         // Update URL and custom fields (even if empty)
-        this.$element.find(':input[name="description"]').val(postComponentProviderParams.custom);
+        this.$element.find(':input[name="componentname"]').val(postComponentProviderParams.componentname);
+        this.$element.find(':input[name="description"]').val(postComponentProviderParams.description);
         this.$element.find(':input[name="url"]').val(url);
+
+        // Update title
+        params.$componentTitle.text(postComponentProviderParams.componentname);
 
         $.post(
             postComponentProviderBaseUrl.replace(

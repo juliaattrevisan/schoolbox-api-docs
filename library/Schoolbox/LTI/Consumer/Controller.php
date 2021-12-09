@@ -159,14 +159,30 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER, $provider->getId());
-        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $provider->getName());
+        $this->updateComponentValue(
+            $component,
+            LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER,
+            $provider->getId(),
+        );
+        $this->updateComponentValue(
+            $component,
+            LtiComponent::COMPONENT_CONFIG_TITLE,
+            $post[LtiComponent::COMPONENT_CONFIG_TITLE] ?? $provider->getName(),
+        );
 
-        if (isset($post['url'])) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $post['url']);
+        if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL])) {
+            $this->updateComponentValue(
+                $component,
+                LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL,
+                $post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL],
+            );
         }
-        if (isset($post['custom'])) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS, $post['custom']);
+        if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS])) {
+            $this->updateComponentValue(
+                $component,
+                LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS,
+                $post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS],
+            );
         }
 
         $this->getResponse()->content->set([

@@ -147,6 +147,7 @@
         $(function () {
             $('#component{{ componentInstanceId }}').ltiComponent({
                 componentInstanceId: '{{ componentInstanceId }}',
+                $componentTitle: $('#component-title-{{ componentInstanceId }}'),
                 $toast: $('#lti-toaster{{ componentInstanceId }}'),
                 $ltiSelectProvider: $('#lti-select-provider{{ componentInstanceId }}'),
                 $ltiSelectPreloader: $('#lti-select-provider{{ componentInstanceId }}'),
@@ -154,13 +155,13 @@
                 $ltiIframe: $('#lti-frame{{ componentInstanceId }}'),
                 providerIdPlaceholder: '{{ providerIdPlaceholder }}',
                 postComponentProviderBaseUrl: '{{
-                routeLookup(
-                    'ltiConsumer.postComponentProvider',
-                    {
-                        providerId:  providerId ?: providerIdPlaceholder,
-                        componentId: componentInstanceId,
-                    }
-                )
+                    routeLookup(
+                        'ltiConsumer.postComponentProvider',
+                        {
+                            providerId:  providerId ?: providerIdPlaceholder,
+                            componentId: componentInstanceId,
+                        }
+                    )
                 }}',
                 lti1p1LaunchUrl: '{{
                     routeLookup(
