@@ -178,11 +178,12 @@ export default {
         async deleteBadge () {
             this.$refs.toast.activate('Deleting badge...');
             const newData = this.data.filter((v) => v.id !== this.currentBadge.id);
-            // @TODO - need the backend to return something to avoid 'Fetch failed loading: DELETE'
             try {
-                await fetch(this.currentBadge._links.delete, {
+                const response = await fetch(this.currentBadge._links.delete, {
                     method: 'DELETE',
                 });
+                //this is to prevent 'Fetch finished loading' in the console, as nothing is retuned and Fetch currently doesn't like that with DELETE
+                await response.text(); 
                 this.data = [];
                 this.$nextTick(() => {
                     this.data = newData;
@@ -405,7 +406,7 @@ export default {
 
         <reveal-modal ref="deleteModal">
             <template v-if="currentBadge">
-                <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&lsquo;</strong></h2>
+                <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&rsquo;</strong></h2>
                 <div class="alert-box alert icon-alert">WARNING! Any users who have been awarded this badge will have it removed from their collection.</div>
                 <p>Are you sure you wish to delete the badge '{{ currentBadge.name }}'?</p>
                 <ul class="flex-list buttons">
