@@ -1,6 +1,5 @@
 <script>
     
-import axios from 'axios';
 import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI';
 
@@ -94,8 +93,8 @@ export default {
          */
         async loadRows () {
             try {
-                const response = await axios.get(ENDPOINTS.payloadFullPath(this.payload.article.id));
-                this.rows = response.data;
+                const response = await fetch(ENDPOINTS.payloadFullPath(this.payload.article.id));
+                this.rows = await response.json();
                 this.isLoading = false;
             } catch (error) {
                 this.isLoading = false; 
