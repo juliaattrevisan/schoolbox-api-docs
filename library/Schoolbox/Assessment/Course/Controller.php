@@ -672,13 +672,15 @@ class Controller extends Base\Base
             return;
         }
 
-        $curriculumCodes  = $post['curriculumCodes'] ? array_filter($post['curriculumCodes']) : [];
-        $courseSpecFolder = $this->folderMapper->findById($courseSpec->getFolder()->getId());
+        $courseSpecFolder       = $this->folderMapper->findById($courseSpec->getFolder()->getId());
+        $newCurriculumCodes     = $post['curriculumCodes'] ? array_filter($post['curriculumCodes']) : [];
+        $currentCurriculumCodes = $courseSpecFolder->getCurriculumNodes()->getPropertyValues('id');
 
         // If anything changed for course
         if (
             $courseSpecFolder->getName() !== $newCourseName
-            || array_diff($courseSpecFolder->getCurriculumNodes()->getPropertyValues('id'), $curriculumCodes)
+            || array_diff($currentCurriculumCodes, $newCurriculumCodes)
+            || array_diff($newCurriculumCodes, $currentCurriculumCodes)
             || $courseSpecFolder->getParent()->getId() !== $parentFolderId
         ) {
             if ($this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) < UserAccess::ACCESS_WRITE) {
@@ -694,7 +696,7 @@ class Controller extends Base\Base
             $this->courseSpecificationMapper->save($courseSpec);
 
             // Save the folder
-            $courseSpecFolder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $curriculumCodes));
+            $courseSpecFolder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $newCurriculumCodes));
 
             $this->folderMapper->save($courseSpecFolder);
         }
