@@ -25,16 +25,31 @@ try {
 // Calendar generation could take a while
 SitePage::extendExecutionTime();
 
-/** @var Calendar_Api_Factory $factory */
-$factory  = $this->getDi()->get('calendarApiFactory');
+if (isset($_GET['componentInstanceId'])) {
+    /* TODO Mine this from the component instance id's config options
+     */
+    $settings = [
+        'eventType',
+        'source'
+    ];
 
-/* If folderId was a querystring param, produce a specific set of subscriptions
- */
-if (isset($_GET['folderId'])) {
-    $api = $factory->produceForFolderId((int)$_GET['folderId'], $user, $viewer);
+    /* If componentInstanceId was a querystring param, mine its config options to see what
+     * event types were allowed and filter on that result set
+     */
+    $api = $this->getDi()->get('calendarDashboardApiFactory')->generateFilteredApi($user, $viewer, $settings['source']);
+} elseif (isset($_GET['folderId'])) {
+    /* If folderId was a querystring param, produce a specific set of subscriptions
+     */
+    $api = $this->getDi()->get('calendarApiFactory')->produceForFolderId((int)$_GET['folderId'], $user, $viewer);
 } else {
-    $api = $factory->produceForUser($user, $viewer);
+    /* Otherwise just get the set of events relevant to a particular user
+     */
+    $api = $this->getDi()->get('calendarApiFactory')->produceForUser($user, $viewer);
 }
+
+/* Find a set of allowed event types by which to filter
+ */
+$allowedEventTypes = null;
 
 $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $this->getDi()->get('authorizer'),
@@ -43,6 +58,7 @@ $calendar = new Calendar_Layout_Full_Ajax_JSON(
     $viewer,
     $api,
     new ModuleChecker(ConfigLoader::getInstance()),
+    $allowedEventTypes
 );
 
 $calendar->render();

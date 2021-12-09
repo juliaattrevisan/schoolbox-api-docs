@@ -69,6 +69,14 @@ abstract class Calendar_Layout_Full_Abstract
 
 
     /**
+     * A set of luEventType ids by which to restrict the result set
+     *
+     * @var array|null
+     */
+    protected ?array $allowedEventTypes = null;
+
+
+    /**
      * Constructor
      *
      * @param Authorizer                       $authorizer
@@ -77,6 +85,7 @@ abstract class Calendar_Layout_Full_Abstract
      * @param User                             $viewer
      * @param Calendar_Api_EventType_Interface $api
      * @param ModuleChecker                    $moduleChecker
+     * @param array|null                       $allowedEventTypes
      */
     public function __construct(
         Authorizer $authorizer,
@@ -84,15 +93,18 @@ abstract class Calendar_Layout_Full_Abstract
         User $user,
         User $viewer,
         Calendar_Api_EventType_Interface $api,
-        ModuleChecker $moduleChecker
+        ModuleChecker $moduleChecker,
+        ?array $allowedEventTypes = null
     ) {
-        $this->api           = $api;
-        $this->moduleChecker = $moduleChecker;
-        $this->user          = $user;
-        $this->viewer        = $viewer;
-        $this->authorizer    = $authorizer;
-        $this->router        = $router;
+        $this->api               = $api;
+        $this->moduleChecker     = $moduleChecker;
+        $this->user              = $user;
+        $this->viewer            = $viewer;
+        $this->authorizer        = $authorizer;
+        $this->router            = $router;
+        $this->allowedEventTypes = $allowedEventTypes;
     }
+
 
     /**
      * Does the current user have permission to view this calendar page?

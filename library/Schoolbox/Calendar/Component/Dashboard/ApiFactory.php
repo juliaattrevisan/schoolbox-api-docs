@@ -76,7 +76,6 @@ class ApiFactory
      * @param User  $viewee
      * @param User  $viewer
      * @param array $schosenSubscriptions
-     * @param array $chosenEventTypes
      * @return \Calendar_Api_EventType_Interface
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
@@ -84,8 +83,7 @@ class ApiFactory
     public function generateFilteredApi(
         User $viewee,
         User $viewer,
-        array $schosenSubscriptions,
-        array $chosenEventTypes
+        array $schosenSubscriptions
     ): \Calendar_Api_EventType_Interface {
 
         /* Get a list of instance-enabled subscriptions; these are sources of data
@@ -127,6 +125,8 @@ class ApiFactory
         /* For each subscription still surviving, have it generate its events
          * but only retrieve events that possessed at least one of the luEventTypes
          * specified in the $eventTypes stack
+         *
+         * This is done via the Composite's call to ->getEvents($this->startTimestamp, $this->endTimestamp, $allowedEventTypes);
          */
 
         /* This produces the intersection of eventTypes x subscriptions such that

@@ -61,6 +61,7 @@ class Renderer
      * @param Authorizer                       $authorizer
      * @param Router                           $router
      * @param User                             $viewer
+     * @param array|null                       $allowedEventTypes
      */
     public function __construct(
         Calendar_Api_EventType_Interface $api,
@@ -69,7 +70,8 @@ class Renderer
         User $user,
         Authorizer $authorizer,
         Router $router,
-        User $viewer
+        User $viewer,
+        ?array $allowedEventTypes = null
     ) {
         $this->api            = $api;
         $this->startTimestamp = $startTimestamp;
@@ -80,16 +82,19 @@ class Renderer
         $this->viewer         = $viewer;
 
         $this->allEvents = new Collection();
-        $this->collectAllEvents();
+        $this->collectAllEvents($allowedEventTypes);
     }
 
 
     /**
      * Collects all events from everywhere, for the current day
+     *
+     * Optionally pass a set of luEventType ids by which to restrict the data further
      */
-    private function collectAllEvents(): void
+    private function collectAllEvents(?array $allowedEventTypes = null): void
     {
-        $eventList = $this->api->getEvents($this->startTimestamp, $this->endTimestamp);
+        $eventList = $this->api->getEvents($this->startTimestamp, $this->endTimestamp, $allowedEventTypes);
+
         /* Only attempt to merge collections
          */
         if ($eventList instanceof Collection) {

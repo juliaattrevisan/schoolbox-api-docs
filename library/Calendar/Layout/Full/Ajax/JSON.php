@@ -37,7 +37,8 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
             $this->user,
             $this->authorizer,
             $this->router,
-            $this->viewer
+            $this->viewer,
+            $this->allowedEventTypes
         );
 
         /* Render all registered events
