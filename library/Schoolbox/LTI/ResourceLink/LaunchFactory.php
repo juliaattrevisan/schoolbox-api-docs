@@ -14,6 +14,7 @@ use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -101,16 +102,19 @@ class LaunchFactory
      * Build a resource link launch message, which will then be used to launch
      * the LTI tool's assessment.
      *
-     * @param Model $assessment
-     * @param User  $currentUser The current user
-     * @param User  $actingUser  The user who the current user is acting as:
-     *                           if not themselves, it may be a student.
+     * @param Model    $assessment
+     * @param User     $currentUser The current user.
+     * @param User     $actingUser  The user who the current user is acting as:
+     *                              if not themselves, it may be a student.
+     * @param int|null $height      If set, add this height to the launch's
+     *                              launch presentation claim.
      * @return LtiMessageInterface
      */
     public function buildForAssessment(
         Model $assessment,
         User $currentUser,
-        User $actingUser
+        User $actingUser,
+        ?int $height = null
     ): LtiMessageInterface {
         // Roles: dependent on whether user is a participant or instructor
         // TODO determine how roles should be set if $actingUser != $currentUser
@@ -121,7 +125,7 @@ class LaunchFactory
         );
 
         // Build additional claims
-        $additionalClaims = $this->buildAdditionalClaims($assessment, $currentUser, $actingUser);
+        $additionalClaims = $this->buildAdditionalClaims($assessment, $currentUser, $actingUser, $height);
 
         // Create an LTI resource link launch, send it to the iframe
         $registration = $this->registrations->find($assessment->getLtiTool()->getDeploymentId());
@@ -142,15 +146,19 @@ class LaunchFactory
     /**
      * Build a list of additional claims for this resource link launch.
      *
-     * @param Model $assessment
-     * @param User  $currentUser
-     * @param User  $actingUser
+     * @param Model    $assessment
+     * @param User     $currentUser The current user.
+     * @param User     $actingUser  The user who the current user is acting as:
+     *                              if not themselves, it may be a student.
+     * @param int|null $height      If set, add this height to the launch
+     *                              presentation claim.
      * @return array<MessagePayloadClaimInterface>
      */
     public function buildAdditionalClaims(
         Model $assessment,
         User $currentUser,
-        User $actingUser
+        User $actingUser,
+        ?int $height
     ): array {
         $baseUrl = (new UrlFactory($this->config))->buildFullyQualified()->setScheme('https');
 
@@ -170,6 +178,13 @@ class LaunchFactory
         // PlatformInstanceClaim: talk about the Schoolbox instance
         $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
         $additionalClaims[]    = $platformInstanceClaim;
+
+        // LaunchPresentationClaim:
+        // talk about how the resource link will be presented
+        $additionalClaims[] = new LaunchPresentationClaim(
+            $assessment->getLtiTool()->getTarget(),
+            (string)$height,
+        );
 
         // Role-scope mentor claims:
         // for parents, this might be their kids

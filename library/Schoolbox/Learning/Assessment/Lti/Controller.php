@@ -418,6 +418,6 @@ class Controller extends Assessment\Controller
             $this->instance,
             $this->getConfigLoader(),
             $this->userCodec
-        ))->buildForAssessment($assessment, $currentUser, $actingUser);
+        ))->buildForAssessment($assessment, $currentUser, $actingUser, $this->request->query->getInt('height'));
     }
 }
