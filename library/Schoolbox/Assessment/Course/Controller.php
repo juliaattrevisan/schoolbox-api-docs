@@ -509,13 +509,14 @@ class Controller extends Base\Base
      * * course not being created, or moved to, outside faculty root
      * * no loops in folder ancestry
      *
-     * @param string   $folderName
-     * @param int|null $folderId
-     * @param int      $parentFolderId
+     * @param string      $folderName
+     * @param int|null    $parentFolderId
+     * @param Folder|null $folder
      * @throws Base\Exception
+     * @throws MapperException
      * @todo move route perm logic from controller to module (eg course parent folder access)
      */
-    protected function validateCourseData(string $folderName, ?int $parentFolderId, ?int $folderId = null): void
+    protected function validateCourseData(string $folderName, ?int $parentFolderId, ?Folder $folder = null): void
     {
         $errors = [];
         $parentFolder = null;
@@ -526,10 +527,10 @@ class Controller extends Base\Base
         }
 
         // Was no parent indicated? (as opposed to explicitly setting to root)
-        if (!$parentFolderId && '0' !== $parentFolderId) {
+        if (!$parentFolderId) {
             $errors[] = "You need to select a faculty or class for {$folderName} to live in";
         } else {
-            $access = $this->access->getFolderAccess($user = $this->getUser(), $parentFolderId);
+            $access = $this->access->getFolderAccess($this->getUser(), $parentFolderId);
 
             if ($access < UserAccess::ACCESS_WRITE) {
                 $errors[] = 'You need to select a Faculty / Subject for which you have write access';
@@ -548,28 +549,19 @@ class Controller extends Base\Base
         }
 
         // Explicitly set to root (as opposed to not set)
-        if ('0' === $parentFolderId && 0 !== $this->courseSpecificationMapper->getFacultyRootFolder()->getId()) {
+        if (0 === $parentFolderId && 0 !== $this->courseSpecificationMapper->getFacultyRootFolder()->getId()) {
             throw new Base\Exception('Courses may not be created in the root folder');
         }
 
 
         // Deeper logic tests
         try {
-            // Does the folder already exist? If so, retrieve it.
-            $folder = null;
-
-            if ($folderId) {
-                $folder = $this->folderMapper->findCheaplyById($folderId);
-            }
-
             // Is this a create, or are we moving an existing course?
-            if (!$folderId || $folder->getParent()->getId() != $parentFolderId) {
-                if (!$this->courseSpecificationMapper->isFolderValid($parentFolder)) {
-                    if ($folderId) {
-                        throw new Base\Exception('Courses may not be moved outside the faculty folder');
-                    } else {
-                        throw new Base\Exception('Courses may not be created outside the faculty folder');
-                    }
+            if (!$this->courseSpecificationMapper->isFolderValid($parentFolder)) {
+                if ($folder) {
+                    throw new Base\Exception('Courses may not be moved outside the faculty folder');
+                } else {
+                    throw new Base\Exception('Courses may not be created outside the faculty folder');
                 }
             }
 
@@ -608,22 +600,25 @@ class Controller extends Base\Base
      */
     public function updateCourse(CourseSpecification $courseSpec)
     {
-        $post = $this->getRequest()->post;
-        $courseSpec->getFolder()->setName(trim($post['name']));
+        $post          = $this->getRequest()->post;
+        $newCourseName = trim($post['name']);
+        if ($newCourseName === '') {
+            $this->sendError(new Base\Exception('You need to give the course a name. ', ['Courses must have names.']));
+            return;
+        }
+
         $parentFolderId = (int)trim($post['parent']);
-        // curriculumCodes is not set when curriculum is disabled
-        $curriculumCodes = $post['curriculumCodes'] ?: [];
 
-        try {
-            $this->validateCourseData($courseSpec->getFolder()->getName(), $parentFolderId, $courseSpec->getFolder()->getId());
-
-            if ($courseSpec->getFolder()->getParent()->getId() != $parentFolderId) {
+        // If course is moved under another folder, validate
+        if ($courseSpec->getFolder()->getParent()->getId() !== $parentFolderId) {
+            try {
+                $this->validateCourseData($newCourseName, $parentFolderId, $courseSpec->getFolder());
                 $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
                 $courseSpec->getFolder()->setParent($parentFolder);
+            } catch (Base\Exception $e) {
+                $this->sendError($e);
+                return;
             }
-        } catch (Base\Exception $e) {
-            $this->sendError($e);
-            return;
         }
 
         // Save each Unit's name
@@ -632,11 +627,24 @@ class Controller extends Base\Base
 
             /* Keep track of how many units were missing names
              */
-            $emptyUnit = 0;
+            $emptyUnit     = 0;
+            $readOnlyUnits = [];
 
             // save unit name changes
             foreach ($courseSpec->getUnits() as $unitSpec) {
+                if (!isset($post['unit'][$unitSpec->getId()])) {
+                    // no change required
+                    continue;
+                }
                 $unitName = trim($post['unit'][$unitSpec->getId()]['name']);
+                if ($unitName === $unitSpec->getFolder()->getName()) {
+                    // name is not changed.
+                    continue;
+                }
+                if ($this->access->getFolderAccess($this->getUser(), $unitSpec->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
+                    $readOnlyUnits[] = $unitSpec->getFolder()->getName();
+                    continue;
+                }
 
                 /* Don't try to save empty units
                  */
@@ -655,22 +663,43 @@ class Controller extends Base\Base
                 $this->sendError(new Base\Exception('At least one unit in this course has no name. ', ['Units must have names.']));
                 return;
             }
+            if (count($readOnlyUnits) > 0) {
+                $this->sendError(new Base\Exception('Cannot update units. ', [sprintf("You don't have permission to update %s.", implode(',', $readOnlyUnits))]));
+                return;
+            }
         } else {
             $this->sendError(new Base\Exception('Cannot create a Course without Units. ', ['You need to create at least 1 unit.']));
             return;
         }
 
-        // Save the Course
-        $this->courseSpecificationMapper->save($courseSpec);
+        $courseSpecFolder       = $this->folderMapper->findById($courseSpec->getFolder()->getId());
+        $newCurriculumCodes     = $post['curriculumCodes'] ? array_filter($post['curriculumCodes']) : [];
+        $currentCurriculumCodes = $courseSpecFolder->getCurriculumNodes()->getPropertyValues('id');
 
-        // Save the folder
-        $folder = $courseSpec->getFolder();
+        // If anything changed for course
+        if (
+            $courseSpecFolder->getName() !== $newCourseName
+            || array_diff($currentCurriculumCodes, $newCurriculumCodes)
+            || array_diff($newCurriculumCodes, $currentCurriculumCodes)
+            || $courseSpecFolder->getParent()->getId() !== $parentFolderId
+        ) {
+            if ($this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) < UserAccess::ACCESS_WRITE) {
+                $this->sendError(new Base\Exception('Cannot update course. ', ["You don't have permission to update {$courseSpecFolder->getName()}."]));
+                return;
+            }
 
-        if (count($curriculumCodes)) {
-            $folder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $curriculumCodes));
+            // curriculumCodes is not set when curriculum is disabled
+            $courseSpecFolder->setName($newCourseName);
+            $courseSpec->setFolder($courseSpecFolder);
+
+            // Save the Course
+            $this->courseSpecificationMapper->save($courseSpec);
+
+            // Save the folder
+            $courseSpecFolder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $newCurriculumCodes));
+
+            $this->folderMapper->save($courseSpecFolder);
         }
-
-        $this->folderMapper->save($folder);
 
         if ($this->getRequest()->isXhr()) {
             // respond to XHR with JSON
@@ -796,7 +825,7 @@ class Controller extends Base\Base
      * @param int      $parentId
      * @param array    $curriculumCodeIds
      * @param bool     $inherit            Whether to inherit permissions
-     * @param int|null $templateId
+     * @param int      $templateId
      * @param array    $rolePermissions    Maps role to permission level
      * @param bool     $recursePermissions If true && user is SU, applies 'inherit' to entire subtree
      * @param array    $classCodes
