@@ -36,7 +36,7 @@ if (isset($_GET['componentInstanceId'])) {
     /* If componentInstanceId was a querystring param, mine its config options to see what
      * event types were allowed and filter on that result set
      */
-    $api = $this->getDi()->get('calendarDashboardApiFactory')->generateFilteredApi($user, $viewer, $settings['source']);
+    $api = $this->getDi()->get('calendarDashboardApiFactory')->produceFilteredApi($user, $viewer, $settings['source']);
 } elseif (isset($_GET['folderId'])) {
     /* If folderId was a querystring param, produce a specific set of subscriptions
      */

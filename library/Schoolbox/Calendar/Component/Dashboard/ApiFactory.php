@@ -80,7 +80,7 @@ class ApiFactory
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function generateFilteredApi(
+    public function produceFilteredApi(
         User $viewee,
         User $viewer,
         array $schosenSubscriptions
