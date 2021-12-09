@@ -206,6 +206,12 @@ class Mapper extends BaseMapper
         }
         $params = array_merge($params, $this->getArrayParameters($statusIds, 'status'));
 
+        /* Ram in the allowedEventTypes if meaningful
+         */
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $params = array_merge($params, $this->getArrayParameters($allowedEventTypes, 'type'));
+        }
+
         $query = "
             SELECT
                 {$this->getColumnString('b')},
@@ -251,6 +257,7 @@ class Mapper extends BaseMapper
         }
 
         $query .= ' ORDER BY e.start_datetime ASC';
+
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
