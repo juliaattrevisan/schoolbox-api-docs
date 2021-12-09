@@ -78,7 +78,6 @@
            target="lti-link"
            style="display: none"
            class="button full-width">
-            Launch LTI tool
         </a>
 
     {% else %}
@@ -131,7 +130,7 @@
                target="lti-link"
                href="{{ src }}?context=componentInstance-{{ componentInstanceId }}"
                class="button full-width">
-                Launch LTI tool
+                {% if embedUrl %}View embedded content{% else %}Select content to embed{% endif %}
             </a>
         {% endif %}
     {% endif %}
@@ -152,6 +151,8 @@
                 $ltiSelectProvider: $('#lti-select-provider{{ componentInstanceId }}'),
                 $ltiSelectPreloader: $('#lti-select-provider{{ componentInstanceId }}'),
                 $ltiLink: $('#lti-link{{ componentInstanceId }}'),
+                linkTextBeforeContentSelected: 'Select content to embed',
+                linkTextAfterContentSelected: 'View embedded content',
                 $ltiIframe: $('#lti-frame{{ componentInstanceId }}'),
                 providerIdPlaceholder: '{{ providerIdPlaceholder }}',
                 postComponentProviderBaseUrl: '{{

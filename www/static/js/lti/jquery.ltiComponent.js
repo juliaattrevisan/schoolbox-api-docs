@@ -25,6 +25,12 @@
         // the iframe when content is selected.
         $ltiLink: $(),
 
+        // Text to display in the LTI link before content is selected
+        linkTextBeforeContentSelected: 'Select content to embed',
+
+        // Text to display in the LTI link after content is selected
+        linkTextAfterContentSelected: 'View embedded content',
+
         // The LTI iframe:
         // show the content selector in here, as well as the selected content
         // (if the provider launches in an iframe).
@@ -164,8 +170,9 @@
                 params.$ltiIframe.attr('src', launchUrl.toString());
                 params.$ltiIframe.show();
             } else if (isProviderTargetWindow) {
-                params.$ltiLink.attr('href', launchUrl.toString());
-                params.$ltiLink.show();
+                params.$ltiLink.attr('href', launchUrl.toString())
+                               .text(params.linkTextBeforeContentSelected)
+                               .show();
             }
         }).fail(function () {
             // This shouldn't happen, but just in case something goes wrong
@@ -271,7 +278,8 @@
             );
             // TODO determine whether to update the link or iframe?
             params.$ltiIframe.attr('src', launchUrl);
-            params.$ltiLink.attr('href', launchUrl);
+            params.$ltiLink.attr('href', launchUrl)
+                           .text(params.linkTextAfterContentSelected);
         });
     };
 
@@ -287,7 +295,8 @@
         );
         // TODO determine whether to update the link or iframe?
         this.params.$ltiIframe.attr('src', deepLinkingUrl);
-        this.params.$ltiLink.attr('href', deepLinkingUrl);
+        this.params.$ltiLink.attr('href', deepLinkingUrl)
+                            .text(this.params.linkTextBeforeContentSelected);
     };
 
     /**
