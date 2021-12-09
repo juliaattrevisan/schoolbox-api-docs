@@ -75,7 +75,7 @@
         </iframe>
         <a id="lti-link{{ componentInstanceId }}"
            href="#"
-           target="_blank"
+           target="lti-link"
            style="display: none"
            class="button full-width">
             Launch LTI tool
@@ -128,7 +128,7 @@
                     frameborder="0"></iframe>
         {% elseif provider.isTargetWindow %}
             <a id="lti-link{{ componentInstanceId }}"
-               target="_blank"
+               target="lti-link"
                href="{{ src }}?context=componentInstance-{{ componentInstanceId }}"
                class="button full-width">
                 Launch LTI tool
