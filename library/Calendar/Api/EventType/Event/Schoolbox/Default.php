@@ -27,12 +27,13 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
         $this->calendarHandler = new Calendar();
     }
 
+
     /**
      * Get day events from this data source
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
@@ -49,18 +50,19 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
         return $collection;
     }
 
+
     /**
      * Gets events out of the calendar handler.
      *
      * Can be overridden in subclasses - a filter can be set on
      * Calendar->getDayEvents().
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      */
-    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp, ?array $allowedEventTypes = null)
+    protected function getEventsFromCalendarHandler(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
         /* Manufacture a special $filters array
         /* Do a detection on $allowedEventTypes, if provided and meaningful

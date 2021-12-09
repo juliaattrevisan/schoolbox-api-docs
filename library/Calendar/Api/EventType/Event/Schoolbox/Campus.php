@@ -39,19 +39,30 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
     /**
      * Overridden to get events only for this campus.
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      */
-    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp)
+    protected function getEventsFromCalendarHandler(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
+        /* Manufacture a special $filters array
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        $filter = [
+            'campus' => $this->campus_id
+        ];
+
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $filter['typeSet'] = $allowedEventTypes;
+        }
+
         return $this->getCalendarHandler()->getDayEvents(
             $this->getUser(),
             $this->getViewer(),
             $startTimestamp,
             $endTimestamp,
-            ['campus' => $this->campus_id]
+            $filter
         );
     }
 }
