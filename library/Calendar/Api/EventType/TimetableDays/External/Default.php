@@ -129,10 +129,9 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                     $event->setCampusList($campusId);
                     $event->setAccess(Event::CAMPUS_ACCESS);
 
-                    /* TODO eventType set in the wrong place
-                     *  Wait a minute. setType() defines personal/group/school events
-                     *  whereas setEventType() defines one of the luEventType relationships...
-                     *  what's happening here?
+                    /* Note that setType sets the event type's id and
+                     * setEventType sets the event type's name, essentially
+                     * decomposing the object into its constituent pieces
                      */
                     $event->setType($eventType);
 
