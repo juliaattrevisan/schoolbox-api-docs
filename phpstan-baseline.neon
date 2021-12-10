@@ -836,16 +836,6 @@ parameters:
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
 
 		-
-			message: "#^Return typehint of method Calendar_Api_EventType_ResourceBooking_Moderation_Default\\:\\:getEvents\\(\\) has invalid type Calendar_Event_Type_ResourceBooking\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
-
-		-
-			message: "#^Method Calendar_Api_EventType_Submission_Schoolbox_Default\\:\\:getEvents\\(\\) should return Calendar\\\\Event\\\\Collection&iterable\\<Calendar\\\\Event\\\\Type\\\\Submission\\\\Event\\> but returns Calendar\\\\Event\\\\Collection\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Submission/Schoolbox/Default.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Calendar/Api/EventType/Submission/Schoolbox/Default.php
@@ -7849,11 +7839,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Resource\\\\Textbox\\\\Model\\:\\:\\$deletedAt \\(Alaress_Date_Format\\|null\\) does not accept default value of type string\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Textbox/Model.php
-
-		-
-			message: "#^Call to method getBooking\\(\\) on an unknown class Calendar_Event_Type_ResourceBooking\\.$#"
-			count: 2
-			path: library/Schoolbox/ResourceBooking/Booking/Component/ResourceManagement.php
 
 		-
 			message: "#^Variable \\$campus might not be defined\\.$#"

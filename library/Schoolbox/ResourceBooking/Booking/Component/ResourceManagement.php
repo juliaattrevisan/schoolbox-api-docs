@@ -83,6 +83,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         // (They should be date-ordered already)
         $groupedBookings = [];
         foreach ($bookingEvents as $event) {
+            /** @var \Calendar\Event\Type\ResourceBooking\Event $event */
             $itemId = $event->getBooking()->getResource()->getId();
             if (empty($groupedBookings[$itemId])) {
                 $groupedBookings[$itemId] = [

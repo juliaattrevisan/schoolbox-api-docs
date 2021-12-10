@@ -21,8 +21,6 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
     /**
      * Serialize multidimensional data so it can be persisted to the db
      *
-     * @param                              $value
-     * @param Component_ControllerAbstract $controller
      * @return false|mixed|string
      * @throws JsonException
      */
@@ -33,11 +31,6 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
 
 
     /**
-     * @param SitePage                          $page
-     * @param                                   $key
-     * @param                                   $keyblock
-     * @param                                   $configValue
-     * @param Component_ControllerAbstract|null $component
      * @return void
      * @throws JsonException
      */
