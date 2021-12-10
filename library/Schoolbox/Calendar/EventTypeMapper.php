@@ -18,7 +18,7 @@ use Schoolbox\Collection;
  *
  * @package Schoolbox\Calendar
  *
- * @method Collection|EventType[] findAll()
+ * @method Collection|EventType[] findAll($options = array())
  * @method EventType createModel()
  * @method EventType hydrate(array $row, $alias = '', $callback = null)
  */
