@@ -31,8 +31,14 @@ readonly PRESERVED_CONFIG=(
   # LDAP Config
   "ldap_enable" "ldap_host" "ldap_user" "ldap_pass" "ldap_base" "ldap_host_alt" "ldap_user_alt" "ldap_base_alt" "ldap_username"
 
+  # OTFS config
+  "otfs_adapter" "otfs_s3_cred_key" "otfs_s3_cred_secret" "otfs_verify_previous_file"
+
+  # DR S3 backups
+  "aws_s3_dr_backup_enabled" "aws_s3_dr_backup_visibility" "aws_s3_dr_sync_status"
+
   # Others
-  "xml_dir" "file_dir" "otfs_verify_previous_file" "api_key" "otfs_s3_cred_key" "otfs_s3_cred_secret"
+  "xml_dir" "file_dir"  "api_key"
 );
 # Associative array of config to preserve during restoration. Maps config_name to config_value.
 declare -A sql_config=();
