@@ -83,6 +83,9 @@ class FilterCodecTest extends TestCase
         $codec = new FilterCodec();
 
         return [
+            /* null/empty-string cases are generally initial conditions
+             * which cannot be revisited
+             */
             'null value' => [
                 null,
                 $codec->getDefaultPayload()
@@ -103,6 +106,8 @@ class FilterCodecTest extends TestCase
                 $codec->getDefaultPayload()
             ],
 
+            /* Selections
+             */
             'No selections' => [
                 Scrub::text("eventType:;source:"),
                 $codec->getDefaultPayload()
