@@ -608,9 +608,10 @@ class Controller extends Base\Base
         }
 
         $parentFolderId = (int)trim($post['parent']);
+        $originalParentFolderId = $courseSpec->getFolder()->getParent()->getId();
 
         // If course is moved under another folder, validate
-        if ($courseSpec->getFolder()->getParent()->getId() !== $parentFolderId) {
+        if ($originalParentFolderId !== $parentFolderId) {
             try {
                 $this->validateCourseData($newCourseName, $parentFolderId, $courseSpec->getFolder());
                 $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
@@ -681,7 +682,7 @@ class Controller extends Base\Base
             $courseSpecFolder->getName() !== $newCourseName
             || array_diff($currentCurriculumCodes, $newCurriculumCodes)
             || array_diff($newCurriculumCodes, $currentCurriculumCodes)
-            || $courseSpecFolder->getParent()->getId() !== $parentFolderId
+            || $originalParentFolderId !== $parentFolderId
         ) {
             if ($this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) < UserAccess::ACCESS_WRITE) {
                 $this->sendError(new Base\Exception('Cannot update course. ', ["You don't have permission to update {$courseSpecFolder->getName()}."]));
