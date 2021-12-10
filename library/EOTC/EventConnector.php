@@ -214,12 +214,12 @@ class EventConnector extends EventMapper
         }
 
         /* Do a detection on $allowedEventTypes, if provided and meaningful
-         * TODO: Replace injections with something less injecty
+         * TODO: Replace injections with something less injecty (rewrite in prepared statements)
          */
         $queryEventTypes = '';
 
         if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
-            $queryEventTypes = ' AND e.type IN (' . implode(',', $allowedEventTypes) . ')';
+            $queryEventTypes = ' AND e.type IN (' . implode(',', array_map('intval', $allowedEventTypes)) . ')';
         }
 
         /* Ram in all the pieces

@@ -556,11 +556,10 @@ class Calendar extends DeprecatedModel
         }
 
         /* Filter to specific event types
-         * TODO: Replace injections with something less injecty
-         * TODO: Enforce int types on typeSet
+         * TODO: Replace injections with something less injecty (rewrite in prepared statements)
          */
         if ($filter['typeSet']) {
-            $filter_query[] = 'type IN (' . implode(',', $filter['typeSet']) . ')';
+            $filter_query[] = 'type IN (' . implode(',', array_map('intval', $filter['typeSet'])) . ')';
         }
 
         if ($filter['personal']) {
