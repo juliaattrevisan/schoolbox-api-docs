@@ -157,7 +157,7 @@
     <div class="row">
         <div class="small-12 column">
             <a class="button submit"
-               target="_blank"
+               {% if assessment.ltiTool.isTargetWindow %}target="_blank"{% endif %}
                href="{{ launchAssessmentUrl }}">
                 Attempt {{ locale.assessment.proper }}
                 {% if student.id != USER.id %}on behalf of {{ student.firstname }}{% endif %}

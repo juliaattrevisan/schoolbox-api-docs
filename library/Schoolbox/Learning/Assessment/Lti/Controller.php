@@ -403,10 +403,12 @@ class Controller extends Assessment\Controller
             ->add([
                 $assessment->getTitle(),
                 $this->getRouteIfAuthorized(
-                    'learningAssessment.getStatus',
+                    'learningAssessment.getSummary',
                     [
                         'assessmentId' => $assessment->getId(),
                         'assessment'   => $assessment,
+                        'studentId'    => $student->getId(),
+                        'student'      => $student,
                     ],
                 )
             ])
