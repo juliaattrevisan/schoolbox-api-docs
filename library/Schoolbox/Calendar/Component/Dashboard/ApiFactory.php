@@ -97,8 +97,11 @@ class ApiFactory
         /* Filter that list of enabled subscriptions with the ones that were
          * enabled via the component configuration checkboxes; this creates
          * a subset of what could be made available
+         *
+         * Mine out the classes that spawn events from connector config and pile
+         * them into a set of (connector id, subscription classname) tuples
          */
-        $availableSubscriptionConfigs = [];
+        $composite = new \Calendar_Api_Composite();
 
         /* Note: you can't delete subscriptions, so this assumption about
          * the array keys existing should hold
@@ -108,20 +111,9 @@ class ApiFactory
          */
         foreach ($subscriptions as $subscription) {
             if ($schosenSubscriptions[$subscription->getId()]) {
-                $availableSubscriptionConfigs[] = $subscription;
+                $composite->add($this->factory->produceFromConfig($subscription, $viewee, $viewer));
             }
         }
-
-        /* Mine out the classes that spawn events from connector config and pile
-         * them into a set of (connector id, subscription classname) tuples
-         */
-        $composite = new \Calendar_Api_Composite();
-
-        foreach ($availableSubscriptionConfigs as $availableSubscriptionConfig) {
-            $composite->add($this->factory->produceFromConfig($availableSubscriptionConfig, $viewee, $viewer));
-        }
-
-        return $composite;
 
         /* For each subscription still surviving, have it generate its events
          * but only retrieve events that possessed at least one of the luEventTypes
@@ -129,6 +121,7 @@ class ApiFactory
          *
          * This is done via the Composite's call to ->getEvents($this->startTimestamp, $this->endTimestamp, $allowedEventTypes);
          */
+        return $composite;
 
         /* This produces the intersection of eventTypes x subscriptions such that
          * the events produces equate to: "out of the enabled subscriptions specified
