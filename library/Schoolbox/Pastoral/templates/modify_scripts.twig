@@ -246,6 +246,8 @@
                 $("#record-visibility-header").addClass('icon-locked');
                 $("#visibility_empty_state").hide();
                 $("#visibility_empty_state_locked").show();
+            } else if (!prevLocked && window.hasChanged) {
+                return;
             } else {
                 $("#record-visibility-header").removeClass('icon-locked');
                 $("#visibility_empty_state").show();
@@ -280,6 +282,9 @@
             updateVisibility();
         }
 
+        {% if record.id > 0 %}
+        window.hasChanged = true;
+        {% endif %}
         loadAudience();
 });
 </script>
