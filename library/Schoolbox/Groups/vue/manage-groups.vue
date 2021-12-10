@@ -6,7 +6,16 @@
 
 export default {
 
-   
+    props: {
+        groupList: {
+            type: Array,
+            required: true,
+        }
+    },
+
+    mounted () {
+        
+    }
 
 }
 

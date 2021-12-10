@@ -203,7 +203,7 @@ module.exports = {
         classList: './library/Schoolbox/Learning/vue/classList.js',
 
         // Groups
-        groups: './library/Schoolbox/Groups/vue/groups.js',
+        manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
 
         // Pastoral Count Badge
         pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',

@@ -74,3 +74,12 @@
         {% endfor %}
     {% endif %}
 </div>
+
+{# <pre>{{ dump(groupList) }}</pre> #}
+
+<div id="manage-groups-container">
+    <manage-groups
+        :group-list="{{ groupList|json_encode }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/manageGroups.js"></script>
