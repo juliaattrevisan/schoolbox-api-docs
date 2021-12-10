@@ -511,12 +511,13 @@ HELP;
                     CHARACTER_SET_NAME,
                     COLLATION_NAME
                 FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_NAME = :table
+                WHERE TABLE_NAME = :table AND TABLE_SCHEMA = :database
                 ORDER BY COLUMN_NAME
             ";
 
             $columns = $this->getDatabaseInternal()->executeQuery($columnsQuery, [
-                'table' => $table['TABLE_NAME']
+                'table' => $table['TABLE_NAME'],
+                'database' => $db
             ])->fetchAll();
 
             foreach ($columns as $column) {
