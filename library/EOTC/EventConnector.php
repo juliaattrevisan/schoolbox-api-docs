@@ -214,12 +214,16 @@ class EventConnector extends EventMapper
         }
 
         /* Do a detection on $allowedEventTypes, if provided and meaningful
-         * TODO: Replace injections with something less injecty (rewrite in prepared statements)
          */
         $queryEventTypes = '';
 
         if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
-            $queryEventTypes = ' AND e.type IN (' . implode(',', array_map('intval', $allowedEventTypes)) . ')';
+            $eventTypesPb = $this->getPredicateBuilder()
+                ->in('e.type', $allowedEventTypes);
+
+            $queryEventTypes = ' AND ' . $eventTypesPb->getWhere()[0];
+
+            $params = array_merge($params, $eventTypesPb->getParams());
         }
 
         /* Ram in all the pieces
