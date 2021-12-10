@@ -103,11 +103,7 @@ class ApiFactory
          */
         $composite = new \Calendar_Api_Composite();
 
-        /* Note: you can't delete subscriptions, so this assumption about
-         * the array keys existing should hold
-         *
-         * Otherwise,
-         * if (isset(chosenSubscriptions[subscriptionId]) && ...
+        /* Note: you can't delete subscriptions
          */
         foreach ($subscriptions as $subscription) {
             if (\in_array($subscription->getId(), $schosenSubscriptions, true)) {
