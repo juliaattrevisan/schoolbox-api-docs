@@ -106,7 +106,7 @@ class UserAccessMapper extends Mapper
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
-            'type' => UserAccess::ACCESS_FULL
+            'type' => UserAccess::ACCESS_FULL,
         ));
 
         if ($userAccess->count()) {
@@ -130,7 +130,7 @@ class UserAccessMapper extends Mapper
             'sid' => $folder->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
             'type' => UserAccess::ACCESS_FULL,
-            'uid' => $user->getId()
+            'uid' => $user->getId(),
         ));
 
         if ($userAccess->count()) {
@@ -207,6 +207,31 @@ class UserAccessMapper extends Mapper
         }
 
         $access = $access->merge($external);
+        /**
+         * merge both arrays, internal SB group permissions and external DB group Permissions.
+         * If a permission matches but has more access Admin,Write then use that, not the lesser permission.
+         * UserAccess::ACCESS_FULL / UserAccess::ACCESS_Write / UserAccess::ACCESS_READ / UserAccess::ACCESS_DENY
+         */
+        $finalAccess = $this->createCollection();
+        $finalsid = [];
+        /** @var UserAccess $row */
+        foreach ($access as $row) {
+            //check if object (homepageId, userId) is already in $finalAccess array
+            //if not add it
+            //if it is, check the permission state, and add/update the one with higher permission
+
+            //check if the access entry is already in final, if not, add it
+            if (
+                !in_array($row->getServiceIdentifier(), $finalsid)
+                && $finalsid[$row->getServiceIdentifier()] !== $row->getService()
+            ) {
+                $finalAccess[] = $row;
+                continue;
+            }
+            //check permission
+            //check if permission is higher or not, then grab the better perm, and save that...
+            break;
+        }
         return $access;
     }
 
