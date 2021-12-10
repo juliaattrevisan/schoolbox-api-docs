@@ -1,23 +1,28 @@
-<p><em>Event Type</em></p>
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        <p><em>Event Type</em></p>
 
-<!-- BEGIN calendarfilter_eventtype -->
-<div>
-    <input type="hidden" name="calendarFilter[eventType][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="0" />
-    <input id="component{COMPONENT_INSTANCE_ID}-calendarfilter-eventType-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" type="checkbox" name="calendarFilter[eventType][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="1" {COMPONENT_CONFIG_CALENDARFILTER_SELECTED} />
-    <label for="component{COMPONENT_INSTANCE_ID}-calendarfilter-eventType-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" class="checkbox-label">
-        {COMPONENT_CONFIG_CALENDARFILTER_NAME}
-    </label>
+        <!-- BEGIN calendarfilter_eventtype -->
+        <div>
+            <input type="hidden" name="calendarFilter[eventType][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="0" />
+            <input id="component{COMPONENT_INSTANCE_ID}-calendarfilter-eventType-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" type="checkbox" name="calendarFilter[eventType][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="1" {COMPONENT_CONFIG_CALENDARFILTER_SELECTED} />
+            <label for="component{COMPONENT_INSTANCE_ID}-calendarfilter-eventType-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" class="checkbox-label">
+                {COMPONENT_CONFIG_CALENDARFILTER_NAME}
+            </label>
+        </div>
+        <!-- END calendarfilter_eventtype -->
+    </div>
+    <div class="small-12 medium-6 columns">
+        <p><em>Source</em></p>
+
+        <!-- BEGIN calendarfilter_source -->
+        <div>
+            <input type="hidden" name="calendarFilter[source][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="0" />
+            <input id="component{COMPONENT_INSTANCE_ID}-calendarfilter-source-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" type="checkbox" name="calendarFilter[source][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="1" {COMPONENT_CONFIG_CALENDARFILTER_SELECTED} />
+            <label for="component{COMPONENT_INSTANCE_ID}-calendarfilter-source-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" class="checkbox-label">
+                {COMPONENT_CONFIG_CALENDARFILTER_NAME}
+            </label>
+        </div>
+        <!-- END calendarfilter_source -->
+    </div>
 </div>
-<!-- END calendarfilter_eventtype -->
-
-<p><em>Source</em></p>
-
-<!-- BEGIN calendarfilter_source -->
-<div>
-    <input type="hidden" name="calendarFilter[source][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="0" />
-    <input id="component{COMPONENT_INSTANCE_ID}-calendarfilter-source-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" type="checkbox" name="calendarFilter[source][{COMPONENT_CONFIG_CALENDARFILTER_VALUE}]" value="1" {COMPONENT_CONFIG_CALENDARFILTER_SELECTED} />
-    <label for="component{COMPONENT_INSTANCE_ID}-calendarfilter-source-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" class="checkbox-label">
-        {COMPONENT_CONFIG_CALENDARFILTER_NAME}
-    </label>
-</div>
-<!-- END calendarfilter_source -->
