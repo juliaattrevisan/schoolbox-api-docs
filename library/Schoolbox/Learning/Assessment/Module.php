@@ -209,7 +209,7 @@ class Module extends BaseModule
         );
         $this->register(
             self::METHOD_GET,
-            "$assRoute/lti/$studentParam/submit",
+            "$assRoute/$studentParam/lti/submit",
             'getLtiCreateResponseLaunch',
             $canSubmit,
             $preloadParticipant,

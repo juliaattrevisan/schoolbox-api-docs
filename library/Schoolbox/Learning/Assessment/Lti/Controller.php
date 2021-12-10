@@ -374,6 +374,56 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Opens a page which launches the LTI assessment's resource link, within
+     * the context of a student.
+     * (This should be the student's create response page for the assessment
+     *  within the LTI tool.)
+     *
+     * The launch method depends on the assessment's LTI tool's target:
+     * * iframe: launch within an iframe
+     * * window: redirect directly to the launch
+     *
+     * @param Model $assessment
+     * @param User  $student
+     *@api   GET /learning/assessments/:assessmentId/:studentId/lti/submit
+     * @since 22.0.0
+     *
+     */
+    public function getLtiCreateResponseLaunch(Model $assessment, User $student): void
+    {
+        // Just redirect to the tool if opening in a new window
+        if ($assessment->getLtiTool()->isTargetWindow()) {
+            $this->getLaunchAssessmentAsStudent($assessment, $student);
+            return;
+        }
+
+        // Show the tool in an iframe
+        $breadcrumbs = $this->getBakery()
+            ->produceFromAssessment($assessment, $this->getUser())
+            ->add([
+                $assessment->getTitle(),
+                $this->getRouteIfAuthorized(
+                    'learningAssessment.getStatus',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'assessment'   => $assessment,
+                    ],
+                )
+            ])
+            ->add(['Create Response for ' . $assessment->getTitle(), '']);
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningAssessment/lti/ltiCreateResponse.twig',
+                [
+                    'assessment'  => $assessment,
+                    'student'     => $student,
+                    'breadcrumbs' => $breadcrumbs,
+                ]
+            )
+        );
+    }
+
+    /**
      * Launches this LTI assessment's resource link, within the context of a
      * student.
      *

@@ -13,6 +13,7 @@
             }
         ) %}
         {% if iframeSrc %}
+            {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
                     // How much space is left for the iframe?
@@ -25,6 +26,8 @@
                     iframe.src          = '{{ iframeSrc }}?height=' + String(iframeHeight);
                 });
             </script>
+            {% endautoescape %}
+
             <iframe id="lti-iframe"></iframe>
         {% endif %}
     </div>
