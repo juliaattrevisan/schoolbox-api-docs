@@ -282,11 +282,10 @@
             updateVisibility();
         }
 
-        {% if record.id == 0 %}
-        loadAudience();
-        {% else %}
+        {% if record.id > 0 %}
         window.hasChanged = true;
         {% endif %}
+        loadAudience();
 });
 </script>
 <script>
