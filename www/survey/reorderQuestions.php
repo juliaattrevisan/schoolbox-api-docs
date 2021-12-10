@@ -29,13 +29,5 @@ if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($su
 }
 
 $questionHandler = new Survey_Question();
-$questions = $questionHandler->getAll($this->arg[0]);
-//confirm the questions are actually from the survey
-foreach ($questions as $question) {
-    if (!in_array($question['question_id'], $_POST['ids'])) {
-        //question that was reordered, is not part of the survey, exit here
-        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW_2);
-    }
-}
-$questionHandler->reorderQuestions($_POST['ids']);
+$questionHandler->reorderQuestions($this->arg[0], $_POST['sectionId'], $_POST['ids']);
 exit();
