@@ -4,6 +4,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\Calendar\Component\Dashboard\ApiFactory;
+use Schoolbox\Calendar\Component\Dashboard\FilterCodec;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 
@@ -26,7 +27,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
      */
     public function dehydrate($value, Component_ControllerAbstract $controller)
     {
-        return json_encode($value, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        return (new FilterCodec())->encode($value);
     }
 
 
@@ -65,19 +66,14 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
 
         /* Init $settings struct
          */
-        $settings = [
-            'eventType' => [],
-            'source' => [],
-        ];
+        $codec = new FilterCodec();
 
         /* This came out of the db
          *
          * Note that Scrub::text() on a json encoded string will inject chars that
          * prevent it from being json_decoded (will result in Syntax Error exception)
          */
-        if ('' !== (string)$configValue) {
-            $settings = json_decode($configValue, true, 512, JSON_THROW_ON_ERROR);
-        }
+        $settings = $codec->decode($configValue);
 
         /* phpliberty island
          */
@@ -88,7 +84,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
             $page->setVar([
                 'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $eventType->getId(),
                 'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => $eventType->getType(),
-                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['eventType'][$eventType->getId()] ? 'checked="checked"' : '',
+                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => \in_array($eventType->getId(), $settings['eventType'], true) ? 'checked="checked"' : '',
             ]);
 
             $page->parse('calendarfilter_eventtype_block', 'calendarfilter_eventtype', true);
@@ -101,7 +97,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
             $page->setVar([
                 'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $subscription->getId(),
                 'COMPONENT_CONFIG_CALENDARFILTER_NAME'     => sprintf('%s (%s)', $subscription->getLabel(), $subscription->getDefaultLabel()),
-                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => $settings['source'][$subscription->getId()] ? 'checked="checked"' : '',
+                'COMPONENT_CONFIG_CALENDARFILTER_SELECTED' => \in_array($subscription->getId(), $settings['source'], false) ? 'checked="checked"' : '',
             ]);
 
             $page->parse('calendarfilter_source_block', 'calendarfilter_source', true);

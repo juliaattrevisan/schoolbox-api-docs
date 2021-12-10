@@ -42,8 +42,8 @@ class FilterCodec
         preg_match(self::DSN_FORMAT, $dsn, $matches);
 
         return [
-            'eventType' => isset($matches[1]) && $matches[1] ? explode(',', $matches[1]) : [],
-            'source' => isset($matches[2])  && $matches[2] ? explode(',', $matches[2]) : [],
+            'eventType' => isset($matches[1]) && $matches[1] ? array_map('intval',explode(',', $matches[1])) : [],
+            'source' => isset($matches[2])  && $matches[2] ? array_map('intval',explode(',', $matches[2])) : [],
         ];
     }
 

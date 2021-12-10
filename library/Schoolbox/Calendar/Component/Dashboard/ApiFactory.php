@@ -110,7 +110,7 @@ class ApiFactory
          * if (isset(chosenSubscriptions[subscriptionId]) && ...
          */
         foreach ($subscriptions as $subscription) {
-            if ($schosenSubscriptions[$subscription->getId()]) {
+            if (\in_array($subscription->getId(), $schosenSubscriptions, true)) {
                 $composite->add($this->factory->produceFromConfig($subscription, $viewee, $viewer));
             }
         }

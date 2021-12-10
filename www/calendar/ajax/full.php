@@ -9,6 +9,7 @@
  */
 
 use Calendar\Api\ModuleChecker;
+use Schoolbox\Calendar\Component\Dashboard\FilterCodec;
 use Schoolbox\Config\Loader as ConfigLoader;
 
 /** @var SitePage $this */
@@ -46,26 +47,12 @@ if (isset($_GET['componentInstanceId']) && (int)$_GET['componentInstanceId']) {
     }
 
     /* If you can't decode the config, use a default struct
-     * The encoding might be bad, tainted, or null/nonexistent to begin with
      */
-    try {
-        $settings = json_decode($instance->getConfigByKey('calendarFilter')->getValue(), true, 512, JSON_THROW_ON_ERROR);
-    } catch (JsonException $e) {
-        $settings = [
-            'eventType' => [],
-            'source' => []
-        ];
-    }
+    $settings = (new FilterCodec())->decode($instance->getConfigByKey('calendarFilter')->getValue());
 
     /* Figure out the allowed event types as well; compile them into a stack
      */
-    $allowedEventTypes = [];
-
-    foreach ($settings['eventType'] as $id => $val) {
-        if ((int)$val) {
-            $allowedEventTypes[] = (int)$id;
-        }
-    }
+    $allowedEventTypes = $settings['eventType'];
 
     /* If componentInstanceId was a querystring param, mine its config options to see what
      * event types were allowed and filter on that result set
