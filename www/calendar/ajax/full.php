@@ -30,6 +30,11 @@ SitePage::extendExecutionTime();
  */
 $allowedEventTypes = null;
 
+/* TODO Maybe able to witness another roletype's dashboard payload
+ *  If you dig hard enough you could perhaps illegally witness a payload belonging to a different roletype's
+ *  dashboard configuration...you could lock that down further by ensuring that $_GET['componentInstanceId']
+ *  belongs on a dashboard corresponding to $viewer.
+ */
 if (isset($_GET['componentInstanceId']) && (int)$_GET['componentInstanceId']) {
     /* This particular method gives me the configs that I can use
      */
