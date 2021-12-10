@@ -24,6 +24,7 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\RoleMapper;
+
 use function in_array;
 
 class Controller extends BaseController
@@ -58,43 +59,11 @@ class Controller extends BaseController
                                                          'service' => UserAccess::SERVICE_HOMEPAGE,
                                                      ])->indexBy('serviceIdentifier');
 
-        // Fetch the logged in user's write access groups to exclude from the lists.
-        //user who has write access, is already a member of the group?
-        $userWriteGroupIds = [];
-        $userGroups        = $accessMapper->findAllForUser($user);
-        $userWriteGroups   = $userGroups->filter(function (UserAccess $element) {
-            return $element->getAccessLevel() >= UserAccess::ACCESS_WRITE;
-        });
-
-        foreach ($userWriteGroups as $userGroup) {
-            $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
-        }
-
         //check if notifications or favourites
         $favourites = $accessMapper->getFavourites($user);
 
         //build notifications
-        $followmentHelp = new \Schoolbox\Realtime\Controller();
-        $service        = UserAccess::SERVICE_HOMEPAGE;
-        $muted          = [
-            'unfollow' => $this->getUser()->getId(),
-            'disabled' => 0,
-        ];
-
-        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
-        foreach ($muted as $k => $id) {
-            $muted[$k] = $followmentHelp->getRerouteOverrideMapper()
-                                        ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                                        ->map(
-                                            function ($override) use ($routeKeyRegex) {
-                                                /** @var RerouteOverride $override */
-                                                preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                                                return is_array($matches) ? $matches[1] : null;
-                                            },
-                                            false
-                                        )
-                                        ->getAll();
-        }
+        $muted = $this->getFollows();
 
         // build output array
         $userAccess     = [];
@@ -109,36 +78,35 @@ class Controller extends BaseController
                 continue;
             }
 
-            if (!in_array($folderId, $userWriteGroupIds)) {
-                //will follow by default, check that user is actually in that group when checking if they are following
-                $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
+            //will follow by default, check that user is actually in that group when checking if they are following
+            $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
 
-                //get enrolment, could be enrolled, can join, or pending
-                $enrollment = $userPerms[$folderId] ? 'enrolled' : 'not enrolled';
-                if ($userPerms[$folderId] && ($userPerms[$folderId]->getAccessLevel() == UserAccess::ACCESS_DENY)) {
-                    $enrollment = 'pending';
-                }
-
-                //favourite
-                $favourite = in_array($folderId, $favourites);
-
-                $tmp              = [
-                    'id'         => $folderId,
-                    'name'       => $group->getFolder()->getName(),
-                    'enrolment'  => $enrollment,
-                    'colour'     => $folder->getColour(),
-                    'coverImage' => $folder->getCoverImage(),
-                    'follow'     => $follow,
-                    'favourite'  => $favourite,
-                    'type'       => $group->getType(),
-                ];
-                $possibleGroups[] = $tmp;
-                try {
-                    $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
-                } catch (MapperException $e) {
-                    $userAccess[$folder->getId()] = null;
-                }
+            //get enrolment, could be enrolled, can join, or pending
+            $enrollment = $userPerms[$folderId] ? 'enrolled' : 'not enrolled';
+            if ($userPerms[$folderId] && ($userPerms[$folderId]->getAccessLevel() == UserAccess::ACCESS_DENY)) {
+                $enrollment = 'pending';
             }
+
+            //favourite
+            $favourite = in_array($folderId, $favourites);
+
+            $tmp              = [
+                'id'         => $folderId,
+                'name'       => $group->getFolder()->getName(),
+                'enrolment'  => $enrollment,
+                'colour'     => $folder->getColour(),
+                'coverImageHash' => $folder->getCoverImage()->getHash(),
+                'follow'     => $follow,
+                'favourite'  => $favourite,
+                'type'       => $group->getType(),
+            ];
+            $possibleGroups[] = $tmp;
+            try {
+                $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
+            } catch (MapperException $e) {
+                $userAccess[$folder->getId()] = null;
+            }
+
         }
 
         //send to frontend
@@ -171,10 +139,10 @@ class Controller extends BaseController
         $post = $this->getRequest()->post->getArrayCopy();
 
         if (
-            !isset($post['action'])
-            || !isset($post['follow'])
-            || !isset($post['favourite'])
-            || !isset($post['group'])
+            !isset($post['group'])
+//            || !isset($post['action'])
+//            || !isset($post['follow'])
+//            || !isset($post['favourite'])
         ) {
             return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
         }
@@ -198,6 +166,10 @@ class Controller extends BaseController
                 'sid' => $post['group'],
             ]);
         } catch (MapperException\NotFound $e) {
+            //don't place the user into the group unless we are specifically requested to add the user.
+            if ($post['action'] !== 'add') {
+                return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'User is not a member of this group']));
+            }
             $userGroup = new UserAccess();
             $userGroup->setServiceIdentifier($post['group'])
                 ->setUser($user)
@@ -207,6 +179,17 @@ class Controller extends BaseController
             if ($group->isFree()) {
                 $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
             }
+            //save group object
+            $accessMapper->save($userGroup);
+            return $this->getResponse()->content->set(
+                $this->buildJsonOutput([
+                   'group'     => $post['group'],
+                   'user'      => $user->getId(),
+                   'favourite' => $userGroup->getFavourite(),
+                   'following' => 0,
+                   'access'    => $userGroup->getService(),
+                ])
+            );
         }
         //add / remove user from group
         if ('delete' === $post['action']) {
@@ -222,24 +205,60 @@ class Controller extends BaseController
         }
 
         //must be edit functions
-        //make/remove favourite
-        $userGroup->setFavourite((bool)$post['favourite']);
+        if ($post['action'] === 'edit') {
+            if (isset($post['favourite'])) {
+                //make/remove favourite
+                $userGroup->setFavourite((bool)$post['favourite']);
+            }
+            //save group object
+            $accessMapper->save($userGroup);
 
-        //save group object
-        $accessMapper->save($userGroup);
+            //subscribe/remove notifications
+            $followingList = [];
+            if (isset($post['follow'])) {
+                //build notifications
+                $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
+                $following      = $post['follow'] ? 1 : 0;
+                $followingList  = $realtimeConfig->persistFollow($user, [$post['group'] => $following]);
+            } else {
+                $followingList = $this->getFollows();
+            }
 
-        //subscribe/remove notifications
-        //build notifications
-        $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
-        $following = $post['follow'] ? 1 : 0;
-        $followingList = $realtimeConfig->persistFollow($user, [$post['group'] => $following]);
+            return $this->getResponse()->content->set(
+                $this->buildJsonOutput([
+                                           'group'     => $post['group'],
+                                           'user'      => $user->getId(),
+                                           'favourite' => $userGroup->getFavourite(),
+                                           'following' => in_array($post['group'], $followingList),
+                                           'access'    => $userGroup->getService(),
+                                       ])
+            );
+        }
+        return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'empty state, something went wrong.']));
+    }
+    protected function getFollows()
+    {
+        $followmentHelp = new \Schoolbox\Realtime\Controller();
+        $service        = UserAccess::SERVICE_HOMEPAGE;
+        $muted          = [
+            'unfollow' => $this->getUser()->getId(),
+            'disabled' => 0,
+        ];
 
-        return $this->getResponse()->content->set($this->buildJsonOutput([
-            'group'     => $post['group'],
-            'user'      => $user->getId(),
-            'favourite' => $userGroup->getFavourite(),
-            'following' => in_array($post['group'], $followingList),
-            'access'    => $userGroup->getService(),
-        ]));
+        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
+        foreach ($muted as $k => $id) {
+            $muted[$k] = $followmentHelp->getRerouteOverrideMapper()
+                                        ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
+                                        ->map(
+                                            function ($override) use ($routeKeyRegex) {
+                                                /** @var RerouteOverride $override */
+                                                preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
+                                                return is_array($matches) ? $matches[1] : null;
+                                            },
+                                            false
+                                        )
+                                        ->getAll();
+        }
+        return $muted;
     }
 }

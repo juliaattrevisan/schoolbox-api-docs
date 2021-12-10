@@ -24,6 +24,7 @@
     </nav>
 </div>
 <div class="row">
+    <pre>{{ dump(groupList|json_encode) }}</pre>
     {% if groupList is empty %}
         <div class="small-12 island">
             <div class = "empty-state">
@@ -41,7 +42,7 @@
             <section>
                 <div class="v-card small-12">
                 <a href="/homepage/{{ group.id }}">
-                            <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+                            <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImageHash %} background-image: url('/storage/image.php?hash={{ group.coverImageHash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
                         </a>
                     <div class="card-content classes groups actions-small-1">
                         <div class="list-item">
