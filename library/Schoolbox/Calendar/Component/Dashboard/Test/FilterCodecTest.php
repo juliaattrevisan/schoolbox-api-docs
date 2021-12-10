@@ -45,7 +45,7 @@ class FilterCodecTest extends TestCase
     /**
      * Test encoding and re-encoding of decoded values
      *
-     * @return \string[][]
+     * @return array
      */
     public function providerFilterCodecEncodeDecode(): array
     {
