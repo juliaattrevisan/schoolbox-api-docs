@@ -4,13 +4,15 @@
  * Manage your groups
  */
 
+import ManageGroupsHeading from './manage-groups-heading.vue';
 import ManageGroupsItem from './manage-groups-item.vue';
 
 
 export default {
 
     components: {
-        ManageGroupsItem
+        ManageGroupsHeading,
+        ManageGroupsItem,
     },
 
     props: {
@@ -42,16 +44,8 @@ export default {
 </script>
 
 <template>
-
-   <div>
-
-       <div class="row actions-small-3">
-            <div class="list-item">
-                <div class="column small-12">
-                    <h1>Groups</h1>
-                </div>
-            </div>
-        </div>
+    <div>
+        <manage-groups-heading />
         <div class="row">
             <manage-groups-item 
                 v-for="group in groups" 
@@ -59,9 +53,7 @@ export default {
                 :group="group"
             />
         </div>
-        
-   </div>
-
+    </div>
 </template>
 
 <style scoped>

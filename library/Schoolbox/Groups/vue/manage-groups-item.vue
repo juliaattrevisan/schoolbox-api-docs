@@ -13,33 +13,39 @@ export default {
         }
     },
 
+    data () {
+        return {
+            isMember: true, 
+        }
+    },
+
     methods: {
 
         /**
          * 
          */
         join () {
-            
+            this.isMember = true;
         },
 
         /**
          * 
          */
         leave () {
+            this.isMember = false;
+        },
+
+        /**
+         * 
+         */
+        addToFavourites () {
             
         },
 
         /**
          * 
          */
-        favourite () {
-            
-        },
-
-        /**
-         * 
-         */
-        unfavourite () {
+        removeFromFavourites () {
             
         },
 
@@ -53,7 +59,7 @@ export default {
         /**
          * 
          */
-        unnotify () {
+        unNotify () {
             
         },
 
@@ -67,9 +73,34 @@ export default {
     <div class="small-12 medium-6 large-4 xlarge-3 island">
         <section>
             <div class="v-card small-12">
-                <a :href="`/homepage/${group.id }`">
+                <a class="group-image-link" :href="`/homepage/${group.id }`">
                     <!-- <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImageHash %} background-image: url('/storage/image.php?hash={{ group.coverImageHash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div> -->
+                    <div class="card-class-image" :style="`background-image: url('/storage/image.php?hash=${group.coverImageHash}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center;`"></div>
+                    <div class="group-actions">
+                        <button class="group-action icon-favourite" title="Add to Favourites" @click="addToFavourites">Add to Favourites</button>
+                        <button class="group-action icon-favourite-hollow" title="Remove from Favourites" @click="removeFromFavourites">Remove from Favourites</button>
+                        <button class="group-action icon-notifications" title="Turn Group Notifications On" @click="removeFromFavourites">Turn Group Notifications On</button>
+                        <button class="group-action icon-notifications-hollow" title="Turn Group Notifications Off" @click="removeFromFavourites">Turn Group Notifications Off</button>
+                    </div>
                 </a>
+                <transition name="fade" mode="out-in">
+                    <button 
+                        v-if="isMember"
+                        class="button expand icon-logout alert leave-button" 
+                        :title="`Leave ${group.name}`"
+                        key="leave" 
+                        @click="leave">
+                        Leave
+                    </button>
+                    <button 
+                        v-else
+                        class="button expand icon-add join-button" 
+                        :title="`Join ${group.name}`" 
+                        key="join" 
+                        @click="join">
+                        Join
+                    </button>
+                </transition>
                 <div class="card-content classes groups actions-small-1">
                     <div class="list-item">
                         <h3><a :href="`/homepage/${group.id}`" :title="group.name">{{ group.name }}</a></h3>
@@ -97,6 +128,41 @@ export default {
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+
+.group-image-link {
+    display: block;
+    position: relative;
+}
+
+.group-actions {
+    display: inline-block;
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+}
+
+.join-button, .leave-button {
+    padding: 1rem;
+}
+
+.group-action {
+    background: none;
+    font-size: 0;
+    &:before {
+        color: var(--content-ui-foreground);
+        font-size: 1.5rem;
+        margin: 0;
+        padding: 0;
+        text-shadow: 1px 1px 2px rgb(73, 73, 73);
+    }
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
 
 </style>
