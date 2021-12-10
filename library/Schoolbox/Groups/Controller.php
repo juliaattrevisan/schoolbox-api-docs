@@ -153,21 +153,11 @@ class Controller extends BaseController
 
     /**
      * edit's a users enrolment into a group
-     * @param int $groupId
      *
-     * @api POST /mygroup/{groupId:\d+}/edit
+     * @api POST /my
      */
-    public function postMyGroup(int $groupId)
+    public function postMyGroup()
     {
-        //helpers
-        $accessMapper   = UserAccessMapper::getInstance();
-        $groupMapper    = GroupMapper::getInstance();
-
-        /** @var \Schoolbox\User $user */
-        $user = $_SESSION["user"];
-
-        /* @var Group $group */
-        $group = $groupMapper->findById($groupId);
         /**
          * post should contain:
          * group id
@@ -184,20 +174,32 @@ class Controller extends BaseController
             !isset($post['action'])
             || !isset($post['follow'])
             || !isset($post['favourite'])
+            || !isset($post['group'])
         ) {
             return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
         }
+
+        //helpers
+        $accessMapper   = UserAccessMapper::getInstance();
+        $groupMapper    = GroupMapper::getInstance();
+
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
+        /* @var Group $group */
+        $group = $groupMapper->findById($post['group']);
+
         //get group object
         $userGroup = false;
 
         try {
             $userGroup = $accessMapper->findOneByColumnList([
                 'uid' => $user->getId(),
-                'sid' => $groupId,
+                'sid' => $post['group'],
             ]);
         } catch (MapperException\NotFound $e) {
             $userGroup = new UserAccess();
-            $userGroup->setServiceIdentifier($groupId)
+            $userGroup->setServiceIdentifier($post['group'])
                 ->setUser($user)
                 ->setService(UserAccess::SERVICE_HOMEPAGE)
                 ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
@@ -213,7 +215,7 @@ class Controller extends BaseController
             }
             $accessMapper->delete($userGroup);
             return $this->getResponse()->content->set($this->buildJsonOutput([
-                'group'     => $groupId,
+                'group'     => $post['group'],
                 'user'      => $user->getId(),
                 'action'    => 'delete'
             ]));
@@ -230,13 +232,13 @@ class Controller extends BaseController
         //build notifications
         $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
         $following = $post['follow'] ? 1 : 0;
-        $followingList = $realtimeConfig->persistFollow($user, [$groupId => $following]);
+        $followingList = $realtimeConfig->persistFollow($user, [$post['group'] => $following]);
 
         return $this->getResponse()->content->set($this->buildJsonOutput([
-            'group'     => $groupId,
+            'group'     => $post['group'],
             'user'      => $user->getId(),
             'favourite' => $userGroup->getFavourite(),
-            'following' => in_array($groupId, $followingList),
+            'following' => in_array($post['group'], $followingList),
             'access'    => $userGroup->getService(),
         ]));
     }

@@ -2,9 +2,9 @@ alter table userAccess
     add favourite bool default false null;
 
 UPDATE menu_top
-SET url = '/groups/mygroups'
+SET url = '/groups/my'
 WHERE url = '/resource/mygroups';
 
 UPDATE menu_side
-SET url = '/groups/mygroups'
+SET url = '/groups/my'
 WHERE url = '/group/join';
