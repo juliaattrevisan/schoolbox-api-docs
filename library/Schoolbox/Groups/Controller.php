@@ -19,6 +19,7 @@ use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
@@ -40,8 +41,9 @@ class Controller extends BaseController
         //displaying included information (notification / favorite)
 
         //helpers
-        $groupMapper      = GroupMapper::getInstance();
-        $accessMapper     = UserAccessMapper::getInstance();
+        $groupMapper    = GroupMapper::getInstance();
+        $accessMapper   = UserAccessMapper::getInstance();
+        $folderMapper   = FolderMapper::getInstance();
 
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
@@ -71,7 +73,8 @@ class Controller extends BaseController
         /* @var Group $group */
         foreach ($groups as $group) {
             $folderId = $group->getFolder()->getId();
-            $folder   = $group->getFolder();
+            $folder   = $folderMapper->findById($folderId);
+//            $folder = $folderMapper->hydrateCollection($folder);
 
             if ($group->isPrivate() && !$userPerms[$folderId]) {
                 // private group and the user is not a member, don't show.
@@ -81,24 +84,36 @@ class Controller extends BaseController
             //will follow by default, check that user is actually in that group when checking if they are following
             $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
 
-            //get enrolment, could be enrolled, can join, or pending
+            //get enrolmentStatus, could be enrolled, can join, or pending
             $enrollment = $userPerms[$folderId] ? 'enrolled' : 'not enrolled';
             if ($userPerms[$folderId] && ($userPerms[$folderId]->getAccessLevel() == UserAccess::ACCESS_DENY)) {
                 $enrollment = 'pending';
             }
 
-            //favourite
-            $favourite = in_array($folderId, $favourites);
 
-            $tmp              = [
-                'id'         => $folderId,
-                'name'       => $group->getFolder()->getName(),
-                'enrolment'  => $enrollment,
-                'colour'     => $folder->getColour(),
-                'coverImageHash' => $folder->getCoverImage()->getHash(),
-                'follow'     => $follow,
-                'favourite'  => $favourite,
-                'type'       => $group->getType(),
+
+            //favourite
+            $isFavourite = in_array($folderId, $favourites);
+
+            //nullable fields cause something have no defaults...
+            $enrollment = ($userPerms[$folderId] && $userPerms[$folderId]->getAccessLevel()) ?? 0;
+            $imageHash  = null;
+            if ($folder->getCoverImage()) {
+                $imageHash = $folder->getCoverImage()->getHash();
+            }
+            $colourHex  = null;
+            if ($folder->getColour()) {
+                $colourHex = $folder->getColour()->getAsHex();
+            }
+            $tmp                    = [
+                'id'                => $folderId,
+                'name'              => $group->getFolder()->getName(),
+                'enrolmentStatus'   => $this->getEnrollmentText($enrollment),
+                'colour'            => $colourHex,
+                'coverImageHash'    => $imageHash,
+                'isNotificationsOn' => $follow,
+                'isFavourite'       => $isFavourite,
+                'type'              => $group->getType(),
             ];
             $possibleGroups[] = $tmp;
             try {
@@ -106,7 +121,6 @@ class Controller extends BaseController
             } catch (MapperException $e) {
                 $userAccess[$folder->getId()] = null;
             }
-
         }
 
         //send to frontend
@@ -120,7 +134,7 @@ class Controller extends BaseController
     }
 
     /**
-     * edit's a users enrolment into a group
+     * edit's a users enrolmentStatus into a group
      *
      * @api POST /my
      */
@@ -141,7 +155,7 @@ class Controller extends BaseController
         if (
             !isset($post['group'])
 //            || !isset($post['action'])
-//            || !isset($post['follow'])
+//            || !isset($post['isNotificationsOn'])
 //            || !isset($post['favourite'])
         ) {
             return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
@@ -181,13 +195,20 @@ class Controller extends BaseController
             }
             //save group object
             $accessMapper->save($userGroup);
+
+            //get enrolmentStatus, could be enrolled, can join, or pending
+            $enrollment = $userGroup->getAccessLevel() ? 'enrolled' : 'not enrolled';
+            if (($userGroup->getAccessLevel() == UserAccess::ACCESS_DENY)) {
+                $enrollment = 'pending';
+            }
+
             return $this->getResponse()->content->set(
                 $this->buildJsonOutput([
-                   'group'     => $post['group'],
-                   'user'      => $user->getId(),
-                   'favourite' => $userGroup->getFavourite(),
-                   'following' => 0,
-                   'access'    => $userGroup->getService(),
+                   'group'              => $post['group'],
+                   'user'               => $user->getId(),
+                   'isFavourite'        => $userGroup->getFavourite(),
+                   'isNotificationsOn'  => 0,
+                   'enrolmentStatus'    => $this->getEnrollmentText($userGroup->getAccessLevel()),
                 ])
             );
         }
@@ -206,19 +227,19 @@ class Controller extends BaseController
 
         //must be edit functions
         if ($post['action'] === 'edit') {
-            if (isset($post['favourite'])) {
+            if (isset($post['isFavourite'])) {
                 //make/remove favourite
-                $userGroup->setFavourite((bool)$post['favourite']);
+                $userGroup->setFavourite((bool)$post['isFavourite']);
             }
             //save group object
             $accessMapper->save($userGroup);
 
             //subscribe/remove notifications
             $followingList = [];
-            if (isset($post['follow'])) {
+            if (isset($post['isNotificationsOn'])) {
                 //build notifications
                 $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
-                $following      = $post['follow'] ? 1 : 0;
+                $following      = $post['isNotificationsOn'] ? 1 : 0;
                 $followingList  = $realtimeConfig->persistFollow($user, [$post['group'] => $following]);
             } else {
                 $followingList = $this->getFollows();
@@ -226,12 +247,12 @@ class Controller extends BaseController
 
             return $this->getResponse()->content->set(
                 $this->buildJsonOutput([
-                                           'group'     => $post['group'],
-                                           'user'      => $user->getId(),
-                                           'favourite' => $userGroup->getFavourite(),
-                                           'following' => in_array($post['group'], $followingList),
-                                           'access'    => $userGroup->getService(),
-                                       ])
+                    'group'             => $post['group'],
+                    'user'              => $user->getId(),
+                    'isFavourite'       => $userGroup->getFavourite(),
+                    'isNotificationsOn' => in_array($post['group'], $followingList),
+                    'access'            => $this->getEnrollmentText($userGroup->getService()),
+                ])
             );
         }
         return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'empty state, something went wrong.']));
@@ -260,5 +281,25 @@ class Controller extends BaseController
                                         ->getAll();
         }
         return $muted;
+    }
+
+    /**
+     * get the text representation of the users enrolment in a group
+     * @param int $enrolment
+     * @return string
+     */
+    protected function getEnrollmentText(int $enrolment): string
+    {
+        switch ($enrolment) {
+            case UserAccess::ACCESS_FULL:
+            case UserAccess::ACCESS_WRITE:
+            case UserAccess::ACCESS_READ:
+                return 'enrolled';
+            case UserAccess::ACCESS_AWAITING_AUTHORISATION:
+                return 'pending';
+            case UserAccess::ACCESS_DENY:
+            default:
+                return 'not Enrolled';
+        }
     }
 }
