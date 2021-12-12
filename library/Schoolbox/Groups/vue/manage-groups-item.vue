@@ -40,6 +40,15 @@ export default {
            return false;
         },
 
+        /**
+         * Check if need to request to join
+         * 
+         * @returns { Boolean }
+         */
+        canAccess () {
+           return false;
+        },
+
     },
 
     methods: {
@@ -143,23 +152,22 @@ export default {
                     <div class="list-item">
                         <h3><a :href="`/homepage/${group.id}`" :title="group.name">{{ group.name }}</a></h3>
                     </div>
-                    <!-- {% if ((not isPrivate) or isAccessWrite or isAccessAdmin) %}
+                    <template v-if="group.isAccessWrite || group.isAccessAdmin">
                         <nav>
-                            <a href="#" class="icon-more" data-dropdown="class-options{{ group.id }}" aria-expanded="false" title="Actions"></a>
+                            <a href="#view-actions" class="icon-more" :data-dropdown="`class-options${ group.id }`" aria-expanded="false" title="Actions"></a>
                         </nav>
-                        <ul data-dropdown-content class="f-dropdown" id="class-options{{ group.id }}">
-                            {% if (isAccessWrite or isAccessAdmin) %}
-                                <li><a href="{{ routeLookup('folder.getFolderModify', {id: group.id}) }}" class="icon-modify">Modify Folder</a></li>
-                                <li><a href="/statistics/homepage/{{ group.id }}" class="icon-report">View Statistics</a></li>
-                            {% endif %}
-                            {% if isAccessAdmin %}
-                                <li><a href="/group/modify/{{ group.id }}" class="icon-group">Modify Group</a></li>
-                            {% endif %}
-                            {% if ((not isPrivate) and (isAccessWrite or isAccessRead)) %}
-                                <li><a href="/group/joinForm.php?leave={{ group.id }}&return=true" data-confirm-leave class="icon-logout">Leave Group</a></li>
-                            {% endif %}
+                        <ul data-dropdown-content class="f-dropdown" :id="`class-options${ group.id }`">
+                            <li v-if="group.isAccessWrite || group.isAccessAdmin">
+                                <a href="#" class="icon-modify">Modify Folder</a>
+                            </li>
+                            <li v-if="group.isAccessWrite || group.isAccessAdmin">
+                                <a :href="`/statistics/homepage/${group.id}`" class="icon-report">View Statistics</a>
+                            </li>
+                            <li v-if="group.isAccessAdmin">
+                                <a :href="`/group/modify/${group.id}`" class="icon-group">Modify Group</a>
+                            </li>
                         </ul>
-                    {% endif %} -->
+                    </template>
                 </div>
             </div>
         </section>
