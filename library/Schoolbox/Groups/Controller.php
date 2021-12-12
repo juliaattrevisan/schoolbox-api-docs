@@ -10,6 +10,7 @@
 namespace Schoolbox\Groups;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -52,7 +53,7 @@ class Controller extends BaseController
         //get list of all possible groups
         $groups = $groupMapper->findByColumn('type', [Group::FREE_GROUP, Group::MODERATED_GROUP]);
         //get list of all groups, will filter out the private and not member
-//        $groups = $groupMapper->findAll();
+        $groups = $groupMapper->findAll();
 
         //check if user is currently member
         // Get the perms for user - including DENY (semantically PENDING) access
@@ -108,6 +109,14 @@ class Controller extends BaseController
             }
             //get access
             $access = $accessHelper->getFolderAccess($this->getUser(), $folder->getId()) ?: null;
+            try {
+                $modifyLink = $this->getRouteIfAuthorized(
+                    'folder.getFolderModify',
+                    ['id' => $folder->getId(), 'folder' => $folder]
+                );
+            } catch (RouteNotFound $e) {
+                $modifyLink = false;
+            }
             $tmp                    = [
                 'id'                => $folderId,
                 'name'              => $group->getFolder()->getName(),
@@ -121,15 +130,22 @@ class Controller extends BaseController
                 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
                 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
                 'isPrivate'         => $group->isPrivate(),
+                'modifyLink'        => $modifyLink,
             ];
             $possibleGroups[] = $tmp;
         }
 
         //send to frontend
-
+        try {
+            $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
+        } catch (MapperException $e) {
+            $userAccess[$folder->getId()] = null;
+        }
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@groups/groups.twig', [
                 'groupList'  => $possibleGroups,
+                'userAccess' => $userAccess,
+                'endpoint'   => $this->getRouteIfAuthorized('groups.newGroups'),
             ])
         );
     }
