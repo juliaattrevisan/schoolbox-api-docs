@@ -21,13 +21,13 @@ interface IMailer
      * @param bool $reinitialise
      * @return TransportInterface
      */
-    public static function getConfiguredSwiftTransport($conf, $reinitialise = false);
+    public static function getConfiguredTransport($conf, $reinitialise = false);
 
     /**
      * @param bool $reinitialise
      * @return TransportInterface
      */
-    public static function getSwiftTransport($reinitialise = false);
+    public static function getTransport($reinitialise = false);
 
     /**
      * @param string $emailAddresses

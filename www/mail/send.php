@@ -13,7 +13,9 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email as MimeEmail;
 
 require_once __DIR__ . "/../../conf/core/require.php";
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -24,7 +26,7 @@ $page->initSession();
 
 function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoader $config)
 {
-    $mail = new \Symfony\Component\Mime\Email();
+    $mail = new MimeEmail();
 
     //get users email address to use in from field
     $email = new Email($_SESSION['user']->getEmail());
@@ -125,7 +127,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     }
 
     try {
-        $mailer = new \Symfony\Component\Mailer\Mailer(Mailer::getSwiftTransport());
+        $mailer = new SymfonyMailer(Mailer::getTransport());
         $mailer->send($mail);
     } catch (TransportExceptionInterface $ex) {
         error(9, $ex->getMessage());

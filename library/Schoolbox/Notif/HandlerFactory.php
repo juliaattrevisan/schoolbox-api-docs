@@ -23,6 +23,7 @@ use Schoolbox\Notif\Handler\SymfonyMailerHandler;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class HandlerFactory
@@ -45,7 +46,7 @@ class HandlerFactory
     protected $conf;
 
     /** @var TransportInterface */
-    protected $swift;
+    protected $transport;
 
     /** @var LoggerInterface */
     protected $log;
@@ -62,14 +63,14 @@ class HandlerFactory
      * TODO: investigate putting all these handlers into DI
      *
      * @param IConfigLoader      $conf
-     * @param TransportInterface $swift
+     * @param TransportInterface $transport
      * @param LoggerInterface    $log
      */
-    public function __construct(IConfigLoader $conf, TransportInterface $swift, LoggerInterface $log)
+    public function __construct(IConfigLoader $conf, TransportInterface $transport, LoggerInterface $log)
     {
-        $this->conf       = $conf;
-        $this->swift      = $swift;
-        $this->log        = $log;
+        $this->conf      = $conf;
+        $this->transport = $transport;
+        $this->log       = $log;
 
         $this->handlerGenerators[self::SYS_FATAL_MAIL] = function () {
             return $this->createMailHandler('Schoolbox is Down', Logger::EMERGENCY);
@@ -202,7 +203,7 @@ class HandlerFactory
             $this->conf->get('mail_from_name')
         ];
 
-        $mail = new \Symfony\Component\Mime\Email();
+        $mail = new Email();
         $mail->subject($title);
 
         try {
@@ -222,7 +223,7 @@ class HandlerFactory
         }
 
         return new SymfonyMailerHandler(
-            new Mailer($this->swift),
+            new Mailer($this->transport),
             $mail,
             $severity,
             $bubble

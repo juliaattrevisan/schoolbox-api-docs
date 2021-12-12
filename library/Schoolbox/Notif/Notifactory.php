@@ -26,7 +26,7 @@ class Notifactory
     protected $conf;
 
     /** @var TransportInterface */
-    protected $swift;
+    protected $transport;
 
     /** @var LoggerInterface */
     protected $log;
@@ -51,13 +51,13 @@ class Notifactory
      * Constructor
      *
      * @param IConfigLoader|null      $configLoader
-     * @param TransportInterface|null $swift
+     * @param TransportInterface|null $transport
      * @param LoggerInterface|null    $log
      */
-    public function __construct(IConfigLoader $configLoader = null, TransportInterface $swift = null, LoggerInterface $log = null)
+    public function __construct(IConfigLoader $configLoader = null, TransportInterface $transport = null, LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
-        $this->setSwiftTransport($swift);
+        $this->setTransport($transport);
         $this->setLogger($log);
     }
 
@@ -77,7 +77,7 @@ class Notifactory
      */
     public function generateHandlerFactory()
     {
-        return new HandlerFactory($this->conf, $this->swift, $this->log);
+        return new HandlerFactory($this->conf, $this->transport, $this->log);
     }
 
 
@@ -111,12 +111,12 @@ class Notifactory
 
 
     /**
-     * @param TransportInterface $swift
+     * @param TransportInterface $transport
      * @return self
      */
-    public function setSwiftTransport(TransportInterface $swift = null)
+    public function setTransport(TransportInterface $transport = null)
     {
-        $this->swift = $swift ?: Mailer::getConfiguredSwiftTransport($this->conf, true);
+        $this->transport = $transport ?: Mailer::getConfiguredTransport($this->conf, true);
         return $this;
     }
 

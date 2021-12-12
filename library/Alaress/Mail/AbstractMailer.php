@@ -17,9 +17,13 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 use function count;
@@ -50,7 +54,7 @@ abstract class AbstractMailer implements IMailer
     protected static $conf;
 
 
-    /** @var \Symfony\Component\Mime\Email */
+    /** @var Email */
     protected $email;
 
     /**
@@ -73,7 +77,7 @@ abstract class AbstractMailer implements IMailer
      */
     public function __construct($template, $subject = '', $to = '', $host = '')
     {
-        $this->email = new \Symfony\Component\Mime\Email();
+        $this->email = new Email();
         $this->setFrom(self::getConfig()->get('mail_from_address'), self::getConfig()->get('mail_from_name'));
 
         //setup header
@@ -280,8 +284,8 @@ abstract class AbstractMailer implements IMailer
     {
         // create transport and send email
         try {
-            $mailer = new \Symfony\Component\Mailer\Mailer(self::getSwiftTransport($reinitialise));
-            $this->configureSwiftMailer($mailer);
+            $mailer = new Mailer(self::getTransport($reinitialise));
+            $this->configureMailer($mailer);
 
             $mailer->send($this->email);
         } catch (TransportExceptionInterface $e) {
@@ -307,9 +311,9 @@ abstract class AbstractMailer implements IMailer
     /**
      * Configure the given Swift_Mailer object prior to sending the email
      *
-     * @param \Symfony\Component\Mailer\MailerInterface $mailer
+     * @param MailerInterface $mailer
      */
-    protected function configureSwiftMailer($mailer)
+    protected function configureMailer($mailer)
     {
         // noop - to be overridden
     }
@@ -320,11 +324,11 @@ abstract class AbstractMailer implements IMailer
      * @param bool          $reinitialise
      * @return TransportInterface
      */
-    public static function getConfiguredSwiftTransport($conf, $reinitialise = false)
+    public static function getConfiguredTransport($conf, $reinitialise = false)
     {
         if (!(self::$transport instanceof TransportInterface) || $reinitialise) {
             if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
-                self::$transport = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport(
+                self::$transport = new EsmtpTransport(
                     $conf->get('mail_smtp_host'),
                     $conf->get('mail_smtp_port')
                 );
@@ -348,9 +352,9 @@ abstract class AbstractMailer implements IMailer
      * @param bool $reinitialise
      * @return TransportInterface
      */
-    public static function getSwiftTransport($reinitialise = false)
+    public static function getTransport($reinitialise = false)
     {
-        return static::getConfiguredSwiftTransport(self::getConfig(), $reinitialise);
+        return static::getConfiguredTransport(self::getConfig(), $reinitialise);
     }
 
     /**
