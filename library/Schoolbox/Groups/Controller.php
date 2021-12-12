@@ -44,6 +44,7 @@ class Controller extends BaseController
         $groupMapper    = GroupMapper::getInstance();
         $accessMapper   = UserAccessMapper::getInstance();
         $folderMapper   = FolderMapper::getInstance();
+        $accessHelper   = Access::getInstance();
 
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
@@ -105,6 +106,8 @@ class Controller extends BaseController
             if ($folder->getColour()) {
                 $colourHex = $folder->getColour()->getAsHex();
             }
+            //get access
+            $access = $accessHelper->getFolderAccess($this->getUser(), $folder->getId()) ?: null;
             $tmp                    = [
                 'id'                => $folderId,
                 'name'              => $group->getFolder()->getName(),
@@ -114,13 +117,12 @@ class Controller extends BaseController
                 'isNotificationsOn' => $follow,
                 'isFavourite'       => $isFavourite,
                 'type'              => $group->getType(),
+                'isAccessAdmin'     => ($access === UserAccess::ACCESS_FULL),
+                'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
+                'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
+                'isPrivate'         => $group->isPrivate(),
             ];
             $possibleGroups[] = $tmp;
-            try {
-                $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
-            } catch (MapperException $e) {
-                $userAccess[$folder->getId()] = null;
-            }
         }
 
         //send to frontend
@@ -128,7 +130,6 @@ class Controller extends BaseController
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@groups/groups.twig', [
                 'groupList'  => $possibleGroups,
-                'userAccess' => $userAccess,
             ])
         );
     }
