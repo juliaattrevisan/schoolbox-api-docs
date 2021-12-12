@@ -54,6 +54,28 @@ export default {
     methods: {
 
         /**
+         * Get the image style, adding in the cover image only if available
+         * 
+         * @returns { Object }
+         */
+        getImageStyles () {
+            let imageStyles = {
+                backgroundColor: `#${this.group.colour}`,
+                borderBottom: `10px solid #${this.group.colour}`,
+            };
+            if (this.group.coverImageHash) {
+                imageStyles = { 
+                    ...imageStyles,
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    backgroundImage: `url('/storage/image.php?hash=${this.group.coverImageHash}&size=cardImageLarge`,
+                }
+            }
+            return imageStyles;
+        },
+
+        /**
          * 
          */
         join () {
@@ -63,8 +85,15 @@ export default {
         /**
          * 
          */
-        leave () {
-            this.isMember = false;
+        async leave () {
+            
+            // try {
+            //     const response = await fetch('/groups/my')
+            // } catch (error) {
+            //     console.warn(error);
+            // } finally {
+            //     this.isMember = false;
+            // }
         },
 
         /**
@@ -106,8 +135,7 @@ export default {
         <section>
             <div class="v-card small-12">
                 <a class="group-image-link" :href="`/homepage/${group.id }`">
-                    <!-- <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImageHash %} background-image: url('/storage/image.php?hash={{ group.coverImageHash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div> -->
-                    <div class="card-class-image" :style="`background-image: url('/storage/image.php?hash=${group.coverImageHash}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center;`"></div>
+                    <div class="card-class-image" :style="getImageStyles()"></div>
                     <div class="group-actions">
                         <button class="group-action icon-favourite" title="Add to Favourites" @click="addToFavourites">Add to Favourites</button>
                         <button class="group-action icon-favourite-hollow" title="Remove from Favourites" @click="removeFromFavourites">Remove from Favourites</button>
