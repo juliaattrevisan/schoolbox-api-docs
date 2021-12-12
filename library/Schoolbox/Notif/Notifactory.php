@@ -11,6 +11,7 @@ namespace Schoolbox\Notif;
 
 use Alaress\Lumberjack;
 use ConfigFallback;
+use Database;
 use Mailer;
 use PDOException;
 use Psr\Log\LoggerInterface;
