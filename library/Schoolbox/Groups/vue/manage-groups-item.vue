@@ -1,3 +1,4 @@
+
 <script>
 
 /**
@@ -17,6 +18,28 @@ export default {
         return {
             isMember: true, 
         }
+    },
+
+    computed: {
+
+        /**
+         * Check if membership is already pending
+         * 
+         * @returns { Boolean }
+         */
+        isMembershipPending () {
+            return false;
+        },
+
+        /**
+         * Check if need to request to join
+         * 
+         * @returns { Boolean }
+         */
+        isRequestToJoin () {
+           return false;
+        },
+
     },
 
     methods: {
@@ -91,6 +114,21 @@ export default {
                         key="leave" 
                         @click="leave">
                         Leave
+                    </button>
+                    <button 
+                        v-else-if="isMembershipPending"
+                        class="button expand pending-button" 
+                        key="membershipPending" 
+                        disabled>
+                        Membership pending
+                    </button>
+                    <button 
+                        v-else-if="isRequestToJoin"
+                        class="button expand icon-add join-button" 
+                        :title="`Request to join ${group.name}`" 
+                        key="requestToJoin" 
+                        @click="requestToJoin">
+                        Request to join
                     </button>
                     <button 
                         v-else

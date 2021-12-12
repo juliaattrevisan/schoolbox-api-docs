@@ -19,7 +19,7 @@ export default {
         groups: {
             type: Array,
             required: true,
-        }
+        },
     },
 
     computed: {
