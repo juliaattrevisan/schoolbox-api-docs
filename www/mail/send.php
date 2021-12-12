@@ -30,8 +30,12 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     $email = new Email($_SESSION['user']->getEmail());
 
     if ($email->isValid()) {
-        $mail->addFrom(new Address($_SESSION['user']->getEmail(), $_SESSION['user']->formatName()));
-        $mail->addReplyTo(new Address($_SESSION['user']->getEmail(), $_SESSION['user']->formatName()));
+        $from = new Address(
+            $_SESSION['user']->getEmail(),
+            $_SESSION['user']->formatName() ?? '',
+        );
+        $mail->addFrom($from);
+        $mail->addReplyTo($from);
     } else {
         error(42);
     }
@@ -57,7 +61,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
 
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
-                $mail->addTo(new Address($address, $name));
+                $mail->addTo(new Address($address, $name ?? ''));
             } catch (Exception $e) {
                 error(9, 'Email address "' . $address . '" is not valid.');
             }
@@ -68,7 +72,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     //put the users email in the to field
     if (!stristr($to, '@') && ($bcc || $cc)) {
         try {
-            $mail->addTo(new Address($_SESSION['user']->getEmail(), $to));
+            $mail->addTo(new Address($_SESSION['user']->getEmail(), $to ?? ''));
         } catch (Exception $e) {
             error(9, 'Your email address is not valid.');
         }
@@ -82,7 +86,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
 
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
-                $mail->addCc(new Address($address, $name));
+                $mail->addCc(new Address($address, $name ?? ''));
             } catch (Exception $e) {
                 error(9, 'Email address "' . $address . '" is not valid.');
             }
@@ -94,7 +98,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
 
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
-                $mail->addBcc(new Address($address, $name));
+                $mail->addBcc(new Address($address, $name ?? ''));
             } catch (Exception $e) {
                 error(9, 'Email address "' . $address . '" is not valid.');
             }

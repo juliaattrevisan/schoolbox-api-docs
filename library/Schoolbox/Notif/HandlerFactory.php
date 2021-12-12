@@ -213,7 +213,7 @@ class HandlerFactory
 
         try {
             if (is_array($from)) {
-                $mail->from(new Address($from[0], $from[1]));
+                $mail->from(new Address($from[0], $from[1] ?? ''));
             } else {
                 $mail->from(new Address($from));
             }
