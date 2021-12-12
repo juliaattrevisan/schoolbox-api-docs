@@ -211,11 +211,15 @@ abstract class AbstractMailer implements IMailer
 
 
     /**
-     * Encodes email in base64 rather than quoted printable
+     * Encodes email in base64 rather than quoted printable.
+     *
+     * @deprecated this does nothing with the migration to Symfony mailer:
+     *             whilst `\Symfony\Component\Mime\Encoder\Base64ContentEncoder`
+     *             exists, I don't know how to set it as an email's encoding
+     *             method.
      */
     public function encodeBase64()
     {
-//        // TODO figure out what to do with this
 //        $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
 //        $this->email->setEncoder($encoder);
     }
