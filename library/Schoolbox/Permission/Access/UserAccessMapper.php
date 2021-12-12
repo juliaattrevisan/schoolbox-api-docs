@@ -230,6 +230,18 @@ class UserAccessMapper extends Mapper
             }
             //check permission
             //check if permission is higher or not, then grab the better perm, and save that...
+            if ($finalsid[$row->getServiceIdentifier()]->getService() && $row->getService()) {
+                //correct service, now to check perms
+                if ($finalsid[$row->getServiceIdentifier()]->getAccessLevel() === $row->getAccessLevel()) {
+                    continue;
+                }
+                if ($finalsid[$row->getServiceIdentifier()]->getAccessLevel() > $row->getAccessLevel()) {
+                    continue;
+                } elseif ($finalsid[$row->getServiceIdentifier()]->getAccessLevel() < $row->getAccessLevel()) {
+                    $finalsid[$row->getServiceIdentifier()] = $row;
+                    continue;
+                }
+            }
             break;
         }
         return $access;
