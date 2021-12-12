@@ -225,26 +225,26 @@ class UserAccessMapper extends Mapper
                 !in_array($row->getServiceIdentifier(), $finalsid)
                 && $finalsid[$row->getServiceIdentifier()] !== $row->getService()
             ) {
-                $finalAccess[] = $row;
+                $finalAccess[$row->getServiceIdentifier()] = $row;
                 continue;
             }
             //check permission
             //check if permission is higher or not, then grab the better perm, and save that...
-            if ($finalsid[$row->getServiceIdentifier()]->getService() && $row->getService()) {
+            if ($finalAccess[$row->getServiceIdentifier()]->getService() && $row->getService()) {
                 //correct service, now to check perms
-                if ($finalsid[$row->getServiceIdentifier()]->getAccessLevel() === $row->getAccessLevel()) {
+                if ($finalAccess[$row->getServiceIdentifier()]->getAccessLevel() === $row->getAccessLevel()) {
                     continue;
                 }
-                if ($finalsid[$row->getServiceIdentifier()]->getAccessLevel() > $row->getAccessLevel()) {
+                if ($finalAccess[$row->getServiceIdentifier()]->getAccessLevel() > $row->getAccessLevel()) {
                     continue;
-                } elseif ($finalsid[$row->getServiceIdentifier()]->getAccessLevel() < $row->getAccessLevel()) {
-                    $finalsid[$row->getServiceIdentifier()] = $row;
+                } elseif ($finalAccess[$row->getServiceIdentifier()]->getAccessLevel() < $row->getAccessLevel()) {
+                    $finalAccess[$row->getServiceIdentifier()] = $row;
                     continue;
                 }
             }
             break;
         }
-        return $access;
+        return $finalAccess;
     }
 
     /**
