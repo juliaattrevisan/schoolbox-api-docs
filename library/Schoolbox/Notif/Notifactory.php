@@ -39,7 +39,7 @@ class Notifactory
      * @param IConfigLoader $configLoader
      * @return NotifInterface
      */
-    public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
+    public static function create(string $topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
     {
         $self = new self($configLoader);
 
@@ -66,9 +66,9 @@ class Notifactory
      * @param string $topic
      * @return NotifInterface
      */
-    public function generateNotif($topic = Notif::TOPIC_SYSTEM)
+    public function generateNotif(string $topic = Notif::TOPIC_SYSTEM)
     {
-        return new Notif($topic, $this->generateHandlerFactory());
+        return new Notif($this->generateHandlerFactory(), $topic);
     }
 
 

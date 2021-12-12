@@ -37,13 +37,13 @@ class Notif implements NotifInterface
     /**
      * Notif constructor.
      *
-     * @param string         $topic
      * @param HandlerFactory $factory
+     * @param string         $topic
      */
-    public function __construct($topic = self::TOPIC_SYSTEM, HandlerFactory $factory)
+    public function __construct(HandlerFactory $factory, string $topic = self::TOPIC_SYSTEM)
     {
-        $this->topic   = $topic;
         $this->factory = $factory;
+        $this->topic   = $topic;
     }
 
 
