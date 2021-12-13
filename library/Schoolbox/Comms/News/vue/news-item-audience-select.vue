@@ -206,10 +206,14 @@ export default {
         //To create an audience string to add to the form submission, linked to the audienceBricks rather than the selectize element
         //This is needed as it's possible to delete audience bricks just by tapping the backspace in the audience input field a few times...
         //Which would result in the bricks displayed in the custom UI not matching what's actually going to be submitted
-        audienceFormString () {
-            const encodedAudienceSegments = this.audienceBricks.map((brick) => codec.encode(brick.segments[0])); //codec is available in this context, and is in audience-bricks.js
-            const audienceFormString = encodedAudienceSegments.join(','); //for a comma delimited segment string
-            return audienceFormString;
+        audienceFormString() {
+            const encodedAudienceSegments = [];
+            this.audienceBricks.forEach(function (brick) {
+                brick.segments.forEach(function (segment) {
+                    encodedAudienceSegments.push(codec.encode(segment));
+                });
+            });
+            return encodedAudienceSegments.join(','); //for a comma delimited segment string
         },
 
     },
