@@ -16,7 +16,11 @@ export default {
     },
 
     props: {
-        groups: {
+        endpoint: { //to join/leave/favourite etc a group
+            type: String,
+            required: true,
+        },
+        groups: { //all the groups that the user can access
             type: Array,
             required: true,
         },
@@ -50,6 +54,7 @@ export default {
             <manage-groups-item 
                 v-for="group in groups" 
                 :key="group.id" 
+                :endpoint="endpoint"
                 :group="group"
             />
         </div>

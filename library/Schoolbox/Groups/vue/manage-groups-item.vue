@@ -8,6 +8,10 @@
 export default {
 
     props: {
+        endpoint: { //to join/leave/favourite etc a group
+            type: String,
+            required: true,
+        },
         group: {
             type: Object,
             required: true,
@@ -16,11 +20,20 @@ export default {
 
     data () {
         return {
-            isMember: true, 
+            isProcessing: false, //to disable other actions while one is already taking place
         }
     },
 
     computed: {
+
+        /**
+         * Check if is already a member
+         * 
+         * @returns { Boolean }
+         */
+        isMember () {
+            return this.group.enrolmentStatus === 'enrolled';
+        },
 
         /**
          * Check if membership is already pending
@@ -28,7 +41,7 @@ export default {
          * @returns { Boolean }
          */
         isMembershipPending () {
-            return false;
+            return this.group.enrolmentStatus === 'pending';
         },
 
         /**
@@ -59,17 +72,21 @@ export default {
          * @returns { Object }
          */
         getImageStyles () {
+            // let imageStyles = {
+            //     backgroundColor: `#${this.group.colour}`,
+            //     borderBottom: `10px solid #${this.group.colour}`,
+            // }
             let imageStyles = {
-                backgroundColor: `#${this.group.colour}`,
-                borderBottom: `10px solid #${this.group.colour}`,
-            };
+                backgroundColor: `green`,
+                borderBottom: `10px solid green`,
+            }
             if (this.group.coverImageHash) {
                 imageStyles = { 
                     ...imageStyles,
+                    backgroundImage: `url('/storage/image.php?hash=${this.group.coverImageHash}&size=cardImageLarge')`,
                     backgroundSize: 'cover',
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
-                    backgroundImage: `url('/storage/image.php?hash=${this.group.coverImageHash}&size=cardImageLarge`,
                 }
             }
             return imageStyles;
@@ -88,7 +105,7 @@ export default {
         async leave () {
             
             // try {
-            //     const response = await fetch('/groups/my')
+            //     const response = await fetch(this.endpoint)
             // } catch (error) {
             //     console.warn(error);
             // } finally {
@@ -146,7 +163,7 @@ export default {
                 <transition name="fade" mode="out-in">
                     <button 
                         v-if="isMember"
-                        class="button expand icon-logout alert leave-button" 
+                        class="button expand icon-logout alert" 
                         :title="`Leave ${group.name}`"
                         key="leave" 
                         @click="leave">
@@ -154,14 +171,14 @@ export default {
                     </button>
                     <button 
                         v-else-if="isMembershipPending"
-                        class="button expand pending-button" 
+                        class="button expand disabled" 
                         key="membershipPending" 
                         disabled>
                         Membership pending
                     </button>
                     <button 
                         v-else-if="isRequestToJoin"
-                        class="button expand icon-add join-button" 
+                        class="button expand icon-add" 
                         :title="`Request to join ${group.name}`" 
                         key="requestToJoin" 
                         @click="requestToJoin">
@@ -169,7 +186,7 @@ export default {
                     </button>
                     <button 
                         v-else
-                        class="button expand icon-add join-button" 
+                        class="button expand icon-add" 
                         :title="`Join ${group.name}`" 
                         key="join" 
                         @click="join">
@@ -216,8 +233,8 @@ export default {
     top: 0.5rem;
 }
 
-.join-button, .leave-button {
-    padding: 1rem;
+.button {
+    padding: 1rem; //add extra padding
 }
 
 .group-action {
