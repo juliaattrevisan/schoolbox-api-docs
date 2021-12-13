@@ -50,22 +50,19 @@
                 <p>No tools have been made available for use in 3rd party assessments. Please contact your system administrator.</p>
             </div>
         {% else %}
-            <div class="input-group">
-                <select id="lti-tool-id" name="ltiToolId" required>
-                    <option value="">-- Select a Learning Tool --</option>
-                    {% for tool in ltiTools %}
-                        <option value="{{ tool.id }}"
-                                label="{{ tool.name }}"
-                                data-launch-url="{{ tool.launchUrl ?? '' }}"
-                                data-tool-selector-url="{{ tool.deepLinkingUrl
-                                    ? routeLookup('ltiPlatformContext.getGenerateDeepLinkingRequestForFolder', {toolId: tool.id, folderId: context.baseContext.folder.id})
-                                    : ''
-                                }}"
-                                {{ assessment.ltiTool.id is defined and tool.id == assessment.ltiTool.id ? 'selected="selected"' : '' }}>{{ tool.name }}</option>
-                    {% endfor %}
-                </select>
-                <a href="#" id="ltiToolLaunchPicker" class="button disabled icon-lti">Use Tool</a>
-            </div>
+            <select id="lti-tool-id" name="ltiToolId" required>
+                <option value="">-- Select a Learning Tool --</option>
+                {% for tool in ltiTools %}
+                    <option value="{{ tool.id }}"
+                            label="{{ tool.name }}"
+                            data-launch-url="{{ tool.launchUrl ?? '' }}"
+                            data-tool-selector-url="{{ tool.deepLinkingUrl
+                                ? routeLookup('ltiPlatformContext.getGenerateDeepLinkingRequestForFolder', {toolId: tool.id, folderId: context.baseContext.folder.id})
+                                : ''
+                            }}"
+                            {{ assessment.ltiTool.id is defined and tool.id == assessment.ltiTool.id ? 'selected="selected"' : '' }}>{{ tool.name }}</option>
+                {% endfor %}
+            </select>
         {% endif %}
     </div>
 
@@ -120,7 +117,6 @@
                 let $ltiToolPicker                    = $('#ltiToolPicker'),
                     $ltiAssessment                    = $('#ltiAssessment'),
                     $toolIdSelector                   = $('#lti-tool-id'),
-                    $toolLaunchPicker                 = $('#ltiToolLaunchPicker'),
                     $resourceLinkMissingLineItemModal = $('#resourceLinkMissingLineItemModal'),
                     $resourceLinkMissingUrlModal      = $('#resourceLinkMissingUrlModal'),
                     $toolModal                        = $('#toolModal'),
@@ -223,16 +219,11 @@
                     event.preventDefault();
                     $ltiToolPicker.removeClass('hide');
                     $ltiAssessment.addClass('hide');
+                    $toolIdSelector.val('');
                 })
 
-                // Enable/disable launcher on change of tool ID
+                // Open launcher on change of tool ID
                 $toolIdSelector.on('change', function () {
-                    let launchEnabled = $(this).val();
-                    $toolLaunchPicker.toggleClass('disabled', !launchEnabled);
-                });
-
-                // Launch picker
-                $toolLaunchPicker.click(function (event) {
                     event.preventDefault();
 
                     // Tool selection and launch URLs
@@ -248,6 +239,7 @@
                         // On close:
                         // * point the iframe nowhere
                         // * stop listening (so that message listeners for other things work)
+                        // * set the tool ID's selected value back to the empty one
                         $toolModal.on('open.fndtn.reveal', function () {
                             $toolModalIframe.attr('src', toolSelectorUrl);
                             window.addEventListener('message', messageHandler);
@@ -255,6 +247,9 @@
                         $toolModal.on('close.fndtn.reveal', function () {
                             $toolModalIframe.removeAttr('src');
                             window.removeEventListener('message', messageHandler);
+                            if (!$('#lti-assessment-url').val()) {
+                                $toolIdSelector.val('');
+                            }
                         });
                         $toolModal.foundation('reveal', 'open');
                     } else if (launchUrl) {
