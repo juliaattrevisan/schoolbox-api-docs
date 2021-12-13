@@ -13,6 +13,7 @@ use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -150,7 +151,7 @@ class Controller extends BaseController
 
         //sort the groups
         usort($possibleGroups, function ($a, $b) {
-            return strcmp($a['name'], $b['name']);
+            return strnatcasecmp($a['name'], $b['name']);
         });
 
         $this->getResponse()->content->set(
