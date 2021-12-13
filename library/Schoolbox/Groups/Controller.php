@@ -265,7 +265,7 @@ class Controller extends BaseController
                 //build notifications
                 $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
                 $following      = $post['isNotificationsOn'] ? 1 : 0;
-                $followingList  = $realtimeConfig->persistFollow($user, [$post['group'] => $following]);
+                $followingList  = $realtimeConfig->persistFollow($user, [$post['group'] => "{$following}"]);
             } else {
                 $followingList = $this->getFollows();
             }
