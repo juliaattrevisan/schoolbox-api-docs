@@ -210,7 +210,7 @@ class Controller extends BaseController
      *
      * @return array
      */
-    protected function calculateFollowment()
+    public function calculateFollowment()
     {
         // as much as we'd like get this as cached in session, we can't include subjects here
         $accesses = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());

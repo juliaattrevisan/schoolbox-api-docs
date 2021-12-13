@@ -29,6 +29,7 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Timetable_ColourMapper;
 
 use function in_array;
@@ -78,7 +79,7 @@ class Controller extends BaseController
         $favourites = $accessMapper->getFavourites($user);
 
         //build notifications
-        $muted = $this->getFollows();
+        $notificationsList = $this->getNotifications($user);
 
         // build output array
         $userAccess     = [];
@@ -93,9 +94,6 @@ class Controller extends BaseController
                 // private group and the user is not a member, don't show.
                 continue;
             }
-
-            //will follow by default, check that user is actually in that group when checking if they are following
-            $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
 
             //favourite
             $isFavourite = in_array($folderId, $favourites);
@@ -130,7 +128,8 @@ class Controller extends BaseController
                 'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folderId]),
                 'colour'            => $folder->getColour()->getAsHex(),
                 'coverImageHash'    => $imageHash,
-                'isNotificationsOn' => $follow,
+                'isNotificationsOn' => $notificationsList[$folderId]['follow'] ?: false,
+                'isForceFollow'     => $notificationsList[$folderId]['force'] ?: false,
                 'isFavourite'       => $isFavourite,
                 'type'              => $this->getGroupType($group->getType()),
                 'isAccessAdmin'     => ($access === UserAccess::ACCESS_FULL),
@@ -260,52 +259,77 @@ class Controller extends BaseController
             $accessMapper->save($userGroup);
 
             //subscribe/remove notifications
-            $followingList = [];
             if (isset($post['isNotificationsOn'])) {
-                //build notifications
-                $realtimeConfig = new Config(RoleMapper::getInstance(), SourceMapper::getInstance(), RoutePermissionMapper::getInstance(), RerouteOverrideMapper::getInstance());
-                $following      = $post['isNotificationsOn'] ? 1 : 0;
-                $followingList  = $realtimeConfig->persistFollow($user, [$post['group'] => "{$following}"]);
-            } else {
-                $followingList = $this->getFollows();
+                //check if the user can actually unsubscribe from notifications
+                if ($group->getForceFollow()) {
+                    return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'No Permission to unfollow group']));
+                }
+                $notificationsList = $this->setNotification($group->getFolder()->getId(), $user, (bool)$post['isNotificationsOn']);
             }
+            $notificationsList = $this->getNotifications($user);
 
             return $this->getResponse()->content->set(
                 $this->buildJsonOutput([
                     'group'             => $post['group'],
                     'user'              => $user->getId(),
                     'isFavourite'       => $userGroup->getFavourite(),
-                    'isNotificationsOn' => in_array($post['group'], $followingList),
+                    'isNotificationsOn' => $notificationsList[$group->getFolder()->getId()]['follow'] ?: false,
+                    'isForceFollow'     => $notificationsList[$group->getFolder()->getId()]['force'] ?: false,
                     'access'            => $this->getEnrollmentText($userGroup),
                 ])
             );
         }
         return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'empty state, something went wrong.']));
     }
-    protected function getFollows()
-    {
-        $followmentHelp = new \Schoolbox\Realtime\Controller();
-        $service        = UserAccess::SERVICE_HOMEPAGE;
-        $muted          = [
-            'unfollow' => $this->getUser()->getId(),
-            'disabled' => 0,
-        ];
 
-        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
-        foreach ($muted as $k => $id) {
-            $muted[$k] = $followmentHelp->getRerouteOverrideMapper()
-                                        ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                                        ->map(
-                                            function ($override) use ($routeKeyRegex) {
-                                                /** @var RerouteOverride $override */
-                                                preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                                                return is_array($matches) ? $matches[1] : null;
-                                            },
-                                            false
-                                        )
-                                        ->getAll();
+    /**
+     * grabs all groups the user is part of and are following
+     * @param \Schoolbox\User $user
+     * @return array
+     */
+    protected function getNotifications(\Schoolbox\User $user): array
+    {
+        $con = new \Schoolbox\Realtime\Controller();
+        $con->setUser($user);
+        return $con->calculateFollowment();
+    }
+
+    /**
+     * follows / unfollows a group
+     * @param int $group
+     * @param User $user
+     * @param bool $isNotificationOn
+     */
+    protected function setNotification(int $group, \Schoolbox\User $user, bool $isNotificationOn): array
+    {
+        //helpers
+        $reRouteOverideMapper = RerouteOverrideMapper::getInstance();
+        $serviceKey =  'service.' . UserAccess::SERVICE_HOMEPAGE . ".$group";
+
+        //see if the object already exists in the db, if so grab it to edit.
+        $muteObj = $reRouteOverideMapper->findByColumnList([
+            'msg_route_key' => $serviceKey,
+            'user_id'       => $user->getId(),
+            'delivery'      => RoutePermission::MUTE
+        ]);
+
+        ///if user does not want notifications/follow for the group, create the mute object, and none exists currently
+        if (false === $isNotificationOn && 0 === $muteObj->count()) {
+            //create the mute object
+            $muteObj = new RerouteOverride();
+            $muteObj->setUser($user);
+            $muteObj->setRouteKey($serviceKey);
+            $muteObj->setDelivery([ RoutePermission::MUTE ]);
+            $reRouteOverideMapper->save($muteObj);
         }
-        return $muted;
+
+        //if the user does want notifications/follows and there is an muteobject entry, lets remove that now.
+        if (true === $isNotificationOn && 0 < $muteObj->count()) {
+            //delete the mute
+            $reRouteOverideMapper->delete($muteObj);
+        }
+
+        return $this->getNotifications($user);
     }
 
     /**
