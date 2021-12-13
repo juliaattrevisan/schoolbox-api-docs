@@ -420,13 +420,6 @@ class Model implements ISoftDeletable
             return $this->getTask();
         }
 
-        // This used to raise an UnexpectedValueException.
-        // The absence of a sub-object is still a data issue, but it's one for
-        // calling classes to figure out.
-        trigger_error(
-            sprintf('Assessment #%d has no sub-object: this is likely a data issue', $this->id),
-            E_USER_WARNING
-        );
         return null;
     }
 

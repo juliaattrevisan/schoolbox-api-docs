@@ -114,7 +114,11 @@ class Adapter
             if ($participant) {
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
                 if ($feedback) {
-                    $this->externalMarkbook->syncFeedback($feedback);
+                    try {
+                        $this->externalMarkbook->syncFeedback($feedback);
+                    } catch (\InvalidArgumentException | \UnderflowException $e) {
+                        //don't let the user know we failed
+                    }
 //                } else {
 //                    // Attempt to delete this student's participation
 //                    $this->externalMarkbook->deleteFeedback($assessment, $student);

@@ -240,11 +240,10 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
         );
 
         foreach ($assessmentList as $assessment) {
-
             if (!$markbookExternal->isSyncable($assessment)) {
                 continue;
             }
-            if($assessment->getSpecificationAssessment() instanceof IAssessable && $assessment->getTitle() != $assessment->getSpecificationAssessment()->getTitle()) {
+            if ($assessment->getSpecificationAssessment() instanceof IAssessable && $assessment->getTitle() != $assessment->getSpecificationAssessment()->getTitle()) {
                 $log->warning("Rewriting title of assessment");
                 $assessment->setTitle($assessment->getSpecificationAssessment()->getTitle());
             }
@@ -305,17 +304,14 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 }
 
 
-                if (!$dryRun) {
-                    if ($feedback) {
-                        if (!$markbookExternal->syncFeedback($feedback)) {
-                            $level = 'warning';
-                            $markLog = '(failed)';
-                            $totalFailure++;
-                        } else {
-                            $totalSuccess++;
-                        }
-//                    } else {
-//                        $markbookExternal->deleteFeedback($assessment, $student);
+                if (!$dryRun && $feedback) {
+                    try {
+                        $markbookExternal->syncFeedback($feedback);
+                        $totalSuccess++;
+                    } catch (InvalidArgumentException | UnderflowException $e) {
+                        $level = 'warning';
+                        $markLog = '(' . $e->getMessage() . ')';
+                        $totalFailure++;
                     }
                 }
 

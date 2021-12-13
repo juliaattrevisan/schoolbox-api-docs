@@ -338,12 +338,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param IFeedback $feedback
      * @return bool
      * @throws \Alaress\Database\Exception
-     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws UnderflowException
      */
     public function syncFeedback(IFeedback $feedback): bool
     {
         if (!$this->isSyncable($feedback->getAssessable())) {
-            return false;
+            throw new InvalidArgumentException('Unable to sync this assessment type because it is a specification or unsupported');
         }
 
         $student = $feedback->getReviewee();
@@ -353,10 +354,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // * Student's ID is invalid
         // * Marker's ID is invalid
         if (!$this->isExternalIdValid($student->getExternalId())) {
-            return false;
+            throw new InvalidArgumentException('Student (' . $student->getUsername() . ') has an invalid external ID: ' . $student->getExternalId());
         }
         if (!$this->isExternalIdValid($marker->getExternalId())) {
-            return false;
+            throw new InvalidArgumentException('Provider of feedback (' . $marker->getUsername() . ') has invalid external ID: ' . $marker->getExternalId());
         }
 
         return $this->setActivityMark($feedback);
@@ -585,6 +586,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $this->insertMarkbooksIfNotExists($activity, $markbookFolderCodes, $studentFileYear, $studentFileSemester);
 
         $assessmentRemoteList = $this->getSynergeticMarkbookList($activity, $studentFileYear, $studentFileSemester);
+
+        if (!count($assessmentRemoteList)) {
+            throw new UnderflowException('Unable to find assessment:  ' .
+                                         $this->getMarkbookIdentifier($activity) . ' in ' .
+                                         implode(',', $markbookFolderCodes));
+        }
 
         $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText));
 
