@@ -31,7 +31,7 @@ class InstallPackagesCest
         $id           = 1;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to create a badge');
+        $i->amGoingTo('Send request to install package "Australian Curriculum - General Capabilities"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
@@ -41,7 +41,7 @@ class InstallPackagesCest
         $id           = 2;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to create a badge');
+        $i->amGoingTo('Send request to install package "Australian Curriculum - Cross-curriculum Priorities package"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
@@ -51,7 +51,7 @@ class InstallPackagesCest
         $id           = 3;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to create a badge');
+        $i->amGoingTo('Send request to install package "General Capability Badges package"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
@@ -61,7 +61,7 @@ class InstallPackagesCest
         $id           = 4;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to create a badge');
+        $i->amGoingTo('Send request to install package "Personal Development Badges package"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
@@ -71,7 +71,7 @@ class InstallPackagesCest
         $id           = 5;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to create a badge');
+        $i->amGoingTo('Send request to install package "Extra Curricular Badges package"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
@@ -81,7 +81,7 @@ class InstallPackagesCest
         $id           = 6;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to create a badge');
+        $i->amGoingTo('Send request to install package "Community Badges package"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
@@ -91,7 +91,7 @@ class InstallPackagesCest
         $id           = 7;
         $packagePayload = new Payload\Admin\Modules\Packages($id);
         #WHEN
-        $i->amGoingTo('Send request to create a badge');
+        $i->amGoingTo('Send request to install package "Australian Early Years Learning Framework package"');
         $i->sendRequest($packagePayload);
         #THEN
         $i->seeResponseCodeIs(200);
