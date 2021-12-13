@@ -582,6 +582,7 @@ class Healthcheck
                 'luPastoralCareType',
                 'PastoralCareComments',
                 'PastoralCareContacts',
+                'PastoralCareActions',
                 'tPastoralCare'
             ];
             $writablePastoralTables = [
