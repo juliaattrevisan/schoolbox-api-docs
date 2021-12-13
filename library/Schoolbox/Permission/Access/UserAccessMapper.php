@@ -220,31 +220,34 @@ class UserAccessMapper extends Mapper
             //if not add it
             //if it is, check the permission state, and add/update the one with higher permission
 
+            //use a key service (homepage/service).folderId as a key to help map / sort the perms
+            $key = "{$row->getService()}.{$row->getServiceIdentifier()}";
             //check if the access entry is already in final, if not, add it
             if (
-                !in_array($row->getServiceIdentifier(), $finalsid)
-                && $finalsid[$row->getServiceIdentifier()] !== $row->getService()
+                !in_array($key, $finalsid)
+                && $finalAccess[$key] !== $row->getService()
             ) {
-                $finalAccess[$row->getServiceIdentifier()] = $row;
+                $finalAccess[$key] = $row;
+                $finalsid[] = $key;
                 continue;
             }
             //check permission
             //check if permission is higher or not, then grab the better perm, and save that...
-            if ($finalAccess[$row->getServiceIdentifier()]->getService() && $row->getService()) {
+            if ($finalAccess[$key]->getService() && $row->getService()) {
                 //correct service, now to check perms
-                if ($finalAccess[$row->getServiceIdentifier()]->getAccessLevel() === $row->getAccessLevel()) {
+                if ($finalAccess[$key]->getAccessLevel() === $row->getAccessLevel()) {
                     continue;
                 }
-                if ($finalAccess[$row->getServiceIdentifier()]->getAccessLevel() > $row->getAccessLevel()) {
+                if ($finalAccess[$key]->getAccessLevel() > $row->getAccessLevel()) {
                     continue;
-                } elseif ($finalAccess[$row->getServiceIdentifier()]->getAccessLevel() < $row->getAccessLevel()) {
-                    $finalAccess[$row->getServiceIdentifier()] = $row;
+                } elseif ($finalAccess[$key]->getAccessLevel() < $row->getAccessLevel()) {
+                    $finalAccess[$key] = $row;
                     continue;
                 }
             }
             break;
         }
-        return $finalAccess;
+        return $finalAccess->reindex();
     }
 
     /**
