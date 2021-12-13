@@ -217,7 +217,7 @@ class HomePageCest
         $homepage_title = 'Testing Home Page Add Members with Permissions at ' . $timestamp;
 
         $folderPayload = new Payload\Resource\Folder\Create();
-        $folderPayload->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
+        $folderPayload->setTemplate(Payload\Resource\Folder\Modify::TEMPLATE_BLANK);
         $folderPayload->setName($homepage_title);
         $folderPayload->setCreateGroup(true);
 
