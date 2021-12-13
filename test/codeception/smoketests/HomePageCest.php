@@ -262,7 +262,7 @@ class HomePageCest
         $homepage_title = 'Testing Home Page Use Text Box Component at ' . $timestamp;
 
         $folderPayload = new Payload\Resource\Folder\Create();
-        $folderPayload->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
+        $folderPayload->setTemplate(Payload\Resource\Folder\Modify::TEMPLATE_BLANK);
         $folderPayload->setName($homepage_title);
         $i->amGoingTo('Send request create homepage');
         $i->sendRequest($folderPayload);
