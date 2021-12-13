@@ -93,7 +93,7 @@ export default {
         },
 
         /**
-         * To update all the marked submissions in parallel
+         * To delete all the marked files in parallel
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
          *
          * @returns { Array }
@@ -112,7 +112,7 @@ export default {
         },
 
         /**
-         * Set up a deleted users array to POST
+         * Set up a deleted files array to POST
          *
          * @returns { URLSearchParams }
          */
@@ -124,14 +124,14 @@ export default {
         },
 
         /**
-         * Cancel the the selected users deletion
+         * Cancel the the selected files deletion
          */
         onCancelDeleteFilesSelected () {
             this.$refs.deleteModal.close();
         },
 
         /**
-         * To confirm/cancel selected users deletion
+         * To confirm/cancel selected files deletion
          */
         onClearFileSelectionSelected () {
             this.$emit('on-selection-cleared'); //emit to view-all-files.vue
