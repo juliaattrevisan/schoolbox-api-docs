@@ -13,7 +13,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Swift_SwiftException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 /**
  * Class MailService
@@ -141,7 +141,7 @@ class MailService
                 'name'  => $user->formatName(),
                 'email' => $user->getEmail()
             ]);
-        } catch (Swift_SwiftException $e) {
+        } catch (TransportExceptionInterface $e) {
             return false;
         }
     }
@@ -245,7 +245,7 @@ class MailService
             $email->sendToBlackhole();
             // technically this email "sent"
             return true;
-        } catch (Swift_SwiftException $e) {
+        } catch (TransportExceptionInterface $e) {
             return false;
         }
     }

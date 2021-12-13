@@ -56,7 +56,6 @@
         "sabre/vobject" : "^4.4.0",
         "ezyang/htmlpurifier": "~4.13.0",
         "twig/twig": "~3.3.0",
-        "swiftmailer/swiftmailer": "^6.3.0",
         "maximebf/debugbar": "^1.17.3",
         "predis/predis": "^1.0",
         "monolog/monolog": "^2.3.5",
@@ -124,7 +123,9 @@
         "oat-sa/lib-lti1p3-deep-linking": "^4.0",
         "oat-sa/lib-lti1p3-nrps": "^7.0",
         "intelliscl/sdk": "0.2.0.4-beta",
-        "apple/apn-push": "^3.1"
+        "apple/apn-push": "^3.1",
+        "symfony/mime": "^5.4",
+        "symfony/mailer": "^5.4"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

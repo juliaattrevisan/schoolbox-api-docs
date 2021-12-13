@@ -17,7 +17,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
-use Swift_Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class Notifactory
 {
@@ -25,8 +25,8 @@ class Notifactory
     /** @var IConfigLoader */
     protected $conf;
 
-    /** @var Swift_Transport */
-    protected $swift;
+    /** @var TransportInterface */
+    protected $transport;
 
     /** @var LoggerInterface */
     protected $log;
@@ -39,7 +39,7 @@ class Notifactory
      * @param IConfigLoader $configLoader
      * @return NotifInterface
      */
-    public static function create($topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
+    public static function create(string $topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
     {
         $self = new self($configLoader);
 
@@ -48,14 +48,16 @@ class Notifactory
 
 
     /**
-     * @param IConfigLoader   $configLoader
-     * @param Swift_Transport $swift
-     * @param LoggerInterface $log
+     * Constructor
+     *
+     * @param IConfigLoader|null      $configLoader
+     * @param TransportInterface|null $transport
+     * @param LoggerInterface|null    $log
      */
-    public function __construct(IConfigLoader $configLoader = null, Swift_Transport $swift = null, LoggerInterface $log = null)
+    public function __construct(IConfigLoader $configLoader = null, TransportInterface $transport = null, LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
-        $this->setSwiftTransport($swift);
+        $this->setTransport($transport);
         $this->setLogger($log);
     }
 
@@ -64,9 +66,9 @@ class Notifactory
      * @param string $topic
      * @return NotifInterface
      */
-    public function generateNotif($topic = Notif::TOPIC_SYSTEM)
+    public function generateNotif(string $topic = Notif::TOPIC_SYSTEM)
     {
-        return new Notif($topic, $this->generateHandlerFactory());
+        return new Notif($this->generateHandlerFactory(), $topic);
     }
 
 
@@ -75,7 +77,7 @@ class Notifactory
      */
     public function generateHandlerFactory()
     {
-        return new HandlerFactory($this->conf, $this->swift, $this->log);
+        return new HandlerFactory($this->conf, $this->transport, $this->log);
     }
 
 
@@ -109,12 +111,12 @@ class Notifactory
 
 
     /**
-     * @param Swift_Transport $swift
+     * @param TransportInterface $transport
      * @return self
      */
-    public function setSwiftTransport(Swift_Transport $swift = null)
+    public function setTransport(TransportInterface $transport = null)
     {
-        $this->swift = $swift ?: Mailer::getConfiguredSwiftTransport($this->conf, true);
+        $this->transport = $transport ?: Mailer::getConfiguredTransport($this->conf, true);
         return $this;
     }
 

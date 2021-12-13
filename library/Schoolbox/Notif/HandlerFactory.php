@@ -13,17 +13,18 @@ use InvalidArgumentException;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SwiftMailerHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use RuntimeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Handler\MySQLHandler;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_RfcComplianceException;
-use Swift_Transport;
+use Schoolbox\Notif\Handler\SymfonyMailerHandler;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class HandlerFactory
 {
@@ -44,8 +45,8 @@ class HandlerFactory
     /** @var IConfigLoader */
     protected $conf;
 
-    /** @var Swift_Transport */
-    protected $swift;
+    /** @var TransportInterface */
+    protected $transport;
 
     /** @var LoggerInterface */
     protected $log;
@@ -61,15 +62,15 @@ class HandlerFactory
      * HandlerFactory constructor. Loads up a whole bunch of lazy-loaded handlers.
      * TODO: investigate putting all these handlers into DI
      *
-     * @param IConfigLoader   $conf
-     * @param Swift_Transport $swift
-     * @param LoggerInterface $log
+     * @param IConfigLoader      $conf
+     * @param TransportInterface $transport
+     * @param LoggerInterface    $log
      */
-    public function __construct(IConfigLoader $conf, Swift_Transport $swift, LoggerInterface $log)
+    public function __construct(IConfigLoader $conf, TransportInterface $transport, LoggerInterface $log)
     {
-        $this->conf       = $conf;
-        $this->swift      = $swift;
-        $this->log        = $log;
+        $this->conf      = $conf;
+        $this->transport = $transport;
+        $this->log       = $log;
 
         $this->handlerGenerators[self::SYS_FATAL_MAIL] = function () {
             return $this->createMailHandler('Schoolbox is Down', Logger::EMERGENCY);
@@ -192,9 +193,9 @@ class HandlerFactory
      * @param string|array $from
      * @param int $severity
      * @param bool $bubble
-     * @return SwiftMailerHandler
+     * @return SymfonyMailerHandler
      */
-    protected function createMailHandler($title, $severity, $bubble = true, $to = null, $from = null)
+    protected function createMailHandler($title, $severity, $bubble = true, $to = null, $from = null): SymfonyMailerHandler
     {
         $to   = $to ?: $this->conf->get('mail_support_address');
         $from = $from ?: [
@@ -202,28 +203,27 @@ class HandlerFactory
             $this->conf->get('mail_from_name')
         ];
 
-        $mail = new Swift_Message($title, null, 'text/plain', 'utf-8');
+        $mail = new Email();
+        $mail->subject($title);
 
         try {
-            $mail->setTo($to);
-        } catch (Swift_RfcComplianceException $e) {
-            $mail->setTo(self::FALLBACK_EMAIL);
+            $mail->to(new Address($to));
+        } catch (RfcComplianceException $e) {
+            $mail->to(new Address(self::FALLBACK_EMAIL));
         }
 
         try {
             if (is_array($from)) {
-                $mail->setFrom($from[0], $from[1]);
+                $mail->from(new Address($from[0], $from[1] ?? ''));
             } else {
-                $mail->setFrom($from);
+                $mail->from(new Address($from));
             }
-        } catch (Swift_RfcComplianceException $e) {
-            $mail->setFrom(self::FALLBACK_EMAIL);
+        } catch (RfcComplianceException $e) {
+            $mail->from(new Address(self::FALLBACK_EMAIL));
         }
 
-        return new SwiftMailerHandler(
-            new Swift_Mailer(
-                $this->swift
-            ),
+        return new SymfonyMailerHandler(
+            new Mailer($this->transport),
             $mail,
             $severity,
             $bubble

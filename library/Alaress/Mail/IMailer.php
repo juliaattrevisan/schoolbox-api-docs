@@ -11,7 +11,7 @@ namespace Alaress\Mail;
 
 use Schoolbox\IConfigLoader;
 use Psr\Log\LoggerInterface;
-use Swift_Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 interface IMailer
 {
@@ -19,15 +19,15 @@ interface IMailer
     /**
      * @param IConfigLoader $conf
      * @param bool $reinitialise
-     * @return Swift_Transport
+     * @return TransportInterface
      */
-    public static function getConfiguredSwiftTransport($conf, $reinitialise = false);
+    public static function getConfiguredTransport($conf, $reinitialise = false);
 
     /**
      * @param bool $reinitialise
-     * @return Swift_Transport
+     * @return TransportInterface
      */
-    public static function getSwiftTransport($reinitialise = false);
+    public static function getTransport($reinitialise = false);
 
     /**
      * @param string $emailAddresses
