@@ -16,7 +16,6 @@ class AjaxChat
 
     private $groupHandler;
     private $chatHandler;
-    private $homepageHandler;
 
     private $method;
     private $catID;

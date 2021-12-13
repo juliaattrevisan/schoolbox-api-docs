@@ -1393,6 +1393,7 @@ abstract class Kernel
                     try {
                         /** @var IConnector $databaseExternal */
                         $databaseExternal = $di->get('databaseExternal');
+                        /** @phpstan-ignore-next-line this _can_ raise this exception */
                     } catch (AlaressDatabaseException $e) {
                         $databaseExternal = null;
                     }
