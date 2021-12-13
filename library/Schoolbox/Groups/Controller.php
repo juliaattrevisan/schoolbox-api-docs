@@ -343,13 +343,13 @@ class Controller extends BaseController
     {
         switch ($type) {
             case Group::MODERATED_GROUP:
-                return 'Moderated';
+                return 'moderated';
             case Group::FREE_GROUP:
-                return 'Free';
+                return 'free';
             case Group::PRIVATE_GROUP:
-                return 'Private';
+                return 'private';
             default:
-                return 'Error';
+                return 'error';
         }
     }
 }
