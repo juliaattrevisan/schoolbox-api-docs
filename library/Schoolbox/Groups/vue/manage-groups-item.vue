@@ -25,18 +25,32 @@ export default {
     data () {
         return {
             isProcessing: false, //to disable other actions while one is already taking place
+            enrolmentStatus: null, //to respond to enrolment changes, joining and leaving group
         }
+    },
+
+    created () {
+        this.initGroupProps();    
     },
 
     computed: {
 
         /**
-         * Check if is already a member
+         * Check if the group is private
+         * 
+         * @returns { Boolean }
+         */
+        isPrivate () {
+            return this.group.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+        },
+
+        /**
+         * Check if is already a member of a non private group, so can leave if requested
          * 
          * @returns { Boolean }
          */
         isEnrolled () {
-            return this.group.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return this.group.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -45,16 +59,7 @@ export default {
          * @returns { Boolean }
          */
         isEnrolmentPending () {
-            return this.group.enrolmentStatus === enrolmentTypes.PENDING;
-        },
-
-        /**
-         * Check if the group is private
-         * 
-         * @returns { Boolean }
-         */
-        isPrivate () {
-            return this.group.type === groupTypes.PRIVATE && this.group.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return this.enrolmentStatus === enrolmentTypes.PENDING;
         },
 
         /**
@@ -63,21 +68,20 @@ export default {
          * @returns { Boolean }
          */
         isRequestToJoin () {
-           return false;
-        },
-
-        /**
-         * Check if need to request to join
-         * 
-         * @returns { Boolean }
-         */
-        canAccess () {
-           return false;
+           return this.group.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
         },
 
     },
 
     methods: {
+
+        /**
+         * Set up the properties on the group object that need to be reactive
+         * 
+         */
+        initGroupProps () {
+            this.enrolmentStatus = this.group.enrolmentStatus;
+        },
 
         /**
          * Get the image style, adding in the cover image only if available
@@ -115,8 +119,27 @@ export default {
         /**
          * 
          */
-        join () {
-            this.isEnrolled = true;
+        async join () {
+            this.isProcessing = true;
+            this.$emit('on-edit-start', 'Updating');
+            try {
+                const formData = this.getFormData();
+                formData.append('action', 'add');
+                const response = await fetch(this.endpoint, {
+                    method: 'POST',
+                    body: formData,
+                })
+                const responseData = await response.json();
+                if (!responseData.error) {
+                    this.enrolmentStatus = enrolmentTypes.ENROLLED;
+                    this.$emit('on-edit-success', 'Group joined');
+                }
+            } catch (error) {
+                console.warn(error);
+                this.$emit('on-edit-error', 'Unable to join group');
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
         /**
@@ -134,12 +157,12 @@ export default {
                 })
                 const responseData = await response.json();
                 if (!responseData.error) {
-                    this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
+                    this.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
                     this.$emit('on-edit-success', 'Group left');
                 }
             } catch (error) {
                 console.warn(error);
-                this.$emit('on-edit-error', 'Unable to update');
+                this.$emit('on-edit-error', 'Unable to leave group');
             } finally {
                 this.isProcessing = false;
             }
