@@ -26,6 +26,7 @@ export default {
         return {
             isProcessing: false, //to disable other actions while one is already taking place
             enrolmentStatus: null, //to respond to enrolment changes, joining and leaving group
+            type: null,
         }
     },
 
@@ -36,12 +37,13 @@ export default {
     computed: {
 
         /**
-         * Check if the group is private
+         * Cant leave private groups, shown so can access other features
          * 
          * @returns { Boolean }
          */
         isPrivate () {
-            return this.group.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            // return this.group.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return this.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -50,7 +52,8 @@ export default {
          * @returns { Boolean }
          */
         isEnrolled () {
-            return this.group.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            // return this.group.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return this.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -68,7 +71,8 @@ export default {
          * @returns { Boolean }
          */
         isRequestToJoin () {
-           return this.group.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
+        //    return this.group.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
+           return this.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
         },
 
     },
@@ -81,6 +85,7 @@ export default {
          */
         initGroupProps () {
             this.enrolmentStatus = this.group.enrolmentStatus;
+            this.type = this.group.type;
         },
 
         /**
@@ -117,11 +122,11 @@ export default {
         },
 
         /**
-         * 
+         * Join the group
          */
         async join () {
             this.isProcessing = true;
-            this.$emit('on-edit-start', 'Updating');
+            this.$emit('on-edit-start', 'Joining group...');
             try {
                 const formData = this.getFormData();
                 formData.append('action', 'add');
@@ -130,8 +135,10 @@ export default {
                     body: formData,
                 })
                 const responseData = await response.json();
-                if (!responseData.error) {
-                    this.enrolmentStatus = enrolmentTypes.ENROLLED;
+                if (responseData.error) {
+                    this.$emit('on-edit-error', responseData.error);
+                } else {
+                    this.enrolmentStatus = responseData.enrolmentStatus; //could be either 'enrolled' or 'pending'
                     this.$emit('on-edit-success', 'Group joined');
                 }
             } catch (error) {
@@ -147,7 +154,7 @@ export default {
          */
         async leave () {
             this.isProcessing = true;
-            this.$emit('on-edit-start', 'Updating');
+            this.$emit('on-edit-start', 'Leaving group...');
             try {
                 const formData = this.getFormData();
                 formData.append('action', 'delete');
@@ -156,7 +163,9 @@ export default {
                     body: formData,
                 })
                 const responseData = await response.json();
-                if (!responseData.error) {
+                if (responseData.error) {
+                    this.$emit('on-edit-error', responseData.error);
+                } else {
                     this.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
                     this.$emit('on-edit-success', 'Group left');
                 }
@@ -217,28 +226,28 @@ export default {
                 </a>
                 <transition name="fade" mode="out-in">
                     <button v-if="isPrivate" class="button expand disabled" key="private" disabled>Private</button>
-                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`"key="leave" @click="leave">Leave</button>
+                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave">Leave</button>
                     <button v-else-if="isEnrolmentPending" class="button expand disabled" key="membershipPending" disabled>Membership pending</button>
-                    <button v-else-if="isRequestToJoin" class="button expand icon-add" :title="`Request to join ${group.name}`" key="requestToJoin" @click="requestToJoin">Request to join</button>
+                    <button v-else-if="isRequestToJoin" class="button expand icon-add" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
                     <button v-else class="button expand icon-add" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
                 </transition>
                 <div class="card-content classes groups actions-small-1">
                     <div class="list-item">
-                        <h3><a :href="`/homepage/${group.id}`" :title="group.name">{{ group.name }}</a></h3>
+                        <h3><a :href="`/homepage/${group.id}`" :title="`Visit ${group.name}`">{{ group.name }}</a></h3>
                     </div>
                     <template v-if="group.isAccessWrite || group.isAccessAdmin">
                         <nav>
-                            <a href="#view-actions" class="icon-more" :data-dropdown="`class-options${ group.id }`" aria-expanded="false" title="Actions"></a>
+                            <a href="#view-actions" class="icon-more" :data-dropdown="`class-options${ group.id }`" aria-expanded="false" title="View actions"></a>
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" :id="`class-options${ group.id }`">
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">
-                                <a href="#" class="icon-modify">Modify Folder</a>
+                                <a :href="group.modifyLink" class="icon-modify" title="Modify Folder">Modify Folder</a>
                             </li>
                             <li v-if="group.isAccessWrite || group.isAccessAdmin">
-                                <a :href="`/statistics/homepage/${group.id}`" class="icon-report">View Statistics</a>
+                                <a :href="`/statistics/homepage/${group.id}`" class="icon-report" title="View Statistics">View Statistics</a>
                             </li>
                             <li v-if="group.isAccessAdmin">
-                                <a :href="`/group/modify/${group.id}`" class="icon-group">Modify Group</a>
+                                <a :href="`/group/modify/${group.id}`" class="icon-group" title="Modify Group">Modify Group</a>
                             </li>
                         </ul>
                     </template>
