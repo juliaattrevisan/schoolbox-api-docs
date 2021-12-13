@@ -332,7 +332,7 @@ class Controller extends BaseController
                 return 'pending';
             case UserAccess::ACCESS_DENY:
             default:
-                return 'not Enrolled';
+                return 'notEnrolled';
         }
     }
 
