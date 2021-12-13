@@ -251,16 +251,8 @@ class HomePageCest
 
 
     /**
-     * Set up text component on homepage using curl requests. Sets up a text component, creates text in it, deletes it.
-     *
-     * Fires off create homepage.
-     *
-     * ** Needs a complete rework.
-     *  Text box creation has changed to a completely different path, it uses a POST request to initialise the component
-     *  It uses then a get request to push the component change for the title when adding the initial title
-     *  Lastly it then has a sepperate request to modify to add the body text going to a new textbox inpoint.
-     *
-     * @incomplete
+     * Set up text component on homepage using curl requests.
+     * Sets up a text box component, creates text in it, modifies it, deletes it.
      * @param IntegrationTester $i
      */
     public function setUpTextComponent(IntegrationTester $i): void
@@ -277,6 +269,7 @@ class HomePageCest
         $i->seeResponseCodeIs(303);
         $homePage = $i->grabFirstFolderByTitle($homepage_title);
 
+        //adding a text box and checking status 200
         #WHEN
         $textboxComponentDefinition = $i->grabComponentDefinitionByClass(TextboxComponent::class);
         $textComponentPayload = new Payload\Homepage\Component\Config($homePage->getId());
@@ -300,9 +293,10 @@ class HomePageCest
         #THEN
         $i->seeResponseCodeIs(200);
 
+        //adding a heading and body into the text box (post trait)
         #WHEN
         $heading = 'Text Component Test Create Text at ' . $timestamp;
-        $text    = '<p>This text has been created</p>';
+        $text    = 'This text has been created';
         $textBoxPayload = new Payload\Homepage\Component\TextBoxCreate($homePage->getId(), $created_component_id);
         $textBoxPayload->setHeading($heading);
         $textBoxPayload->setBody($text);
@@ -312,10 +306,25 @@ class HomePageCest
         #THEN
         $i->seeResponseCodeIs(200);
 
+        //getting the folder id for the text box created above to get it updated in the next test
+        $json_reply = json_decode($i->grabResponse(), true);
+        $createdFolderId = ($json_reply['id']);
+        var_dump($json_reply);
+
+        //modifying the textbox heading and body (put trait)
+        $heading = 'Getting this title updated at ' . $timestamp;
+        $text    = 'Body text updated at' . $timestamp;
+        $textBoxModifyPayload = new Payload\Homepage\Component\TextBoxModify($homePage->getId(), $createdFolderId);
+        $textBoxModifyPayload->setHeading($heading);
+        $textBoxModifyPayload->setBody($text);
+        $i->amGoingTo('Update the text on the text box heading and body #' . $homePage->getId());
+        $i->sendRequest($textBoxModifyPayload);
+
+        //adding a text box to be deleted
         #WHEN
         $textComponentPayload = new Payload\Homepage\Component\Config($homePage->getId());
         $textComponentPayload->setFormParam('add', $textboxComponentDefinition->getId());
-        $i->amGoingTo('Add text component to homepage #' . $homePage->getId());
+        $i->amGoingTo('Add text component to homepage to be deleted #' . $homePage->getId());
         $i->sendRequest($textComponentPayload);
 
         preg_match($capture_new_component_id, $i->grabResponse(), $secondTextboxMatches);
@@ -326,24 +335,26 @@ class HomePageCest
         $i->amGoingTo('send request drop component #' . $deleted_component_id . ' onto homepage #' . $homePage->getId());
         $i->sendRequest($textComponentPayload);
 
+        #THEN
         $i->seeResponseCodeIs(200);
 
+        //creating a heading and body into the text box (post trait)
         $heading = 'Text Component Test Deleted Text at ' . $timestamp;
-        $text    = '<p>This text has been deleted</p>';
+        $text    = 'This text has been deleted';
         $textBoxPayload = new Payload\Homepage\Component\TextBoxCreate($homePage->getId(), $deleted_component_id);
         $textBoxPayload->setHeading($heading);
         $textBoxPayload->setBody($text);
         $i->amGoingTo('send request create text on component #' . $created_component_id . ' on homepage #' . $homePage->getId());
         $i->sendRequest($textBoxPayload);
-        $i->seeResponseCodeIs(302);
+        $i->seeResponseCodeIs(200);
 
 
+        //deleting the text box and checking response is 200
         $textBox = $i->grabTextBoxByHeading($heading);
-        $textBoxDelete = new Payload\Homepage\Component\TextboxDelete($homePage->getId(), $textBox->getId());
+        $textBoxDelete = new Payload\Homepage\Component\TextBoxDelete($homePage->getId(), $textBox->getId());
         $i->amGoingTo('send request delete text box content on homepage #' . $homePage->getId());
         $i->sendRequest($textBoxDelete);
-        $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', "/homepage/{$homePage->getId()}");
+        $i->seeResponseCodeIs(200);
 
         $i->sendGET("https://vagrant.dev.schoolbox.cloud/homepage/{$homePage->getId()}");
         $i->seeResponseCodeIs(200);
