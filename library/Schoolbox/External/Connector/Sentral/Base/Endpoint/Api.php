@@ -209,7 +209,7 @@ class Api implements IApi
                  * Occurs when you try access someone's timetable, but they don't have one in sentral
                  * That also stupidly comes out as a 404 in an error struct
                  *
-                 * "Staff member was found but has no registered timeview information."
+                 * "Staff member was found but has no registered timeview information"
                  * "Missing timeview student information for the given student"
                  */
                 if (strpos($decoded['errors'][0]['detail'], ' timeview ') > -1) {
@@ -243,7 +243,7 @@ class Api implements IApi
                     'Sentral Endpoint error at endpoint %s: %s',
                     $endpoint,
                     "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
-                ), 422);
+                ), 400);
             }
 
             return $decoded;
