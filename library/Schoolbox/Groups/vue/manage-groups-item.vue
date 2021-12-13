@@ -6,7 +6,7 @@
  */
 
 import enrolmentTypes from './mangeGroupsEnrolmentTypes';
-import groupTypes from './mangeGroupsGroupTypes';
+import groupTypes from './manageGroupsGroupTypes';
 
 
 export default {
@@ -46,6 +46,15 @@ export default {
          */
         isEnrolmentPending () {
             return this.group.enrolmentStatus === enrolmentTypes.PENDING;
+        },
+
+        /**
+         * Check if the group is private
+         * 
+         * @returns { Boolean }
+         */
+        isPrivate () {
+            return this.group.type === groupTypes.PRIVATE && this.group.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -115,7 +124,7 @@ export default {
          */
         async leave () {
             this.isProcessing = true;
-            // this.$refs.toast.activate('Updating...');
+            this.$emit('on-edit-start', 'Updating');
             try {
                 const formData = this.getFormData();
                 formData.append('action', 'delete');
@@ -126,11 +135,11 @@ export default {
                 const responseData = await response.json();
                 if (!responseData.error) {
                     this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
-                    // this.$refs.toast.timeout('Group left', true, 2000);
+                    this.$emit('on-edit-success', 'Group left');
                 }
             } catch (error) {
                 console.warn(error);
-                // this.$refs.toast.timeout('Unable to update', false, 3000);
+                this.$emit('on-edit-error', 'Unable to update');
             } finally {
                 this.isProcessing = false;
             }
@@ -184,37 +193,11 @@ export default {
                     </div>
                 </a>
                 <transition name="fade" mode="out-in">
-                    <button 
-                        v-if="isEnrolled"
-                        class="button expand icon-logout alert" 
-                        :title="`Leave ${group.name}`"
-                        key="leave" 
-                        @click="leave">
-                        Leave
-                    </button>
-                    <button 
-                        v-else-if="isEnrolmentPending"
-                        class="button expand disabled" 
-                        key="membershipPending" 
-                        disabled>
-                        Membership pending
-                    </button>
-                    <button 
-                        v-else-if="isRequestToJoin"
-                        class="button expand icon-add" 
-                        :title="`Request to join ${group.name}`" 
-                        key="requestToJoin" 
-                        @click="requestToJoin">
-                        Request to join
-                    </button>
-                    <button 
-                        v-else
-                        class="button expand icon-add" 
-                        :title="`Join ${group.name}`" 
-                        key="join" 
-                        @click="join">
-                        Join
-                    </button>
+                    <button v-if="isPrivate" class="button expand disabled" key="private" disabled>Private</button>
+                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`"key="leave" @click="leave">Leave</button>
+                    <button v-else-if="isEnrolmentPending" class="button expand disabled" key="membershipPending" disabled>Membership pending</button>
+                    <button v-else-if="isRequestToJoin" class="button expand icon-add" :title="`Request to join ${group.name}`" key="requestToJoin" @click="requestToJoin">Request to join</button>
+                    <button v-else class="button expand icon-add" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
                 </transition>
                 <div class="card-content classes groups actions-small-1">
                     <div class="list-item">

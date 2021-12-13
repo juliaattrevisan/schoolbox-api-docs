@@ -43,6 +43,38 @@ export default {
 
     mounted () {
         
+
+    },
+
+    methods: { 
+
+        /**
+         * 
+         * 
+         * @param { String }
+         */
+        onGroupEditStart (text) {
+            this.$refs.toast.activate(text);
+        },
+
+        /**
+         * 
+         * 
+         * @param { String }
+         */
+        onGroupEditSuccess (text) {
+            this.$refs.toast.timeout(text, true, 3000);
+        },
+
+        /**
+         * 
+         * 
+         * @param { String }
+         */
+        onGroupEditError () {
+            this.$refs.toast.timeout(text, false, 3000);
+        },
+
     },
 
 }
@@ -58,6 +90,9 @@ export default {
                 :key="group.id" 
                 :endpoint="endpoint"
                 :group="group"
+                @on-edit-start="onGroupEditStart"
+                @on-edit-success="onGroupEditSuccess"
+                @on-edit-error="onGroupEditError"
             />
         </div>
         <toast ref="toast"></toast>
