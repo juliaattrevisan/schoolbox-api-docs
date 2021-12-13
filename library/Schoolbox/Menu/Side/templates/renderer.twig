@@ -48,20 +48,18 @@
                 {% endif %}
 
             {% elseif section.section == 'groups' and section.visible %}
-                {% if groups | length > 0 %}
-                    <li id="side-menu-mygroups">
-                        <h3><a href="{{ routeLookup('folder.getGroups') }}">{{ section.title }}</a></h3>
-                        <div class="nav-wrapper">
-                            <ul class="off-canvas-list">
-                                {% for group in groups %}
-                                    <li>
-                                        <a href="/homepage/{{ group.sid }}/">{{ group.name }}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </li>
-                {% endif %}
+                <li id="side-menu-mygroups" {% if groups | length == 0 %}class="hide"{% endif %}>
+                    <h3><a href="{{ routeLookup('folder.getGroups') }}">{{ section.title }}</a></h3>
+                    <div class="nav-wrapper">
+                        <ul class="off-canvas-list">
+                            {% for group in groups %}
+                                <li>
+                                    <a href="/homepage/{{ group.sid }}/">{{ group.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
 
             {% elseif section.section == 'bookmarks' and section.visible %}
                 <li id="side-menu-mylinks">

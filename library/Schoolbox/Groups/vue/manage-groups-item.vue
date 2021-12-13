@@ -7,6 +7,7 @@
 
 import enrolmentTypes from './mangeGroupsEnrolmentTypes';
 import groupTypes from './manageGroupsGroupTypes';
+import { addGroupToSideMenu, removeGroupFromSideMenu } from '../js/modifyGroupSideMenu';
 
 
 export default {
@@ -26,8 +27,8 @@ export default {
         return {
             isProcessing: false, //to disable other actions while one is already taking place
             enrolmentStatus: null, //to respond to enrolment changes, joining and leaving group
-            isFavourite: null, //
-            isNotificationsOn: null, //
+            isFavourite: null, //to show whether the group is a favourite or not
+            isNotificationsOn: null, //to show whether notifications is turned or not
         }
     },
 
@@ -192,6 +193,7 @@ export default {
                 } else {
                     this.isFavourite = responseData.isFavourite;
                     this.$emit('on-edit-success', 'Added to favourites');
+                    addGroupToSideMenu(this.group.name, `/homepage/${this.group.id}/`);
                 }
             } catch (error) {
                 console.warn(error);
@@ -217,6 +219,7 @@ export default {
                 } else {
                     this.isFavourite = responseData.isFavourite;
                     this.$emit('on-edit-success', 'Removed from favourites');
+                    removeGroupFromSideMenu(this.group.id);
                 }
             } catch (error) {
                 console.warn(error);
