@@ -114,7 +114,7 @@ class User extends SchoolboxUser
      *
      * @param array $userAccessRemove
      */
-    public function setUserAccessRemove(array$userAccessRemove): void
+    public function setUserAccessRemove(array $userAccessRemove): void
     {
         /* Add it to the list of things to process later
          */
