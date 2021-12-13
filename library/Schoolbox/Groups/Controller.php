@@ -140,7 +140,7 @@ class Controller extends BaseController
                 'coverImageHash'    => $imageHash,
                 'isNotificationsOn' => $follow,
                 'isFavourite'       => $isFavourite,
-                'type'              => $group->getType(),
+                'type'              => $this->getGroupType($group->getType()),
                 'isAccessAdmin'     => ($access === UserAccess::ACCESS_FULL),
                 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
                 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
@@ -251,9 +251,10 @@ class Controller extends BaseController
             }
             $accessMapper->delete($userGroup);
             return $this->getResponse()->content->set($this->buildJsonOutput([
-                'group'     => $post['group'],
-                'user'      => $user->getId(),
-                'action'    => 'delete'
+                'user'              => $user->getId(),
+                'group'             => $post['group'],
+                'action'            => 'delete',
+                'enrolmentStatus'   => $this->getEnrollmentText(UserAccess::ACCESS_DENY),
             ]));
         }
 
@@ -332,6 +333,23 @@ class Controller extends BaseController
             case UserAccess::ACCESS_DENY:
             default:
                 return 'not Enrolled';
+        }
+    }
+
+    /**
+     * get the text representaion of the group type (public, private, moderated)
+     */
+    protected function getGroupType(int $type): string
+    {
+        switch ($type) {
+            case Group::MODERATED_GROUP:
+                return 'Moderated';
+            case Group::FREE_GROUP:
+                return 'Free';
+            case Group::PRIVATE_GROUP:
+                return 'Private';
+            default:
+                return 'Error';
         }
     }
 }
