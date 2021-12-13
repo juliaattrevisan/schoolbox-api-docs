@@ -1085,7 +1085,7 @@ class Controller extends Base
             $record->setSubType($subtype);
 
             // If severity was deleted, allow it to be saved only when it's not changed.
-            if ($severity && $severity->isDeleted() && ($record->getSeverity()->getId() !== $severity->getId())) {
+            if ($severity && $severity->isDeleted() && (!$record->getSeverity() || $record->getSeverity()->getId() !== $severity->getId())) {
                 $db->rollback();
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
