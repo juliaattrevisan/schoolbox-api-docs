@@ -234,7 +234,7 @@ class Specification
                         $monday = date('Y-m-d', strtotime('monday this week'));
                         $friday = date('Y-m-d', strtotime('friday this week'));
 
-                        $students = $this->api->retrieveDocument("enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=10");
+                        $students = $this->api->retrieveDocument("enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=1");
 
                         /* Guess a 10-person payload
                          * Try to find someone with a timetable; sentral refers to this as a "timeview information"
@@ -243,8 +243,19 @@ class Specification
                             try {
                                 $this->api->retrieveDocument("timetables/student/{$student['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
                                 break;
-                            } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                            } catch (\InvalidArgumentException $e) {
+                                $errorMessage = $e->getMessage();
+                                $result = false;
+                            } catch (\DomainException $e) {
+                                /* The current person might not have a timeview (a  timetable)
+                                 * but the api endpoint is still there; that's still a success
+                                 */
                                 continue;
+                            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                                /* Couldn't communicate to the endpoint
+                                 */
+                                $errorMessage = $e->getMessage();
+                                $result = false;
                             }
                         }
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
@@ -268,7 +279,7 @@ class Specification
                         $monday = date('Y-m-d', strtotime('monday this week'));
                         $friday = date('Y-m-d', strtotime('friday this week'));
 
-                        $staffs = $this->api->retrieveDocument('enrolments/staff?include=person,qualifications,employments&limit=10');
+                        $staffs = $this->api->retrieveDocument('enrolments/staff?include=person,qualifications,employments&limit=1');
 
                         /* Guess a 10-person payload
                          * Try to find someone with a timetable; sentral refers to this as a "registered timeview information"
@@ -278,8 +289,19 @@ class Specification
                             try {
                                 $this->api->retrieveDocument("timetables/staff/{$staff['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
                                 break;
-                            } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
+                            } catch (\InvalidArgumentException $e) {
+                                $errorMessage = $e->getMessage();
+                                $result = false;
+                            } catch (\DomainException $e) {
+                                /* The current person might not have a timeview (a  timetable)
+                                 * but the api endpoint is still there; that's still a success
+                                 */
                                 continue;
+                            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                                /* Couldn't communicate to the endpoint
+                                 */
+                                $errorMessage = $e->getMessage();
+                                $result = false;
                             }
                         }
                     } catch (\InvalidArgumentException | \GuzzleHttp\Exception\GuzzleException $e) {
