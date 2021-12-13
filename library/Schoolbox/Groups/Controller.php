@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Groups;
 
+use Alaress\Color\Color;
+use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\GenericCollection;
@@ -26,6 +28,7 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\RoleMapper;
+use Timetable_ColourMapper;
 
 use function in_array;
 
@@ -49,6 +52,13 @@ class Controller extends BaseController
 
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
+
+        //colours for groups with no colours
+        /* Get Timetable colours to use as random colours for null set folders */
+        $colourList = Timetable_ColourMapper::getInstance()->findAll();
+        $colourIndex = 0;
+        $colourFactory = new ColorFactory();
+        $colourCache   = new GenericCollection(Color::class);
 
         //get list of all possible groups
         $groups = $groupMapper->findByColumn('type', [Group::FREE_GROUP, Group::MODERATED_GROUP]);
@@ -103,9 +113,14 @@ class Controller extends BaseController
             if ($folder->getCoverImage()) {
                 $imageHash = $folder->getCoverImage()->getHash();
             }
-            $colourHex  = null;
-            if ($folder->getColour()) {
-                $colourHex = $folder->getColour()->getAsHex();
+            if (!$folder->getColour()) {
+                /* Apply colour from list if no colour exists */
+                $hexColour = $colourList[$colourIndex]->getHexColour();
+                if (!$colourCache->offsetExists($hexColour)) {
+                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
+                }
+                $folder->setColour($colourCache->getOffset($hexColour));
+                $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
             //get access
             $access = $accessHelper->getFolderAccess($this->getUser(), $folder->getId()) ?: null;
@@ -121,7 +136,7 @@ class Controller extends BaseController
                 'id'                => $folderId,
                 'name'              => $group->getFolder()->getName(),
                 'enrolmentStatus'   => $this->getEnrollmentText($enrollment),
-                'colour'            => $colourHex,
+                'colour'            => $folder->getColour()->getAsHex(),
                 'coverImageHash'    => $imageHash,
                 'isNotificationsOn' => $follow,
                 'isFavourite'       => $isFavourite,
