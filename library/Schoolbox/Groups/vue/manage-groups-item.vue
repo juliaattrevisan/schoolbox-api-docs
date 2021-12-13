@@ -26,7 +26,8 @@ export default {
         return {
             isProcessing: false, //to disable other actions while one is already taking place
             enrolmentStatus: null, //to respond to enrolment changes, joining and leaving group
-            type: null,
+            isFavourite: null, //
+            isNotificationsOn: null, //
         }
     },
 
@@ -42,8 +43,7 @@ export default {
          * @returns { Boolean }
          */
         isPrivate () {
-            // return this.group.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
-            return this.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return this.group.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -52,8 +52,7 @@ export default {
          * @returns { Boolean }
          */
         isEnrolled () {
-            // return this.group.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
-            return this.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return this.group.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -71,8 +70,7 @@ export default {
          * @returns { Boolean }
          */
         isRequestToJoin () {
-        //    return this.group.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
-           return this.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
+            return this.group.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
         },
 
     },
@@ -81,11 +79,11 @@ export default {
 
         /**
          * Set up the properties on the group object that need to be reactive
-         * 
          */
         initGroupProps () {
             this.enrolmentStatus = this.group.enrolmentStatus;
-            this.type = this.group.type;
+            this.isFavourite = this.group.isFavourite;
+            this.isNotificationsOn = this.group.isNotificationsOn;
         },
 
         /**
@@ -178,31 +176,119 @@ export default {
         },
 
         /**
-         * 
+         * Add to the users favourite list
          */
-        addToFavourites () {
-            
+        async addToFavourites () {
+            this.isProcessing = true;
+            this.$emit('on-edit-start', 'Adding to favourites...');
+            try {
+                const formData = this.getFormData();
+                formData.append('action', 'edit');
+                formData.append('isFavourite', '1');
+                const response = await fetch(this.endpoint, {
+                    method: 'POST',
+                    body: formData,
+                })
+                const responseData = await response.json();
+                if (responseData.error) {
+                    this.$emit('on-edit-error', responseData.error);
+                } else {
+                    this.isFavourite = responseData.isFavourite;
+                    this.$emit('on-edit-success', 'Added to favourites');
+                }
+            } catch (error) {
+                console.warn(error);
+                this.$emit('on-edit-error', 'Unable to add to favourites');
+            } finally {
+                this.isProcessing = false;
+            }
+        },
+
+        /**
+         * Remove from the users favourite list
+         */
+        async removeFromFavourites () {
+            this.isProcessing = true;
+            this.$emit('on-edit-start', 'Removing from favourites...');
+            try {
+                const formData = this.getFormData();
+                formData.append('action', 'edit');
+                formData.append('isFavourite', '0');
+                const response = await fetch(this.endpoint, {
+                    method: 'POST',
+                    body: formData,
+                })
+                const responseData = await response.json();
+                if (responseData.error) {
+                    this.$emit('on-edit-error', responseData.error);
+                } else {
+                    this.isFavourite = responseData.isFavourite;
+                    this.$emit('on-edit-success', 'Removed from favourites');
+                }
+            } catch (error) {
+                console.warn(error);
+                this.$emit('on-edit-error', 'Unable to remove from favourites');
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
         /**
          * 
          */
-        removeFromFavourites () {
-            
+        async addToNotifications () {
+            this.isProcessing = true;
+            this.$emit('on-edit-start', 'Adding to notifications...');
+            try {
+                const formData = this.getFormData();
+                formData.append('action', 'edit');
+                formData.append('isNotificationsOn', '1');
+                const response = await fetch(this.endpoint, {
+                    method: 'POST',
+                    body: formData,
+                })
+                const responseData = await response.json();
+                if (responseData.error) {
+                    this.$emit('on-edit-error', responseData.error);
+                } else {
+                    this.isFavourite = responseData.isFavourite;
+                    this.$emit('on-edit-success', 'Added to notifications');
+                }
+            } catch (error) {
+                console.warn(error);
+                this.$emit('on-edit-error', 'Unable to add to notifications');
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
         /**
          * 
          */
-        notify () {
-            
-        },
-
-        /**
-         * 
-         */
-        unNotify () {
-            
+        async removeFromNotifications () {
+            this.isProcessing = true;
+            this.$emit('on-edit-start', 'Adding to notifications...');
+            try {
+                const formData = this.getFormData();
+                formData.append('action', 'edit');
+                formData.append('isNotificationsOn', '0');
+                const response = await fetch(this.endpoint, {
+                    method: 'POST',
+                    body: formData,
+                })
+                const responseData = await response.json();
+                if (responseData.error) {
+                    this.$emit('on-edit-error', responseData.error);
+                } else {
+                    this.isFavourite = responseData.isFavourite;
+                    this.$emit('on-edit-success', 'Added to notifications');
+                }
+            } catch (error) {
+                console.warn(error);
+                this.$emit('on-edit-error', 'Unable to add to notifications');
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
     }
@@ -215,21 +301,21 @@ export default {
     <div class="small-12 medium-6 large-4 xlarge-3 island">
         <section>
             <div class="v-card small-12">
-                <a class="group-image-link" :href="`/homepage/${group.id }`">
+                <div class="group-image-container">
                     <div class="card-class-image" :style="getImageStyles()"></div>
                     <div class="group-actions">
-                        <button class="group-action icon-favourite" title="Add to Favourites" @click="addToFavourites">Add to Favourites</button>
-                        <button class="group-action icon-favourite-hollow" title="Remove from Favourites" @click="removeFromFavourites">Remove from Favourites</button>
-                        <button class="group-action icon-notifications" title="Turn Group Notifications On" @click="removeFromFavourites">Turn Group Notifications On</button>
-                        <button class="group-action icon-notifications-hollow" title="Turn Group Notifications Off" @click="removeFromFavourites">Turn Group Notifications Off</button>
+                        <button v-if="isFavourite" class="group-action icon-favourite" title="Remove from Favourites" key="remove-favourite" @click="removeFromFavourites">Remove from Favourites</button>
+                        <button v-else class="group-action icon-favourite-hollow" title="Add to Favourites" key="add-favourite" @click="addToFavourites">Add to Favourites</button>
+                        <button v-if="isNotificationsOn" class="group-action icon-notifications" title="Remove from Notifications" key="remove-notification" @click="removeFromNotifications">Remove from Notifications</button>
+                        <button class="group-action icon-notifications-hollow" title="Add to Notifications" key="add-notification" @click="addToNotifications">Add to Notifications</button>
                     </div>
-                </a>
+                </div>
                 <transition name="fade" mode="out-in">
-                    <button v-if="isPrivate" class="button expand disabled" key="private" disabled>Private</button>
+                    <button v-if="isPrivate" class="button expand private disabled" key="private" disabled>Private</button>
                     <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave">Leave</button>
-                    <button v-else-if="isEnrolmentPending" class="button expand disabled" key="membershipPending" disabled>Membership pending</button>
-                    <button v-else-if="isRequestToJoin" class="button expand icon-add" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
-                    <button v-else class="button expand icon-add" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
+                    <button v-else-if="isEnrolmentPending" class="button expand submit disabled" key="membershipPending" disabled>Membership pending</button>
+                    <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
+                    <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
                 </transition>
                 <div class="card-content classes groups actions-small-1">
                     <div class="list-item">
@@ -259,20 +345,15 @@ export default {
 
 <style lang="scss" scoped>
 
-.group-image-link {
-    display: block;
+.group-image-container {
     position: relative;
 }
 
-.group-actions {
+.group-actions { //to put them in the top right corner
     display: inline-block;
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
-}
-
-.button {
-    padding: 1rem; //add extra padding
 }
 
 .group-action {
@@ -287,8 +368,18 @@ export default {
     }
 }
 
+.button {
+    display: inline-block;
+    padding: 1rem; //add extra padding
+}
+
+.private {
+    background: #DDDDDD;
+    color: #5e5e5e;
+}
+
 .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.3s;
+    transition: opacity 0.2s;
 }
 .fade-enter, .fade-leave-to {
     opacity: 0;
