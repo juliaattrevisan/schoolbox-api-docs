@@ -223,9 +223,11 @@ abstract class Evaluation_Question extends DeprecatedModel
     /**
      * Reorder questions via jquery sortable
      *
+     * @param int $quizId
+     * @param int $sectionId
      * @param array $allIds
      */
-    public function reorderQuestions(array $allIds): void
+    public function reorderQuestions(int $quizId, int $sectionId, array $allIds): void
     {
         if (is_array($allIds) && count($allIds)) {
             $sequence = 1;
@@ -243,8 +245,9 @@ abstract class Evaluation_Question extends DeprecatedModel
 
                 $this->db->query("
                     UPDATE {$this->_table}
-                    SET sequence = {$sequence}
-                    WHERE question_id = {$currentId}
+                    JOIN assess_section on assess_section.section_id = {$this->_table}.section_id
+                    SET {$this->_table}.sequence = {$sequence}
+                    WHERE question_id = {$currentId} AND {$this->_table}.section_id = {$sectionId} AND assess_id = {$quizId}
                 ");
 
                 $sequence++;

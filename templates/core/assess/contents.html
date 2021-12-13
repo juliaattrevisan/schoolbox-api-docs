@@ -22,7 +22,9 @@
             handle: '.grip',
             axis: 'y',
             stop: function () {
-                let allQuestions = $(this).children('li'), data = [];
+                let allQuestions = $(this).children('li'),
+                        sectionId = $(this).attr('data-section-id'),
+                        data = [];
 
                 $.each(allQuestions, function (index, element) {
                     data.push($(element).attr('data-question-id'));
@@ -30,7 +32,7 @@
 
                 /* Reorder questions upon reorder completion
                  */
-                $.post('/{ASSESS_KIND_LC}/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data}, function () {
+                $.post('/{ASSESS_KIND_LC}/reorderQuestions/{ASSESS_ASSESS_ID}', {ids: data, sectionId: sectionId}, function () {
                     let sequence = 1;
 
                     allQuestions.each(function (index, element) {
@@ -81,7 +83,7 @@
 <!-- END empty_description -->
 
 <section>
-    <ul class="action-list sortable-card" id="section{SECTION_SECTION_ID}" data-question-list>
+    <ul class="action-list sortable-card" id="section{SECTION_SECTION_ID}" data-section-id="{SECTION_SECTION_ID}" data-question-list>
         <!-- BEGIN question -->
         <li class="actions-small-3" id="question_{QUESTION_QUESTION_ID}" data-question-id="{QUESTION_QUESTION_ID}">
             <div>
