@@ -109,14 +109,23 @@ export default {
         },
 
         /**
-         * The default data to pass through
+         * A simple wrapper to handle the shared post request behaviour
          * 
-         * @returns { FormData }
+         * @param { Object }
+         * 
+         * @returns { Object }
          */
-        getFormData () {
+        async getResponseData (appendList) {
             const formData = new FormData();
             formData.append('group', this.group.id);
-            return formData;
+            for (const [key, value] of Object.entries(appendList)) {
+                formData.append(`${key}`, `${value}`);
+            }
+            const response = await fetch(this.endpoint, {
+                method: 'POST',
+                body: formData,
+            })
+            return await response.json();
         },
 
         /**
@@ -126,13 +135,9 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Joining group...');
             try {
-                const formData = this.getFormData();
-                formData.append('action', 'add');
-                const response = await fetch(this.endpoint, {
-                    method: 'POST',
-                    body: formData,
-                })
-                const responseData = await response.json();
+                const responseData = await this.getResponseData({
+                    action: 'add'
+                });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -154,13 +159,9 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Leaving group...');
             try {
-                const formData = this.getFormData();
-                formData.append('action', 'delete');
-                const response = await fetch(this.endpoint, {
-                    method: 'POST',
-                    body: formData,
-                })
-                const responseData = await response.json();
+                const responseData = await this.getResponseData({
+                    action: 'delete'
+                });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -182,14 +183,10 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Adding to favourites...');
             try {
-                const formData = this.getFormData();
-                formData.append('action', 'edit');
-                formData.append('isFavourite', '1');
-                const response = await fetch(this.endpoint, {
-                    method: 'POST',
-                    body: formData,
-                })
-                const responseData = await response.json();
+                const responseData = await this.getResponseData({
+                    action: 'edit',
+                    isFavourite: '1'
+                });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -211,14 +208,10 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Removing from favourites...');
             try {
-                const formData = this.getFormData();
-                formData.append('action', 'edit');
-                formData.append('isFavourite', '0');
-                const response = await fetch(this.endpoint, {
-                    method: 'POST',
-                    body: formData,
-                })
-                const responseData = await response.json();
+                const responseData = await this.getResponseData({
+                    action: 'edit',
+                    isFavourite: '0'
+                });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -234,24 +227,20 @@ export default {
         },
 
         /**
-         * 
+         * Add to the users notifications list
          */
         async addToNotifications () {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Adding to notifications...');
             try {
-                const formData = this.getFormData();
-                formData.append('action', 'edit');
-                formData.append('isNotificationsOn', '1');
-                const response = await fetch(this.endpoint, {
-                    method: 'POST',
-                    body: formData,
-                })
-                const responseData = await response.json();
+                const responseData = await this.getResponseData({
+                    action: 'edit',
+                    isNotificationsOn: '1'
+                });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.isFavourite = responseData.isFavourite;
+                    this.isNotificationsOn = responseData.isNotificationsOn;
                     this.$emit('on-edit-success', 'Added to notifications');
                 }
             } catch (error) {
@@ -263,29 +252,25 @@ export default {
         },
 
         /**
-         * 
+         * Remove from the users notifications list
          */
         async removeFromNotifications () {
             this.isProcessing = true;
-            this.$emit('on-edit-start', 'Adding to notifications...');
+            this.$emit('on-edit-start', 'Remove from notifications...');
             try {
-                const formData = this.getFormData();
-                formData.append('action', 'edit');
-                formData.append('isNotificationsOn', '0');
-                const response = await fetch(this.endpoint, {
-                    method: 'POST',
-                    body: formData,
-                })
-                const responseData = await response.json();
+                const responseData = await this.getResponseData({
+                    action: 'edit',
+                    isNotificationsOn: '0'
+                });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.isFavourite = responseData.isFavourite;
-                    this.$emit('on-edit-success', 'Added to notifications');
+                    this.isNotificationsOn = responseData.isNotificationsOn;
+                    this.$emit('on-edit-success', 'Removed from notifications');
                 }
             } catch (error) {
                 console.warn(error);
-                this.$emit('on-edit-error', 'Unable to add to notifications');
+                this.$emit('on-edit-error', 'Unable to remove from notifications');
             } finally {
                 this.isProcessing = false;
             }
