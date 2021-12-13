@@ -181,8 +181,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]
         );
 
-        if ($_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']) {
-            $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => $_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']]);
+        if ($this->request->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH')) {
+            $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => $this->request->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH')]);
         }
         $this->redirect($defaultUrl);
     }

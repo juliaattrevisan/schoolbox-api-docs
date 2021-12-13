@@ -21,6 +21,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
@@ -194,7 +195,7 @@ class ListController extends Web\Controller\Base
         /* Check whether SEB was required
          */
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
-            $this->getRequest()->server->getArrayCopy(),
+            $this->request->server->getArrayCopy(),
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
              */
@@ -203,9 +204,10 @@ class ListController extends Web\Controller\Base
              */
             (new SebPayload(
                 $this->getConfigLoader(),
-                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->request->server->get('HTTP_HOST'),
                 $this->router
-            ))->generateConfigKey($assessment, $this->getUser())
+            ))->generateConfigKey($assessment, $this->getUser()),
+            $this->request->query->get(Payload::SEB_KEY)
         );
     }
 

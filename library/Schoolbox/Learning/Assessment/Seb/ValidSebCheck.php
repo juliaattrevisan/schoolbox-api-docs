@@ -21,20 +21,22 @@ class ValidSebCheck
      * it checks whether the $_SERVER superglobal contains the two headers
      * that SEB Safe Exam Browser expects to find.
      *
-     * @param array  $serverSuperglobal
-     * @param string $browserExamKey
-     * @param string $configKey
+     * @param array       $serverSuperglobal
+     * @param string      $browserExamKey
+     * @param string      $configKey
+     * @param string|null $sebKey
      * @return bool
      */
     public function isSatisfiedBy(
         array $serverSuperglobal,
         string $browserExamKey,
-        string $configKey
+        string $configKey,
+        ?string $sebKey
     ): bool {
 
         /* Otherwise check whether the two superglobal keys exist
          */
-        if (isset($_GET[Payload::SEB_KEY])) {
+        if ($sebKey) {
             /* Calculate the absolute start url
              * This is part of the configuration xml, in the startUrl node
              * It is different per assessment and changes the config hash accordingly
@@ -52,7 +54,7 @@ class ValidSebCheck
              */
  //           $configHash = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? $_GET['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'];
 
-            $configKeyMatches = $_GET[Payload::SEB_KEY] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
+            $configKeyMatches = $sebKey === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
 
             /* Both computed hashes must match what we expected
              *
