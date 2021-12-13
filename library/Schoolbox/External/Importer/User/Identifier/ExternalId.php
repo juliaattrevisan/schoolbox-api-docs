@@ -24,12 +24,12 @@ class ExternalId implements IdentifierInterface
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * @var array|RoleModel[]
      */
-    protected $roleList;
+    protected array $roleList;
 
     /**
      * Constructor
@@ -46,7 +46,7 @@ class ExternalId implements IdentifierInterface
     /**
      * @inheritdoc
      */
-    public function accept($row)
+    public function accept(array $row): bool
     {
         return trim($row['External ID'] ?? '') !== '' && trim($row['Role'] ?? '') !== '';
     }
@@ -54,7 +54,7 @@ class ExternalId implements IdentifierInterface
     /**
      * @inheritdoc
      */
-    public function retrieve($row)
+    public function retrieve(array $row): \Schoolbox\User
     {
         if (array_key_exists($row['Role'], $this->roleList)) {
             $role = $this->roleList[$row['Role']];

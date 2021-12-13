@@ -16,6 +16,7 @@ use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
+use Schoolbox\Sync\Provisioner\ValidUser;
 use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
@@ -83,6 +84,16 @@ class User extends AbstractImporter
      * @var array|User\Hydrator\HydratorInterface[]
      */
     protected $userHydrators = [];
+
+    /**
+     * Caches new user's usernames so we can detect multi new users
+     * with the the same username during dry-run.
+     *
+     * Maps 'username' => 'externalId'
+     *
+     * @var array<string, string>
+     */
+    protected array $newUsernameCache = [];
 
     /**
      * Documentation function for expected format
@@ -210,6 +221,7 @@ class User extends AbstractImporter
                 }
             }
         }
+
         return null;
     }
 
@@ -236,8 +248,18 @@ class User extends AbstractImporter
         foreach ($this->reader as $i => $row) {
             // Step 1: identify user
             $user = $this->retrieveUser($row);
+
+            /* retrieveUser performs a set of checks for a way to identify someone -
+             * someone can be identified by any of the following fields which are
+             * optional in the csv import:
+             *
+             * external id, username, user id
+             *
+             * Users have to be identified by one of those fields. When they can't,
+             * null is returned.
+             */
             if (!$user instanceof UserModel) {
-                $this->log->warning('User could not be identified - skipping');
+                $this->log->warning('User could not be identified by any of the following fields: external id, user id or username - skipping');
                 continue;
             }
 
@@ -251,7 +273,6 @@ class User extends AbstractImporter
 
             // Step 3: update user based on fields
             $userResult->setUser($this->hydrateUser($row, $user));
-
 
             // Step 4: save user
             if ($userResult->isUserDeleted()) {
@@ -290,6 +311,15 @@ class User extends AbstractImporter
             }
         } else {
             $this->log->info(sprintf('Pretending to create user "%s"', $user->formatName()));
+
+            /* Also figure out if you can actually change the user's details
+             * based on the current hydration outcome
+             */
+            try {
+                (new ValidUser($this->userMapper, $this->newUsernameCache))->sanityCheck($user);
+            } catch (\UnexpectedValueException $e) {
+                $this->log->error('User not updated: ' . $e->getMessage());
+            }
         }
     }
 
@@ -310,10 +340,19 @@ class User extends AbstractImporter
                     $this->log->info(sprintf('Updated user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
                 }
             } catch (\Exception $e) {
-                $this->log->error('User not created: ' . $e->getMessage());
+                $this->log->error('User not updated: ' . $e->getMessage());
             }
         } else {
             $this->log->info(sprintf('Pretending to update user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
+
+            /* Also figure out if you can actually change the user's details
+             * based on the current hydration outcome
+             */
+            try {
+                (new ValidUser($this->userMapper, $this->newUsernameCache))->sanityCheck($user);
+            } catch (\UnexpectedValueException $e) {
+                $this->log->error('User not updated: ' . $e->getMessage());
+            }
         }
     }
 

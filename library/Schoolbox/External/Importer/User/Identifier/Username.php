@@ -9,7 +9,6 @@
 namespace Schoolbox\External\Importer\User\Identifier;
 
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 
 use function trim;
@@ -24,7 +23,7 @@ class Username implements IdentifierInterface
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * Constructor
@@ -39,7 +38,7 @@ class Username implements IdentifierInterface
     /**
      * @inheritdoc
      */
-    public function accept($row)
+    public function accept(array $row): bool
     {
         return trim($row['Username'] ?? '') !== '';
     }
@@ -47,7 +46,7 @@ class Username implements IdentifierInterface
     /**
      * @inheritdoc
      */
-    public function retrieve($row)
+    public function retrieve(array $row): \Schoolbox\User
     {
         try {
             return $this->userMapper->findOneByColumn('username', $row['Username'], ['cache' => false]);

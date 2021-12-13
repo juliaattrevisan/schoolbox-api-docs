@@ -246,7 +246,7 @@ class Controller extends Base
      * @return AbstractImporter
      * @throws \OutOfRangeException
      */
-    protected function buildImporter(Reader $reader, LoggerInterface $log, $performUpdate = false): AbstractImporter
+    protected function buildImporter(Reader $reader, LoggerInterface $log, bool $performUpdate = false): AbstractImporter
     {
         return $this->importerFactory->buildImporter($this->basename, $reader, $log, $performUpdate);
     }
@@ -265,7 +265,7 @@ class Controller extends Base
         $logLines = [];
 
         while ($line = fgets($stream)) {
-            if ($logLine = json_decode($line, true)) {
+            if ($logLine = json_decode($line, true, 512, JSON_THROW_ON_ERROR)) {
                 $logLines[] = $logLine;
             }
         }

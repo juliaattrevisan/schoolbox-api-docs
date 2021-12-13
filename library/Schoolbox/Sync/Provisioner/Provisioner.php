@@ -513,6 +513,7 @@ class Provisioner
         throw new InvalidArgumentException("$roleType is not one of: student, staff, parent");
     }
 
+
     /**
      * Performs a sanity check on this user - checks if all their required
      * fields are set.
@@ -521,50 +522,14 @@ class Provisioner
      *
      * @param User $internalUser
      * @throws UnexpectedValueException if a value isn't what it should be
+     * @throws \PDOException
+     * @throws \UnderflowException
      */
-    protected function sanityCheck(User $internalUser)
+    protected function sanityCheck(User $internalUser): void
     {
-        $this->userMapper->verifyValidUsername($internalUser);
-        $this->userMapper->verifyUniqueUsername($internalUser);
-        $this->verifyUniqueNewUserUsername($internalUser);
-        $this->userMapper->verifyValidRole($internalUser);
-        $this->userMapper->verifyHasCampus($internalUser);
-        $this->userMapper->verifyValidFirstName($internalUser);
-        $this->userMapper->verifyValidLocalEmail($internalUser);
-        $this->userMapper->verifyValidWebmail($internalUser);
-        $this->userMapper->verifyValidInternalMail($internalUser);
-        $this->userMapper->verifyValidEportfolioEnabled($internalUser);
+        (new ValidUser($this->userMapper, $this->newUsernameCache))->sanityCheck($internalUser);
     }
 
-    /**
-     * Checks whether a new user's proposed username conflicts with another new user.
-     * This enables such scenarios to be detected during the dry-run, rather than waiting for
-     * mapper to throw error during live-run.
-     *
-     * @param \Schoolbox\Sync\Provisioner\User $internalUser
-     * @return bool Always true, as long as it doesn't throw
-     * @throws UnexpectedValueException if multiple new users were created with same username
-     */
-    protected function verifyUniqueNewUserUsername(User $internalUser)
-    {
-
-        // Is this a new user?
-        if (null === $internalUser->getId()) {
-            // Have we already created a new user with this username?
-            if (isset($this->newUsernameCache[$internalUser->getUsername()])) {
-                throw new UnexpectedValueException(
-                    sprintf(
-                        'A new user with username "%s" was already created. Other user external id: "%s"',
-                        $internalUser->getUsername(),
-                        $this->newUsernameCache[$internalUser->getUsername()]
-                    )
-                );
-            }
-            // New username is unique. Add to cache
-            $this->newUsernameCache[$internalUser->getUsername()] = $internalUser->getExternalId();
-        }
-        return true;
-    }
 
     /**
      * Cache lookups for log
