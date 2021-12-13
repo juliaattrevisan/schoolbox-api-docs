@@ -52,7 +52,7 @@ export default {
         },
 
         /**
-         * For proper count display, eg: '1 user' / '4 users'
+         * For proper count display, eg: '1 file' / '4 file'
          *
          * @returns { String }
          */
@@ -71,14 +71,14 @@ export default {
     methods: {
 
         /**
-         * To confirm/cancel selected users deletion
+         * To confirm/cancel selected files deletion
          */
         onDeleteFilesSelected () {
             this.$refs.deleteModal.open();
         },
 
         /**
-         * Delete the selected users, informing of deletion and clearing them from the table list as well
+         * Delete the selected files, informing of deletion and clearing them from the table list as well
          */
         async onConfirmDeleteFilesSelected () {
             this.$refs.toast.activate('Deleting...');
