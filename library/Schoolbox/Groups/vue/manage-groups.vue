@@ -4,8 +4,9 @@
  * Manage your groups
  */
 
-import ManageGroupsHeading from './manage-groups-heading.vue';
-import ManageGroupsItem from './manage-groups-item.vue';
+import ManageGroupsHeading from './manage-groups-heading';
+import ManageGroupsItem from './manage-groups-item';
+import Toast from '@vue/components/toast';
 
 
 export default {
@@ -13,6 +14,7 @@ export default {
     components: {
         ManageGroupsHeading,
         ManageGroupsItem,
+        Toast,
     },
 
     props: {
@@ -58,6 +60,7 @@ export default {
                 :group="group"
             />
         </div>
+        <toast ref="toast"></toast>
     </div>
 </template>
 

@@ -5,6 +5,10 @@
  * A single group item, can join/leave, add toggle favourites/notifications
  */
 
+import enrolmentTypes from './mangeGroupsEnrolmentTypes';
+import groupTypes from './mangeGroupsGroupTypes';
+
+
 export default {
 
     props: {
@@ -12,7 +16,7 @@ export default {
             type: String,
             required: true,
         },
-        group: {
+        group: { //all the group data
             type: Object,
             required: true,
         }
@@ -31,8 +35,8 @@ export default {
          * 
          * @returns { Boolean }
          */
-        isMember () {
-            return this.group.enrolmentStatus === 'enrolled';
+        isEnrolled () {
+            return this.group.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -40,8 +44,8 @@ export default {
          * 
          * @returns { Boolean }
          */
-        isMembershipPending () {
-            return this.group.enrolmentStatus === 'pending';
+        isEnrolmentPending () {
+            return this.group.enrolmentStatus === enrolmentTypes.PENDING;
         },
 
         /**
@@ -72,13 +76,9 @@ export default {
          * @returns { Object }
          */
         getImageStyles () {
-            // let imageStyles = {
-            //     backgroundColor: `#${this.group.colour}`,
-            //     borderBottom: `10px solid #${this.group.colour}`,
-            // }
             let imageStyles = {
-                backgroundColor: `green`,
-                borderBottom: `10px solid green`,
+                backgroundColor: `#${this.group.colour}`,
+                borderBottom: `10px solid #${this.group.colour}`,
             }
             if (this.group.coverImageHash) {
                 imageStyles = { 
@@ -93,24 +93,47 @@ export default {
         },
 
         /**
+         * The default data to pass through
          * 
+         * @returns { FormData }
          */
-        join () {
-            this.isMember = true;
+        getFormData () {
+            const formData = new FormData();
+            formData.append('group', this.group.id);
+            return formData;
         },
 
         /**
          * 
          */
+        join () {
+            this.isEnrolled = true;
+        },
+
+        /**
+         * Leave the group 
+         */
         async leave () {
-            
-            // try {
-            //     const response = await fetch(this.endpoint)
-            // } catch (error) {
-            //     console.warn(error);
-            // } finally {
-            //     this.isMember = false;
-            // }
+            this.isProcessing = true;
+            // this.$refs.toast.activate('Updating...');
+            try {
+                const formData = this.getFormData();
+                formData.append('action', 'delete');
+                const response = await fetch(this.endpoint, {
+                    method: 'POST',
+                    body: formData,
+                })
+                const responseData = await response.json();
+                if (!responseData.error) {
+                    this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
+                    // this.$refs.toast.timeout('Group left', true, 2000);
+                }
+            } catch (error) {
+                console.warn(error);
+                // this.$refs.toast.timeout('Unable to update', false, 3000);
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
         /**
@@ -162,7 +185,7 @@ export default {
                 </a>
                 <transition name="fade" mode="out-in">
                     <button 
-                        v-if="isMember"
+                        v-if="isEnrolled"
                         class="button expand icon-logout alert" 
                         :title="`Leave ${group.name}`"
                         key="leave" 
@@ -170,7 +193,7 @@ export default {
                         Leave
                     </button>
                     <button 
-                        v-else-if="isMembershipPending"
+                        v-else-if="isEnrolmentPending"
                         class="button expand disabled" 
                         key="membershipPending" 
                         disabled>
