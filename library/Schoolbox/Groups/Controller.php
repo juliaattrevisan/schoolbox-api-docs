@@ -96,19 +96,10 @@ class Controller extends BaseController
             //will follow by default, check that user is actually in that group when checking if they are following
             $follow = (!(in_array($folderId, $muted['unfollow']) || in_array($folderId, $muted['disabled'])) && $userPerms[$folderId]);
 
-            //get enrolmentStatus, could be enrolled, can join, or pending
-            $enrollment = $userPerms[$folderId] ? 'enrolled' : 'not enrolled';
-            if ($userPerms[$folderId] && ($userPerms[$folderId]->getAccessLevel() == UserAccess::ACCESS_DENY)) {
-                $enrollment = 'pending';
-            }
-
-
-
             //favourite
             $isFavourite = in_array($folderId, $favourites);
 
             //nullable fields cause something have no defaults...
-            $enrollment = ($userPerms[$folderId] && $userPerms[$folderId]->getAccessLevel()) ?? 0;
             $imageHash  = null;
             if ($folder->getCoverImage()) {
                 $imageHash = $folder->getCoverImage()->getHash();
@@ -135,7 +126,7 @@ class Controller extends BaseController
             $tmp                    = [
                 'id'                => $folderId,
                 'name'              => $group->getFolder()->getName(),
-                'enrolmentStatus'   => $this->getEnrollmentText($enrollment),
+                'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folderId]),
                 'colour'            => $folder->getColour()->getAsHex(),
                 'coverImageHash'    => $imageHash,
                 'isNotificationsOn' => $follow,
@@ -228,19 +219,13 @@ class Controller extends BaseController
             //save group object
             $accessMapper->save($userGroup);
 
-            //get enrolmentStatus, could be enrolled, can join, or pending
-            $enrollment = $userGroup->getAccessLevel() ? 'enrolled' : 'not enrolled';
-            if (($userGroup->getAccessLevel() == UserAccess::ACCESS_DENY)) {
-                $enrollment = 'pending';
-            }
-
             return $this->getResponse()->content->set(
                 $this->buildJsonOutput([
                    'group'              => $post['group'],
                    'user'               => $user->getId(),
                    'isFavourite'        => $userGroup->getFavourite(),
                    'isNotificationsOn'  => 0,
-                   'enrolmentStatus'    => $this->getEnrollmentText($userGroup->getAccessLevel()),
+                   'enrolmentStatus'    => $this->getEnrollmentText($userGroup),
                 ])
             );
         }
@@ -254,7 +239,7 @@ class Controller extends BaseController
                 'user'              => $user->getId(),
                 'group'             => $post['group'],
                 'action'            => 'delete',
-                'enrolmentStatus'   => $this->getEnrollmentText(UserAccess::ACCESS_DENY),
+                'enrolmentStatus'   => 'notEnrolled',
             ]));
         }
 
@@ -284,7 +269,7 @@ class Controller extends BaseController
                     'user'              => $user->getId(),
                     'isFavourite'       => $userGroup->getFavourite(),
                     'isNotificationsOn' => in_array($post['group'], $followingList),
-                    'access'            => $this->getEnrollmentText($userGroup->getService()),
+                    'access'            => $this->getEnrollmentText($userGroup),
                 ])
             );
         }
@@ -318,22 +303,20 @@ class Controller extends BaseController
 
     /**
      * get the text representation of the users enrolment in a group
-     * @param int $enrolment
+     * @param null|UserAccess $userGroup
      * @return string
      */
-    protected function getEnrollmentText(int $enrolment): string
+    protected function getEnrollmentText($userGroup): string
     {
-        switch ($enrolment) {
-            case UserAccess::ACCESS_FULL:
-            case UserAccess::ACCESS_WRITE:
-            case UserAccess::ACCESS_READ:
-                return 'enrolled';
-            case UserAccess::ACCESS_AWAITING_AUTHORISATION:
-                return 'pending';
-            case UserAccess::ACCESS_DENY:
-            default:
-                return 'notEnrolled';
+        if ($userGroup === null) {
+            return 'notEnrolled';
         }
+        //get enrolmentStatus, could be enrolled, can join, or pending
+        $enrollment = $userGroup->getAccessLevel() ? 'enrolled' : 'notEnrolled';
+        if (($userGroup->getAccessLevel() == UserAccess::ACCESS_DENY)) {
+            $enrollment = 'pending';
+        }
+        return $enrollment;
     }
 
     /**
