@@ -8066,11 +8066,6 @@ parameters:
 			path: library/Schoolbox/Sync/Log/Mapper.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int\\|string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Provisioner/Provisioner.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findAllGroupsForUser\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Provisioner/UserMapper.php
