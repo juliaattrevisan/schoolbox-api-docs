@@ -43,7 +43,7 @@ class HomePageCest
 
         #WHEN
         $createFolderRequest = new Payload\Resource\Folder\Create();
-        $createFolderRequest->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
+        $createFolderRequest->setTemplate(Payload\Resource\Folder\Modify::TEMPLATE_BLANK);
         $createFolderRequest->setName($homepageTitle);
         $i->sendRequest($createFolderRequest);
 
@@ -64,7 +64,7 @@ class HomePageCest
 
         #WHEN
         $createFolderRequest = new Payload\Resource\Folder\Create();
-        $createFolderRequest->setTemplate(Payload\Resource\Folder\Create::TEMPLATE_BLANK);
+        $createFolderRequest->setTemplate(Payload\Resource\Folder\Modify::TEMPLATE_BLANK);
         $createFolderRequest->setName($homepageTitle);
         $createFolderRequest->unsetCurriculumCodes();
         $i->sendRequest($createFolderRequest);
