@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Seb\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\ValidSebCheck;
 
 class SebCheckTest extends TestCase
@@ -35,12 +36,11 @@ class SebCheckTest extends TestCase
         string $configKey,
         bool $expected
     ): void {
-        $actualConfig = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? '';
+        $_GET[Payload::SEB_KEY] = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? '';
         $outcome = (new ValidSebCheck())->isSatisfiedBy(
             $serverSuperglobal,
             $browserExamKey,
-            $configKey,
-            $actualConfig
+            $configKey
         );
 
         /* There are other assertions that you can try (ctrl-click to follow)

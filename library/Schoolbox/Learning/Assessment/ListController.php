@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
@@ -150,13 +149,10 @@ class ListController extends Web\Controller\Base
      */
     public function getSebConfig(IAssessable $assessment): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
         $sebPayload = new SebPayload(
             $this->getConfigLoader(),
             $this->getRequest()->server->get('HTTP_HOST'),
-            $this->router,
-            $database
+            $this->router
         );
 
         $contents = $sebPayload->generate($assessment, $this->getUser());
@@ -197,14 +193,6 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-        $sebPayload = new SebPayload(
-            $this->getConfigLoader(),
-            $this->getRequest()->server->get('HTTP_HOST'),
-            $this->router,
-            $database
-        );
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
             $this->getRequest()->server->getArrayCopy(),
             /* Don't worry about the Browser Exam Key for now
@@ -213,8 +201,11 @@ class ListController extends Web\Controller\Base
             'f0d55cfa7ac12bb9bddd3ce12e01dfbff3bcdf8a0d883094b842dca8a050f7e5',
             /* Generate a config key hash from the xml that guards this assessment url
              */
-            $sebPayload->generateConfigKey($assessment, $this->getUser()),
-            $sebPayload->getConfigKeyHash($assessment->getId(), $this->getUser()->getId(), $this->request->query->get($sebPayload::ONETIME_KEY))
+            (new SebPayload(
+                $this->getConfigLoader(),
+                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->router
+            ))->generateConfigKey($assessment, $this->getUser())
         );
     }
 

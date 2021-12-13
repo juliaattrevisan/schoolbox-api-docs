@@ -29,13 +29,12 @@ class ValidSebCheck
     public function isSatisfiedBy(
         array $serverSuperglobal,
         string $browserExamKey,
-        string $configKey,
-        ?string $actualConfigKey
+        string $configKey
     ): bool {
 
         /* Otherwise check whether the two superglobal keys exist
          */
-        if ($actualConfigKey) {
+        if (isset($_GET[Payload::SEB_KEY])) {
             /* Calculate the absolute start url
              * This is part of the configuration xml, in the startUrl node
              * It is different per assessment and changes the config hash accordingly
@@ -53,7 +52,7 @@ class ValidSebCheck
              */
  //           $configHash = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? $_GET['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'];
 
-            $configKeyMatches = $actualConfigKey === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
+            $configKeyMatches = $_GET[Payload::SEB_KEY] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
 
             /* Both computed hashes must match what we expected
              *

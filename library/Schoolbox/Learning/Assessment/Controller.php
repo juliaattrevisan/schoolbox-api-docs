@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
@@ -182,20 +181,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]
         );
 
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-        if ($this->getRequest()->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH')) {
-            $sebPayload = new Payload(
-                $this->getConfigLoader(),
-                $this->getRequest()->server->get('HTTP_HOST'),
-                $this->router,
-                $database
-            );
-
-            $onetimeKey = $sebPayload->getOneTimeKey($assessment->getId(), $student->getId(), $this->getRequest()->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'));
-
-//            $defaultUrl .= '?sebkey=' . $_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'];
-            $defaultUrl .= sprintf('?%s=%s', $sebPayload::ONETIME_KEY, $onetimeKey);
+        if ($_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']) {
+            $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => $_SERVER['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH']]);
         }
         $this->redirect($defaultUrl);
     }

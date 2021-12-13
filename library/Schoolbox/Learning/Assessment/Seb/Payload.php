@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Seb;
 
-use Alaress\Database\Connector\IConnector;
 use Aura\Router\Router;
 use CFPropertyList\CFData;
 use CFPropertyList\CFDate;
@@ -84,11 +83,6 @@ class Payload
     private IConfigLoader $config;
 
     /**
-     * @var IConnector
-     */
-    private IConnector $database;
-
-    /**
      * A random 4 character unicode string to replace backslashes during json_encode.
      */
     private const BACKSLASH_SUBSTITUTE = "ؼҷҍԴ";
@@ -96,7 +90,7 @@ class Payload
     /**
      * request parameter name to pass onetime key
      */
-    public const ONETIME_KEY = 'sebKey';
+    public const SEB_KEY = 'sebKey';
 
     /**
      * Constructor.
@@ -105,13 +99,12 @@ class Payload
      * @param string $host
      * @param Router $router
      */
-    public function __construct(IConfigLoader $config, string $host, Router $router, IConnector $database)
+    public function __construct(IConfigLoader $config, string $host, Router $router)
     {
         $this->saltBasis = (string)$config->get('site_school_code');
         $this->host = $host;
         $this->router = $router;
         $this->config = $config;
-        $this->database = $database;
     }
 
 
@@ -239,59 +232,6 @@ class Payload
         return $this->hash($this->generate($assessment, $user));
     }
 
-    /**
-     * Store configKeyHash in a tmp file and return one time key for the tmp file
-     * @param int    $assessmentId
-     * @param int    $userId
-     * @param string $configKeyHash HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH
-     * @return string
-     */
-    public function getOneTimeKey(int $assessmentId, int $userId, string $configKeyHash): string
-    {
-        $onetimeKey     = uniqid((string)mt_rand());
-        $this->database->executeQuery('DELETE FROM seb_onetime WHERE  onetime_key LIKE :sebKeyName', ['sebKeyName' => "{$assessmentId}_{$userId}%"]);
-
-
-        $sebKeyName = $this->getConfigKeyHashKeyName($assessmentId, $userId, $onetimeKey);
-        $query = 'INSERT INTO seb_onetime (onetime_key, config_hash, created_at) VALUES (:sebKeyName, :configKeyHash, now())';
-        $this->database->executeQuery($query, ['sebKeyName' => $sebKeyName, 'configKeyHash' => $configKeyHash]);
-        return $onetimeKey;
-    }
-
-    /**
-     * Read tmp file storing configKeyHash and return it
-     * @param int         $assessmentId
-     * @param int         $userId
-     * @param string|null $onetimeKey
-     * @return string|null
-     */
-    public function getConfigKeyHash(int $assessmentId, int $userId, ?string $onetimeKey): ?string
-    {
-        if (!$onetimeKey) {
-            return null;
-        }
-
-        $sebKeyName = $this->getConfigKeyHashKeyName($assessmentId, $userId, $onetimeKey);
-
-        $query = 'SELECT config_hash FROM seb_onetime WHERE onetime_key = :sebKeyName';
-        $configKeyHash = $this->database->executeQuery($query, ['sebKeyName' => $sebKeyName])->fetchColumn();
-
-        // delete onetime key
-        $this->database->executeQuery('DELETE FROM seb_onetime WHERE  onetime_key = :sebKeyName', ['sebKeyName' => $sebKeyName]);
-
-        return $configKeyHash ?? null;
-    }
-
-    /**
-     * @param int    $assessmentId
-     * @param int    $userId
-     * @param string $onetimeKey
-     * @return string
-     */
-    private function getConfigKeyHashKeyName(int $assessmentId, int $userId, string $onetimeKey): string
-    {
-        return sprintf("%d_%d_%d", $assessmentId, $userId, $onetimeKey);
-    }
 
     /**
      * Hash an xml into whatever format was required
