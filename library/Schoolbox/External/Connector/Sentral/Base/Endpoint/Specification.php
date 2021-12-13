@@ -239,7 +239,7 @@ class Specification
                         /* Guess a 10-person payload
                          * Try to find someone with a timetable; sentral refers to this as a "timeview information"
                          */
-                        foreach ($students as $student) {
+                        foreach ($students['data'] as $student) {
                             try {
                                 $this->api->retrieveDocument("timetables/student/{$student['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
                                 break;
@@ -274,7 +274,7 @@ class Specification
                          * Try to find someone with a timetable; sentral refers to this as a "registered timeview information"
                          * Yes, this message is slightly different to the students' timetable error
                          */
-                        foreach ($staffs as $staff) {
+                        foreach ($staffs['data'] as $staff) {
                             try {
                                 $this->api->retrieveDocument("timetables/staff/{$staff['id']}/timetable-lessons?fromDate={$monday}&toDate={$friday}");
                                 break;
