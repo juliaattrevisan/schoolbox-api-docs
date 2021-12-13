@@ -21,197 +21,197 @@ class Model
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $dateOfBirth;
+    private ?Alaress_Date_Format $dateOfBirth = null;
 
     /**
      * @var string|null
      */
-    private ?string $username;
+    private ?string $username = null;
 
     /**
      * @var string|null
      */
-    private ?string $email;
+    private ?string $email = null;
 
     /**
      * @var string|null
      */
-    private ?string $gender;
+    private ?string $gender = null;
 
     /**
      * @var string|null
      */
-    private ?string $campusName;
+    private ?string $campusName = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactName1;
+    private ?string $emergencyContactName1 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactPhone1;
+    private ?string $emergencyContactPhone1 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactPhoneAlt1;
+    private ?string $emergencyContactPhoneAlt1 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactName2;
+    private ?string $emergencyContactName2 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactPhone2;
+    private ?string $emergencyContactPhone2 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactPhoneAlt2;
+    private ?string $emergencyContactPhoneAlt2 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactName3;
+    private ?string $emergencyContactName3 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactPhone3;
+    private ?string $emergencyContactPhone3 = null;
 
     /**
      * @var string|null
      */
-    private ?string $emergencyContactPhoneAlt3;
+    private ?string $emergencyContactPhoneAlt3 = null;
 
     /**
      * @var string|null
      */
-    private ?string $headOfHouseId;
+    private ?string $headOfHouseId = null;
 
     /**
      * @var string|null
      */
-    private ?string $headOfHouseName;
+    private ?string $headOfHouseName = null;
 
     /**
      * @var string|null
      */
-    private ?string $houseName;
+    private ?string $houseName = null;
 
     /**
      * @var string|null
      */
-    private ?string $formName;
+    private ?string $formName = null;
 
     /**
      * @var string|null
      */
-    private ?string $formTeacherId;
+    private ?string $formTeacherId = null;
 
     /**
      * @var string|null
      */
-    private ?string $formTeacherName;
+    private ?string $formTeacherName = null;
 
     /**
      * @var string|null
      */
-    private ?string $tutorGroup;
+    private ?string $tutorGroup = null;
 
     /**
      * @var string|null
      */
-    private ?string $tutorTeacherId;
+    private ?string $tutorTeacherId = null;
 
     /**
      * @var string|null
      */
-    private ?string $tutorTeacherName;
+    private ?string $tutorTeacherName = null;
 
     /**
      * @var string|null
      */
-    private ?string $yearLevel;
+    private ?string $yearLevel = null;
 
     /**
      * @var string|null
      */
-    private ?string $yearLevelCoordinatorId;
+    private ?string $yearLevelCoordinatorId = null;
 
     /**
      * @var string|null
      */
-    private ?string $yearLevelCoordinatorName;
+    private ?string $yearLevelCoordinatorName = null;
 
     /**
      * @var string|null
      */
-    private ?string $mobile;
+    private ?string $mobile = null;
 
     /**
      * @var string|null
      */
-    private ?string $studiesCode;
+    private ?string $studiesCode = null;
 
     /**
      * @var string|null
      */
-    private ?string $alertMedical;
+    private ?string $alertMedical = null;
 
     /**
      * @var string|null
      */
-    private ?string $alertComment;
+    private ?string $alertComment = null;
 
     /**
      * @var string|null
      */
-    private ?string $alertMessage;
+    private ?string $alertMessage = null;
 
     /**
      * @var string|null
      */
-    private ?string $alertLegal;
+    private ?string $alertLegal = null;
 
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $enrolmentDate;
+    private ?Alaress_Date_Format $enrolmentDate = null;
 
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $leavingDate;
+    private ?Alaress_Date_Format $leavingDate = null;
 
     /**
      * @var bool|null
      */
-    private ?bool $ib;
+    private ?bool $ib = null;
 
     /**
      * @var bool|null
      */
-    private ?bool $individualLearningPlans;
+    private ?bool $individualLearningPlans = null;
 
     /**
      * @var bool|null
      */
-    private ?bool $esl;
+    private ?bool $esl = null;
 
     /**
      * @var bool|null
      */
-    private ?bool $specialNeeds;
+    private ?bool $specialNeeds = null;
 
     /**
      * @var bool|null
      */
-    private ?bool $boardingStatus;
+    private ?bool $boardingStatus = null;
 
 
     /**
@@ -229,7 +229,7 @@ class Model
     /**
      * @var string|null
      */
-    private ?string $boardingHouseName;
+    private ?string $boardingHouseName = null;
 
 
     /**
