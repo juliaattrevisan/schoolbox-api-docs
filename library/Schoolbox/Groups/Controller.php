@@ -147,6 +147,12 @@ class Controller extends BaseController
         } catch (MapperException $e) {
             $userAccess[$folder->getId()] = null;
         }
+
+        //sort the groups
+        usort($possibleGroups, function ($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@groups/groups.twig', [
                 'groupList'  => $possibleGroups,
