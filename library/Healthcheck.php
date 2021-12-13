@@ -582,12 +582,12 @@ class Healthcheck
                 'luPastoralCareType',
                 'PastoralCareComments',
                 'PastoralCareContacts',
-                'PastoralCareActions',
                 'tPastoralCare'
             ];
             $writablePastoralTables = [
                 'PastoralCareComments',
                 'PastoralCareContacts',
+                'PastoralCareActions',
                 'tPastoralCare'
             ];
             $this->selectTest($allPastoralTables);
