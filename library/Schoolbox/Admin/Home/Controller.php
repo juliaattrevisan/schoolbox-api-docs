@@ -674,18 +674,19 @@ class Controller extends Base
         if ($this->isCloudHosted()) {
             return [null, null];
         }
+        $host = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $host = str_replace('https://', '', $host);
         $streamContext = stream_context_create(
             [
                 'ssl' => [
                     'capture_peer_cert' => true,
+                    'peer_name'         => $host,
                 ],
             ]
         );
         $timeout = 4.0;
-        $host = (new Factory($this->getConfigLoader()))->buildFullyQualified();
-        $host = str_replace('https://', '', $host);
         $client = stream_socket_client(
-            sprintf('ssl://%s:443', $host),
+            'ssl://127.0.0.1:443',
             $errorNumber,
             $errorDescription,
             $timeout,
