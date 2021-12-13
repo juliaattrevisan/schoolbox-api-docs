@@ -94,7 +94,7 @@ export default {
                     this.$emit('on-files-deleted'); //emit to view-all-files.vue
                 }
             } catch (error) {
-                this.$refs.toast.timeout('Sorry, there was an error deleting all selected files.', false, 3000);
+                this.$refs.toast.timeout('Sorry, there was an error deleting all selected files. Please refresh the page and try again.', false, 3000);
             }    
         },
 
