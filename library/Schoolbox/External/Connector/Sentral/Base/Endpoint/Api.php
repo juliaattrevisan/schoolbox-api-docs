@@ -219,7 +219,7 @@ class Api implements IApi
                         "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
                     ));
                 }
-                
+
                 /* Endpoint doesn't exist
                  */
                 throw new InvalidArgumentException(sprintf(
