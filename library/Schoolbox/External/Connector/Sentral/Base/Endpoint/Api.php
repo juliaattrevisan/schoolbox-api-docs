@@ -144,6 +144,7 @@ class Api implements IApi
      * @return array
      * @throws InvalidArgumentException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws DomainException
      */
     public function retrieveDocument(string $endpoint): array
     {
@@ -188,7 +189,7 @@ class Api implements IApi
                 throw new InvalidArgumentException(sprintf(
                     'Sentral Endpoint error: could not json_decode payload for endpoint %s; did something snap?',
                     $endpoint
-                ));
+                ), 400);
             }
 
             /* When you can't decode the json, sentral's given you something unexpected
@@ -198,7 +199,34 @@ class Api implements IApi
                 throw new InvalidArgumentException(sprintf(
                     'Sentral Endpoint error: could not json_decode payload for endpoint %s - it is null; did something snap?',
                     $endpoint
-                ));
+                ), 400);
+            }
+
+            /* Multiple meanings of 404 that aren't necessarily sensible
+             */
+            if (404 === $response->getStatusCode()) {
+                /* Person doesn't have a registered timeview
+                 * Occurs when you try access someone's timetable, but they don't have one in sentral
+                 * That also stupidly comes out as a 404 in an error struct
+                 *
+                 * "Staff member was found but has no registered timeview information"
+                 * "Missing timeview student information for the given student"
+                 */
+                if (strpos($decoded['errors'][0]['detail'], ' timeview ') > -1) {
+                    throw new \DomainException(sprintf(
+                        'Sentral Endpoint error at endpoint %s: %s',
+                        $endpoint,
+                        "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
+                    ));
+                }
+
+                /* Endpoint doesn't exist
+                 */
+                throw new InvalidArgumentException(sprintf(
+                    'Sentral Endpoint error at endpoint %s: %s',
+                    $endpoint,
+                    "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
+                ), 404);
             }
 
             /* Check for error payload instead of data payload
@@ -215,7 +243,7 @@ class Api implements IApi
                     'Sentral Endpoint error at endpoint %s: %s',
                     $endpoint,
                     "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
-                ));
+                ), 400);
             }
 
             return $decoded;
