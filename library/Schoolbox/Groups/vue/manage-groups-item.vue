@@ -300,13 +300,6 @@ export default {
                         </template>
                     </div>
                 </div>
-                <transition name="fade" mode="out-in">
-                    <button v-if="isPrivate" class="button expand private disabled" key="private" disabled>Private</button>
-                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave">Leave</button>
-                    <button v-else-if="isEnrolmentPending" class="button expand submit disabled" key="membershipPending" disabled>Membership pending</button>
-                    <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
-                    <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
-                </transition>
                 <div class="card-content classes groups actions-small-1">
                     <div class="list-item">
                         <h3><a :href="`/homepage/${group.id}`" :title="`Visit ${group.name}`">{{ group.name }}</a></h3>
@@ -328,6 +321,13 @@ export default {
                         </ul>
                     </template>
                 </div>
+                <transition name="fade" mode="out-in">
+                    <button v-if="isPrivate" class="button expand private disabled" key="private" disabled>Private</button>
+                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave">Leave</button>
+                    <button v-else-if="isEnrolmentPending" class="button expand submit disabled" key="membershipPending" disabled>Membership pending</button>
+                    <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
+                    <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
+                </transition>
             </div>
         </section>
     </div>
@@ -340,26 +340,28 @@ export default {
 }
 
 .group-actions { //to put them in the top right corner
+    background: rgba(43, 51, 63, 0.85);
+    border: 2px solid white;
     display: inline-block;
     position: absolute;
-    right: 0.5rem;
-    top: 0.5rem;
+    right: 10px;
+    top: 10px;
 }
 
 .group-action {
     background: none;
     font-size: 0;
     &:before {
-        color: var(--content-ui-foreground);
+        color: white;
         font-size: 1.5rem;
         margin: 0;
         padding: 0;
-        text-shadow: 1px 1px 2px rgb(73, 73, 73);
     }
 }
 
 .button {
     display: inline-block;
+    margin: 0;
     padding: 1rem; //add extra padding
 }
 
