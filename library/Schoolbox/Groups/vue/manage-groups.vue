@@ -28,6 +28,12 @@ export default {
         },
     },
 
+    data () {
+        return {
+            currentGroupsSelection: null,
+        }
+    },
+
     computed: {
 
         /**
@@ -36,17 +42,25 @@ export default {
          * @returns { Number }
          */
         isGroupsEmpty () {
-            return this.groups.length === 0;
-        }
+            return this.currentGroupsSelection.length === 0;
+        },
 
     },
 
-    mounted () {
-        
-
+    created () {
+        this.currentGroupsSelection = this.groups; //the initial group state
     },
 
     methods: { 
+
+        /**
+         * A <select> change or search query has been updated
+         * 
+         * @param { Array }
+         */
+        onSelectionChange (groups) {
+            this.currentGroupsSelection = groups;
+        },
 
         /**
          * Notify that a group edit action has started taking place
@@ -83,10 +97,21 @@ export default {
 
 <template>
     <div>
-        <manage-groups-heading />
-        <div class="row">
+        <manage-groups-heading 
+            :groups="groups" 
+            @on-selection-change="onSelectionChange"
+        />
+        <div v-if="isGroupsEmpty" class="row">
+            <div class="column small-12">
+                <div class="empty-state">
+                    <i class="icon-group"></i>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div v-else class="row">
             <manage-groups-item 
-                v-for="group in groups" 
+                v-for="group in currentGroupsSelection" 
                 :key="group.id" 
                 :endpoint="endpoint"
                 :group="group"
@@ -99,6 +124,10 @@ export default {
     </div>
 </template>
 
-<style scoped>
+<style>
+
+body {
+    overflow-y: scroll; /*to prevent jarring shifts when moving between group selections */
+}
 
 </style>

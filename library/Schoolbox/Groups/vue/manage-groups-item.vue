@@ -5,8 +5,8 @@
  * A single group item, can join/leave, add toggle favourites/notifications
  */
 
-import enrolmentTypes from './mangeGroupsEnrolmentTypes';
-import groupTypes from './manageGroupsGroupTypes';
+import enrolmentTypes from '../js/manageGroupsEnrolmentTypes';
+import groupTypes from '../js/manageGroupsGroupTypes';
 import { addGroupToSideMenu, removeGroupFromSideMenu } from '../js/modifyGroupSideMenu';
 
 
@@ -95,7 +95,6 @@ export default {
         getImageStyles () {
             let imageStyles = {
                 backgroundColor: `#${this.group.colour}`,
-                // borderLeft: `10px solid #${this.group.colour}`,
             }
             if (this.group.coverImageHash) {
                 imageStyles = { 
@@ -168,6 +167,9 @@ export default {
                 } else {
                     this.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
                     this.$emit('on-edit-success', 'Group left');
+                    if (this.isFavourite) {
+                        removeGroupFromSideMenu(this.group.id);
+                    }
                 }
             } catch (error) {
                 console.warn(error);
