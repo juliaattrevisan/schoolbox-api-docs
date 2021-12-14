@@ -240,7 +240,6 @@ class UserAccessMapper extends Mapper
                     continue;
                 }
             }
-            break;
         }
         return $finalAccess->reindex();
     }
