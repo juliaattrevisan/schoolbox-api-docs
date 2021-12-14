@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace External\Canvas\Importer;
 
-use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,9 +18,9 @@ class Announcements
 {
 
     /**
-     * @var IConnector
+     * @var CanvasDb
      */
-    private IConnector $canvasDb;
+    private CanvasDb $canvasDb;
 
 
     /**
@@ -31,19 +30,19 @@ class Announcements
 
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
-    private LoggerInterface $log;
+    private ?LoggerInterface $log;
 
 
     /**
      * Constructor.
      *
-     * @param IConnector      $canvasDb
-     * @param IApi            $api
-     * @param LoggerInterface $log
+     * @param CanvasDb             $canvasDb
+     * @param IApi                 $api
+     * @param LoggerInterface|null $log
      */
-    public function __construct(IConnector $canvasDb, IApi $api, LoggerInterface $log)
+    public function __construct(CanvasDb $canvasDb, IApi $api, ?LoggerInterface $log = null)
     {
         $this->canvasDb = $canvasDb;
         $this->api = $api;
@@ -57,6 +56,7 @@ class Announcements
      * logging as we go
      *
      * @return void
+     * @throws \Alaress\Database\Exception
      */
     public function import(): void
     {
@@ -65,6 +65,19 @@ class Announcements
          * column, but you'll need to prefix it with "course_" before you can use
          * them in the canvas api
          */
+        $query = "
+            SELECT 
+                CONCAT('course_', canvas_id) AS courseId, 
+                name, 
+                code
+            FROM course_dim 
+        ";
+
+        $statement = $this->canvasDb->build()->executeQuery($query);
+
+        while ($row = $statement->fetch()) {
+            print_r($row);
+        }
 
         /* For each of the courses you found, figure out which folders are destinations
          * One would have to presume schoolbox folders exist, whose folder codes match
