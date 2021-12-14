@@ -49,7 +49,7 @@ export default {
     methods: { 
 
         /**
-         * 
+         * Notify that a group edit action has started taking place
          * 
          * @param { String }
          */
@@ -58,7 +58,7 @@ export default {
         },
 
         /**
-         * 
+         * A group edit action was successful 
          * 
          * @param { String }
          */
@@ -67,11 +67,11 @@ export default {
         },
 
         /**
-         * 
+         * A group edit action has an error
          * 
          * @param { String }
          */
-        onGroupEditError () {
+        onGroupEditError (text) {
             this.$refs.toast.timeout(text, false, 3000);
         },
 

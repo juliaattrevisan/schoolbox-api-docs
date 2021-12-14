@@ -291,11 +291,13 @@ export default {
             <div class="v-card small-12">
                 <div class="group-image-container">
                     <div class="card-class-image" :style="getImageStyles()"></div>
-                    <div class="group-actions">
+                    <div class="group-actions" v-if="isEnrolled || isPrivate">
                         <button v-if="isFavourite" class="group-action icon-favourite" title="Remove from Favourites" key="remove-favourite" @click="removeFromFavourites">Remove from Favourites</button>
                         <button v-else class="group-action icon-favourite-hollow" title="Add to Favourites" key="add-favourite" @click="addToFavourites">Add to Favourites</button>
-                        <button v-if="isNotificationsOn" class="group-action icon-notifications" title="Remove from Notifications" key="remove-notification" @click="removeFromNotifications">Remove from Notifications</button>
-                        <button class="group-action icon-notifications-hollow" title="Add to Notifications" key="add-notification" @click="addToNotifications">Add to Notifications</button>
+                        <template v-if="!group.isForceFollow">
+                            <button v-if="isNotificationsOn" class="group-action icon-notifications" title="Remove from Notifications" key="remove-notification" @click="removeFromNotifications">Remove from Notifications</button>
+                            <button class="group-action icon-notifications-hollow" title="Add to Notifications" key="add-notification" @click="addToNotifications">Add to Notifications</button>
+                        </template>
                     </div>
                 </div>
                 <transition name="fade" mode="out-in">
