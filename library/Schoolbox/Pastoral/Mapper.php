@@ -16,10 +16,12 @@ use PDOStatement;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Action\Model as Action;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
@@ -87,7 +89,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseMulti('pastoral_id', PastoralCommentMapper::class, 'comments', 'comments');
         $this->joinsReverseMulti('pastoral_id', PastoralAttachmentMapper::class, 'attachments', 'attachments');
         $this->joinsReverseMulti('pastoral_id', PastoralTagMapper::class, 'tags', 'tags');
-        $this->joinsReverseMulti('pastoral_record_action', PastoralRecordActionMapper::class, 'recordActions', 'recordActions');
+        $this->joinsReverseMulti('pastoral_id', PastoralRecordActionMapper::class, 'recordActions', 'recordActions');
         $this->joinsReverseMulti('root_id', PastoralRevisionMapper::class, 'revisions', 'revisions');
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
@@ -285,8 +287,9 @@ class Mapper extends BaseMapper
         }
 
         $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
-        $model->setRecordActions($this->getJoinMapper('recordActions')->findByColumn('pastoral_id', $model->getId()));
-
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+            $model->setRecordActions($this->getJoinMapper('recordActions')->findByColumn('pastoral_id', $model->getId()));
+        }
         $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId(), [
             'order' => [
                 'created_at' => 'desc'
@@ -801,8 +804,11 @@ class Mapper extends BaseMapper
      * @param Collection            $years
      * @param Collection            $houses
      * @param Collection            $campuses
+     * @param Collection            $actions
      * @param bool                  $includeStudentsWithoutYear
      * @param bool                  $includeStudentsWithoutHouse
+     * @param bool                  $includeReportsWithoutAction
+     * @param bool                  $includeUncompletedActionsOnly
      *
      * @return Collection|Model[]
      */
@@ -817,12 +823,15 @@ class Mapper extends BaseMapper
         Collection $students,
         Collection $tags,
         Collection $order,
-        $involved,
+        bool $involved,
         Collection $years,
         Collection $houses,
         Collection $campuses,
+        Collection $actions,
         bool $includeStudentsWithoutYear,
-        bool $includeStudentsWithoutHouse
+        bool $includeStudentsWithoutHouse,
+        bool $includeReportsWithoutAction,
+        bool $includeUncompletedActionsOnly
     ) {
         $this->bindings = [];
         $this->filters  = [];
@@ -850,6 +859,16 @@ class Mapper extends BaseMapper
         $this->addCampusFilter($campuses);
         $this->addTypeFilter($types, $subtypes);
         $this->addFilter($authors, '`owner_id`');
+
+        $join = '';
+        if (
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)
+            && ($actions->count() > 0 || $includeReportsWithoutAction)
+        ) {
+            $join = ($includeReportsWithoutAction ? ' LEFT ' : ' INNER ')
+                . " JOIN {$this->getJoinSql('recordActions', '', 'a')} ";
+            $this->addActionFilter($actions, $includeReportsWithoutAction, $includeUncompletedActionsOnly);
+        }
 
         $orderParts = [];
         foreach ($order as $orderCurrent) {
@@ -925,7 +944,7 @@ class Mapper extends BaseMapper
         // Execute SQL
 
         $statement = $this->getDatabase()->prepare(
-            $this->getSelectString() . ' ' . $this->getFromString() . "{$criteriaSql} {$orderSql}"
+            $this->getSelectString() . ' ' . $this->getFromString() . "{$join} {$criteriaSql} {$orderSql}"
         );
         $statement->execute($this->bindings);
 
@@ -1095,6 +1114,37 @@ class Mapper extends BaseMapper
         $this->filters[] = "`sc`.`id` IN ({$pbArray['placeholders']})";
 
         self::$placeholderIndex++;
+    }
+
+    /**
+     * Filter the report on action.
+     *
+     * @param Collection|Action[] $actions
+     */
+    private function addActionFilter(Collection $actions, bool $includeReportsWithoutAction, bool $includeUncompletedActionsOnly): void
+    {
+        $filter = '';
+        if ($actions->count() > 0) {
+            $pbArray = PredicateBuilder::getArrayBindings(
+                $actions->getPropertyValues('id'),
+                'action' . self::$placeholderIndex
+            );
+            self::$placeholderIndex++;
+
+            $this->bindings = array_merge($this->bindings, $pbArray['bindings']);
+
+            $filter = "`a`.`action_id` IN ({$pbArray['placeholders']})";
+            if ($includeUncompletedActionsOnly) {
+                $filter .= " AND `a`.`completed` = 0 ";
+            }
+        }
+        if ($includeReportsWithoutAction) {
+            $filter = ($filter === '' ? '' : "({$filter}) OR") . " `a`.`action_id` IS NULL ";
+        }
+        if ($filter === '') {
+            return;
+        }
+        $this->filters[] = $filter;
     }
 
     /**

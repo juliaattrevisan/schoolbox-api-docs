@@ -88,7 +88,8 @@ class Module extends BaseModule
             'pastoralGroupMapper'           => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Group\Mapper::class),
             'pastoralReportDashboardMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Report\Dashboard\Mapper::class),
             'termMapper'                    => $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Term\Mapper::class),
-            'yearLevelMapper'               => $this->getMapperFactory()->getLazy(\Schoolbox\YearLevel\Mapper::class)
+            'yearLevelMapper'               => $this->getMapperFactory()->getLazy(\Schoolbox\YearLevel\Mapper::class),
+            'actionMapper'                  => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Action\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

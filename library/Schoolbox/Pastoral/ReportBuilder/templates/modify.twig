@@ -356,6 +356,60 @@
                         </div>
                     </section>
                 </div>
+                {% if config.pastoral_action_enable %}
+                    <div class="small-12 medium-6 columns">
+                        <h2 class="subheader">Actions</h2>
+                        <p class="meta">Select the actions you want included in the report</p>
+
+                        <section>
+                            <div class="small-12 columns content">
+                                <div class="checklist">
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="includeUncompletedActionsOnly"
+                                                   name="includeUncompletedActionsOnly"
+                                                   value="1"
+                                                   type="checkbox"
+                                                   {% if report.includeUncompletedActionsOnly %}checked{% endif %}
+                                            >
+                                            <label for="includeUncompletedActionsOnly">Match only uncompleted actions</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="checklist">
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="action-all" type="checkbox" data-check-all-action>
+                                            <label for="action-all">Select All</label>
+                                        </li>
+                                        <li>
+                                            <input id="includeRecordsWithoutAction"
+                                                   name="includeRecordsWithoutAction"
+                                                   value="1"
+                                                   type="checkbox"
+                                                   {% if report.includeRecordsWithoutAction %}checked{% endif %}
+                                                   data-check-action
+                                            >
+                                            <label for="includeRecordsWithoutAction">(No action)</label>
+                                        </li>
+                                        {% for action in actions %}
+                                            <li>
+                                                <input id="action-{{ action.id }}"
+                                                       name="actions[]"
+                                                       value="{{ action.id }}"
+                                                       type="checkbox"
+                                                       {% for actionSelected in (report.actions ?? []) | filter(actionSelected => actionSelected == action) %}checked{% endfor %}
+                                                       data-check-action
+                                                >
+                                                <label for="action-{{ action.id }}">{{ action.name }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                {% endif %}
             </div>
 
             <h2 class="subheader">Sort Order</h2>
@@ -633,6 +687,11 @@
         $reportForm.selectAll({
             selector: '#campus-all',
             checkboxes: '[data-check-campus]'
+        });
+
+        $reportForm.selectAll({
+            selector: '#action-all',
+            checkboxes: '[data-check-action]'
         });
 
         {# Setup selectize boxes #}

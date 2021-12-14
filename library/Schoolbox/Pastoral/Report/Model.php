@@ -22,6 +22,7 @@ use Schoolbox\Pastoral\Group as PastoralGroup;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
 use Schoolbox\Pastoral\Type as PastoralType;
+use Schoolbox\Pastoral\Action\Model as Action;
 use Schoolbox\User;
 use House;
 
@@ -99,6 +100,9 @@ class Model implements ISoftDeletable
     /** @var string $campusesCsv */
     private $campusesCsv;
 
+    /** Actions CSV */
+    private ?string $actionsCsv = null;
+
     /** @var string $authorsCsv */
     private $authorsCsv;
 
@@ -140,6 +144,9 @@ class Model implements ISoftDeletable
     /** @var Collection|Campus[] $campuses */
     private $campuses;
 
+    /** Actions */
+    private Collection $actions;
+
     /**
      * Will be null if severity is turned off in admin config
      *
@@ -156,7 +163,7 @@ class Model implements ISoftDeletable
      *
      * @var bool
      */
-    private $includeStudentsWithoutYear = false;
+    private bool $includeStudentsWithoutYear = false;
 
 
     /**
@@ -164,8 +171,21 @@ class Model implements ISoftDeletable
      *
      * @var bool
      */
-    private $includeStudentsWithoutHouse = false;
+    private bool $includeStudentsWithoutHouse = false;
 
+    /**
+     * Are records without an action included in this report?
+     *
+     * @var bool
+     */
+    private bool $includeRecordsWithoutAction = false;
+
+    /**
+     * Are completed actions excluded in this report?
+     *
+     * @var bool
+     */
+    private bool $includeUncompletedActionsOnly = false;
 
     /**
      * Model constructor
@@ -180,6 +200,7 @@ class Model implements ISoftDeletable
         $this->subTypes = new GenericCollection(PastoralSubType\Model::class);
         $this->houses   = new GenericCollection(House::class);
         $this->campuses = new GenericCollection(Campus::class);
+        $this->actions  = new GenericCollection(Action::class);
 
         // This is a collection of groups that have access to this report
         $this->groups = new GenericCollection(PastoralGroup\Model::class);
@@ -277,6 +298,24 @@ class Model implements ISoftDeletable
     public function getCampusesCsv(): ?string
     {
         return $this->campusesCsv;
+    }
+
+    /**
+     * @param null|string $actionsCsv
+     * @return $this
+     */
+    public function setActionsCsv(?string $actionsCsv): self
+    {
+        $this->actionsCsv = $actionsCsv;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getActionsCsv(): ?string
+    {
+        return $this->actionsCsv;
     }
 
     /**
@@ -586,6 +625,24 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * @return null|Collection|Action[]
+     */
+    public function getActions(): ?Collection
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @param Collection|Action[] $actions
+     * @return $this
+     */
+    public function setActions(Collection $actions): self
+    {
+        $this->actions = $actions;
+        return $this;
+    }
+
+    /**
      * @return null|Collection|Campus[]
      */
     public function getCampuses(): ?Collection
@@ -793,12 +850,47 @@ class Model implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function getIncludeRecordsWithoutAction(): bool
+    {
+        return $this->includeRecordsWithoutAction;
+    }
+
+    /**
+     * @param bool $includeRecordsWithoutAction
+     * @return static
+     */
+    public function setIncludeRecordsWithoutAction(bool $includeRecordsWithoutAction): self
+    {
+        $this->includeRecordsWithoutAction = $includeRecordsWithoutAction;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIncludeUncompletedActionsOnly(): bool
+    {
+        return $this->includeUncompletedActionsOnly;
+    }
+
+    /**
+     * @param bool $includeUncompletedActionsOnly
+     * @return static
+     */
+    public function setIncludeUncompletedActionsOnly(bool $includeUncompletedActionsOnly): self
+    {
+        $this->includeUncompletedActionsOnly = $includeUncompletedActionsOnly;
+        return $this;
+    }
 
     /**
      * @param User $user
      * @return bool
      */
-    public function hasAccess(User $user)
+    public function hasAccess(User $user): bool
     {
         if ($this->getOwner()->getId() == $user->getId()) {
             return true;

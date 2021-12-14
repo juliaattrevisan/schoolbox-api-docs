@@ -14,6 +14,7 @@ use Schoolbox\Mapper as BaseMapper;
 /**
  * @method Model findById($identifierValue)
  * @method GenericCollection|Model[] findAll($options = [])
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {

@@ -17,6 +17,7 @@ use HouseMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -29,54 +30,58 @@ use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
+use Schoolbox\Pastoral\Action\Mapper as ActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\YearLevel;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
     /** @var ErrorMapper $errorMapper */
-    private $errorMapper;
+    private ErrorMapper $errorMapper;
 
     /** @var PastoralDataSource $pastoralDataSource */
-    private $pastoralDataSource;
+    private PastoralDataSource $pastoralDataSource;
 
     /** @var PastoralTagMapper $pastoralTagMapper */
-    private $pastoralTagMapper;
+    private PastoralTagMapper $pastoralTagMapper;
 
     /** @var PastoralTypeMapper $pastoralTypeMapper */
-    private $pastoralTypeMapper;
+    private PastoralTypeMapper $pastoralTypeMapper;
 
     /** @var PastoralSubTypeMapper $pastoralSubTypeMapper */
-    private $pastoralSubTypeMapper;
+    private PastoralSubTypeMapper $pastoralSubTypeMapper;
 
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
-    private $pastoralSeverityMapper;
+    private PastoralSeverityMapper $pastoralSeverityMapper;
 
     /** @var PastoralReportMapper $pastoralReportMapper */
-    private $pastoralReportMapper;
+    private PastoralReportMapper $pastoralReportMapper;
 
     /** @var PastoralReportDashboardMapper $pastoralReportDashboardMapper */
-    private $pastoralReportDashboardMapper;
+    private PastoralReportDashboardMapper $pastoralReportDashboardMapper;
 
     /** @var PastoralGroupMapper $pastoralGroupMapper */
-    private $pastoralGroupMapper;
+    private PastoralGroupMapper $pastoralGroupMapper;
 
     /** @var HouseMapper $houseMapper */
-    private $houseMapper;
+    private HouseMapper $houseMapper;
 
     /** @var CampusMapper $campusMapper */
     private CampusMapper $campusMapper;
 
+
     /** @var Term\Mapper $termMapper */
-    private $termMapper;
+    private Term\Mapper $termMapper;
 
     /**
      * @var YearLevel\Mapper
      */
-    private $yearLevelMapper;
+    private YearLevel\Mapper $yearLevelMapper;
+
+    /** @var ActionMapper $actionMapper */
+    private ActionMapper $actionMapper;
 
     // Strings that can be converted to actual dates using strtotime
     private const THIS_YEAR = 'first day of january';
@@ -116,6 +121,7 @@ class Controller extends Base
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
      * @param Term\Mapper                   $termMapper
      * @param YearLevel\Mapper              $yearLevelMapper
+     * @param ActionMapper                  $actionMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -130,7 +136,8 @@ class Controller extends Base
         PastoralReportMapper $pastoralReportMapper,
         PastoralReportDashboardMapper $pastoralReportDashboardMapper,
         Term\Mapper $termMapper,
-        YearLevel\Mapper $yearLevelMapper
+        YearLevel\Mapper $yearLevelMapper,
+        ActionMapper $actionMapper
     ) {
         $this->errorMapper                   = $errorMapper;
         $this->pastoralDataSource            = $pastoralDataSource;
@@ -145,6 +152,7 @@ class Controller extends Base
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
         $this->termMapper                    = $termMapper;
         $this->yearLevelMapper               = $yearLevelMapper;
+        $this->actionMapper                  = $actionMapper;
     }
 
     /**
@@ -200,7 +208,7 @@ class Controller extends Base
      *
      * @param PastoralReport $report
      */
-    public function getReportUpdate($report): void
+    public function getReportUpdate(PastoralReport $report): void
     {
         // These are required to populate the selectize
 
@@ -232,7 +240,7 @@ class Controller extends Base
             ];
         }
 
-        // Authors
+        // Tags
 
         $tagsSelected = [];
 
@@ -241,6 +249,21 @@ class Controller extends Base
                 'id'   => $tag->getId(),
                 'name' => $tag->getName(),
             ];
+        }
+
+        // Actions
+
+        $actionsSelected  = [];
+        $availableActions = [];
+
+        if (!$this->getConfigLoader()->get($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED))) {
+            foreach ($report->getActions() as $action) {
+                $actionsSelected[] = [
+                    'id'   => $action->getId(),
+                    'name' => $action->getName(),
+                ];
+            }
+            $availableActions = $this->actionMapper->findAll();
         }
 
         $orders = [
@@ -305,10 +328,12 @@ class Controller extends Base
                     'subTypes'         => $this->pastoralSubTypeMapper->findAll(),
                     'severities'       => $severities,
                     'tags'             => $this->pastoralTagMapper->findAll(),
+                    'actions'          => $availableActions,
                     'groups'           => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
                     'studentsSelected' => $studentsSelected,
                     'authorsSelected'  => $authorsSelected,
                     'tagsSelected'     => $tagsSelected,
+                    'actionsSelected'  => $actionsSelected,
                     'report'           => $report,
                     'datePresets'      => self::RELATIVE_DATE_PRESETS,
                     'selectedRelativeDate' => $report->getRelativeDateString()
@@ -323,7 +348,7 @@ class Controller extends Base
      *
      * @param PastoralTag $tag
      */
-    public function getReportTags($tag): void
+    public function getReportTags(PastoralTag $tag): void
     {
         $records = $this->pastoralDataSource->findByTag($this->getUser(), $tag);
 
@@ -455,7 +480,7 @@ class Controller extends Base
      *
      * @return Collection
      */
-    private function getReportData($report): Collection
+    private function getReportData(PastoralReport $report): Collection
     {
         // Get matching records
 
@@ -487,8 +512,11 @@ class Controller extends Base
             $report->getYears(),
             $report->getHouses(),
             $report->getCampuses(),
+            $report->getActions(),
             $report->getIncludeStudentsWithoutYear(),
-            $report->getIncludeStudentsWithoutHouse()
+            $report->getIncludeStudentsWithoutHouse(),
+            $report->getIncludeRecordsWithoutAction(),
+            $report->getIncludeUncompletedActionsOnly()
         );
     }
 
@@ -498,7 +526,7 @@ class Controller extends Base
      * @param PastoralReport $report
      * @throws MapperException
      */
-    public function postReportDelete($report): void
+    public function postReportDelete(PastoralReport $report): void
     {
         $this->pastoralReportMapper->delete($report);
     }
@@ -507,6 +535,7 @@ class Controller extends Base
      * Insert/update pastoral report
      * @throws MapperException
      * @throws RouteNotFound
+     * @throws \Exception
      */
     public function postReportModify(): void
     {
@@ -617,6 +646,16 @@ class Controller extends Base
         $pastoralReport->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
         $pastoralReport->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
 
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+            if (is_array($post['actions'])) {
+                $pastoralReport->setActionsCsv(implode(',', $post['actions']));
+            } else {
+                $pastoralReport->setActionsCsv('');
+            }
+            $pastoralReport->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', false));
+            $pastoralReport->setIncludeUncompletedActionsOnly($post->getBool('includeUncompletedActionsOnly', false));
+        }
+
         // Save groups the report is shared with
 
         if (is_array($post['group'])) {
@@ -676,7 +715,7 @@ class Controller extends Base
      * @return string
      * @throws MapperException
      */
-    private function updatePastoralDashboard($report, $display): string
+    private function updatePastoralDashboard(PastoralReport $report, bool $display): string
     {
         try {
             // Check if the report is already on the dashboard
