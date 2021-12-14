@@ -21,25 +21,28 @@ class ValidSebCheck
      * it checks whether the $_SERVER superglobal contains the two headers
      * that SEB Safe Exam Browser expects to find.
      *
-     * @param array  $serverSuperglobal
-     * @param string $browserExamKey
-     * @param string $configKey
+     * @param array       $serverSuperglobal
+     * @param string      $browserExamKey
+     * @param string      $configKey
+     * @param string|null $sebKey
      * @return bool
      */
     public function isSatisfiedBy(
         array $serverSuperglobal,
         string $browserExamKey,
-        string $configKey
+        string $configKey,
+        ?string $sebKey
     ): bool {
 
         /* Otherwise check whether the two superglobal keys exist
          */
-        if (isset($serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'], $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'])) {
+        if ($sebKey) {
             /* Calculate the absolute start url
              * This is part of the configuration xml, in the startUrl node
              * It is different per assessment and changes the config hash accordingly
              */
-            $startUrl = 'https://' . $serverSuperglobal['HTTP_HOST'] . $serverSuperglobal['REQUEST_URI'];
+            $paths = parse_url($serverSuperglobal['REQUEST_URI']);
+            $startUrl = 'https://' . $serverSuperglobal['HTTP_HOST'] . $paths['path'] . '/seb';
 
             /* Both keys that were transmitted by the browser must match
              * the values we expected to receive
@@ -49,7 +52,9 @@ class ValidSebCheck
              * 2021-08-26 Disabled the BEK check because ran out of time
              * $bekMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_REQUESTHASH'] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$browserExamKey}");
              */
-            $configKeyMatches = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
+ //           $configHash = $serverSuperglobal['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'] ?? $_GET['HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH'];
+
+            $configKeyMatches = $sebKey === hash(Payload::HASH_ALGORITHM, "{$startUrl}{$configKey}");
 
             /* Both computed hashes must match what we expected
              *

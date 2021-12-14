@@ -16,12 +16,12 @@ use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
 use LogicException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
@@ -156,7 +156,7 @@ class ListController extends Web\Controller\Base
             $this->router
         );
 
-        $contents = $sebPayload->generate($assessment);
+        $contents = $sebPayload->generate($assessment, $this->getUser());
 
         /* Send as a downloadable file
          */
@@ -194,8 +194,11 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
+        if ($this->request->query->get(Payload::SEB_KEY)) {
+            $this->session->set(Payload::SEB_KEY, $this->request->query->get(Payload::SEB_KEY));
+        }
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
-            $this->getRequest()->server->getArrayCopy(),
+            $this->request->server->getArrayCopy(),
             /* Don't worry about the Browser Exam Key for now
              * We need to generate some platform-specific crypto for it
              */
@@ -204,9 +207,10 @@ class ListController extends Web\Controller\Base
              */
             (new SebPayload(
                 $this->getConfigLoader(),
-                $this->getRequest()->server->get('HTTP_HOST'),
+                $this->request->server->get('HTTP_HOST'),
                 $this->router
-            ))->generateConfigKey($assessment)
+            ))->generateConfigKey($assessment, $this->getUser()),
+            $this->session->get(Payload::SEB_KEY)
         );
     }
 
