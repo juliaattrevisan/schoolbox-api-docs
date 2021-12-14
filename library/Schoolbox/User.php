@@ -40,7 +40,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     // Username of the accounts used by Schoolbox staff
     public const USERNAME_SCHOOLBOX_ADMIN = 'alaress';
 
-    /** @var int */
+    /** @var null|int */
     private $id;
 
     /** @var string */
@@ -634,7 +634,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
     /**
      * @todo We should decide what type we want and enforce it.
-     * @return int|string
+     * @return int|null
      */
     public function getId()
     {
