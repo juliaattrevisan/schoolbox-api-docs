@@ -781,7 +781,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      * Inserts actions to Synergetic
      * - Actions, which can be selected in the dropdown, depend on selected Type. (doesn't seem to have concept of completion)
      * - luPastoralCareActionType table defines list of actions that are available in the system.
-     * - luPastoralCareAction table associates Types and Categories (subtype in SB) to Action Types.
+     * - luPastoralCareAction table defines available combinations of Types, Categories (subtype in SB) and Action Types.
      * - PastoralCareActions table holds relationship between PastoralCareSeq and luPastoralCareActionSeq.
      * @param Pastoral $pastoral
      * @throws MapperException
@@ -802,23 +802,23 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
 
-        // Find luPastoralCareActionSeq from
-        //   type (PastoralCareTypeCode), subtype (PastoralCareCategoryCode) and action above
-        // which is not yet associated with this record
+        // Find luPastoralCareActionSeq (look up table) of combination of
+        // type (PastoralCareTypeCode), subtype (PastoralCareCategoryCode) and action(s)
+        // of this record, which is not yet associated in Synergetic with this record
         $actionCodeBindings = PredicateBuilder::getArrayBindings($recordActionTypeCodes, 'actionCode');
 
         $query  = "
-            SELECT PastoralCareActionsSeq,
-                   luPastoralCareAction.luPastoralCareActionSeq,
+            SELECT actions.PastoralCareActionsSeq,
+                   lookup.luPastoralCareActionSeq,
                    PastoralCareActionTypeCode
-            FROM luPastoralCareAction
-            LEFT JOIN PastoralCareActions
-              ON PastoralCareActions.luPastoralCareActionSeq = luPastoralCareAction.luPastoralCareActionSeq
-              AND PastoralCareSeq = :PastoralCareSeq
-            WHERE PastoralCareTypeCode = :PastoralCareTypeCode
-              AND PastoralCareCategoryCode = :PastoralCareCategoryCode
-              AND PastoralCareActionTypeCode IN ({$actionCodeBindings['placeholders']})
-              AND PastoralCareSeq IS NULL
+            FROM luPastoralCareAction lookup
+            LEFT JOIN PastoralCareActions actions
+              ON actions.luPastoralCareActionSeq = lookup.luPastoralCareActionSeq
+              AND actions.PastoralCareSeq = :PastoralCareSeq
+            WHERE lookup.PastoralCareTypeCode = :PastoralCareTypeCode
+              AND lookup.PastoralCareCategoryCode = :PastoralCareCategoryCode
+              AND lookup.PastoralCareActionTypeCode IN ({$actionCodeBindings['placeholders']})
+              AND actions.PastoralCareSeq IS NULL
         ";
         $params = [
             'PastoralCareTypeCode'     => $pastoral->getType()->getExternalCode(),
@@ -828,14 +828,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $params = array_merge($params, $actionCodeBindings['bindings']);
 
         $luPastoralCareActions = $this->connector->executeQuery($query, $params)->fetchAll();
-        // No valid action found
+        // No predefined combination of type (PastoralCareTypeCode), subtype (PastoralCareCategoryCode) and action(s)
+        // found in the look up table luPastoralCareAction
         if (empty($luPastoralCareActions)) {
             return;
         }
 
         // Insert new actionSeqs (not removing, as we don't want to remove actions created via Synergetic
         $newSeqs    = array_column($luPastoralCareActions, 'luPastoralCareActionSeq');
-        $indexOrder = max(array_map('intval', array_column($luPastoralCareActions, 'IndexOrder')));
 
         $insertQuery = "
             INSERT INTO PastoralCareActions (PastoralCareSeq, luPastoralCareActionSeq, IndexOrder)

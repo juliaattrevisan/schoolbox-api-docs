@@ -588,7 +588,6 @@ class Healthcheck
             $writablePastoralTables = [
                 'PastoralCareComments',
                 'PastoralCareContacts',
-                'PastoralCareActions',
                 'tPastoralCare'
             ];
             $this->selectTest($allPastoralTables);
