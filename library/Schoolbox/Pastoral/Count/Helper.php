@@ -278,9 +278,12 @@ class Helper
             $studentTypeId    = $studentCount->getOffset('typeId');
 
             /**
-             * handle the rare cases where a pastoral event has a subtype, but no icon and color
+             * handle the cases where pastoral types/subtypes are deleted
              */
-            if ($studentCount->offsetExists('subtypeId') && !$pastoralSubtypes->offsetExists($studentSubTypeId)) {
+            if (
+                ($studentSubTypeId && !$pastoralSubtypes->offsetExists($studentSubTypeId))
+                || ($studentTypeId && !$pastoralTypes->offsetExists($studentTypeId))
+            ) {
                 continue;
             }
 
