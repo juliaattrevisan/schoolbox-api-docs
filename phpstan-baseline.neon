@@ -2896,11 +2896,6 @@ parameters:
 			path: library/Schoolbox/Admin/Timezone/Timezone.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between int\\|string and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/User/Controller.php
-
-		-
 			message: "#^Method Schoolbox\\\\Admin\\\\User\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/User/Module.php
@@ -3374,11 +3369,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Calendar\\\\Config\\\\Base\\:\\:\\$data \\(Schoolbox\\\\Collection\\) does not accept array\\<string, mixed\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Config/Filter.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between int\\|string and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Controller.php
 
 		-
 			message: "#^Instanceof between Alaress_Date_Format and DateTime will always evaluate to false\\.$#"
@@ -6962,11 +6952,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Permission/Access/Access.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int\\|string will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Permission/Access/Access.php
 
