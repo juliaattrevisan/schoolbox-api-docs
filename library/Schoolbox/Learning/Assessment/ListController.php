@@ -194,6 +194,9 @@ class ListController extends Web\Controller\Base
     {
         /* Check whether SEB was required
          */
+        if ($this->request->query->get(Payload::SEB_KEY)) {
+            $this->session->set(Payload::SEB_KEY, $this->request->query->get(Payload::SEB_KEY));
+        }
         return (new Seb\ValidSebCheck())->isSatisfiedBy(
             $this->request->server->getArrayCopy(),
             /* Don't worry about the Browser Exam Key for now
@@ -207,7 +210,7 @@ class ListController extends Web\Controller\Base
                 $this->request->server->get('HTTP_HOST'),
                 $this->router
             ))->generateConfigKey($assessment, $this->getUser()),
-            $this->request->query->get(Payload::SEB_KEY)
+            $this->session->get(Payload::SEB_KEY)
         );
     }
 
