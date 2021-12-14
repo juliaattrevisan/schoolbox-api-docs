@@ -7,6 +7,7 @@
  */
 
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+import debounce from 'lodash/debounce';
 
 
 export default {
@@ -73,17 +74,19 @@ export default {
         },
 
         /**
-         * Listen for form data changes to show the save button
+         * Listen for form data changes to show the save button straight away on a change
          */
         initFormChangeListeners () {
             document.getElementById(this.formId).addEventListener('change', () => this.onFormDataChange());
-            document.getElementById(this.formId).addEventListener('keyup', () => this.onFormDataChange());
+            document.getElementById(this.formId).addEventListener('keyup', debounce(() => {
+                this.onFormDataChange();
+            }, 350));
             CKEDITOR.on('instanceReady', (instanceReadyEvent) => { //need to wait until the ckEditor is loaded prior to listening for chnages
-                instanceReadyEvent.editor.on('change', (changeEvent) => { //update the linked <textarea>, which doesn't update until form save otherwise
+                instanceReadyEvent.editor.on('change', debounce((changeEvent) => { //update the linked <textarea>, which doesn't update until form save otherwise
                     document.getElementById(changeEvent.editor.name).textContent = changeEvent.editor.getData();
                     this.onFormDataChange()
-                });
-            });
+                }, 350));
+            }); 
         },
 
         /**
@@ -93,8 +96,8 @@ export default {
         onFormDataChange () {
             this.currentFormDataValues = '';
             const formData = new FormData(document.getElementById(this.formId));
-            formData.forEach((value) => this.currentFormDataValues += value);
-            this.hasFormDataChange = this.initialFormDataValues !== this.currentFormDataValues;
+            formData.forEach((value) => this.currentFormDataValues += value); //loop through and grab all the form values, creating a single string
+            this.hasFormDataChange = this.initialFormDataValues !== this.currentFormDataValues; //and now compare the old value to the new
         },
 
     },
