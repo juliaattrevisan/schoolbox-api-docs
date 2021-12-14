@@ -231,25 +231,4 @@ class Controller extends AbstractController
         // find out if we have access to the requested folder
         return Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId);
     }
-
-    /**
-     * basic grab from fileForm.php incase there are errors when uploading files to the view all file page
-     * @param \Exception $e
-     * @param IFile     $file
-     */
-    private function outputException(\Exception $e, IFile $file)
-    {
-        // Output errors
-        if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
-            $code = 11;
-        } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
-            $code = 10;
-        } else {
-            $code = 9;
-        }
-
-        $msg  = $e->getMessage();
-        http_response_code(400);
-        die(json_encode(array('code' => $code, 'error' => $msg)));
-    }
 }
