@@ -30,6 +30,12 @@ class Announcements
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
      * @var LoggerInterface|null
      */
     private ?LoggerInterface $log;
@@ -47,6 +53,10 @@ class Announcements
         $this->canvasDb = $canvasDb;
         $this->api = $api;
         $this->log = $log;
+
+        /* TODO Inject these all later
+         */
+        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
     }
 
 
@@ -75,25 +85,50 @@ class Announcements
 
         $statement = $this->canvasDb->build()->executeQuery($query);
 
-        while ($row = $statement->fetch()) {
-            print_r($row);
-        }
-
         /* For each of the courses you found, figure out which folders are destinations
          * One would have to presume schoolbox folders exist, whose folder codes match
          * the course's code exactly
          */
+        while ($row = $statement->fetch()) {
+            try {
+                $folder = $this->folderMapper->findByCode($row['code']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* If you can't find a matching folder for the course code provided, skip it
+                 */
+                $this->logDebug(sprintf(
+                    'Course code %s does not have a corresponding schoolbox folder; skipping',
+                    $row['code']
+                ));
 
-        /* If you can't find a matching folder for the course code provided, skip it
-         */
+                continue;
+            }
 
-        /* Spawn a new article instance, then map each Announcement's fields to the article's
-         */
+            /* Spawn a new article instance, then map each Announcement's fields to the article's
+             */
+
+
+        }
+
+
 
         /* Make the folder an audiencing segment/brick for the article
          */
 
         /* Shank it into comms_news_article
          */
+    }
+
+
+    /**
+     * If a logger was provided, bump out a message
+     *
+     * @param string $message
+     * @return void
+     */
+    private function logDebug(string $message): void
+    {
+        if ($this->log) {
+            $this->log->debug($message);
+        }
     }
 }
