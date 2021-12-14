@@ -8,6 +8,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Database;
 
@@ -574,22 +575,23 @@ class Healthcheck
 
         // Pastoral Care Tables (Only If Module Enabled)
 
-        if ($this->configMapper->get('pastoral_enabled')) {
-            $allPastoralTables = [
-                'luPastoralCareAction',
-                'luPastoralCareActionType',
-                'luPastoralCareCategory',
-                'luPastoralCareType',
+        if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_ENABLED)) {
+            $allPastoralTables      = [
                 'PastoralCareComments',
                 'PastoralCareContacts',
                 'PastoralCareActions',
-                'tPastoralCare'
+                'tPastoralCare',
             ];
             $writablePastoralTables = [
                 'PastoralCareComments',
                 'PastoralCareContacts',
-                'tPastoralCare'
+                'tPastoralCare',
             ];
+            if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $allPastoralTables[]      = 'luPastoralCareAction';
+                $allPastoralTables[]      = 'luPastoralCareActionType';
+                $writablePastoralTables[] = 'PastoralCareActions';
+            }
             $this->selectTest($allPastoralTables);
             $this->insertTest($writablePastoralTables);
         }
