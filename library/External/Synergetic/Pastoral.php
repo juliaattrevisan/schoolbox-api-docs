@@ -778,11 +778,26 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * Inserts actions to Synergetic
-     * - Actions, which can be selected in the dropdown, depend on selected Type. (doesn't seem to have concept of completion)
-     * - luPastoralCareActionType table defines list of actions that are available in the system.
-     * - luPastoralCareAction table defines available combinations of Types, Categories (subtype in SB) and Action Types.
-     * - PastoralCareActions table holds relationship between PastoralCareSeq and luPastoralCareActionSeq.
+     * Inserts `$pastoral`'s actions into Synergetic.
+     *
+     * A pastoral record action may only be inserted into Synergetic if _all_
+     * of the following conditions are met:
+     * * the action's code (`lu_pastoral_action.external_code`)
+     *   matches a Synergetic external code (`luPastoralCareActionType.Code`)
+     * * the record's type's code (`lu_pastoral_type.external_code`)
+     *   matches a Synergetic external code (`luPastoralCareType.Code`)
+     * * the record has a subtype
+     * * the record's subtype's code (`lu_pastoral_subtype.external_code`)
+     *   matches a Synergetic external code (`luPastoralCareCategory.Code`)
+     * * the action is available for the record's type and subtype
+     *   (`luPastoralCareAction` has a row with the `PastoralCareTypeCode`,
+     *   `PastoralCareCategoryCode` and `PastoralCareActionTypeCode` matching
+     *   the record's type's code, record's subtype's code and action's code)
+     *
+     * Insertion of actions have the limitation of only being able to be added:
+     * they may not be removed, nor may they be marked as done.
+     * (Synergetic appears to offer no ability to mark actions as done, anyway.)
+     *
      * @param Pastoral $pastoral
      * @throws MapperException
      */
