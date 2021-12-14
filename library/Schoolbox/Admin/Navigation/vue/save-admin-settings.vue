@@ -77,8 +77,9 @@ export default {
          */
         initFormChangeListeners () {
             document.getElementById(this.formId).addEventListener('change', () => this.onFormDataChange());
+            document.getElementById(this.formId).addEventListener('keyup', () => this.onFormDataChange());
             CKEDITOR.on('instanceReady', (instanceReadyEvent) => { //need to wait until the ckEditor is loaded prior to listening for chnages
-                instanceReadyEvent.editor.on('blur', (changeEvent) => { //update the linked <textarea>, which doesn't update until form save otherwise
+                instanceReadyEvent.editor.on('change', (changeEvent) => { //update the linked <textarea>, which doesn't update until form save otherwise
                     document.getElementById(changeEvent.editor.name).textContent = changeEvent.editor.getData();
                     this.onFormDataChange()
                 });
