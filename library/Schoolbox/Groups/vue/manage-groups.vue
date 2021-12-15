@@ -34,7 +34,7 @@ export default {
     data () {
         return {
             selectedGroups: selectionTypes.GROUPS_IM_IN, //current group selection as a String
-            filteredGroups: null, //selectedGroups, then also with the search filter considered and as an Array
+            filteredGroups: [], //selectedGroups, then also with the search filter considered and as an Array
             isSearchActive: false, //to update the empty state messages to consider searching
         }
     },
@@ -53,11 +53,24 @@ export default {
     },
 
     created () {
-        this.filteredGroups = this.groups; //the initial group state
-        location.hash = this.selectedGroups;
+        this.checkForValidHash();
     },
 
     methods: { 
+
+        /**
+         * The hash is used for initial group selection display, so we can land straight
+         * on my favourite groups, groups pending membership etch 
+         * 
+         * @param { String }
+         */
+        checkForValidHash () {
+            const hash = window.location.hash.substring(1); //ditch the # of the hash
+            const isHashValid = Object.values(selectionTypes).includes(hash); //check if the hash is one of the valid selectionTypes
+            if (hash && isHashValid) {
+                this.selectedGroups = hash;
+            } 
+        },
 
         /**
          * A <select> change has taken place
@@ -66,7 +79,7 @@ export default {
          */
         onGroupsSelected (groupsSelection) {
             this.selectedGroups = groupsSelection;
-            location.hash = this.selectedGroups;
+            window.location.hash = this.selectedGroups;
         },
 
         /**
@@ -75,7 +88,7 @@ export default {
          * @param { Array }
          * @param { Boolean }
          */
-        onGroupsFiltered (groups, isSearchActive) {
+        onGroupsFiltered (groups, isSearchActive=false) {
             this.filteredGroups = groups;
             this.isSearchActive = isSearchActive;
         },
