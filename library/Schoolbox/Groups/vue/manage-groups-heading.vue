@@ -142,14 +142,6 @@ export default {
             </div>
         </div>
         <div class="row">
-            <div class="column small-8">
-                <input
-                    v-model="query"
-                    @input="$event.target.composing = false"
-                    :placeholder="inputPlaceholder"
-                    type="text"
-                />
-            </div>
             <div class="column small-4">
                 <select @change="onSelectionChange($event)" ref="select">
                     <option :value="selectionTypes.ALL_GROUPS">All groups</option>
@@ -158,6 +150,14 @@ export default {
                     <option :value="selectionTypes.GROUPS_I_CAN_JOIN">Groups I can join</option>
                     <option :value="selectionTypes.GROUPS_PENDING_MEMBERSHIP">Groups pending membership</option>
                 </select>
+            </div>
+            <div class="column small-8">
+                <input
+                    v-model="query"
+                    @input="$event.target.composing = false"
+                    :placeholder="inputPlaceholder"
+                    type="text"
+                />
             </div>
         </div>
     </div>

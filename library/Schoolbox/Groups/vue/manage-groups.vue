@@ -54,6 +54,7 @@ export default {
 
     created () {
         this.filteredGroups = this.groups; //the initial group state
+        location.hash = this.selectedGroups;
     },
 
     methods: { 
@@ -65,6 +66,7 @@ export default {
          */
         onGroupsSelected (groupsSelection) {
             this.selectedGroups = groupsSelection;
+            location.hash = this.selectedGroups;
         },
 
         /**
