@@ -116,7 +116,9 @@ export default {
     <div>
         <div class="row">
             <div class="column small-12">
-                <h1>{{ pageTitle }}</h1>
+                <transition name="fade" mode="out-in">
+                    <h1 :key="pageTitle">{{ pageTitle }}</h1>
+                </transition>
             </div>
         </div>
         <div class="row">
@@ -142,5 +144,12 @@ export default {
 </template>
 
 <style scoped>
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.2s;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
 
 </style>

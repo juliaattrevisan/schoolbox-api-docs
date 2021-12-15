@@ -26,17 +26,37 @@ export default {
     data () {
         return {
             isProcessing: false, //to disable other actions while one is already taking place
-            enrolmentStatus: null, //to respond to enrolment changes, joining and leaving group
-            isFavourite: null, //to show whether the group is a favourite or not
-            isNotificationsOn: null, //to show whether notifications is turned or not
         }
     },
 
-    created () {
-        this.initGroupProps();    
-    },
-
     computed: {
+
+        /**
+         * To respond to enrolment changes, joining and leaving group
+         * 
+         * @returns { String }
+         */
+        enrolmentStatus () {
+            return this.group.enrolmentStatus;
+        },
+
+        /**
+         * To show whether the group is a favourite or not
+         * 
+         * @returns { Boolean }
+         */
+        isFavourite () {
+            return this.group.isFavourite;
+        },
+
+        /**
+         * To show whether notifications is turned or not
+         * 
+         * @returns { Boolean }
+         */
+        isNotificationsOn () {
+            return this.group.isNotificationsOn;
+        },
 
         /**
          * Cant leave private groups, shown so can access other features
@@ -77,15 +97,6 @@ export default {
     },
 
     methods: {
-
-        /**
-         * Set up the properties on the group object that need to be reactive
-         */
-        initGroupProps () {
-            this.enrolmentStatus = this.group.enrolmentStatus;
-            this.isFavourite = this.group.isFavourite;
-            this.isNotificationsOn = this.group.isNotificationsOn;
-        },
 
         /**
          * Get the image style, adding in the cover image only if available
@@ -141,7 +152,7 @@ export default {
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.enrolmentStatus = responseData.enrolmentStatus; //could be either 'enrolled' or 'pending'
+                    this.group.enrolmentStatus = responseData.enrolmentStatus; //could be either 'enrolled' or 'pending'
                     this.$emit('on-edit-success', 'Group joined');
                 }
             } catch (error) {
@@ -165,9 +176,10 @@ export default {
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
+                    this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
                     this.$emit('on-edit-success', 'Group left');
-                    if (this.isFavourite) {
+                    if (this.group.isFavourite) { //assumed that wouldn't be a favourite group if re-added
+                        this.group.isFavourite = false;
                         removeGroupFromSideMenu(this.group.id);
                     }
                 }
@@ -193,7 +205,7 @@ export default {
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.isFavourite = responseData.isFavourite;
+                    this.group.isFavourite = responseData.isFavourite;
                     this.$emit('on-edit-success', 'Added to favourites');
                     addGroupToSideMenu(this.group.name, `/homepage/${this.group.id}/`);
                 }
@@ -219,7 +231,7 @@ export default {
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.isFavourite = responseData.isFavourite;
+                    this.group.isFavourite = responseData.isFavourite;
                     this.$emit('on-edit-success', 'Removed from favourites');
                     removeGroupFromSideMenu(this.group.id);
                 }
@@ -245,7 +257,7 @@ export default {
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.isNotificationsOn = responseData.isNotificationsOn;
+                    this.group.isNotificationsOn = responseData.isNotificationsOn;
                     this.$emit('on-edit-success', 'Added to notifications');
                 }
             } catch (error) {
@@ -270,7 +282,7 @@ export default {
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.isNotificationsOn = responseData.isNotificationsOn;
+                    this.group.isNotificationsOn = responseData.isNotificationsOn;
                     this.$emit('on-edit-success', 'Removed from notifications');
                 }
             } catch (error) {
