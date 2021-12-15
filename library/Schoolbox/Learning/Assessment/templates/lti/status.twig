@@ -49,37 +49,41 @@
     {% set pStatusText    = pTooltip %}
     {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
 
-    <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}" class="actions-small-1">
-        <div class="flex-grade list-item">
-            {% include '@learningAssessment/fragments/lti/participantStatus.twig' with {
-                participant: participant,
-                statusClass: pStatusClass,
-                statusText:  pStatusText,
-                statusTip:   pTooltip,
-                routeArgs:   routeArgs,
-            } only %}
+    <li data-status="{{ pStatusClass }}" data-participant-name="{{ participant.user.fullName }}">
+        <div class="small-12 columns">
+            <div class="row actions-small-1">
+                <div class="flex-grade list-item">
+                    {% include '@learningAssessment/fragments/lti/participantStatus.twig' with {
+                        participant: participant,
+                        statusClass: pStatusClass,
+                        statusText:  pStatusText,
+                        statusTip:   pTooltip,
+                        routeArgs:   routeArgs,
+                    } only %}
 
-            {% if (latestFeedback.humanReadableMark ?? null) is not null %}
-                {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
-                <div class="grade {{ urgencyClass }}-bg">
-                    <span>{{ latestFeedback.humanReadableMark ?? ''}}</span>
+                    {% if (latestFeedback.humanReadableMark ?? null) is not null %}
+                        {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
+                        <div class="grade {{ urgencyClass }}-bg">
+                            <span>{{ latestFeedback.humanReadableMark ?? ''}}</span>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+
+                {% set createAttemptIdBase = "createAttempt-" ~ participant.user.id %}
+                <nav>
+                    <a class="icon-more" title="" data-dropdown="feedbackOptions-{{ participant.user.id }}"></a>
+                </nav>
+
+                <ul id="feedbackOptions-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                    {%- apply spaceless %}
+                        {% if pActionSummary %}
+                            <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s attempt history">View Attempt History</a></li>
+                        {% endif %}
+                        <li><a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work" title="Create score for {{ participant.user.firstName }}">Create Score...</a></li>
+                    {% endapply -%}
+                </ul>
+            </div>
         </div>
-
-        {% set createAttemptIdBase = "createAttempt-" ~ participant.user.id %}
-        <nav>
-            <a class="icon-more" title="" data-dropdown="feedbackOptions-{{ participant.user.id }}"></a>
-        </nav>
-
-        <ul id="feedbackOptions-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
-            {%- apply spaceless %}
-                {% if pActionSummary %}
-                    <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s attempt history">View Attempt History</a></li>
-                {% endif %}
-                <li><a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work" title="Create score for {{ participant.user.firstName }}">Create Score...</a></li>
-            {% endapply -%}
-        </ul>
 
         <div id="{{ createAttemptIdBase }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
             <h2>Create score for {{ participant.user.fullname }}</h2>
