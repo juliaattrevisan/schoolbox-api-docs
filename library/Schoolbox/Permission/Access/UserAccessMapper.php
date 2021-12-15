@@ -237,7 +237,6 @@ class UserAccessMapper extends Mapper
                 //correct service, now to check perms
                 if ($row->getAccessLevel() > $finalAccess[$key]->getAccessLevel()) {
                     $finalAccess[$key] = $row;
-                    continue;
                 }
             }
         }
