@@ -7,6 +7,7 @@
 
 import enrolmentTypes from '../js/manageGroupsEnrolmentTypes';
 import groupTypes from '../js/manageGroupsGroupTypes';
+import { gsap } from 'gsap/all';
 import { addGroupToSideMenu, removeGroupFromSideMenu } from '../js/modifyGroupSideMenu';
 
 
@@ -192,36 +193,25 @@ export default {
         },
 
         /**
-         * Add to the users favourite list
+         * Toggle the group favourite status
+         * 
+         * @param { Event }
          */
-        async addToFavourites () {
+        async toggleFavourites (event) {
             this.isProcessing = true;
-            this.$emit('on-edit-start', 'Adding to favourites...');
-            try {
-                const responseData = await this.getResponseData({
-                    action: 'edit',
-                    isFavourite: '1'
-                });
-                if (responseData.error) {
-                    this.$emit('on-edit-error', responseData.error);
-                } else {
-                    this.group.isFavourite = responseData.isFavourite;
-                    this.$emit('on-edit-success', 'Added to favourites');
-                    addGroupToSideMenu(this.group.name, `/homepage/${this.group.id}/`);
-                }
-            } catch (error) {
-                console.warn(error);
-                this.$emit('on-edit-error', 'Unable to add to favourites');
-            } finally {
-                this.isProcessing = false;
+            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } );
+            if (this.isFavourite) {
+                await this.removeFromFavourites();
+            } else {
+                await this.addToFavourites();
             }
+            this.isProcessing = false;
         },
 
         /**
          * Remove from the users favourite list
          */
         async removeFromFavourites () {
-            this.isProcessing = true;
             this.$emit('on-edit-start', 'Removing from favourites...');
             try {
                 const responseData = await this.getResponseData({
@@ -233,46 +223,57 @@ export default {
                 } else {
                     this.group.isFavourite = responseData.isFavourite;
                     this.$emit('on-edit-success', 'Removed from favourites');
-                    removeGroupFromSideMenu(this.group.id);
+                    await removeGroupFromSideMenu(this.group.id);
                 }
             } catch (error) {
                 console.warn(error);
                 this.$emit('on-edit-error', 'Unable to remove from favourites');
-            } finally {
-                this.isProcessing = false;
-            }
+            } 
         },
 
         /**
-         * Add to the users notifications list
+         * Add to the users favourite list
          */
-        async addToNotifications () {
-            this.isProcessing = true;
-            this.$emit('on-edit-start', 'Adding to notifications...');
+        async addToFavourites () {
+            this.$emit('on-edit-start', 'Adding to favourites...');
             try {
                 const responseData = await this.getResponseData({
                     action: 'edit',
-                    isNotificationsOn: '1'
+                    isFavourite: '1'
                 });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
-                    this.group.isNotificationsOn = responseData.isNotificationsOn;
-                    this.$emit('on-edit-success', 'Added to notifications');
+                    this.group.isFavourite = responseData.isFavourite;
+                    this.$emit('on-edit-success', 'Added to favourites');
+                    await addGroupToSideMenu(this.group.name, `/homepage/${this.group.id}/`);
                 }
             } catch (error) {
                 console.warn(error);
-                this.$emit('on-edit-error', 'Unable to add to notifications');
-            } finally {
-                this.isProcessing = false;
+                this.$emit('on-edit-error', 'Unable to add to favourites');
+            } 
+        },
+
+        /**
+         * Toggle the group favourite status
+         * 
+         * @param { Event }
+         */
+        async toggleNotifications (event) {
+            this.isProcessing = true;
+            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } );
+            if (this.isNotificationsOn) {
+                await this.removeFromNotifications();
+            } else {
+                await this.addToNotifications();
             }
+            this.isProcessing = false;
         },
 
         /**
          * Remove from the users notifications list
          */
         async removeFromNotifications () {
-            this.isProcessing = true;
             this.$emit('on-edit-start', 'Remove from notifications...');
             try {
                 const responseData = await this.getResponseData({
@@ -288,9 +289,29 @@ export default {
             } catch (error) {
                 console.warn(error);
                 this.$emit('on-edit-error', 'Unable to remove from notifications');
-            } finally {
-                this.isProcessing = false;
-            }
+            } 
+        },
+
+        /**
+         * Add to the users notifications list
+         */
+        async addToNotifications () {
+            this.$emit('on-edit-start', 'Adding to notifications...');
+            try {
+                const responseData = await this.getResponseData({
+                    action: 'edit',
+                    isNotificationsOn: '1'
+                });
+                if (responseData.error) {
+                    this.$emit('on-edit-error', responseData.error);
+                } else {
+                    this.group.isNotificationsOn = responseData.isNotificationsOn;
+                    this.$emit('on-edit-success', 'Added to notifications');
+                }
+            } catch (error) {
+                console.warn(error);
+                this.$emit('on-edit-error', 'Unable to add to notifications');
+            } 
         },
 
     }
@@ -305,14 +326,12 @@ export default {
             <div class="v-card small-12">
                 <div class="group-image-container">
                     <div class="card-class-image" :style="getImageStyles()"></div>
-                    <div class="group-actions" v-if="isEnrolled || isPrivate">
-                        <button v-if="isFavourite" class="group-action icon-favourite" title="Remove from Favourites" key="remove-favourite" @click="removeFromFavourites">Remove from Favourites</button>
-                        <button v-else class="group-action icon-favourite-hollow" title="Add to Favourites" key="add-favourite" @click="addToFavourites">Add to Favourites</button>
-                        <template v-if="!group.isForceFollow">
-                            <button v-if="isNotificationsOn" class="group-action icon-notifications" title="Remove from Notifications" key="remove-notification" @click="removeFromNotifications">Remove from Notifications</button>
-                            <button v-else class="group-action icon-notifications-hollow" title="Add to Notifications" key="add-notification" @click="addToNotifications">Add to Notifications</button>
-                        </template>
-                    </div>
+                    <transition name="slide">
+                        <div class="group-actions" v-if="isEnrolled || isPrivate" :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
+                            <button :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']" title="Toggle Favourites" @click="toggleFavourites">Toggle Favourites</button>
+                            <button v-if="!group.isForceFollow" :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"  title="Toggle Notifications" @click="toggleNotifications">Toggle Notifications</button>
+                        </div>
+                    </transition>
                 </div>
                 <div class="card-content classes groups actions-small-1">
                     <div class="list-item">
@@ -335,13 +354,15 @@ export default {
                         </ul>
                     </template>
                 </div>
-                <transition name="fade" mode="out-in">
-                    <button v-if="isPrivate" class="button expand private disabled" key="private" disabled>Private</button>
-                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave">Leave</button>
-                    <button v-else-if="isEnrolmentPending" class="button expand submit disabled" key="membershipPending" disabled>Membership pending</button>
-                    <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
-                    <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
-                </transition>
+                <div :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
+                    <transition name="fade" mode="out-in">
+                        <button v-if="isPrivate" class="button expand private disabled" key="private" disabled>Private</button>
+                        <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave">Leave</button>
+                        <button v-else-if="isEnrolmentPending" class="button expand submit disabled" key="membershipPending" disabled>Membership pending</button>
+                        <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
+                        <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
+                    </transition>
+                </div>
             </div>
         </section>
     </div>
@@ -350,6 +371,7 @@ export default {
 <style lang="scss" scoped>
 
 .group-image-container {
+    overflow: hidden; 
     position: relative;
 }
 
@@ -364,11 +386,15 @@ export default {
 .group-action {
     background: none;
     font-size: 0;
+    transition: all 0.2s;
     &:before {
         color: white;
         font-size: 1.5rem;
         margin: 0;
         padding: 0;
+    }
+    &:hover {
+        opacity: 0.8;
     }
 }
 
@@ -388,6 +414,18 @@ export default {
 }
 .fade-enter, .fade-leave-to {
     opacity: 0;
+}
+
+
+.slide-enter-active,
+.slide-leave-active {
+    transition: transform 0.3s ease-out;
+}
+.slide-enter-active, .slide-leave-to {
+    transform: translateX(100%);
+}
+.slide-enter-to {
+    transform: translateX(0%);
 }
 
 </style>

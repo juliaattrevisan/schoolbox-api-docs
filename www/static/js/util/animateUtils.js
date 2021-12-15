@@ -15,7 +15,7 @@ const PADDING_BOTTOM_ATTRIBUTE = 'data-padding-bottom';
  * @params { DOMElement }
  * @params { Number } in seconds, so 0.3 is 300ms
  */
-export const slideDown = async (element, duration = 0.3) => {
+export async function slideDown (element, duration = 0.3) {
     
     if (element.classList.contains('hide')) element.classList.remove('hide');
 
@@ -38,10 +38,20 @@ export const slideDown = async (element, duration = 0.3) => {
         paddingBottom: paddingBottom,
         overwrite: 'auto', 
         duration: duration,
-        ease: 'power1.inOut',
-        onComplete: () => element.style.overflow = 'visible'
+        ease: 'power1.out',
+        onComplete: () => onSlideDownComplete(element)
     } );
 
+}
+
+/**
+ * Revert to it's original state
+ * 
+ * @params { DOMElement }
+ */
+function onSlideDownComplete (element) {
+    element.style.height = 'auto';
+    element.style.overflow = 'visible';
 }
 
 /**
@@ -51,7 +61,7 @@ export const slideDown = async (element, duration = 0.3) => {
  * 
  * @returns { Number } 
  */
-const getPaddingTop = (element) => {
+function getPaddingTop (element) {
     if (element.getAttribute(PADDING_TOP_ATTRIBUTE)) {
         return parseFloat(element.getAttribute(PADDING_TOP_ATTRIBUTE));
     } else {
@@ -66,7 +76,7 @@ const getPaddingTop = (element) => {
  * 
  * @returns { Number } 
  */
-const getPaddingBottom = (element) => {
+function getPaddingBottom (element) {
     if (element.getAttribute(PADDING_BOTTOM_ATTRIBUTE)) {
         return parseFloat(element.getAttribute(PADDING_BOTTOM_ATTRIBUTE));
     } else {
@@ -80,7 +90,7 @@ const getPaddingBottom = (element) => {
  * @params { DOMElement }
  * @params { Number } in seconds, so 0.3 is 300ms
  */
-export const slideUp = (element, duration = 0.3) => {
+export async function slideUp (element, duration = 0.3) {
     element.style.overflow = 'hidden';
     const paddingTop = getPaddingTop(element);
     const paddingBottom = getPaddingBottom(element);
@@ -102,7 +112,7 @@ export const slideUp = (element, duration = 0.3) => {
  * @params { Number }
  * @params { Number }
  */
-const onSlideUpComplete = (element, paddingTop, paddingBottom) => {
+function onSlideUpComplete (element, paddingTop, paddingBottom) {
     element.style.display = 'none';
     element.style.height = 'auto';
     element.style.overflow = 'visible';

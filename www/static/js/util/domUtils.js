@@ -8,7 +8,7 @@
  * 
  * @return { Number } position of the DOM element
  */
-export const getIndex = (element) => {
+export function getIndex (element) {
     if (!element) {
         return -1;
     }
@@ -27,7 +27,7 @@ export const getIndex = (element) => {
  * @param { DOMElement } the DOM element to empty
  * 
  */
-export const empty = (element) => {
+export function empty (element) {
     while (element.firstChild) {
         element.removeChild(element.firstChild);
     }
@@ -40,7 +40,7 @@ export const empty = (element) => {
  * @param { DOMElement } the second DOM element
  * 
  */
-export const swapElements = (firstElement, secondElement) => {
+export function swapElements (firstElement, secondElement) {
     firstElement.parentNode.insertBefore(firstElement, secondElement);
 }
 
@@ -50,7 +50,7 @@ export const swapElements = (firstElement, secondElement) => {
  * @param { DOMElement } element to use as basis
  * @param { DOMElement } element that will be added
  */
- export const insertElementBefore = (referenceElement, targetElement) => {
+export function insertElementBefore (referenceElement, targetElement) {
     referenceElement.parentNode.insertBefore(targetElement, referenceElement);
 }
   
@@ -60,7 +60,7 @@ export const swapElements = (firstElement, secondElement) => {
  * @param { DOMElement } element to use as basis 
  * @param { DOMElement } element that will be added
  */
-export const insertElementAfter = (referenceElement, targetElement) => {
+export function insertElementAfter (referenceElement, targetElement) {
     referenceElement.parentNode.insertBefore(targetElement, referenceElement.nextSibling);
 }
 
@@ -70,7 +70,7 @@ export const insertElementAfter = (referenceElement, targetElement) => {
  * @param { DOMElement } the DOM element
  * 
  */
- export const insertBeforeFirstChild = (element) => {
+ export function insertBeforeFirstChild (element) {
     const theFirstChild = element.parentNode.firstChild;
     element.parentNode.insertBefore(element, theFirstChild);
 }
@@ -83,7 +83,7 @@ export const insertElementAfter = (referenceElement, targetElement) => {
  * 
  * @returns { DOMElement }   
  */
-export const getClosestElement = (targetElement, elements) => {
+export function getClosestElement (targetElement, elements) {
     const targetPoint = getElementsLeftAndMidHeightPoint(targetElement);
     let closestElement = elements[0];
     let minDistance = 99999; //if this doesn't get overwritten we got issues...
@@ -105,7 +105,7 @@ export const getClosestElement = (targetElement, elements) => {
  * 
  * @returns { x, y }   
  */
- export const getElementsLeftAndMidHeightPoint = (element) => {
+ export function getElementsLeftAndMidHeightPoint (element) {
     return {
         left: element.getBoundingClientRect().left,
         top: (element.getBoundingClientRect().top + window.scrollY) + (element.offsetHeight / 2)
@@ -119,7 +119,7 @@ export const getClosestElement = (targetElement, elements) => {
  * 
  * @returns { x, y }   
  */
-export const getElementsMidPoint = (element) => {
+export function getElementsMidPoint (element) {
     return {
         left: element.getBoundingClientRect().left + (element.offsetWidth / 2),
         top: (element.getBoundingClientRect().top + window.scrollY) + (element.offsetHeight / 2)
@@ -134,7 +134,7 @@ export const getElementsMidPoint = (element) => {
  * 
  * @returns { Boolean }  
  */
-export const isElementAboveOtherElement = (firstElement, secondElement) => {
+export function isElementAboveOtherElement (firstElement, secondElement) {
     return (getElementsMidPoint(firstElement).top > getElementsMidPoint(secondElement).top);
 }
 
@@ -146,7 +146,7 @@ export const isElementAboveOtherElement = (firstElement, secondElement) => {
  * 
  * @returns { Boolean }  
  */
-export const isElementBelowOtherElement = (firstElement, secondElement) => {
+export function isElementBelowOtherElement (firstElement, secondElement) {
     return (getElementsMidPoint(firstElement).top < getElementsMidPoint(secondElement).top);
 }
 
@@ -156,7 +156,7 @@ export const isElementBelowOtherElement = (firstElement, secondElement) => {
  * @param { DOMElement }  
  * @param { Styles } for example { position: 'absolute', top: '20px' } 
  */
-export const setStylesOnElement = (element,styles) => {
+export function setStylesOnElement (element,styles) {
     Object.assign(element.style, styles);
 }
 
@@ -164,7 +164,7 @@ export const setStylesOnElement = (element,styles) => {
  * Async inject a <script> tag into the DOM
  * https://stackoverflow.com/a/39008859
  */
-export const injectScript = (src) => {
+export function injectScript (src) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = src;
@@ -172,4 +172,18 @@ export const injectScript = (src) => {
         script.addEventListener('error', e => reject(e.error));
         document.head.appendChild(script);
     });
+}
+
+/**
+ * Set and get an attribute on an element
+ * 
+ * @param { Element }  
+ * @param { String }
+ * @param { String }
+ * 
+ * @returns { String }  
+ */
+export function setAndGetAttribute (element, attribute, value) {
+    element.setAttribute(attribute, value)
+    return element.getAttribute(attribute);
 }
