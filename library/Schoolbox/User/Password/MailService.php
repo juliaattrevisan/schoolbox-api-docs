@@ -168,7 +168,11 @@ class MailService
         $sent = [];
 
         if (empty($users)) {
-            // bai.
+            // No users to mail to were found.
+            // To mitigate timing attacks: craft the email regardless, and send
+            // it to the blackhole.
+            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
+            $email->sendToBlackhole();
             return $sent;
         }
 

@@ -263,6 +263,9 @@ abstract class AbstractMailer implements IMailer
      */
     public function sendToBlackhole()
     {
+        // This has to be sent somewhere
+        $this->email->to(new Address('devnull@blackhole'));
+
         // construct body and set headers
         $this->email->text($this->composePlain());
         $this->email->html($this->composeHTML());
