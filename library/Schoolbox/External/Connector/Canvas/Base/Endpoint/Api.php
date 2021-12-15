@@ -137,7 +137,8 @@ class Api implements IApi
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
-                $response = $this->client->$method($route, [
+                //we(schoolbox) have said / signed an agreement with NEWIC that we will only be hitting the GET routes, I'll hard code this here, so we don't make the mistake.
+                $response = $this->client->get($route, [
                     RequestOptions::JSON => $params
                 ]);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {

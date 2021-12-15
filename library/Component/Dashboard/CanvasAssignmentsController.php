@@ -267,6 +267,15 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
 
         //get calendar events for the current user
         try {
+            /**
+             * canvas API being what it is, I apparently need to specify the courses when doing the API call for the assignments
+             * so lets grab a list of the courses the user is in, then build / send the get assignments request, with a limit of 10 courses. yay for loops
+             */
+            $courses = $connection->retrieveDocument('get', "/api/v1/users/${userId}/courses", [
+                'state'             => 'available',
+                'enrollment_state'  => 'active',
+            ]);
+
             $this->assignments = $connection->retrieveDocument('get', "/api/v1/users/${userId}/calendar_events", [
                 'end_date'  => $endDate,
                 'type'      => 'assignment',
