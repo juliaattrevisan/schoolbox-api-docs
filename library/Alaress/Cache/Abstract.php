@@ -128,10 +128,6 @@ abstract class Alaress_Cache_Abstract
 
         $this->headers = $headers;
 
-        /* Logging class handles verbosity and any logging
-         */
-        // $this->registerObserver('Alaress_Cache_Locker_Log');
-
         /* Determine the filenames of files that could be used
          */
         $this->cachedFile = $this->generateCachedFilename();
@@ -161,23 +157,13 @@ abstract class Alaress_Cache_Abstract
                     if ($this->isExpired($this->lockFile, $this->lockTime)) {
                         /* Update cached version
                          */
-                        //$this->notifyObservers("Cache expired, lockfile expired perhaps due to timeout or halted. Regenerate everything.");
                         $this->newCacheUpdate();
-                    } else {
-                        /* Load content from cached version
-                         */
-                        //$this->notifyObservers("Cache expired, lockfile still fresh. Loading from cache: {$this->cachedFile}, while in process of retrieving new stream contents.");
                     }
                 } else {
                     /* Update cached version
                      */
-                    //$this->notifyObservers("Cache expired, lockfile doesn't exist. Regenerate everything.");
                     $this->newCacheUpdate();
                 }
-            } else {
-                /* Load content from cached version
-                 */
-                //$this->notifyObservers("Cached file exists and is still fresh. Loading from cache: {$this->cachedFile}");
             }
         } else {
             /* First load
@@ -290,19 +276,7 @@ abstract class Alaress_Cache_Abstract
     {
         $now = $_SERVER['REQUEST_TIME'];
 
-        /* Difference between now and when file was created
-         */
-        $difference = $now - filemtime($file);
-
-        /* How much time is remaining
-         */
-        $remaining = $duration - $difference;
-
-        //$this->notifyObservers(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
-        //$this->notifyObservers('[' . $difference . '] ' . $now . ' - ' . filemtime($file));
-
         if (filemtime($file) < ($now - $duration)) {
-            //$this->notifyObservers($file . ' expired.');
             return true;
         }
 
@@ -339,28 +313,6 @@ abstract class Alaress_Cache_Abstract
     protected function encode($data): string
     {
         return md5($data);
-    }
-
-    /**
-     * Add an observer
-     *
-     * @param string $observer
-     * @return Alaress_Cache_Abstract
-     */
-    private function registerObserver($observer): Alaress_Cache_Abstract
-    {
-        $this->observerRegistry[$observer] = new $observer($this->getVerbose());
-    }
-
-    /**
-     * Remove an observer
-     *
-     * @param string $observer
-     * @return void
-     */
-    private function unregisterObserver($observer): void
-    {
-        unset($this->observerRegistry[$observer]);
     }
 
     /**

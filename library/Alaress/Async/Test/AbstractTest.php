@@ -11,28 +11,14 @@ namespace Alaress\Async\Test;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
 
 abstract class AbstractTest extends BaseTestCase implements TestCase
 {
-
     /** @var LoggerInterface */
     protected $log;
 
-    /** @var LoopInterface */
-    private $loop;
-
     /** @var callable */
     private $buffy;
-
-
-    /**
-     * @param LoopInterface $loop
-     */
-    public function attachLoop(LoopInterface $loop)
-    {
-        $this->loop = $loop;
-    }
 
     /**
      * @param LoggerInterface $log

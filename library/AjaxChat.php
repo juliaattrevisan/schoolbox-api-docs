@@ -50,7 +50,6 @@ class AjaxChat
 
         $this->groupHandler = new Group();
         $this->chatHandler = new Chat();
-        $this->homepageHandler = new Homepage($this->catID);
 
         $this->output = [];
 

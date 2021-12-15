@@ -47,7 +47,7 @@ class HasServicePermission extends All
      * * UserAccess::SERVICE_CALENDAR and UserAccess::SERVICE_NEWS: a campus ID
      * * Anything else: not used
      *
-     * @var int|callable
+     * @var int|callable|null
      */
     protected $serviceIdentifier = null;
 
@@ -79,23 +79,21 @@ class HasServicePermission extends All
             // Check this user's permissions against this item's service and
             // access level.
             $accessList = $user->getAccessList();
-            if (!empty($accessList)) {
-                foreach ($accessList as $access) {
-                    if (
-                        $access->getService() == $this->service
-                        && $access->getAccessLevel() >= $this->accessLevel
-                    ) {
-                        if (!isset($this->serviceIdentifier)) {
-                            return true;
-                        }
-                        if (is_callable($this->serviceIdentifier)) {
-                            $identifier = call_user_func($this->serviceIdentifier, $params, $user);
-                        } else {
-                            $identifier = $this->serviceIdentifier;
-                        }
-                        if ($identifier == $access->getServiceIdentifier()) {
-                            return true;
-                        }
+            foreach ($accessList as $access) {
+                if (
+                    $access->getService() == $this->service
+                    && $access->getAccessLevel() >= $this->accessLevel
+                ) {
+                    if (!isset($this->serviceIdentifier)) {
+                        return true;
+                    }
+                    if (is_callable($this->serviceIdentifier)) {
+                        $identifier = call_user_func($this->serviceIdentifier, $params, $user);
+                    } else {
+                        $identifier = $this->serviceIdentifier;
+                    }
+                    if ($identifier == $access->getServiceIdentifier()) {
+                        return true;
                     }
                 }
             }
