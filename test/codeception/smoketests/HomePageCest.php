@@ -309,7 +309,6 @@ class HomePageCest
         //getting the folder id for the text box created above to get it updated in the next test
         $json_reply = json_decode($i->grabResponse(), true);
         $createdFolderId = ($json_reply['id']);
-        var_dump($json_reply);
 
         //modifying the textbox heading and body (put trait)
         $heading = 'Getting this title updated at ' . $timestamp;
