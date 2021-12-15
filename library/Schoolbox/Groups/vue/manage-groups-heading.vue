@@ -15,12 +15,15 @@ export default {
             type: Array,
             required: true,
         },
+        selectedGroups: { //current <select> selection
+            type: String, 
+            required: true,
+        }
     },
 
     data () {
         return {
             query: '', //to further refine group search
-            currentGroupSelection: 'allGroups' //current group selection
         }
     },
 
@@ -39,7 +42,7 @@ export default {
                 [selectionTypes.GROUPS_I_CAN_JOIN]: `Groups I can join`,
                 [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: `Groups pending membership`,
             };
-            return pageTitle[this.currentGroupSelection];
+            return pageTitle[this.selectedGroups];
         },
 
         /**
@@ -55,7 +58,7 @@ export default {
                 [selectionTypes.GROUPS_I_CAN_JOIN]: `Search groups I can join...`,
                 [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: `Search groups pending membership...`,
             };
-            return inputPlaceholder[this.currentGroupSelection];
+            return inputPlaceholder[this.selectedGroups];
         },
 
         /**
@@ -71,7 +74,7 @@ export default {
                 [selectionTypes.GROUPS_I_CAN_JOIN]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.NOT_ENROLLED),
                 [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.PENDING),
             };
-            return currentGroups[this.currentGroupSelection]();
+            return currentGroups[this.selectedGroups]();
         },
 
         /**
@@ -99,7 +102,7 @@ export default {
          * @param { Array } 
          */
         groupsFiltered (newGroups) {
-            this.$emit('on-selection-change', newGroups);
+            this.$emit('on-groups-filtered', newGroups);
         }
 
     },
@@ -107,6 +110,19 @@ export default {
     created () {
         this.selectionTypes = selectionTypes; //to access within the template
     },
+
+    methods: {
+
+        /**
+         * Notify manage-groups.vue of state change
+         * 
+         * @param { Object } 
+         */
+        onSelectionChange (event) {
+            this.$emit('on-groups-selected', event.currentTarget.value);
+        }
+
+    }
 
 }
 
@@ -131,7 +147,7 @@ export default {
                 />
             </div>
             <div class="column small-4">
-                <select v-model="currentGroupSelection">
+                <select @change="onSelectionChange($event)">
                     <option :value="selectionTypes.ALL_GROUPS">All groups</option>
                     <option :value="selectionTypes.MY_FAVOURITE_GROUPS">My favourite groups</option>
                     <option :value="selectionTypes.GROUPS_IM_IN">Groups I'm in</option>

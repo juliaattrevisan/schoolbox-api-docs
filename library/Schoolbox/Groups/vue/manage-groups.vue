@@ -6,6 +6,7 @@
 
 import ManageGroupsHeading from './manage-groups-heading';
 import ManageGroupsItem from './manage-groups-item';
+import selectionTypes from '../js/manageGroupsSelectionTypes';
 import Toast from '@vue/components/toast';
 
 
@@ -30,7 +31,8 @@ export default {
 
     data () {
         return {
-            currentGroupsSelection: null,
+            selectedGroups: selectionTypes.GROUPS_IM_IN, //current group selection
+            filteredGroups: null, //selectedGroups, then also with the search filter considered
         }
     },
 
@@ -42,24 +44,33 @@ export default {
          * @returns { Number }
          */
         isGroupsEmpty () {
-            return this.currentGroupsSelection.length === 0;
+            return this.filteredGroups.length === 0;
         },
 
     },
 
     created () {
-        this.currentGroupsSelection = this.groups; //the initial group state
+        this.filteredGroups = this.groups; //the initial group state
     },
 
     methods: { 
 
         /**
-         * A <select> change or search query has been updated
+         * A <select> change has taken place
+         * 
+         * @param { String }
+         */
+        onGroupsSelected (groupsSelection) {
+            this.selectedGroups = groupsSelection;
+        },
+
+        /**
+         * The current <select> status and search query considered
          * 
          * @param { Array }
          */
-        onSelectionChange (groups) {
-            this.currentGroupsSelection = groups;
+        onGroupsFiltered (groups) {
+            this.filteredGroups = groups;
         },
 
         /**
@@ -99,7 +110,9 @@ export default {
     <div>
         <manage-groups-heading 
             :groups="groups" 
-            @on-selection-change="onSelectionChange"
+            :selected-groups="selectedGroups" 
+            @on-groups-selected="onGroupsSelected"
+            @on-groups-filtered="onGroupsFiltered"
         />
         <div v-if="isGroupsEmpty" class="row">
             <div class="column small-12">
@@ -111,7 +124,7 @@ export default {
         </div>
         <div v-else class="row">
             <manage-groups-item 
-                v-for="group in currentGroupsSelection" 
+                v-for="group in filteredGroups" 
                 :key="group.id" 
                 :endpoint="endpoint"
                 :group="group"
