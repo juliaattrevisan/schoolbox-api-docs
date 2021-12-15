@@ -143,7 +143,7 @@ export default {
             </div>
         </div>
         <div class="row">
-            <div class="column small-4">
+            <div class="column small-12 medium-4">
                 <select @change="onSelectionChange($event)" ref="select">
                     <option :value="selectionTypes.ALL_GROUPS">All groups</option>
                     <option :value="selectionTypes.MY_FAVOURITE_GROUPS">My favourite groups</option>
@@ -152,7 +152,7 @@ export default {
                     <option :value="selectionTypes.GROUPS_PENDING_MEMBERSHIP">Groups pending membership</option>
                 </select>
             </div>
-            <div class="column small-8">
+            <div class="column small-12 medium-8">
                 <input
                     v-model="query"
                     @input="$event.target.composing = false"

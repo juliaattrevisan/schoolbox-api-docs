@@ -82,7 +82,7 @@ export default {
          * 
          * @returns { Boolean }
          */
-        isEnrolmentPending () {
+        isMembershipPending () {
             return this.enrolmentStatus === enrolmentTypes.PENDING;
         },
 
@@ -354,15 +354,13 @@ export default {
                         </ul>
                     </template>
                 </div>
-                <div :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
-                    <transition name="fade" mode="out-in">
-                        <button v-if="isPrivate" class="button expand private disabled" key="private" disabled>Private</button>
-                        <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave">Leave</button>
-                        <button v-else-if="isEnrolmentPending" class="button expand submit disabled" key="membershipPending" disabled>Membership pending</button>
-                        <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join">Request to join</button>
-                        <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join">Join</button>
-                    </transition>
-                </div>
+                <transition name="fade" mode="out-in">
+                    <div v-if="isPrivate" class="expand private" key="private">Private</div>
+                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave" :disabled="isProcessing">Leave</button>
+                    <div v-else-if="isMembershipPending" class="expand membership-pending" key="membershipPending">Membership pending</div>
+                    <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join" :disabled="isProcessing">Request to join</button>
+                    <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join" :disabled="isProcessing">Join</button>
+                </transition>
             </div>
         </section>
     </div>
@@ -371,7 +369,7 @@ export default {
 <style lang="scss" scoped>
 
 .group-image-container {
-    overflow: hidden; 
+    overflow: hidden; //so can slide the .group-actions in and out
     position: relative;
 }
 
@@ -402,11 +400,16 @@ export default {
     display: inline-block;
     margin: 0;
     padding: 1rem; //add extra padding
+    &:disabled {
+        color: white;
+    }
 }
 
-.private {
+.private, .membership-pending  {
     background: #DDDDDD;
-    color: #5e5e5e;
+    color: #999999;
+    padding: 1rem; //add extra padding
+    text-align: center;
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -415,7 +418,6 @@ export default {
 .fade-enter, .fade-leave-to {
     opacity: 0;
 }
-
 
 .slide-enter-active,
 .slide-leave-active {
