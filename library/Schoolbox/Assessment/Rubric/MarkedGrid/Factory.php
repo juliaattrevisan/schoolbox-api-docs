@@ -64,6 +64,11 @@ class Factory
                     ? null
                     : $postCapabilities[$capabilityId]['customMark'];
 
+                //if null that is a valid entry
+                if ($capabilityCustomMarkInput === '') {
+                    $capabilityCustomMarkInput = null;
+                }
+
                 // Validate the input string first
                 $capMarkSpec = new ValidCapabilityMark($capabilityMark->getMarkScheme());
                 if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {

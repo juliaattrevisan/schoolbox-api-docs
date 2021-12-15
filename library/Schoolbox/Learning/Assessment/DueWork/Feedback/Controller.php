@@ -382,8 +382,8 @@ class Controller extends Base
             return;
         } catch (PDOException $e) {
             $this->sendError('Unable to save results');
-        } catch (\InvalidArgumentException $e) {
-            $this->sendError("Invalid Capability Mark: {$e->getMessage()}");
+//        } catch (\InvalidArgumentException $e) {
+//            $this->sendError("Invalid Capability Mark: {$e->getMessage()}");
         }
     }
 
