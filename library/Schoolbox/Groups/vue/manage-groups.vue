@@ -35,7 +35,7 @@ export default {
         return {
             selectedGroups: selectionTypes.GROUPS_IM_IN, //current group selection as a String
             filteredGroups: null, //selectedGroups, then also with the search filter considered and as an Array
-            isSearchActive: false, //to update the empty state message to consider searching
+            isSearchActive: false, //to update the empty state messages to consider searching
         }
     },
 
@@ -73,8 +73,9 @@ export default {
          * @param { Array }
          * @param { Boolean }
          */
-        onGroupsFiltered (groups) {
+        onGroupsFiltered (groups, isSearchActive) {
             this.filteredGroups = groups;
+            this.isSearchActive = isSearchActive;
         },
 
         /**
@@ -121,6 +122,7 @@ export default {
         <manage-groups-empty 
             v-if="isGroupsEmpty" 
             :selected-groups="selectedGroups"
+            :is-search-active="isSearchActive"
         />
         <div v-else class="row">
             <manage-groups-item 

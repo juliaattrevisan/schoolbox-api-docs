@@ -13,25 +13,51 @@ export default {
         selectedGroups: { //current <select> selection
             type: String, 
             required: true,
+        },
+        isSearchActive: { //to update the empty state messages to consider searching
+            type: Boolean, 
+            required: true,
         }
     },
 
     computed: {
 
         /**
-         * Change the place holder depending on the current selection
+         * Notify the user when there's no groups within the current selection
+         * 
+         * @returns { String } 
+         */
+        selectionMessage () {
+            const emptyMessage = {
+                [selectionTypes.ALL_GROUPS]: `No groups are available`,
+                [selectionTypes.MY_FAVOURITE_GROUPS]: `You don't currently have any favourite groups`,
+                [selectionTypes.GROUPS_IM_IN]: `You aren't currently in any groups`,
+                [selectionTypes.GROUPS_I_CAN_JOIN]: `There are currently no other groups you can join`,
+                [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: `You have no groups currently pending membership`,
+            };
+            return emptyMessage[this.selectedGroups];
+        },
+
+        /**
+         * Whether any groups matches the current search
+         * 
+         * @returns { String } 
+         */
+        searchMessage () {
+            if (this.isSearchActive) {
+                return ' that match your search'
+            } else {
+                return '';
+            }
+        },
+
+        /**
+         * Change the text depending on the status of the group selection and current search
          * 
          * @returns { String } 
          */
         emptyMessage () {
-            const emptyMessage = {
-                [selectionTypes.ALL_GROUPS]: `There are currently no groups that match your search`,
-                [selectionTypes.MY_FAVOURITE_GROUPS]: `You don't currently have any favourite groups.`,
-                [selectionTypes.GROUPS_IM_IN]: `You aren't currently in any groups.`,
-                [selectionTypes.GROUPS_I_CAN_JOIN]: `There are currently no other groups you can join.`,
-                [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: `You have no groups currently pending membership.`,
-            };
-            return emptyMessage[this.selectedGroups];
+            return `${this.selectionMessage}${this.searchMessage}.`;
         },
 
     }
