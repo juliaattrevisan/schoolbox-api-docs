@@ -106,7 +106,7 @@ class UserAccessMapper extends Mapper
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
-            'type' => UserAccess::ACCESS_FULL
+            'type' => UserAccess::ACCESS_FULL,
         ));
 
         if ($userAccess->count()) {
@@ -130,7 +130,7 @@ class UserAccessMapper extends Mapper
             'sid' => $folder->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
             'type' => UserAccess::ACCESS_FULL,
-            'uid' => $user->getId()
+            'uid' => $user->getId(),
         ));
 
         if ($userAccess->count()) {
@@ -207,7 +207,40 @@ class UserAccessMapper extends Mapper
         }
 
         $access = $access->merge($external);
-        return $access;
+        /**
+         * merge both arrays, internal SB group permissions and external DB group Permissions.
+         * If a permission matches but has more access Admin,Write then use that, not the lesser permission.
+         * UserAccess::ACCESS_FULL / UserAccess::ACCESS_Write / UserAccess::ACCESS_READ / UserAccess::ACCESS_DENY
+         */
+        $finalAccess = $this->createCollection();
+        $finalsid = [];
+        /** @var UserAccess $row */
+        foreach ($access as $row) {
+            //check if object (homepageId, userId) is already in $finalAccess array
+            //if not add it
+            //if it is, check the permission state, and add/update the one with higher permission
+
+            //use a key service (homepage/service).folderId as a key to help map / sort the perms
+            $key = "{$row->getService()}.{$row->getServiceIdentifier()}";
+            //check if the access entry is already in final, if not, add it
+            if (
+                !in_array($key, $finalsid)
+                && $finalAccess[$key] !== $row->getService()
+            ) {
+                $finalAccess[$key] = $row;
+                $finalsid[] = $key;
+                continue;
+            }
+            //check permission
+            //check if permission is higher or not, then grab the better perm, and save that...
+            if ($finalAccess[$key]->getService() && $row->getService()) {
+                //correct service, now to check perms
+                if ($row->getAccessLevel() > $finalAccess[$key]->getAccessLevel()) {
+                    $finalAccess[$key] = $row;
+                }
+            }
+        }
+        return $finalAccess->reindex();
     }
 
     /**
