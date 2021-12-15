@@ -14,6 +14,7 @@ use Payload\Request;
 
 /**
  * Encapsulates a textbox CREATE request
+ * creates a text box through manage all textbox page via post
  */
 class TextBoxCreate extends Request
 {
@@ -22,12 +23,12 @@ class TextBoxCreate extends Request
     /**
      * @var int
      */
-    private $homepageId;
+    private int $homepageId;
 
     /**
      * @var int
      */
-    private $componentInstanceId;
+    private int $componentInstanceId;
 
     public function __construct(int $homepageId, int $componentInstanceId)
     {
@@ -36,6 +37,9 @@ class TextBoxCreate extends Request
         $this->setBody('');
         $this->homepageId          = $homepageId;
         $this->componentInstanceId = $componentInstanceId;
+
+        $this->setHeader('content-type', 'application/json');
+        $this->setAccepts('application/json, text/javascript, */*; q=0.01');
     }
 
     public function setHeading(string $heading): void
@@ -51,6 +55,6 @@ class TextBoxCreate extends Request
     /** @inheritDoc */
     protected function getUrl(): string
     {
-        return "/textbox/folder/{$this->homepageId}/component/{$this->componentInstanceId}";
+        return "/textbox/folder/{$this->homepageId}";
     }
 }

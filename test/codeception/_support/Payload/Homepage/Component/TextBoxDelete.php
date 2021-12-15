@@ -12,7 +12,7 @@ namespace Payload\Homepage\Component;
 use Payload\DeleteTrait;
 use Payload\Request;
 
-class TextboxDelete extends Request
+class TextBoxDelete extends Request
 {
     use DeleteTrait;
 
@@ -23,7 +23,7 @@ class TextboxDelete extends Request
 
     public function __construct(int $homepageId, int $textboxId)
     {
-        $this->setReferer("/homepage/$homepageId");
+        $this->setReferer("/textbox/folder/$homepageId");
         $this->textboxId = $textboxId;
     }
 
