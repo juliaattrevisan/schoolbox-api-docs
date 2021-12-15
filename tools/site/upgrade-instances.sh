@@ -179,6 +179,10 @@ function upgrade_instances(){
 
     if [[ $is_primary_host == '1' ]]; then
     {
+      # TODO remove once all instance upgrade to 21.1.2+
+      echo "running row repair tool"
+      INSTANCE_ID="$i" "$site_root"/tools/schema/row-format.php -p -v
+
       echo "running update"
       INSTANCE_ID="$i" "$site_root"/tools/update-sql.sh
       # Ensure instance has JWT keys deployed. TODO, should be run once only on install, not on upgrade
