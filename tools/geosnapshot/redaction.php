@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 
 /**
@@ -11,7 +10,6 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Geosnapshot\Api;
-use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -58,8 +56,6 @@ $app = new class extends CliTool\App
 
 Geosnapshot Redactions send a list of students to Geosnapshot, describing which humans
 had their pictures redacted via the sis. Also transmits some additional metadata.
-
-If you enter planning mode, it'll show you a list of redacted dudes only
 
 Usage: php redaction.php [--perform]
 

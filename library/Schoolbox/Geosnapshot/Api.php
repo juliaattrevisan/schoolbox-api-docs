@@ -185,6 +185,7 @@ class Api
              * which is un-json_decodable - just return empty array I guess
              */
             $content = $response->getBody()->getContents();
+
             if ('' === $content) {
                 return [];
             }
