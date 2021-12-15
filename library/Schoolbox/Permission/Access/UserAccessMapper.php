@@ -213,7 +213,6 @@ class UserAccessMapper extends Mapper
          * UserAccess::ACCESS_FULL / UserAccess::ACCESS_Write / UserAccess::ACCESS_READ / UserAccess::ACCESS_DENY
          */
         $finalAccess = $this->createCollection();
-        $finalsid = [];
         /** @var UserAccess $row */
         foreach ($access as $row) {
             //check if object (homepageId, userId) is already in $finalAccess array
@@ -223,14 +222,7 @@ class UserAccessMapper extends Mapper
             //use a key service (homepage/service).folderId as a key to help map / sort the perms
             $key = "{$row->getService()}.{$row->getServiceIdentifier()}";
             //check if the access entry is already in final, if not, add it
-            if (
-                !in_array($key, $finalsid)
-                && $finalAccess[$key] !== $row->getService()
-            ) {
-                $finalAccess[$key] = $row;
-                $finalsid[] = $key;
-                continue;
-            }
+            $finalAccess[$key] ??= $row;
             //check permission
             //check if permission is higher or not, then grab the better perm, and save that...
             if ($finalAccess[$key]->getService() && $row->getService()) {
