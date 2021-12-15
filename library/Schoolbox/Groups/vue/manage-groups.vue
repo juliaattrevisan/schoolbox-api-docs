@@ -5,6 +5,7 @@
  */
 
 import ManageGroupsHeading from './manage-groups-heading';
+import ManageGroupsEmpty from './manage-groups-empty';
 import ManageGroupsItem from './manage-groups-item';
 import selectionTypes from '../js/manageGroupsSelectionTypes';
 import Toast from '@vue/components/toast';
@@ -14,8 +15,9 @@ export default {
 
     components: {
         ManageGroupsHeading,
+        ManageGroupsEmpty,
         ManageGroupsItem,
-        Toast,
+        Toast
     },
 
     props: {
@@ -31,8 +33,9 @@ export default {
 
     data () {
         return {
-            selectedGroups: selectionTypes.GROUPS_IM_IN, //current group selection
-            filteredGroups: null, //selectedGroups, then also with the search filter considered
+            selectedGroups: selectionTypes.GROUPS_IM_IN, //current group selection as a String
+            filteredGroups: null, //selectedGroups, then also with the search filter considered and as an Array
+            isSearchActive: false, //to update the empty state message to consider searching
         }
     },
 
@@ -68,6 +71,7 @@ export default {
          * The current <select> status and search query considered
          * 
          * @param { Array }
+         * @param { Boolean }
          */
         onGroupsFiltered (groups) {
             this.filteredGroups = groups;
@@ -114,14 +118,10 @@ export default {
             @on-groups-selected="onGroupsSelected"
             @on-groups-filtered="onGroupsFiltered"
         />
-        <div v-if="isGroupsEmpty" class="row">
-            <div class="column small-12">
-                <div class="empty-state">
-                    <i class="icon-group"></i>
-                    <p></p>
-                </div>
-            </div>
-        </div>
+        <manage-groups-empty 
+            v-if="isGroupsEmpty" 
+            :selected-groups="selectedGroups"
+        />
         <div v-else class="row">
             <manage-groups-item 
                 v-for="group in filteredGroups" 

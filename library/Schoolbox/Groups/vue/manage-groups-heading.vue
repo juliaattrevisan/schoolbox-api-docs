@@ -83,12 +83,11 @@ export default {
          * @returns { Array } 
          */
         groupsFiltered () {
-            let groupsFiltered = [];
             if (this.query.length <= 2) {
-                groupsFiltered = this.currentGroups;
+                return this.currentGroups;
+            } else {
+                return this.currentGroups.filter((group) => group.name.toLowerCase().includes(this.query));
             }
-            groupsFiltered = this.currentGroups.filter((group) => group.name.toLowerCase().includes(this.query));
-            return groupsFiltered;
         },
 
     },
@@ -102,13 +101,18 @@ export default {
          * @param { Array } 
          */
         groupsFiltered (newGroups) {
-            this.$emit('on-groups-filtered', newGroups);
+            const isSearchActive = this.query.length > 2 ? true : false;
+            this.$emit('on-groups-filtered', newGroups, isSearchActive);
         }
 
     },
 
     created () {
         this.selectionTypes = selectionTypes; //to access within the template
+    },
+
+    mounted () {
+        this.$refs.select.value = this.selectedGroups; //to set initial selection status
     },
 
     methods: {
@@ -147,7 +151,7 @@ export default {
                 />
             </div>
             <div class="column small-4">
-                <select @change="onSelectionChange($event)">
+                <select @change="onSelectionChange($event)" ref="select">
                     <option :value="selectionTypes.ALL_GROUPS">All groups</option>
                     <option :value="selectionTypes.MY_FAVOURITE_GROUPS">My favourite groups</option>
                     <option :value="selectionTypes.GROUPS_IM_IN">Groups I'm in</option>
