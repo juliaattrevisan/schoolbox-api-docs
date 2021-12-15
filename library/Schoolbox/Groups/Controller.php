@@ -230,7 +230,7 @@ class Controller extends BaseController
                    'group'              => $post['group'],
                    'user'               => $user->getId(),
                    'isFavourite'        => $userGroup->getFavourite(),
-                   'isNotificationsOn'  => 0,
+                   'isNotificationsOn'  => true,
                    'enrolmentStatus'    => $this->getEnrollmentText($userGroup),
                 ])
             );

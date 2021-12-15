@@ -337,7 +337,6 @@ class Controller extends BaseController
                 'perms'   => $this->getConfig()->getPermissionList($digest, $mobile),
                 'digest'  => $digest,
                 'mobile'  => $mobile,
-                'groups'  => $this->calculateFollowment(),
                 'config'  => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
             ],
         ]);
@@ -353,7 +352,6 @@ class Controller extends BaseController
         $post = $this->getRequest()->post;
 
         $postData   = isset($post['data']) ? $post['data'] : [];
-        $postFollow = isset($post['follow']) ? $post['follow'] : [];
 
         $conf = [];
 
@@ -364,11 +362,6 @@ class Controller extends BaseController
                     $conf[$slug][$key][$sourceId] = $this->getConfig()->persistUser($this->getUser(), $slug, $key, $settings);
                 }
             }
-        }
-
-        // update following if it was sent
-        if (count($postFollow)) {
-            $conf['follow'] = $this->getConfig()->persistFollow($this->getUser(), $postFollow);
         }
 
         if ($this->getRequest()->isXhr()) {
