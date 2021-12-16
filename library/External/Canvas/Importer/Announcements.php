@@ -133,7 +133,7 @@ class Announcements
         /* No course codes found? No trabajo
          */
         if (!\count($courseCodes)) {
-            $this->logInfo('No course codes found.');
+            $this->logInfo('No course codes found; exiting');
             return;
         }
 
@@ -147,19 +147,38 @@ class Announcements
         /* No announcements? No trabajo
          */
         if (!\count($announcements)) {
-            $this->logInfo('No announcements found.');
+            $this->logInfo('No announcements found; exiting');
             return;
         }
 
-        /* Spawn a new article instance, then map each Announcement's fields to the article's
+        /* Every Announcement comes with a context_code field which you can use
+         * to figure out the folder into which it should be placed, by using
+         * $courseCodes as a hash lookup
          */
-        $article = $this->newsMapper->createModel();
+        foreach ($announcements as $announcement) {
+            $folder = $courseCodes[$announcement['context_code']];
 
-        /* Make the folder an audiencing segment/brick for the article
-         */
+            /* Spawn a new article instance, then map each Announcement's fields to the article's
+             *
+             * TODO: update if this announcement previously existed from a prior import
+             *  instead of blindly spawning new instances every time, by checking a new
+             *  relationship table comms_news_article_source (article_id, source_name, guid)
+             *  A similar principle exists for schoolbox events
+             */
+            $article = $this->newsMapper->createModel()
+                ->setTitle($announcement['title'])
+                ->setBody($announcement['message'])
+                ->setSticky(false)
+            ;
 
-        /* Shank it into comms_news_article
-         */
+            /* Make the folder an audiencing segment/brick for the article
+             */
+
+            /* Shank it into comms_news_article
+             */
+
+        }
+
     }
 
 
