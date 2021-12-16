@@ -80,21 +80,19 @@ HELP;
             exit();
         }
 
-        $canvasDb = new CanvasDb();
-
-        $api = new Api(
-            $this->getOpt(self::OPT_LONG_TOKEN),
-            $this->getConfig()->get('canvas_url')
-        );
-
-        $announcements = new Announcements(
-            $canvasDb,
-            $api,
+        (new Announcements(
+            new CanvasDb(),
+            new Api(
+                $this->getOpt(self::OPT_LONG_TOKEN),
+                $this->getConfig()->get('canvas_url')
+            ),
+            \Schoolbox\Resource\Folder\Mapper::getInstance(),
+            \Schoolbox\UserMapper::getInstance(),
+            \Schoolbox\Comms\News\Mapper::getInstance(),
+            \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
             $this->getDi()->get('commsNewsAudienceStrategyFactory'),
             $this->getLogger()
-        );
-
-        $announcements->import();
+        ))->import();
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');

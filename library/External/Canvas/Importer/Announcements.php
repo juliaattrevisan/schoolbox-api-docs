@@ -47,9 +47,21 @@ class Announcements
 
 
     /**
+     * @var \Schoolbox\Comms\News\Mapper
+     */
+    private \Schoolbox\Comms\News\Mapper $newsMapper;
+
+
+    /**
      * @var \Schoolbox\Comms\News\Audience\Mapper
      */
     private \Schoolbox\Comms\News\Audience\Mapper $audienceMapper;
+
+
+    /**
+     * @var StrategyFactory
+     */
+    private StrategyFactory $strategyFactory;
 
 
     /**
@@ -61,14 +73,22 @@ class Announcements
     /**
      * Constructor.
      *
-     * @param CanvasDb             $canvasDb
-     * @param IApi                 $api
-     * @param StrategyFactory      $strategyFactory
-     * @param LoggerInterface|null $log
+     * @param CanvasDb                              $canvasDb
+     * @param IApi                                  $api
+     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
+     * @param UserMapper                            $userMapper
+     * @param \Schoolbox\Comms\News\Mapper          $newsMapper
+     * @param \Schoolbox\Comms\News\Audience\Mapper $audienceMapper
+     * @param StrategyFactory                       $strategyFactory
+     * @param LoggerInterface|null                  $log
      */
     public function __construct(
         CanvasDb $canvasDb,
         IApi $api,
+        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        \Schoolbox\UserMapper $userMapper,
+        \Schoolbox\Comms\News\Mapper $newsMapper,
+        \Schoolbox\Comms\News\Audience\Mapper $audienceMapper,
         StrategyFactory $strategyFactory,
         ?LoggerInterface $log = null
     ) {
@@ -76,12 +96,10 @@ class Announcements
         $this->api = $api;
         $this->log = $log;
 
-        /* TODO Inject these all later
-         */
-        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-        $this->userMapper = \Schoolbox\UserMapper::getInstance();
-        $this->newsMapper = \Schoolbox\Comms\News\Mapper::getInstance();
-        $this->audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
+        $this->folderMapper = $folderMapper;
+        $this->userMapper = $userMapper;
+        $this->newsMapper = $newsMapper;
+        $this->audienceMapper = $audienceMapper;
         $this->strategyFactory = $strategyFactory;
     }
 
