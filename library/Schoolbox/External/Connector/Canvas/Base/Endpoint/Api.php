@@ -57,6 +57,10 @@ class Api implements IApi
      */
     private Client $client;
 
+    /**
+     * @var array
+     */
+    private array $initHeaders;
 
     /**
      * Constructor
@@ -95,8 +99,10 @@ class Api implements IApi
             'Content-Type' => 'application/json'
         ];
 
+        //save the headers for future use
+        $this->initHeaders = $headers;
+
         return new Client([
-            'headers' => $headers,
             'timeout' => $timeout,
             'http_errors' => false,
 
@@ -139,7 +145,8 @@ class Api implements IApi
             try {
                 //we(schoolbox) have said / signed an agreement with NEWIC that we will only be hitting the GET routes, I'll hard code this here, so we don't make the mistake.
                 $response = $this->client->get($route, [
-                    RequestOptions::JSON => $params
+//                    RequestOptions::QUERY => $params,
+                    'headers' => $this->initHeaders, //headers get deleted after each request, lets set them here, now
                 ]);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;

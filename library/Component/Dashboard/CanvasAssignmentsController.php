@@ -45,29 +45,29 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
 
         //connect to canvas
         // Check Canvas URL config
-        if (
-            !$this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL) ||
-            !$this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_KEY) ||
-            !$this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)
-        ) {
-            return false;
-        }
+        $key = '1031~pbBe6G8P4R18723FsgmZsOX1KvOU2ka7GntkBt9rucM0Xl7znok2Pmsc6xh2QMu0';
+        $host = 'https://canvas.newington.nsw.edu.au';
+//        if (
+//            !$this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL) ||
+//            !$this->getConfigLoader()->get(ConfigMapper::_CANVAS_API_KEY)
+//        ) {
+//            return false;
+//        }
 
         $connection =  new Api(
-            $this->getConfigLoader()->get(ConfigMapper::_CANVAS_URL),
-            $this->getConfigLoader()->get(ConfigMapper::_CANVAS_DATA_API_KEY)
+            $host, $key
         );
 
         //get userId
         $userId = $this->getUser()->getExternalId();
         $userId = '124933';
-        $userId = '6252194';
+        $userId = '1213412';
 
         if ($userId === null) {
             return false;
         }
         //get date 30 days in the future
-        $endDate = gmdate("Y-m-d\TH:i:s", date_create('+1 Month')->getTimestamp());
+        $endDate = gmdate("Y-m-d\TH:i:s", date_create('+3 Month')->getTimestamp());
 
 
         /** test assignments for the user */
@@ -269,17 +269,40 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
         try {
             /**
              * canvas API being what it is, I apparently need to specify the courses when doing the API call for the assignments
-             * so lets grab a list of the courses the user is in, then build / send the get assignments request, with a limit of 10 courses. yay for loops
+             * so lets grab a list of the courses the user is in, then build / send the get assignments request, with a loop of 10 courses a time. yay for loops
              */
+            $this->assignments = [];
             $courses = $connection->retrieveDocument('get', "/api/v1/users/${userId}/courses", [
                 'state'             => 'available',
                 'enrollment_state'  => 'active',
             ]);
+            $coursesArr = [];
+            $course10Count = 0;
+            $courseCount = 0;
+            foreach ($courses as $course) {
+                $coursesArr[$course10Count][] = "course_{$course['id']}";
+                $courseCount++;
+                if ($courseCount % 10 === 0) {
+                    $course10Count++;
+                }
+            }
+            //split at groups of 10 courses
+            //create arrays of a max 10 courses in each, then request the assignments from calendar using those events
 
-            $this->assignments = $connection->retrieveDocument('get', "/api/v1/users/${userId}/calendar_events", [
-                'end_date'  => $endDate,
-                'type'      => 'assignment',
-            ]);
+            foreach ($coursesArr as $course10) {
+                $params = [
+//                $assignments = $connection->retrieveDocument('get', "/api/v1/users/${userId}/calendar_events", [
+//                    'end_date'          => $endDate,
+                    'all_events'        => 'true',
+//                    'context_codes[]'   =>  'course_1601419',
+                    'type'              => 'assignment',
+                    'as_user_id'        => $userId,
+                ];
+                $courseParm = join('&context_codes[]=', $course10);
+                $paramsJoin = join('&', $params);
+                $assignments = $connection->retrieveDocument('get', "/api/v1/calendar_events?context_codes[]={$courseParm}&type=assignment&all_events=true&as_user_id={$userId}", []);
+                $this->assignments = array_merge($this->assignments, $assignments);
+            }
         } catch (\Throwable $e) {
             $this->assignments = [];
         }
