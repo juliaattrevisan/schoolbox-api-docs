@@ -53,6 +53,7 @@ export default {
     },
 
     created () {
+        window.onhashchange = this.checkForValidHash; //account for history changes or for example selection the 'my favourite groups' link in the side menu
         this.checkForValidHash();
     },
 
@@ -67,9 +68,11 @@ export default {
         checkForValidHash () {
             const hash = window.location.hash.substring(1); //ditch the # of the hash
             const isHashValid = Object.values(selectionTypes).includes(hash); //check if the hash is one of the valid selectionTypes
-            if (hash && isHashValid) {
+            if (isHashValid && hash !== this.selectedGroups) {
                 this.selectedGroups = hash; //only update if valid, otherwise just show the default
-            } 
+            } else {
+                this.selectedGroups = selectionTypes.GROUPS_IM_IN;
+            }
         },
 
         /**

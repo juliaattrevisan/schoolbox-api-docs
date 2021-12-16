@@ -95,6 +95,16 @@ export default {
     watch: {
 
         /**
+         * The <select> is not the only way the selectedGroups can change, it can be toggled by
+         * a history state change or for example selection the 'my favourite groups' link in the side menu
+         * 
+         * @param { String } 
+         */
+        selectedGroups (newGroups) {
+            this.$refs.select.value = newGroups; //to set <select> value on change 
+        },
+
+        /**
          * As currentGroups and filteredGroups are not within the <template>
          * we need to watch in order to dispatch changes to manage-groups.vue
          * 
@@ -113,7 +123,7 @@ export default {
     },
 
     mounted () {
-        this.$refs.select.value = this.selectedGroups; //to set initial <select> value
+        this.$refs.select.value = this.selectedGroups; //to set the initial <select> value 
     },
 
     methods: {
