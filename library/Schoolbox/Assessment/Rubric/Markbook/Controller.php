@@ -487,12 +487,13 @@ class Controller extends Base
         $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->isNull('sr.deleted_at')
             ->notNull('sr.published_at')
-            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->in('sb.assessment_id', array_keys($assessments));
+
         $innerWhere = implode(' AND ', $innerPb->getWhere());
 
         $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
-            ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->in('vrm.assessment_id', array_keys($assessments));
+            ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
         if ($filteringByRubricUsage) {
             $usagePb = new Database\Predicate\Builder($this->internalDb->getQuoter(), '');
