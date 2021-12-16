@@ -68,11 +68,9 @@ export default {
         checkForValidHash () {
             const hash = window.location.hash.substring(1); //ditch the # of the hash
             const isHashValid = Object.values(selectionTypes).includes(hash); //check if the hash is one of the valid selectionTypes
-            if (isHashValid && hash !== this.selectedGroups) {
-                this.selectedGroups = hash; //only update if valid, otherwise just show the default
-            } else {
-                this.selectedGroups = selectionTypes.GROUPS_IM_IN;
-            }
+            if (isHashValid) {
+                this.selectedGroups = hash; //only update if valid, otherwise just leave as is
+            } 
         },
 
         /**
