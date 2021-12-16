@@ -8,6 +8,9 @@
 
 declare(strict_types=1);
 
+use External\Canvas\Importer\Announcements;
+use External\Canvas\Importer\Api;
+use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -77,14 +80,19 @@ HELP;
             exit();
         }
 
-        $canvasDb = new \External\Canvas\Importer\CanvasDb();
+        $canvasDb = new CanvasDb();
 
-        $api = new \External\Canvas\Importer\Api(
+        $api = new Api(
             $this->getOpt(self::OPT_LONG_TOKEN),
             $this->getConfig()->get('canvas_url')
         );
 
-        $announcements = new \External\Canvas\Importer\Announcements($canvasDb, $api, $this->getLogger());
+        $announcements = new Announcements(
+            $canvasDb,
+            $api,
+            $this->getDi()->get('commsNewsAudienceStrategyFactory'),
+            $this->getLogger()
+        );
 
         $announcements->import();
 

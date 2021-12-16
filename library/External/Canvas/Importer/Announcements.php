@@ -11,6 +11,8 @@ namespace External\Canvas\Importer;
 
 use External\Canvas\Importer\Codec\FolderCode;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
 
@@ -45,6 +47,12 @@ class Announcements
 
 
     /**
+     * @var \Schoolbox\Comms\News\Audience\Mapper
+     */
+    private \Schoolbox\Comms\News\Audience\Mapper $audienceMapper;
+
+
+    /**
      * @var LoggerInterface|null
      */
     private ?LoggerInterface $log;
@@ -55,10 +63,15 @@ class Announcements
      *
      * @param CanvasDb             $canvasDb
      * @param IApi                 $api
+     * @param StrategyFactory      $strategyFactory
      * @param LoggerInterface|null $log
      */
-    public function __construct(CanvasDb $canvasDb, IApi $api, ?LoggerInterface $log = null)
-    {
+    public function __construct(
+        CanvasDb $canvasDb,
+        IApi $api,
+        StrategyFactory $strategyFactory,
+        ?LoggerInterface $log = null
+    ) {
         $this->canvasDb = $canvasDb;
         $this->api = $api;
         $this->log = $log;
@@ -68,6 +81,8 @@ class Announcements
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->userMapper = \Schoolbox\UserMapper::getInstance();
         $this->newsMapper = \Schoolbox\Comms\News\Mapper::getInstance();
+        $this->audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
+        $this->strategyFactory = $strategyFactory;
     }
 
 
@@ -196,6 +211,18 @@ class Announcements
          * $courseCodes as a hash lookup
          */
         foreach ($announcements as $announcement) {
+            /* Skip announcements that aren't published
+             */
+            if (!(int)$announcement['published']) {
+                $this->logDebug(sprintf(
+                    'Announcement "%s" by %s is not published in canvas; skipping',
+                    $announcement['title'],
+                    $announcement['author']['display_name']
+                ));
+
+                continue;
+            }
+
             $folder = $courseCodes[$announcement['context_code']];
 
             /* Figure out the external id of the person who owns this
@@ -228,18 +255,50 @@ class Announcements
              */
             $article = $this->newsMapper->createModel()
                 ->setTitle($announcement['title'])
+                ->setBlurb('')
                 ->setBody($announcement['message'])
                 ->setSticky(false)
-                ->setAuthor($author);
+                ->setAuthor($author)
+                ->setAudience(new GenericCollection(\Schoolbox\Comms\News\Audience\Model::class));
 
-            new \Alaress_Probe($article->getTitle(), $article->getBody(), $article->getAuthor()->getFullName());
-
-            /* Make the folder an audiencing segment/brick for the article
+            /* Assume some details about dates to map them to schoolbox concepts:
+             *
+             * Submitted === announcement[posted_at]
+             * Accepted === announcement[posted_at]
+             * Published === announcement[posted_at]
+             * Expires === one year after announcement[posted_at]
              */
+            $postedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
+            $expiresAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']))->addYears(1);
+
+            $article
+                ->setSubmittedAt($postedAt)
+                ->setAcceptedAt($postedAt)
+                ->setAcceptedBy($author)
+                ->setPublishAt($postedAt)
+                ->setExpiresAt($expiresAt);
 
             /* Shank it into comms_news_article
              */
+            $this->newsMapper->save($article);
 
+            /* Andy things. Not entirely sure if this was the intended manner in which
+             * to persist audience segments, but whatever - it's a mess in there
+             */
+            $segment = (new \Schoolbox\Comms\News\Audience\Model())
+                ->setEntityType(\Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType())
+                ->setEntityValue((string)$folder->getId())
+                ->setRelationship(\Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_SELF)
+                ->setCommsNewsArticle($article);
+
+            /* Make the folder an audiencing segment/brick for the article
+             */
+            $audience = new GenericCollection(\Schoolbox\Comms\News\Audience\Model::class);
+            $audience->add($segment);
+
+            // Perform intelligent update and persistence in specialised helper class
+            (new \Schoolbox\Comms\News\Audience\Segment\Transactor($this->audienceMapper, $this->strategyFactory))
+                ->save($article, $audience);
         }
     }
 
