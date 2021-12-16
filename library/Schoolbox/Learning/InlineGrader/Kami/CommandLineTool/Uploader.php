@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami\CommandLineTool;
 
-use Alaress\Http\UnreliableClient;
+use Alaress\Http\UnreliableMiddleware;
 use Alaress\Jitter\Jitter;
 use Alaress\Random;
 use GuzzleHttp;
+use GuzzleHttp\HandlerStack;
 use Proxy;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\InlineGrader\Kami;
@@ -97,9 +98,18 @@ class Uploader extends CliTool\App
         $mapperFactory = $this->getDi()->get('mapperFactory');
         /** @var Kami\Mapper $kamiMapper */
         $kamiMapper = $mapperFactory->get(Kami\Mapper::class);
-        $client     = $failureRate === 0.0
-            ? new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()])
-            : new UnreliableClient($failureRate, new Random\FloatGenerator());
+
+        $stack = HandlerStack::create();
+        if ($failureRate > 0.0) {
+            $stack->before(
+                'http_errors',
+                new UnreliableMiddleware($failureRate, new Random\FloatGenerator()),
+            );
+        }
+        $client = new GuzzleHttp\Client([
+            'curl'    => Proxy\Server::getInstance()->buildCurlOptions(),
+            'handler' => $stack,
+        ]);
 
         $connector = $dryRun
             ? new Kami\MockConnector($client)
