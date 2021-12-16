@@ -81,6 +81,19 @@ class Announcements
      */
     public function import(): void
     {
+        /* TODO: Define default author
+         *  Canvas Importer doesn't create user accounts; they're presumed toe exist somehow
+         *  but in the case where they don't exist in schoolbox.user, assume a default owner
+         *  We don't really have anyone, so assign Schoolbox Admin arbitrarily...
+         *  (There should be a non-human system user account that can be given this kind of data)
+         */
+        $defaultOwner = $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+
+        if (null === $defaultOwner) {
+            $this->logInfo('Default owner not found; exiting');
+            return;
+        }
+
         /* Use the internal db to interrogate canvas_data_<instanceId>.course_dim
          * for all the Courses that we imported; contextCodes are stored in the canvas_id
          * column, but you'll need to prefix it with "course_" before you can use
@@ -159,14 +172,6 @@ class Announcements
             $this->logInfo('No announcements found; exiting');
             return;
         }
-
-        /* TODO: Define authors
-         *  Canvas Importer doesn't create user accounts; they're presumed toe exist somehow
-         *  but in the case where they don't exist in schoolbox.user, assume a default owner
-         *  We don't really have anyone, so assign Schoolbox Admin arbitrarily...
-         *  (There should be a non-human system user account that can be given this kind of data)
-         */
-        $defaultOwner = $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
 
         /* Every Announcement comes with a context_code field which you can use
          * to figure out the folder into which it should be placed, by using
