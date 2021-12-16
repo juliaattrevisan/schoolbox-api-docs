@@ -15,7 +15,7 @@ export default {
             type: Array,
             required: true,
         },
-        selectedGroups: { //current <select> selection
+        selectedGroups: { //current groups selection
             type: String, 
             required: true,
         }
@@ -30,7 +30,7 @@ export default {
     computed: {
 
         /**
-         * Change the place holder depending on the current selection
+         * Change the page title depending on the current group selection
          * 
          * @returns { String } 
          */
@@ -46,7 +46,7 @@ export default {
         },
 
         /**
-         * Change the place holder depending on the current selection
+         * Change the search place holder depending on the current group selection
          * 
          * @returns { String } 
          */
@@ -82,7 +82,7 @@ export default {
          * 
          * @returns { Array } 
          */
-        groupsFiltered () {
+        filteredGroups () {
             if (this.query.length <= 2) {
                 return this.currentGroups;
             } else {
@@ -95,12 +95,12 @@ export default {
     watch: {
 
         /**
-         * As currentGroups and groupsFiltered are not within the <template>
+         * As currentGroups and filteredGroups are not within the <template>
          * we need to watch in order to dispatch changes to manage-groups.vue
          * 
          * @param { Array } 
          */
-        groupsFiltered (newGroups) {
+        filteredGroups (newGroups) {
             const isSearchActive = this.query.length > 2 ? true : false;
             this.$emit('on-groups-filtered', newGroups, isSearchActive);
         }
@@ -109,11 +109,11 @@ export default {
 
     created () {
         this.selectionTypes = selectionTypes; //to access within the template   
-        this.$emit('on-groups-filtered', this.groupsFiltered); //dipsatch to set up the initial group selection on manage-groups.vue
+        this.$emit('on-groups-filtered', this.filteredGroups); //dipsatch to set up the initial group selection on manage-groups.vue
     },
 
     mounted () {
-        this.$refs.select.value = this.selectedGroups; //to set initial selection status
+        this.$refs.select.value = this.selectedGroups; //to set initial <select> value
     },
 
     methods: {

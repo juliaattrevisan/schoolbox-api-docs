@@ -1,6 +1,6 @@
 /** 
- * Add a group page to the side menu
- *
+ * Add a group page link to the side menu
+ * It'll slide in/out of the menu, and hide/show the whole menu when there's no items in the container
  */
 
 import { insertElementBefore, insertElementAfter } from '@js/util/domUtils';
@@ -19,8 +19,8 @@ export async function addGroupToSideMenu (title, href) {
     if (document.getElementById(sideMenuId)) { //may not be set to display in the admin settings 
         const groupLinks = document.getElementById(sideMenuId).querySelector('ul');
         if (groupLinks.children.length === 0) { //show the parent element first if it's empty
-            document.getElementById('side-menu-mygroups').classList.remove('hide'); 
-            await slideDown(document.getElementById('side-menu-mygroups')); //slide the element parent element in first
+            document.getElementById(sideMenuId).classList.remove('hide'); 
+            await slideDown(document.getElementById(sideMenuId)); //slide the element parent element in first
         }
         const newElement = getListItem(title, href);
         insertSortedAlphabetically(newElement);
@@ -92,8 +92,8 @@ export async function removeGroupFromSideMenu (id) {
         groupLinks.removeChild(elementToRemove); //then remove it after
         
         if (groupLinks.children.length === 0) { //ensure the list is hidden if there's no items to show
-            await slideUp(document.getElementById('side-menu-mygroups')); //slide the element out first
-            document.getElementById('side-menu-mygroups').classList.add('hide'); 
+            await slideUp(document.getElementById(sideMenuId)); //slide the element out first
+            document.getElementById(sideMenuId).classList.add('hide'); 
         }
 
     }

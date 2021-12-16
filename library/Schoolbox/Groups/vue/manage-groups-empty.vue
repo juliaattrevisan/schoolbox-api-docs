@@ -10,7 +10,7 @@ import selectionTypes from '../js/manageGroupsSelectionTypes';
 export default {
 
     props: {
-        selectedGroups: { //current <select> selection
+        selectedGroups: { //current groups selection
             type: String, 
             required: true,
         },

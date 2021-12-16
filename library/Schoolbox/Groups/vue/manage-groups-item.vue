@@ -133,10 +133,7 @@ export default {
             for (const [key, value] of Object.entries(appendList)) {
                 formData.append(`${key}`, `${value}`);
             }
-            const response = await fetch(this.endpoint, {
-                method: 'POST',
-                body: formData,
-            })
+            const response = await fetch(this.endpoint, { method: 'POST', body: formData });
             return await response.json();
         },
 
@@ -147,9 +144,7 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Joining group...');
             try {
-                const responseData = await this.getResponseData({
-                    action: 'add'
-                });
+                const responseData = await this.getResponseData({ action: 'add' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -171,9 +166,7 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Leaving group...');
             try {
-                const responseData = await this.getResponseData({
-                    action: 'delete'
-                });
+                const responseData = await this.getResponseData({ action: 'delete' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -199,7 +192,7 @@ export default {
          */
         async toggleFavourites (event) {
             this.isProcessing = true;
-            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } );
+            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } ); //to help indicate selection
             if (this.isFavourite) {
                 await this.removeFromFavourites();
             } else {
@@ -214,10 +207,7 @@ export default {
         async removeFromFavourites () {
             this.$emit('on-edit-start', 'Removing from favourites...');
             try {
-                const responseData = await this.getResponseData({
-                    action: 'edit',
-                    isFavourite: '0'
-                });
+                const responseData = await this.getResponseData({ action: 'edit', isFavourite: '0' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -237,10 +227,7 @@ export default {
         async addToFavourites () {
             this.$emit('on-edit-start', 'Adding to favourites...');
             try {
-                const responseData = await this.getResponseData({
-                    action: 'edit',
-                    isFavourite: '1'
-                });
+                const responseData = await this.getResponseData({ action: 'edit', isFavourite: '1' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -261,7 +248,7 @@ export default {
          */
         async toggleNotifications (event) {
             this.isProcessing = true;
-            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } );
+            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } ); //to help indicate selection
             if (this.isNotificationsOn) {
                 await this.removeFromNotifications();
             } else {
@@ -271,15 +258,12 @@ export default {
         },
 
         /**
-         * Remove from the users notifications list
+         * Remove the group from the users notifications list
          */
         async removeFromNotifications () {
             this.$emit('on-edit-start', 'Remove from notifications...');
             try {
-                const responseData = await this.getResponseData({
-                    action: 'edit',
-                    isNotificationsOn: '0'
-                });
+                const responseData = await this.getResponseData({ action: 'edit', isNotificationsOn: '0' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -298,10 +282,7 @@ export default {
         async addToNotifications () {
             this.$emit('on-edit-start', 'Adding to notifications...');
             try {
-                const responseData = await this.getResponseData({
-                    action: 'edit',
-                    isNotificationsOn: '1'
-                });
+                const responseData = await this.getResponseData({ action: 'edit', isNotificationsOn: '1' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -372,7 +353,6 @@ export default {
     overflow: hidden; //so can slide the .group-actions in and out
     position: relative;
 }
-
 .group-actions { //to put them in the top right corner
     background: rgba(0, 102, 176, 0.85);
     display: inline-block;
@@ -380,7 +360,6 @@ export default {
     right: 10px;
     top: 10px;
 }
-
 .group-action {
     background: none;
     font-size: 0;
@@ -402,6 +381,7 @@ export default {
     padding: 1rem; //add extra padding
     &:disabled {
         color: white;
+        opacity: 1;
     }
 }
 

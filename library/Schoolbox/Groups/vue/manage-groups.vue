@@ -21,7 +21,7 @@ export default {
     },
 
     props: {
-        endpoint: { //to join/leave/favourite etc a group
+        endpoint: { //to call join/leave/favourite etc a group
             type: String,
             required: true,
         },
@@ -60,7 +60,7 @@ export default {
 
         /**
          * The hash is used for initial group selection display, so we can land straight
-         * on my favourite groups, groups pending membership etch 
+         * on my favourite groups, groups pending membership etc 
          * 
          * @param { String }
          */
@@ -83,7 +83,7 @@ export default {
         },
 
         /**
-         * The current <select> status and search query considered
+         * Both the current <select> status and search query considered to show the current group list
          * 
          * @param { Array }
          * @param { Boolean }
