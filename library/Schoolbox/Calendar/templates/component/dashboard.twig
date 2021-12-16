@@ -15,12 +15,15 @@
             importEventsUrl: "/calendar/import",
             canCreateEvent: false,
             dayjsDateLong:  '{{ config.date_long | dayjsFormat }}',
-            isDashboard: true,
-            title: '{{ locale.calendar.proper }}'
+            isDashboard: true
         };
     </script>
 {% endautoescape %}
-    <div id="calendar">
-        <calendar-component />
-    </div>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/calendarComponent.js?v={{ config.site_version }}"></script>
+
+<div id="calendar-{{ component.instance.id }}">
+    <calendar-component
+        :component-instance-id="{{ component.instance.id }}"
+        title="{{ component.config.componentname }}"
+    />
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/calendarComponent.js?v={{ config.site_version }}"></script>

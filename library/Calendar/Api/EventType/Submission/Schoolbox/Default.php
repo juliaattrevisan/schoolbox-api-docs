@@ -65,22 +65,38 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     /**
      * Get day events from this data source
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     * @return Collection|Event[]
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
+     * @return Collection
      * @throws DomainException
+     * @throws LogicException
      * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         $stack = new Collection();
         // Configuration may not have been set, take this into account.
-        // TODO - this is wrong!
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
         } catch (Schoolbox\Mapper\Exception $e) {
+            /* TODO Repair assumption about default luEventType id
+             *  You can't really make this assumption, because someone could have
+             *  soft-deleted the first luEventType record; arbitrarily assigning 1
+             *  could put events into a deleted event type; instead, you could get
+             *  the full set, then pop the first of its elements
+             */
             $eventType = 1;
+        }
+
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            if (!\in_array((int)$eventType, $allowedEventTypes, true)) {
+                return $stack;
+            }
         }
 
         // Get a timeline of events

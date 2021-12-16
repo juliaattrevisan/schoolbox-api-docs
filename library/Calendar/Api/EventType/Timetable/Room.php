@@ -55,14 +55,17 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $this->roomCodes         = $roomCodes;
     }
 
+
     /**
      * Get day events from this data source
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return Collection
+     * @throws InvalidArgumentException
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         $stack = new Collection();
 
@@ -133,6 +136,9 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                     continue;
                 }
 
+                /* TODO where is ->setEventType() at?
+                 * TODO is this even used?
+                 */
                 $event = new Event();
                 // Make this up as type: campus for now
                 // It also has a category.

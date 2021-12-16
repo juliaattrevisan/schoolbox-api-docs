@@ -88,7 +88,7 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      * @param int $endTimestamp
      * @return Collection
      */
-    abstract public function getEvents($startTimestamp, $endTimestamp);
+    abstract public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection;
 
     /**
      * Find a particular event from this source.

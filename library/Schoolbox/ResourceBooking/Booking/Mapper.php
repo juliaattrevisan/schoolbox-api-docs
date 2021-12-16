@@ -176,7 +176,7 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @throws \PDOException
      */
-    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array())
+    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array(), ?array $allowedEventTypes = null)
     {
         if (empty($statusIds)) {
             $statusIds = array(Status\Model::STATUS_PENDING, Status\Model::STATUS_APPROVED);
@@ -205,6 +205,13 @@ class Mapper extends BaseMapper
             $params = array_merge($params, $this->getArrayParameters($extra['owner_id'], 'owner'));
         }
         $params = array_merge($params, $this->getArrayParameters($statusIds, 'status'));
+
+        /* Ram in the allowedEventTypes if meaningful
+         */
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $params = array_merge($params, $this->getArrayParameters($allowedEventTypes, 'type'));
+        }
+
         $query = "
             SELECT
                 {$this->getColumnString('b')},
@@ -241,7 +248,16 @@ class Mapper extends BaseMapper
             $query .= ' AND eo.id IN '
                     . $this->getArrayPlaceholders($extra['owner_id'], 'owner');
         }
+
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $query .= ' AND e.type IN '
+                . $this->getArrayPlaceholders($allowedEventTypes, 'type');
+        }
+
         $query .= ' ORDER BY e.start_datetime ASC';
+
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
@@ -289,17 +305,20 @@ class Mapper extends BaseMapper
      *                             gets Status\Model::STATUS_PENDING and
      *                             Status\Model::STATUS_APPROVED only.
      *
+     * @param array|null $allowedEventTypes  A set of lutEventType ids which filter the result set
+     *
      * @return Collection|Model[]
      * @throws BaseMapper\DefinitionException
      * @throws \PDOException
      */
-    public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array())
+    public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array(), ?array $allowedEventTypes = null)
     {
         return $this->findForTimespan(
             $fromTimestamp,
             $toTimestamp,
             $statusIds,
-            array('owner_id' => array($ownerId))
+            array('owner_id' => array($ownerId)),
+            $allowedEventTypes
         );
     }
 
@@ -307,24 +326,25 @@ class Mapper extends BaseMapper
     /**
      * Retrieves all bookings for the given category.
      *
-     * @param int   $categoryId
-     * @param int   $fromTimestamp
-     * @param int   $toTimestamp
-     * @param array $statusIds     Status IDs of events to fetch. By default,
-     *                             gets Status\Model::STATUS_PENDING and
-     *                             Status\Model::STATUS_APPROVED only.
-     *
+     * @param int        $categoryId
+     * @param int        $fromTimestamp
+     * @param int        $toTimestamp
+     * @param array      $statusIds Status IDs of events to fetch. By default,
+     *                              gets Status\Model::STATUS_PENDING and
+     *                              Status\Model::STATUS_APPROVED only.
+     * @param array|null $allowedEventTypes    A set of lutEventType ids which filter the result set
      * @return Collection|Model[]
      * @throws BaseMapper\DefinitionException
      * @throws \PDOException
      */
-    public function findForCategory($categoryId, $fromTimestamp, $toTimestamp, $statusIds = array())
+    public function findForCategory($categoryId, $fromTimestamp, $toTimestamp, $statusIds = array(), ?array $allowedEventTypes = null)
     {
         return $this->findForTimespan(
             $fromTimestamp,
             $toTimestamp,
             $statusIds,
-            array('category_id' => array($categoryId))
+            array('category_id' => array($categoryId)),
+            $allowedEventTypes
         );
     }
 
@@ -332,24 +352,25 @@ class Mapper extends BaseMapper
     /**
      * Retrieves all bookings for the given resource.
      *
-     * @param int[] $resourceIds
-     * @param int   $fromTimestamp
-     * @param int   $toTimestamp
-     * @param array $statusIds     Status IDs of events to fetch. By default,
-     *                             gets Status\Model::STATUS_PENDING and
-     *                             Status\Model::STATUS_APPROVED only.
-     *
+     * @param int[]      $resourceIds
+     * @param int        $fromTimestamp
+     * @param int        $toTimestamp
+     * @param array      $statusIds Status IDs of events to fetch. By default,
+     *                              gets Status\Model::STATUS_PENDING and
+     *                              Status\Model::STATUS_APPROVED only.
+     * @param array|null $allowedEventTypes    A set of lutEventType ids which filter the result set
      * @return Collection|Model[]
      * @throws BaseMapper\DefinitionException
      * @throws \PDOException
      */
-    public function findForResource(array $resourceIds, $fromTimestamp, $toTimestamp, $statusIds = array())
+    public function findForResource(array $resourceIds, $fromTimestamp, $toTimestamp, $statusIds = array(), ?array $allowedEventTypes = null)
     {
         return $this->findForTimespan(
             $fromTimestamp,
             $toTimestamp,
             $statusIds,
-            array('resource_id' => $resourceIds)
+            array('resource_id' => $resourceIds),
+            $allowedEventTypes
         );
     }
 

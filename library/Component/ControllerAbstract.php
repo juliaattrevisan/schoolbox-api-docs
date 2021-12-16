@@ -592,7 +592,6 @@ abstract class Component_ControllerAbstract
 
         $page->setFile($key, $templateFile);
         $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
-
         $page->parse('CONFIG_ELEMENT_CONTENT', $key);
         $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
         $page->parse('config_element_block', 'config_element', true);

@@ -1406,6 +1406,27 @@ abstract class Kernel
             )
         );
 
+        $di->set(
+            'calendarDashboardApiFactory',
+            $di->lazy(
+                function () use ($di) {
+                    try {
+                        /** @var IConnector $databaseExternal */
+                        $databaseExternal = $di->get('databaseExternal');
+                    } catch (AlaressDatabaseException $e) {
+                        $databaseExternal = null;
+                    }
+
+                    /** @var AssessmentDataSource $assessmentDataSource */
+                    $assessmentDataSource  = $di->get('assessmentDataSource');
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+                    return new \Schoolbox\Calendar\Component\Dashboard\ApiFactory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
+                }
+            )
+        );
+
+
         // Pastoral Care data source
         // TODO consider moving into a module's dependencies?
         $di->set(

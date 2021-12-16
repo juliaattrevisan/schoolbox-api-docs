@@ -21,7 +21,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @var Calendar_Api_EventType_Interface
      */
-    protected $api;
+    protected Calendar_Api_EventType_Interface $api;
 
 
     /**
@@ -29,7 +29,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @var Schoolbox\User $user
      */
-    protected $user;
+    protected Schoolbox\User $user;
 
 
     /**
@@ -38,7 +38,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @var Schoolbox\User $viewer
      */
-    protected $viewer;
+    protected Schoolbox\User $viewer;
 
 
     /**
@@ -48,7 +48,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @var ModuleChecker
      */
-    private $moduleChecker;
+    private ModuleChecker $moduleChecker;
 
 
     /**
@@ -57,7 +57,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @var Authorizer
      */
-    protected $authorizer;
+    protected Authorizer $authorizer;
 
 
     /**
@@ -65,38 +65,46 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @var Router
      */
-    protected $router;
+    protected Router $router;
+
+
+    /**
+     * A set of luEventType ids by which to restrict the result set
+     *
+     * @var array|null
+     */
+    protected ?array $allowedEventTypes = null;
 
 
     /**
      * Constructor
      *
-     * @param Authorizer           $authorizer
-     * @param Router               $router
-     * @param User                 $user
-     * @param User                 $viewer
-     * @param Calendar_Api_Factory $factory
-     * @param ModuleChecker        $moduleChecker
-     * @param int|null             $folderId
+     * @param Authorizer                       $authorizer
+     * @param Router                           $router
+     * @param User                             $user
+     * @param User                             $viewer
+     * @param Calendar_Api_EventType_Interface $api
+     * @param ModuleChecker                    $moduleChecker
+     * @param array|null                       $allowedEventTypes
      */
     public function __construct(
         Authorizer $authorizer,
         Router $router,
         User $user,
         User $viewer,
-        Calendar_Api_Factory $factory,
+        Calendar_Api_EventType_Interface $api,
         ModuleChecker $moduleChecker,
-        ?int $folderId = null
+        ?array $allowedEventTypes = null
     ) {
-        $this->api           = isset($folderId)
-            ? $factory->produceForFolderId($folderId, $user, $viewer)
-            : $factory->produceForUser($user, $viewer);
-        $this->moduleChecker = $moduleChecker;
-        $this->user          = $user;
-        $this->viewer        = $viewer;
-        $this->authorizer    = $authorizer;
-        $this->router        = $router;
+        $this->api               = $api;
+        $this->moduleChecker     = $moduleChecker;
+        $this->user              = $user;
+        $this->viewer            = $viewer;
+        $this->authorizer        = $authorizer;
+        $this->router            = $router;
+        $this->allowedEventTypes = $allowedEventTypes;
     }
+
 
     /**
      * Does the current user have permission to view this calendar page?

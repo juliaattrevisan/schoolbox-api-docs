@@ -27,6 +27,23 @@ export default {
         CustomisedCalendarEvent
     },
 
+    props: {
+        componentInstanceId: {
+            type: Number,
+            required: false,
+        },
+        title: {
+            type: String,
+            required: true,
+            default: () => {
+                /* This is a default string that should never appear
+                 * It should always be using the component config's componentName value
+                 */
+                return 'Calendar';
+            }
+        }
+    },
+
     mixins: [
         fullCalendarHelper
     ],
@@ -118,7 +135,7 @@ export default {
 
             const headingElement = document.createElement('h2');
             headingElement.classList.add('subheader');
-            headingElement.innerText = this.config.title;
+            headingElement.innerText = this.title;
 
             /**
              * For example:
@@ -155,6 +172,7 @@ export default {
                         end:      Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                         userId:   this.config.userId,
                         folderId: this.config.folderId,
+                        componentInstanceId: this.componentInstanceId
                     }
                 }
             ).then((response) => {

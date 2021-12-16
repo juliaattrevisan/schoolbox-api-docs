@@ -163,7 +163,7 @@ class EventConnector extends EventMapper
      * @throws DefinitionException
      * @throws \InvalidArgumentException
      */
-    public function getDayEvents($startTimestamp, $endTimestamp): Collection
+    public function getDayEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -185,16 +185,15 @@ class EventConnector extends EventMapper
                 'endDate' => $endDate,
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
-        }
-        /* For all other user types:
-         * Only show events where $user is either staff or student attendee
-         *
-         * This saves us from having to subquery these attendees separately,
-         * by initially only getting events that are relevant to $user
-         *
-         * Skip Rejected events
-         */
-        else {
+        } else {
+            /* For all other user types:
+             * Only show events where $user is either staff or student attendee
+             *
+             * This saves us from having to subquery these attendees separately,
+             * by initially only getting events that are relevant to $user
+             *
+             * Skip Rejected events
+             */
             $querySelect = "
                 eotc_metadata_student.user_id as studentUserId,
                 eotc_metadata_staff.user_id as staffUserId,
@@ -212,6 +211,19 @@ class EventConnector extends EventMapper
                 'staffUserId' => $this->getUser()->getId(),
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
+        }
+
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        $queryEventTypes = '';
+
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $eventTypesPb = $this->getPredicateBuilder()
+                ->in('e.type', $allowedEventTypes);
+
+            $queryEventTypes = ' AND ' . $eventTypesPb->getWhere()[0];
+
+            $params = array_merge($params, $eventTypesPb->getParams());
         }
 
         /* Ram in all the pieces
@@ -252,6 +264,7 @@ class EventConnector extends EventMapper
                 DATE(e.start_datetime) <= :endDate
                 AND eotc_metadata.status_id != :rejected
                 AND e.deleted_at IS NULL
+                {$queryEventTypes}
             ORDER BY e.start_datetime, e.end_datetime
         ";
 

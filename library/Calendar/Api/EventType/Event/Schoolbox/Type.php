@@ -43,19 +43,30 @@ class Calendar_Api_EventType_Event_Schoolbox_Type extends Calendar_Api_EventType
      * User filtering is done in query - this may change, as admins may want to
      * fetch personal events from other calendars.
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      */
-    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp)
+    protected function getEventsFromCalendarHandler(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
+        /* Manufacture a special $filters array
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        $filter = [
+            'type' => $this->eventTypeId
+        ];
+
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            $filter['typeSet'] = $allowedEventTypes;
+        }
+
         return $this->getCalendarHandler()->getDayEvents(
             $this->getUser(),
             $this->getViewer(),
             $startTimestamp,
             $endTimestamp,
-            array('type' => $this->eventTypeId)
+            $filter
         );
     }
 }

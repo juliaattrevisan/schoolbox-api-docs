@@ -41,9 +41,9 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
-        $collection = $this->calendarHandler->getDayEvents($startTimestamp, $endTimestamp);
+        $collection = $this->calendarHandler->getDayEvents($startTimestamp, $endTimestamp, $allowedEventTypes);
 
         /* Give the calendar_connector id so this event knows where it came from
          * This allows you to create an event detail screen in Mobile

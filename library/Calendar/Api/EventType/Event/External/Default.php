@@ -77,17 +77,10 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @throws InvalidArgumentException
      * @throws MapperException
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
 
         $stack = new Collection();
-
-        try {
-            /** @var IIterator $externalEvents */
-            $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
-        } catch (InvalidArgumentException $e) {
-            return $stack;
-        }
 
         // Figure out default event type
         try {
@@ -97,6 +90,21 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $defaultEventType = $decodedConfig->getLuEventType();
         } catch (MapperException $e) {
             $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
+        }
+
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            if (!\in_array((int)$defaultEventType, $allowedEventTypes, true)) {
+                return $stack;
+            }
+        }
+
+        try {
+            /** @var IIterator $externalEvents */
+            $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
+        } catch (InvalidArgumentException $e) {
+            return $stack;
         }
 
         foreach ($externalEvents as $externalEvent) {

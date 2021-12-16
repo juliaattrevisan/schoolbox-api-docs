@@ -20,6 +20,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * @param String $templateHandle
      *
      * @return bool
+     * @throws \RuntimeException
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     * @throws \JsonException
      */
     public function renderTemplate($templateHandle)
     {
@@ -28,7 +33,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             '@calendar/component/dashboard.twig',
             [
                 'component' => $this,
-                'user'      => $this->getUser(),
+                'user' => $this->getUser(),
             ],
             false
         );

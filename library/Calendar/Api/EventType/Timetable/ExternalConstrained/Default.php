@@ -36,15 +36,17 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         $this->configLoader = $configLoader;
     }
 
+
     /**
      * Get day events from this data source
      *
-     * @param int $startTimestamp
-     * @param int $endTimestamp
-     *
+     * @param int        $startTimestamp
+     * @param int        $endTimestamp
+     * @param array|null $allowedEventTypes
      * @return Collection
+     * @throws InvalidArgumentException
      */
-    public function getEvents($startTimestamp, $endTimestamp)
+    public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
         // we're going to use this as a window for not building *too* much expensive timetable at once
         $startOfDay = Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
@@ -75,7 +77,21 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 $days = max(0, $decodedConfig->getDuration());
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
+            /* TODO Repair assumption about default luEventType id
+             *  You can't really make this assumption, because someone could have
+             *  soft-deleted the first luEventType record; arbitrarily assigning 1
+             *  could put events into a deleted event type; instead, you could get
+             *  the full set, then pop the first of its elements
+             */
             $eventType = 1;
+        }
+
+        /* Do a detection on $allowedEventTypes, if provided and meaningful
+         */
+        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
+            if (!\in_array((int)$eventType, $allowedEventTypes, true)) {
+                return new Collection();
+            }
         }
 
         $externalAttendanceLink = null;
