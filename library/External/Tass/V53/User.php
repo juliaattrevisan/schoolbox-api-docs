@@ -17,12 +17,11 @@ class External_Tass_V53_User extends External_Tass_User
      */
     public function getParentEmails(array $externalUserIds): array
     {
-        $emailList  = [];
-        $idBindings = PredicateBuilder::getBindings($externalUserIds, 'externalId');
-
-        if (empty($idBindings)) {
+        if (empty($externalUserIds)) {
             return [];
         }
+        $emailList  = [];
+        $idBindings = PredicateBuilder::getBindings($externalUserIds, 'externalId');
 
         $addNumBindings = $this->helper->getAddNumBindings();
 
@@ -51,7 +50,7 @@ class External_Tass_V53_User extends External_Tass_User
             $typeCodeBindings = $this->helper->getTypeCodeBindings();
 
             $typeWhere = '';
-            if (!empty($typeCodeBindings)) {
+            if (!empty($typeCodeBindings->getParams())) {
                 $typeWhere = "AND scr.commtype_code IN ({$typeCodeBindings->getPlaceholder()}) ";
                 $params    = array_merge($params, $typeCodeBindings->getParams());
             }

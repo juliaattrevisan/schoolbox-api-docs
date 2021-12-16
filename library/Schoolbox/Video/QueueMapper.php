@@ -135,24 +135,20 @@ class QueueMapper extends Mapper
             foreach ($status as $statusCurrent) {
                 $results = $this->findByColumn('status', $statusCurrent, $options);
 
-                if (!empty($results)) {
-                    /** @var \Schoolbox\Video\Queue $videoQueue */
-                    foreach ($results as $videoQueue) {
-                        if ($videoQueue->getStorage() instanceof Storage\Model) {
-                            $result[$statusCurrent][] = $videoQueue;
-                        }
+                /** @var \Schoolbox\Video\Queue $videoQueue */
+                foreach ($results as $videoQueue) {
+                    if ($videoQueue->getStorage() instanceof Storage\Model) {
+                        $result[$statusCurrent][] = $videoQueue;
                     }
                 }
             }
         } else {
             $results = $this->findByColumn('status', $status, $options);
 
-            if (!empty($results)) {
-                /** @var \Schoolbox\Video\Queue $videoQueue */
-                foreach ($results as $videoQueue) {
-                    if ($videoQueue->getStorage() instanceof Storage\Model) {
-                        $result[] = $videoQueue;
-                    }
+            /** @var \Schoolbox\Video\Queue $videoQueue */
+            foreach ($results as $videoQueue) {
+                if ($videoQueue->getStorage() instanceof Storage\Model) {
+                    $result[] = $videoQueue;
                 }
             }
         }

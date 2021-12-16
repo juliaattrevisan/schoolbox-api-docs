@@ -207,7 +207,6 @@ class EventMapper extends CalendarEventMapper
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
-        $sql = '';
 
         // Build a query around from/to dates
         $queryParts  = ['WHERE (e.deleted_at IS NULL)'];
@@ -222,9 +221,7 @@ class EventMapper extends CalendarEventMapper
             $queryParams['to'] = $to->getDatabaseDate();
         }
 
-        if (!empty($queryParts)) {
-            $sql = implode(' AND ', $queryParts);
-        }
+        $sql = implode(' AND ', $queryParts);
 
         /* Looked for a way to convince GROUP BY to group records with
          * integer series_id's, but leave NULL ones individual

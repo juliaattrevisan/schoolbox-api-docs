@@ -178,6 +178,7 @@ class ServiceManager implements IServiceManager
                 $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
             }
 
+            // @phpstan-ignore-next-line: WTF is this?
             if (empty($p)) {
                 $p['service'] = $srv;
                 $p['registrations'] = new GenericCollection(Registry::class);

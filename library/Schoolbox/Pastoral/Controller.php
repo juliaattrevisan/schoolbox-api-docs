@@ -891,7 +891,13 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         $studentId           = (int)$post->get('student_id');
-        $duplicateStudentIds = explode(',', $post->get('duplicateIds') ?? '');
+        $duplicateStudentIds = array_filter(
+            array_map(
+                'trim',
+                explode(',', $post->get('duplicateIds') ?? '')
+            ),
+            'strlen',
+        );
         if (empty($studentId) && empty($duplicateStudentIds)) {
             throw new InvalidArgumentException('No student provided.');
         }

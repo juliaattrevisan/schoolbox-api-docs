@@ -216,10 +216,10 @@ class User extends Base implements IUser
 
                 $whereSql .= $filterSqlCurrent;
             }
+        }
 
-            if (!empty($whereSql)) {
-                $whereSql = "WHERE {$whereSql}";
-            }
+        if (!empty($whereSql)) {
+            $whereSql = "WHERE {$whereSql}";
         }
 
         // Create the SQL query

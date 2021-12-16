@@ -262,10 +262,8 @@ class Result extends Base
 
         $hasNewsServicePermission = false;
 
-        if (!empty($accessList)) {
-            foreach ($accessList as $access) {
-                $hasNewsServicePermission = $access->getService() === Access\UserAccess::SERVICE_NEWS;
-            }
+        foreach ($accessList as $access) {
+            $hasNewsServicePermission = $access->getService() === Access\UserAccess::SERVICE_NEWS;
         }
 
         return $hasNewsServicePermission;
