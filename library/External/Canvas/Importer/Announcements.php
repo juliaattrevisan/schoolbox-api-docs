@@ -11,6 +11,8 @@ namespace External\Canvas\Importer;
 
 use External\Canvas\Importer\Codec\FolderCode;
 use Psr\Log\LoggerInterface;
+use Schoolbox\UserMapper;
+
 
 /**
  * Import Canvas' Course Announcements as Schoolbox News Articles
@@ -37,6 +39,12 @@ class Announcements
 
 
     /**
+     * @var UserMapper
+     */
+    private UserMapper $userMapper;
+
+
+    /**
      * @var LoggerInterface|null
      */
     private ?LoggerInterface $log;
@@ -58,6 +66,7 @@ class Announcements
         /* TODO Inject these all later
          */
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $this->userMapper = \Schoolbox\UserMapper::getInstance();
         $this->newsMapper = \Schoolbox\Comms\News\Mapper::getInstance();
     }
 
@@ -151,12 +160,40 @@ class Announcements
             return;
         }
 
+        /* TODO: Define authors
+         *  Canvas Importer doesn't create user accounts; they're presumed toe exist somehow
+         *  but in the case where they don't exist in schoolbox.user, assume a default owner
+         *  We don't really have anyone, so assign Schoolbox Admin arbitrarily...
+         *  (There should be a non-human system user account that can be given this kind of data)
+         */
+        $defaultOwner = $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+
         /* Every Announcement comes with a context_code field which you can use
          * to figure out the folder into which it should be placed, by using
          * $courseCodes as a hash lookup
          */
         foreach ($announcements as $announcement) {
             $folder = $courseCodes[$announcement['context_code']];
+
+            /* Figure out the external id of the person who owns this
+             * The external id should match someone in schoolbox.user (hopefully)
+             * but if it can't, it'll fall back to $defaultOwner
+             */
+            $endpoint = sprintf(
+                'api/v1/users/%s',
+                $announcement['author']['id']
+            );
+
+            try {
+                $announcementOwner = $this->api->retrieve('GET', $endpoint, []);
+
+                $owner = $this->userMapper->findByExternalId($announcementOwner['sis_user_id']);
+            } catch (\RuntimeException | \Schoolbox\Mapper\Exception $e) {
+                /* noop: owner not found in schoolbox; assign default
+                 */
+            }
+
+            $author = $owner ?? $defaultOwner;
 
             /* Spawn a new article instance, then map each Announcement's fields to the article's
              *
@@ -169,7 +206,9 @@ class Announcements
                 ->setTitle($announcement['title'])
                 ->setBody($announcement['message'])
                 ->setSticky(false)
-            ;
+                ->setAuthor($author);
+
+            new \Alaress_Probe($article->getTitle(), $article->getBody(), $article->getAuthor()->getFullName());
 
             /* Make the folder an audiencing segment/brick for the article
              */
@@ -178,7 +217,6 @@ class Announcements
              */
 
         }
-
     }
 
 
