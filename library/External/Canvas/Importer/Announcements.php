@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace External\Canvas\Importer;
 
+use External\Canvas\Importer\Codec\FolderCode;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -57,6 +58,7 @@ class Announcements
         /* TODO Inject these all later
          */
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $this->newsMapper = \Schoolbox\Comms\News\Mapper::getInstance();
     }
 
 
@@ -80,7 +82,7 @@ class Announcements
                 CONCAT('course_', canvas_id) AS courseId, 
                 name, 
                 code
-            FROM course_dim 
+            FROM course_dim
         ";
 
         $statement = $this->canvasDb->build()->executeQuery($query);
@@ -89,7 +91,26 @@ class Announcements
          * One would have to presume schoolbox folders exist, whose folder codes match
          * the course's code exactly
          */
+        $codec = new FolderCode();
+        $currentYear = (int)date('Y');
+
         while ($row = $statement->fetch()) {
+            /* We could have skipped this with a WHERE LIKE '%$currentYear' but we couldn't
+             * log the skips and other diagnostic hankypanky
+             */
+            $folderCode = $codec->decode($currentYear, $row['code']);
+
+            if (null === $folderCode) {
+                $this->logDebug(sprintf(
+                    'Course code %s is not a class, or does not occur in current year; skipping',
+                    $row['code']
+                ));
+
+                continue;
+            }
+
+            /* Try to figure out where to make an article in schoolbox
+             */
             try {
                 $folder = $this->folderMapper->findByCode($row['code']);
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -105,6 +126,7 @@ class Announcements
 
             /* Spawn a new article instance, then map each Announcement's fields to the article's
              */
+            $article = $this->newsMapper->createModel();
 
 
         }

@@ -72,6 +72,11 @@ HELP;
             exit;
         }
 
+        if ('' === (string)$this->getOpt(self::OPT_LONG_TOKEN)) {
+            $this->getLogger()->info('Provide an authentication token to continue.');
+            exit();
+        }
+
         $canvasDb = new \External\Canvas\Importer\CanvasDb();
 
         $api = new \External\Canvas\Importer\Api(
