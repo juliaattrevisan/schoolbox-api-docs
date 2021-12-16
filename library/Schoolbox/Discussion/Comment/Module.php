@@ -154,10 +154,10 @@ abstract class Module extends BaseModule
     }
 
     /**
-     * @return ErrorMapper|IMapper
+     * @return ErrorMapper
      * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getErrorMapper()
+    private function getErrorMapper(): ErrorMapper
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }

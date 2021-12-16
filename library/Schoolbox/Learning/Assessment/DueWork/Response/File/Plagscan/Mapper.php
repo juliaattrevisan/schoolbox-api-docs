@@ -314,6 +314,7 @@ class Mapper extends \Schoolbox\Mapper
             );
             // TODO is this check necessary - can't we assume plagscanID is empty if we're in the catch?
             // TODO need to return [] in other catch as well
+            // @phpstan-ignore-next-line: this _can_ be empty
             if (empty($plagscanId)) {
                 return [];
             }

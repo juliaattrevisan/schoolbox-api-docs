@@ -78,7 +78,7 @@ class CourseTeachers
         while ($row = $statement->fetch()) {
             $courseCanvasId                  = (int)$row['course.canvas_id'];
             $courseTeacherSisId              = $row['pseudonym.sis_user_id'];
-            $courseTeacherUserId             = $externalIdToUserIdMap[$courseTeacherSisId];
+            $courseTeacherUserId             = $externalIdToUserIdMap[$courseTeacherSisId] ?? null;
             $courseTeachers[$courseCanvasId] = (int)$courseTeacherUserId;
         }
         return $courseTeachers;

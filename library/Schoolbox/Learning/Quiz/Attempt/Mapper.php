@@ -521,7 +521,7 @@ class Mapper extends BaseMapper
 
     /**
      * Mark the attempt as reviewed
-     * @return bool|\int[]
+     * @return bool|int[]
      * @param Model $attempt
      * @param User $reviewer
      * @throws BaseMapper\Exception

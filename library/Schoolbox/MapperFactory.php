@@ -31,9 +31,10 @@ class MapperFactory
      *
      * Use this when you need a Mapper - as opposed to getLazy()
      *
-     * @param string $mapperName
+     * @template T
+     * @param class-string<T> $mapperName
+     * @return T
      * @throws InvalidArgumentException If mapper class not found
-     * @return BaseMapper
      */
     public function get($mapperName)
     {
@@ -45,6 +46,7 @@ class MapperFactory
         }
 
         // yank it straight back out (but now it's registered!)
+        // @phpstan-ignore-next-line: can't enforce this constraint here
         return $di->get($mapperName);
     }
 
@@ -54,7 +56,8 @@ class MapperFactory
      * Use this when registering a service on the DI.
      * Only the DI knows how to transform a lazy ref to a Mapper into a Mapper instance.
      *
-     * @param string $mapperName
+     * @template T
+     * @param class-string<T> $mapperName
      * @throws InvalidArgumentException If mapper class not found
      * @return Lazy
      */

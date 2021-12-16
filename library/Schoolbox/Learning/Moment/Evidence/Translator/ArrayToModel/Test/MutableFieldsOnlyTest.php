@@ -409,7 +409,7 @@ class MutableFieldsOnlyTest extends TestCase
         if (!$converter) {
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter            ??= new MutableFieldsOnly($collectorFactoryMock);
+            $converter            = new MutableFieldsOnly($collectorFactoryMock);
         }
         return $converter;
     }

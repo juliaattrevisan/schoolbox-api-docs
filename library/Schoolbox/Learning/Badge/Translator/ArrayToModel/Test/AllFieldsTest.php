@@ -565,7 +565,7 @@ class AllFieldsTest extends TestCase
         if (!$converter) {
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter            ??= new AllFields($collectorFactoryMock);
+            $converter            = new AllFields($collectorFactoryMock);
         }
         return $converter;
     }

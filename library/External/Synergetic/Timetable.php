@@ -273,6 +273,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $statement->execute();
         $statement->close();
 
+        // @phpstan-ignore-next-line: $currentDay can be set by reference
         return $currentDay ?? 0;
     }
 

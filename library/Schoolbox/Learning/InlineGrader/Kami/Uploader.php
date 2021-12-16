@@ -115,7 +115,7 @@ class Uploader
      * Timed-out kami documents are also marked as failed, so that `upload()`
      * with `$retryFailed` will attempt to re-process them.
      *
-     * @return array|\int[] Returns the IDs of affected models
+     * @return array|int[] Returns the IDs of affected models
      * @throws \PDOException If unable to save any models to database
      */
     public function timeout(): array
@@ -383,7 +383,7 @@ class Uploader
      * Saves a Kami model (or simulates if in dryRun)
      *
      * @param Model $kamiModel
-     * @return array|\int[]
+     * @return array|int[]
      * @throws \PDOException If unable to save the model
      */
     private function saveKamiModel(Model $kamiModel): array
@@ -399,7 +399,7 @@ class Uploader
      * Saves a collection of Kami models (or simulates if in dryRun)
      *
      * @param GenericCollection $models
-     * @return array|\int[]
+     * @return array|int[]
      * @throws \PDOException If unable to save any of the models
      */
     private function saveKamiModelCollection(GenericCollection $models): array

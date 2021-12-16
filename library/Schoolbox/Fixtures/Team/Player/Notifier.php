@@ -60,7 +60,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      *
-     * @param null $dependencies
+     * @param mixed $dependencies
      */
     public function loadDependencies($dependencies = null)
     {
@@ -68,11 +68,11 @@ class Notifier extends AbstractModuleNotifier
             $dependencies['teamMapper'] = TeamMapper::getInstance();
         }
 
-        if (empty($dependcies['matchMapper'])) {
+        if (empty($dependencies['matchMapper'])) {
             $dependencies['matchMapper'] = MatchMapper::getInstance();
         }
 
-        if (empty($dependcies['userMapper'])) {
+        if (empty($dependencies['userMapper'])) {
             $dependencies['userMapper'] = UserMapper::getInstance();
         }
 

@@ -57,7 +57,7 @@ class Model implements ISoftDeletable
     private $config;
 
     /**
-     * @var Collection|GenericCollection<QuizAnswer>
+     * @return QuizAnswer[]|GenericCollection
      */
     private $answers;
 
@@ -206,7 +206,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return QuizAnswer[]|GenericCollection<QuizQuestion>
+     * @return QuizAnswer[]|GenericCollection
      */
     public function getAnswers()
     {

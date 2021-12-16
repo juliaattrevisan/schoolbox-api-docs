@@ -315,7 +315,7 @@ class SitePage extends Page
 
         if (
             !$_SESSION['user'] instanceof User || //If session does not exist ||
-            (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
+            ((int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
             ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
             // Catch users with the remember me cookie

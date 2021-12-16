@@ -83,13 +83,13 @@ class Factory
          */
         $fragment = null;
 
-        if ($result['type'] !== 'inline') {
+        if (($result['type'] ?? null) !== 'inline') {
             $fragment = $result['src'];
         }
 
         return [
-            'type'     => $result['type'],
-            'twig'     => $result['twig'],
+            'type'     => $result['type'] ?? null,
+            'twig'     => $result['twig'] ?? null,
             'fragment' => $fragment,
         ];
     }
