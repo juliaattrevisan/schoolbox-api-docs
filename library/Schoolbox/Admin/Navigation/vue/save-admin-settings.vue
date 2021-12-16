@@ -77,16 +77,13 @@ export default {
          * Listen for form data changes to show the save button straight away on a change
          */
         initFormChangeListeners () {
-            document.getElementById(this.formId).addEventListener('change', () => this.onFormDataChange());
-            document.getElementById(this.formId).addEventListener('keyup', debounce(() => {
-                this.onFormDataChange();
-            }, 350));
             CKEDITOR.on('instanceReady', (instanceReadyEvent) => { //need to wait until the ckEditor is loaded prior to listening for chnages
                 instanceReadyEvent.editor.on('change', debounce((changeEvent) => { //update the linked <textarea>, which doesn't update until form save otherwise
                     document.getElementById(changeEvent.editor.name).textContent = changeEvent.editor.getData();
                     this.onFormDataChange()
                 }, 350));
             }); 
+            setInterval(this.onFormDataChange, 500);
         },
 
         /**
