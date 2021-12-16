@@ -252,14 +252,48 @@ class Announcements
                 $announcement['author']['id']
             );
 
+            $this->logDebug(sprintf(
+                '%s announcement %s: searching for article author %s (id %s) in canvas endpoint %s',
+                $announcement['context_code'],
+                $announcement['id'],
+                $announcement['author']['display_name'],
+                $announcement['author']['id'],
+                $endpoint
+            ));
+
+            /* Inspect canvas for this author
+             */
             try {
                 $announcementOwner = $this->api->retrieve('GET', $endpoint, []);
+            } catch (\RuntimeException $e) {
+                $this->logDebug(sprintf(
+                    '%s announcement %s: endpoint %s error - %s; skipping',
+                    $announcement['context_code'],
+                    $announcement['id'],
+                    $endpoint,
+                    $e->getMessage()
+                ));
 
+                continue;
+            }
+
+            /* Inspect schoolbox for this owner
+             */
+            try {
                 $owner = $this->userMapper->findByExternalId($announcementOwner['sis_user_id']);
-            } catch (\RuntimeException | \Schoolbox\Mapper\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 /* noop: owner not found in schoolbox; assign default
                  */
                 $owner = null;
+
+                $this->logDebug(sprintf(
+                    '%s announcement %s: author %s (externalId/sis_user_id %s) not found in schoolbox users - reverting to default ownership by %s',
+                    $announcement['context_code'],
+                    $announcement['id'],
+                    $announcement['author']['display_name'],
+                    $announcementOwner['sis_user_id'],
+                    $defaultOwner->getFullName()
+                ));
             }
 
             $author = $owner ?? $defaultOwner;
@@ -317,6 +351,25 @@ class Announcements
             // Perform intelligent update and persistence in specialised helper class
             (new \Schoolbox\Comms\News\Audience\Segment\Transactor($this->audienceMapper, $this->strategyFactory))
                 ->save($article, $audience);
+
+            $this->logDebug(sprintf(
+                '%s announcement %s: article titled "%s" has audiencing segment (%s, %s, %s)',
+                $announcement['context_code'],
+                $announcement['id'],
+                $article->getTitle(),
+                $segment->getEntityType(),
+                $segment->getEntityValue(),
+                $segment->getRelationship()
+            ));
+
+            $this->logInfo(sprintf(
+                '%s announcement %s: created article "%s" by %s in folder %s',
+                $announcement['context_code'],
+                $announcement['id'],
+                $article->getTitle(),
+                $article->getAuthor()->getFullName(),
+                $folder->getNameWithCodes()
+            ));
         }
     }
 
