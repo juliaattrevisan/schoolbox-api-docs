@@ -1,7 +1,7 @@
 parameters:
     bootstrapFiles:
         - %rootDir%/../../../conf/core/require.php
-    level: 4
+    level: 3
     parallel:
         processTimeout: 300.0
     paths:
@@ -10,6 +10,15 @@ parameters:
         - library
         - tools
     inferPrivatePropertyTypeFromConstructor: true
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#is not falsy#'
+        - '#is unused#'
+        - '#is never read#'
+        - '#is not nullable#'
+        - '#through static::#'
+        - '#@var above a method has no effect#'
+        - '#Dead catch#'
 
 includes:
     - phpstan-baseline.neon
