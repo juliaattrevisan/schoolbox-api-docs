@@ -274,7 +274,14 @@ class CliImporter extends CliTool\App
 
             exec("gunzip -f -k " . escapeshellarg("$tempDir/$tableGzFile")); // force overwrite of existing files, keep original
             $dataRestorer->restoreTableData($tableName, $tableFile);
-            unlink($tableFile);
+            if (file_exists($tableFile)) {
+                unlink($tableFile);
+            } else {
+                $this->getLogger()->debug(sprintf(
+                    'Could not unlink %s; file does not exist.',
+                    $tableFile
+                ));
+            }
         }
         $dataRestorer->addExtraIndexes();
     }
