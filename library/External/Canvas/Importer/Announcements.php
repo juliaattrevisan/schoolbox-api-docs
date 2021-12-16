@@ -73,13 +73,13 @@ class Announcements
     public function import(): void
     {
         /* Use the internal db to interrogate canvas_data_<instanceId>.course_dim
-         * for all the Courses that we imported; courseIds are stored in the canvas_id
+         * for all the Courses that we imported; contextCodes are stored in the canvas_id
          * column, but you'll need to prefix it with "course_" before you can use
          * them in the canvas api
          */
         $query = "
             SELECT 
-                CONCAT('course_', canvas_id) AS courseId, 
+                CONCAT('course_', canvas_id) AS contextCode, 
                 name, 
                 code
             FROM course_dim
@@ -91,6 +91,7 @@ class Announcements
          * One would have to presume schoolbox folders exist, whose folder codes match
          * the course's code exactly
          */
+        $courseCodes = [];
         $codec = new FolderCode();
         $currentYear = (int)date('Y');
 
@@ -112,7 +113,7 @@ class Announcements
             /* Try to figure out where to make an article in schoolbox
              */
             try {
-                $folder = $this->folderMapper->findByCode($row['code']);
+                $folder = $this->folderMapper->findByCode($folderCode);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 /* If you can't find a matching folder for the course code provided, skip it
                  */
@@ -124,14 +125,35 @@ class Announcements
                 continue;
             }
 
-            /* Spawn a new article instance, then map each Announcement's fields to the article's
+            /* Add it to the stack
              */
-            $article = $this->newsMapper->createModel();
-
-
+            $courseCodes[$row['contextCode']] = $folder;
         }
 
+        /* No course codes found? No trabajo
+         */
+        if (!\count($courseCodes)) {
+            $this->logInfo('No course codes found.');
+            return;
+        }
 
+        /* If we found any meaningful course codes,
+         * fetch article contents from the api
+         */
+        $announcements = $this->api->retrieve('GET', 'api/v1/announcements', [
+            'context_codes' => array_keys($courseCodes)
+        ]);
+
+        /* No announcements? No trabajo
+         */
+        if (!\count($announcements)) {
+            $this->logInfo('No announcements found.');
+            return;
+        }
+
+        /* Spawn a new article instance, then map each Announcement's fields to the article's
+         */
+        $article = $this->newsMapper->createModel();
 
         /* Make the folder an audiencing segment/brick for the article
          */
@@ -151,6 +173,19 @@ class Announcements
     {
         if ($this->log) {
             $this->log->debug($message);
+        }
+    }
+
+    /**
+     * If a logger was provided, bump out a message
+     *
+     * @param string $message
+     * @return void
+     */
+    private function logInfo(string $message): void
+    {
+        if ($this->log) {
+            $this->log->info($message);
         }
     }
 }
