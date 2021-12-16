@@ -63,84 +63,80 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
             $this->setVar('empty_state_block', '');
 
-            if (!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
+            $this->setVar('source_folder_deleted_block', '');
+
+            // Set up component name
+            $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
+
+            $this->setVar(
+                [
+                    'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
+                    'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
+                    'COMPONENT_CONFIG_IMAGE_RATIO'           => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
+                ]
+            );
+
+            /* Prevent multiple galleries from other categories stacking up in the wrong place
+             * and initialise empty gallery by default
+             */
+            $this->setVar('image_scroller_block', '');
+
+            if ($this->getConfig('randomStartingSlide')) {
+                $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
             } else {
-                $this->setVar('source_folder_deleted_block', '');
+                $this->setVar('COMPONENT_RANDOM_SLIDE', 0);
+            }
 
-                // Set up component name
-                $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+            // Controls such as Post Images
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar("submit_image_scroller_block", "");
+            } else {
+                $this->parse("submit_image_scroller_block", "submit_image_scroller");
+            }
 
+            // Iterate
+            foreach ($allFiles as $currentFile) {
+                $url = '';
+
+                // sanitise url
+                if ($currentFile->getDescription()) {
+                    $description = $currentFile->getDescription();
+                    if (filter_var($description, FILTER_VALIDATE_URL)) {
+                        $url = $description;
+                    } elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
+                        // it might be referencing inside schoolbox, so simulate that to the validator
+                        $url = $description;
+                    }
+                }
 
                 $this->setVar(
                     [
-                        'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
-                        'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
-                        'COMPONENT_CONFIG_IMAGE_RATIO'           => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
+                        'IMAGE_ID'   => $currentFile->getId(),
+                        'IMAGE_NAME' => Scrub::text($currentFile->getTitle()),
+                        'IMAGE_URL'  => $url,
                     ]
                 );
 
-                /* Prevent multiple galleries from other categories stacking up in the wrong place
-                 * and initialise empty gallery by default
-                 */
-                $this->setVar('image_scroller_block', '');
-
-                if ($this->getConfig('randomStartingSlide')) {
-                    $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
+                /* Link image */
+                if ($url) {
+                    $this->parse('linked_image_block', 'linked_image');
+                    $this->setVar('unlinked_image_block', '');
                 } else {
-                    $this->setVar('COMPONENT_RANDOM_SLIDE', 0);
+                    $this->parse('unlinked_image_block', 'unlinked_image');
+                    $this->setVar('linked_image_block', '');
                 }
 
-                // Controls such as Post Images
-                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar("submit_image_scroller_block", "");
+                // Display captions
+                if ($this->getConfig('captionState') == 'Active') {
+                    $this->parse('show_caption_block', 'show_caption');
                 } else {
-                    $this->parse("submit_image_scroller_block", "submit_image_scroller");
+                    $this->setVar('show_caption_block', '');
                 }
 
-                // Iterate
-                foreach ($allFiles as $currentFile) {
-                    $url = '';
-
-                    // sanitise url
-                    if ($currentFile->getDescription()) {
-                        $description = $currentFile->getDescription();
-                        if (filter_var($description, FILTER_VALIDATE_URL)) {
-                            $url = $description;
-                        } elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
-                            // it might be referencing inside schoolbox, so simulate that to the validator
-                            $url = $description;
-                        }
-                    }
-
-                    $this->setVar(
-                        [
-                            'IMAGE_ID'   => $currentFile->getId(),
-                            'IMAGE_NAME' => Scrub::text($currentFile->getTitle()),
-                            'IMAGE_URL'  => $url,
-                        ]
-                    );
-
-                    /* Link image */
-                    if ($url) {
-                        $this->parse('linked_image_block', 'linked_image');
-                        $this->setVar('unlinked_image_block', '');
-                    } else {
-                        $this->parse('unlinked_image_block', 'unlinked_image');
-                        $this->setVar('linked_image_block', '');
-                    }
-
-                    // Display captions
-                    if ($this->getConfig('captionState') == 'Active') {
-                        $this->parse('show_caption_block', 'show_caption');
-                    } else {
-                        $this->setVar('show_caption_block', '');
-                    }
-
-                    $this->parse('image_scroller_block', 'image_scroller', true);
-                }
-                $this->parse('source_folder_exists_block', 'source_folder_exists');
+                $this->parse('image_scroller_block', 'image_scroller', true);
             }
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
 
             $this->parse('has_images_block', 'has_images');
         }

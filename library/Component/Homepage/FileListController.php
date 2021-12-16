@@ -23,14 +23,14 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      * Available filters for this component.
      *
      * @see Component_Config_Filter for how this data is passed in/out of the database
-     * @var array
+     * @var string[]
      */
     protected $filterFields = ['document', 'audio', 'video', 'image', 'other'];
 
     /**
      * Available sort fields for this component.
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = ['name', 'date'];
 
@@ -147,98 +147,94 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             );
 
 
-            if (!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
-            } else {
-                $this->setVar(
-                    [
-                        'source_folder_deleted_block' => '',
-                        'files_block'                 => '',
-                    ]
-                );
+            $this->setVar(
+                [
+                    'source_folder_deleted_block' => '',
+                    'files_block'                 => '',
+                ]
+            );
 
-                /** @var Schoolbox\Resource\File\Model[] $fileList */
-                if (count($fileList)) {
-                    $folderId = $this->getContext()->getId();
-                    foreach ($fileList as $file) {
-                        if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                            continue;
-                        }
+            /** @var Schoolbox\Resource\File\Model[] $fileList */
+            if (count($fileList)) {
+                $folderId = $this->getContext()->getId();
+                foreach ($fileList as $file) {
+                    if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                        continue;
+                    }
 
-                        $mostRecentEditor = $file->getModifiedBy() ?: $file->getOwner();
-                        $message          = $file->getModifiedBy() ? 'Last updated' : 'Posted';
-                        $mostRecentDate   = $file->getModifiedAt() ?: $file->getCreatedAt();
+                    $mostRecentEditor = $file->getModifiedBy() ?: $file->getOwner();
+                    $message          = $file->getModifiedBy() ? 'Last updated' : 'Posted';
+                    $mostRecentDate   = $file->getModifiedAt() ?: $file->getCreatedAt();
 
+                    $this->setVar(
+                        [
+                            'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
+                            'FILE_ID'              => $file->getId(),
+                            'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
+                            'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
+                            'FILE_POSTED_BY'       => $mostRecentEditor->getFullName(),
+                            'FILE_POSTED_BY_ID'    => $mostRecentEditor->getId(),
+                            'FILE_POSTED_DATE'     => $mostRecentDate->getShort(),
+                            'FILE_POSTED_RELATIVE' => $mostRecentDate->getRelativeTime(),
+                            'FILE_POSTED_MESSAGE'  => $message,
+                            'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
+                            'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
+                            'RETURN_URL'           => Redirect::RETURN_URL . '=' . Redirect::encode("/homepage/$folderId"),
+                        ]
+                    );
+
+                    if (!$this->getConfig('compactMode')) {
+                        $this->setVar('FILE_COMPACT', '');
+                    } else {
+                        $this->setVar('FILE_COMPACT', 'compact');
+                    }
+
+                    $this->setVar('file_modify_user_block', '');
+                    $this->setVar('file_deleted_user_block', '');
+
+                    if (!$mostRecentEditor->isDeleted()) {
+                        $this->parse('file_modify_user_block', 'file_modify_user');
+                    } else {
+                        $this->parse('file_deleted_user_block', 'file_deleted_user');
+                    }
+
+                    //set name
+                    if ($file->getFilename() != "") {
                         $this->setVar(
                             [
-                                'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
-                                'FILE_ID'              => $file->getId(),
-                                'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
-                                'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
-                                'FILE_POSTED_BY'       => $mostRecentEditor->getFullName(),
-                                'FILE_POSTED_BY_ID'    => $mostRecentEditor->getId(),
-                                'FILE_POSTED_DATE'     => $mostRecentDate->getShort(),
-                                'FILE_POSTED_RELATIVE' => $mostRecentDate->getRelativeTime(),
-                                'FILE_POSTED_MESSAGE'  => $message,
-                                'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
-                                'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
-                                'RETURN_URL'           => Redirect::RETURN_URL . '=' . Redirect::encode("/homepage/$folderId"),
+                                'FILE_URL'          => '/send.php?id=' . $file->getId(),
+                                'FILE_TARGET'       => '_blank',
+                                'file_no_url_block' => '',
                             ]
                         );
-
-                        if (!$this->getConfig('compactMode')) {
-                            $this->setVar('FILE_COMPACT', '');
-                        } else {
-                            $this->setVar('FILE_COMPACT', 'compact');
-                        }
-
-                        $this->setVar('file_modify_user_block', '');
-                        $this->setVar('file_deleted_user_block', '');
-
-                        if (!$mostRecentEditor->isDeleted()) {
-                            $this->parse('file_modify_user_block', 'file_modify_user');
-                        } else {
-                            $this->parse('file_deleted_user_block', 'file_deleted_user');
-                        }
-
-                        //set name
-                        if ($file->getFilename() != "") {
-                            $this->setVar(
-                                [
-                                    'FILE_URL'          => '/send.php?id=' . $file->getId(),
-                                    'FILE_TARGET'       => '_blank',
-                                    'file_no_url_block' => '',
-                                ]
-                            );
-                            $this->parse('file_url_block', 'file_url');
-                        } else {
-                            $this->setVar('file_url_block', '');
-                            $this->parse('file_no_url_block', 'file_no_url');
-                        }
-                        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                            $this->parse('modify_file_block', 'modify_file');
-                        } else {
-                            $this->setVar('modify_file_block', '');
-                        }
-
-                        $this->parse('files_block', 'files', true);
+                        $this->parse('file_url_block', 'file_url');
+                    } else {
+                        $this->setVar('file_url_block', '');
+                        $this->parse('file_no_url_block', 'file_no_url');
                     }
-                } else {
-                    $this->setVar('files_block', '');
-                }
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                        $this->parse('modify_file_block', 'modify_file');
+                    } else {
+                        $this->setVar('modify_file_block', '');
+                    }
 
-                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar([
-                        'component_action_block' => '',
-                    ]);
-                } else {
-                    $this->parse("component_action_block", "component_action");
+                    $this->parse('files_block', 'files', true);
                 }
-                $this->parse('source_folder_exists_block', 'source_folder_exists');
+            } else {
+                $this->setVar('files_block', '');
             }
 
-            $this->parse('has_file_block', 'has_file');
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar([
+                    'component_action_block' => '',
+                ]);
+            } else {
+                $this->parse("component_action_block", "component_action");
+            }
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
+
+        $this->parse('has_file_block', 'has_file');
 
         return true;
     }

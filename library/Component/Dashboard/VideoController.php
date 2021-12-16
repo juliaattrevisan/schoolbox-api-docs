@@ -33,7 +33,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
     /**
      * Available sort fields for this component.
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = array('name', 'date');
 

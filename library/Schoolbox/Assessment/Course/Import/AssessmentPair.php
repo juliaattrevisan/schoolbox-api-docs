@@ -38,6 +38,7 @@ class AssessmentPair
 
     /**
      * If this pair is a sub-pair (ie inside a Project) this points to parent Project pair.
+     * @phpstan-ignore-next-line: this property _is_ written by the constructor
      *
      * @var AssessmentPair|null
      */

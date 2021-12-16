@@ -34,7 +34,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
     /**
     * Available sort fields for this component.
     *
-    * @var array
+    * @var string[]
     */
     protected $sortFields = array('name', 'date');
 

@@ -79,6 +79,9 @@ class Controller extends Base
                 $result = $mapper->delete($record);
             } catch (MapperException $e) {
                 // Something failed in the mapper: noop
+
+                // Deletion _can_ raise UnexpectedValueException
+                /** @phpstan-ignore-next-line */
             } catch (UnexpectedValueException $e) {
                 // Something else unexpected happened, likely thrown by a
                 // pre-delete: noop

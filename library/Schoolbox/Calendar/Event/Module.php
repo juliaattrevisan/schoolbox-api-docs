@@ -195,7 +195,7 @@ class Module extends BaseModule
 
     /**
      * @param array $params
-     * @return array|null
+     * @return array
      * @throws Exception
      * @throws Mapper\Exception\Deleted
      * @throws InvalidArgumentException

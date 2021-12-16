@@ -11,12 +11,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RandImageController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var DeprecatedDatabase
-     */
-    private $db;
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -30,7 +24,6 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             return false;
         }
 
-        $this->db = DeprecatedDatabase::getInstance();
         return true;
     }
 

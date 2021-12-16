@@ -20,7 +20,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
     /**
      * Available sort fields for this component.
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = array('name', 'date');
 

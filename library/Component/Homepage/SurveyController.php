@@ -181,7 +181,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             $this->parse('reviewLink_block', 'reviewLink');
                         } else {
                             // show to everyone unless expired
-                            if (strtotime($currentSurvey['finish']) < time()) {
+                            if ((int)strtotime($currentSurvey['finish']) < time()) {
                                 $this->parse('surveyNoLink_block', 'surveyNoLink');
                                 $this->setVar(
                                     [

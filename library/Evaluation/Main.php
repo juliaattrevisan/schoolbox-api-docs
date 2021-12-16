@@ -420,7 +420,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
         if (!isset($assess['start'])) {
             return false;
         }
-        if (strtotime($assess['start']) <= time()) {
+        if ((int)strtotime($assess['start']) <= time()) {
             return true;
         }
         return false;

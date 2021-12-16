@@ -27,7 +27,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     /**
      * Available sort fields for this component.
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = ['name', 'date'];
 

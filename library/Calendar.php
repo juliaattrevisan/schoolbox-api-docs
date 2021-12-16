@@ -446,12 +446,12 @@ class Calendar extends DeprecatedModel
     /**
      * Get all events occurring across the specified date span.
      *
-     * @param User  $user
-     * @param User  $viewer
-     * @param int   $startTimestamp           If not null, filter out events that end on
+     * @param User     $user
+     * @param User     $viewer
+     * @param int|null $startTimestamp           If not null, filter out events that end on
      *                                        or before this time
      *                                        (end times are exclusive in calendars)
-     * @param int   $endTimestamp             If not null, filter out events that start
+     * @param int|null $endTimestamp             If not null, filter out events that start
      *                                        after this time
      * @param array $filter                   A filter to put on the list of results.
      *                                        * campus: if set, event set is restricted to

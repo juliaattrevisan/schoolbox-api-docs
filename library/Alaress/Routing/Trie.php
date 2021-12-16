@@ -30,7 +30,7 @@ class Trie
     private $usort;
 
     /** @var bool */
-    private $writable = true;
+    private bool $writable = true;
 
 
     /**
@@ -65,7 +65,7 @@ class Trie
         }
 
         // if not sorted, do it now
-        if (!empty($this->writable) && !$this->sorted) {
+        if ($this->writable && !$this->sorted) {
             $this->sort();
         }
 
@@ -126,11 +126,11 @@ class Trie
 
     /**
      * @param string $key
-     * @return static
+     * @return static|null
      */
     public function put($key)
     {
-        if (empty($this->writable)) {
+        if (!$this->writable) {
             return null;
         }
 
@@ -151,7 +151,7 @@ class Trie
      */
     public function set(array $params, $k, $v)
     {
-        if (empty($this->writable)) {
+        if (!$this->writable) {
             return;
         }
 
@@ -200,7 +200,7 @@ class Trie
      */
     protected function sort()
     {
-        if (empty($this->writable)) {
+        if (!$this->writable) {
             return;
         }
 
@@ -224,7 +224,7 @@ class Trie
      */
     public function lock()
     {
-        if (empty($this->writable)) {
+        if (!$this->writable) {
             return;
         }
 
@@ -234,7 +234,8 @@ class Trie
 
         // finalise sorting
         $this->sort();
-        unset($this->writable, $this->usort, $this->sorted);
+        $this->writable = false;
+        unset($this->usort, $this->sorted);
 
         if (count($this->tries)) {
             foreach ($this->tries as $t) {
@@ -252,7 +253,7 @@ class Trie
      */
     public function isLocked()
     {
-        return empty($this->writable);
+        return !$this->writable;
     }
 
 

@@ -14,7 +14,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
     /**
      * The sort options made available to the dropdown
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = ['Name', 'Created', 'Last Updated'];
 
@@ -107,50 +107,46 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
                 ]
             );
 
-            if (!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
-            } else {
-                /* Optional limits
-                 */
-                if ($this->getConfig('size')) {
-                    $options['limit'] = $this->getConfig('size');
-                }
-
-                /* Only provide Modify Document button to those with write access
-                 */
-                foreach ($allPads as $currentPad) {
-                    $this->setVar(
-                        [
-                            'HOMEPAGE_ID'         => $this->getInstance()->getIdentifier(),
-                            'ETHERPAD_PAD_ID'     => $currentPad->getId(),
-                            'ETHERPAD_NAME'       => Scrub::text($currentPad->getDisplayName()),
-                            'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
-                        ]
-                    );
-
-                    if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
-                        $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
-                    }
-
-                    $this->parse('etherpad_pad_block', 'etherpad_pad', true);
-
-                    /* Clear children after parsing out the parent
-                     */
-                    $this->setVar('etherpad_has_modify_block', '');
-                }
-
-                /* Only provide Create Document button to those with write access
-                 */
-                if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
-                    $this->setVar('SOURCE_ID', $this->getSource()->getId());
-                    $this->parse('etherpad_has_create_block', 'etherpad_has_create');
-                }
-
-                $this->parse('source_folder_exists_block', 'source_folder_exists');
+            /* Optional limits
+             */
+            if ($this->getConfig('size')) {
+                $options['limit'] = $this->getConfig('size');
             }
 
-            $this->parse('has_docs_block', 'has_docs');
+            /* Only provide Modify Document button to those with write access
+             */
+            foreach ($allPads as $currentPad) {
+                $this->setVar(
+                    [
+                        'HOMEPAGE_ID'         => $this->getInstance()->getIdentifier(),
+                        'ETHERPAD_PAD_ID'     => $currentPad->getId(),
+                        'ETHERPAD_NAME'       => Scrub::text($currentPad->getDisplayName()),
+                        'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
+                    ]
+                );
+
+                if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
+                    $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
+                }
+
+                $this->parse('etherpad_pad_block', 'etherpad_pad', true);
+
+                /* Clear children after parsing out the parent
+                 */
+                $this->setVar('etherpad_has_modify_block', '');
+            }
+
+            /* Only provide Create Document button to those with write access
+             */
+            if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
+                $this->setVar('SOURCE_ID', $this->getSource()->getId());
+                $this->parse('etherpad_has_create_block', 'etherpad_has_create');
+            }
+
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
+
+        $this->parse('has_docs_block', 'has_docs');
 
         return true;
     }

@@ -52,13 +52,11 @@ abstract class Component_FactoryAbstract
 
         $componentCollection = new Collection();
 
-        if (!empty($instanceCollection)) {
-            foreach ($instanceCollection as $instance) {
-                $component = $this->buildComponent($instance);
+        foreach ($instanceCollection as $instance) {
+            $component = $this->buildComponent($instance);
 
-                if (!empty($component)) {
-                    $componentCollection->add($component);
-                }
+            if (!empty($component)) {
+                $componentCollection->add($component);
             }
         }
 

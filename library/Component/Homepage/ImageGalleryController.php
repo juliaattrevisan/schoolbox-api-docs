@@ -105,34 +105,30 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
                 ]
             );
 
-            if (!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
-            } else {
-                /* Set up component name
-                 *
-                 * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
-                 */
+            /* Set up component name
+             *
+             * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
+             */
 
-                // Controls such as Post News
-                if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                    $this->parse('submit_image_gallery_block', 'submit_image_gallery');
-                }
-
-                // Iterate
-                foreach ($allImages as $currentImage) {
-                    $this->setVar(
-                        [
-                            'THUMBNAIL_ID'          => $currentImage->getId(),
-                            'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
-                            'THUMBNAIL_SIZE'        => Config::get('thumbnail_size'),
-                            'IMAGE_HEIGHT'          => Config::get('thumbnail_size'),
-                        ]
-                    );
-
-                    $this->parse('image_gallery_block', 'image_gallery', true);
-                }
-                $this->parse('source_folder_exists_block', 'source_folder_exists');
+            // Controls such as Post News
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                $this->parse('submit_image_gallery_block', 'submit_image_gallery');
             }
+
+            // Iterate
+            foreach ($allImages as $currentImage) {
+                $this->setVar(
+                    [
+                        'THUMBNAIL_ID'          => $currentImage->getId(),
+                        'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
+                        'THUMBNAIL_SIZE'        => Config::get('thumbnail_size'),
+                        'IMAGE_HEIGHT'          => Config::get('thumbnail_size'),
+                    ]
+                );
+
+                $this->parse('image_gallery_block', 'image_gallery', true);
+            }
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
 
             $this->parse('has_images_block', 'has_images');
         }

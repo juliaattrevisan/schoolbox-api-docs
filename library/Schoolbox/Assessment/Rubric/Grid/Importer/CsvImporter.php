@@ -41,7 +41,7 @@ class CsvImporter implements IImporter
      * then the indicators within, and finally the descriptors within each
      * indicator.
      *
-     * @var string[]
+     * @var array<array<string>>
      */
     private $square;
 
