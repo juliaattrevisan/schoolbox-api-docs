@@ -173,6 +173,24 @@ class Announcements
             return;
         }
 
+        $this->importAnnouncements($announcements, $courseCodes, $defaultOwner);
+    }
+
+
+    /**
+     * Import $announcements into folders identified by $courseCodes
+     * Assigns $defaultOwner as the author if the actual author can't be found in schoolbox.user
+     *
+     * @param array           $announcements
+     * @param array           $courseCodes
+     * @param \Schoolbox\User $defaultOwner
+     * @return void
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DebugBar\DebugBarException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function importAnnouncements(array $announcements, array $courseCodes, \Schoolbox\User $defaultOwner): void
+    {
         /* Every Announcement comes with a context_code field which you can use
          * to figure out the folder into which it should be placed, by using
          * $courseCodes as a hash lookup
@@ -196,6 +214,7 @@ class Announcements
             } catch (\RuntimeException | \Schoolbox\Mapper\Exception $e) {
                 /* noop: owner not found in schoolbox; assign default
                  */
+                $owner = null;
             }
 
             $author = $owner ?? $defaultOwner;
