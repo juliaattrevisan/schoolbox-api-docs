@@ -630,7 +630,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
             $this->expiresAt = $publishAt;
         }
 
-        $this->publishAt = $publishAt ?? Alaress_Date_Format::now();
+        $this->publishAt = $publishAt;
     }
 
 

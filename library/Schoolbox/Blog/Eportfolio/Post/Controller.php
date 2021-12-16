@@ -103,7 +103,7 @@ class Controller extends Base
      * @param Collection $attachments
      * @return array
      */
-    private function getAttachZone($attachments)
+    private function getAttachZone(Collection $attachments)
     {
         $zone = new Zone('attachment');
         $zone
@@ -114,7 +114,7 @@ class Controller extends Base
             ->setMimeFilter('image/*')
             ->setReadOnly(false)
             ->setMulti(true)
-            ->attachFiles($attachments ?? []);
+            ->attachFiles($attachments);
 
         return $zone->getTwigContext();
     }

@@ -360,7 +360,7 @@ class Profile implements IStrategy
                  */
                 $studentProfile
                     ->setUsername($username)
-                    ->setAlertComment($alertComments ?? null)
+                    ->setAlertComment($alertComments)
                     ->setAlertLegal($alertLegal ?? null)
                     ->setAlertMessage($messages)
                     ->setCampusName($campusName)

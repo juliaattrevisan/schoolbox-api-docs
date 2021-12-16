@@ -490,9 +490,9 @@ class SitePage extends Page
      * Usage - SitePage::localRedir($url)
      *
      * @static
-     * @param  string $file
-     * @param  bool $keepProcessing True if processing continues in background
-     * @param  int $responseCode If set, output this response code.
+     * @param  string|null $file           If null, redirect to dashboard
+     * @param  bool        $keepProcessing True to keep processing in background
+     * @param  int         $responseCode   If set, output this response code.
      * @return void
      */
     public static function localRedir($file, $keepProcessing = false, $responseCode = null)
