@@ -15,7 +15,6 @@ use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
-
 /**
  * Import Canvas' Course Announcements as Schoolbox News Articles
  */
