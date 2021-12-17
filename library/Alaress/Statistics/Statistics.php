@@ -26,7 +26,7 @@ class Statistics
      */
     public static function median(array $values): ?float
     {
-        return static::internalMedian(static::preProcess($values));
+        return self::internalMedian(self::preProcess($values));
     }
 
 
@@ -42,7 +42,7 @@ class Statistics
      */
     public static function buildBoxPlotValues(array $values): array
     {
-        $values = static::preProcess($values);
+        $values = self::preProcess($values);
 
         // Empty case: all null
         if (empty($values)) {
@@ -71,15 +71,15 @@ class Statistics
         $series = [
             'low'    => (float)$values[0],
             'high'   => (float)$values[$count - 1],
-            'median' => static::internalMedian($values),
+            'median' => self::internalMedian($values),
         ];
 
         // Calculate q1 (median of lower half), q3 (median of upper half)
         $sliceSize  = (int)($count / 2);
         $lowValues  = \array_slice($values, 0, $sliceSize);
         $highValues = \array_slice($values, -$sliceSize);
-        $series['q1'] = static::internalMedian($lowValues);
-        $series['q3'] = static::internalMedian($highValues);
+        $series['q1'] = self::internalMedian($lowValues);
+        $series['q3'] = self::internalMedian($highValues);
         return $series;
     }
 
