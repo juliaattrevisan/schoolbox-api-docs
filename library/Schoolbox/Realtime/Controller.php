@@ -247,16 +247,11 @@ class Controller extends BaseController
         foreach ($folders as $folder) {
             $forced = false;
 
-            // forced hydration
-            $folder = $this->getFolderMapper()
-                           ->findById($folder->getId());
-
             if ($grp = $folder->getGroup()) {
                 $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
             }
 
             $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
-
 
             $followment[$folder->getId()] = [
                 'name'   => $folder->getName(),
