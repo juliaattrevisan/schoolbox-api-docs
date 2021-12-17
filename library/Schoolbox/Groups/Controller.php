@@ -12,27 +12,19 @@ namespace Schoolbox\Groups;
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
-use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
-use Schoolbox\Realtime\Message\RoutePermissionMapper;
-use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RerouteOverride;
-use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Timetable_ColourMapper;
-
-use function in_array;
 
 class Controller extends BaseController
 {
@@ -53,7 +45,7 @@ class Controller extends BaseController
         $accessHelper   = Access::getInstance();
 
         /** @var \Schoolbox\User $user */
-        $user = $_SESSION["user"];
+        $user = $this->getUser();
 
         //colours for groups with no colours
         /* Get Timetable colours to use as random colours for null set folders */
@@ -62,41 +54,37 @@ class Controller extends BaseController
         $colourFactory = new ColorFactory();
         $colourCache   = new GenericCollection(Color::class);
 
-        //get list of all possible groups
-        $groups = $groupMapper->findByColumn('type', [Group::FREE_GROUP, Group::MODERATED_GROUP]);
-        //get list of all groups, will filter out the private and not member
-        $groups = $groupMapper->findAll();
-
         //check if user is currently member
-        // Get the perms for user - including DENY (semantically PENDING) access
+        // Get the groups the user is currently a member, their enrolment type and favourite status
         /** @var GenericCollection|UserAccess[] $userPerms */
         $userPerms = $accessMapper->findByColumnList([
-                                                         'uid'     => $user->getId(),
-                                                         'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                     ])->indexBy('serviceIdentifier');
+            'uid'     => $user->getId(),
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+        ])->indexBy('serviceIdentifier');
+        $groupIds = $userPerms->keys();
 
-        //check if notifications or favourites
-        $favourites = $accessMapper->getFavourites($user);
+        //get list of all possible public groups
+        $groups = $groupMapper->findByColumnList([
+            'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
+        ]);
+        $groupIds = array_unique(array_merge($groupIds, $groups->keys()));
 
         //build notifications
         $notificationsList = $this->getNotifications($user);
 
+        //build the folder list object with hydration
+        $folders = $folderMapper->findByColumnList(['id' => $groupIds]);
+
         // build output array
         $userAccess     = [];
         $possibleGroups = [];
-        /* @var Group $group */
-        foreach ($groups as $group) {
-            $folderId = $group->getFolder()->getId();
-            $folder   = $folderMapper->findById($folderId);
-//            $folder = $folderMapper->hydrateCollection($folder);
-
-            if ($group->isPrivate() && !$userPerms[$folderId]) {
-                // private group and the user is not a member, don't show.
-                continue;
-            }
-
+        /* @var UserAccess|Group $group */
+        foreach ($folders as $folder) {
             //favourite
-            $isFavourite = in_array($folderId, $favourites);
+            $isFavourite = false;
+            if ($userPerms[$folder->getId()]) {
+                $isFavourite = $userPerms[$folder->getId()]->getFavourite();
+            }
 
             //nullable fields cause something have no defaults...
             $imageHash  = null;
@@ -113,39 +101,32 @@ class Controller extends BaseController
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
             //get access
-            $access = $accessHelper->getFolderAccess($this->getUser(), $folder->getId()) ?: null;
-            try {
-                $modifyLink = $this->getRouteIfAuthorized(
+            $access = $accessHelper->getFolderAccess($user, $folder->getId()) ?: null;
+            if (UserAccess::ACCESS_WRITE <= $access) {
+                $modifyLink = $this->getRouter()->generate(
                     'folder.getFolderModify',
                     ['id' => $folder->getId(), 'folder' => $folder]
                 );
-            } catch (RouteNotFound $e) {
+            } else {
                 $modifyLink = false;
             }
             $tmp                    = [
-                'id'                => $folderId,
-                'name'              => $group->getFolder()->getName(),
-                'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folderId]),
+                'id'                => $folder->getId(),
+                'name'              => $folder->getName(),
+                'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folder->getId()]),
                 'colour'            => $folder->getColour()->getAsHex(),
                 'coverImageHash'    => $imageHash,
-                'isNotificationsOn' => $notificationsList[$folderId]['follow'] ?: false,
-                'isForceFollow'     => $notificationsList[$folderId]['force'] ?: false,
+                'isNotificationsOn' => $notificationsList[$folder->getId()]['follow'] ?: false,
+                'isForceFollow'     => $notificationsList[$folder->getId()]['force'] ?: false,
                 'isFavourite'       => $isFavourite,
-                'type'              => $this->getGroupType($group->getType()),
+                'type'              => $this->getGroupType($folder->getGroup()->getType()),
                 'isAccessAdmin'     => ($access === UserAccess::ACCESS_FULL),
                 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
                 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
-                'isPrivate'         => $group->isPrivate(),
+                'isPrivate'         => $folder->getGroup()->isPrivate(),
                 'modifyLink'        => $modifyLink,
             ];
             $possibleGroups[] = $tmp;
-        }
-
-        //send to frontend
-        try {
-            $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
-        } catch (MapperException $e) {
-            $userAccess[$folder->getId()] = null;
         }
 
         //sort the groups
@@ -156,8 +137,7 @@ class Controller extends BaseController
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@groups/groups.twig', [
                 'groupList'  => $possibleGroups,
-                'userAccess' => $userAccess,
-                'endpoint'   => $this->getRouteIfAuthorized('groups.newGroups'),
+                'endpoint'   => $this->getRouter()->generate('groups.newGroups'),
             ])
         );
     }
@@ -183,9 +163,6 @@ class Controller extends BaseController
 
         if (
             !isset($post['group'])
-//            || !isset($post['action'])
-//            || !isset($post['isNotificationsOn'])
-//            || !isset($post['favourite'])
         ) {
             return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
         }
@@ -195,7 +172,7 @@ class Controller extends BaseController
         $groupMapper    = GroupMapper::getInstance();
 
         /** @var \Schoolbox\User $user */
-        $user = $_SESSION["user"];
+        $user = $this->getUser();
 
         /* @var Group $group */
         $group = $groupMapper->findById($post['group']);
