@@ -100,6 +100,7 @@ class Announcements
      * @param UserMapper                            $userMapper
      * @param \Schoolbox\Comms\News\Mapper          $newsMapper
      * @param \Schoolbox\Comms\News\Audience\Mapper $audienceMapper
+     * @param \Schoolbox\Comms\News\Source\Mapper   $sourceMapper
      * @param StrategyFactory                       $strategyFactory
      * @param LoggerInterface|null                  $log
      */
