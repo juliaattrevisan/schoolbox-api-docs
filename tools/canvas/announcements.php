@@ -86,6 +86,7 @@ HELP;
                 $this->getOpt(self::OPT_LONG_TOKEN),
                 $this->getConfig()->get('canvas_url')
             ),
+            $this->getConfig(),
             \Schoolbox\Resource\Folder\Mapper::getInstance(),
             \Schoolbox\UserMapper::getInstance(),
             \Schoolbox\Comms\News\Mapper::getInstance(),

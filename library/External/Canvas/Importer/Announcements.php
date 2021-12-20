@@ -12,7 +12,10 @@ namespace External\Canvas\Importer;
 use External\Canvas\Importer\Codec\FolderCode;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Comms\News\ValidDateOffset;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 
 /**
@@ -31,6 +34,12 @@ class Announcements
      * @var IApi
      */
     private IApi $api;
+
+
+    /**
+     * @var IConfigLoader
+     */
+    private IConfigLoader $configLoader;
 
 
     /**
@@ -74,6 +83,7 @@ class Announcements
      *
      * @param CanvasDb                              $canvasDb
      * @param IApi                                  $api
+     * @param IConfigLoader                         $configLoader
      * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
      * @param UserMapper                            $userMapper
      * @param \Schoolbox\Comms\News\Mapper          $newsMapper
@@ -84,6 +94,7 @@ class Announcements
     public function __construct(
         CanvasDb $canvasDb,
         IApi $api,
+        IConfigLoader $configLoader,
         \Schoolbox\Resource\Folder\Mapper $folderMapper,
         \Schoolbox\UserMapper $userMapper,
         \Schoolbox\Comms\News\Mapper $newsMapper,
@@ -93,13 +104,13 @@ class Announcements
     ) {
         $this->canvasDb = $canvasDb;
         $this->api = $api;
-        $this->log = $log;
-
+        $this->configLoader = $configLoader;
         $this->folderMapper = $folderMapper;
         $this->userMapper = $userMapper;
         $this->newsMapper = $newsMapper;
         $this->audienceMapper = $audienceMapper;
         $this->strategyFactory = $strategyFactory;
+        $this->log = $log;
     }
 
 
@@ -324,10 +335,22 @@ class Announcements
              * Submitted === announcement[posted_at]
              * Accepted === announcement[posted_at]
              * Published === announcement[delayed_post_at]
-             * Expires === one year after announcement[posted_at]
+             * Expires === as set in config "news_default_expiry", if set; otherwise, postedAt
              */
             $postedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
-            $expiresAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']))->addYears(1);
+
+            /* Set presumed expiry date using instance config
+             * This is the same implementation as found elsewhere in comms/news
+             *
+             * If the config var didn't contain anything, just expire immediately I guess
+             */
+            $expiresAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
+
+            $expireDateOffset = (string)$this->configLoader->get(ConfigMapper::_EXPIRY_DATE_OFFSET);
+
+            if ((new ValidDateOffset())->isSatisfiedBy($expireDateOffset)) {
+                $expiresAt->modify($expireDateOffset)->endOfDay();
+            }
 
             /* delayed_post_at can be null
              * I presume this meant "publish immediately" inside canvas
