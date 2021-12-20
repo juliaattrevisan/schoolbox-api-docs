@@ -39,7 +39,7 @@ class Controller extends Base
 //            'start_at' => "2012-07-19T23:59:00-06:00",
 //            'end_at' => "2012-07-19T23:59:00-06:00",
 //            'description' => "<b>Write an essay. Whatever you want.</b>",
-//            'context_code' => "course_123",
+//            'context_name' => "French Course",
 //            'workflow_state' => "published",
 //            'url' => "https://example.com/api/v1/calendar_events/assignment_987",
 //            'html_url' => "http://example.com/courses/123/assignments/987",
@@ -57,7 +57,7 @@ class Controller extends Base
 //            'start_at' => "2012-07-19T23:59:00-06:00",
 //            'end_at' => "2036-07-19T23:59:00-06:00",
 //            'description' => "<b>Write an essay. Whatever you want.</b>",
-//            'context_code' => "English Unit 4",
+//            'context_name' => "English Unit 4",
 //            'workflow_state' => "published",
 //            'url' => "https://example.com/api/v1/calendar_events/assignment_987",
 //            'html_url' => "https://ddg.gg",
@@ -69,7 +69,9 @@ class Controller extends Base
 //            'assignment_overrides' => null,
 //            'important_dates' => true
 //        ];
-
+//        return $this->getResponse()->content->set($this->buildJsonOutput([
+//                                                                             'assignments' => $assignments,
+//                                                                         ]));
 
         $key = '1031~pbBe6G8P4R18723FsgmZsOX1KvOU2ka7GntkBt9rucM0Xl7znok2Pmsc6xh2QMu0';
         $host = 'https://canvas.newington.nsw.edu.au';
@@ -77,10 +79,11 @@ class Controller extends Base
 
         //grab user
         $user = $this->getUser();
-        $userId = urlencode($user->getExternalId());
-        $userId = urlencode('sis_user_id:142898');
+        //userID format sis_user_id:sisID
+        $userId = urlencode('sis_user_id:' . $user->getExternalId());
+//        $userId = urlencode('sis_user_id:142898');
 
-        if ($userId === null) {
+        if ($userId === 'sis_user_id:') {
             return $this->getResponse()->content->set($this->buildJsonOutput([
                                                                                  'error' => 'No External User ID',
                                                                              ]));

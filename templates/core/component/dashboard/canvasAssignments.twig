@@ -9,8 +9,7 @@
                 <div id="canvas-assignments-container">
                     <canvas-assignments></canvas-assignments>
                 </div>
-                <!-- You need this; spawns after you "npm run build" or "npm run watch" for the first time -->
-                <script src="{{ CDN_PREFIX }}/js/bundle/canvasAssignments.js"></script>
+
                 <ul class="information-list">
                     {# % if assignments | length %}
                         {%  for assignment in assignments %}
@@ -35,3 +34,5 @@
         </div>
     </div>
 </div>
+<!-- You need this; spawns after you "npm run build" or "npm run watch" for the first time -->
+<script src="{{ CDN_PREFIX }}/js/bundle/canvasAssignments.js"></script>
