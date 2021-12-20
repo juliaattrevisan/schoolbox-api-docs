@@ -59,11 +59,11 @@ class Api implements IApi
     /**
      * Constructor.
      *
-     * @param string $bearerToken
      * @param string $host
+     * @param string $bearerToken
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $bearerToken, string $host)
+    public function __construct(string $host, string $bearerToken)
     {
         $this->host = $host;
 

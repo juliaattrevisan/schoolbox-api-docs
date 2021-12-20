@@ -83,8 +83,8 @@ HELP;
         (new Announcements(
             new CanvasDb(),
             new Api(
-                $this->getOpt(self::OPT_LONG_TOKEN),
-                $this->getConfig()->get('canvas_url')
+                $this->getConfig()->get('canvas_url'),
+                $this->getOpt(self::OPT_LONG_TOKEN)
             ),
             $this->getConfig(),
             \Schoolbox\Resource\Folder\Mapper::getInstance(),
