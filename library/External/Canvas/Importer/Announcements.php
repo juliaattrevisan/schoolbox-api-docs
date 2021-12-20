@@ -160,11 +160,6 @@ class Announcements
 
         if (null === $defaultOwner) {
             $this->logInfo('Default owner not found; exiting');
-
-            /* Releasing control
-             */
-            $this->lock->release();
-
             return;
         }
 
@@ -231,11 +226,6 @@ class Announcements
          */
         if (!\count($courseCodes)) {
             $this->logInfo('No course codes found; exiting');
-
-            /* Releasing control
-             */
-            $this->lock->release();
-
             return;
         }
 
@@ -250,11 +240,6 @@ class Announcements
          */
         if (!\count($announcements)) {
             $this->logInfo('No announcements found; exiting');
-
-            /* Releasing control
-             */
-            $this->lock->release();
-
             return;
         }
 
