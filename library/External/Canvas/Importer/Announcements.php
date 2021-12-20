@@ -239,10 +239,29 @@ class Announcements
      * skip over them, instead of repeatedly interrogating the db
      *
      * @return array
+     * @throws \PDOException
      */
     private function generateLookup(): array
     {
-        return [];
+        $query = "
+            SELECT guid
+            FROM {$this->sourceMapper->getTable()}
+            WHERE source_name = :sourceName
+            ORDER BY guid
+        ";
+
+        $statement = $this->sourceMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'sourceName' => self::SOURCE_NAME
+        ]);
+
+        $lookup = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $lookup[$row['guid']] = true;
+        }
+
+        return $lookup;
     }
 
 
@@ -255,8 +274,11 @@ class Announcements
      * @param \Schoolbox\User $defaultOwner
      * @return void
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
+     * @throws \PDOException
+     * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws \UnexpectedValueException
      */
     private function importAnnouncements(array $announcements, array $courseCodes, \Schoolbox\User $defaultOwner): void
     {
@@ -267,7 +289,7 @@ class Announcements
          * to obtaining the article instance; otherwise just get an indexed list
          * of canvas announcement ids that we can ignore later
          */
-        $lookup = array_flip($this->sourceMapper->findByColumn('source_name', self::SOURCE_NAME)->indexBy('guid')->keys());
+        $lookup = $this->generateLookup();
 
         /* Every Announcement comes with a context_code field which you can use
          * to figure out the folder into which it should be placed, by using
