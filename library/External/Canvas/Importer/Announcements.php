@@ -387,11 +387,6 @@ class Announcements
             $author = $owner ?? $defaultOwner;
 
             /* Spawn a new article instance, then map each Announcement's fields to the article's
-             *
-             * TODO: update if this announcement previously existed from a prior import
-             *  instead of blindly spawning new instances every time, by checking a new
-             *  relationship table comms_news_article_source (article_id, source_name, guid)
-             *  A similar principle exists for schoolbox events
              */
             $article = $this->newsMapper->createModel()
                 ->setTitle($announcement['title'])
@@ -450,6 +445,18 @@ class Announcements
             /* Shank it into comms_news_article
              */
             $this->newsMapper->save($article);
+
+            /* Update the article source table so we know this article's origins
+             * That allows us to skip over it faster next time
+             *
+             * Since it's saved in a Published state, we don't need to ever update it, really
+             */
+            $source = $this->sourceMapper->createModel()
+                ->setArticle($article)
+                ->setSourceName(self::SOURCE_NAME)
+                ->setGuid((string)$announcement['id']);
+
+            $this->sourceMapper->save($source);
 
             /* Andy things. Not entirely sure if this was the intended manner in which
              * to persist audience segments, but whatever - it's a mess in there
