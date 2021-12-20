@@ -6,8 +6,13 @@
         <div class="small-12 island">
             <h2 class="subheader">Canvas Assignments</h2>
             <section>
+                <div id="canvas-assignments-container">
+                    <canvas-assignments></canvas-assignments>
+                </div>
+                <!-- You need this; spawns after you "npm run build" or "npm run watch" for the first time -->
+                <script src="{{ CDN_PREFIX }}/js/bundle/canvasAssignments.js"></script>
                 <ul class="information-list">
-                    {% if assignments | length %}
+                    {# % if assignments | length %}
                         {%  for assignment in assignments %}
                             {% if 'published' == assignment.workflow_state %}
                                 <li>
@@ -24,7 +29,7 @@
                         {% endfor %}
                     {% else %}
                     <li>No Assignments Due</li>
-                    {% endif %}
+                    {% endif %#}
                 </ul>
             </section>
         </div>

@@ -221,6 +221,8 @@ module.exports = {
         //Sortable components for homepages
         sortableComponents: './templates/core/homepage/js/sortableComponents.js',
 
+        canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvas-assignments.vue',
+
         //Sass
         chromeFoundation: './www/static/css/foundation/chromeFoundation.scss',
         editor: './www/static/css/foundation/editor.scss',
