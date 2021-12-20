@@ -25,6 +25,12 @@ class Announcements
 {
 
     /**
+     * Arbitrary string indicating this article came from the canvas importer
+     */
+    private const SOURCE_NAME = 'canvas_importer';
+
+
+    /**
      * @var CanvasDb
      */
     private CanvasDb $canvasDb;
@@ -67,6 +73,12 @@ class Announcements
 
 
     /**
+     * @var \Schoolbox\Comms\News\Source\Mapper
+     */
+    private \Schoolbox\Comms\News\Source\Mapper $sourceMapper;
+
+
+    /**
      * @var StrategyFactory
      */
     private StrategyFactory $strategyFactory;
@@ -99,6 +111,7 @@ class Announcements
         \Schoolbox\UserMapper $userMapper,
         \Schoolbox\Comms\News\Mapper $newsMapper,
         \Schoolbox\Comms\News\Audience\Mapper $audienceMapper,
+        \Schoolbox\Comms\News\Source\Mapper $sourceMapper,
         StrategyFactory $strategyFactory,
         ?LoggerInterface $log = null
     ) {
@@ -109,6 +122,7 @@ class Announcements
         $this->userMapper = $userMapper;
         $this->newsMapper = $newsMapper;
         $this->audienceMapper = $audienceMapper;
+        $this->sourceMapper = $sourceMapper;
         $this->strategyFactory = $strategyFactory;
         $this->log = $log;
     }
@@ -221,6 +235,18 @@ class Announcements
 
 
     /**
+     * Get an indexed array of guids that we previously imported so we can quickly
+     * skip over them, instead of repeatedly interrogating the db
+     *
+     * @return array
+     */
+    private function generateLookup(): array
+    {
+        return [];
+    }
+
+
+    /**
      * Import $announcements into folders identified by $courseCodes
      * Assigns $defaultOwner as the author if the actual author can't be found in schoolbox.user
      *
@@ -234,11 +260,34 @@ class Announcements
      */
     private function importAnnouncements(array $announcements, array $courseCodes, \Schoolbox\User $defaultOwner): void
     {
+        /* Build a lookup of previously-imported Announcement ids
+         * This allows us to skip announcements without touching the db at all
+         *
+         * If you want to update published news, you can use this as a shortcut
+         * to obtaining the article instance; otherwise just get an indexed list
+         * of canvas announcement ids that we can ignore later
+         */
+        $lookup = array_flip($this->sourceMapper->findByColumn('source_name', self::SOURCE_NAME)->indexBy('guid')->keys());
+
         /* Every Announcement comes with a context_code field which you can use
          * to figure out the folder into which it should be placed, by using
          * $courseCodes as a hash lookup
          */
         foreach ($announcements as $announcement) {
+            /* This announcement was previously imported in a published state
+             */
+            if (array_key_exists($announcement['id'], $lookup)) {
+                $this->logDebug(sprintf(
+                    '%s announcement %s: "%s" by %s was previously imported; skipping',
+                    $announcement['context_code'],
+                    $announcement['id'],
+                    $announcement['title'],
+                    $announcement['author']['display_name']
+                ));
+
+                continue;
+            }
+
             /* Skip announcements that aren't published
              */
             if (!(int)$announcement['published']) {

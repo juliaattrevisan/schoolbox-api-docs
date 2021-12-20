@@ -91,6 +91,7 @@ HELP;
             \Schoolbox\UserMapper::getInstance(),
             \Schoolbox\Comms\News\Mapper::getInstance(),
             \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
+            \Schoolbox\Comms\News\Source\Mapper::getInstance(),
             $this->getDi()->get('commsNewsAudienceStrategyFactory'),
             $this->getLogger()
         ))->import();
