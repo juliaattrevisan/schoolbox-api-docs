@@ -137,6 +137,30 @@ class Api2 implements IApi
                 continue;
             }
 
+            /* check if it was a permission error,
+             * if it was lets throw that now.
+             * it may be the developer key is not set for the account
+             * https://canvas.instructure.com/doc/api/file.developer_keys.html#how-do-management-features-function
+             */
+            if (401 === $response->getStatusCode()) {
+                throw new RuntimeException(sprintf(
+                    'No Permission %s %s: %s. Payload: %s',
+                    $method,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    base64_encode(json_encode([
+                        /* These were requested by suds
+                        */
+                        'method' => $method,
+                        'route' => $route,
+
+                        /* This was generated and sent to canvas
+                        */
+                        'queryArgs' => $queryArgs
+                    ], JSON_THROW_ON_ERROR))
+                ), $response->getStatusCode());
+            }
+
             /* Successful response from server, but it might not send a valid data payload back
              * so try to decode it. If it can't decode properly, return null
              */
