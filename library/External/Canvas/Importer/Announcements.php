@@ -232,7 +232,9 @@ class Announcements
              */
             if (!(int)$announcement['published']) {
                 $this->logDebug(sprintf(
-                    'Announcement "%s" by %s is not published in canvas; skipping',
+                    '%s announcement %s: "%s" by %s is not published in canvas; skipping',
+                    $announcement['context_code'],
+                    $announcement['id'],
                     $announcement['title'],
                     $announcement['author']['display_name']
                 ));
@@ -240,7 +242,12 @@ class Announcements
                 continue;
             }
 
-            $folder = $courseCodes[$announcement['context_code']];
+            $this->logInfo(sprintf(
+                '%s announcement %s: found "%s"',
+                $announcement['context_code'],
+                $announcement['id'],
+                $announcement['title'],
+            ));
 
             /* Figure out the external id of the person who owns this
              * The external id should match someone in schoolbox.user (hopefully)
@@ -320,8 +327,24 @@ class Announcements
              * Expires === one year after announcement[posted_at]
              */
             $postedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
-            $publishedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['delayed_post_at']));
             $expiresAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']))->addYears(1);
+
+            /* delayed_post_at can be null
+             * I presume this meant "publish immediately" inside canvas
+             * Use the $postedAt instead
+             */
+            if ('' === (string)$announcement['delayed_post_at']) {
+                $publishedAt = $postedAt;
+
+                $this->logDebug(sprintf(
+                    '%s announcement %s: article did not set delayed_post_at - reusing announcement post date %s as publish date',
+                    $announcement['context_code'],
+                    $announcement['id'],
+                    $publishedAt->getDatabase()
+                ));
+            } else {
+                $publishedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['delayed_post_at']));
+            }
 
             $article
                 ->setSubmittedAt($postedAt)
@@ -337,6 +360,8 @@ class Announcements
             /* Andy things. Not entirely sure if this was the intended manner in which
              * to persist audience segments, but whatever - it's a mess in there
              */
+            $folder = $courseCodes[$announcement['context_code']];
+
             $segment = (new \Schoolbox\Comms\News\Audience\Model())
                 ->setEntityType(\Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType())
                 ->setEntityValue((string)$folder->getId())
@@ -353,10 +378,9 @@ class Announcements
                 ->save($article, $audience);
 
             $this->logDebug(sprintf(
-                '%s announcement %s: article titled "%s" has audiencing segment (%s, %s, %s)',
+                '%s announcement %s: article has audiencing segment (%s, %s, %s)',
                 $announcement['context_code'],
                 $announcement['id'],
-                $article->getTitle(),
                 $segment->getEntityType(),
                 $segment->getEntityValue(),
                 $segment->getRelationship()
