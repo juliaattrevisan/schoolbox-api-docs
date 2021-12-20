@@ -8,9 +8,7 @@
 
 declare(strict_types=1);
 
-use External\Canvas\Importer\Announcements;
-use External\Canvas\Importer\Api;
-use External\Canvas\Importer\CanvasDb;
+use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -26,87 +24,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *
  *     Example: php example.php 2> log.txt
  */
-$app = new class extends CliTool\App
-{
-
-    /**
-     * --help
-     *
-     * Print help text for those who don't know how to use this tool
-     */
-    private const OPT_LONG_HELP = 'help';
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP
-        ];
-    }
-
-
-    /**
-     * Run the cli tool
-     */
-    public function run(): void
-    {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Import canvas' course announcements into schoolbox folder news articles
-
-Usage: announcements.php [--perform]
-
-
-HELP;
-            exit;
-        }
-
-        $bearerToken = $this->getConfig()->get('canvas_bearer_token');
-
-        if ('' === trim((string)$bearerToken)) {
-            $this->getLogger()->info('Provide an authentication token to continue.');
-            exit();
-        }
-
-        (new Announcements(
-            new CanvasDb(),
-            new Api(
-                $this->getConfig()->get('canvas_url'),
-                $bearerToken
-            ),
-            $this->getConfig(),
-            \Schoolbox\Resource\Folder\Mapper::getInstance(),
-            \Schoolbox\UserMapper::getInstance(),
-            \Schoolbox\Comms\News\Mapper::getInstance(),
-            \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
-            \Schoolbox\Comms\News\Source\Mapper::getInstance(),
-            $this->getDi()->get('commsNewsAudienceStrategyFactory'),
-            $this->getLogger()
-        ))->import();
-
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
-        }
-    }
-
-
-    /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
-     *
-     * @return bool|null
-     */
-    public function runAsRoot(): ?bool
-    {
-        return parent::runAsRoot();
-    }
-};
+$app = new AnnouncementsTool();
 
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
  *

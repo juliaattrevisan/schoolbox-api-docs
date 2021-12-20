@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace External\Canvas\Importer;
 
+use External\Canvas\Importer\Cli\AnnouncementsTool;
 use External\Canvas\Importer\Codec\FolderCode;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
@@ -17,6 +18,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Import Canvas' Course Announcements as Schoolbox News Articles
@@ -91,6 +93,12 @@ class Announcements
 
 
     /**
+     * @var LockInterface|null
+     */
+    private ?LockInterface $lock;
+
+
+    /**
      * Constructor.
      *
      * @param CanvasDb                              $canvasDb
@@ -103,6 +111,7 @@ class Announcements
      * @param \Schoolbox\Comms\News\Source\Mapper   $sourceMapper
      * @param StrategyFactory                       $strategyFactory
      * @param LoggerInterface|null                  $log
+     * @param LockInterface|null                    $lock
      */
     public function __construct(
         CanvasDb $canvasDb,
@@ -114,7 +123,8 @@ class Announcements
         \Schoolbox\Comms\News\Audience\Mapper $audienceMapper,
         \Schoolbox\Comms\News\Source\Mapper $sourceMapper,
         StrategyFactory $strategyFactory,
-        ?LoggerInterface $log = null
+        ?LoggerInterface $log = null,
+        ?LockInterface $lock = null
     ) {
         $this->canvasDb = $canvasDb;
         $this->api = $api;
@@ -126,6 +136,7 @@ class Announcements
         $this->sourceMapper = $sourceMapper;
         $this->strategyFactory = $strategyFactory;
         $this->log = $log;
+        $this->lock = $lock;
     }
 
 
@@ -149,6 +160,11 @@ class Announcements
 
         if (null === $defaultOwner) {
             $this->logInfo('Default owner not found; exiting');
+
+            /* Releasing control
+             */
+            $this->lock->release();
+
             return;
         }
 
@@ -215,6 +231,11 @@ class Announcements
          */
         if (!\count($courseCodes)) {
             $this->logInfo('No course codes found; exiting');
+
+            /* Releasing control
+             */
+            $this->lock->release();
+
             return;
         }
 
@@ -229,6 +250,11 @@ class Announcements
          */
         if (!\count($announcements)) {
             $this->logInfo('No announcements found; exiting');
+
+            /* Releasing control
+             */
+            $this->lock->release();
+
             return;
         }
 
@@ -298,6 +324,17 @@ class Announcements
          * $courseCodes as a hash lookup
          */
         foreach ($announcements as $announcement) {
+            /* Refresh lock
+             */
+            if (null !== $this->lock) {
+                $this->logDebug(sprintf(
+                    'Refreshing lock for another %s seconds',
+                    AnnouncementsTool::LOCK_TTL
+                ));
+
+                $this->lock->refresh();
+            }
+
             /* This announcement was previously imported in a published state
              */
             if (array_key_exists($announcement['id'], $lookup)) {
