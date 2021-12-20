@@ -198,8 +198,9 @@ class Announcements
                 /* If you can't find a matching folder for the course code provided, skip it
                  */
                 $this->logDebug(sprintf(
-                    'Course code %s does not have a corresponding schoolbox folder; skipping',
-                    $row['code']
+                    'Course code %s does not have a corresponding schoolbox folder %s; skipping',
+                    $row['code'],
+                    $folderCode
                 ));
 
                 continue;
