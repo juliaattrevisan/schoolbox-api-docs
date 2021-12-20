@@ -38,22 +38,12 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --token
-     *
-     * Accept a bearer token in the cli param, for now
-     * TODO replace with a config var, I guess
-     */
-    private const OPT_LONG_TOKEN = 'token:';
-
-
-    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
-            self::OPT_LONG_HELP,
-            self::OPT_LONG_TOKEN
+            self::OPT_LONG_HELP
         ];
     }
 
@@ -68,14 +58,16 @@ $app = new class extends CliTool\App
 
 Import canvas' course announcements into schoolbox folder news articles
 
-Usage: announcements.php --token=... [--perform]
+Usage: announcements.php [--perform]
 
 
 HELP;
             exit;
         }
 
-        if ('' === (string)$this->getOpt(self::OPT_LONG_TOKEN)) {
+        $bearerToken = $this->getConfig()->get('canvas_bearer_token');
+
+        if ('' === trim((string)$bearerToken)) {
             $this->getLogger()->info('Provide an authentication token to continue.');
             exit();
         }
@@ -84,7 +76,7 @@ HELP;
             new CanvasDb(),
             new Api(
                 $this->getConfig()->get('canvas_url'),
-                $this->getOpt(self::OPT_LONG_TOKEN)
+                $bearerToken
             ),
             $this->getConfig(),
             \Schoolbox\Resource\Folder\Mapper::getInstance(),
