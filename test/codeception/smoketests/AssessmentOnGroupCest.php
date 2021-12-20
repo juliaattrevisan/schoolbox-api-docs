@@ -252,7 +252,7 @@ class AssessmentOnGroupCest
     public function markAssessment(IntegrationTester $i): void
     {
         #GIVEN
-        $timestamp  = time();
+        $timestamp = time();
         $groupPage = $this->createHomepage($i, 'Testing Mark Assessment on Group Page at ' . $timestamp);
 
         $student = $i->grabUser('jreed');
@@ -298,6 +298,111 @@ class AssessmentOnGroupCest
         $i->seeResponseCodeIs(200);
     }
 
+    /**
+     * Submits an assessment by attaching a file on behalf of the student
+     * @param IntegrationTester $i
+     */
+    public function submitAssessmentByAttachingFile(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp  = time();
+        $groupPage = $this->createHomepage($i, 'Testing Submit Assessment on Group Page at ' . $timestamp);
+
+        $student = $i->grabUser('jreed');
+        $teacher = $i->grabUser('jcoles');
+        $admin   = $i->grabUser('alaress');
+
+        $addMembers = new AddMembers($groupPage->getId());
+        $addMembers->setNewMembers([$student->getId(), $admin->getId(), $teacher->getId()]);
+        $i->amGoingTo('Add group members to Group Page #' . $groupPage->getId());
+        $i->sendRequest($addMembers);
+
+        $setAccessLevels = new Payload\Group\ModifyAccessLevel($groupPage->getId());
+        $setAccessLevels->setMemberAccessLevel($student->getId(), UserAccess::ACCESS_READ);
+        $setAccessLevels->setMemberAccessLevel($teacher->getId(), UserAccess::ACCESS_WRITE);
+        $setAccessLevels->setMemberAccessLevel($admin->getId(), UserAccess::ACCESS_FULL);
+        $i->amGoingTo("Add group members permissions to Group Page #{$groupPage->getId()}");
+        $i->sendRequest($setAccessLevels);
+
+        $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
+        $assessment_title = 'Testing Submit Assessment by attaching a file On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
+        $newAssessment->setTitle($assessment_title);
+        $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
+        $i->sendRequest($newAssessment);
+        $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
+
+
+        #WHEN
+        $referrer                = "/learning/assessments/$assessmentPageId/{$student->getId()}/submit";
+        $url                     = "/learning/assessments/$assessmentPageId/{$student->getId()}/submit";
+        $submitAssessmentPayload = new Payload\Base('POST', $referrer, $url);
+        $submitAssessmentPayload->setFormParam('responseId', '');
+        $submitAssessmentPayload->setFormParam('body', '');
+        //$submitAssessmentPayload->setFormParam('submitted_in_person', 'on');
+        $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
+        $image_location      = '/UploadTestFiles/fish2.png';
+        $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
+        $i->amGoingTo('Upload image to the Badge');
+        $i->sendRequest($storageUpload);
+        $i->seeResponseCodeIs(200);
+        $json_reply = json_decode($i->grabResponse(), true);
+        $file = ($json_reply['hash'] . ":fish2.png");
+        $submitAssessmentPayload->setFormParam('attachment[]', $file);
+        $i->amGoingTo('Send submit assessment by attaching a file on students behalf. Student #' . $student->getId());
+        $i->sendRequest($submitAssessmentPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', "/learning/assessments/$assessmentPageId/{$student->getId()}");
+    }
+
+    /**
+     * Submits an assessment by typing something in the ckeditor on behalf of the student
+     * @param IntegrationTester $i
+     */
+    public function submitAssessmentByTypingSomething(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp  = time();
+        $groupPage = $this->createHomepage($i, 'Testing Submit Assessment on Group Page at ' . $timestamp);
+
+        $student = $i->grabUser('jreed');
+        $teacher = $i->grabUser('jcoles');
+        $admin   = $i->grabUser('alaress');
+
+        $addMembers = new AddMembers($groupPage->getId());
+        $addMembers->setNewMembers([$student->getId(), $admin->getId(), $teacher->getId()]);
+        $i->amGoingTo('Add group members to Group Page #' . $groupPage->getId());
+        $i->sendRequest($addMembers);
+
+        $setAccessLevels = new Payload\Group\ModifyAccessLevel($groupPage->getId());
+        $setAccessLevels->setMemberAccessLevel($student->getId(), UserAccess::ACCESS_READ);
+        $setAccessLevels->setMemberAccessLevel($teacher->getId(), UserAccess::ACCESS_WRITE);
+        $setAccessLevels->setMemberAccessLevel($admin->getId(), UserAccess::ACCESS_FULL);
+        $i->amGoingTo("Add group members permissions to Group Page #{$groupPage->getId()}");
+        $i->sendRequest($setAccessLevels);
+
+        $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
+        $assessment_title = 'Testing Submit Assessment by typing something in the ckeditor On Homepage ID ' . $groupPage->getId() . ' at ' . $timestamp;
+        $newAssessment->setTitle($assessment_title);
+        $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
+        $i->sendRequest($newAssessment);
+        $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
+
+
+        #WHEN
+        $referrer                = "/learning/assessments/$assessmentPageId/{$student->getId()}/submit";
+        $url                     = "/learning/assessments/$assessmentPageId/{$student->getId()}/submit";
+        $submitAssessmentPayload = new Payload\Base('POST', $referrer, $url);
+        $submitAssessmentPayload->setFormParam('responseId', '');
+        $submitAssessmentPayload->setFormParam('body', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.');
+        $i->amGoingTo('Send submit assessment by typing something in the ckeditor on students behalf. Student #' . $student->getId());
+        $i->sendRequest($submitAssessmentPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', "/learning/assessments/$assessmentPageId/{$student->getId()}");
+    }
 
     /**
      * Convenience method to create and return a new folder with homepage via the HTTP API
