@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Canvas;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\External\Connector\Canvas\Base\Endpoint\Api;
+use External\Canvas\Importer\Api;
 
 class Controller extends Base
 {
@@ -90,7 +90,7 @@ class Controller extends Base
         try {
         //get courses for user
         //get assignments for user
-            $courses = $connection->retrieveDocument('get', "/api/v1/users/${userId}/courses", [
+            $courses = $connection->retrieve('get', "/api/v1/users/${userId}/courses", [
             'state'             => 'available',
             'enrollment_state'  => 'active',
             ]);
@@ -109,7 +109,7 @@ class Controller extends Base
 
             foreach ($coursesArr as $course10) {
                 $courseParm = "context_codes[]=" . join('&context_codes[]=', $course10);
-                $tempAssign = $connection->retrieveDocument('get', "/api/v1/calendar_events?{$courseParm}&type=assignment&start_date=2021-12-01T00:53:51Z&end_date={$endDate}&as_user_id={$userId}", []);
+                $tempAssign = $connection->retrieve('get', "/api/v1/calendar_events?{$courseParm}&type=assignment&start_date=2021-12-01T00:53:51Z&end_date={$endDate}&as_user_id={$userId}", []);
                 $assignments = array_merge($assignments, $tempAssign);
             }
         } catch (\RuntimeException $e) {

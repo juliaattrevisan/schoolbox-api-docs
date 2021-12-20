@@ -1,6 +1,5 @@
 <?php
 
-use Schoolbox\External\Connector\Canvas\Base\Endpoint\Api;
 use Schoolbox\Config\ConfigMapper;
 
 /**
@@ -24,11 +23,6 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
      */
 
     /**
-     * returned list of assignments
-     */
-    private array $assignments;
-
-    /**
      */
     public function execute()
     {
@@ -40,7 +34,7 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
     public function renderTemplate($templateHandle)
     {
         /**
-         * display template and get the template to do an asyncronis request to get the assignments
+         * display template and get the template to do an async request to get the assignments
          */
         return $this->renderTwigTemplate(
             $templateHandle,
