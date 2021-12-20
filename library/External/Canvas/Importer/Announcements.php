@@ -316,17 +316,18 @@ class Announcements
              *
              * Submitted === announcement[posted_at]
              * Accepted === announcement[posted_at]
-             * Published === announcement[posted_at]
+             * Published === announcement[delayed_post_at]
              * Expires === one year after announcement[posted_at]
              */
             $postedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
+            $publishedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['delayed_post_at']));
             $expiresAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']))->addYears(1);
 
             $article
                 ->setSubmittedAt($postedAt)
                 ->setAcceptedAt($postedAt)
                 ->setAcceptedBy($author)
-                ->setPublishAt($postedAt)
+                ->setPublishAt($publishedAt)
                 ->setExpiresAt($expiresAt);
 
             /* Shank it into comms_news_article
