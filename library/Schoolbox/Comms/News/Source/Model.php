@@ -12,7 +12,7 @@ namespace Schoolbox\Comms\News\Source;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use \Schoolbox\Comms\News\Model as Article;
+use Schoolbox\Comms\News\Model as Article;
 
 /**
  * Represents metadata for news articles and where they originated
