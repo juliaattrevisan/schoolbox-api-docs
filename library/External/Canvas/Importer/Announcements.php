@@ -163,6 +163,43 @@ class Announcements
             return;
         }
 
+        $courseCodes = $this->generateCourseCodes();
+
+        /* No course codes found? No trabajo
+         */
+        if (!\count($courseCodes)) {
+            $this->logInfo('No course codes found; exiting');
+            return;
+        }
+
+        /* If we found any meaningful course codes,
+         * fetch article contents from the api
+         */
+        $announcements = $this->api->retrieve('GET', 'api/v1/announcements', [
+            'context_codes' => array_keys($courseCodes)
+        ]);
+
+        /* No announcements? No trabajo
+         */
+        if (!\count($announcements)) {
+            $this->logInfo('No announcements found; exiting');
+            return;
+        }
+
+        $this->importAnnouncements($announcements, $courseCodes, $defaultOwner);
+    }
+
+
+    /**
+     * Geneate a lookup of (context code, folder instance) tuples
+     *
+     * @return array
+     * @throws \Alaress\Database\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     */
+    private function generateCourseCodes(): array
+    {
         /* Use the internal db to interrogate canvas_data_<instanceId>.course_dim
          * for all the Courses that we imported; contextCodes are stored in the canvas_id
          * column, but you'll need to prefix it with "course_" before you can use
@@ -222,30 +259,8 @@ class Announcements
             $courseCodes[$row['contextCode']] = $folder;
         }
 
-        /* No course codes found? No trabajo
-         */
-        if (!\count($courseCodes)) {
-            $this->logInfo('No course codes found; exiting');
-            return;
-        }
-
-        /* If we found any meaningful course codes,
-         * fetch article contents from the api
-         */
-        $announcements = $this->api->retrieve('GET', 'api/v1/announcements', [
-            'context_codes' => array_keys($courseCodes)
-        ]);
-
-        /* No announcements? No trabajo
-         */
-        if (!\count($announcements)) {
-            $this->logInfo('No announcements found; exiting');
-            return;
-        }
-
-        $this->importAnnouncements($announcements, $courseCodes, $defaultOwner);
+        return $courseCodes;
     }
-
 
     /**
      * Get an indexed array of guids that we previously imported so we can quickly
