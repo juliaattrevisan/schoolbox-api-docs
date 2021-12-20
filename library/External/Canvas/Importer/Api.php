@@ -149,13 +149,8 @@ class Api implements IApi
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     base64_encode(json_encode([
-                        /* These were requested by suds
-                        */
                         'method' => $method,
                         'route' => $route,
-
-                        /* This was generated and sent to canvas
-                        */
                         'queryArgs' => $queryArgs
                     ], JSON_THROW_ON_ERROR))
                 ), $response->getStatusCode());
