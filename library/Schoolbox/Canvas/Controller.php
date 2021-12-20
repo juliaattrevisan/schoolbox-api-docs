@@ -112,7 +112,7 @@ class Controller extends Base
 
             foreach ($coursesArr as $course10) {
                 $courseParm = "context_codes[]=" . join('&context_codes[]=', $course10);
-                $tempAssign = $connection->retrieve('get', "/api/v1/calendar_events?{$courseParm}&type=assignment&start_date=2021-12-01T00:53:51Z&end_date={$endDate}&as_user_id={$userId}", []);
+                $tempAssign = $connection->retrieve('get', "/api/v1/calendar_events?{$courseParm}&type=assignment&end_date={$endDate}&as_user_id={$userId}", []);
                 $assignments = array_merge($assignments, $tempAssign);
             }
         } catch (\RuntimeException $e) {
