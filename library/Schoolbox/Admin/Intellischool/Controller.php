@@ -36,13 +36,12 @@ class Controller extends Base
     /**
      * Display the admin console for Intellischool for admins to edit settings in Albitros themselves
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getConsole()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminIntellischool/console.twig', [
             'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
-            'jwt'         => $this->jwtFactory->buildForLearnerProfile($this->getUser(), $student),
+            'jwt'         => $this->jwtFactory->buildForAdminView($this->getUser()),
         ])->setTitle('Intellischool - Admin Console'));
     }
 

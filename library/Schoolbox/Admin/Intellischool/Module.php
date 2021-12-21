@@ -15,13 +15,11 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Intellischool\Controller;
+use Schoolbox\Admin\Intellischool\Controller;
 use Schoolbox\Intellischool\JwtFactory;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
