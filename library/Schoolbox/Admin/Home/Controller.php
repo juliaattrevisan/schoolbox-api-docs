@@ -380,6 +380,7 @@ class Controller extends Base
                     'amqpOnline' => $amqpOnline,
                     'isCustomCert' => $isCustomCert,
                     'certExpiry'   => $certExpiry,
+                    'show_port_80_availability_check' => $this->getConfigLoader()->get('show_port_80_availability_check'),
                 ),
             )
         );
