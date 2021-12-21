@@ -28,25 +28,34 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
 
     /**
+     * @var \Schoolbox\Calendar\EventTypeMapper
+     */
+    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
+
+
+    /**
      * Constructor
      *
-     * @param int                    $connectorId
-     * @param User                   $user
-     * @param User                   $viewer
-     * @param AssessmentDataSource   $assessmentDataSource
-     * @param Visibility             $visibility
+     * @param int                                 $connectorId
+     * @param User                                $user
+     * @param User                                $viewer
+     * @param AssessmentDataSource                $assessmentDataSource
+     * @param Visibility                          $visibility
+     * @param \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper
      */
     public function __construct(
         int $connectorId,
         User $user,
         User $viewer,
         AssessmentDataSource $assessmentDataSource,
-        Visibility $visibility
+        Visibility $visibility,
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
-        $this->calendarHandler       = new Calendar();
-        $this->assessmentDataSource  = $assessmentDataSource;
-        $this->visibility            = $visibility;
+        $this->calendarHandler      = new Calendar();
+        $this->assessmentDataSource = $assessmentDataSource;
+        $this->visibility           = $visibility;
+        $this->eventTypeMapper      = $eventTypeMapper;
     }
 
     /**
@@ -82,13 +91,17 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
         } catch (Schoolbox\Mapper\Exception $e) {
-            /* TODO Repair assumption about default luEventType id
-             *  You can't really make this assumption, because someone could have
-             *  soft-deleted the first luEventType record; arbitrarily assigning 1
-             *  could put events into a deleted event type; instead, you could get
-             *  the full set, then pop the first of its elements
+            /* Find the first available event type
+             * If you can't find one, we can't assign anything to the events from this subscription
+             * so just return the empty stack; there's no way we could categorise those events
              */
-            $eventType = 1;
+            $firstEventType = $this->eventTypeMapper->findAll()->first();
+
+            if (!$firstEventType) {
+                return $stack;
+            }
+
+            $eventType = $firstEventType->getId();
         }
 
         /* Do a detection on $allowedEventTypes, if provided and meaningful

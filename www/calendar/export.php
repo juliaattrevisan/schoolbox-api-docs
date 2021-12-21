@@ -248,7 +248,7 @@ try {
 
             $api = buildApiClass(
                 Calendar_Api_EventType_Submission_Schoolbox_Default::class,
-                [$user, $viewer, $assessmentDataSource, $visibility],
+                [\Schoolbox\Calendar\EventTypeMapper::getInstance(), $user, $viewer, $assessmentDataSource, $visibility],
                 true,
                 $sentry
             );

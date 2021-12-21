@@ -31,9 +31,10 @@ class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Ap
         User $viewer,
         Assessment\MapperProxy $assessmentDataSource,
         Visibility $visibility,
-        Timetable_ColourManager $colourManager
+        Timetable_ColourManager $colourManager,
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper
     ) {
-        parent::__construct($connectorId, $user, $viewer, $assessmentDataSource, $visibility);
+        parent::__construct($connectorId, $user, $viewer, $assessmentDataSource, $visibility, $eventTypeMapper);
         $this->colourManager = $colourManager;
     }
 
