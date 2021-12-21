@@ -1,0 +1,12 @@
+<div class="scroll-wrapper">
+    <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="iframe">
+        <input type="hidden" name="id_token" value="{{ jwt }}">
+    </form>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('iframeForm').submit();
+        });
+    </script>
+    <iframe class="fullscreen" name="iframe" id="iframe">
+    </iframe>
+</div>

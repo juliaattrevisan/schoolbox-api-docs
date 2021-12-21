@@ -102,5 +102,8 @@ class Admin implements ModuleConfigInterface
 
         // Usage Graphs
         (new \Schoolbox\Admin\Usage\Module($di))->init('/adminv2/usage');
+
+        // Usage Graphs
+        (new \Schoolbox\Admin\Intellischool\Module($di))->init('/adminv2/intellischool');
     }
 }
