@@ -99,22 +99,27 @@
                            data-datesync-startdate="#reportDateStart"
                     >
                 </div>
-
                 <div class="item">
                     <h4>Status</h4>
-                    <input type="checkbox" id="reportStatusAll" value="{}" name="" data-select-all data-select-all-for-group="status"  />
-                    <label for="reportStatusAll" class="checkbox-label">Select all</label>
-
-                    <!-- BEGIN report_status -->
-                    <input type="checkbox"
-                           id="reportStatus-{REPORT_STATUS_ID}"
-                           value="{REPORT_STATUS_ID}"
-                           name="status[]"
-                           {REPORT_STATUS_ID_SELECTED}
-                           data-select-all-group="status" />
-                    <label for="reportStatus-{REPORT_STATUS_ID}" class="checkbox-label">{REPORT_STATUS_NAME}</label>
-                    <!-- END report_status -->
+                    <ul class="option-list">
+                        <li>
+                            <input type="checkbox" id="reportStatusAll" value="{}" name="" data-select-all data-select-all-for-group="status"  />
+                            <label for="reportStatusAll" class="checkbox-label">Select all</label>
+                        </li>
+                        <!-- BEGIN report_status -->
+                        <li>
+                            <input type="checkbox"
+                                   id="reportStatus-{REPORT_STATUS_ID}"
+                                   value="{REPORT_STATUS_ID}"
+                                   name="status[]"
+                                   {REPORT_STATUS_ID_SELECTED}
+                                   data-select-all-group="status" />
+                            <label for="reportStatus-{REPORT_STATUS_ID}" class="checkbox-label">{REPORT_STATUS_NAME}</label>
+                        </li>
+                        <!-- END report_status -->
+                    </ul>
                 </div>
+
                 <input type="submit" title="Search" value="Search">
             </section>
         </form>
