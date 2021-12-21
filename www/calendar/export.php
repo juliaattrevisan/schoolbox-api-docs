@@ -259,7 +259,7 @@ try {
         case 'timetable':
             $api = buildApiClass(
                 Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                [$user, $viewer, $kernel->getDependencyInjector()->get('config')],
+                [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
                 true,
                 $sentry
             );

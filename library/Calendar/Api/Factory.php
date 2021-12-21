@@ -223,7 +223,7 @@ class Calendar_Api_Factory
                     \Schoolbox\Calendar\EventTypeMapper::getInstance()
                 );
             case Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class:
-                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $viewer, $this->configLoader);
+                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $viewer, $this->configLoader, \Schoolbox\Calendar\EventTypeMapper::getInstance());
             case Calendar_Api_EventType_Timetable_Room::class:
                 return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, $viewer, new External_Timetable());
             case Calendar_Api_EventType_TimetableDays_External_Default::class:

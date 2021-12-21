@@ -91,14 +91,28 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
         } catch (Schoolbox\Mapper\Exception $e) {
-            /* Find the first available event type
-             * If you can't find one, we can't assign anything to the events from this subscription
-             * so just return the empty stack; there's no way we could categorise those events
+            /* Something went awry with loadConnectorConfiguration()
+             * Can't determine what event type this would be
              */
+            $eventType = null;
+        }
+
+        /* Ensure $eventType is valid, finding first available one if it is invalid.
+         * If you can't find one, we can't assign anything to the events from this subscription
+         * so just return the empty stack; there's no way we could categorise those events
+         *
+         * getLuEventType() can return a deleted event type identifier.
+         */
+        try {
+            $eventTypeExists = $this->eventTypeMapper->findById($eventType);
+            $eventType = $eventTypeExists->getId();
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $firstEventType = $this->eventTypeMapper->findAll()->first();
 
+            /* Exit early; no chance of assigning any kind of event type
+             */
             if (!$firstEventType) {
-                return $stack;
+                return new Collection();
             }
 
             $eventType = $firstEventType->getId();
