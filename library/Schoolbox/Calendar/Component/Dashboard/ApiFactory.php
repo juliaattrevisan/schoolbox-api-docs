@@ -76,7 +76,7 @@ class ApiFactory
      *
      * @param User  $viewee
      * @param User  $viewer
-     * @param array $schosenSubscriptions
+     * @param array $chosenSubscriptions
      * @return \Calendar_Api_EventType_Interface
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
@@ -84,7 +84,7 @@ class ApiFactory
     public function produceFilteredApi(
         User $viewee,
         User $viewer,
-        array $schosenSubscriptions
+        array $chosenSubscriptions
     ): \Calendar_Api_EventType_Interface {
 
         /* Get a list of instance-enabled subscriptions; these are sources of data
@@ -104,9 +104,15 @@ class ApiFactory
         $composite = new \Calendar_Api_Composite();
 
         /* Note: you can't delete subscriptions
+         *
+         * Special Case: If you haven't chosen any subscriptions, enable all subscriptions
+         * and just add all the ones that are available. This is a very liberal initial state.
+         * Otherwise, just add the ones that were selected in $chosenSubscriptions
          */
         foreach ($subscriptions as $subscription) {
-            if (\in_array($subscription->getId(), $schosenSubscriptions, true)) {
+            $numChosenSubscriptions = \count($chosenSubscriptions);
+
+            if (!$numChosenSubscriptions || \in_array($subscription->getId(), $chosenSubscriptions, true)) {
                 $composite->add($this->factory->produceFromConfig($subscription, $viewee, $viewer));
             }
         }
