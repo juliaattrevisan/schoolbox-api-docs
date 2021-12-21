@@ -272,7 +272,7 @@ try {
         case 'timetabledays':
             $api = buildApiClass(
                 Calendar_Api_EventType_TimetableDays_External_Default::class,
-                [$user, $viewer],
+                [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance()],
                 true,
                 $sentry
             );
