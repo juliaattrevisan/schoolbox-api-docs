@@ -101,20 +101,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
          *
          * getLuEventType() can return a deleted event type identifier.
          */
-        try {
-            $eventTypeExists = $this->eventTypeMapper->findById($eventType);
-            $eventType = $eventTypeExists->getId();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $firstEventType = $this->eventTypeMapper->findAll()->first();
-
-            /* Exit early; no chance of assigning any kind of event type
-             */
-            if (!$firstEventType) {
-                return new Collection();
-            }
-
-            $eventType = $firstEventType->getId();
-        }
+        $eventType = $this->eventTypeMapper->findFirstMeaningfulId($eventType);
 
         /* Do a detection on $allowedEventTypes, if provided and meaningful
          */
