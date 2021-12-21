@@ -87,7 +87,7 @@ class CanSeeParticipation extends AbstractParticipationRule
         //$participant may be null, where the student is excluded from the assessment
         if (!$participant) {
             // Then this route does not exist.
-            throw new Unauthorized("User '{$student->getId()}' is excluded from assessment '{$assessable->getId()}'");
+            throw new Unauthorized("User {$student->getFullName()} is excluded from {$assessable->getTitle()}");
         }
 
         // Is assessment not yet published for participant?
