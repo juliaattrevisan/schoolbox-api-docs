@@ -293,4 +293,378 @@ class NewsCest
         $i->seeResponseCodeIs(302);
         $i->seeHttpHeader('location', '/news');
     }
+
+    /** Publish news with audience Campus Primary
+     * Check if only audience from Primary campus can view the news article
+     *
+     * @param IntegrationTester $i
+     */
+    public function checkCampusAudience(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+        $title     = 'Smoke Test News Article Testing Campus Audience ' . $timestamp;
+
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('body', 'Testing Campus Audience');
+        $createDraft->setFormParam('audience', 'campus:IjIi:self');
+        $i->amGoingTo('Send request to create the news article draft with Primary campus audience');
+        $i->sendRequest($createDraft);
+        $article   = $i->grabNewsArticleByTitle($title);
+        $articleID = $i->grabFromDatabase('comms_news_article', 'id', ['title' => $title]);
+
+        #WHEN
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept the news article draft with Primary campus audience');
+        $i->sendRequest($submitRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
+
+        //impersonating Eden Reed(junior student) to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(6);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Alison Chan(primary teacher) to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(43);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jana Reed(middle student) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(25);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Jack Coles(secondary teacher) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(22);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
+
+    /** Publish news with roles Teacher and Middle Students
+     * Check if only audience teachers and middle students can view the news article
+     *
+     * @param IntegrationTester $i
+     */
+    public function checkRolesAudience(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+        $title     = 'Smoke Test News Article Testing Roles Audience ' . $timestamp;
+
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('body', 'Testing Roles Audience');
+        $createDraft->setFormParam('audience', 'role:IjIi:self,role:IjYi:self');
+        $i->amGoingTo('Send request to create the news article draft with teacher and middle student role audience');
+        $i->sendRequest($createDraft);
+        $article   = $i->grabNewsArticleByTitle($title);
+        $articleID = $i->grabFromDatabase('comms_news_article', 'id', ['title' => $title]);
+
+        #WHEN
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept the news article draft with teacher and middle student roles audience');
+        $i->sendRequest($submitRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
+
+        //impersonating Eden Reed(Jr Student) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(6);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Alison Chan(primary teacher) to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(43);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jana Reed(middle student) to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(25);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jack Coles(secondary teacher) to ensure the news article is visible to him
+        #GIVEN
+        $i->impersonateUser(22);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jenni Reed(parent) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(27);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
+
+    /** Publish news with house Prospect audience (users in role)
+     * Check if only Prospect hosue users in role audience can view the news article
+     *
+     * @param IntegrationTester $i
+     */
+    public function checkHouseAudience(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+        $title     = 'Smoke Test News Article Testing Prospect Audience (users in role)' . $timestamp;
+
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('body', 'Testing Roles Audience');
+        $createDraft->setFormParam('audience', 'school_house:IjIi:self');
+        $i->amGoingTo('Send request to create the news article draft with house role audience');
+        $i->sendRequest($createDraft);
+        $article   = $i->grabNewsArticleByTitle($title);
+        $articleID = $i->grabFromDatabase('comms_news_article', 'id', ['title' => $title]);
+
+        #WHEN
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept the news article draft with house roles audience');
+        $i->sendRequest($submitRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
+
+        //impersonating Eden Reed(Jr Student) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(6);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Jana Reed(middle student) to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(25);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jack Coles(secondary teacher) to ensure the news article is NOT visible to him
+        #GIVEN
+        $i->impersonateUser(22);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Jenni Reed(parent) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(27);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
+
+    /** Publish news with 9A English class 9 (parents of students) audience
+     * Check if only parents of students from that class can view the news article
+     * keeping as incomplete until I get the answer on how this permission works to either
+     * get the test updated or issue fixed (then removing the incomplete from this code)
+     * @incomplete
+     * @param IntegrationTester $i
+     */
+    public function checkClassesAudience(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+        $title     = 'Smoke Test News Article Testing 9A English class 9 (parents of students)' . $timestamp;
+
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('body', 'Testing Class Audience');
+        $createDraft->setFormParam('audience', 'folder:IjgzIg==:parents_of');
+        $i->amGoingTo('Send request to create the news article draft with class audience');
+        $i->sendRequest($createDraft);
+        $article   = $i->grabNewsArticleByTitle($title);
+        $articleID = $i->grabFromDatabase('comms_news_article', 'id', ['title' => $title]);
+
+        #WHEN
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept the news article draft with class audience');
+        $i->sendRequest($submitRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
+
+        //impersonating Jana Reed(middle student) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(25);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Jack Coles(secondary teacher) to ensure the news article is NOT visible to him
+        #GIVEN
+        $i->impersonateUser(22);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Jenni Reed(parent) to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(27);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+    }
+
+    /** Publish news with Year 9 (teacher of students) audience
+     * Check if only teacher of students from that class can view the news article
+     *
+     * @param IntegrationTester $i
+     */
+    public function checkYearAudience(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+        $title     = 'Smoke Test News Article Testing Year 9 (teachers of students)' . $timestamp;
+
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('body', 'Testing Class Audience');
+        $createDraft->setFormParam('audience', 'year:Ijki:teachers_of');
+        $i->amGoingTo('Send request to create the news article draft with year level audience');
+        $i->sendRequest($createDraft);
+        $article   = $i->grabNewsArticleByTitle($title);
+        $articleID = $i->grabFromDatabase('comms_news_article', 'id', ['title' => $title]);
+
+        #WHEN
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept the news article draft with year level audience');
+        $i->sendRequest($submitRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
+
+        //impersonating Jana Reed(year 9 student) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(25);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Jack Coles(year 9 teacher) to ensure the news article is visible to him
+        #GIVEN
+        $i->impersonateUser(22);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jenni Reed(parent) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(27);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
+
+    /** Publish news by passing a specific user
+     * Check if only users targeted can view the news article (Jana Reed and teacher of student, Eden Reed)
+     *
+     * @param IntegrationTester $i
+     */
+    public function checkSpecificUsersAudience(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp = time();
+        $title     = 'Smoke Test News Article Testing targeting specific users' . $timestamp;
+
+        $createDraft = new Payload\News\Create(Querystring::encode('/'));
+        $createDraft->setNewsTitle($title);
+        $createDraft->setFormParam('body', 'Testing targeting specific users');
+        $createDraft->setFormParam('audience', 'user:IjI1Ig==:self,user:IjI1Ig==:teachers_of,user:IjYi:self');
+        $i->amGoingTo('Send request to create the news article draft with specific audience');
+        $i->sendRequest($createDraft);
+        $article   = $i->grabNewsArticleByTitle($title);
+        $articleID = $i->grabFromDatabase('comms_news_article', 'id', ['title' => $title]);
+
+        #WHEN
+        $submitRequest = new Payload\News\Accept(Querystring::encode('/'), $article);
+        $i->amGoingTo('Send request to accept the news article draft with specific audience');
+        $i->sendRequest($submitRequest);
+
+        #THEN
+        $i->seeResponseCodeIs(302);
+        $i->seeHttpHeader('location', '/');
+
+        //impersonating Jana Reed(year 9 student) to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(25);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jack Coles(year 9 teacher) to ensure the news article is visible to him
+        #GIVEN
+        $i->impersonateUser(22);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Jenni Reed(parent) to ensure the news article is NOT visible to her
+        #GIVEN
+        $i->impersonateUser(27);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+
+        //impersonating Eden Reed to ensure the news article is visible to her
+        #GIVEN
+        $i->impersonateUser(6);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        //impersonating Staff 1 to ensure the news article is NOT visible to them
+        #GIVEN
+        $i->impersonateUser(65);
+        #WHEN
+        $i->sendGet('/news/' . $articleID);
+        #THEN
+        $i->seeResponseCodeIs(401);
+    }
 }

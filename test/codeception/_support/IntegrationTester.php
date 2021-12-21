@@ -44,4 +44,13 @@ class IntegrationTester extends \Codeception\Actor
         $this->seeResponseCodeIs(303);
         $this->seeHttpHeader('location', '/');
     }
+
+    /**
+     * impersonating users
+     */
+    public function impersonateUser(int $userId): void
+    {
+        $this->sendGet('user/recoverSession');
+        $this->sendGet('/user/switch/' . $userId);
+    }
 }
