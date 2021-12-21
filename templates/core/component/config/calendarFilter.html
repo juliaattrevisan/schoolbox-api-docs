@@ -2,6 +2,9 @@
     <div class="small-12 medium-6 columns">
         <p><em>Event Type</em></p>
 
+        <input type="hidden" name="calendarFilter[eventType][]" />
+        <input type="hidden" name="calendarFilter[source][]" />
+
         <!-- BEGIN calendarfilter_eventtype -->
         <div>
             <input id="component{COMPONENT_INSTANCE_ID}-calendarfilter-eventType-{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" type="checkbox" name="calendarFilter[eventType][]" value="{COMPONENT_CONFIG_CALENDARFILTER_VALUE}" {COMPONENT_CONFIG_CALENDARFILTER_SELECTED} />
