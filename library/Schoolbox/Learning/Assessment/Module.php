@@ -721,13 +721,15 @@ class Module extends BaseModule
             new AssessmentNotDeleted(),
             new CanViewAssessable(new Visibility($this->getAccess())),
             new Rule\Any(
-                // Normal participants (whether explicit or dynamic participants)
-                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions')),
                 // Instructor/staff viewing assessment details, on their own summary page
                 new Rule\All(
                     $this->buildAuthRuleHasInstructorAccess(),
                     new Rule\IsUser('studentId')
-                )
+                ),
+                //check second, if the viewing user is admin, and the student is excluded, both this and the above rule fail.
+                //but we want to see the nice response from this one "User {studentID} is excluded from this assessment"
+                // Normal participants (whether explicit or dynamic participants)
+                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
             )
         );
     }

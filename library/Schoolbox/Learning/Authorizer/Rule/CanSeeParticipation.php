@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Learning\Authorizer\Rule;
 
-use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -76,7 +75,7 @@ class CanSeeParticipation extends AbstractParticipationRule
         // All other exclusions mean this page does not exist
         if (!$participant) {
             // Then this route does not exist.
-            throw new InvalidPath();
+            throw new Unauthorized("User '{$student->getId()}' is excluded from assessment '{$assessable->getId()}'");
         }
 
         // Instructors or staffs can always see participants' summary pages
