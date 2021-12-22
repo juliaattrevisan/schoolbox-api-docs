@@ -402,7 +402,7 @@ class Mimetype implements ISoftDeletable
             return 'video';
         } elseif (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $this->getMime())) {
             return 'document';
-        } elseif ("" !== $this->getMime()) {
+        } elseif (null !== $this->getMime()) {
             return 'other';
         }
         return null;
