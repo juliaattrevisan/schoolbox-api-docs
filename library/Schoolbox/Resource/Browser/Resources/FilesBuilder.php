@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
