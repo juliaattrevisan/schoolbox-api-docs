@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -18,9 +17,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\File\IFile;
 use Component_InstanceMapper;
 use Schoolbox\Mapper;
 use Schoolbox\RoleMapper;
@@ -35,11 +32,6 @@ class Controller extends AbstractController
     protected $linkMapper;
 
     /**
-     * @var IConnector
-     */
-    protected $database;
-
-    /**
      * @var FileMapper
      */
     protected $fileMapper;
@@ -47,17 +39,15 @@ class Controller extends AbstractController
     /**
      * @var Component_InstanceMapper
      */
-    protected $componentInstanceMapper;
+    protected Component_InstanceMapper $componentInstanceMapper;
 
     /**
      * Constructor, just using this for the showAll files and FilesBuilder class
-     * @param IConnector               $database
      * @param FileMapper               $fileMapper
      * @param Component_InstanceMapper $componentInstanceMapper
      */
-    public function __construct(IConnector $database, FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
+    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
     {
-        $this->database                 = $database;
         $this->fileMapper               = $fileMapper;
         $this->componentInstanceMapper  = $componentInstanceMapper;
     }
@@ -119,7 +109,7 @@ class Controller extends AbstractController
      */
     public function showFiles(int $componentID, int $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder($this->database, $this->fileMapper, $this->componentInstanceMapper);
+        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper);
         $homepage_id = $filesBuilder->getHomepage($componentID);
         $homepage = $this->folderMapper->findById($homepage_id);
 

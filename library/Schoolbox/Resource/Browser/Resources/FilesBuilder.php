@@ -18,27 +18,18 @@ use Component_InstanceMapper;
 
 class FilesBuilder
 {
-    private IConnector $db;
     private int $componentId;
-
-    /**
-     * @var FileMapper
-     */
-    protected $fileMapper;
-
-    /**
-     * @var Component_InstanceMapper
-     */
-    protected $componentInstanceMapper;
+    protected FileMapper $fileMapper;
+    protected Component_InstanceMapper $componentInstanceMapper;
 
     /**
      * FilesBuilder constructor.
      *
-     * @param IConnector $db
+     * @param FileMapper               $fileMapper
+     * @param Component_InstanceMapper $componentInstanceMapper
      */
-    public function __construct(IConnector $db, FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
+    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
     {
-        $this->db                       = $db;
         $this->fileMapper               = $fileMapper;
         $this->componentInstanceMapper  = $componentInstanceMapper;
     }
