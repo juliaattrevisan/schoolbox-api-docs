@@ -28,6 +28,11 @@ trait FormTrait
         $this->setFormParam('heading', $heading);
     }
 
+    public function setParentCommentsAllowed(): void
+    {
+        $this->setFormParam('parent comments allowed', '1');
+    }
+
     public function setUserAccess(int $userId, int $accessLevel): void
     {
         $this->setAccess('user', $userId, $accessLevel);

@@ -103,7 +103,7 @@ class PastoralCest
 
 
     /** Comments on a pastoral record for a student using a curl request.
-     *
+     *  Ensure parents are not able to comment as the flag for parents comments is off
      *  Fires off create a pastoral record step.
      *
      * @param IntegrationTester $i
@@ -131,6 +131,58 @@ class PastoralCest
         #THEN
         $i->seeResponseCodeIs(200);
         #WHEN
+        $i->sendGET($i->grabHttpHeader('location'));
+        $i->seeResponseCodeIs(200);
+
+        #WHEN impersonating Jenni Reed
+        $i->impersonateUser(27);
+
+        #THEN I am unable to make a comment
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a parent');
+        $i->amGoingTo("Send request add comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
+
+        $i->seeResponseCodeIs(400);
+
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
+        $pastoralCommentPayload->setPrivateComment('A very private comment from a parent');
+        $i->amGoingTo("Send request add private comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
+
+        $i->seeResponseCodeIs(400);
+    }
+
+    /** Parents able to comment on a pastoral record for a student using a curl request.
+     *
+     *  Fires off create a pastoral record step.
+     *
+     * @param IntegrationTester $i
+     */
+    public function parentCommentOnPastoralRecord(IntegrationTester $i): void
+    {
+        #GIVEN
+        $student_jreed = $i->grabUser('jreed');
+        $pastoral_record = $this->createParentsCommentsToggledOnPastoralRecord($i, $student_jreed, 'Automated Test Pastoral Allow Parents to comment toggled on at ' . time());
+
+        #WHEN impersonating Jenni Reed
+        $i->impersonateUser(27);
+
+        #THEN Jenni Reed(parent) is able to add comment to the pastoral record
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a parent');
+        $i->amGoingTo("Send request add comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
+
+        $i->seeResponseCodeIs(200);
+
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
+        $pastoralCommentPayload->setPrivateComment('A very private comment from a parent');
+        $i->amGoingTo("Send request add private comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
+
+        $i->seeResponseCodeIs(200);
+
         $i->sendGET($i->grabHttpHeader('location'));
         $i->seeResponseCodeIs(200);
     }
@@ -163,4 +215,31 @@ class PastoralCest
 
         return $i->grabPastoralRecordByTitle($heading);
     }
+
+    /**
+     * Convenience method to create a pastoral record that parents can comment (general and confidential) it via the API
+     *
+     * @param IntegrationTester $i
+     * @param User              $student
+     * @param string            $heading
+     * @return Pastoral\Model
+     */
+    private function createParentsCommentsToggledOnPastoralRecord(IntegrationTester $i, User $student, string $heading): Pastoral\Model
+    {
+        $parent         = $i->grabUser('jennireed01');
+
+        $createPastoral = new Payload\Pastoral\Create($student->getId());
+        $createPastoral->setHeading($heading);
+        $createPastoral->setUserAccess($parent->getId(), Pastoral\Access\Mapper::ACCESS_PRIVATE);
+        $createPastoral->setParentCommentsAllowed();
+        $i->amGoingTo('Send request create pastoral record for student #' . $student->getId());
+        $i->sendRequest($createPastoral);
+
+        $i->seeResponseCodeIs(303);
+        $i->seeHttpHeader('location', "/pastoral/student/{$student->getId()}");
+
+        return $i->grabPastoralRecordByTitle($heading);
+    }
+
+
 }
