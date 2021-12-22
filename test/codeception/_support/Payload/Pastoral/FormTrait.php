@@ -28,6 +28,16 @@ trait FormTrait
         $this->setFormParam('heading', $heading);
     }
 
+    public function setPastoralType(int $type): void
+    {
+        $this->setFormParam('typeId', $type);
+    }
+
+    public function setPastoralSubType(int $subType): void
+    {
+        $this->setFormParam('subtypeId', $subType);
+    }
+
     public function setParentCommentsAllowed(): void
     {
         $this->setFormParam('parent comments allowed', '1');

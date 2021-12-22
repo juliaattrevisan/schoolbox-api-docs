@@ -432,6 +432,72 @@ class PastoralCest
         $i->seeResponseCodeIs(400);
     }
 
+    /** Test add pastoral type
+     *  Fires off create a pastoral record step with the new pastoral type
+     *
+     * @param IntegrationTester $i
+     */
+    public function addPastoralType(IntegrationTester $i): void
+    {
+
+        #GIVEN a new pastoral type is created
+        $name = 'Automated Pastoral Type ' . time();
+        $id = $i->grabNumRecords('lu_pastoral_type');
+        $createPastoralType = new Payload\Admin\Lists\PastoralTypes($name, $id);
+        $i->sendRequest($createPastoralType);
+        $i->seeResponseCodeIs(200);
+
+        #WHEN sending a request to create a new pastoral record with the new pastoral type
+        $student_jreed = $i->grabUser('jreed');
+        $heading = 'Automated Test Pastoral Record visibility grant access by group ' . time();
+        $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
+        $createPastoral->setHeading($heading);
+        $createPastoral->setPastoralType($id);
+        $i->amGoingTo('Send request create pastoral record with the new pastoral type for student #' . $student_jreed->getId());
+        $i->sendRequest($createPastoral);
+
+        #THEN the record is created with the new type id
+        $i->seeResponseCodeIs(303);
+        $i->grabPastoralRecordByTitle($heading);
+        $typeID = $i->grabFromDatabase('pastoral', 'type_id', ['heading' => $heading]);
+        $i->assertEquals($typeID, $id);
+    }
+
+
+    /** Test add pastoral subType for the type Bullying
+     *  Fires off create a pastoral record step with the new pastoral subType
+     *
+     * @param IntegrationTester $i
+     */
+    public function addPastoralSubType(IntegrationTester $i): void
+    {
+
+        #GIVEN a new pastoral type is created
+        $name = 'Automated Pastoral Type ' . time();
+        $pastoralType = 4;
+        $subTypeName = 'Automated Pastoral Bullying Sub Type ' . time();
+        $id = $i->grabNumRecords('lu_pastoral_subtype');
+        $createPastoralSubType = new Payload\Admin\Lists\PastoralSubType($pastoralType, $subTypeName, $id);
+        $i->sendRequest($createPastoralSubType);
+        $i->seeResponseCodeIs(200);
+
+        #WHEN sending a request to create a new pastoral record with the new pastoral type
+        $student_jreed = $i->grabUser('jreed');
+        $heading = 'Automated Test Pastoral Record visibility grant access by group ' . time();
+        $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
+        $createPastoral->setHeading($heading);
+        $createPastoral->setPastoralType($pastoralType);
+        $createPastoral->setPastoralSubType($id);
+        $i->amGoingTo('Send request create pastoral record with the new pastoral subtype for student #' . $student_jreed->getId());
+        $i->sendRequest($createPastoral);
+
+        #THEN the record is created with the new type id
+        $i->seeResponseCodeIs(303);
+        $i->grabPastoralRecordByTitle($heading);
+        $subTypeID = $i->grabFromDatabase('pastoral', 'subtype_id', ['heading' => $heading]);
+        $i->assertEquals($subTypeID, $id);
+    }
+
     /**
      * Convenience method to create a default pastoral record via the API
      *
