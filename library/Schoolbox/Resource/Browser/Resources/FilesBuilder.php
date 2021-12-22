@@ -108,7 +108,7 @@ class FilesBuilder
      * @param int                            $folderId
      * @return array
      */
-    public function buildFile(\Schoolbox\Resource\File\Model $file, int $componentId, int $folderId): array
+    private function buildFile(\Schoolbox\Resource\File\Model $file, int $componentId, int $folderId): array
     {
         //get return url, for edit page
         $returnURL = Redirect::encode("/resources/folder/{$componentId}/files/{$folderId}");
