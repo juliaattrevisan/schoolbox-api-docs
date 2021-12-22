@@ -213,8 +213,8 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     } catch (Exception $e) {
         outputException($e, $file, $ajax);
     }
-} /* Move file from one category to another */
-elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+} elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+    /* Move file from one category to another */
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
 
@@ -238,8 +238,8 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 
     header("Content-type: application/json");
     print json_encode(array('result' => $result));
-} /* Delete a single file */
-elseif (is_numeric($_GET['delete'])) {
+} elseif (is_numeric($_GET['delete'])) {
+    /* Delete a single file */
     try {
         $file = FileMapper::getInstance()->findById($_GET['delete']);
 
@@ -261,8 +261,8 @@ elseif (is_numeric($_GET['delete'])) {
     } else {
         SitePage::localRedir(Redirect::decode($encodedReturnUrl));
     }
-} /* Delete a list of files */
-elseif (is_numeric($_GET['deleteList'])) {
+} elseif (is_numeric($_GET['deleteList'])) {
+    /* Delete a list of files */
     $fileList = array_filter(explode(',', rtrim($_GET['fileList'], ',')));
 
     if (is_array($fileList)) {
@@ -300,11 +300,11 @@ elseif (is_numeric($_GET['deleteList'])) {
     }
 
     $page->backToTheFuture(1);
-} /* Exceeded PHP max file size */
-elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES)) {
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES)) {
+    /* Exceeded PHP max file size */
     error(ErrorMapper::ERROR_FILE_SIZE);
-} /* Unknown action */
-else {
+} else {
+    /* Unknown action */
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
