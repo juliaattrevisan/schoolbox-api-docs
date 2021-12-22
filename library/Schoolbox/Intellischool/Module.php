@@ -105,6 +105,13 @@ class Module extends BaseModule
             new Rule\All($basePermission, $staffPermission),
             $classCodePreload,
         );
+        //cohort profile
+        $this->register(
+            BaseModule::METHOD_GET,
+            "/cohort",
+            'getCohortProfile',
+            new Rule\All($basePermission, $staffPermission),
+        );
     }
 
     /**

@@ -144,7 +144,7 @@ class JwtFactory
      * @param string $cohortIdentifier
      * @return string
      */
-    private function buildForCohort(User $currentUser, string $cohortType, string $cohortIdentifier): string
+    public function buildForCohort(User $currentUser, string $cohortType, string $cohortIdentifier): string
     {
         $claims = $this->buildBaseClaims($currentUser);
         $claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] = sprintf(

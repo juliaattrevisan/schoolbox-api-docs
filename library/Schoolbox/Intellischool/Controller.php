@@ -123,4 +123,23 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * Intellischool cohort analytics.
+     *
+     * @api GET /modules/intellischool/cohort
+     */
+    public function getCohortProfile(): void
+    {
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@intellischool/cohort.twig',
+                [
+                    'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
+                    'jwt'         => $this->jwtFactory->buildForCohort($this->getUser(), '', ''),
+                ],
+                sprintf('Cohort Analytics'),
+            )
+        );
+    }
 }
