@@ -38,22 +38,24 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        // Various permissions
+        $basePermission = new Rule\All(
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL, $this->getConfig()),
+        );
+
         /* Anyone can see the form
          */
         $getPerms = new Rule\All(
+            $basePermission,
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
 
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-        );
-
-
         $this->register('GET', '/console', 'getConsole', $getPerms, null);
-        $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
 
     /**

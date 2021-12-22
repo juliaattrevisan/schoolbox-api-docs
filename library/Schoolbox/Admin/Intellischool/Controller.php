@@ -48,12 +48,4 @@ class Controller extends Base
             'title' => 'Intellischool - Admin Console'
         ])->setTitle('Intellischool - Admin Console'));
     }
-
-
-    /**
-     * Process the form vars
-     */
-    public function postExample()
-    {
-    }
 }
