@@ -9,25 +9,28 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use Alaress\Database\Connector\IConnector;
-use Schoolbox\File\Mimetype;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Component_InstanceMapper;
 
 class FilesBuilder
 {
-    private IConnector $db;
     private int $componentId;
+    protected FileMapper $fileMapper;
+    protected Component_InstanceMapper $componentInstanceMapper;
 
     /**
      * FilesBuilder constructor.
      *
-     * @param IConnector $db
+     * @param FileMapper               $fileMapper
+     * @param Component_InstanceMapper $componentInstanceMapper
      */
-    public function __construct(IConnector $db)
+    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
     {
-        $this->db = $db;
+        $this->fileMapper               = $fileMapper;
+        $this->componentInstanceMapper  = $componentInstanceMapper;
     }
 
     /**
@@ -37,28 +40,16 @@ class FilesBuilder
      * @returns int
      * @throws Mapper\Exception\NotFound
      */
-    public function getHomepage(int $componentId)
+    public function getHomepage(int $componentId): int
     {
         $this->componentId = $componentId;
-        //get the homepage Id, from the component and confirm it is a files component
-        $statement = $this->db->executeQuery("
-            SELECT component_instance.identifier FROM component_instance
-                INNER JOIN component_definition
-                    ON component_instance.component_definition_id = component_definition.id
-                WHERE component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
-            ", ['id' => $componentId]);
+        $component = $this->componentInstanceMapper->findByInstanceId($componentId);
 
-        /** @var array|bool $homepage_id */
-        $homepage_id = $statement->fetch(\PDO::FETCH_ASSOC);
-
-        if ($homepage_id === false) {
-            //component ID does not exist
-            throw new \Schoolbox\Mapper\Exception\NotFound();
+        if ($component && $component->getDefinition()->getClass() === 'Component_Homepage_FileListController') {
+            return $component->getIdentifier();
         }
-
-        return $homepage_id['identifier'];
+        throw new Mapper\Exception\NotFound();
     }
-
 
     /**
      * Get the list of files from a folder, not children just the ones in this folder.
@@ -71,41 +62,17 @@ class FilesBuilder
     public function getFolderData(int $folderId, int $folderAccess = UserAccess::ACCESS_READ): array
     {
         //get the files, for the source folder
-        $fileMapper = \Schoolbox\Resource\File\Mapper::getInstance();
-        $fileList = $fileMapper->findForFolders(
+        $fileList = $this->fileMapper->findForFolders(
             [$folderId],
             [
                 'getHidden' => $folderAccess >= UserAccess::ACCESS_WRITE,
             ]
         );
 
-        //get return url, for edit page
-
-        $returnURL = Redirect::encode("/resources/folder/" . $this->componentId . "/files/${folderId}");
-
         //lets build the list folder array, so we don't have to worry about hydration. etc
         $files = [];
         foreach ($fileList as $file) {
-            $files[] = [
-                'name'                  => $file->getTitle(),
-                'id'                    => $file->getId(),
-                'url'                   => '/send.php?id=' . $file->getId(),
-                'mime'                  => [
-                    'mimeType'          => $file->getStorage()->getMimetype()->getMime(),
-                    'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
-                    'description'       => $file->getStorage()->getMimetype()->getDescription(),
-                    'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
-                ],
-                'hidden'                => $file->isHidden(),
-                'type'                  => $this->getType($file->getMimetype()),
-                'hash'                  => $file->getHash(),
-                'size'                  => $file->getSize(),
-                'dateModified'          => [
-                            'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
-                            'formatted' => $file->getModifiedAt()->getShort(),
-                ],
-                'editUrl'              => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "=${returnURL}",
-            ];
+            $files[] = $this->buildFile($file, $this->componentId, $folderId);
         }
         return $files;
     }
@@ -116,12 +83,11 @@ class FilesBuilder
      * @param int $componentId
      * @param int $homepageId
      * @return array componentConfig
-     * @throws Mapper\Exception\NotFound
      */
     public function getComponentConf(int $componentId, int $homepageId): array
     {
         //get the instance config.
-        $instanceMapper = \Component_InstanceMapper::getInstance();
+        $instanceMapper = $this->componentInstanceMapper;
         $instanceConfig = $instanceMapper->findByInstanceId($componentId)->getConfigArray();
 
         //if there is no source, update to the current homepage
@@ -135,41 +101,36 @@ class FilesBuilder
     }
 
     /**
-     *get Type, returns the string for one of the following:
-     *  ['Document', 'Audio', 'Video', 'Image', 'Other']
-     * @param Mimetype $mime
-     * @return string
+     * Build the return file object, so it is the same for both the getting all files and the uploading a file
+     * @param \Schoolbox\Resource\File\Model $file
+     * @param int                            $componentId
+     * @param int                            $folderId
+     * @return array
      */
-    private function getType(Mimetype $mime)
+    private function buildFile(\Schoolbox\Resource\File\Model $file, int $componentId, int $folderId): array
     {
-        /**
-        //get filters from FileMapper
-        // Put together mimetype filters
-        $fileTypeMimes = [
-            'document' => [
-                "%pdf%",
-                "%msword%",
-                "%vnd.ms%",
-                "%rtf%",
-                "%text%",
-                "%document%",
-                "%powerpoint%",
+        //get return url, for edit page
+        $returnURL = Redirect::encode("/resources/folder/{$componentId}/files/{$folderId}");
+
+        return [
+            'name'                  => $file->getTitle(),
+            'id'                    => $file->getId(),
+            'url'                   => '/send.php?id=' . $file->getId(),
+            'mime'                  => [
+                'mimeType'          => $file->getStorage()->getMimetype()->getMime(),
+                'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
+                'description'       => $file->getStorage()->getMimetype()->getDescription(),
+                'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
             ],
-            'image' => ["%image%",],
-            'audio' => ["%audio%",],
-            'video' => ["%video%", "%flash%", "%realmedia%",],
+            'hidden'                => $file->isHidden(),
+            'type'                  => $file->getMimetype()->getType(),
+            'hash'                  => $file->getHash(),
+            'size'                  => $file->getSize(),
+            'dateModified'          => [
+                'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
+                'formatted' => $file->getModifiedAt()->getShort(),
+            ],
+            'editUrl'               => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "={$returnURL}",
         ];
-        */
-        if ($mime->isImage() === true) {
-            return "image";
-        } elseif ($mime->isAudio() === true) {
-            return "audio";
-        } elseif ($mime->isVideo()) {
-            return "video";
-        } elseif (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $mime->getMime())) {
-            return "document";
-        }
-        //else other??
-        return "other";
     }
 }

@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -18,6 +17,8 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Component_InstanceMapper;
 use Schoolbox\Mapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -31,17 +32,24 @@ class Controller extends AbstractController
     protected $linkMapper;
 
     /**
-     * @var IConnector
+     * @var FileMapper
      */
-    protected $database;
+    protected $fileMapper;
+
+    /**
+     * @var Component_InstanceMapper
+     */
+    protected Component_InstanceMapper $componentInstanceMapper;
 
     /**
      * Constructor, just using this for the showAll files and FilesBuilder class
-     * @param IConnector $database
+     * @param FileMapper               $fileMapper
+     * @param Component_InstanceMapper $componentInstanceMapper
      */
-    public function __construct(IConnector $database)
+    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
     {
-        $this->database = $database;
+        $this->fileMapper               = $fileMapper;
+        $this->componentInstanceMapper  = $componentInstanceMapper;
     }
 
     // Injectables
@@ -101,10 +109,9 @@ class Controller extends AbstractController
      */
     public function showFiles(int $componentID, int $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder($this->database);
-        $folderMapper = Folder\Mapper::getInstance();
+        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper);
         $homepage_id = $filesBuilder->getHomepage($componentID);
-        $homepage = $folderMapper->findById($homepage_id);
+        $homepage = $this->folderMapper->findById($homepage_id);
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
         $accessSource = $this->getAccess($sourceFolderID);
@@ -137,12 +144,18 @@ class Controller extends AbstractController
             $componentConfig['filter']['value'] = (int)$componentConfig['filter']['value'] / 2;
         }
 
+        //grab the referrer so the saved filters can be recalled only when returning from the edit page
+        $referrer = 'component';
+        if (strpos($_SERVER['HTTP_REFERER'], 'cms/file') !== false) {
+            $referrer = 'edit';
+        }
         //just dump the lot to the page for front end use.
         //output results
         $this->getResponse()->content->set([
            'template'   => '@resourceBrowser/viewAll.twig',
            'title'      => $componentConfig['componentname']['value'],
            'data'       => [
+                    'referrer'                  => $referrer,
                     'canEdit'                   => $canEdit,
                     'homepage'                  => $homepage,
                     'filter'                    => $filter,

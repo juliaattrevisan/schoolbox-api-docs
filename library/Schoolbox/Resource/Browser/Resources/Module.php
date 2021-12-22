@@ -98,7 +98,8 @@ class Module extends AbstractModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'database' => $injector->lazyGet('databaseInternal'),
+                    'fileMapper'        => $this->getMapperFactory()->getLazy(\Schoolbox\Resource\File\Mapper::class),
+                    'componentInstance' => $this->getMapperFactory()->getLazy(\Component_InstanceMapper::class),
                 ],
                 $this->getSetterList($injector)
             )

@@ -169,8 +169,10 @@
                 if (!this.options.clickable) {
                     const dzMessage = this.element.querySelector('.dz-message');
                     const dzButton = this.element.querySelector('.dz-button');
-                    dzMessage.removeChild(dzButton);
-                    dzMessage.textContent = dzButton.textContent;
+                    if (dzButton !== null) {
+                        dzMessage.removeChild(dzButton);
+                        dzMessage.textContent = dzButton.textContent;
+                    }
                 }
 
                 this.on('sending',        function() { self.options.sending.apply(this, arguments) });

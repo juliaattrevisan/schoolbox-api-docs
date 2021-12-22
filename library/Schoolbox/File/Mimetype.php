@@ -249,7 +249,7 @@ class Mimetype implements ISoftDeletable
     /**
      * Get mime type
      *
-     * @return string
+     * @return string|null
      */
     public function getMime()
     {
@@ -389,18 +389,32 @@ class Mimetype implements ISoftDeletable
 
 
     /**
-     * Decide whether this is image, video or audio,
+     * Decide whether this is image, video, audio, documents or other files
      * encompassing separate filetypes for each
      */
-    public function getType()
+    public function getType(): ?string
     {
+        //new file / mime object, so return null
+        if (null === $this->getMime()) {
+            return null;
+        }
+
+        //is a file, lets check which it is
         if ($this->isImage()) {
             return 'image';
-        } else if ($this->isAudio()) {
+        }
+        if ($this->isAudio()) {
             return 'audio';
-        } else if ($this->isVideo()) {
+        }
+        if ($this->isVideo()) {
             return 'video';
         }
+        if (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $this->getMime())) {
+            return 'document';
+        }
+
+        //if not a 'standard' document, it is something else, return other
+        return 'other';
     }
 
     /**

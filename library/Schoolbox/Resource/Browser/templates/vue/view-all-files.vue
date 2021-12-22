@@ -11,7 +11,7 @@ import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
 
 export default {
-    
+
     components: {
         ViewAllFilesFilters
     },
@@ -21,6 +21,10 @@ export default {
     ],
 
     props: {
+        canEdit: { //whether the user has permission to modify files
+            type: Boolean,
+            required: true,
+        },
         componentInstanceConfig: { //any config used within the homepage component instance, currently used to set initial sorting
             type: Object,
             required: true,
@@ -33,10 +37,10 @@ export default {
             type: Array,
             required: true,
         },
-        canEdit: { //whether the user has permission to modify files
-            type: Boolean,
+        sourceFolderId: { //to know where to upload files to
+            type: Number,
             required: true,
-        }
+        },
     },
 
     data () {
@@ -99,7 +103,7 @@ export default {
                     ascending: this.componentInstanceConfig.sortdir.value === 'asc' ? true : false,
                     column: this.componentInstanceConfig.sort.value === 'name' ? 'name' : 'dateModified.formatted',
                 },
-                perPage: 100, 
+                perPage: 100,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
                 sortable: ['name', 'dateModified.formatted'], //the edit column doesn't need to be sortable
@@ -140,7 +144,7 @@ export default {
 
         /**
          * The edit column is only display to those that have permission
-         * 
+         *
          * @returns { Array }
          */
         getTableColumns () {
@@ -155,7 +159,47 @@ export default {
          * To update the table to show the UI in the footer
          */
         onTableLoaded () {
-            this.$nextTick(() => this.footerUI_update());
+            this.$nextTick(() => {
+                this.footerUI_update();
+                this.initDropZone();
+            });
+        },
+
+        /**
+         *
+         */
+        initDropZone () {
+            $('#dropzone').fileDrop({
+                previewsContainer: '#view-all-files [data-dz-container]',
+                previewTemplate: '#view-all-files [data-dz-template]',
+                reloadContent: false,
+                sending: (file, xhr, formData) => {
+                    const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
+                    const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
+                    formData.append('description', uploadDescription);
+                    formData.append('category', this.sourceFolderId);
+                    formData.append('comment', '');
+                    formData.append('hidden', 0);
+                },
+                complete: (file) => {
+                    file.previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
+                },
+                success: (file, response) => {
+                    /**
+                     * when you go to the edit link, theis needs a returnUrl so the edit page knows where to send the user after they have edited/deleted the file
+                     * we shall append this here to all newly uploaded files
+                     */
+                    response.editUrl  = response.editUrl + '?returnUrl=' + encodeURIComponent(btoa(window.location.pathname));
+                    this.files.push(response);
+                    const previewElement = file.previewElement;
+                    previewElement.remove();
+                },
+                error: (file, response) => {
+                    document.querySelector('.dz-error [data-close]').classList.remove('hide');
+                    file.previewElement.classList.remove('dz-processing');
+                    file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
+                }
+            });
         },
 
     },
@@ -166,25 +210,56 @@ export default {
 
 <template>
 
-    <div class="row">
+    <div class="row" id="view-all-files">
 
         <div class="small-12 columns">
 
-            <v-client-table
-                ref="table"
-                :data="tableData"
-                :columns="tableColumns"
-                :options="tableOptions"
-            >
-                <div slot="beforeTable">
-                    <view-all-files-filters 
-                        :selected-filters="selectedFilters"
-                    />
-                </div>
-                <div slot="afterTable">
-                    <div class="VueTables__table-footer" ref="tableFooter"></div>
-                </div>
-            </v-client-table>
+            <div class="dropzone-wrap">
+
+                <form class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
+                    <div class="dz-default dz-message">You can drag files into this space.</div>
+                </form>
+
+                <v-client-table
+                    ref="table"
+                    :data="tableData"
+                    :columns="tableColumns"
+                    :options="tableOptions"
+                >
+                    <div slot="beforeTable">
+                        <view-all-files-filters
+                            :selected-filters="selectedFilters"
+                        />
+                    </div>
+                    <div slot="afterTable">
+                        <div class="dropped-files-container">
+                            <div data-dz-container=""></div>
+                            <div data-dz-template="" class="hide">
+                                <div>
+                                    <div class="card small-12">
+                                        <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                        <img data-dz-thumbnail="" class="mime" src="/static/images/foundation/preloader.gif" alt="file loading spinner">
+                                        <p data-dz-name=""></p>
+                                        <p class="meta" data-dz-status="">Uploading...</p>
+                                        <div class="progress dz-progress">
+                                            <span class="meter dz-upload" style="width:0;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="VueTables__table-footer" ref="tableFooter"></div>
+                        <div class="component-action">
+                            <section>
+                                <p><a :href="`/cms/file/new/${this.sourceFolderId}`">Select a file</a> or drag and drop multiple onto this component</p>
+                            </section>
+                        </div>
+                    </div>
+                </v-client-table>
+
+            </div>
 
         </div>
 
@@ -200,7 +275,7 @@ export default {
     table-layout: fixed; //to ensure the flex within view-all-files-row-name can shrink all the way down
 }
 
-.VueTables__search { 
+.VueTables__search {
     padding-bottom: 0.5rem; //to put the view-all-files-filters.vue up closer to the search input
 }
 
@@ -234,5 +309,22 @@ export default {
     width: 2.5rem; //keep the edit icon on the right side
 }
 
+.dropped-files-container {
+    background: white;
+    ul li {
+        list-style-type: none;
+    }
+    .card {
+        background: white;
+    }
+}
+
+.VueTables__table-footer {
+    margin-bottom: 0; //.component action sits underneath
+}
+
+.component-action {
+    margin-bottom: 2rem; //add margin as it's below the table-footer
+}
 
 </style>

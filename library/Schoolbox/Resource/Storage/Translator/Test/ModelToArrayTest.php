@@ -66,7 +66,7 @@ class ModelToArrayTest extends TestCase
             [
                 'hash'   => '1234567890',
                 'mime'   => 'document/ms-word',
-                'type'   => null,
+                'type'   => 'document',
                 'size'   => 12345,
                 '_links' => [
                     'fetch' => '/storage/fetch.php?hash=1234567890',
