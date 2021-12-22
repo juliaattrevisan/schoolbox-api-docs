@@ -389,7 +389,7 @@ class Mimetype implements ISoftDeletable
 
 
     /**
-     * Decide whether this is image, video or audio,
+     * Decide whether this is image, video, audio, documents or other files
      * encompassing separate filetypes for each
      */
     public function getType()
