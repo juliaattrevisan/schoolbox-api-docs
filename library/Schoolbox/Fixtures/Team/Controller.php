@@ -335,17 +335,35 @@ class Controller extends AbstractController
 
         if ($context === null) {
             $database = $this->getMapper()->getDatabase();
-            $pb       = $this->getMapper()->getPredicateBuilder();
-            $pb->like('name', "%{$database->getQuoter()->escapeForLike($query)}%");
-            $allTeams = $this->getMapper()->findByPredicates($pb);
+            $queryLike = "%{$database->getQuoter()->escapeForLike($query)}%";
+            //build query to check all possible options Team, sport, division
+            $query = "
+            SELECT st.id as teamID, ss.name AS sport, sd.name AS division, st.name AS team
+            FROM sportsfixtures_division as sd
+            JOIN sportsfixtures_sport ss on ss.id = sd.sport_id
+            JOIN sportsfixtures_team st on sd.id = st.division_id
+            WHERE st.name like :search
+                OR ss.name like :search
+                OR sd.name like :search;
+            ";
+            $ex = $database->prepare($query);
+            $ex->execute(['search' => $queryLike]);
+            $allTeams = $ex->fetchAll();
         } else {
             $allTeams = $this->getMapper()->findByName($context->getId(), $query);
         }
 
         $teams = [];
 
-        /** @var Team $currentTeam */
+        /** @var array|Team $currentTeam */
         foreach ($allTeams as $currentTeam) {
+            if (null === $context) {
+                $teams[] = [
+                    'id' => $currentTeam['teamID'],
+                    'name' => "{$currentTeam['team']} ({$currentTeam['sport']} / {$currentTeam['division']})"
+                ];
+                continue;
+            }
             $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
         }
 
