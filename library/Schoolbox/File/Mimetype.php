@@ -392,7 +392,7 @@ class Mimetype implements ISoftDeletable
      * Decide whether this is image, video, audio, documents or other files
      * encompassing separate filetypes for each
      */
-    public function getType()
+    public function getType(): ?string
     {
         if ($this->isImage()) {
             return 'image';
@@ -402,9 +402,10 @@ class Mimetype implements ISoftDeletable
             return 'video';
         } elseif (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $this->getMime())) {
             return 'document';
-        } else {
+        } elseif ("" !== $this->getMime()) {
             return 'other';
         }
+        return null;
     }
 
     /**
