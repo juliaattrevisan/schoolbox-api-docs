@@ -73,15 +73,21 @@ class CanSeeParticipation extends AbstractParticipationRule
         $participant = $assessable->getParticipantIfExtant($student);
         $accessLevel = $this->calculateAccessLevel($assessable, $user);
 
-        // All other exclusions mean this page does not exist
-        if (!$participant) {
-            // Then this route does not exist.
+        //is user student deleted? if so they do not exist
+        if ($student->isDeleted()) {
             throw new InvalidPath();
         }
 
         // Instructors or staffs can always see participants' summary pages
         if ($accessLevel >= UserAccess::ACCESS_WRITE || ($user->getRole()->isStaff() && $user->getRole()->getViewStudentGrades())) {
             return true;
+        }
+
+        // All other exclusions mean this page does not exist
+        //$participant may be null, where the student is excluded from the assessment
+        if (!$participant) {
+            // Then this route does not exist.
+            throw new Unauthorized("User {$student->getFullName()} is excluded from {$assessable->getTitle()}");
         }
 
         // Is assessment not yet published for participant?

@@ -74,7 +74,8 @@
             student: student,
             icon: 'icon-due-work',
             canShowcase: canShowcase,
-            isShowcased: isShowcased
+            isShowcased: isShowcased,
+            participant: participant
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
