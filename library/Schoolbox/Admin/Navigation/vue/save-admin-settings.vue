@@ -21,6 +21,14 @@ export default {
             type: String,
             required: true,
             default: 'settings',
+        },
+        /* Decide if we need special polling mechanism for dropzones and color pickers
+         * since they don't trigger onchange normally, probably because jquery
+         */
+        polling: {
+            type: Number,
+            required: true,
+            default: 0,
         }
     },
 
@@ -82,8 +90,19 @@ export default {
                     document.getElementById(changeEvent.editor.name).textContent = changeEvent.editor.getData();
                     this.onFormDataChange()
                 }, 350));
-            }); 
-            setInterval(this.onFormDataChange, 500);
+            });
+
+            /* Polling is required for dropzones and colorpickers since they don't
+             * trigger onchange events normally (probably because jquery plugins)
+             */
+            if (this.polling) {
+                setInterval(this.onFormDataChange, 500);
+            } else {
+                document.getElementById(this.formId).addEventListener('change', () => this.onFormDataChange());
+                document.getElementById(this.formId).addEventListener('keyup', debounce(() => {
+                    this.onFormDataChange();
+                }, 350));
+            }
         },
 
         /**

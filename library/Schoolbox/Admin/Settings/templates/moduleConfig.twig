@@ -99,25 +99,41 @@
     <form data-action="saveSettings" id="settings" method="post" action="{{ postRoute }}">
         <section>
             <fieldset class="content">
-                    {% for setting in settings %}
-                        {% set data = setting.data %}
-                        {% if not data.hidden %}
-                            <div class="small-12 columns">
-                                <label id="{{ data.name }}" for="{{ data.name }}-field">
-                                    <span {{ data.required and data.editable ? 'class="required-with-tip"' }}>{{ data.title }}</span>
-                                    <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
-                                </label>
-                                {% include '@settings/fieldType/' ~ setting.template with data only %}
-                            </div>
-                            
-                        {% endif %}
-                    {% endfor %}
+                {# Remember if we encountered a dropzone here somewhere
+                 # We need it for the vue component's polling
+                 #}
+                {% set hasAttachzone = 0 %}
+                {% set usePolling = 0 %}
+
+                {% for setting in settings %}
+                    {% set data = setting.data %}
+
+                    {% if data.attachzone is defined %}
+                        {% set hasAttachzone = 1 %}
+                    {% endif %}
+
+                    {% if not data.hidden %}
+                        <div class="small-12 columns">
+                            <label id="{{ data.name }}" for="{{ data.name }}-field">
+                                <span {{ data.required and data.editable ? 'class="required-with-tip"' }}>{{ data.title }}</span>
+                                <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
+                            </label>
+                            {% include '@settings/fieldType/' ~ setting.template with data only %}
+                        </div>
+
+                    {% endif %}
+                {% endfor %}
             </fieldset>
         </section>
         {% if isEditable %}
+            {% if hasColourPicker or hasAttachzone %}
+                {% set usePolling = 1 %}
+            {% endif %}
+
             <div id="save-admin-settings-container">
                 <save-admin-settings
                     form-id="settings"
+                    :polling="{{ usePolling }}"
                 />
             </div>
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
