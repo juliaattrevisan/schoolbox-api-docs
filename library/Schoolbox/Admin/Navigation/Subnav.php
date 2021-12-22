@@ -561,6 +561,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
+                    '/adminv2/intellischool/console' => [
+                        'name'        => 'Intellischool Admin',
+                        'visible'     => ($this->configLoader->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID)),
+                        'children'    => [],
+                        'description' => 'Configure Albitros Intellischool Integration.',
+                    ],
                 ],
             ],
             '/adminv2/news'                           => [

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Intellischool;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Intellischool\JwtFactory;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -40,8 +41,11 @@ class Controller extends Base
     public function getConsole()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminIntellischool/console.twig', [
+            'pageCurrent'      => $this->router->generate('adminIntellischool.getConsole'),
+            'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminIntellischool.getConsole')),
             'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
             'jwt'         => $this->jwtFactory->buildForAdminView($this->getUser()),
+            'title' => 'Intellischool - Admin Console'
         ])->setTitle('Intellischool - Admin Console'));
     }
 

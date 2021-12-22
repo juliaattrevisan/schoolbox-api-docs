@@ -1,12 +1,31 @@
-<div class="scroll-wrapper">
-    <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="iframe">
-        <input type="hidden" name="id_token" value="{{ jwt }}">
-    </form>
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById('iframeForm').submit();
-        });
-    </script>
-    <iframe class="fullscreen" name="iframe" id="iframe">
-    </iframe>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+{# show each term #}
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+
+                <div class="scroll-wrapper">
+                    <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="iframe">
+                        <input type="hidden" name="id_token" value="{{ jwt }}">
+                    </form>
+                    <script type="text/javascript">
+                        document.addEventListener("DOMContentLoaded", function() {
+                            document.getElementById('iframeForm').submit();
+                        });
+                    </script>
+                    <iframe class="fullscreen" name="iframe" id="iframe">
+                    </iframe>
+                </div>
+
+
+
+        </div>
+    </div>
 </div>
+
