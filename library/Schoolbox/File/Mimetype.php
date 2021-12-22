@@ -400,6 +400,10 @@ class Mimetype implements ISoftDeletable
             return 'audio';
         } else if ($this->isVideo()) {
             return 'video';
+        } elseif (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $this->getMime())) {
+            return 'document';
+        } else {
+            return 'other';
         }
     }
 

@@ -185,7 +185,6 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         if (isset($_POST['return'])) {
             SitePage::localRedir($_POST['return']);
         } elseif ($ajax) {
-            $mime = \Schoolbox\Resource\Browser\Resources\FilesBuilder::getType($file->getMimetype());
             http_response_code(201);
             die(json_encode([
                 'id'                    => $affectedIds[0],
@@ -198,7 +197,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
                     'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
                 ],
                 'hidden'                => $file->isHidden(),
-                'type'                  => $mime,
+                'type'                  => $file->getStorage()->getMimetype()->getType(),
                 'hash'                  => $file->getHash(),
                 'size'                  => $file->getSize(),
                 'dateModified'          => [

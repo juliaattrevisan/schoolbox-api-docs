@@ -112,45 +112,6 @@ class FilesBuilder
     }
 
     /**
-     *get Type, returns the string for one of the following:
-     *  ['Document', 'Audio', 'Video', 'Image', 'Other']
-     * @param Mimetype $mime
-     * @return string
-     */
-    public static function getType(Mimetype $mime)
-    {
-        /**
-        //get filters from FileMapper
-        // Put together mimetype filters
-        $fileTypeMimes = [
-            'document' => [
-                "%pdf%",
-                "%msword%",
-                "%vnd.ms%",
-                "%rtf%",
-                "%text%",
-                "%document%",
-                "%powerpoint%",
-            ],
-            'image' => ["%image%",],
-            'audio' => ["%audio%",],
-            'video' => ["%video%", "%flash%", "%realmedia%",],
-        ];
-        */
-        if ($mime->isImage() === true) {
-            return "image";
-        } elseif ($mime->isAudio() === true) {
-            return "audio";
-        } elseif ($mime->isVideo()) {
-            return "video";
-        } elseif (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $mime->getMime())) {
-            return "document";
-        }
-        //else other??
-        return "other";
-    }
-
-    /**
      * Build the return file object, so it is the same for both the getting all files and the uploading a file
      * @param \Schoolbox\Resource\File\Model $file
      * @param int                            $componentId
@@ -173,7 +134,7 @@ class FilesBuilder
                 'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
             ],
             'hidden'                => $file->isHidden(),
-            'type'                  => $this->getType($file->getMimetype()),
+            'type'                  => $file->getMimetype()->getType(),
             'hash'                  => $file->getHash(),
             'size'                  => $file->getSize(),
             'dateModified'          => [
