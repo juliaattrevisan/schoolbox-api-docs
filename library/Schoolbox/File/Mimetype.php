@@ -394,19 +394,27 @@ class Mimetype implements ISoftDeletable
      */
     public function getType(): ?string
     {
+        //new file / mime object, so return null
         if (null === $this->getMime()) {
             return null;
-        } else if ($this->isImage()) {
-            return 'image';
-        } else if ($this->isAudio()) {
-            return 'audio';
-        } else if ($this->isVideo()) {
-            return 'video';
-        } elseif (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $this->getMime())) {
-            return 'document';
-        } else {
-            return 'other';
         }
+
+        //is a file, lets check which it is
+        if ($this->isImage()) {
+            return 'image';
+        }
+        if ($this->isAudio()) {
+            return 'audio';
+        }
+        if ($this->isVideo()) {
+            return 'video';
+        }
+        if (preg_match('/(pdf)|(msword)|(vnd.ms)|(rtf)|(text)|(document)|(powerpoint)/', $this->getMime())) {
+            return 'document';
+        }
+
+        //if not a 'standard' document, it is something else, return other
+        return 'other';
     }
 
     /**
