@@ -121,7 +121,7 @@ class FilesBuilder
     public function buildFile(\Schoolbox\Resource\File\Model $file, int $componentId, int $folderId)
     {
         //get return url, for edit page
-        $returnURL = Redirect::encode("/resources/folder/${componentId}/files/${folderId}");
+        $returnURL = Redirect::encode("/resources/folder/{$componentId}/files/{$folderId}");
 
         return [
             'name'                  => $file->getTitle(),
@@ -141,7 +141,7 @@ class FilesBuilder
                 'timestamp' => $file->getModifiedAt()->getUnixTimeStamp(),
                 'formatted' => $file->getModifiedAt()->getShort(),
             ],
-            'editUrl'               => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "=${returnURL}",
+            'editUrl'               => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "={$returnURL}",
         ];
     }
 }
