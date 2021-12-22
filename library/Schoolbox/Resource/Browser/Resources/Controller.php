@@ -21,6 +21,7 @@ use Schoolbox\Resource\Browser\AbstractController;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\IFile;
+use Component_InstanceMapper;
 use Schoolbox\Mapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -39,12 +40,26 @@ class Controller extends AbstractController
     protected $database;
 
     /**
-     * Constructor, just using this for the showAll files and FilesBuilder class
-     * @param IConnector $database
+     * @var FileMapper
      */
-    public function __construct(IConnector $database)
+    protected $fileMapper;
+
+    /**
+     * @var Component_InstanceMapper
+     */
+    protected $componentInstanceMapper;
+
+    /**
+     * Constructor, just using this for the showAll files and FilesBuilder class
+     * @param IConnector               $database
+     * @param FileMapper               $fileMapper
+     * @param Component_InstanceMapper $componentInstanceMapper
+     */
+    public function __construct(IConnector $database, FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
     {
-        $this->database = $database;
+        $this->database                 = $database;
+        $this->fileMapper               = $fileMapper;
+        $this->componentInstanceMapper  = $componentInstanceMapper;
     }
 
     // Injectables
@@ -104,10 +119,9 @@ class Controller extends AbstractController
      */
     public function showFiles(int $componentID, int $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder($this->database);
-        $folderMapper = Folder\Mapper::getInstance();
+        $filesBuilder = new FilesBuilder($this->database, $this->fileMapper, $this->componentInstanceMapper);
         $homepage_id = $filesBuilder->getHomepage($componentID);
-        $homepage = $folderMapper->findById($homepage_id);
+        $homepage = $this->folderMapper->findById($homepage_id);
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
         $accessSource = $this->getAccess($sourceFolderID);

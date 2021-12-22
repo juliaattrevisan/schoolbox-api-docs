@@ -10,10 +10,11 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\File\Mimetype;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Component_InstanceMapper;
 
 class FilesBuilder
 {
@@ -21,13 +22,25 @@ class FilesBuilder
     private int $componentId;
 
     /**
+     * @var FileMapper
+     */
+    protected $fileMapper;
+
+    /**
+     * @var Component_InstanceMapper
+     */
+    protected $componentInstanceMapper;
+
+    /**
      * FilesBuilder constructor.
      *
      * @param IConnector $db
      */
-    public function __construct(IConnector $db)
+    public function __construct(IConnector $db, FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
     {
-        $this->db = $db;
+        $this->db                       = $db;
+        $this->fileMapper               = $fileMapper;
+        $this->componentInstanceMapper  = $componentInstanceMapper;
     }
 
     /**
@@ -37,28 +50,16 @@ class FilesBuilder
      * @returns int
      * @throws Mapper\Exception\NotFound
      */
-    public function getHomepage(int $componentId)
+    public function getHomepage(int $componentId): int
     {
         $this->componentId = $componentId;
-        //get the homepage Id, from the component and confirm it is a files component
-        $statement = $this->db->executeQuery("
-            SELECT component_instance.identifier FROM component_instance
-                INNER JOIN component_definition
-                    ON component_instance.component_definition_id = component_definition.id
-                WHERE component_definition.class = 'Component_Homepage_FileListController' AND component_instance.id = :id
-            ", ['id' => $componentId]);
+        $component = $this->componentInstanceMapper->findByInstanceId($componentId);
 
-        /** @var array|bool $homepage_id */
-        $homepage_id = $statement->fetch(\PDO::FETCH_ASSOC);
-
-        if ($homepage_id === false) {
-            //component ID does not exist
-            throw new \Schoolbox\Mapper\Exception\NotFound();
+        if ($component && $component->getDefinition()->getClass() === 'Component_Homepage_FileListController') {
+            return $component->getIdentifier();
         }
-
-        return $homepage_id['identifier'];
+        throw new Mapper\Exception\NotFound();
     }
-
 
     /**
      * Get the list of files from a folder, not children just the ones in this folder.
@@ -71,8 +72,7 @@ class FilesBuilder
     public function getFolderData(int $folderId, int $folderAccess = UserAccess::ACCESS_READ): array
     {
         //get the files, for the source folder
-        $fileMapper = \Schoolbox\Resource\File\Mapper::getInstance();
-        $fileList = $fileMapper->findForFolders(
+        $fileList = $this->fileMapper->findForFolders(
             [$folderId],
             [
                 'getHidden' => $folderAccess >= UserAccess::ACCESS_WRITE,
@@ -93,12 +93,11 @@ class FilesBuilder
      * @param int $componentId
      * @param int $homepageId
      * @return array componentConfig
-     * @throws Mapper\Exception\NotFound
      */
     public function getComponentConf(int $componentId, int $homepageId): array
     {
         //get the instance config.
-        $instanceMapper = \Component_InstanceMapper::getInstance();
+        $instanceMapper = $this->componentInstanceMapper;
         $instanceConfig = $instanceMapper->findByInstanceId($componentId)->getConfigArray();
 
         //if there is no source, update to the current homepage
@@ -118,7 +117,7 @@ class FilesBuilder
      * @param int                            $folderId
      * @return array
      */
-    public function buildFile(\Schoolbox\Resource\File\Model $file, int $componentId, int $folderId)
+    public function buildFile(\Schoolbox\Resource\File\Model $file, int $componentId, int $folderId): array
     {
         //get return url, for edit page
         $returnURL = Redirect::encode("/resources/folder/{$componentId}/files/{$folderId}");
