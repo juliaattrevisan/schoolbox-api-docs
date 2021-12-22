@@ -113,8 +113,9 @@
             } else {
                 this.hasAssignments = true;
             }
-        } ).catch(function(error) {
+        } ).catch((error) => {
             this.loading = false;
+            this.error = error
             this.assignments = false;
         });
 },
@@ -131,28 +132,33 @@
 </script>
 
 <template>
-    <div>
+    <section class="content">
         <div v-if="loading">
-            Loading Data...
+            <div class="loader"></div>
         </div>
-        <div v-if="!hasAssignments && !loading && error">
+        <div v-if="!hasAssignments && !loading && error" class="">
             Error getting Assignments.
         </div>
         <div v-else-if="!hasAssignments && !loading">
             No Assignments
         </div>
-        <ul v-else>
+        <ul v-else class="canvas-assignments">
             <li v-for="assignment in assignments.assignments" :key="assignment.id">
-                <p>
                 {{ assignment.context_name }} <a :href="assignment.html_url">{{ assignment.title }}</a>
-            </p>
-                <p class="meta">Due: <time>{{ assignment.end_at }}</time></p>
+                <div class="meta">Due: <time>{{ assignment.end_at }}</time></div>
             </li>
         </ul>
 
-    </div>
+    </section>
 </template>
 
 <style lang="scss">
     //Styles linked to the component placed here
+    .canvas-assignments {
+        margin-bottom: 0px;
+        margin-left: 0.5rem;
+    }
+    .canvas-assignments li {
+        display: block;
+    }
 </style>

@@ -5,32 +5,9 @@
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Canvas Assignments</h2>
-            <section>
-                <div id="canvas-assignments-container">
-                    <canvas-assignments></canvas-assignments>
-                </div>
-
-                <ul class="information-list">
-                    {# % if assignments | length %}
-                        {%  for assignment in assignments %}
-                            {% if 'published' == assignment.workflow_state %}
-                                <li>
-                                    <div class="list-item">
-                                        <div class="card small-12 wrap-down">
-                                            <p>
-                                                {{ assignment.context_name }} <a href="{{ assignment.html_url }}">{{ assignment.title }}</a>
-                                            </p>
-                                            <p class="meta">Due: <time>{{ assignment.end_at|date("d/m/y H:m") }}</time></p>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                    <li>No Assignments Due</li>
-                    {% endif %#}
-                </ul>
-            </section>
+            <div id="canvas-assignments-container">
+                <canvas-assignments></canvas-assignments>
+            </div>
         </div>
     </div>
 </div>

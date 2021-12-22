@@ -115,6 +115,12 @@ class Controller extends Base
                 $tempAssign = $connection->retrieve('get', "/api/v1/calendar_events?{$courseParm}&type=assignment&end_date={$endDate}&as_user_id={$userId}", []);
                 $assignments = array_merge($assignments, $tempAssign);
             }
+
+            //fix end_date for assignments to make it more user friendly...
+            foreach ($assignments as $id => $assignment) {
+                $date = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $assignment['end_at']);
+                $assignments[$id]['end_at'] = $date->format("Y/m/d H:i");
+            }
         } catch (\RuntimeException $e) {
             return $this->getResponse()->content->set($this->buildJsonOutput([
                                                                           'error' => $e->getMessage(),
