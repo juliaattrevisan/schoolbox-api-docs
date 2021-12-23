@@ -449,7 +449,7 @@ class PastoralCest
 
         #WHEN sending a request to create a new pastoral record with the new pastoral type
         $student_jreed = $i->grabUser('jreed');
-        $heading = 'Automated Test Pastoral Record visibility grant access by group ' . time();
+        $heading = 'Automated Test Pastoral Record Pastoral Type ' . time();
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
         $createPastoral->setPastoralType($id);
@@ -473,7 +473,6 @@ class PastoralCest
     {
 
         #GIVEN a new pastoral type is created
-        $name = 'Automated Pastoral Type ' . time();
         $pastoralType = 4;
         $subTypeName = 'Automated Pastoral Bullying Sub Type ' . time();
         $id = $i->grabNumRecords('lu_pastoral_subtype');
@@ -483,7 +482,7 @@ class PastoralCest
 
         #WHEN sending a request to create a new pastoral record with the new pastoral type
         $student_jreed = $i->grabUser('jreed');
-        $heading = 'Automated Test Pastoral Record visibility grant access by group ' . time();
+        $heading = 'Automated Test Pastoral Record Pastoral Sub Type ' . time();
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
         $createPastoral->setPastoralType($pastoralType);
@@ -497,6 +496,47 @@ class PastoralCest
         $subTypeID = $i->grabFromDatabase('pastoral', 'subtype_id', ['heading' => $heading]);
         $i->assertEquals($subTypeID, $id);
     }
+
+    /** Test add pastoral action in the admin list
+     *  Fires off create a pastoral record step with the pastoral action
+     *
+     * @param IntegrationTester $i
+     */
+    public function addPastoralActions(IntegrationTester $i): void
+    {
+
+        #GIVEN a new pastoral type is created
+        $i->updateInDatabase('config', array('value' => '1'), array('name' => 'pastoral_action_enable'));
+        $pastoralName = 'Automated Pastoral Action' . time();
+        $id = $i->grabNumRecords('lu_pastoral_action');
+        $createPastoraAction = new Payload\Admin\Lists\PastoralActions($pastoralName, $id);
+
+        #WHEN the pastoral action request is sent
+        $i->sendRequest($createPastoraAction);
+
+        #THEN the pastoral action is added
+        $i->seeResponseCodeIs(200);
+
+        #WHEN sending a request to create a new pastoral record with the pastoral action
+        $i->haveInDatabase('pastoral_type_action', array('type_id' => 2, 'subtype_id' => null,'action_id' => 6));
+        $student_jreed = $i->grabUser('jreed');
+        $heading = 'Automated Test Pastoral Record with a Pastoral Action ' . time();
+        $pastoralType = 2;
+        $pastoralAction = 6;
+        $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
+        $createPastoral->setHeading($heading);
+        $createPastoral->setPastoralType($pastoralType);
+        $createPastoral->setPastoralActions($pastoralAction);
+        $i->amGoingTo('Send request create pastoral record with the new pastoral action for student #' . $student_jreed->getId());
+        $i->sendRequest($createPastoral);
+
+        #THEN the record is created with the new pastoral action
+        $i->seeResponseCodeIs(303);
+        $pastoralRecord =  $i->grabFromDatabase('pastoral', 'id', ['heading' => $heading]);
+        $actionId = $i->grabFromDatabase('pastoral_record_action', 'action_id', ['pastoral_id' => $pastoralRecord]);
+        $i->assertEquals($pastoralAction, $actionId);
+    }
+
 
     /**
      * Convenience method to create a default pastoral record via the API

@@ -29,6 +29,7 @@ class Create extends Request
         $this->setFormParam('severityId', '1');
         $this->setFormParam('points', '');
         $this->setFormParam('tags', '');
+        $this->setFormParam('actions[]', '');
         $this->setFormParam('body_public', '');
         $this->setFormParam('body_private', '');
     }
