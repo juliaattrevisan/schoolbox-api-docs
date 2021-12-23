@@ -38,7 +38,7 @@ class Component_Config_Team extends Component_Config_Abstract
         $page->setVar(
             array(
                 'COMPONENT_TEAM_ID'      => $team->getId(),
-                'COMPONENT_TEAM_NAME'    => $team->getName()
+                'COMPONENT_TEAM_NAME'    => "{$team->getName()} ({$team->getDivision()->getSport()->getName()} / {$team->getDivision()->getName()})"
             )
         );
     }

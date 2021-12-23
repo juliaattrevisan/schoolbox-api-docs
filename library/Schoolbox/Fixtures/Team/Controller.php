@@ -364,7 +364,10 @@ class Controller extends AbstractController
                 ];
                 continue;
             }
-            $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
+            $teams[] = [
+                'id' => $currentTeam->getId(),
+                'name' => "{$currentTeam->getName()} ({$currentTeam->getDivision()->getSport()->getName()} / {$currentTeam->getDivision()->getName()})"
+            ];
         }
 
         // If the 'schools' parameter is set we also want to add schools from the tag cloud

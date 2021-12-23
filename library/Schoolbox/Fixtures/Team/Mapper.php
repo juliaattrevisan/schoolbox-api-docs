@@ -17,6 +17,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Fixtures\Coach;
 use Schoolbox\Fixtures\Division;
 use Schoolbox\Fixtures\Season;
+use Schoolbox\Fixtures\Sport;
 
 /**
  * Class Mapper
@@ -43,6 +44,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+//        $this->joins('division_id.sport_id', Sport\Mapper::class, 'id', null, null, 'sport', 'sport');
         $this->joinsVia(
             'sportsfixtures_team_coach',
             Coach\Mapper::class,
@@ -64,14 +66,15 @@ class Mapper extends BaseMapper
      *
      * @return string
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         return "
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('sportsfixtures_team_coach', 'coaches')},
                 {$this->getJoinColumnString('division', 'd')},
-                {$this->getJoinColumnString('division.season', 's')}
+                {$this->getJoinColumnString('division.season', 's')},
+                {$this->getJoinColumnString('division.sport', 'sp')}
         ";
     }
 
@@ -82,13 +85,14 @@ class Mapper extends BaseMapper
      *
      * @return string
      */
-    protected function getFromString()
+    protected function getFromString(): string
     {
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('sportsfixtures_team_coach', null, 'coaches')}
             JOIN {$this->getJoinSql('division', null, 'd', true)}
             JOIN {$this->getJoinSql('division.season', 'd', 's', true)}
+            JOIN {$this->getJoinSql('division.sport', 'd', 'sp', true)}
         ";
     }
 
@@ -97,7 +101,7 @@ class Mapper extends BaseMapper
      * @param PDOStatement $statement
      * @return Collection
      */
-    protected function hydrateSelect(PDOStatement $statement)
+    protected function hydrateSelect(PDOStatement $statement): Collection
     {
         /** @var Model[] $cache */
         $cache = [];
@@ -124,6 +128,10 @@ class Mapper extends BaseMapper
             /** @var Season\Model $season */
             $season = $this->hydrateJoin($r, 'division.season', 's');
             $cache[$teamId]->getDivision()->setSeason($season);
+
+            /** @var Sport\Model $sport */
+            $sport = $this->hydrateJoin($r, 'division.sport', 'sp');
+            $cache[$teamId]->getDivision()->setSport($sport);
         }
 
         return $this->createCollection($cache);
