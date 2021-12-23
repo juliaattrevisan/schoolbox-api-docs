@@ -282,16 +282,12 @@ HELP;
 
 
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
-     *
+     * Script does not modify the filesystem, so it does not care who it is run as
      * @return bool|null
      */
     public function runAsRoot(): ?bool
     {
-        return parent::runAsRoot();
+        return null;
     }
 };
 
