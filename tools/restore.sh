@@ -883,7 +883,7 @@ fi
 
 # Restart schoolbox services
 echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
-"$package"cloud-restart-daemons "$destination_instance_id";
+/usr/share/"$package"/tools/notif/allrestart "$destination_instance_id"
 
 echo -e "Rebuilding cron jobs (because timezone may be different in new DB). Assuming this host is primary"
 schoolboxcloud-rebuild-cronjobs --site-root "$instdir" --is-primary-host 1
