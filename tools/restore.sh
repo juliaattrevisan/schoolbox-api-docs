@@ -1,8 +1,7 @@
 #!/bin/bash
 # Schoolbox Restore
 # Description:
-#       Allows for restoring database and data files from another install or
-#       backup of Schoolbox.
+#       Allows for restoring database and data files from another install or backup of Schoolbox.
 #       Backup source as defined in /etc/schoolbox-backup-cifs.conf
 #       Remote sources as defined in /root/.ssh/config
 #
