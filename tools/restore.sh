@@ -39,9 +39,10 @@ readonly PRESERVED_CONFIG=(
   # Others
   "xml_dir" "file_dir"  "api_key"
 );
-# Associative array of config to preserve during restoration. Maps config_name to config_value.
-declare -A sql_config=();
-declare alaress_password;
+
+declare -A sql_config=();                # Associative array of config to preserve during restoration. Maps config_name to config_value.
+declare alaress_password;                # 'alaress' admin user password
+declare destination_site_type;           # site_type of instance we are restoring into
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
@@ -247,14 +248,14 @@ liveCheck() {
     temp_ini_file="/etc/schoolbox/instances.ini"
   fi
   read_ini "$destination_instance_id"
-  site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
+  destination_site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
 
-  if [[ $site_type == 'dev' ]]; then
+  if [[ $destination_site_type == 'dev' ]]; then
     echo "Looks like it is a vagrant instance. Ok." >&2
-  elif [[ $site_type == 'stg' ]]; then
+  elif [[ $destination_site_type == 'stg' ]]; then
     echo "Looks like it is a STG instance. Ok." >&2
   else
-    echo "site_type: '$site_type'" >&2
+    echo "Destination site_type: '$destination_site_type'" >&2
 		if [ "$syncType" != "local" ]; then
       echo -e "\033[0;33m";
 			echo "Not a DEV or STG instance. Just in case, pretty sure you don't want to run a sync from the STG to the PRD server. If you really really do, run the restore script with the -local flag to override";
@@ -836,8 +837,7 @@ setdebugstacktrace () {
   mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='debug_show_stack_trace'";
 }
 titleprefix='';
-if [ "$package" = 'vagrant' ];
-then
+if [ "$destination_site_type" = 'dev' ]; then
 	titleprefix='[Vagrant]';
 	updatetitle;
 	setmailcatcher;
@@ -845,8 +845,7 @@ then
 	setdebugstacktrace;
 	truncateTables;
 fi
-if [ "$package" = 'schoolboxdev' ];
-then
+if [ "$destination_site_type" = 'stg' ]; then
 	titleprefix='[Staging]';
 	updatetitle;
 	setmailcatcher;
