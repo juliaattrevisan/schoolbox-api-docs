@@ -220,20 +220,29 @@ truncateTables() {
 }
 
 liveCheck() {
-	echo "Making sure this is a dev server..."
+  echo "Checking site_type of instance being restored to..."
 
-	if [ "$package" = "schoolboxdev" ]; then
-    echo "Looks like it is a dev server!"
-  elif [ "$package" = 'vagrant' ]; then
-    echo "Looks like it is a vagrant server!"
+  if [[ $package == 'schoolboxdev' ]]; then
+    temp_ini_file="/etc/schoolboxdev/instances.ini"
   else
+    temp_ini_file="/etc/schoolbox/instances.ini"
+  fi
+  read_ini
+  site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
+
+  if [[ $site_type == 'dev' ]]; then
+    echo "Looks like it is a vagrant instance. Ok." >&2
+  elif [[ $site_type == 'stg' ]]; then
+    echo "Looks like it is a STG instance. Ok." >&2
+  else
+    echo "site_type: '$site_type'" >&2
 		if [ "$syncType" != "local" ]; then
       echo -e "\033[0;33m";
-			echo "Not a dev server. Just in case, pretty sure you don't want to run a sync from the dev to the live server. If you really really do, run the restore script with the -local flag to override";
+			echo "Not a DEV or STG instance. Just in case, pretty sure you don't want to run a sync from the STG to the PRD server. If you really really do, run the restore script with the -local flag to override";
       echo -e "\033[0m";
 			exit 1;
 		else
-			echo "You have chosen to retore a local backup to this server. Proceed with caution";
+			echo "You have chosen to restore a local backup to this server. Proceed with caution";
 		fi
 	fi
 }
