@@ -70,7 +70,17 @@ get_destination_instance_id(){
       i=0
       for instance in $instance_list; do
         ((i++))
-        echo "$i. $instance" >&2
+        echo -n "$i. $instance (" >&2
+        hostnames=$(INSTANCE_ID="$instance" schoolbox-read-instances --ini "$ini_file" --option hostnames)
+        hostname_idx=0
+        for hostname in $hostnames; do
+          ((hostname_idx++))
+          if [[ $hostname_idx -gt 1 ]]; then
+            echo -n "," >&2
+          fi
+          echo -n "$hostname" >&2
+        done
+        echo ")" >&2
       done
       read -r -p 'Choice: ' choice
       if [[ $choice -lt 1 ]] || [[ $choice -gt $i ]]; then
