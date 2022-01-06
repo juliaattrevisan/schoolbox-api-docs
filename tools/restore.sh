@@ -19,7 +19,10 @@ fi
 # Names of config that should be preserved when performing a restoration
 readonly PRESERVED_CONFIG=(
   # Retrieve some of the Schoolbox config from MySQL using provided credentials
-  "site_hostname" "site_domain" "amqp_user" "amqp_pass" "amqp_vhost"
+  "site_hostname" "site_domain" "site_type" "title"
+
+  # AMQP credentials
+  "amqp_user" "amqp_pass" "amqp_vhost"
 
   # External DB Config
   "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
@@ -861,9 +864,10 @@ if [[ $syncType == "db" ]]; then
 fi
 
 # If a shared host, need to truncate etherpad to prevent updates/deletes from staging destroying production data
-if [ -f /usr/share/schoolbox/www/index.php ] && [ -f /usr/share/schoolboxdev/www/index.php ]; then
-    echo "Shared stg/prd host detected, truncating 'etherpad_pad' table";
-    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE etherpad_pad";
+# (First test is old single-instance arch, second test is new multi-instance arch)
+if { [ -f /usr/share/schoolbox/www/index.php ] && [ -f /usr/share/schoolboxdev/www/index.php ]; } || { [ -f /etc/schoolbox/instances.ini ] && [[ $(schoolbox-read-instances --option instance-list | wc -l) -gt 1 ]] ;}; then
+  echo "Shared stg/prd host detected, truncating 'etherpad_pad' table";
+  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE etherpad_pad";
 fi
 
 # Restart nginx
