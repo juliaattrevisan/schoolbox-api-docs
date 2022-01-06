@@ -82,7 +82,7 @@ get_destination_instance_id(){
         done
         echo ")" >&2
       done
-      read -r -p 'Choice: ' choice
+      read -r -p "Choice (1-$i): " choice
       if [[ $choice -lt 1 ]] || [[ $choice -gt $i ]]; then
         echo "Invalid choice" >&2
       else
@@ -94,7 +94,13 @@ get_destination_instance_id(){
     echo "$instance_list"
   fi
 }
-destination_instance_id="$(get_destination_instance_id)"
+
+# Determine which instance to restore into
+if [[ -n $INSTANCE_ID ]]; then
+  destination_instance_id=$INSTANCE_ID
+else
+  destination_instance_id="$(get_destination_instance_id)"
+fi
 if [[ -z "$destination_instance_id" ]]; then
   echo "Unable to derive destination instance_id" >&2
   exit 1
@@ -137,40 +143,53 @@ readconf() {
 	tempsqldb=$(schoolbox-conf --conf="$tempconffile" --option=SQL_db);
 }
 declare temp_ini_file;
+
+# Reads SQL credentials from ini file
+# Selects instance in order of preference:
+# 1. As specified explicitly by param
+# 2. If only a single instance found in ini file
+# 3. If multiple instances in ini file, prompt user to select
+# prompt user to select
 read_ini() {
-  # Collect Credentials from $temp_ini_file
-  instance_list=$(schoolbox-read-instances --ini "$temp_ini_file" --option instance-list)
-  if [[ $(echo "$instance_list" | wc -l) -gt 1 ]]; then
-    # Multiple instances in instances.ini file. Prompt user to select an instance.
-    valid_selection=0
-    while [[ $valid_selection == 0 ]]; do
-      line_idx=0
-      for instance_id in $instance_list; do
-        ((line_idx++))
-        echo -n "$line_idx: $instance_id ("
-        hostnames=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option hostnames)
-        hostname_idx=0
-        for hostname in $hostnames; do
-          ((hostname_idx++))
-          if [[ $hostname_idx -gt 1 ]]; then
-            echo -n ","
-          fi
-          echo -n "$hostname"
+  local instance_id=$1
+
+  # Was instance_id not explicitly declared?
+  if [[ -z $instance_id ]]; then
+    # Collect Credentials from $temp_ini_file
+    instance_list=$(schoolbox-read-instances --ini "$temp_ini_file" --option instance-list)
+    if [[ $(echo "$instance_list" | wc -l) -gt 1 ]]; then
+      # Multiple instances in instances.ini file. Prompt user to select an instance.
+      valid_selection=0
+      while [[ $valid_selection == 0 ]]; do
+        line_idx=0
+        for instance_id in $instance_list; do
+          ((line_idx++))
+          echo -n "$line_idx: $instance_id ("
+          hostnames=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option hostnames)
+          hostname_idx=0
+          for hostname in $hostnames; do
+            ((hostname_idx++))
+            if [[ $hostname_idx -gt 1 ]]; then
+              echo -n ","
+            fi
+            echo -n "$hostname"
+          done
+          echo ")"
         done
-        echo ")"
+        read -r -p "Choice (1-$line_idx): " instance_id_idx
+        if [[ $instance_id_idx -lt 1 ]] || [[ $instance_id_idx -gt $line_idx ]]; then
+          echo "Invalid selection, enter a value from (1-$line_idx)" >&2
+        else
+          valid_selection=1
+          instance_id=$(echo "$instance_list" | head -n "$instance_id_idx" | tail -n 1)
+        fi
       done
-      read -r -p "Option (1-$line_idx): " instance_id_idx
-      if [[ $instance_id_idx -lt 1 ]] || [[ $instance_id_idx -gt $line_idx ]]; then
-        echo "Invalid selection, enter a value from (1-$line_idx)" >&2
-      else
-        valid_selection=1
-        instance_id=$(echo "$instance_list" | head -n "$instance_id_idx" | tail -n 1)
-      fi
-    done
-  else
-    # Only 1 instance in instances.ini file
-    instance_id=$instance_list
+    else
+      # Only 1 instance in instances.ini file
+      instance_id=$instance_list
+    fi
   fi
+
   tempsqluser=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_user);
   tempsqlpasswd=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_passwd);
   tempsqlhost=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_host);
@@ -227,7 +246,7 @@ liveCheck() {
   else
     temp_ini_file="/etc/schoolbox/instances.ini"
   fi
-  read_ini
+  read_ini "$destination_instance_id"
   site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
 
   if [[ $site_type == 'dev' ]]; then
@@ -404,6 +423,7 @@ do
     if scp $host:/etc/schoolbox/instances.ini /tmp >/dev/null 2>&1; then
       remote_found=1
       temp_ini_file="/tmp/instances.ini"
+      echo ""
       read_ini
     # fallback to old conf arch.
     elif scp $host:/etc/schoolbox/conf.php /tmp >/dev/null 2>&1; then
