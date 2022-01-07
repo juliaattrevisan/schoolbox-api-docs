@@ -9,11 +9,7 @@ declare(strict_types=1);
 
 define('SITE_root', dirname(__DIR__, 2));
 define('WEB_root', SITE_root . '/www');
-
-# TODO remove this when we standardise environments, this will always be 'schoolbox'
-$siteRootDirs = explode(DIRECTORY_SEPARATOR, SITE_root);
-$sideRootDir  = end($siteRootDirs);
-$package      = $sideRootDir === "schoolboxdev" ? "schoolboxdev" : "schoolbox"; // note that 'vagrant' maps to 'schoolbox' package
+$package      = 'schoolbox';
 
 // Are we executing in the context of a specific tenant/instance?
 $instances  = parse_ini_file("/etc/$package/instances.ini", true);
