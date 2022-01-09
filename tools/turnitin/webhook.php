@@ -81,15 +81,15 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Register Turnitin webhooks. Turnitin posts payloads to a schoolbox endpoint(s) when it 
+Register Turnitin webhooks. Turnitin posts payloads to a schoolbox endpoint(s) when it
 finishes various stages of its processing - upload of documents, generation of reports,
 and updating of the report contents. Each webhook's endpoint is an absolute url so that
-Turnitin can send stuff there. 
+Turnitin can send stuff there.
 
 Every now and then you might need to set up the webhook urls again, such as when an
 absolute url changes name or if something is just broken.
 
-The --instance flag isn't used at the moment, but infra might need it later so I 
+The --instance flag isn't used at the moment, but infra might need it later so I
 kept it in here for their convenience.
 
 Get a diagnostic list of all currently registered webhooks:
@@ -97,7 +97,7 @@ Get a diagnostic list of all currently registered webhooks:
 
 Forcibly register all webhooks again:
     Usage: webhook.php [--instance=INSTANCE_ID] [--reset]
-    
+
 
 HELP;
             exit;
@@ -183,7 +183,7 @@ HELP;
         $payload = [
             'signing_secret' => base64_encode('aaa'),
             'description' => 'Unified Turnitin Endpoint',
-            'url' => 'https:' . (new Factory($this->getConfig()))->buildFullyQualified() . self::WEBHOOK_URL,
+            'url' => (new Factory($this->getConfig()))->buildFullyQualified() . self::WEBHOOK_URL,
             'event_types' => [
                 TurnitinController::SUBMISSION_COMPLETE,
                 TurnitinController::SIMILARITY_COMPLETE,
@@ -282,16 +282,12 @@ HELP;
 
 
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
-     *
+     * Script does not modify the filesystem, so it does not care who it is run as
      * @return bool|null
      */
     public function runAsRoot(): ?bool
     {
-        return parent::runAsRoot();
+        return null;
     }
 };
 
