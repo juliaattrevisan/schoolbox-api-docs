@@ -10,11 +10,10 @@
  */
 class Leave_Core_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory
 {
-
     /**
      * Produce a notification for the request based on status.
      *
-     * @return Leave_Core_Notice_Admin_Abstract
+     * @return Leave_Core_Notice_Admin_Abstract|null
      */
     public function produce()
     {
@@ -24,13 +23,18 @@ class Leave_Core_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory
         $request = $this->getRequest();
         if ($request->isPending()) {
             $notice = new Leave_Core_Notice_Admin_Submitted($request);
-            $notice->setup();
         } else if ($request->isApproved()) {
             $notice = new Leave_Core_Notice_Admin_Authorised($request);
-            $notice->setup();
         } else if ($request->isRejected()) {
             $notice = new Leave_Core_Notice_Admin_Rejected($request);
-            $notice->setup();
+        }
+
+        if ($notice) {
+            try {
+                $notice->setup();
+            } catch (TypeError $e) {
+                return null;
+            }
         }
         return $notice;
     }

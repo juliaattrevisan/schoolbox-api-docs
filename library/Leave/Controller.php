@@ -1632,7 +1632,10 @@ class Leave_Controller extends Controller
         /* Choose the Factory, have it produce() the notice object and send
          */
         $leaveFactory = new Leave_Notice_Factory($request);
-        $leaveFactory->produceUserFactory()->produce()->send();
+        $notice       = $leaveFactory->produceUserFactory()->produce();
+        if ($notice) {
+            $notice->send();
+        }
     }
 
     /**
@@ -1646,7 +1649,10 @@ class Leave_Controller extends Controller
             /* Choose the Factory, have it produce() the notice object and send
              */
             $leaveFactory = new Leave_Notice_Factory($request);
-            $leaveFactory->produceParentFactory()->produce()->send();
+            $notice       = $leaveFactory->produceParentFactory()->produce();
+            if ($notice) {
+                $notice->send();
+            }
         }
     }
 
@@ -1661,7 +1667,10 @@ class Leave_Controller extends Controller
     public function sendAdminNotice($request)
     {
         $leaveFactory = new Leave_Notice_Factory($request);
-        $leaveFactory->produceAdminFactory()->produce()->send();
+        $notice       = $leaveFactory->produceAdminFactory()->produce();
+        if ($notice) {
+            $notice->send();
+        }
     }
 
     /**
