@@ -81,6 +81,7 @@ class Module extends BaseModule
         $this->register('GET', '/class/lists/{folderId}', 'getStudentListByClassId', $this->canAccessClassLists(), $preloadFolder);
 
         $this->register('GET', '/class/{folderId}', 'getClassListPage', $this->canAccessClassLists(), $preloadFolder);
+        $this->register('GET', '/assessment-audit/{folderId}', 'getAssessmentAudit', new Rule\IsSuperuser(), $preloadFolder);
     }
 
     /**

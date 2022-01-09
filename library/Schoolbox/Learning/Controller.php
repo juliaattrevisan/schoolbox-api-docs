@@ -494,4 +494,46 @@ class Controller extends Base
 
         return json_encode($result);
     }
+
+    /**
+     * displays / downloads csv of all assessments within a folder
+     *
+     *
+     * @api   GET /learning/assessment-audit/{folder}
+     *
+     * @param Folder\Model $folder
+     */
+    public function getAssessmentAudit(Folder\Model $folder)
+    {
+        $assMapper = Assessment\DataModel\Mapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
+        //get all children folders
+        $allFolders = $folderMapper->findAllChildren($folder->getId(), true);
+        //start finding the assessments within the current folder
+        $assessments = $assMapper->findAllForFolderId($folder->getId(), $assMapper->getPredicateBuilder());
+        foreach ($allFolders as $folder) {
+            //grab all assessments within each child folder
+            $ass = $assMapper->findAllForFolderId($folder->getId(), $assMapper->getPredicateBuilder());
+            $assessments = $assessments->merge($ass);
+        }
+
+        //build the csv
+        $rowHeadings = ['AssessmentId', 'AssessmentTitle'];//, /*'folderId', 'folderName', 'classCode',*/ 'workType'];//, 'commonTask', 'OnlineSubs', 'SimCheck', 'MarkType'];
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings);
+        foreach ($assessments as $assessment) {
+            fputcsv($fp, [
+                $assessment->getId(),
+                $assessment->getTitle(),
+//                $assessment->getContextFolder()->getId(),
+//                $assessment->getContextFolder()->getTitle(),
+//                $assessment->getContextFolder()->getCodeString(),
+//                $assessment->getWorkType()->getName()
+            ]);
+        }
+        fclose($fp);
+    }
 }
