@@ -33,49 +33,31 @@ class Leave_Notice_Factory
     /**
      * Produce a Parent factory
      *
-     * @return mixed
+     * @return Leave_Notice_Abstract_Factory
      */
-    public function produceParentFactory()
+    public function produceParentFactory(): Leave_Notice_Abstract_Factory
     {
-        $fullClassname = "Leave_{$this->getClassname()}_Notice_Parent_Factory";
-
-        if (!class_exists($fullClassname)) {
-            $fullClassname = "Leave_Core_Notice_Parent_Factory";
-        }
-
-        return new $fullClassname($this->getRequestData());
+        return new Leave_Core_Notice_Parent_Factory($this->getRequestData());
     }
 
     /**
      * Produce a User factory
      *
-     * @return mixed
+     * @return Leave_Notice_Abstract_Factory
      */
-    public function produceUserFactory()
+    public function produceUserFactory(): Leave_Notice_Abstract_Factory
     {
-        $fullClassname = "Leave_{$this->getClassname()}_Notice_User_Factory";
-
-        if (!class_exists($fullClassname)) { //Default to core
-            $fullClassname = "Leave_Core_Notice_User_Factory";
-        }
-
-        return new $fullClassname($this->getRequestData());
+        return new Leave_Core_Notice_User_Factory($this->getRequestData());
     }
 
     /**
      * Produce an Admin factory
      *
-     * @return mixed
+     * @return Leave_Notice_Abstract_Factory
      */
-    public function produceAdminFactory()
+    public function produceAdminFactory(): Leave_Notice_Abstract_Factory
     {
-        $fullClassname = "Leave_{$this->getClassname()}_Notice_Admin_Factory";
-
-        if (!class_exists($fullClassname)) { //Default to core
-            $fullClassname = "Leave_Core_Notice_Admin_Factory";
-        }
-
-        return new $fullClassname($this->getRequestData());
+        return new Leave_Core_Notice_Admin_Factory($this->getRequestData());
     }
 
     /* Getters/Setters
