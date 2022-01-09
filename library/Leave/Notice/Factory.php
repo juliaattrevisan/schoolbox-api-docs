@@ -16,18 +16,16 @@
  */
 class Leave_Notice_Factory
 {
-    private $requestData = null;
-    private $classname   = '';
+    private Leave_Request $requestData;
 
     /**
      * Constructor
      *
      * @param Leave_Request $requestData
      */
-    public function __construct($requestData)
+    public function __construct(Leave_Request $requestData)
     {
-        $this->setRequestData($requestData);
-        $this->setClassname(ucfirst(strtolower(Config::get('site_school_code'))));
+        $this->requestData = $requestData;
     }
 
     /**
@@ -37,7 +35,7 @@ class Leave_Notice_Factory
      */
     public function produceParentFactory(): Leave_Notice_Abstract_Factory
     {
-        return new Leave_Core_Notice_Parent_Factory($this->getRequestData());
+        return new Leave_Core_Notice_Parent_Factory($this->requestData);
     }
 
     /**
@@ -47,7 +45,7 @@ class Leave_Notice_Factory
      */
     public function produceUserFactory(): Leave_Notice_Abstract_Factory
     {
-        return new Leave_Core_Notice_User_Factory($this->getRequestData());
+        return new Leave_Core_Notice_User_Factory($this->requestData);
     }
 
     /**
@@ -57,49 +55,6 @@ class Leave_Notice_Factory
      */
     public function produceAdminFactory(): Leave_Notice_Abstract_Factory
     {
-        return new Leave_Core_Notice_Admin_Factory($this->getRequestData());
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set classname
-     *
-     * @param string $classname
-     */
-    private function setClassname($classname)
-    {
-        $this->classname = $classname;
-    }
-
-    /**
-     * Get classname
-     *
-     * @return string
-     */
-    private function getClassname()
-    {
-        return $this->classname;
-    }
-
-    /**
-     * Set request data
-     *
-     * @param Leave_Request $requestData
-     */
-    private function setRequestData($requestData)
-    {
-        $this->requestData = $requestData;
-    }
-
-    /**
-     * Get request data
-     *
-     * @return Leave_Request
-     */
-    private function getRequestData()
-    {
-        return $this->requestData;
+        return new Leave_Core_Notice_Admin_Factory($this->requestData);
     }
 }

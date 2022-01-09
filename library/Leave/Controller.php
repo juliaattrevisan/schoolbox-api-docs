@@ -1625,9 +1625,9 @@ class Leave_Controller extends Controller
     /**
      * Send email notification
      *
-     * @param \Leave_Request $request
+     * @param Leave_Request $request
      */
-    public function sendUserNotice($request)
+    public function sendUserNotice(Leave_Request $request)
     {
         /* Choose the Factory, have it produce() the notice object and send
          */
@@ -1641,9 +1641,9 @@ class Leave_Controller extends Controller
     /**
      * Send a notice to a parent when someone creates a leave request
      *
-     * @param \Leave_Request $request
+     * @param Leave_Request $request
      */
-    public function sendParentNotice($request)
+    public function sendParentNotice(Leave_Request $request)
     {
         if (Config::get('boarder_leave_parent_notification_enabled')) {
             /* Choose the Factory, have it produce() the notice object and send
@@ -1662,9 +1662,9 @@ class Leave_Controller extends Controller
      * At Kings Live, parent_notification started saving as integer 1/0, instead
      * of the usual true/false string?
      *
-     * @param \Leave_Request $request
+     * @param Leave_Request $request
      */
-    public function sendAdminNotice($request)
+    public function sendAdminNotice(Leave_Request $request)
     {
         $leaveFactory = new Leave_Notice_Factory($request);
         $notice       = $leaveFactory->produceAdminFactory()->produce();
