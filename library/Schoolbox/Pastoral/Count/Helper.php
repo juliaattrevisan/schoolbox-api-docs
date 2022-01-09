@@ -278,20 +278,10 @@ class Helper
             $studentTypeId    = $studentCount->getOffset('typeId');
 
             /**
-             * handle the cases where pastoral types/subtypes are deleted
-             */
-            if (
-                ($studentSubTypeId && !$pastoralSubtypes->offsetExists($studentSubTypeId))
-                || ($studentTypeId && !$pastoralTypes->offsetExists($studentTypeId))
-            ) {
-                continue;
-            }
-
-            /**
              * checking whether the subtype is within the whitelist is important, because it's possible to assign a
              * subtype after its been created and assigned.
              */
-            if ($studentCount->offsetExists('subtypeId')) {
+            if ($studentSubTypeId && $pastoralSubtypes->offsetExists($studentSubTypeId)) {
                 /** @var PastoralSubType|null $subtype */
                 $subtype         = $pastoralSubtypes->getOffset($studentSubTypeId);
                 $foregroundColor = $subtype->getColor();
@@ -300,7 +290,7 @@ class Helper
                     ->setOffset('title', sprintf("%s: %s", $subtype->getPastoralType()->getName(), $subtype->getName()))
                     ->setOffset('subSequence', $subtype->getSequence())
                     ->setOffset('sequence', $subtype->getPastoralType()->getSequence());
-            } else {
+            } elseif ($studentTypeId && $pastoralTypes->offsetExists($studentTypeId)) {
                 /** @var PastoralType|null $type */
                 $type            = $pastoralTypes->getOffset($studentTypeId);
                 $foregroundColor = $type->getColor();
@@ -309,7 +299,10 @@ class Helper
                     ->setOffset('title', $type->getName())
                     ->setOffset('subSequence', 0)
                     ->setOffset('sequence', $type->getSequence());
+            } else {
+                continue;
             }
+
             /** @noinspection PhpUnhandledExceptionInspection */
             $destinationUrl = sprintf(
                 "%s?type=%s&subtype=%s",
