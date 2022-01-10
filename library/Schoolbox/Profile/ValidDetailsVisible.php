@@ -71,9 +71,8 @@ class ValidDetailsVisible
             return $viewer->isSuperuser();
         }
 
-        // Super user can see any user's detail
         // A viewer can see self
-        if ($viewer->isSuperuser() || ($viewer->getId() === $viewee->getId())) {
+        if ($viewer->getId() === $viewee->getId()) {
             return true;
         }
 
