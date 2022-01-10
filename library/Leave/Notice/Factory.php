@@ -16,108 +16,45 @@
  */
 class Leave_Notice_Factory
 {
-    private $requestData = null;
-    private $classname   = '';
+    private Leave_Request $requestData;
 
     /**
      * Constructor
      *
      * @param Leave_Request $requestData
      */
-    public function __construct($requestData)
-    {
-        $this->setRequestData($requestData);
-        $this->setClassname(ucfirst(strtolower(Config::get('site_school_code'))));
-    }
-
-    /**
-     * Produce a Parent factory
-     *
-     * @return mixed
-     */
-    public function produceParentFactory()
-    {
-        $fullClassname = "Leave_{$this->getClassname()}_Notice_Parent_Factory";
-
-        if (!class_exists($fullClassname)) {
-            $fullClassname = "Leave_Core_Notice_Parent_Factory";
-        }
-
-        return new $fullClassname($this->getRequestData());
-    }
-
-    /**
-     * Produce a User factory
-     *
-     * @return mixed
-     */
-    public function produceUserFactory()
-    {
-        $fullClassname = "Leave_{$this->getClassname()}_Notice_User_Factory";
-
-        if (!class_exists($fullClassname)) { //Default to core
-            $fullClassname = "Leave_Core_Notice_User_Factory";
-        }
-
-        return new $fullClassname($this->getRequestData());
-    }
-
-    /**
-     * Produce an Admin factory
-     *
-     * @return mixed
-     */
-    public function produceAdminFactory()
-    {
-        $fullClassname = "Leave_{$this->getClassname()}_Notice_Admin_Factory";
-
-        if (!class_exists($fullClassname)) { //Default to core
-            $fullClassname = "Leave_Core_Notice_Admin_Factory";
-        }
-
-        return new $fullClassname($this->getRequestData());
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set classname
-     *
-     * @param string $classname
-     */
-    private function setClassname($classname)
-    {
-        $this->classname = $classname;
-    }
-
-    /**
-     * Get classname
-     *
-     * @return string
-     */
-    private function getClassname()
-    {
-        return $this->classname;
-    }
-
-    /**
-     * Set request data
-     *
-     * @param Leave_Request $requestData
-     */
-    private function setRequestData($requestData)
+    public function __construct(Leave_Request $requestData)
     {
         $this->requestData = $requestData;
     }
 
     /**
-     * Get request data
+     * Produce a Parent factory
      *
-     * @return Leave_Request
+     * @return Leave_Notice_Abstract_Factory
      */
-    private function getRequestData()
+    public function produceParentFactory(): Leave_Notice_Abstract_Factory
     {
-        return $this->requestData;
+        return new Leave_Core_Notice_Parent_Factory($this->requestData);
+    }
+
+    /**
+     * Produce a User factory
+     *
+     * @return Leave_Notice_Abstract_Factory
+     */
+    public function produceUserFactory(): Leave_Notice_Abstract_Factory
+    {
+        return new Leave_Core_Notice_User_Factory($this->requestData);
+    }
+
+    /**
+     * Produce an Admin factory
+     *
+     * @return Leave_Notice_Abstract_Factory
+     */
+    public function produceAdminFactory(): Leave_Notice_Abstract_Factory
+    {
+        return new Leave_Core_Notice_Admin_Factory($this->requestData);
     }
 }

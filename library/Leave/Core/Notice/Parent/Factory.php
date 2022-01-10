@@ -9,11 +9,10 @@
  */
 class Leave_Core_Notice_Parent_Factory extends Leave_Notice_Abstract_Factory
 {
-
     /**
-     * Produce a family of Kings Parent Notifications based on status
+     * Produce a family of Parent Notifications based on status
      *
-     * @return Leave_Core_Notice_Parent_Authorised|Leave_Core_Notice_Parent_Rejected|Leave_Core_Notice_Parent_Submitted|null
+     * @return Leave_Core_Notice_Parent_Abstract|null
      */
     public function produce()
     {
@@ -21,15 +20,19 @@ class Leave_Core_Notice_Parent_Factory extends Leave_Notice_Abstract_Factory
 
         if ($this->getRequest()->isPending()) {
             $notice = new Leave_Core_Notice_Parent_Submitted($this->getRequest());
-            $notice->setup();
         } else if ($this->getRequest()->isApproved()) {
             $notice = new Leave_Core_Notice_Parent_Authorised($this->getRequest());
-            $notice->setup();
         } else if ($this->getRequest()->isRejected()) {
             $notice = new Leave_Core_Notice_Parent_Rejected($this->getRequest());
-            $notice->setup();
         }
 
+        if ($notice) {
+            try {
+                $notice->setup();
+            } catch (TypeError $e) {
+                return null;
+            }
+        }
         return $notice;
     }
 }

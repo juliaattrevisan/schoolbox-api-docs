@@ -20,8 +20,6 @@ abstract class Leave_Notice_Abstract_Notice
     public function __construct(Leave_Request $request)
     {
         $this->setRequest($request);
-
-        $this->setup();
     }
 
     abstract public function setup();
