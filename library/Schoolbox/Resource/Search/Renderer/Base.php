@@ -152,8 +152,8 @@ abstract class Base
             ));
 
             $this->getPage()->parse('pagination_block', 'pagination', true);
-        } // only 1 page to display
-        else {
+        } else {
+            // only 1 page to display
             $this->getPage()->setVar('pagination_block');
         }
 

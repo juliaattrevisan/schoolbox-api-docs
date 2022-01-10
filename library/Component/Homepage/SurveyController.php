@@ -135,8 +135,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
                             // If the last assess is not completed provide resume link
-                            if (
-                                !$attempt['finish']
+                            if (!$attempt['finish']
                                 && ($attemptTimeRemaining < 0
                                     || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION
                                 )

@@ -874,7 +874,7 @@ interface IAssessable extends ISoftDeletable
     public function setUpdatedAt(\Alaress_Date_Format $updatedAt = null);
 
     /**
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
      */
     public function getDeletedAt();
 

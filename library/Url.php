@@ -25,7 +25,7 @@ class Url
      * Intentionally does not auto-prepend a protocol to otherwise valid absolute URLs.
      * This ensures caller retains control of protocol prepending.
      *
-     * @param string $url
+     * @param string      $url
      * @param string|null $siteHost Override data-base configured siteHost. Used in tests or CLI context.
      * @throws InvalidArgumentException if $url is not a string
      * @throws DomainException If cannot determine the SB instance's configured hostname. This is required for determining relativity.
@@ -41,7 +41,7 @@ class Url
         // No override, use config
         if (null === $siteHost) {
             $site_hostname = trim(Config::get('site_hostname'));
-            $site_domain = trim(Config::get('site_domain'));
+            $site_domain   = trim(Config::get('site_domain'));
 
             // Is domain part set ?
             if ($site_domain) {
@@ -51,12 +51,12 @@ class Url
                 } else {
                     $this->setSiteHost($site_domain);
                 }
-            } // Is host part set?
-            else {
+            } else {
+                // Is host part set?
                 if ($site_hostname) {
                     $this->setSiteHost($site_hostname);
-                } // Unable to determine instance hostname
-                else {
+                } else {
+                    // Unable to determine instance hostname
                     throw new DomainException('No hostname explicitly supplied, or retrievable from Database');
                 }
             }
@@ -69,8 +69,8 @@ class Url
      * If Local, convert to relative form.
      * If Not Local, ensure protocol is present.
      *
-     * @throws InvalidArgumentException If unable to parse URL
      * @return static
+     * @throws InvalidArgumentException If unable to parse URL
      */
     public function normalise()
     {
