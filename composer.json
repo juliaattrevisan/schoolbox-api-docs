@@ -144,5 +144,11 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "codeception/module-phpbrowser": "^1.0",
         "fakerphp/faker": "^1.17"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "ramsey/composer-repl": true
+        }
     }
 }
