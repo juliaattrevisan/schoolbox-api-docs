@@ -595,6 +595,19 @@ class SitePage extends Page
      */
     public static function redirectToBrokenImage($code = 500, $options = [])
     {
+        static::localRedir(self::getBrokenImagePath($code, $options), false, 307);
+    }
+
+    /**
+     * Generates a broken image path.
+     *
+     * @param int   $code    The HTTP error number
+     * @param array $options Options for the size and transformation of the
+     *                       broken image.
+     * @return string
+     */
+    public static function getBrokenImagePath($code = 500, $options = []): string
+    {
         $query           = [
             'code'           => true,
             'width'          => true,
@@ -604,9 +617,8 @@ class SitePage extends Page
         ];
         $options['code'] = $code;
         $options         = array_intersect_key($options, $query);
-        static::localRedir("/images/fail.php?" . http_build_query($options), false, 307);
+        return "/images/fail.php?" . http_build_query($options);
     }
-
 
     /**
      * Forces a redirect to the login page, by throwing an unauthenticated

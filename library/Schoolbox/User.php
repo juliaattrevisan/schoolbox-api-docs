@@ -10,6 +10,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Image\Transformation\Portrait;
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Alaress\Json\Serializable;
@@ -1420,6 +1421,16 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
                     '/portrait.php?id=%s&size=%s',
                     urlencode($this->id),
                     urlencode(\Alaress\Image\Transformation\Storage::TRANSFORM_SQUARE64)
+                )
+            );
+        } else {
+            $links['avatar'] = new SitePageLink(
+                \SitePage::getBrokenImagePath(
+                    500,
+                    [
+                        'transform_type' => Portrait::getSlug(),
+                        'transform'      => \Alaress\Image\Transformation\Storage::TRANSFORM_SQUARE64,
+                    ]
                 )
             );
         }
