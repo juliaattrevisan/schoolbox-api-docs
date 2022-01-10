@@ -104,6 +104,7 @@ $app = new class extends CliTool\App {
     private function incrementColumn(string $tableName, string $column, int $diffDays): void
     {
         // Is column blacklisted?
+        // @phpstan-ignore-next-line: whilst blacklisted columns are currently empty, they may not be forever
         if (isset(self::BLACKLISTED_COLUMNS[$tableName]) && in_array($column, self::BLACKLISTED_COLUMNS[$tableName])) {
             return;
         }

@@ -124,6 +124,7 @@ class Series
             }
         }
         foreach ($resource->getRelatedResourceList() as $relatedResource) {
+            // @phpstan-ignore-next-line: I don't know how this can be considered to always be false
             if (array_key_exists($relatedResource->getId(), $relatedItems)) {
                 if (isset($difference)) {
                     foreach ($series as $occurenceStart) {

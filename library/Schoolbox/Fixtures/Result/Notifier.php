@@ -61,7 +61,7 @@ class Notifier extends AbstractModuleNotifier
     protected $teamPlayerMapper;
 
     /**
-     * @param null $dependencies
+     * @param mixed $dependencies
      */
     public function loadDependencies($dependencies = null)
     {

@@ -119,7 +119,7 @@ class Module extends RestfulModule
     }
 
     /**
-     * @return Mapper|Term\Mapper
+     * @return Term\Mapper
      * @throws \InvalidArgumentException If unable to find mapper class
      */
     private function getTermMapper()

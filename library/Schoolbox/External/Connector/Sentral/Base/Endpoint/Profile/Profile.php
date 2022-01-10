@@ -521,6 +521,7 @@ class Profile implements IStrategy
      * Assign campuses if they exist in the mapping
      * Otherwise quietly disregard bad data
      *
+     * @phpstan-ignore-next-line: this will eventually return a string
      * @return string|null
      */
     private function findCampusName(): ?string
@@ -742,6 +743,7 @@ class Profile implements IStrategy
     /**
      * Find legal alerts
      *
+     * @phpstan-ignore-next-line: this will eventually return a string
      * @return string|null
      */
     private function findLegal(): ?string

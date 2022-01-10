@@ -78,6 +78,7 @@ class CourseTeachers
         while ($row = $statement->fetch()) {
             $courseCanvasId                  = (int)$row['course.canvas_id'];
             $courseTeacherSisId              = $row['pseudonym.sis_user_id'];
+            // @phpstan-ignore-next-line: I don't know how this can be considered to always be null
             $courseTeacherUserId             = $externalIdToUserIdMap[$courseTeacherSisId] ?? null;
             $courseTeachers[$courseCanvasId] = (int)$courseTeacherUserId;
         }

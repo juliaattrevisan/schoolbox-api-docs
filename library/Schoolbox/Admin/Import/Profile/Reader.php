@@ -166,6 +166,7 @@ class Reader implements \Iterator
         }
 
         $metadata = stream_get_meta_data($this->fp);
+        // @phpstan-ignore-next-line: stream_get_meta_data _can_ contain seekable
         $seekable = $metadata['seekable'] ?? false;
         if (!$seekable) {
             throw new \RuntimeException('File stream does not support seeking');

@@ -92,6 +92,7 @@ class Url
         $this->prependScheme();
 
         // Is it now valid ?
+        // @phpstan-ignore-next-line: the line above may have mutated this object
         if ($this->isUrl()) {
             return $this;
         }

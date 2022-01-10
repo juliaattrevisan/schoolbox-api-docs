@@ -554,7 +554,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Get times for when periods begin and end
      *
-     * @return array|bool
+     * @return array
      * @throws InvalidArgumentException
      */
     private function getPeriodTimes()
