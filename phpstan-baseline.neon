@@ -21,6 +21,11 @@ parameters:
 			path: library/AjaxChat.php
 
 		-
+			message: "#^Dead catch \\- Alaress\\\\Database\\\\Exception is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Alaress/Application/Kernel.php
+
+		-
 			message: "#^Property Alaress\\\\Async\\\\AMQP\\\\AMQPConnector\\:\\:\\$conn \\(PhpAmqpLib\\\\Connection\\\\AMQPStreamConnection\\) does not accept null\\.$#"
 			count: 2
 			path: library/Alaress/Async/AMQP/AMQPConnector.php
@@ -71,11 +76,6 @@ parameters:
 			path: library/Alaress/Async/Queue/RedisQueue.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Alaress/Async/Stomp/Implementation/Stream/Connection.php
-
-		-
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Async/Test/Subscription.php
@@ -94,16 +94,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Alaress/Authorizer/Rule/LazyCallback.php
-
-		-
-			message: "#^Method Alaress_Cache_Abstract\\:\\:registerObserver\\(\\) should return Alaress_Cache_Abstract but return statement is missing\\.$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
-
-		-
-			message: "#^Property Alaress_Cache_Abstract\\:\\:\\$cachedTime \\(null\\) does not accept default value of type int\\.$#"
-			count: 1
-			path: library/Alaress/Cache/Abstract.php
 
 		-
 			message: "#^Cannot access an offset on bool\\.$#"
@@ -216,6 +206,11 @@ parameters:
 			path: library/Alaress/Database/Statement/Base.php
 
 		-
+			message: "#^Property Alaress\\\\Database\\\\Statement\\\\Base\\:\\:\\$statement \\(PDOStatement\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Alaress/Database/Statement/Base.php
+
+		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Transactor\\\\Base\\:\\:implicitCommit\\(\\)\\.$#"
 			count: 9
 			path: library/Alaress/Database/Transactor/Test/TransactorTest.php
@@ -297,7 +292,7 @@ parameters:
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 9
+			count: 6
 			path: library/Alaress/Date/Format.php
 
 		-
@@ -344,26 +339,6 @@ parameters:
 			message: "#^Function mssql_rows_affected not found\\.$#"
 			count: 1
 			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
-
-		-
-			message: "#^Constant TIDEWAYS_XHPROF_FLAGS_CPU not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
-
-		-
-			message: "#^Constant TIDEWAYS_XHPROF_FLAGS_MEMORY not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
-
-		-
-			message: "#^Function tideways_xhprof_disable not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
-
-		-
-			message: "#^Function tideways_xhprof_enable not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
 
 		-
 			message: "#^Instanceof between null and Throwable will always evaluate to false\\.$#"
@@ -481,11 +456,6 @@ parameters:
 			path: library/Alaress/Routing/Test/RouterTest.php
 
 		-
-			message: "#^Method Alaress\\\\Routing\\\\Trie\\:\\:put\\(\\) should return static\\(Alaress\\\\Routing\\\\Trie\\) but returns null\\.$#"
-			count: 1
-			path: library/Alaress/Routing/Trie.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Routing/Trie.php
@@ -494,6 +464,11 @@ parameters:
 			message: "#^Access to an undefined property Xml\\:\\:\\$channel\\.$#"
 			count: 1
 			path: library/Alaress/Rss/Strategy/Rss20.php
+
+		-
+			message: "#^Property Xml\\:\\:\\$xml \\(SimpleXMLElement\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Alaress/Rss/Stream.php
 
 		-
 			message: "#^Method Alaress\\\\Rules\\\\Condition\\:\\:test\\(\\) should return bool but returns int\\.$#"
@@ -511,14 +486,19 @@ parameters:
 			path: library/Alaress/Rules/Token/Tokenizer.php
 
 		-
-			message: "#^Property Alaress_Cache_Abstract\\:\\:\\$cachedTime \\(null\\) does not accept int\\.$#"
+			message: "#^Property Alaress\\\\Scheduler\\\\AbstractScheduler\\:\\:\\$dispatcher \\(Alaress\\\\WorkerCrew\\\\DispatcherInterface\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
-			path: library/Alaress/Saml/Cache.php
+			path: library/Alaress/Scheduler/AbstractScheduler.php
 
 		-
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:transaction\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Cache/RedisCache.php
+
+		-
+			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Alaress/Scheduler/CronScheduler.php
 
 		-
 			message: "#^Method Alaress\\\\Scheduler\\\\Event\\\\BlankEvent\\:\\:getEffector\\(\\) should return object but returns null\\.$#"
@@ -529,26 +509,6 @@ parameters:
 			message: "#^Method Alaress\\\\Scheduler\\\\Event\\\\BlankEvent\\:\\:getObject\\(\\) should return object but returns null\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Event/BlankEvent.php
-
-		-
-			message: "#^Access to property \\$log on an unknown class Alaress\\\\Scheduler\\\\StompScheduler\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/Interactive/Interactor.php
-
-		-
-			message: "#^Call to method getStatus\\(\\) on an unknown class Alaress\\\\Scheduler\\\\StompScheduler\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/Interactive/Interactor.php
-
-		-
-			message: "#^Parameter \\$scheduler of method Alaress\\\\Scheduler\\\\Interactive\\\\Interactor\\:\\:__construct\\(\\) has invalid typehint type Alaress\\\\Scheduler\\\\StompScheduler\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/Interactive/Interactor.php
-
-		-
-			message: "#^Property Alaress\\\\Scheduler\\\\Interactive\\\\Interactor\\:\\:\\$scheduler has unknown class Alaress\\\\Scheduler\\\\StompScheduler as its type\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/Interactive/Interactor.php
 
 		-
 			message: "#^Right side of && is always true\\.$#"
@@ -569,6 +529,16 @@ parameters:
 			message: "#^Method Alaress\\\\Session\\\\BaseSessionSegment\\:\\:load\\(\\) should return null but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Session/BaseSessionSegment.php
+
+		-
+			message: "#^Property Alaress\\\\Session\\\\Phpfunc\\:\\:\\$redis is never read, only written\\.$#"
+			count: 1
+			path: library/Alaress/Session/Phpfunc.php
+
+		-
+			message: "#^Property Aura\\\\Session\\\\Segment\\:\\:\\$name \\(string\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Alaress/Session/Segment.php
 
 		-
 			message: "#^Return type \\(void\\) of method Alaress\\\\Session\\\\Segment\\:\\:load\\(\\) should be compatible with return type \\(null\\) of method Aura\\\\Session\\\\Segment\\:\\:load\\(\\)$#"
@@ -631,9 +601,24 @@ parameters:
 			path: library/Alaress/Validator/Abstract.php
 
 		-
+			message: "#^Property Alaress\\\\Web\\\\Output\\\\Base\\:\\:\\$data \\(string\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Alaress/Web/Output/Base.php
+
+		-
 			message: "#^Variable \\$data in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Alaress/Web/Output/Base.php
+
+		-
+			message: "#^Property Alaress\\\\Web\\\\Output\\\\File\\:\\:\\$file \\(string\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Alaress/Web/Output/File.php
+
+		-
+			message: "#^Property Alaress\\\\Web\\\\Output\\\\Html\\:\\:\\$template \\(string\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Alaress/Web/Output/Html.php
 
 		-
 			message: "#^Call to an undefined method Aura\\\\Router\\\\Router\\:\\:setTokens\\(\\)\\.$#"
@@ -653,6 +638,11 @@ parameters:
 		-
 			message: "#^Property Alaress\\\\WorkerCrew\\\\Transaction\\\\AbstractTransaction\\:\\:\\$timer \\(React\\\\EventLoop\\\\TimerInterface\\) does not accept null\\.$#"
 			count: 2
+			path: library/Alaress/WorkerCrew/Transaction/AbstractTransaction.php
+
+		-
+			message: "#^Property Alaress\\\\WorkerCrew\\\\Transaction\\\\AbstractTransaction\\:\\:\\$timer \\(React\\\\EventLoop\\\\TimerInterface\\) in isset\\(\\) is not nullable\\.$#"
+			count: 3
 			path: library/Alaress/WorkerCrew/Transaction/AbstractTransaction.php
 
 		-
@@ -741,18 +731,8 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: "#^Variable \\$endTimestamp in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
 			message: "#^Variable \\$groupChunk might not be defined\\.$#"
 			count: 3
-			path: library/Calendar.php
-
-		-
-			message: "#^Variable \\$startTimestamp in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
 			path: library/Calendar.php
 
 		-
@@ -971,9 +951,19 @@ parameters:
 			path: library/Calendar/Import/Vcal.php
 
 		-
+			message: "#^Property Calendar_Layout_Full_Abstract\\:\\:\\$moduleChecker is never read, only written\\.$#"
+			count: 1
+			path: library/Calendar/Layout/Full/Abstract.php
+
+		-
 			message: "#^Instanceof between null and DateTime will always evaluate to false\\.$#"
 			count: 1
 			path: library/Chat.php
+
+		-
+			message: "#^Dead catch \\- Alaress\\\\Database\\\\Exception is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Component/Config/CalendarFilter.php
 
 		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Component_ConfigMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
@@ -996,6 +986,31 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
+			message: "#^Method Component_Dashboard_ImageGalleryController\\:\\:getFileMapper\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Component/Dashboard/ImageGalleryController.php
+
+		-
+			message: "#^Method Component_Dashboard_ImageGalleryController\\:\\:getImagesPerRow\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Component/Dashboard/ImageGalleryController.php
+
+		-
+			message: "#^Method Component_Dashboard_ImageGalleryController\\:\\:setImagesPerRow\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Component/Dashboard/ImageGalleryController.php
+
+		-
+			message: "#^Method Component_Dashboard_JuniorTimetableController\\:\\:setIncludeNonclasses\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Component/Dashboard/JuniorTimetableController.php
+
+		-
+			message: "#^Method Component_Dashboard_JuniorTimetableController\\:\\:tempdata\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Component/Dashboard/JuniorTimetableController.php
+
+		-
 			message: "#^Parameter \\#1 \\$component \\(array\\) of method Component_DefinitionMapper\\:\\:create\\(\\) should be compatible with parameter \\$object \\(object\\) of method Schoolbox\\\\Mapper\\:\\:create\\(\\)$#"
 			count: 1
 			path: library/Component/DefinitionMapper.php
@@ -1016,7 +1031,7 @@ parameters:
 			path: library/Component/Eportfolio/FileListController.php
 
 		-
-			message: "#^Property Component_Homepage_AudioController\\:\\:\\$videoResourceMapper \\(Schoolbox\\\\Video\\\\ResourceVideoMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
+			message: "#^Property Component_Homepage_AudioController\\:\\:\\$allowedFileHandler is never read, only written\\.$#"
 			count: 1
 			path: library/Component/Homepage/AudioController.php
 
@@ -1039,6 +1054,11 @@ parameters:
 			message: "#^Offset 'icon' does not exist on string\\.$#"
 			count: 1
 			path: library/Component/Homepage/ControllerAbstract.php
+
+		-
+			message: "#^Method Component_Homepage_EtherpadController\\:\\:setSortMapping\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Component/Homepage/EtherpadController.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
@@ -1131,6 +1151,11 @@ parameters:
 			path: library/Component/Homepage/WolframController.php
 
 		-
+			message: "#^Property Component_Instance\\:\\:\\$config \\(iterable\\<Component_ConfigDefinition\\>&Schoolbox\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Component/Instance.php
+
+		-
 			message: "#^Variable \\$val in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Component/Instance.php
@@ -1161,14 +1186,14 @@ parameters:
 			path: library/Custom/Dsfg/AchievementReport/Module.php
 
 		-
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$year is never read, only written\\.$#"
+			count: 1
+			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
+
+		-
 			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\StandardisedTest\\\\PAT\\\\ValidPAT\\:\\:\\$year \\(string\\) does not accept default value of type int\\.$#"
 			count: 1
 			path: library/Custom/Dsfg/AchievementReport/StandardisedTest/PAT/ValidPAT.php
-
-		-
-			message: "#^Call to function in_array\\(\\) with arguments string\\|null, array\\(0, 1, 2, 3, 4, 5, 6\\) and true will always evaluate to false\\.$#"
-			count: 1
-			path: library/Custom/Dsfg/AchievementReport/StandardisedTest/ValidHasLiteracyNumeracy.php
 
 		-
 			message: "#^Method Custom\\\\Help\\\\CourseParticipation\\\\Controller\\:\\:getCampusMapper\\(\\) should return Schoolbox\\\\CampusMapper but returns Schoolbox\\\\Mapper\\.$#"
@@ -1241,6 +1266,11 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Handler.php
 
 		-
+			message: "#^Property Custom\\\\Help\\\\CourseParticipation\\\\Handler\\:\\:\\$tokenMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Custom/Help/CourseParticipation/Handler.php
+
+		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Help/CourseParticipation/Module.php
@@ -1254,31 +1284,6 @@ parameters:
 			message: "#^Property Custom\\\\Lc\\\\Survey\\\\Controller\\:\\:\\$externalClass \\(External_Class\\) does not accept External_ClassInterface\\.$#"
 			count: 1
 			path: library/Custom/Lc/Survey/Controller.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Ms/Pastoral/Module.php
-
-		-
-			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getHouseMapper\\(\\) should return HouseMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Ms/Pastoral/Module.php
-
-		-
-			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getSubjectMapper\\(\\) should return Schoolbox\\\\External\\\\SubjectMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Ms/Pastoral/Module.php
-
-		-
-			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Ms/Pastoral/Module.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Custom/Ms/Pastoral/StudentInvolvement/Report/Factory.php
 
 		-
 			message: "#^Method Custom\\\\Mggs\\\\Calendar\\\\Event\\\\Type\\\\Submission\\\\Renderer\\\\Javascript\\:\\:getStatus\\(\\) should return string but returns null\\.$#"
@@ -1301,14 +1306,14 @@ parameters:
 			path: library/Custom/Mggs/Learning/Upcoming/Controller.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForDate\\(\\)\\.$#"
+			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
-			path: library/Custom/Mggs/Personalised/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForToday\\(\\)\\.$#"
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
-			path: library/Custom/Mggs/Personalised/Module.php
+			path: library/Custom/Ms/Pastoral/StudentInvolvement/Report/Factory.php
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
@@ -1316,14 +1321,14 @@ parameters:
 			path: library/Custom/Sk/NCEA/Availability.php
 
 		-
+			message: "#^Property Custom\\\\Sk\\\\NCEA\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Custom/Sk/NCEA/Controller.php
+
+		-
 			message: "#^string does not accept array\\<string, mixed\\>\\.$#"
 			count: 1
 			path: library/Custom/Sk/OleReport/Controller.php
-
-		-
-			message: "#^Method Custom\\\\Sk\\\\OleReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Sk/OleReport/Module.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -1336,22 +1341,7 @@ parameters:
 			path: library/Custom/Tigs/Summative/Admin/Module.php
 
 		-
-			message: "#^Property Custom\\\\Tigs\\\\Summative\\\\CliPdfGenerator\\:\\:\\$folderMapper \\(Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
-
-		-
-			message: "#^Property Custom\\\\Tigs\\\\Summative\\\\CliPdfGenerator\\:\\:\\$userMapper \\(Schoolbox\\\\UserMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
-
-		-
-			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\ParticipationReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
 
@@ -1366,6 +1356,11 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AbstractMatrix.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/AbstractMatrix.php
+
+		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
@@ -1376,22 +1371,52 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
 
 		-
+			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Components\\\\HscAssessmentRank\\:\\:deriveCohortAverage\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/HscAssessmentRank.php
+
+		-
+			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Components\\\\HscAssessmentRank\\:\\:deriveCohortMarks\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/HscAssessmentRank.php
+
+		-
+			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Components\\\\HscAssessmentRank\\:\\:deriveCohortRank\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/HscAssessmentRank.php
+
+		-
+			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Components\\\\HscAssessmentRank\\:\\:findStudentFeedback\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/HscAssessmentRank.php
+
+		-
+			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Components\\\\MiddleYearsAssessmentTasks\\:\\:deriveCohortAverage\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/MiddleYearsAssessmentTasks.php
+
+		-
+			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Components\\\\MiddleYearsAssessmentTasks\\:\\:deriveCohortMarks\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/MiddleYearsAssessmentTasks.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 3
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/NesaScoreGraphHSC.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 3
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/NesaScoreGraphMiddleYears.php
+
+		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
 
 		-
 			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
-
-		-
-			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
-
-		-
-			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
 
@@ -1426,11 +1451,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/TeacherFetcher.php
 
 		-
-			message: "#^Property Custom\\\\Tps\\\\AssessmentFeedbackImporter\\:\\:\\$userMapper \\(Schoolbox\\\\UserMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Tps/AssessmentFeedbackImporter.php
-
-		-
 			message: "#^Method DAV_Auth_Digest\\:\\:getDigestHash\\(\\) should return string\\|null but returns false\\.$#"
 			count: 1
 			path: library/DAV/Auth/Digest.php
@@ -1457,6 +1477,16 @@ parameters:
 
 		-
 			message: "#^Property Database\\:\\:\\$connection \\(PDO\\) does not accept null\\.$#"
+			count: 1
+			path: library/Database.php
+
+		-
+			message: "#^Property Database\\:\\:\\$connection \\(PDO\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Database.php
+
+		-
+			message: "#^Property Database\\:\\:\\$connection \\(PDO\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Database.php
 
@@ -1786,6 +1816,11 @@ parameters:
 			path: library/EOTC/ListGroup/Type/PendingDetails.php
 
 		-
+			message: "#^Method EOTC\\\\ListGroup\\\\Type\\\\PendingDetails\\:\\:setAlternateNextStatusId\\(\\) is unused\\.$#"
+			count: 1
+			path: library/EOTC/ListGroup/Type/PendingDetails.php
+
+		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/EOTC/ListGroup/Type/PendingDetails.php
@@ -1846,6 +1881,16 @@ parameters:
 			path: library/Eportfolio.php
 
 		-
+			message: "#^Offset 'left_column_width' on array\\{left_column_width\\: float, right_column_width\\: float\\} in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: library/Eportfolio.php
+
+		-
+			message: "#^Offset 'right_column_width' on array\\{left_column_width\\: float, right_column_width\\: float\\} in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: library/Eportfolio.php
+
+		-
 			message: "#^Method Eportfolio\\\\Page\\:\\:getPermissions\\(\\) should return iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\Collection but returns array\\<Eportfolio\\\\Permission\\>\\|\\(iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\GenericCollection\\)\\.$#"
 			count: 1
 			path: library/Eportfolio/Page.php
@@ -1886,16 +1931,6 @@ parameters:
 			path: library/Eportfolio/Template.php
 
 		-
-			message: "#^Call to function is_numeric\\(\\) with int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Eportfolio/TemplateMapper.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: library/Eportfolio/TemplateMapper.php
-
-		-
 			message: "#^Property Etherpad\\\\Pad\\:\\:\\$padId \\(null\\) does not accept default value of type string\\.$#"
 			count: 1
 			path: library/Etherpad/Pad.php
@@ -1904,6 +1939,11 @@ parameters:
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Etherpad\\\\PadMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/Etherpad/PadMapper.php
+
+		-
+			message: "#^Method Etherpad\\\\Session\\:\\:setDuration\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Etherpad/Session.php
 
 		-
 			message: "#^Property Evaluation_Answer\\:\\:\\$legendHTML \\(bool\\) does not accept string\\.$#"
@@ -2076,6 +2116,21 @@ parameters:
 			path: library/External/AscTimetables/Translator/Timetable.php
 
 		-
+			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\Account\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/Bridge/Account.php
+
+		-
+			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\AssignmentOverride\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/Bridge/AssignmentOverride.php
+
+		-
+			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\CourseGroup\\:\\:codePrefix\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/Bridge/CourseGroup.php
+
+		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/Bridge/CourseSection.php
@@ -2116,11 +2171,6 @@ parameters:
 			path: library/External/Canvas/Sync/DataSync.php
 
 		-
-			message: "#^Offset mixed does not exist on array\\(\\)\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/Helpers/CourseTeachers.php
-
-		-
 			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
@@ -2137,6 +2187,11 @@ parameters:
 
 		-
 			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
+
+		-
+			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\CourseAssignments\\:\\:\\$accountBridge is unused\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
 
@@ -2226,6 +2281,11 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
 
 		-
+			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\SectionQuiz\\:\\:\\$questionTypeMapper is unused\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
+
+		-
 			message: "#^Right side of && is always true\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
@@ -2246,7 +2306,32 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/Submission.php
 
 		-
+			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\Submission\\:\\:\\$schoolboxAdmin \\(Schoolbox\\\\User\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/Submission.php
+
+		-
+			message: "#^Property External_Doublefirst_Class\\:\\:\\$externalUser is never read, only written\\.$#"
+			count: 1
+			path: library/External/Doublefirst/Class.php
+
+		-
+			message: "#^Method External_Doublefirst_Helper\\:\\:setDatabase\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Doublefirst/Helper.php
+
+		-
 			message: "#^Method External_Doublefirst_Timetable\\:\\:getDayNumber\\(\\) should return bool\\|string but returns int\\.$#"
+			count: 1
+			path: library/External/Doublefirst/Timetable.php
+
+		-
+			message: "#^Method External_Doublefirst_Timetable\\:\\:setDatabase\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Doublefirst/Timetable.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: library/External/Doublefirst/Timetable.php
 
@@ -2256,14 +2341,14 @@ parameters:
 			path: library/External/Doublefirst/Timetable.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			message: "#^Method External_Doublefirst_User\\:\\:setDatabase\\(\\) is unused\\.$#"
 			count: 1
 			path: library/External/Doublefirst/User.php
 
 		-
-			message: "#^Anonymous function has an unused use \\$db\\.$#"
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
-			path: library/External/Edumate/Class.php
+			path: library/External/Doublefirst/User.php
 
 		-
 			message: "#^Method External_Edumate_Connection\\:\\:getConnection\\(\\) should return Alaress\\\\Database\\\\Connector\\\\Base but returns Alaress\\\\Database\\\\Connector\\\\IConnector\\|null\\.$#"
@@ -2291,6 +2376,16 @@ parameters:
 			path: library/External/Isams/Batch/Reader/Timetable.php
 
 		-
+			message: "#^Property External_Isams_Class\\:\\:\\$database is unused\\.$#"
+			count: 1
+			path: library/External/Isams/Class.php
+
+		-
+			message: "#^Property External_Isams_Class\\:\\:\\$externalUser is never read, only written\\.$#"
+			count: 1
+			path: library/External/Isams/Class.php
+
+		-
 			message: "#^Method External_Isams_Timetable\\:\\:getDayNumber\\(\\) should return int but returns string\\.$#"
 			count: 2
 			path: library/External/Isams/Timetable.php
@@ -2311,6 +2406,11 @@ parameters:
 			path: library/External/Liss/Authenticator.php
 
 		-
+			message: "#^Property External_Liss_Authenticator\\:\\:\\$schoolCode is never read, only written\\.$#"
+			count: 1
+			path: library/External/Liss/Authenticator.php
+
+		-
 			message: "#^If condition is always false\\.$#"
 			count: 3
 			path: library/External/Liss/Server.php
@@ -2321,12 +2421,27 @@ parameters:
 			path: library/External/Maze/Class.php
 
 		-
+			message: "#^Method External_Maze_Helper\\:\\:setBetweenSemesters\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Maze/Helper.php
+
+		-
+			message: "#^Method External_Maze_Helper\\:\\:setDb\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Maze/Helper.php
+
+		-
 			message: "#^Method External_Maze_Timetable\\:\\:getHelper\\(\\) should return External_Maze_Helper but returns null\\.$#"
 			count: 1
 			path: library/External/Maze/Timetable.php
 
 		-
-			message: "#^Method External_Maze_Timetable\\:\\:getPeriodTimes\\(\\) never returns bool so it can be removed from the return typehint\\.$#"
+			message: "#^Method External_Maze_Timetable\\:\\:setDb\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Maze/Timetable.php
+
+		-
+			message: "#^Property External_Maze_Timetable\\:\\:\\$timetableDayLabel is never read, only written\\.$#"
 			count: 1
 			path: library/External/Maze/Timetable.php
 
@@ -2336,9 +2451,34 @@ parameters:
 			path: library/External/Maze/Timetable.php
 
 		-
+			message: "#^Method External_Maze_User\\:\\:recombine\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Maze/User.php
+
+		-
+			message: "#^Method External_Pcschools_Class\\:\\:setDatabase\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Pcschools/Class.php
+
+		-
 			message: "#^Binary operation \"\\-\\=\" between string and 12 results in an error\\.$#"
 			count: 2
 			path: library/External/Pcschools/Timetable.php
+
+		-
+			message: "#^Method External_Pcschools_Timetable\\:\\:setDatabase\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Pcschools/Timetable.php
+
+		-
+			message: "#^Method External_Pcschools_User\\:\\:setDatabase\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Pcschools/User.php
+
+		-
+			message: "#^Property External_Pcschools_User\\:\\:\\$userMapper is never read, only written\\.$#"
+			count: 1
+			path: library/External/Pcschools/User.php
 
 		-
 			message: "#^Method External_Schoolbox_Class\\:\\:getClassIterator\\(\\) should return Alaress\\\\Database\\\\Iterator\\\\IIterator but returns array\\.$#"
@@ -2356,11 +2496,6 @@ parameters:
 			path: library/External/Schoolbox/Timetable.php
 
 		-
-			message: "#^Cannot unset offset 'TimetableDayID' on array\\('TimetableDay' \\=\\> mixed\\)\\.$#"
-			count: 1
-			path: library/External/Schooledge/Timetable.php
-
-		-
 			message: "#^Return type \\(bool\\) of method External_Schoolpro_Timetable\\:\\:getDayNumber\\(\\) should be compatible with return type \\(int\\) of method External_TimetableInterface\\:\\:getDayNumber\\(\\)$#"
 			count: 1
 			path: library/External/Schoolpro/Timetable.php
@@ -2371,14 +2506,24 @@ parameters:
 			path: library/External/Synergetic/Class.php
 
 		-
+			message: "#^Method External_Synergetic_Class\\:\\:setDatabase\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Synergetic/Class.php
+
+		-
 			message: "#^Property External_Synergetic_Class\\:\\:\\$externalUser \\(External_User\\) does not accept External_UserInterface\\.$#"
 			count: 1
 			path: library/External/Synergetic/Class.php
 
 		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			message: "#^Constant External_Synergetic_Markbook\\:\\:NORMALISED is unused\\.$#"
 			count: 1
-			path: library/External/Synergetic/Ths/Class.php
+			path: library/External/Synergetic/Markbook.php
+
+		-
+			message: "#^Expression in empty\\(\\) is not falsy\\.$#"
+			count: 3
+			path: library/External/Synergetic/Pastoral.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -2411,12 +2556,17 @@ parameters:
 			path: library/External/Synergetic/Smcs/Class.php
 
 		-
-			message: "#^Method External_Synergetic_Timetable\\:\\:fetchDayNumber\\(\\) never returns bool so it can be removed from the return typehint\\.$#"
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: library/External/Synergetic/Ths/Class.php
+
+		-
+			message: "#^Method External_Synergetic_Timetable\\:\\:setDatabase\\(\\) is unused\\.$#"
 			count: 1
 			path: library/External/Synergetic/Timetable.php
 
 		-
-			message: "#^Method External_Synergetic_Timetable\\:\\:fetchDayNumber\\(\\) never returns string so it can be removed from the return typehint\\.$#"
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: library/External/Synergetic/Timetable.php
 
@@ -2424,6 +2574,11 @@ parameters:
 			message: "#^Parameter \\#1 \\$dayNumber \\(string\\) of method External_Synergetic_Timetable\\:\\:getDayName\\(\\) should be compatible with parameter \\$dayNumber \\(int\\) of method External_TimetableInterface\\:\\:getDayName\\(\\)$#"
 			count: 1
 			path: library/External/Synergetic/Timetable.php
+
+		-
+			message: "#^Static property External_Synergetic_User\\:\\:\\$fileYearSemesterDefault \\(array\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/External/Synergetic/User.php
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
@@ -2461,6 +2616,16 @@ parameters:
 			path: library/External/Tass/Api/ModelFactory.php
 
 		-
+			message: "#^Method External_Tass_Helper\\:\\:setDatabase\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Tass/Helper.php
+
+		-
+			message: "#^Property External_Tass_Helper\\:\\:\\$spousePrefix is unused\\.$#"
+			count: 1
+			path: library/External/Tass/Helper.php
+
+		-
 			message: "#^Variable \\$longestDay might not be defined\\.$#"
 			count: 1
 			path: library/External/Tass/Timetable.php
@@ -2484,6 +2649,11 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between int and false will always evaluate to false\\.$#"
 			count: 1
 			path: library/External/TimetableDatePeriod.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/External/UserInterface.php
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
@@ -2541,6 +2711,11 @@ parameters:
 			path: library/Group.php
 
 		-
+			message: "#^Property Group\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Group.php
+
+		-
 			message: "#^Variable \\$catList might not be defined\\.$#"
 			count: 1
 			path: library/Group.php
@@ -2586,7 +2761,17 @@ parameters:
 			path: library/Leave/Controller.php
 
 		-
+			message: "#^Method Leave_Controller\\:\\:getTimeMap\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Leave/Controller.php
+
+		-
 			message: "#^Method Leave_Controller\\:\\:hasApprovePermission\\(\\) should return bool but returns int\\.$#"
+			count: 1
+			path: library/Leave/Controller.php
+
+		-
+			message: "#^Method Leave_Controller\\:\\:setTimeMap\\(\\) is unused\\.$#"
 			count: 1
 			path: library/Leave/Controller.php
 
@@ -2613,6 +2798,11 @@ parameters:
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 2
+			path: library/Leave/Report/House/RendererBase.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
 			path: library/Leave/Report/House/RendererBase.php
 
 		-
@@ -2786,14 +2976,14 @@ parameters:
 			path: library/Schoolbox/Admin/API/Module.php
 
 		-
+			message: "#^Property Schoolbox\\\\Admin\\\\CourseBuilder\\\\Controller\\:\\:\\$folderMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Admin/CourseBuilder/Controller.php
+
+		-
 			message: "#^Binary operation \"\\*\" between string and 1024 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Home/Controller.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Home/Module.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -2826,11 +3016,6 @@ parameters:
 			path: library/Schoolbox/Admin/Import/Profile/Reader.php
 
 		-
-			message: "#^Method Schoolbox\\\\Admin\\\\LTI\\\\Module\\:\\:getProviderMapper\\(\\) should return Schoolbox\\\\LTI\\\\Provider\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/LTI/Module.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/News/Policy/Module.php
@@ -2856,6 +3041,11 @@ parameters:
 			path: library/Schoolbox/Admin/RouteSummary/Controller.php
 
 		-
+			message: "#^Property Schoolbox\\\\Admin\\\\Service\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Admin/Service/Controller.php
+
+		-
 			message: "#^Method Schoolbox\\\\Admin\\\\Settings\\\\FieldType\\\\AbstractRenderer\\:\\:getData\\(\\) should return array\\<string\\> but returns array\\<string, bool\\|string\\|null\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Settings/FieldType/AbstractRenderer.php
@@ -2876,29 +3066,19 @@ parameters:
 			path: library/Schoolbox/Admin/Settings/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\Admin\\\\Terms\\\\Module\\:\\:getTermMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Term\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Terms/Module.php
-
-		-
 			message: "#^Property Schoolbox\\\\Admin\\\\Timezone\\\\Timezone\\:\\:\\$offset \\(int\\) does not accept array\\|string\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Timezone/Timezone.php
 
 		-
-			message: "#^Method Schoolbox\\\\Admin\\\\User\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Property Schoolbox\\\\Admin\\\\Usage\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/Admin/User/Module.php
+			path: library/Schoolbox/Admin/Usage/Controller.php
 
 		-
-			message: "#^Method Schoolbox\\\\Admin\\\\User\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Property Schoolbox\\\\Admin\\\\Usage\\\\Graph\\\\GlobalUsers\\\\TotalPayload\\:\\:\\$database is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/Admin/User/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Admin\\\\Video\\\\Module\\:\\:getQueueMapper\\(\\) should return Schoolbox\\\\Video\\\\QueueMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Video/Module.php
+			path: library/Schoolbox/Admin/Usage/Graph/GlobalUsers/TotalPayload.php
 
 		-
 			message: "#^Anonymous function has an unused use \\$di\\.$#"
@@ -2986,6 +3166,11 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 7
+			path: library/Schoolbox/Assessment/Course/Controller.php
+
+		-
 			message: "#^Call to function is_null\\(\\) with Alaress_Date_Format will always evaluate to false\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Course/Import/AssessmentPair.php
@@ -3028,6 +3213,11 @@ parameters:
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
+			path: library/Schoolbox/Assessment/Course/Import/Controller.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 5
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
 		-
@@ -3136,11 +3326,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
 
 		-
-			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Markbook\\\\Module\\:\\:getCourseSpecMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Markbook/Module.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Markbook/Module.php
@@ -3154,31 +3339,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
-
-		-
-			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Module\\:\\:getCourseSpecificationMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Module\\:\\:getUnitImplementationMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Unit\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Module\\:\\:getUnitSpecificationMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Unit\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Module.php
 
 		-
 			message: "#^Property Schoolbox\\\\Assessment\\\\Course\\\\Task\\:\\:\\$id \\(int\\) does not accept null\\.$#"
@@ -3211,6 +3371,11 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
+
+		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
@@ -3234,6 +3399,11 @@ parameters:
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/Grid/Importer/AbstractCsvImporterFactory.php
+
+		-
+			message: "#^Property Schoolbox\\\\Assessment\\\\Rubric\\\\Grid\\\\Importer\\\\GenericImporter\\:\\:\\$capabilities \\(array\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Assessment/Rubric/Grid/Importer/GenericImporter.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
@@ -3271,29 +3441,9 @@ parameters:
 			path: library/Schoolbox/Blog/Eportfolio/Comment/Notifier.php
 
 		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Eportfolio\\\\Module\\:\\:getEportfolioBlogCommentMapper\\(\\) should return Schoolbox\\\\Blog\\\\Eportfolio\\\\Comment\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Property Schoolbox\\\\Blog\\\\Eportfolio\\\\Comment\\\\Notifier\\:\\:\\$folderMapper is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Eportfolio\\\\Module\\:\\:getEportfolioBlogMapper\\(\\) should return Schoolbox\\\\Blog\\\\Eportfolio\\\\Post\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Eportfolio\\\\Module\\:\\:getEportfolioPageMapper\\(\\) should return Eportfolio\\\\PageMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Eportfolio\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Eportfolio\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Module.php
+			path: library/Schoolbox/Blog/Eportfolio/Comment/Notifier.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -3301,29 +3451,14 @@ parameters:
 			path: library/Schoolbox/Blog/Eportfolio/Post/Notifier.php
 
 		-
+			message: "#^Property Schoolbox\\\\Blog\\\\Eportfolio\\\\Post\\\\Notifier\\:\\:\\$folderMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Blog/Eportfolio/Post/Notifier.php
+
+		-
 			message: "#^Return type \\(iterable\\<Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\Model\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Blog\\\\Homepage\\\\Comment\\\\Mapper\\:\\:findForFeed\\(\\) should be compatible with return type \\(iterable\\<Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Feed\\\\FeedableMapperInterface\\:\\:findForFeed\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Comment/Mapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Homepage\\\\Module\\:\\:getBlogCommentMapper\\(\\) should return Schoolbox\\\\Blog\\\\Homepage\\\\Comment\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Homepage\\\\Module\\:\\:getBlogMapper\\(\\) should return Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Homepage\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Blog\\\\Homepage\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Module.php
 
 		-
 			message: "#^PHPDoc tag @throws with type Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\DefinitionException is not subtype of Throwable$#"
@@ -3421,22 +3556,7 @@ parameters:
 			path: library/Schoolbox/Calendar/Event/Access.php
 
 		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\\\Attendance\\\\Module\\:\\:getEventMapper\\(\\) should return Schoolbox\\\\Calendar\\\\EventMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Attendance/Module.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\\\Module\\:\\:getEventMapper\\(\\) should return Schoolbox\\\\Calendar\\\\EventMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\\\Module\\:\\:preloadEvent\\(\\) never returns null so it can be removed from the return typehint\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event/Module.php
 
@@ -3526,17 +3646,12 @@ parameters:
 			path: library/Schoolbox/Calendar/Test/Event/AccessTest.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$callback with type Schoolbox\\\\callback is not subtype of native type callable\\.$#"
+			message: "#^Property Schoolbox\\\\Campus\\:\\:\\$cycleIdentifier is unused\\.$#"
 			count: 1
-			path: library/Schoolbox/Collection.php
+			path: library/Schoolbox/Campus.php
 
 		-
-			message: "#^Parameter \\$callback of method Schoolbox\\\\Collection\\:\\:filter\\(\\) has invalid typehint type Schoolbox\\\\callback\\.$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^Parameter \\$callback of method Schoolbox\\\\Collection\\:\\:map\\(\\) has invalid typehint type Schoolbox\\\\callback\\.$#"
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
 
@@ -3577,6 +3692,11 @@ parameters:
 
 		-
 			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\RelationshipFilterer\\:\\:getTeachers\\(\\) should return array\\<int\\> but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection\\.$#"
+			count: 1
+			path: library/Schoolbox/Comms/News/Audience/RelationshipFilterer.php
+
+		-
+			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Audience\\\\RelationshipFilterer\\:\\:\\$userAccessMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/RelationshipFilterer.php
 
@@ -3646,12 +3766,17 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Validation/Factory.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Discussion\\\\Thread\\\\Context\\\\IThreadLocation\\:\\:setAudience\\(\\)\\.$#"
+			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\AudienceBrowser\\\\Controller\\:\\:\\$audienceMapper is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
+			path: library/Schoolbox/Comms/News/AudienceBrowser/Controller.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForArticles\\(\\)\\.$#"
+			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Discussion\\\\Comment\\\\Notifier\\:\\:\\$userMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Comms/News/Discussion/Comment/Notifier.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Discussion\\\\Thread\\\\Context\\\\IThreadLocation\\:\\:setAudience\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
 
@@ -3716,16 +3841,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Moderation/Controller.php
 
 		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Moderation\\\\Module\\:\\:getArticleMapper\\(\\) should return Schoolbox\\\\Comms\\\\News\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Moderation/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Moderation\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Moderation/Module.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Moderation/Module.php
@@ -3742,11 +3857,6 @@ parameters:
 
 		-
 			message: "#^Class Schoolbox\\\\Comms\\\\News\\\\Discussion\\\\Permission\\\\CanModerateThread constructor invoked with 2 parameters, 1 required\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Module\\:\\:getArticleMapper\\(\\) should return Schoolbox\\\\Comms\\\\News\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Module.php
 
@@ -3791,11 +3901,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/SaveForLater/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Statistics\\\\Cumulative\\\\Mapper\\:\\:increment\\(\\) never returns array\\<int\\> so it can be removed from the return typehint\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Cumulative/Mapper.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Interactions.php
@@ -3811,11 +3916,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Statistics/Interactions.php
 
 		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Statistics\\\\Module\\:\\:getArticleMapper\\(\\) should return Schoolbox\\\\Comms\\\\News\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Module.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Module.php
@@ -3826,7 +3926,7 @@ parameters:
 			path: library/Schoolbox/Comms/News/Statistics/Module.php
 
 		-
-			message: "#^If condition is always true\\.$#"
+			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Statistics\\\\Test\\\\Obama\\:\\:\\$acceptedBy is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Test/Obama.php
 
@@ -3856,6 +3956,16 @@ parameters:
 			path: library/Schoolbox/Config/Loader.php
 
 		-
+			message: "#^Static property Schoolbox\\\\Config\\\\Loader\\:\\:\\$allConfigs \\(array\\) in isset\\(\\) is not nullable\\.$#"
+			count: 3
+			path: library/Schoolbox/Config/Loader.php
+
+		-
+			message: "#^Static property Schoolbox\\\\Config\\\\Loader\\:\\:\\$instance \\(Schoolbox\\\\Config\\\\Loader\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Config/Loader.php
+
+		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Controller.php
@@ -3871,14 +3981,14 @@ parameters:
 			path: library/Schoolbox/Curriculum/Import/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\Curriculum\\\\Module\\:\\:getNodeMapper\\(\\) should return Schoolbox\\\\Curriculum\\\\Node\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Module.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Curriculum/Node/Mapper.php
+
+		-
+			message: "#^Static property Schoolbox\\\\Database\\\\Factory\\:\\:\\$instance \\(Schoolbox\\\\Database\\\\Factory\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Database/Factory.php
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
@@ -3891,24 +4001,39 @@ parameters:
 			path: library/Schoolbox/Di/Configurator.php
 
 		-
+			message: "#^Property Schoolbox\\\\Discussion\\\\Comment\\\\Controller\\:\\:\\$threadMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Discussion/Comment/Controller.php
+
+		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Comment/Model.php
 
 		-
-			message: "#^Call to method generateException\\(\\) on an unknown class Schoolbox\\\\Discussion\\\\Comment\\\\Error\\\\Mapper\\.$#"
+			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
 			count: 1
-			path: library/Schoolbox/Discussion/Comment/Module.php
-
-		-
-			message: "#^Return typehint of method Schoolbox\\\\Discussion\\\\Comment\\\\Module\\:\\:getErrorMapper\\(\\) has invalid type Schoolbox\\\\Discussion\\\\Comment\\\\Error\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Comment/Module.php
+			path: library/Schoolbox/Discussion/Thread/Context/BaseThreadLocator.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 2
 			path: library/Schoolbox/Discussion/Thread/Controller.php
+
+		-
+			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Compass/Base/Endpoint/Status.php
+
+		-
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Compass\\\\Base\\\\Endpoint\\\\TimetableCalendar\\\\Lookup\\\\Enrolments\\:\\:\\$log is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Compass/Base/Endpoint/TimetableCalendar/Lookup/Enrolments.php
+
+		-
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Compass\\\\Base\\\\Endpoint\\\\TimetableCalendar\\\\Prepare\\:\\:\\$eventMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Compass/Base/Endpoint/TimetableCalendar/Prepare.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\CustomSync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
@@ -4089,6 +4214,11 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
+
+		-
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Isams\\\\Base\\\\Endpoint\\\\Timetable\\\\Identifier\\:\\:\\$perform is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/Identifier.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Isams\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
@@ -4276,6 +4406,31 @@ parameters:
 			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
 
 		-
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\QueryHelper\\\\Freedom\\:\\:CONTACT_LEVEL_NONE is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/Freedom.php
+
+		-
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\QueryHelper\\\\Freedom\\:\\:CONTACT_LEVEL_RESTRICTED is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/Freedom.php
+
+		-
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\QueryHelper\\\\NonFreedom\\:\\:CONTACT_LEVEL_NONE is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/NonFreedom.php
+
+		-
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\QueryHelper\\\\NonFreedom\\:\\:CONTACT_LEVEL_NO_DEMOGRAPHIC is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/NonFreedom.php
+
+		-
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\QueryHelper\\\\NonFreedom\\:\\:CONTACT_TYPE_MOTHER is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/NonFreedom.php
+
+		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Schoolbox/Base/Sync.php
@@ -4371,6 +4526,16 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schooledge/Base/Sync.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Schoolpro/Base/GuardianIterator.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Schoolpro/Base/StaffIterator.php
+
+		-
 			message: "#^Call to function is_array\\(\\) with int will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/StudentIterator.php
@@ -4436,19 +4601,24 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:findCampusName\\(\\) never returns string so it can be removed from the return typehint\\.$#"
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Api\\:\\:DEFAULT_LIMIT is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Api.php
+
+		-
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Factory\\:\\:\\$campusMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Factory.php
+
+		-
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:MAX_EMERGENCY_CONTACTS is unused\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Profile/Profile.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:findLegal\\(\\) never returns string so it can be removed from the return typehint\\.$#"
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Timetable\\\\Preloader\\:\\:\\$perform is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Profile/Profile.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:findMedicalAlert\\(\\) never returns null so it can be removed from the return typehint\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Profile/Profile.php
+			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Timetable/Preloader.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\CommunityPortal\\:\\:changePassword\\(\\) should return bool but returns Alaress\\\\Database\\\\Statement\\\\Query\\\\Base\\|Alaress\\\\Database\\\\Statement\\\\Query\\\\IQuery\\.$#"
@@ -4516,6 +4686,11 @@ parameters:
 			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
 
 		-
+			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Smcs\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Synergetic/Smcs/Sync.php
+
+		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Soc\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Synergetic/Soc/Sync.php
@@ -4524,11 +4699,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Ss\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Synergetic/Ss/Sync.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Smcs\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Smcs/Sync.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Ths\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
@@ -4604,6 +4774,16 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\V53\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Tass/V53/Sync.php
+
+		-
+			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:EMPLOYEE_PREFIX is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Profile/Profile.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
 
 		-
 			message: "#^Result of \\|\\| is always false\\.$#"
@@ -4836,49 +5016,9 @@ parameters:
 			path: library/Schoolbox/Filter/Codec.php
 
 		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getAccess\\(\\) should return Schoolbox\\\\Permission\\\\Access\\\\Access but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Property Schoolbox\\\\Filter\\\\Controller\\:\\:\\$rosettaStone is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getCourseImplMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getCourseSpecMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getProjectMapper\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Project\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getTermMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Term\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getUnitImplMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Unit\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getUnitSpecMapper\\(\\) should return Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Unit\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getWorkTypeMapper\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\WorkType\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
+			path: library/Schoolbox/Filter/Controller.php
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\.$#"
@@ -4921,6 +5061,11 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/Folder/CourseImports/Component.php
 
 		-
+			message: "#^Property Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\Folder\\\\KeyConverter\\:\\:\\$folderIds is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/Filters/Assessment/Folder/KeyConverter.php
+
+		-
 			message: "#^Instanceof between array\\<int\\>\\|null and Schoolbox\\\\Collection will always evaluate to false\\.$#"
 			count: 23
 			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
@@ -4946,6 +5091,11 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
 
 		-
+			message: "#^Property Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\MarkPerCap\\\\Definition\\:\\:\\$rosettaStone is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/Filters/Assessment/MarkPerCap/Definition.php
+
+		-
 			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\NullableContext\\\\Factory\\:\\:parseFolderIds\\(\\) should return array\\<int\\> but returns array\\<string, string\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Factory.php
@@ -4958,16 +5108,6 @@ parameters:
 		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 2
-			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\NullableContext\\\\Project\\\\Factory\\:\\:fetchRelatedFolders\\(\\) should return Schoolbox\\\\GenericCollection but returns array\\<int, Schoolbox\\\\GenericCollection\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php
-
-		-
-			message: "#^PHPDoc tag @return with type iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Project\\\\Model\\|Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\Collection is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php
 
 		-
@@ -4991,6 +5131,11 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/Term/KeyConverter.php
 
 		-
+			message: "#^Property Schoolbox\\\\Filter\\\\Filters\\\\Badge\\\\CurriculumNode\\\\Factory\\:\\:\\$curriculumTaggingEnabled is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/Filters/Badge/CurriculumNode/Factory.php
+
+		-
 			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Collection and null will always evaluate to false\\.$#"
 			count: 2
 			path: library/Schoolbox/Filter/Filters/Event/Matcher.php
@@ -5006,9 +5151,19 @@ parameters:
 			path: library/Schoolbox/Filter/Test/Assessment/LogicTests.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Fixtures/Component/ComponentDelegate.php
+
+		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Division/Module.php
+
+		-
+			message: "#^Constant Schoolbox\\\\Fixtures\\\\Import\\\\Controller\\:\\:TYPE_DIVISION is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Fixtures/Import/Controller.php
 
 		-
 			message: "#^Method Schoolbox\\\\Fixtures\\\\Import\\\\Controller\\:\\:compareKey\\(\\) should return string but returns bool\\.$#"
@@ -5021,17 +5176,17 @@ parameters:
 			path: library/Schoolbox/Fixtures/Import/Controller.php
 
 		-
-			message: "#^Parameter \\#1 \\$dependencies \\(null\\) of method Schoolbox\\\\Fixtures\\\\ItineraryItem\\\\Notifier\\:\\:loadDependencies\\(\\) should be compatible with parameter \\$dependencies \\(array\\<Schoolbox\\\\Mapper\\>\\) of method Schoolbox\\\\Realtime\\\\Schedule\\\\Module\\\\AbstractModuleNotifier\\:\\:loadDependencies\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/ItineraryItem/Notifier.php
-
-		-
 			message: "#^Empty array passed to foreach\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Landing/Module.php
 
 		-
 			message: "#^Cannot call method sortBy\\(\\) on array\\<Schoolbox\\\\Fixtures\\\\Match\\\\Model\\>\\.$#"
+			count: 1
+			path: library/Schoolbox/Fixtures/Match/Controller.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Match/Controller.php
 
@@ -5056,11 +5211,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Match/Notifier.php
 
 		-
-			message: "#^Parameter \\#1 \\$dependencies \\(null\\) of method Schoolbox\\\\Fixtures\\\\Match\\\\Notifier\\:\\:loadDependencies\\(\\) should be compatible with parameter \\$dependencies \\(array\\<Schoolbox\\\\Mapper\\>\\) of method Schoolbox\\\\Realtime\\\\Schedule\\\\Module\\\\AbstractModuleNotifier\\:\\:loadDependencies\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Match/Notifier.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\BuilderInterface\\:\\:setNamespace\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Match/Notifier/Helper.php
@@ -5076,24 +5226,9 @@ parameters:
 			path: library/Schoolbox/Fixtures/Result/Controller.php
 
 		-
-			message: "#^Method Schoolbox\\\\Fixtures\\\\Result\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Fixtures\\\\Result\\\\Module\\:\\:getTeamMapper\\(\\) should return Schoolbox\\\\Fixtures\\\\Team\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Module.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Result/Module.php
-
-		-
-			message: "#^Parameter \\#1 \\$dependencies \\(null\\) of method Schoolbox\\\\Fixtures\\\\Result\\\\Notifier\\:\\:loadDependencies\\(\\) should be compatible with parameter \\$dependencies \\(array\\<Schoolbox\\\\Mapper\\>\\) of method Schoolbox\\\\Realtime\\\\Schedule\\\\Module\\\\AbstractModuleNotifier\\:\\:loadDependencies\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Notifier.php
 
 		-
 			message: "#^Parameter \\#1 \\$context \\(null\\) of method Schoolbox\\\\Fixtures\\\\Sport\\\\Controller\\:\\:getList\\(\\) should be compatible with parameter \\$context \\(object\\) of method Alaress\\\\Web\\\\Controller\\\\Restful\\\\IController\\:\\:getList\\(\\)$#"
@@ -5119,11 +5254,6 @@ parameters:
 			message: "#^Instanceof between Schoolbox\\\\Fixtures\\\\Team\\\\Position\\\\Model and Schoolbox\\\\Fixtures\\\\Team\\\\Position\\\\Participant\\\\Model will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Metadata/Metadata.php
-
-		-
-			message: "#^Parameter \\#1 \\$dependencies \\(null\\) of method Schoolbox\\\\Fixtures\\\\Team\\\\Player\\\\Notifier\\:\\:loadDependencies\\(\\) should be compatible with parameter \\$dependencies \\(array\\<Schoolbox\\\\Mapper\\>\\) of method Schoolbox\\\\Realtime\\\\Schedule\\\\Module\\\\AbstractModuleNotifier\\:\\:loadDependencies\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Player/Notifier.php
 
 		-
 			message: "#^Variable \\$teamMapper in PHPDoc tag @var does not exist\\.$#"
@@ -5176,28 +5306,33 @@ parameters:
 			path: library/Schoolbox/GenericCollection.php
 
 		-
-			message: "#^Property Schoolbox\\\\LTI\\\\Consumer\\\\Module\\:\\:\\$componentInstanceMapper \\(Component_InstanceMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
+			message: "#^Property Schoolbox\\\\Greenhouse\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/LTI/Consumer/Module.php
+			path: library/Schoolbox/Greenhouse/Controller.php
 
 		-
-			message: "#^Property Schoolbox\\\\LTI\\\\Consumer\\\\Module\\:\\:\\$folderMapper \\(Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
+			message: "#^Property Schoolbox\\\\Help\\\\SingleSignOn\\\\Controller\\:\\:\\$userMapper is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/LTI/Consumer/Module.php
+			path: library/Schoolbox/Help/SingleSignOn/Controller.php
 
 		-
-			message: "#^Property Schoolbox\\\\LTI\\\\Consumer\\\\Module\\:\\:\\$providerMapper \\(Schoolbox\\\\LTI\\\\Provider\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
+			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
 			count: 1
-			path: library/Schoolbox/LTI/Consumer/Module.php
+			path: library/Schoolbox/InstanceRegistry/ApiClient.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Analytics\\\\BoxPlot\\\\Summary\\:\\:generateInterquartileRange\\(\\) never returns null so it can be removed from the return typehint\\.$#"
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
 			count: 1
-			path: library/Schoolbox/Learning/Analytics/BoxPlot/Summary.php
+			path: library/Schoolbox/LTI/Role/ClaimFactory.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Analytics\\\\CohortAnalysis\\:\\:getParticipatingStudents\\(\\) should return iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
+			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 4
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
 		-
@@ -5231,9 +5366,9 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Api.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findOneForClass\\(\\)\\.$#"
+			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Calendar\\\\Events\\\\Controller\\:\\:\\$visibility is never read, only written\\.$#"
 			count: 1
-			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Module.php
+			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -5241,14 +5376,14 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Component/Homepage/Builder/Controller.php
 
 		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Component\\\\Homepage\\\\Builder\\\\Controller\\:\\:\\$unitSpecificationMapper \\(Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Unit\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Component/Homepage/Builder/Controller.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Component/Homepage/Outline/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Controller\\:\\:\\$replicator is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Controller.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"
@@ -5686,6 +5821,11 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/IAssessmentTypeTranslator.php
+
+		-
 			message: "#^Right side of \\|\\| is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Project.php
@@ -5806,11 +5946,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Dehydrator.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DueDateSortStrategy\\:\\:retrieveDateForSort\\(\\) never returns null so it can be removed from the return typehint\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueDateSortStrategy.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:assertAcceptSubmission\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
@@ -5849,6 +5984,11 @@ parameters:
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Decorator\\\\CourseManagedDecorator\\:\\:\\$original is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DueWork/Decorator/CourseManagedDecorator.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseRubric\\(\\)\\.$#"
@@ -5897,11 +6037,6 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Feedback\\\\Module\\:\\:getAccess\\(\\) should return Schoolbox\\\\Permission\\\\Access\\\\Access but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
 
@@ -5996,6 +6131,21 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/IAssessable.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/IFeedback.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/IResponse.php
+
+		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:restoreResponsesAndFeedbacks\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ListController.php
@@ -6031,7 +6181,7 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Module\\:\\:getAccess\\(\\) should return Schoolbox\\\\Permission\\\\Access\\\\Access but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Dead catch \\- OutOfBoundsException is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Module.php
 
@@ -6111,6 +6261,16 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/Model.php
 
 		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Controller\\:\\:\\$quizAttemptMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Controller\\:\\:\\$quizSectionMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
+
+		-
 			message: "#^Cannot call method add\\(\\) on array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Feedback\\\\Model\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
@@ -6156,12 +6316,22 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Summator/Maximum.php
 
 		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Maximum\\:\\:\\$max \\(float\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Summator/Maximum.php
+
+		-
 			message: "#^Return type \\(void\\) of method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Maximum\\:\\:calculateTotalWeight\\(\\) should be compatible with return type \\(int\\) of method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\AbstractSummator\\:\\:calculateTotalWeight\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Summator/Maximum.php
 
 		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Minimum\\:\\:\\$min \\(float\\) does not accept null\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/Summator/Minimum.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Minimum\\:\\:\\$min \\(float\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Summator/Minimum.php
 
@@ -6256,6 +6426,16 @@ parameters:
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
 
 		-
+			message: "#^Method Schoolbox\\\\Learning\\\\Badge\\\\Award\\\\Module\\:\\:authorizeOnlyUserIsSelf\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Badge/Award/Module.php
+
+		-
+			message: "#^Method Schoolbox\\\\Learning\\\\Badge\\\\Award\\\\Notifier\\:\\:notifyGoalset\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Badge/Award/Notifier.php
+
+		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Badge/Award/Notifier.php
@@ -6271,29 +6451,19 @@ parameters:
 			path: library/Schoolbox/Learning/Badge/Translator/ModelToArray.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Classes/ClassList.php
+
+		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Component\\\\Dashboard\\\\ClassController\\:\\:execute\\(\\) should return true but returns false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Component/Dashboard/ClassController.php
 
 		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Component\\\\Dashboard\\\\ClassController\\:\\:\\$termMapper \\(Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Component/Dashboard/ClassController.php
-
-		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Component\\\\Dashboard\\\\ClassController\\:\\:\\$timeTableColourMapper \\(Timetable_ColourMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Component/Dashboard/ClassController.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForToday\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Component/Dashboard/UpcomingWorkController.php
-
-		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Component\\\\Dashboard\\\\UpcomingWorkController\\:\\:\\$termMapper \\(Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Component/Dashboard/UpcomingWorkController.php
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Controller.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Mapper\\:\\:findAllByCourseSpecificationId\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Model\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\AbstractCourse\\>&Schoolbox\\\\GenericCollection\\.$#"
@@ -6326,12 +6496,12 @@ parameters:
 			path: library/Schoolbox/Learning/Grades/Controller.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
-			path: library/Schoolbox/Learning/Grades/Module.php
+			path: library/Schoolbox/Learning/Grades/Controller.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Grades\\\\Module\\:\\:getTermMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Term\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Grades/Module.php
 
@@ -6376,26 +6546,6 @@ parameters:
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\Uploader\\:\\:saveKamiModel\\(\\) should return array\\<int\\> but returns array\\<int, int\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Uploader.php
-
-		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\Uploader\\:\\:saveKamiModel\\(\\) has invalid type int\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Uploader.php
-
-		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\Uploader\\:\\:saveKamiModelCollection\\(\\) has invalid type int\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Uploader.php
-
-		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\Uploader\\:\\:timeout\\(\\) has invalid type int\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Uploader.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/StudentCarousel/Blind.php
@@ -6436,17 +6586,7 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/Test/AssessableTest.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\CompletionTest\\:\\:provider_humanReadable_withResponse\\(\\) should return array\\<array\\<mixed\\>\\> but returns array\\<int, array\\<int, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\CompletionTest\\:\\:provider_normalised_valid\\(\\) should return array\\<array\\<int\\>\\> but returns array\\<int, array\\<int, float\\|int\\>\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
-
-		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\CompletionTest\\:\\:provider_humanReadable_withResponse\\(\\) has invalid type mixed\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
 
@@ -6466,9 +6606,19 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
+
+		-
 			message: "#^PHPDoc tag @param for parameter \\$totalMark with type float\\|int\\|null is not subtype of native type float\\|null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Markbook\\\\Markbook\\:\\:\\$students \\(Schoolbox\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Markbook/Markbook.php
 
 		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Markbook\\\\Markbook\\:\\:\\$totalWeight \\(int\\) does not accept float\\.$#"
@@ -6477,26 +6627,6 @@ parameters:
 
 		-
 			message: "#^Empty array passed to foreach\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Mastery/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Mastery\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Mastery/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Mastery\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Mastery/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Mastery\\\\Module\\:\\:getTermMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Term\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Mastery/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Mastery\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Mastery/Module.php
 
@@ -6536,11 +6666,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
 
 		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Mapper\\:\\:finalizeReview\\(\\) has invalid type int\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$answers with type array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
@@ -6552,6 +6677,31 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Quiz/Controller.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Quiz/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Controller\\:\\:\\$quizAnswerMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Quiz/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Controller\\:\\:\\$quizQuestionMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Quiz/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Controller\\:\\:\\$quizSectionMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Quiz/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Controller\\:\\:\\$quizSolutionMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Controller.php
 
@@ -6576,11 +6726,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Model.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Quiz\\\\Module\\:\\:getTermMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\|Schoolbox\\\\Learning\\\\Quiz\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Module.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Model.php
@@ -6591,17 +6736,7 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Mapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\:\\:getAnswers\\(\\) should return array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\QuizQuestion\\>&Schoolbox\\\\GenericCollection\\) but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
-
-		-
-			message: "#^Return typehint of method Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\:\\:getAnswers\\(\\) has invalid type Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\QuizQuestion\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
 
@@ -6616,6 +6751,11 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
 
 		-
+			message: "#^Constant Schoolbox\\\\Learning\\\\Turnitin\\\\ValidFile\\:\\:MIN_TURNITIN_TEXT_LENGTH is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Turnitin/ValidFile.php
+
+		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Upcoming/Module.php
@@ -6626,17 +6766,22 @@ parameters:
 			path: library/Schoolbox/Learning/Upcoming/Module.php
 
 		-
+			message: "#^Property Schoolbox\\\\LearningAnalytics\\\\Controller\\:\\:\\$folderMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/LearningAnalytics/Controller.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/LearningAnalytics/Module.php
+
+		-
 			message: "#^Call to function unset\\(\\) contains undefined variable \\$flatList\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Mapper\\:\\:create\\(\\) should return array\\<int\\> but returns array\\<int\\>\\|bool\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -6671,8 +6816,13 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^Return typehint of method Schoolbox\\\\Mapper\\:\\:save\\(\\) has invalid type int\\.$#"
+			message: "#^Property Schoolbox\\\\Mapper\\:\\:\\$propagatorSuppressed \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Propagator\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
+			path: library/Schoolbox/Mapper.php
+
+		-
+			message: "#^Property Schoolbox\\\\Mapper\\:\\:\\$soft_delete_column \\(string\\) in isset\\(\\) is not nullable\\.$#"
+			count: 5
 			path: library/Schoolbox/Mapper.php
 
 		-
@@ -6761,11 +6911,6 @@ parameters:
 			path: library/Schoolbox/Menu/Top/Model.php
 
 		-
-			message: "#^Offset string does not exist on array\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/MobileApp/ServiceManager.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Module/RestfulModule.php
@@ -6809,6 +6954,11 @@ parameters:
 			message: "#^Return type \\(\\$this\\(Schoolbox\\\\Notif\\\\MQ\\\\Test\\\\MockAMQPConnector\\)\\) of method Schoolbox\\\\Notif\\\\MQ\\\\Test\\\\MockAMQPConnector\\:\\:unbindQueue\\(\\) should be compatible with return type \\(PhpAmqpLib\\\\Channel\\\\AMQPChannel\\) of method Alaress\\\\Async\\\\AMQP\\\\AMQPInterface\\:\\:unbindQueue\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
+
+		-
+			message: "#^Property Schoolbox\\\\Notif\\\\Notif\\:\\:\\$topic_cache \\(array\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Notif/Notif.php
 
 		-
 			message: "#^Constructor of class Schoolbox\\\\Notif\\\\Queue\\\\Bindings\\\\Generator has an unused parameter \\$userAccessMapper\\.$#"
@@ -6986,6 +7136,11 @@ parameters:
 			path: library/Schoolbox/Permission/Access/UserAccessMapper.php
 
 		-
+			message: "#^Property Schoolbox\\\\Picker\\\\DateTime\\\\Controller\\:\\:\\$userMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Picker/DateTime/Controller.php
+
+		-
 			message: "#^Empty array passed to foreach\\.$#"
 			count: 1
 			path: library/Schoolbox/Picker/DateTime/Module.php
@@ -7031,6 +7186,11 @@ parameters:
 			path: library/Schoolbox/Preview/Chain/Strategy/External/Image.php
 
 		-
+			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\Internal\\\\IFrame\\:\\:setContentTypes\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Preview/Chain/Strategy/Internal/IFrame.php
+
+		-
 			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\Internal\\\\IFrame\\:\\:test\\(\\) should return string but returns array\\<string, string\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Preview/Chain/Strategy/Internal/IFrame.php
@@ -7044,21 +7204,6 @@ parameters:
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Preview/Chain/Strategy/Internal/Media.php
-
-		-
-			message: "#^Offset 'src' does not exist on null\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Factory.php
-
-		-
-			message: "#^Offset 'twig' does not exist on array\\('src' \\=\\> string\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Factory.php
-
-		-
-			message: "#^Offset 'type' does not exist on array\\('src' \\=\\> string\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Preview/Factory.php
 
 		-
 			message: "#^Variable \\$pd in PHPDoc tag @var does not exist\\.$#"
@@ -7091,6 +7236,11 @@ parameters:
 			path: library/Schoolbox/Profile/Test/VisibilityTest.php
 
 		-
+			message: "#^Property Schoolbox\\\\Realtime\\\\Admin\\\\Controller\\:\\:\\$config \\(Schoolbox\\\\Realtime\\\\Config\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Admin/Controller.php
+
+		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 5
 			path: library/Schoolbox/Realtime/Admin/Controller.php
@@ -7107,6 +7257,11 @@ parameters:
 
 		-
 			message: "#^If condition is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Realtime\\\\Controller\\:\\:\\$config \\(Schoolbox\\\\Realtime\\\\Config\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Controller.php
 
@@ -7152,6 +7307,16 @@ parameters:
 
 		-
 			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock \\(string\\) does not accept null\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Pipe/Pipe.php
+
+		-
+			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock \\(string\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Pipe/Pipe.php
+
+		-
+			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/Pipe.php
 
@@ -7226,6 +7391,11 @@ parameters:
 			path: library/Schoolbox/Realtime/Routing/Subscription/Test/NestTestResolver.php
 
 		-
+			message: "#^Dead catch \\- TypeError is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Schedule/Event/Event.php
+
+		-
 			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Module\\\\AbstractModuleNotifier\\:\\:\\$iconSize \\(int\\) does not accept default value of type string\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Module/AbstractModuleNotifier.php
@@ -7261,6 +7431,21 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
 
 		-
+			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
+
+		-
+			message: "#^Method Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Propagator\\:\\:toRedis\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Schedule/Trigger/Propagator.php
+
+		-
+			message: "#^Dead catch \\- BadMethodCallException is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Schedule/Trigger/Timetable/TimetableTrigger.php
+
+		-
 			message: "#^Array \\(array\\<Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerBundle\\>\\) does not accept Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerBundleInterface\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Trigger/TriggerFactory.php
@@ -7281,6 +7466,11 @@ parameters:
 			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Test/AbstractNotificationTest.php
+
+		-
 			message: "#^Method Schoolbox\\\\Realtime\\\\Timetable\\\\TimetableNotifier\\:\\:process\\(\\) should return string but returns int\\.$#"
 			count: 2
 			path: library/Schoolbox/Realtime/Timetable/TimetableNotifier.php
@@ -7289,6 +7479,16 @@ parameters:
 			message: "#^Return type \\(string\\) of method Schoolbox\\\\Realtime\\\\Timetable\\\\TimetableNotifier\\:\\:process\\(\\) should be compatible with return type \\(int\\) of method Schoolbox\\\\Realtime\\\\WorkNotifier\\:\\:process\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Timetable/TimetableNotifier.php
+
+		-
+			message: "#^Dead catch \\- InvalidArgumentException is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Timetable/TimetableScheduler.php
+
+		-
+			message: "#^Property Schoolbox\\\\Realtime\\\\WorkNotifier\\:\\:\\$log \\(Psr\\\\Log\\\\LoggerInterface\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/WorkNotifier.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\AbstractFile\\:\\:setModifiedBy\\(\\)\\.$#"
@@ -7571,6 +7771,11 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Component/Dashboard/GroupController.php
 
 		-
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Folder/Controller.php
+
+		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Schoolbox\\\\Resource\\\\Folder\\\\Log\\\\Mapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Log/Mapper.php
@@ -7614,11 +7819,6 @@ parameters:
 			message: "#^PHPDoc tag @param for parameter \\$yearLevels with type \\(iterable\\<Schoolbox\\\\YearLevel\\\\Model\\>&Schoolbox\\\\GenericCollection\\)\\|null is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Resource\\\\Folder\\\\Module\\:\\:getMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Module.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"
@@ -7736,6 +7936,31 @@ parameters:
 			path: library/Schoolbox/Resource/Storage/GC/Check/DbCheck.php
 
 		-
+			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\GC\\\\Check\\\\SoftLinks\\:\\:\\$scanStmt \\(PDOStatement\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Storage/GC/Check/SoftLinks.php
+
+		-
+			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\GC\\\\Check\\\\SoftLinks\\:\\:\\$softStmt \\(PDOStatement\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Storage/GC/Check/SoftLinks.php
+
+		-
+			message: "#^Dead catch \\- League\\\\Flysystem\\\\Exception is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
+
+		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 2
+			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
+
+		-
+			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\Mapper\\:\\:\\$checkPrevious is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Storage/Mapper.php
+
+		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
@@ -7754,6 +7979,11 @@ parameters:
 			message: "#^Return type \\(Schoolbox\\\\File\\\\Mimetype\\) of method Schoolbox\\\\Resource\\\\Storage\\\\Model\\:\\:getMimetype\\(\\) should be compatible with return type \\(string\\|false\\) of method League\\\\Flysystem\\\\File\\:\\:getMimetype\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
+
+		-
+			message: "#^Dead catch \\- Aws\\\\S3\\\\Exception\\\\S3Exception is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Storage/S3/Migration.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -7791,21 +8021,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\ResourceBooking\\\\Booking\\\\Module\\:\\:getItemMapper\\(\\) should return Schoolbox\\\\ResourceBooking\\\\Item\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\ResourceBooking\\\\Booking\\\\Module\\:\\:getMapper\\(\\) should return Schoolbox\\\\ResourceBooking\\\\Booking\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Module.php
-
-		-
-			message: "#^Call to function array_key_exists\\(\\) with int and array\\(\\) will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Series.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Series.php
@@ -7831,18 +8046,13 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Category/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\ResourceBooking\\\\Category\\\\Module\\:\\:getMapper\\(\\) should return Schoolbox\\\\ResourceBooking\\\\Category\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Dead catch \\- Schoolbox\\\\Application\\\\Exception\\\\NotFound is never thrown in the try block\\.$#"
 			count: 1
-			path: library/Schoolbox/ResourceBooking/Category/Module.php
+			path: library/Schoolbox/ResourceBooking/Item/Controller.php
 
 		-
 			message: "#^If condition is always true\\.$#"
 			count: 3
-			path: library/Schoolbox/ResourceBooking/Item/Mapper.php
-
-		-
-			message: "#^Variable \\$callback in isset\\(\\) is always null\\.$#"
-			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Mapper.php
 
 		-
@@ -7852,11 +8062,6 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Item/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\ResourceBooking\\\\Item\\\\Module\\:\\:getMapper\\(\\) should return Schoolbox\\\\ResourceBooking\\\\Item\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Module.php
 
@@ -7886,22 +8091,22 @@ parameters:
 			path: library/Schoolbox/Search/Mock/ResultBuilder.php
 
 		-
+			message: "#^Property Schoolbox\\\\Statistics\\\\DataSource\\:\\:\\$folderMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Statistics/DataSource.php
+
+		-
+			message: "#^Property Schoolbox\\\\Statistics\\\\DataSource\\:\\:\\$userMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Statistics/DataSource.php
+
+		-
 			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
 			count: 3
 			path: library/Schoolbox/Statistics/DataSource.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Statistics/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Statistics\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Statistics/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Statistics\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Statistics/Module.php
 
@@ -7921,9 +8126,24 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Controller.php
 
 		-
+			message: "#^Method Schoolbox\\\\Sync\\\\Effect\\\\Type\\\\Model\\:\\:setEffectSkipTemplate\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Sync/Effect/Type/Model.php
+
+		-
+			message: "#^Method Schoolbox\\\\Sync\\\\Effect\\\\Type\\\\Model\\:\\:setEffectTemplate\\(\\) is unused\\.$#"
+			count: 1
+			path: library/Schoolbox/Sync/Effect/Type/Model.php
+
+		-
 			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Condition\\\\ExternalUserValueIn\\:\\:assertIn\\(\\) should return bool but returns int\\<0, max\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Condition/ExternalUserValueIn.php
+
+		-
+			message: "#^Dead catch \\- ReflectionException is never thrown in the try block\\.$#"
+			count: 2
+			path: library/Schoolbox/Sync/Grammar/Factory.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with string will always evaluate to false\\.$#"
@@ -7981,6 +8201,11 @@ parameters:
 			path: library/Schoolbox/Sync/Hydrator/Custom/AbstractLoggableHydrator.php
 
 		-
+			message: "#^Property Schoolbox\\\\Sync\\\\Hydrator\\\\Custom\\\\AddParentToStudentClasses\\:\\:\\$campusMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Sync/Hydrator/Custom/AddParentToStudentClasses.php
+
+		-
 			message: "#^Method Schoolbox\\\\Sync\\\\Hydrator\\\\Custom\\\\Factory\\:\\:produceFromCollection\\(\\) should return array\\<Schoolbox\\\\Sync\\\\Hydrator\\\\HydratorInterface\\> but returns Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Hydrator/Custom/Factory.php
@@ -8036,6 +8261,11 @@ parameters:
 			path: library/Schoolbox/Tile/Controller.php
 
 		-
+			message: "#^Property Schoolbox\\\\Tile\\\\Controller\\:\\:\\$folderMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Tile/Controller.php
+
+		-
 			message: "#^If condition is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Tile/Mapper.php
@@ -8046,44 +8276,9 @@ parameters:
 			path: library/Schoolbox/Tile/Mapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Tile\\\\Module\\:\\:getComponentInstanceMapper\\(\\) should return Component_InstanceMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Tile\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Tile\\\\Module\\:\\:getRoleAccessMapper\\(\\) should return Schoolbox\\\\Permission\\\\Access\\\\RoleAccessMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Tile\\\\Module\\:\\:getTileLayoutMapper\\(\\) should return Schoolbox\\\\Tile\\\\Layout\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\Tile\\\\Module\\:\\:getTileMapper\\(\\) should return Schoolbox\\\\Tile\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Module.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Tour/Mapper.php
-
-		-
-			message: "#^Property Schoolbox\\\\Tour\\\\Model\\:\\:\\$triggerList has unknown class Schoolbox\\\\Tour\\\\Trigger as its type\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Model.php
-
-		-
-			message: "#^Return typehint of method Schoolbox\\\\Tour\\\\Model\\:\\:getTriggerList\\(\\) has invalid type Schoolbox\\\\Tour\\\\Trigger\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Model.php
 
 		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
@@ -8101,24 +8296,14 @@ parameters:
 			path: library/Schoolbox/User.php
 
 		-
+			message: "#^Property Schoolbox\\\\User\\:\\:\\$accessList \\(iterable\\<Schoolbox\\\\Permission\\\\Access\\\\UserAccess\\>&Schoolbox\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/User.php
+
+		-
 			message: "#^Variable \\$result might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/User/Controller.php
-
-		-
-			message: "#^Method Schoolbox\\\\User\\\\Module\\:\\:getErrorMapper\\(\\) should return Schoolbox\\\\Error\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\User\\\\Module\\:\\:getFolderMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Module.php
-
-		-
-			message: "#^Method Schoolbox\\\\User\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Module.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"
@@ -8142,7 +8327,7 @@ parameters:
 
 		-
 			message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/UserMapper.php
 
 		-
@@ -8154,6 +8339,11 @@ parameters:
 			message: "#^Call to function is_null\\(\\) with Schoolbox\\\\User will always evaluate to false\\.$#"
 			count: 2
 			path: library/Schoolbox/UserNotifier.php
+
+		-
+			message: "#^Property Schoolbox\\\\Video\\\\Queue\\:\\:\\$storageMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Video/Queue.php
 
 		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
@@ -8169,6 +8359,21 @@ parameters:
 			message: "#^Binary operation \"\\*\" between string and 3600 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Weather/WeatherstackClient.php
+
+		-
+			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Schoolbox/Weather/WeatherstackClient.php
+
+		-
+			message: "#^Property Schoolbox\\\\WebDav\\\\FileServer\\\\File\\:\\:\\$user \\(Schoolbox\\\\User\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/WebDav/FileServer/File.php
+
+		-
+			message: "#^Property Schoolbox\\\\WebDav\\\\FileServer\\\\Folder\\:\\:\\$user \\(Schoolbox\\\\User\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/WebDav/FileServer/Folder.php
 
 		-
 			message: "#^Return type \\(void\\) of method Schoolbox\\\\WebDav\\\\FileServer\\\\Folder\\:\\:createFile\\(\\) should be compatible with return type \\(string\\|null\\) of method Sabre\\\\DAV\\\\Collection\\:\\:createFile\\(\\)$#"
@@ -8211,6 +8416,16 @@ parameters:
 			path: library/Schoolbox/WebDav/Rules/Ruleset.php
 
 		-
+			message: "#^Property Schoolbox\\\\WebDav\\\\SubjectServer\\\\Server\\:\\:\\$childNodeCache \\(array\\<Sabre\\\\DAV\\\\INode\\>\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/WebDav/SubjectServer/Server.php
+
+		-
+			message: "#^Property Schoolbox\\\\WebDav\\\\SubjectServer\\\\Server\\:\\:\\$user \\(Schoolbox\\\\User\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: library/Schoolbox/WebDav/SubjectServer/Server.php
+
+		-
 			message: "#^Return type \\(iterable\\<Schoolbox\\\\Wiki\\\\Revision\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Wiki\\\\RevisionMapper\\:\\:findForFeed\\(\\) should be compatible with return type \\(iterable\\<Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Feed\\\\FeedableMapperInterface\\:\\:findForFeed\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Wiki/RevisionMapper.php
@@ -8234,11 +8449,6 @@ parameters:
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Session.php
-
-		-
-			message: "#^Comparison operation \"\\<\" between \\(array\\|float\\|int\\) and int results in an error\\.$#"
-			count: 1
-			path: library/SitePage.php
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
@@ -8296,12 +8506,32 @@ parameters:
 			path: library/SocialStream/PostNotifier.php
 
 		-
+			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/SocialStream/Threads.php
+
+		-
 			message: "#^Property SocialStream\\\\Threads\\:\\:\\$tree \\(array\\) does not accept Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/SocialStream/Threads.php
 
 		-
 			message: "#^Method SocialStream\\\\UrlDetection\\:\\:getHomepageIdFromUrl\\(\\) should return string but returns null\\.$#"
+			count: 1
+			path: library/SocialStream/UrlDetection.php
+
+		-
+			message: "#^Method SocialStream\\\\UrlDetection\\:\\:setHomepagePatterns\\(\\) is unused\\.$#"
+			count: 1
+			path: library/SocialStream/UrlDetection.php
+
+		-
+			message: "#^Method SocialStream\\\\UrlDetection\\:\\:setResourcePatterns\\(\\) is unused\\.$#"
+			count: 1
+			path: library/SocialStream/UrlDetection.php
+
+		-
+			message: "#^Method SocialStream\\\\UrlDetection\\:\\:setStoragePatterns\\(\\) is unused\\.$#"
 			count: 1
 			path: library/SocialStream/UrlDetection.php
 
@@ -8336,6 +8566,11 @@ parameters:
 			path: library/Url.php
 
 		-
+			message: "#^Property User\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/User.php
+
+		-
 			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
 			count: 1
 			path: library/Wiki.php
@@ -8366,9 +8601,14 @@ parameters:
 			path: tools/assessment/csv.php
 
 		-
-			message: "#^Method class@anonymous/tools/custom/dcc/pastoral\\-import\\.php\\:29\\:\\:getFilename\\(\\) never returns false so it can be removed from the return typehint\\.$#"
+			message: "#^Dead catch \\- League\\\\Flysystem\\\\FileExistsException is never thrown in the try block\\.$#"
 			count: 1
 			path: tools/custom/dcc/pastoral-import.php
+
+		-
+			message: "#^Constant class@anonymous/tools/custom/wes/changeType\\.php\\:11\\:\\:ACCESS_LEVEL_PRIVATE is unused\\.$#"
+			count: 1
+			path: tools/custom/wes/changeType.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -8379,6 +8619,11 @@ parameters:
 			message: "#^Variable \\$addParamsShort might not be defined\\.$#"
 			count: 1
 			path: tools/markbook/sync.php
+
+		-
+			message: "#^Constant class@anonymous/tools/mq/list\\-redis\\-routes\\.php\\:21\\:\\:TTL_NOT_SET is unused\\.$#"
+			count: 1
+			path: tools/mq/list-redis-routes.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -8426,9 +8671,9 @@ parameters:
 			path: tools/pastoral/generateTestData.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForAssessmentAndUser\\(\\)\\.$#"
+			message: "#^Constant class@anonymous/tools/pastoral/generateTestData\\.php\\:23\\:\\:NUM_RECORDS is unused\\.$#"
 			count: 1
-			path: tools/quiz/autoFinish.php
+			path: tools/pastoral/generateTestData.php
 
 		-
 			message: "#^Variable \\$participantMapper in PHPDoc tag @var does not exist\\.$#"
@@ -8440,22 +8685,3 @@ parameters:
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php
 
-		-
-			message: "#^Binary operation \"\\+\" between array\\('Using strategy\\:'\\) and array\\|string results in an error\\.$#"
-			count: 1
-			path: tools/socket/socketd.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Thread/Context/BaseThreadLocator.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: tools/increment-instance-dates.php

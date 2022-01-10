@@ -10,16 +10,6 @@ parameters:
         - library
         - tools
     inferPrivatePropertyTypeFromConstructor: true
-    reportUnmatchedIgnoredErrors: false
-    ignoreErrors:
-        - '#@var above a method has no effect#'
-        - '#is unused#'
-        - '#is never read#'
-        - '#Dead catch#'
-        - '#in isset\(\) is not nullable#'
-        - '#in isset\(\) always exists and is not nullable#'
-        - '#in empty\(\) is not falsy#'
-        - '#on left side of \?\? is not nullable#'
 
 includes:
     - phpstan-baseline.neon
