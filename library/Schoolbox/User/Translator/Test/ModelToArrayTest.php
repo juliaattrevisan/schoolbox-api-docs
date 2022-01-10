@@ -39,6 +39,11 @@ class ModelToArrayTest extends TestCase
             'name_format'  => '{title} {firstname} {lastname}',
         ]);
 
+        $emptyUser = (new User())
+        ->setFirstname(null)
+        ->setLastname(null)
+        ->setConfigLoader($configLoader);
+
         $emptyResponse = [
             'id'               => null,
             'campus'           => null,
@@ -78,8 +83,7 @@ class ModelToArrayTest extends TestCase
             ],
         ];
         yield 'empty fields' => [
-            (new User())
-                ->setConfigLoader($configLoader),
+            clone $emptyUser,
             $emptyResponse,
         ];
 
@@ -206,8 +210,7 @@ class ModelToArrayTest extends TestCase
             'calendarView'           => 'month',
         ];
         yield 'inverse flags' => [
-            (new User())
-                ->setConfigLoader($configLoader)
+            (clone $emptyUser)
                 ->setWebmail(true)
                 ->setHideContacts(false)
                 ->setHideTimetable(false)
@@ -223,8 +226,7 @@ class ModelToArrayTest extends TestCase
         $superuser              = $emptyResponse;
         $superuser['superuser'] = true;
         yield 'superuser' => [
-            (new User())
-                ->setConfigLoader($configLoader)
+            (clone $emptyUser)
                 ->setSuperuser(true),
             $superuser,
         ];
@@ -238,8 +240,7 @@ class ModelToArrayTest extends TestCase
         // This relies upon the user's config loader.
         // Unlike with the username I can't really fake this
         yield 'derived email' => [
-            (new User())
-                ->setConfigLoader($configLoader)
+            (clone $emptyUser)
                 ->setUsername('test')
                 ->setLocalEmail(true),
             $derivedEmail,
@@ -249,8 +250,7 @@ class ModelToArrayTest extends TestCase
         $deletedUser              = $emptyResponse;
         $deletedUser['isDeleted'] = true;
         yield 'deleted user' => [
-            (new User())
-                ->setConfigLoader($configLoader)
+            (clone $emptyUser)
                 ->setDeletedAt(Alaress_Date_Format::now()),
             $deletedUser,
         ];
