@@ -39,7 +39,7 @@ class Pipe implements PipeInterface
 
 
     /**
-     * @var string
+     * @var array
      */
     protected $cookies;
 
