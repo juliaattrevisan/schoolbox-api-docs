@@ -25,6 +25,8 @@ abstract class Leave_Notice_Abstract_Factory
 
     /**
      * Produce a Notice object whose implementation is school-specific
+     *
+     * @return Leave_Notice_Abstract_Notice|null
      */
     abstract public function produce();
 
