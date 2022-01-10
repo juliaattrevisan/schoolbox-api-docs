@@ -19,10 +19,9 @@ readonly L_ERROR=400
 # Global vars
 declare verbose=0
 declare single_instance_mode=0
-declare package                # One of [schoolbox|schoolboxdev]
 declare site_root              # No trailing slash, eg '/vagrant'
 declare is_primary_host        # One of [0|1]
-declare instance_list          # Set of instances for this package
+declare instance_list          # Set of instances for this host
 declare socketd_ports          # Use these if provided, otherwise fetch from IR. Eg '--socketd-ports vagrantx:9081'
 
 # Logging helpers
@@ -41,7 +40,7 @@ function error(){
 # Renders the help message
 function help(){
   echo "Description"
-  echo "  Upgrades all instances for this package (not host)"
+  echo "  Upgrades all instances for this host"
   echo "Usage:"
   echo "  $0 --is-primary-host [0|1] [-v|--verbose]"
   echo "Args:"
@@ -116,29 +115,24 @@ function parse_global_vars(){
   this_file=$(readlink -f "$0");
   this_dir=${this_file%/*};
   site_root=$(readlink -f "$this_dir"/../../)
-  if [[ ${site_root##*/} == 'schoolboxdev' ]]; then
-    package='schoolboxdev'
-  else
-    package='schoolbox'
-  fi
+
   if [[ -z $is_primary_host ]]; then
     error "You must specify if this is a primary using the --is-primary-host [0|1] flag"
     exit 1
   fi
   if [[ -z $instance_list ]]; then
-    if ! instance_list=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option instance-list | sort); then
-      error "Unable to parse instance list from ini file: '/etc/$package/instances.ini'"
+    if ! instance_list=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option instance-list | sort); then
+      error "Unable to parse instance list from ini file: '/etc/schoolbox/instances.ini'"
       exit 1;
     fi
   fi
   for i in $instance_list; do
-    if ! INSTANCE_ID=$i schoolbox-read-instances --ini "/etc/$package/instances.ini" --option INSTANCE_ID; then
+    if ! INSTANCE_ID=$i schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option INSTANCE_ID; then
       error "instance id $i is invalid!"
       exit 1;
     fi
   done
   debug "site_root: '$site_root'"
-  debug "package: '$package'"
   debug "instance_list: $(echo -e "$instance_list" | tr '\n' ' ')"
   debug "single_instance_mode: $single_instance_mode"
 }
@@ -154,18 +148,6 @@ function upgrade_instances(){
     mkdir -p /var/log/schoolbox/"$i"
     instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
     log "upgrade starting for instance $i - logging to $instance_log_file";
-
-    # If log exists in old location, move to new location. TODO remove once all instances upgrade past 20.2.12
-    old_filename=/var/lib/"$package"/"$i"_upgrade.log
-    if [[ -f  "$old_filename" ]]; then
-      mv "$old_filename" "$instance_log_file"
-    fi
-
-    # Ensure 'schoolboxdev' logs moved TODO remove once all instances upgrade 21.0.4+
-    if [[ -f /var/log/schoolboxdev/"$i"/upgrade.log ]]; then
-      cat /var/log/schoolboxdev/"$i"/upgrade.log >> /var/log/schoolbox/"$i"/upgrade.log
-      rm /var/log/schoolboxdev/"$i"/upgrade.log
-    fi
 
     # TODO, consider case where:
     # 1. Non-primary upgrades from v1 to v2, and creates dirs using v1 schema
@@ -203,10 +185,10 @@ function upgrade_instances(){
 
     if [[ $is_primary_host == '1' ]]; then
       echo "$(date) - checking saml certificate" >> "$instance_log_file";
-      sql_user=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user);
-      sql_pass=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd);
-      sql_host=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host);
-      sql_schema=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db);
+      sql_user=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_user);
+      sql_pass=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_passwd);
+      sql_host=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_host);
+      sql_schema=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_db);
 
       if ! saml_public_cert=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "SELECT value FROM config WHERE name='saml_public_cert'"); then
         error "Unable to fetch 'saml_public_cert' from database" >> "$instance_log_file" 2>&1

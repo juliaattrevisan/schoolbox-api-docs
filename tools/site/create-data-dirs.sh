@@ -133,12 +133,8 @@ function parse_global_vars() {
   this_file=$(readlink -f "$0");
   this_dir=${this_file%/*};
   install_dir=$(readlink -f "$this_dir"/../../)
-  if [[ ${install_dir##*/} == 'schoolboxdev' ]]; then
-    package='schoolboxdev'
-  else
-    package='schoolbox'
-  fi
-  ini_file="/etc/$package/instances.ini"
+
+  ini_file="/etc/schoolbox/instances.ini"
   if [[ ! -f $ini_file ]]; then
     error "No instances.ini file found at '$ini_file'"
     exit 1

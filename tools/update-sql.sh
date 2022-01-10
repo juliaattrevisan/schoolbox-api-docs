@@ -15,7 +15,6 @@ readonly L_ERROR=400
 readonly UNSUPPORTED_FROM_MAJOR='20.1' # Require force if upgrading a schema at this version or below
 
 # Global vars
-declare package                  # 'schoolbox'|'schoolboxdev'
 declare site_root                # Schoolbox root dir
 declare sql_user
 declare sql_pass
@@ -58,24 +57,21 @@ derive_global_vars(){
   full_path=${file_path%/*};
 
   site_root=$(readlink -f "$full_path"/../);
-  package=${site_root##*/};
-  if [[ $package == 'vagrant' ]]; then
-    package='schoolbox'
-  fi
 
-  if [ ! -f "/etc/$package/instances.ini" ]; then
-    error "No ini found at '/etc/$package/instances.ini";
+
+  if [ ! -f "/etc/schoolbox/instances.ini" ]; then
+    error "No ini found at '/etc/schoolbox/instances.ini";
     error "No cache directories cleaned";
     exit;
   fi
 
-  log "Using db credentials from: '/etc/$package/instances.ini'";
+  log "Using db credentials from: '/etc/schoolbox/instances.ini'";
 
   # Collect Credentials
-  sql_user=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user);
-  sql_pass=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd);
-  sql_host=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host);
-  sql_db=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db);
+  sql_user=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_user);
+  sql_pass=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_passwd);
+  sql_host=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_host);
+  sql_db=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_db);
 }
 
 # Check we could detect current and desired SQL versions
@@ -170,8 +166,8 @@ execute_upgrade_scripts(){
 
   # Set Site Package version in config will be blank in vagrant
   local package_version
-  if dpkg -l | grep -qE "\s${package}\s"; then
-    package_version=$(dpkg -s $package | grep Version | awk '{print $2}')
+  if dpkg -l | grep -qE "\schoolbox\s"; then
+    package_version=$(dpkg -s schoolbox | grep Version | awk '{print $2}')
   fi
   log "Setting 'site_package' to '$package_version'"
   mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
@@ -196,11 +192,11 @@ update_puppet_facts(){
   mkdir -p /etc/facter/facts.d/ >/dev/null 2>&1;
   if [ $error_int -ne 0 ]; then
     error_msg=$(echo "$error_msg" | cut -d',' -f2-100);
-    echo "$package""_update_error=$error_int" > /etc/facter/facts.d/"$package"_update.txt;
-    echo "$package""_update_errormsg=$error_msg" >> /etc/facter/facts.d/"$package"_update.txt;
+    echo "schoolbox_update_error=$error_int" > /etc/facter/facts.d/schoolbox_update.txt;
+    echo "schoolbox_update_errormsg=$error_msg" >> /etc/facter/facts.d/schoolbox_update.txt;
     error "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup."
   else
-    echo "$package""_update_error=0" > /etc/facter/facts.d/"$package"_update.txt;
+    echo "schoolbox_update_error=0" > /etc/facter/facts.d/schoolbox_update.txt;
     log "SQL updates completed";
   fi
 }
