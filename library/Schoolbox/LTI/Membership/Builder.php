@@ -28,6 +28,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Context\Folder\Codec as FolderCodec;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
@@ -186,9 +187,10 @@ class Builder implements MembershipServiceServerBuilderInterface
      *
      * @param User   $user
      * @param string $role
+     * @param string $status
      * @return MemberInterface
      */
-    private function mapUserToMember(User $user, string $role): MemberInterface
+    private function mapUserToMember(User $user, string $role, string $status = MemberInterface::STATUS_ACTIVE): MemberInterface
     {
         // Share minimal information by default, as per
         // http://www.imsglobal.org/spec/lti-nrps/v2p0#sharing-of-personal-data
@@ -201,12 +203,12 @@ class Builder implements MembershipServiceServerBuilderInterface
                 $user->getFullName(),
                 $user->getEmail(),
             ),
-            MemberInterface::STATUS_ACTIVE,
+            $status,
             [$role],
             // Why must I provide the above as properties below?
             [
                 'user_id'    => $encodedUser,
-                'status'     => MemberInterface::STATUS_ACTIVE,
+                'status'     => $status,
                 'roles'      => [$role],
                 'given_name' => $user->getFullName(),
                 'email'      => $user->getEmail(),
@@ -226,17 +228,27 @@ class Builder implements MembershipServiceServerBuilderInterface
     }
 
     /**
-     * Map function: convert a user+assessment to a learner-type member object,
-     * with a message appropriate for the assessment.
+     * Map function: convert a participant to a learner-type member object.
      *
-     * @param User          $user
-     * @param LtiAssessment $assessment
+     * If the participant is excluded, this contains the user's status;
+     * otherwise it contains a message appropriate for the assessment.
+     *
+     * @param Participant $participant
      * @return MemberInterface
      */
-    private function mapUserToLearnerWithAssessment(User $user, LtiAssessment $assessment): MemberInterface
+    private function mapParticipantToLearner(Participant $participant): MemberInterface
     {
-        $member = $this->mapUserToLearner($user);
-        return $member->setMessage($this->buildMessage($user, $assessment));
+        $member = $this->mapUserToMember(
+            $participant->getUser(),
+            'Learner',
+            $participant->isExcluded() ? MemberInterface::STATUS_INACTIVE : MemberInterface::STATUS_ACTIVE,
+        );
+
+        $assessment = $participant->getAssessable();
+        if (!$participant->isExcluded() && $assessment instanceof LtiAssessment) {
+            $member = $member->setMessage($this->buildMessage($participant->getUser(), $assessment));
+        }
+        return $member;
     }
 
     /**
@@ -337,10 +349,8 @@ class Builder implements MembershipServiceServerBuilderInterface
             ->buildEmptyMemberCollection()
             ->merge(
                 $assessment
-                    ->getParticipantUsers()
-                    ->map(function (User $user) use ($assessment) {
-                        return $this->mapUserToLearnerWithAssessment($user, $assessment);
-                    })
+                    ->getAllParticipants()
+                    ->map(Closure::fromCallable([$this, 'mapParticipantToLearner']))
             );
     }
 
