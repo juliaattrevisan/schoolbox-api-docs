@@ -65,7 +65,6 @@ class ModelToArrayTest extends TestCase
             'yearLevel'        => null,
             'isDeleted'        => false,
             'isBoarder'        => false,
-            'isBoarder'        => false,
             'flags'            => [
                 'showWebmailTab'         => null,
                 'showContacts'           => true,
