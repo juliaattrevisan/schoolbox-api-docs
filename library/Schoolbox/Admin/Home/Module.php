@@ -64,15 +64,16 @@ class Module extends BaseModule
             'configMapper'     => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             'kamiConnector'    => $this->getInjector()->lazyGet('kamiConnector'),
             'databaseFactory'  => $this->getInjector()->lazyGet('databaseFactory'),
-            'databaseExternal' => $injector->lazy(
-                static function () use ($injector) {
-                    try {
-                        return $injector->get('databaseExternal');
-                    } catch (Database\Exception $e) {
-                        return null;
-                    }
-                }
-            ),
+            'databaseExternal' => $injector->lazyGet('databaseExternal'),
+//            'databaseExternal' => $injector->lazy(
+//                static function () use ($injector) {
+//                    try {
+//                        return $injector->get('databaseExternal');
+//                    } catch (Database\Exception $e) {
+//                        return null;
+//                    }
+//                }
+//            ),
         ]));
     }
 

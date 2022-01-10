@@ -40,6 +40,11 @@ class ModelToArrayTest extends TestCase
             'name_format'  => '{title} {firstname} {lastname}',
         ]);
 
+        $emptyUser = (new User())
+        ->setFirstname(null)
+        ->setLastname(null)
+        ->setConfigLoader($configLoader);
+
         $emptyResponse = [
             'id'        => null,
             '_links'    => [],
@@ -50,8 +55,7 @@ class ModelToArrayTest extends TestCase
             'isDeleted' => false,
         ];
         yield 'empty fields' => [
-            (new User())
-                ->setConfigLoader($configLoader),
+            clone $emptyUser,
             $emptyResponse,
         ];
 
@@ -119,8 +123,7 @@ class ModelToArrayTest extends TestCase
         $deletedUser              = $emptyResponse;
         $deletedUser['isDeleted'] = true;
         yield 'deleted user' => [
-            (new User())
-                ->setConfigLoader($configLoader)
+            clone $emptyUser
                 ->setDeletedAt(Alaress_Date_Format::now()),
             $deletedUser,
         ];

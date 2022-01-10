@@ -113,7 +113,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
 
 
     /**
-     * @param Mapper[] $dependencies
+     * @param mixed $dependencies
      */
     public function loadDependencies($dependencies = null)
     {

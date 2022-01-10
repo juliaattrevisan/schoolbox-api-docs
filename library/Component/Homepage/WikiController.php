@@ -14,7 +14,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
     /**
      * Available sort fields for this component.
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = ['Heading', 'Created', 'Modified'];
 
@@ -94,79 +94,75 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
             // Custom sorting options
 
-            if (!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
+            $this->setVar('source_folder_deleted_block', '');
+
+            $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
+            /* Prevent multiple blog entries from other categories stacking up in the wrong place
+            * and initialise empty wiki roll by default
+            */
+            $this->setVar('wiki_row_block', '');
+
+            // Controls such as Post News
+
+            /* First check that Allow Create is active. If it is, continue;
+             * otherwise proceed to the usual getPermission()
+             */
+            $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->getInstance()->getId());
+
+            if (((int)$value === 1) && ($this->getContentPermission() < UserAccess::ACCESS_WRITE)) {
+                $this->parse("submit_wiki_block", "submit_wiki");
+            } elseif ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar("submit_wiki_block", "");
             } else {
-                $this->setVar('source_folder_deleted_block', '');
-
-                $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
-                /* Prevent multiple blog entries from other categories stacking up in the wrong place
-                * and initialise empty wiki roll by default
-                */
-                $this->setVar('wiki_row_block', '');
-
-                // Controls such as Post News
-
-                /* First check that Allow Create is active. If it is, continue;
-                 * otherwise proceed to the usual getPermission()
+                /* Allow Create is off
                  */
-                $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->getInstance()->getId());
+                $this->parse("submit_wiki_block", "submit_wiki");
+            }
 
-                if (((int)$value === 1) && ($this->getContentPermission() < UserAccess::ACCESS_WRITE)) {
-                    $this->parse("submit_wiki_block", "submit_wiki");
-                } elseif ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar("submit_wiki_block", "");
-                } else {
-                    /* Allow Create is off
-                     */
-                    $this->parse("submit_wiki_block", "submit_wiki");
-                }
+            // Iterate
+            foreach ($wikiList as $wiki) {
+                $modifiedTime = new Alaress_Date_Format($wiki['modified'], 'U');
 
-                // Iterate
-                foreach ($wikiList as $wiki) {
-                    $modifiedTime = new Alaress_Date_Format($wiki['modified'], 'U');
+                $this->setVar(
+                    [
+                        'WIKI_ID'         => $wiki['wikiID'],
+                        'WIKI_CATEGORYID' => $wiki['categoryID'],
+                        'WIKI_SLUG'       => $wiki['slug'],
+                        'WIKI_HEADING'    => Scrub::text($wiki['heading']),
+                        'WIKI_AUTHOR'     => $userHandler->formatName($wiki),
+                        'WIKI_AUTHOR_ID'  => $wiki['userID'],
+                        'WIKI_MODIFIED'   => $modifiedTime->getRelativeTime(),
+                        'WIKI_BODY'       => TextFormatter::cutSentence(Scrub::html($wiki['body']), 500),
+                    ]
+                );
 
+                if ($this->getConfig('compactMode')) {
                     $this->setVar(
                         [
-                            'WIKI_ID'         => $wiki['wikiID'],
-                            'WIKI_CATEGORYID' => $wiki['categoryID'],
-                            'WIKI_SLUG'       => $wiki['slug'],
-                            'WIKI_HEADING'    => Scrub::text($wiki['heading']),
-                            'WIKI_AUTHOR'     => $userHandler->formatName($wiki),
-                            'WIKI_AUTHOR_ID'  => $wiki['userID'],
-                            'WIKI_MODIFIED'   => $modifiedTime->getRelativeTime(),
-                            'WIKI_BODY'       => TextFormatter::cutSentence(Scrub::html($wiki['body']), 500),
+                            'compact_hide_block' => '',
+                            'WIKI_COMPACT'       => 'compact',
                         ]
                     );
+                } else {
+                    $this->setVar('WIKI_COMPACT', '');
 
-                    if ($this->getConfig('compactMode')) {
-                        $this->setVar(
-                            [
-                                'compact_hide_block' => '',
-                                'WIKI_COMPACT'       => 'compact',
-                            ]
-                        );
-                    } else {
-                        $this->setVar('WIKI_COMPACT', '');
-
-                        $this->parse('compact_hide_block', 'compact_hide');
-                    }
-
-                    $this->setVar('modify_wiki_block', '');
-
-                    if (
-                        ($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
-                        || $this->getContentPermission() >= UserAccess::ACCESS_WRITE
-                    ) {
-                        $this->parse('modify_wiki_block', 'modify_wiki');
-                    }
-
-                    $this->parse('wiki_row_block', 'wiki_row', true);
+                    $this->parse('compact_hide_block', 'compact_hide');
                 }
 
-                $this->parse('source_folder_exists_block', 'source_folder_exists');
+                $this->setVar('modify_wiki_block', '');
+
+                if (
+                    ($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
+                    || $this->getContentPermission() >= UserAccess::ACCESS_WRITE
+                ) {
+                    $this->parse('modify_wiki_block', 'modify_wiki');
+                }
+
+                $this->parse('wiki_row_block', 'wiki_row', true);
             }
+
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
 
             $this->parse('has_wiki_block', 'has_wiki');
         }

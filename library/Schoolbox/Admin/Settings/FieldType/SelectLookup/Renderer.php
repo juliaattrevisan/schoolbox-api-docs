@@ -46,7 +46,7 @@ class Renderer extends Select\Renderer
     protected function buildOptions(string $optionsString): array
     {
         // options: expected to contain mapper class
-        $lookupOptions  = \unserialize($optionsString ?? '', [false]);
+        $lookupOptions  = \unserialize($optionsString, [false]);
         $mapper         = $this->mapperFactory->get($lookupOptions[self::OPTION_KEY_MAPPER]);
         $getKeyMethod   = $lookupOptions[self::OPTION_KEY_GET_KEY_METHOD] ?? 'getId';
         $getValueMethod = $lookupOptions[self::OPTION_KEY_GET_VALUE_METHOD] ?? 'getName';

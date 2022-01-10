@@ -198,9 +198,11 @@ class Factory extends NullableContext\Factory
      * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $options
      * @param Filter\Page\Model                                       $pageFilter
      * @param User                                                    $viewee
-     * @return Collection|GenericCollection|Project\Model[]|Folder\Model[]
+     * @return array{0: GenericCollection|Folder\Model[], 1: GenericCollection|Folder\Model[]}
+     *               0: directly related folders
+     *               1: indirect folders via a unit implementation
      */
-    private function fetchRelatedFolders(GenericCollection $options, Filter\Page\Model $pageFilter, User $viewee): GenericCollection
+    private function fetchRelatedFolders(GenericCollection $options, Filter\Page\Model $pageFilter, User $viewee): array
     {
         $optionNone          = $options[Definition::KEY_NONE];
         $optionClassFolder   = $options[Definition::KEY_ON_CLASS_FOLDER];
@@ -231,12 +233,13 @@ class Factory extends NullableContext\Factory
         $getClasses = $inClass || $inUnitImplImportedToClass;
         $getGroups  = $inGroup || $inUnitImplImportedToGroup;
 
-        $projects = $this->projectMapper->createCollection();
-
         // Are we not getting projects for either classes or groups?
         if (!$getClasses && !$getGroups) {
             // Bug out early.
-            return $projects;
+            return [
+                $this->folderMapper->createCollection(),
+                $this->folderMapper->createCollection(),
+            ];
         }
 
         // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
@@ -300,7 +303,7 @@ class Factory extends NullableContext\Factory
             $placeholders = implode('AND', $builder->getWhere());
 
             $query = "
-                SELECT 
+                SELECT
                   {$this->projectMapper->getColumnString('p')},
                   {$assessmentMapper->getColumnString('a')},
                   {$this->folderMapper->getColumnString('f')},

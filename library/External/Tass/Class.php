@@ -171,8 +171,11 @@ class External_Tass_Class implements External_ClassInterface
                 E_USER_WARNING,
             );
             [$year, $code, $class] = $parts;
-            $year  ??= '';
-            $code  ??= '';
+            // @phpstan-ignore-next-line: $year can be null
+            $year ??= '';
+            // @phpstan-ignore-next-line: $code can be null
+            $code ??= '';
+            // @phpstan-ignore-next-line: $class can be null
             $class ??= '';
         }
 

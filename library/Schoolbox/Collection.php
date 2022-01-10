@@ -843,7 +843,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * collection with the result. If $includeNull == false, iterations that
      * return explicitly null will be omitted from the final result
      *
-     * @param  callback $callback
+     * @param  callable $callback
      * @param  bool $includeNull
      * @return Collection
      */
@@ -863,7 +863,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * Filters out items that don't match $callable, and returns a new
      * collection with the result.
      *
-     * @param  callback $callback
+     * @param  callable $callback
      * @return static
      */
     public function filter(callable $callback)

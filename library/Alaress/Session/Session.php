@@ -39,20 +39,20 @@ class Session extends BaseSession
      *
      * Sets up config dependencies
      *
-     * @param SegmentFactory                 $segment_factory     A session segment factory.
-     * @param \Aura\Session\CsrfTokenFactory $csrf_token_factory  A CSRF token factory.
+     * @param SegmentFactory                 $segment_factory    A session segment factory.
+     * @param \Aura\Session\CsrfTokenFactory $csrf_token_factory A CSRF token factory.
      * @param \Aura\Session\Phpfunc          $phpfunc
-     * @param array                          $cookies             An array of cookies from the client, typically a copy of $_COOKIE.
+     * @param array                          $cookies            An array of cookies from the client, typically a copy of $_COOKIE.
      * @param IConfigLoader                  $config
-     * @param int                            $requestTime         Request time, to compare the session time against
+     * @param int                            $requestTime        Request time, to compare the session time against
      */
     public function __construct(
         SegmentFactory $segment_factory,
         \Aura\Session\CsrfTokenFactory $csrf_token_factory,
         \Aura\Session\Phpfunc $phpfunc,
-        array $cookies = array(),
+        array $cookies,
         \Schoolbox\IConfigLoader $config,
-        $requestTime
+        int $requestTime
     ) {
         parent::__construct($segment_factory, $csrf_token_factory, $phpfunc, $cookies);
         $this->setConfig($config);

@@ -594,9 +594,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function sendHeader($pipe, $code, $allowRetry = false)
     {
-        if (isset(static::$headerMap[$code])) {
+        if (isset(self::$headerMap[$code])) {
             $data = [
-                'error' => static::$headerMap[$code],
+                'error' => self::$headerMap[$code],
                 'code'  => $code,
             ];
 

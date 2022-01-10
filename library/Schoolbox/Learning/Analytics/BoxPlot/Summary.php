@@ -256,9 +256,9 @@ class Summary
     /**
      * Generates Interquartile range
      *
-     * @return float|null
+     * @return float
      */
-    private function generateInterquartileRange(): ?float
+    private function generateInterquartileRange(): float
     {
         return ($this->findMedian($this->setupThirdQuartile()) - $this->findMedian($this->setupFirstQuartile()));
     }

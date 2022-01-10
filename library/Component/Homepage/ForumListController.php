@@ -19,7 +19,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     /**
      * Available sort fields for this component.
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = ['Threads', 'Posts'];
 
@@ -104,59 +104,55 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                 'COMPONENT_NAME'            => strlen($this->getConfig('componentname')) ? $this->getConfig('componentname') : $this->getComponentName(),
             ]);
 
-            if (!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
-            } else {
-                $this->setVar([
-                    'source_folder_deleted_block' => '',
-                    'forum_post_block'            => '',
-                ]);
+            $this->setVar([
+                'source_folder_deleted_block' => '',
+                'forum_post_block'            => '',
+            ]);
 
-                if ($is_post_allowed) {
-                    $this->parse('forum_post_block', 'forum_post');
-                }
-
-                /* Prevent multiple forum entries from other categories stacking up in the wrong place
-                 * and initialise empty forum roll by default
-                 */
-                $this->setVar("forum_block", '');
-
-                // Iterate
-                if (is_array($threadList)) {
-                    $j           = 0;
-                    $userHandler = new User();
-
-                    foreach ($threadList as $thread) {
-                        $user = [
-                            'title'     => $thread['userTitle'],
-                            'firstname' => $thread['userFirstname'],
-                            'lastname'  => $thread['userLastname'],
-                        ];
-
-                        $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
-
-                        $this->setVar([
-                            'THREAD_ID'               => $thread['threadID'],
-                            'THREAD_USER'             => $userHandler->formatName($user),
-                            'THREAD_USER_ID'          => $thread['userID'],
-                            'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
-                            'THREAD_DATE'             => $threadTime->getRelativeTime(),
-                            'THREAD_TITLE'            => Scrub::text($thread['title']),
-                            'forum_reply_block'       => '',
-                        ]);
-
-                        if ($is_post_allowed && ($thread['locked'] != 'true' || $this->getContentPermission() >= UserAccess::ACCESS_FULL)) {
-                            $this->parse('forum_reply_block', 'forum_reply');
-                        }
-
-                        $this->parse("forum_block", "forum", true);
-                    }
-                } else {
-                    $this->setVar("forum_block", '');
-                }
-                $this->parse('source_folder_exists_block', 'source_folder_exists');
-                $this->parse('has_posts_block', 'has_posts');
+            if ($is_post_allowed) {
+                $this->parse('forum_post_block', 'forum_post');
             }
+
+            /* Prevent multiple forum entries from other categories stacking up in the wrong place
+             * and initialise empty forum roll by default
+             */
+            $this->setVar("forum_block", '');
+
+            // Iterate
+            if (is_array($threadList)) {
+                $j           = 0;
+                $userHandler = new User();
+
+                foreach ($threadList as $thread) {
+                    $user = [
+                        'title'     => $thread['userTitle'],
+                        'firstname' => $thread['userFirstname'],
+                        'lastname'  => $thread['userLastname'],
+                    ];
+
+                    $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
+
+                    $this->setVar([
+                        'THREAD_ID'               => $thread['threadID'],
+                        'THREAD_USER'             => $userHandler->formatName($user),
+                        'THREAD_USER_ID'          => $thread['userID'],
+                        'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
+                        'THREAD_DATE'             => $threadTime->getRelativeTime(),
+                        'THREAD_TITLE'            => Scrub::text($thread['title']),
+                        'forum_reply_block'       => '',
+                    ]);
+
+                    if ($is_post_allowed && ($thread['locked'] != 'true' || $this->getContentPermission() >= UserAccess::ACCESS_FULL)) {
+                        $this->parse('forum_reply_block', 'forum_reply');
+                    }
+
+                    $this->parse("forum_block", "forum", true);
+                }
+            } else {
+                $this->setVar("forum_block", '');
+            }
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
+            $this->parse('has_posts_block', 'has_posts');
         }
 
         return true;

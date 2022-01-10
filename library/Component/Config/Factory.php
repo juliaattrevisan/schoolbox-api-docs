@@ -12,7 +12,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 abstract class Component_Config_Factory
 {
 
-    private static $invalid = array('factory', 'abstract', 'interface');
+    private static array $invalid = array('factory', 'abstract', 'interface');
 
     /**
      * @static
@@ -21,7 +21,7 @@ abstract class Component_Config_Factory
      * @param array                                $fields
      * @return Component_Config_Abstract|bool
      */
-    public static function build($key, $context = null, array $fields)
+    public static function build($key, $context, array $fields)
     {
         if (in_array(strtolower($key), self::$invalid)) {
             return false;

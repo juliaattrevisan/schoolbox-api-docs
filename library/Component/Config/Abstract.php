@@ -33,7 +33,7 @@ abstract class Component_Config_Abstract
 
     /**
      * @param Folder|Eportfolio_Page_Instance|null $context
-     * @param null $fields
+     * @param array|null $fields
      */
     public function __construct($context, $fields = null)
     {

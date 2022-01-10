@@ -26,7 +26,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     /**
      * Available sort fields for this component.
      *
-     * @var array
+     * @var string[]
      */
     protected $sortFields = ['Name', 'Date'];
 
@@ -149,76 +149,72 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
             $this->setVar('empty_state_block', '');
 
-            if (!$this->isSourceRenderable()) {
-                return $this->renderSourceUnavailable();
-            } else {
+            $this->setVar(
+                [
+                    'source_folder_deleted_block' => '',
+                    'link_block'                  => '',
+                ]
+            );
+
+            foreach ($allLinks as $currentLink) {
                 $this->setVar(
                     [
-                        'source_folder_deleted_block' => '',
-                        'link_block'                  => '',
+                        'LINK_ID'           => Scrub::text($currentLink->getId()),
+                        'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
+                        'LINK_TARGET'       => Scrub::text($currentLink->getLinkTarget()),
+                        'LINK_POSTED_BY'    => Scrub::text($currentLink->getOwner()->formatName()),
+                        'LINK_POSTED_BY_ID' => Scrub::text($currentLink->getOwner()->getId()),
+                        'LINK_POSTED_DATE'  => Scrub::text($currentLink->getSubmitted()->getShort()),
+                        'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
+                        'HIDDEN'            => $currentLink->getHidden() ? 'translucent' : '',
                     ]
                 );
 
-                foreach ($allLinks as $currentLink) {
-                    $this->setVar(
-                        [
-                            'LINK_ID'           => Scrub::text($currentLink->getId()),
-                            'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
-                            'LINK_TARGET'       => Scrub::text($currentLink->getLinkTarget()),
-                            'LINK_POSTED_BY'    => Scrub::text($currentLink->getOwner()->formatName()),
-                            'LINK_POSTED_BY_ID' => Scrub::text($currentLink->getOwner()->getId()),
-                            'LINK_POSTED_DATE'  => Scrub::text($currentLink->getSubmitted()->getShort()),
-                            'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
-                            'HIDDEN'            => $currentLink->getHidden() ? 'translucent' : '',
-                        ]
-                    );
-
-                    // Owner name and optional link
-                    if ($currentLink->getOwner()->isDeleted()) {
-                        $this->setVar('owner_exists_block', '');
-                        $this->parse('owner_deleted_block', 'owner_deleted');
-                    } else {
-                        $this->parse('owner_exists_block', 'owner_exists');
-                        $this->setVar('owner_deleted_block', '');
-                    }
-
-                    // Controls
-                    if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                        $this->setVar('modify_link_block', '');
-                    } else {
-                        $this->parse('modify_link_block', 'modify_link');
-                    }
-
-                    $this->parse("link_block", "link", true);
+                // Owner name and optional link
+                if ($currentLink->getOwner()->isDeleted()) {
+                    $this->setVar('owner_exists_block', '');
+                    $this->parse('owner_deleted_block', 'owner_deleted');
+                } else {
+                    $this->parse('owner_exists_block', 'owner_exists');
+                    $this->setVar('owner_deleted_block', '');
                 }
 
-                $showComponentAction = false;
+                // Controls
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar('submit_link_block', '');
+                    $this->setVar('modify_link_block', '');
                 } else {
-                    $showComponentAction = true;
-                    $this->parse('submit_link_block', 'submit_link');
+                    $this->parse('modify_link_block', 'modify_link');
                 }
 
-                // Show view all links button, only when total available is more than links displayed.
-                if (\count($allLinks) < $linkCount && $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                    $showComponentAction = true;
-                    $this->parse('view_all_links_block', 'view_all_links');
-                } else {
-                    $this->setVar('view_all_links_block', '');
-                }
-
-                if ($showComponentAction) {
-                    $this->parse('component_action_block', 'component_action');
-                } else {
-                    $this->setVar('component_action_block', '');
-                }
-
-                $this->parse('source_folder_exists_block', 'source_folder_exists');
+                $this->parse("link_block", "link", true);
             }
 
-            $this->parse('has_link_block', 'has_link');
+            $showComponentAction = false;
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                $this->setVar('submit_link_block', '');
+            } else {
+                $showComponentAction = true;
+                $this->parse('submit_link_block', 'submit_link');
+            }
+
+            // Show view all links button, only when total available is more than links displayed.
+            if (\count($allLinks) < $linkCount && $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                $showComponentAction = true;
+                $this->parse('view_all_links_block', 'view_all_links');
+            } else {
+                $this->setVar('view_all_links_block', '');
+            }
+
+            if ($showComponentAction) {
+                $this->parse('component_action_block', 'component_action');
+            } else {
+                $this->setVar('component_action_block', '');
+            }
+
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
+
+        $this->parse('has_link_block', 'has_link');
 
         return true;
     }

@@ -107,12 +107,12 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     public function buildCurrentState($page, $enabledOnly): GenericCollection
     {
         /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
-        $savedPageFilters = $this->getPageMapper()->findForPageAndEntity($page, static::getEntity())->indexByCallback(function (Page\Model $pageFilter) {
+        $savedPageFilters = $this->getPageMapper()->findForPageAndEntity($page, $this->getEntity())->indexByCallback(function (Page\Model $pageFilter) {
             return $pageFilter->getFilter()->getId();
         });
 
         // Get all filters for this entity type
-        $entityFilters = $this->getFilterMapper()->findForEntity(static::getEntity());
+        $entityFilters = $this->getFilterMapper()->findForEntity($this->getEntity());
 
         $definitions = $this->createDefinitionCollection();
 
@@ -232,12 +232,12 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return string
      * @throws DomainException If called on abstract, or concrete class that does not override
      */
-    private static function getEntity(): string
+    private function getEntity(): string
     {
-        if ('' === static::ENTITY) {
+        if ('' === $this::ENTITY) {
             throw new DomainException('Concrete classes must define this constant');
         }
-        return static::ENTITY;
+        return $this::ENTITY;
     }
 
 
@@ -302,7 +302,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     {
         // What pageFilters could appear on this page ?
         /** @var GenericCollection|Model[] $availableFilters */
-        $availableFilters = $this->getFilterMapper()->findForEntity(static::getEntity())->filter(function (Model $instance) use ($page) {
+        $availableFilters = $this->getFilterMapper()->findForEntity($this->getEntity())->filter(function (Model $instance) use ($page) {
             $definitionClass = $instance->getClass();
             return in_array($page, $definitionClass::getPages($this->configLoader), true);
         });
@@ -313,7 +313,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         // Note we cannot filter by $enabledOnly, $userConfigurableOnly here, as we want explicitly disabled items
         // to not be ignored later when we insert initial state to fill missing data
         /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
-        $savedPageFilters = $pageFilterMapper->findForPageAndEntity($page, static::getEntity())->indexByCallback(function (Page\Model $pageFilter) {
+        $savedPageFilters = $pageFilterMapper->findForPageAndEntity($page, $this->getEntity())->indexByCallback(function (Page\Model $pageFilter) {
             return $pageFilter->getFilter()->getId();
         });
 

@@ -16,7 +16,7 @@ abstract class Base
     /**
      * Result data
      *
-     * @var null
+     * @var mixed
      */
     protected $result = null;
 
@@ -25,8 +25,7 @@ abstract class Base
      *
      * Try until one of the strategies matches
      *
-     * @param  Strategy\Internal\Base[] $responsibilities
-     * @return mixed
+     * @param Strategy\Internal\Base[] $responsibilities
      */
     protected function start($responsibilities)
     {
@@ -45,7 +44,7 @@ abstract class Base
     /**
      * Set result
      *
-     * @param null $result
+     * @param mixed $result
      */
     protected function setResult($result)
     {
@@ -55,7 +54,7 @@ abstract class Base
     /**
      * Get result
      *
-     * @return null
+     * @return mixed
      */
     public function getResult()
     {

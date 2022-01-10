@@ -444,7 +444,11 @@ class ConnectorTest extends TestCase
         ResponseInterface $response
     ): void {
         $connector = new MockConnector($this->getMockClient($response));
-        $session   = $connector->viewSession('2kmcksmndlkansdlk', new User());
+        $user = new User();
+        $user->setFirstname('Mock User');
+        $user->setLastname('Mock Surname');
+
+        $session   = $connector->viewSession('2kmcksmndlkansdlk', $user);
 
         $this->assertEquals($viewerUrl, $session->getViewerUrl());
         $this->assertEquals($viewSessionKey, $session->getViewSessionKey());
@@ -473,7 +477,11 @@ class ConnectorTest extends TestCase
             json_encode(["errors" => ["Record Not Found"],])
         );
         $connector = new MockConnector($this->getMockClient($response));
-        $connector->viewSession('asdfghjkl', new User());
+        $user = new User();
+        $user->setFirstname('Mock User');
+        $user->setLastname('Mock Surname');
+
+        $connector->viewSession('asdfghjkl', $user);
     }
 
 
@@ -489,7 +497,11 @@ class ConnectorTest extends TestCase
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
         $connector = new MockConnector($this->getMockClient($response));
-        $connector->viewSession('asdfghjkl', new User());
+        $user = new User();
+        $user->setFirstname('Mock User');
+        $user->setLastname('Mock Surname');
+
+        $connector->viewSession('asdfghjkl', $user);
     }
 
 

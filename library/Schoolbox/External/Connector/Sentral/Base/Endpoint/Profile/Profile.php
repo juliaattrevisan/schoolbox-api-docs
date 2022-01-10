@@ -360,7 +360,7 @@ class Profile implements IStrategy
                  */
                 $studentProfile
                     ->setUsername($username)
-                    ->setAlertComment($alertComments ?? null)
+                    ->setAlertComment($alertComments)
                     ->setAlertLegal($alertLegal ?? null)
                     ->setAlertMessage($messages)
                     ->setCampusName($campusName)
@@ -521,6 +521,7 @@ class Profile implements IStrategy
      * Assign campuses if they exist in the mapping
      * Otherwise quietly disregard bad data
      *
+     * @phpstan-ignore-next-line: this will eventually return a string
      * @return string|null
      */
     private function findCampusName(): ?string
@@ -742,6 +743,7 @@ class Profile implements IStrategy
     /**
      * Find legal alerts
      *
+     * @phpstan-ignore-next-line: this will eventually return a string
      * @return string|null
      */
     private function findLegal(): ?string
@@ -757,10 +759,10 @@ class Profile implements IStrategy
      *
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
-     * @return string|null
+     * @return string
      * @throws \InvalidArgumentException
      */
-    private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): ?string
+    private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): string
     {
 
         /* Find another endpoint who can tell us the answer

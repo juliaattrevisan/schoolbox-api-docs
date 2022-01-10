@@ -262,9 +262,9 @@ class Mapper extends BaseMapper
      *
      * @todo migrate this into hydrateSelect
      *
-     * @param array  $row
-     * @param string $alias
-     * @param null   $callback
+     * @param array         $row
+     * @param string        $alias
+     * @param callable|null $callback
      *
      * @return object|Model
      */

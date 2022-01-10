@@ -60,38 +60,22 @@ abstract class Base
      * Render clickable tab menu
      *
      * @param MapperResult $mapperResult
-     * @param string|null $type
      */
-    public function renderTab(MapperResult $mapperResult, $type)
+    public function renderTab(MapperResult $mapperResult)
     {
         if ($mapperResult->getCount()) {
-            $this->getPage()->setVar(array(
-                'TYPE_TYPE' => $this->getType(),
-                'TYPE_NAME' => $this->getTabName(),
+            $this->getPage()->setVar([
+                'TYPE_TYPE'  => $this->getType(),
+                'TYPE_NAME'  => $this->getTabName(),
                 'TYPE_COUNT' => $mapperResult->getCount(),
-            ));
-
-            /* Rage these styles in, because of css specificity
-             */
-            if ($this->getType() == 'all') {
-                $this->getPage()->setVar(array(
-                    'TYPE_CLASS' => ''
-                ));
-            } elseif (!$mapperResult->getCount()) {
-                $this->getPage()->setVar(array(
-                    'TYPE_CLASS' => 'hide'
-                ));
-            } else {
-                $this->getPage()->setVar(array(
-                    'TYPE_CLASS' => ''
-                ));
-            }
+                'TYPE_CLASS' => '',
+            ]);
 
             $this->getPage()->parse('type_block', 'type', true);
 
-            $this->getPage()->setVar(array(
+            $this->getPage()->setVar([
                 'RESULT_TYPE' => $this->getType(),
-            ));
+            ]);
 
             $this->getPage()->parse('result_block', 'result', true);
         }
@@ -168,8 +152,8 @@ abstract class Base
             ));
 
             $this->getPage()->parse('pagination_block', 'pagination', true);
-        } // only 1 page to display
-        else {
+        } else {
+            // only 1 page to display
             $this->getPage()->setVar('pagination_block');
         }
 

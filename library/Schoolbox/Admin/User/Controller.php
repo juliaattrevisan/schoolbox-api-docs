@@ -438,6 +438,8 @@ class Controller extends Base
     public function getInsert()
     {
         $user = $this->userMapper->createModel()
+            ->setFirstname(null)
+            ->setLastname(null)
             ->setDisplayGradeGraph($this->getConfigLoader()->get('display_grade_graph'));
 
         /* Attachzone for profile picture

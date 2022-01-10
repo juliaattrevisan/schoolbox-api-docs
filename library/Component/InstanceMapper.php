@@ -306,7 +306,7 @@ class Component_InstanceMapper extends BaseMapper
 
             // The results will contain multiple rows referencing the same component, we only want to hydrate the
             // component definition once, so we need to test if it already exists in our collection
-            /** @var Component_Definition $definition */
+            /** @var Component_Definition|null $definition */
             $definition = $definitionCollection->getOffset($definitionId);
 
             if (empty($definition) && $definitionId) {

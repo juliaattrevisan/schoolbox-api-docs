@@ -31,7 +31,7 @@ class Model implements ISoftDeletable
     /**
      * Supported mime types
      *
-     * @var string[]
+     * @var array<string, bool>
      */
     const ALLOWED_FILE_TYPES = [
         'doc'     => true,

@@ -155,11 +155,7 @@ class Builder implements IBuilder
     {
         foreach ($columnList as $columnName => $columnValue) {
             if (\is_iterable($columnValue)) {
-                try {
-                    $this->in($columnName, $columnValue);
-                } catch (TypeError $e) {
-                    // impossible to throw as we have checked type is traversable
-                }
+                $this->in($columnName, $columnValue);
             } else {
                 // May be null, bool, or scalar
                 $this->addPredicate($columnName, $columnValue);

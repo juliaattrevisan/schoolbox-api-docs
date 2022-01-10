@@ -151,7 +151,6 @@ abstract class Base implements IStatement
      */
     public function nextRowset()
     {
-        /** @var PDOStatement $statement */
         $statement = $this->statement;
 
         try {

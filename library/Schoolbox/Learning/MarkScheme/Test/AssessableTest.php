@@ -3034,30 +3034,39 @@ class AssessableTest extends TestCase
         switch ($userId) {
             case 1:
                 $user->setFirstname('Andrew (Student)');
+                $user->setLastname('Andrew (Student)');
                 break;
             case 2:
                 $user->setFirstname('Barry (Student)');
+                $user->setLastname('Barry (Student)');
                 break;
             case 3:
                 $user->setFirstname('Charlie (Student)');
+                $user->setLastname('Charlie (Student)');
                 break;
             case 4:
                 $user->setFirstname('David (Student)');
+                $user->setLastname('David (Student)');
                 break;
             case 5:
                 $user->setFirstname('Ethan (Student)');
+                $user->setLastname('Ethan (Student)');
                 break;
             case 6:
                 $user->setFirstname('Fred (Student)');
+                $user->setLastname('Fred (Student)');
                 break;
             case 7:
                 $user->setFirstname('Gary (Student)');
+                $user->setLastname('Gary (Student)');
                 break;
             case 8:
                 $user->setFirstname('Harry (Student)');
+                $user->setLastname('Harry (Student)');
                 break;
             case 9:
                 $user->setFirstname('Issac (Student)');
+                $user->setLastname('Issac (Student)');
                 break;
             default:
                 throw new InvalidArgumentException("Unknown userId: $userId");
@@ -3082,9 +3091,11 @@ class AssessableTest extends TestCase
         switch ($userId) {
             case 101:
                 $user->setFirstname('Andy (Teacher)');
+                $user->setLastname('Andy (Teacher)');
                 break;
             case 102:
                 $user->setFirstname('Boris (Teacher)');
+                $user->setLastname('Boris (Teacher)');
                 break;
             default:
                 throw new InvalidArgumentException("Unknown userId: $userId");

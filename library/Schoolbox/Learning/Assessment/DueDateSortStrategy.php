@@ -80,6 +80,7 @@ class DueDateSortStrategy
      *
      * @param IAssessable $assessment
      * @return Alaress_Date_Format|null
+     * @phpstan-ignore-next-line: getDueAt may return null
      */
     private function retrieveDateForSort(IAssessable $assessment): ?Alaress_Date_Format
     {

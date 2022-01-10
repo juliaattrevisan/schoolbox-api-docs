@@ -241,7 +241,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /**
      * @param Campus $campus
      * @param int    $date
-     * @return bool|int|string
+     * @return int
      * @throws \Alaress\Database\Exception
      */
     private function fetchDayNumber(Campus $campus, $date = 0)
@@ -273,6 +273,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $statement->execute();
         $statement->close();
 
+        // @phpstan-ignore-next-line: $currentDay can be set by reference
         return $currentDay ?? 0;
     }
 

@@ -50,7 +50,7 @@ class Model implements ISoftDeletable
     protected $firstStep;
 
     /**
-     * @var GenericCollection|Trigger[]
+     * @var GenericCollection|Trigger\Model[]
      */
     protected $triggerList;
 
@@ -162,7 +162,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return GenericCollection|Trigger[]
+     * @return GenericCollection|Trigger\Model[]
      */
     public function getTriggerList()
     {

@@ -21,7 +21,6 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
-use ZendService\Apple\Apns;
 
 /**
  * Class ServiceManager
@@ -168,6 +167,7 @@ class ServiceManager implements IServiceManager
      */
     private function findRegistrationsByUser($userId)
     {
+        /** @var array<string, array<string, Registry>> $registrations */
         $registrations = [];
 
         foreach (RegistryMapper::getInstance()->findByColumn('user_id', $userId) as $registration) {
@@ -178,6 +178,7 @@ class ServiceManager implements IServiceManager
                 $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
             }
 
+            // @phpstan-ignore-next-line: WTF is this?
             if (empty($p)) {
                 $p['service'] = $srv;
                 $p['registrations'] = new GenericCollection(Registry::class);

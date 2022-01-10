@@ -45,7 +45,10 @@ trait CSVTrait
             $event->getDetail() ? \Scrub::htmlAbsoluteUri($event->getDetail(), $this->baseUrl) : '',
             $event->getLocation(),
             $event->getType(),
-            empty($event->getPublishDate()) ? '' : $event->getPublishDate()->getLocalShort(),
+            // @phpstan-ignore-next-line: this could be a null date
+            ($event->getPublishDate() && !$event->getPublishDate()->isNull())
+                ? $event->getPublishDate()->getLocalShort()
+                : '',
             $event->canAttend() ? 1 : 0,
         ];
 

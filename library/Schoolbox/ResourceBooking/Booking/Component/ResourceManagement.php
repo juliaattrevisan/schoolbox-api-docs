@@ -12,6 +12,7 @@
 
 namespace Schoolbox\ResourceBooking\Booking\Component;
 
+use Calendar\Event\Type\ResourceBooking\Event;
 use Component_Dashboard_ControllerAbstract;
 use Calendar_Api_EventType_ResourceBooking_Moderation_Default;
 use Schoolbox\ResourceBooking\Booking;
@@ -83,15 +84,16 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         // (They should be date-ordered already)
         $groupedBookings = [];
         foreach ($bookingEvents as $event) {
-            /** @var \Calendar\Event\Type\ResourceBooking\Event $event */
-            $itemId = $event->getBooking()->getResource()->getId();
-            if (empty($groupedBookings[$itemId])) {
-                $groupedBookings[$itemId] = [
-                    'resource'      => $event->getBooking()->getResource(),
-                    'bookingEvents' => [],
-                ];
+            if ($event instanceof Event) {
+                $itemId = $event->getBooking()->getResource()->getId();
+                if (empty($groupedBookings[$itemId])) {
+                    $groupedBookings[$itemId] = [
+                        'resource'      => $event->getBooking()->getResource(),
+                        'bookingEvents' => [],
+                    ];
+                }
+                $groupedBookings[$itemId]['bookingEvents'][] = $event;
             }
-            $groupedBookings[$itemId]['bookingEvents'][] = $event;
         }
         usort($groupedBookings, function ($a, $b) {
             return strcmp($a['resource']->getName(), $b['resource']->getName());

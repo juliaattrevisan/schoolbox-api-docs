@@ -69,7 +69,7 @@ class Markbook
     /**
      * @var int
      */
-    private $totalWeight;
+    private $totalWeight = 0;
 
     /**
      * Normalised (0.0 - 100.0) average mark for all assessments in this markbook

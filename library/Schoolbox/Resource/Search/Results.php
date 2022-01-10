@@ -140,7 +140,7 @@ class Results implements Searchable
             if (($this->type === 'all') || ($currentDefinition->getType() === $this->type)) {
                 $searcher = $this->result->getOffset($currentDefinition->getType());
 
-                $currentDefinition->getRenderer()->renderTab($searcher, $this->type);
+                $currentDefinition->getRenderer()->renderTab($searcher);
             }
         }
     }

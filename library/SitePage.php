@@ -41,7 +41,7 @@ class SitePage extends Page
     /** @var bool $lite */
     private $lite;
 
-    /** @var User $user */
+    /** @var User|null $user */
     private $user;
 
     /** @var ConfigLoader */
@@ -315,7 +315,7 @@ class SitePage extends Page
 
         if (
             !$_SESSION['user'] instanceof User || //If session does not exist ||
-            (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
+            ((int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
             ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
             // Catch users with the remember me cookie
@@ -490,9 +490,9 @@ class SitePage extends Page
      * Usage - SitePage::localRedir($url)
      *
      * @static
-     * @param  string $file
-     * @param  bool $keepProcessing True if processing continues in background
-     * @param  int $responseCode If set, output this response code.
+     * @param  string|null $file           If null, redirect to dashboard
+     * @param  bool        $keepProcessing True to keep processing in background
+     * @param  int         $responseCode   If set, output this response code.
      * @return void
      */
     public static function localRedir($file, $keepProcessing = false, $responseCode = null)

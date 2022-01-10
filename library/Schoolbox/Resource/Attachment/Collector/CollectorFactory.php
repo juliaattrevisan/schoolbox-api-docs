@@ -100,9 +100,7 @@ class CollectorFactory
 
             $mapped = $map[$xpl[0]];
 
-            if (empty($handlers[$xpl[0]])) {
-                $handlers[$mapped] = $this->get($xpl[0]);
-            }
+            $handlers[$mapped] ??= $this->get($xpl[0]);
 
             $indexedAttachments[$mapped][] = $xpl[1];
         }

@@ -21,9 +21,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     use SerializeTrait;
 
     /**
-     * @var static
+     * Cached instance of the current date.
      */
-    private static $now;
+    private static ?Alaress_Date_Format $now = null;
 
     /**
      * @var Carbon
@@ -74,22 +74,22 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
      *
      * @param IClock $clock
-     * @return static
+     * @return self
      */
     public static function now(IClock $clock = null): self
     {
         if ($clock) {
             // always give precendence to a clock if passed in
-            return new static($clock->time(), 'U');
+            return new self($clock->time(), 'U');
         }
 
         if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
             // if we're CLI, do not freeze time
-            return new static(time(), 'U');
+            return new self(time(), 'U');
         }
 
         // down here, cache the clock at time of request
-        if (!self::$now instanceof static) {
+        if (!self::$now instanceof Alaress_Date_Format) {
             if (isset($_SERVER['REQUEST_TIME'])) {
                 $time = $_SERVER['REQUEST_TIME'];
             } else {
@@ -98,11 +98,11 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 // @codeCoverageIgnoreEnd
             }
 
-            static::$now = new static($time, 'U');
+            self::$now = new self($time, 'U');
         }
 
         // never return the actual object, always a clone
-        return clone static::$now;
+        return clone self::$now;
     }
 
     /**

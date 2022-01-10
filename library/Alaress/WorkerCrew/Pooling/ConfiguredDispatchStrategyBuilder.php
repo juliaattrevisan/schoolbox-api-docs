@@ -75,22 +75,15 @@ class ConfiguredDispatchStrategyBuilder
 
 
     /**
-     * @param string $element
-     * @return array|string
+     * @return array
      */
-    public function summarise($element = '')
+    public function summarise()
     {
-        $summary = array(
+        return [
             'queue'  => sprintf("Q : n < %d <= %d, every %dms", $this->queueWarnSize, $this->queueMaxSize, $this->queueDelay),
             'worker' => sprintf("W : %d <= n <= %d", $this->minWorkers, $this->maxWorkers),
             'task'   => sprintf("T : t < %dms <= %dms", $this->workerTimeoutSoft, $this->workerTimeoutHard),
-        );
-
-        if (isset($summary[$element])) {
-            return $summary[$element];
-        }
-
-        return $summary;
+        ];
     }
 
 

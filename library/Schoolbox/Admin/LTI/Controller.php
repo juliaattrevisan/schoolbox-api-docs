@@ -123,10 +123,7 @@ class Controller extends ConfigController
      */
     public function postDelete(Provider $provider): void
     {
-        if (!empty($provider)) {
-            $this->providerMapper->delete($provider);
-        }
-
+        $this->providerMapper->delete($provider);
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLti.getIndex'));
     }
 

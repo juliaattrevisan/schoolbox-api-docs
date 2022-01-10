@@ -31,15 +31,6 @@ class Creational extends AbstractFactory
     private const EXTERNAL_TITLE_LENGTH = 255;
 
     /**
-     * The way in which things were uploaded
-     * (one of url, upload, resource)
-     *
-     * @var string
-     */
-    private $type;
-
-
-    /**
      * The object that was produced by the factory
      *
      * @var \SocialStream_Post_Abstract
@@ -138,7 +129,7 @@ class Creational extends AbstractFactory
                 $this->product = new \SocialStream_Post_Url();
                 $this->populate($data);
             }
-        } elseif (($this->type === 'upload') && ($_FILES['file']['size'] > 0)) {
+        } elseif ($_FILES['file']['size'] > 0) {
             /* If upload option was chosen, extract metadata and thumbnail information
              * directly from already-known information (no curling needed)
              */

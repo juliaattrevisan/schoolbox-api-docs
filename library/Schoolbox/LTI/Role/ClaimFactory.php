@@ -118,7 +118,7 @@ class ClaimFactory
         // Instructor case
         if ($this->access->isInstructor($user, $assessment->getBaseContext()->getFolder())) {
             $roles[] = self::MEMBERSHIP_ROLE_INSTRUCTOR;
-            foreach (($assessment->getAllParticipants() ?? []) as $participant) {
+            foreach (($assessment->getAllParticipants()) as $participant) {
                 if (!$participant->isExcluded()) {
                     $roles[] = self::MEMBERSHIP_ROLE_MENTOR;
                     break;

@@ -165,15 +165,15 @@ class DataSource
      * @param int                  $folderId
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param null                 $role
+     * @param string                 $role
      * @param string               $orderBy
-     * @param null                 $limit
+     * @param int|null                 $limit
      * @return Collection
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws MapperException
      */
-    public function getVisitors($folderId, $startDate, $endDate, $role = null, $orderBy, $limit = null)
+    public function getVisitors($folderId, $startDate, $endDate, $role, $orderBy, $limit = null)
     {
         $queryParams = [
             'folderId' => $folderId,

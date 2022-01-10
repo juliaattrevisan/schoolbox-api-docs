@@ -10,11 +10,6 @@ parameters:
         - library
         - tools
     inferPrivatePropertyTypeFromConstructor: true
-    excludes_analyse:
-        - library/Schoolbox/Sync/Iterator/StackableTrait.php
-        - library/Schoolbox/Sync/Iterator/Guardian.php
-        - library/Schoolbox/Sync/Iterator/Staff.php
-        - library/Schoolbox/Sync/Iterator/Student.php
 
 includes:
-	- phpstan-baseline.neon
+    - phpstan-baseline.neon

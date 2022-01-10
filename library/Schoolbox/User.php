@@ -47,11 +47,21 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var string */
     private $title;
 
-    /** @var string */
-    private $firstname;
+    /**
+     * The user's first name.
+     *
+     * It's expected but not mandatory that it is not null.
+     *
+     * @var string|null
+     */
+    private ?string $firstname;
 
-    /** @var string */
-    private $lastname;
+    /**
+     * The user's last name (a.k.a. surname).
+     *
+     * It's expected but not mandatory that it is not null.
+     */
+    private ?string $lastname;
 
     /** @var null|string */
     private $externalId;
@@ -68,8 +78,11 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var string */
     private $username;
 
-    /** @var string */
-    private $password;
+    /**
+     * The user's encoded password: may be null if they have no password for
+     * logging in.
+     */
+    private ?string $password;
 
     /**
      * Retrievable version of the user's password.
@@ -563,10 +576,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @param string $firstname
+     * @param string|null $firstname
      * @return self
      */
-    public function setFirstname($firstname)
+    public function setFirstname(?string $firstname): self
     {
         $this->firstname = $firstname;
         return $this;
@@ -574,9 +587,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFirstname()
+    public function getFirstname(): ?string
     {
         return $this->firstname;
     }
@@ -664,10 +677,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @param string $lastname
+     * @param string|null $lastname
      * @return self
      */
-    public function setLastname($lastname)
+    public function setLastname(?string $lastname): self
     {
         $this->lastname = $lastname;
         return $this;
@@ -675,9 +688,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getLastname()
+    public function getLastname(): ?string
     {
         return $this->lastname;
     }
@@ -704,10 +717,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @param string $password
+     * @param string|null $password
      * @return self
      */
-    public function setPassword($password)
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
         return $this;
@@ -715,9 +728,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -1372,7 +1385,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return GenericCollection|User[]
+     * @return GenericCollection<User>
      */
     public function getChildren()
     {

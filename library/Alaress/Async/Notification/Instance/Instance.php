@@ -610,6 +610,9 @@ class Instance implements JsonSerializable
         // But what if the message is delivered to multiple users differently?
         $topic = $this->topics[0];
         [, $delivery] = explode('.', $topic);
+
+        // PHPStan is wrong to report this: `$delivery` _can_ be null
+        /** @phpstan-ignore-next-line */
         return $delivery ?? self::DELIVERY_NOTIFY;
     }
 

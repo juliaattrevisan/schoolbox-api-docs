@@ -120,6 +120,8 @@ class Attendance_Synergetic_AttendanceMaster
         // Don't know if all these are required. But it is possible for the query to return an unknown
         // value for AttendanceMasterSeq due to an error handler in the stored procedure.
 
+        // $attendanceMasterSeq is passed by reference, so it can be set
+        /** @phpstan-ignore-next-line */
         if ($result && !empty($attendanceMasterSeq) && is_numeric($attendanceMasterSeq) && $attendanceMasterSeq > 0) {
             $this->setAttendanceMasterSeq($attendanceMasterSeq);
         } else {

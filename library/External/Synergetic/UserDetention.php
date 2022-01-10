@@ -61,10 +61,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         }
 
         // Slam the where part in
-        $wherePart = '';
-        if (!empty($whereParts)) {
-            $wherePart = 'WHERE ' . implode(' AND ', $whereParts);
-        }
+        $wherePart = 'WHERE ' . implode(' AND ', $whereParts);
 
         return array($wherePart, $params,);
     }

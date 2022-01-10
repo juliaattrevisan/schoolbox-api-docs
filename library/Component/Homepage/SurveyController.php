@@ -135,8 +135,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
                             // If the last assess is not completed provide resume link
-                            if (
-                                !$attempt['finish']
+                            if (!$attempt['finish']
                                 && ($attemptTimeRemaining < 0
                                     || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION
                                 )
@@ -181,7 +180,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             $this->parse('reviewLink_block', 'reviewLink');
                         } else {
                             // show to everyone unless expired
-                            if (strtotime($currentSurvey['finish']) < time()) {
+                            if ((int)strtotime($currentSurvey['finish']) < time()) {
                                 $this->parse('surveyNoLink_block', 'surveyNoLink');
                                 $this->setVar(
                                     [

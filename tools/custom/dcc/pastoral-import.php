@@ -334,6 +334,8 @@ HELP;
      * This seems to be a windows machine to use the other slash instead
      *
      * @param string $filepath
+     *
+     @ @phpstan-ignore-next-line: I don't know how this never returns false
      * @return false|string
      */
     private function getFilename(string $filepath)

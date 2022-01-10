@@ -18,9 +18,9 @@ class MockTokenizer extends Tokenizer
 {
 
     /**
-     * @var array $tokens
+     * @param array $tokens
      */
-    public function __construct($tokens)
+    public function __construct(array $tokens)
     {
         foreach ($tokens as $key => $label) {
             $this->addToken(new Token($key, $label, function ($entity, $settings) {

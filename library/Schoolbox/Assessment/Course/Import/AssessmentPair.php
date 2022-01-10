@@ -38,6 +38,7 @@ class AssessmentPair
 
     /**
      * If this pair is a sub-pair (ie inside a Project) this points to parent Project pair.
+     * @phpstan-ignore-next-line: this property _is_ written by the constructor
      *
      * @var AssessmentPair|null
      */
@@ -63,8 +64,8 @@ class AssessmentPair
             } elseif (!$impl->getDeletedAt() instanceof \Alaress_Date_NullDate) {
                 throw new \DomainException('AssessmentImpl cannot be deleted: ' . $impl->getId());
             }
-        } // else we must have just received a Spec
-        else {
+        } else {
+            // else we must have just received a Spec
             // Ensure it is not deleted
             if (is_null($spec->getDeletedAt())) {
                 throw new \DomainException("AssessmentSpec deletedAt required for integrity check: {$spec->getId()}");

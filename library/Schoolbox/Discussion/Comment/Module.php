@@ -18,6 +18,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception;
@@ -148,17 +149,17 @@ abstract class Module extends BaseModule
                 'comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
             ];
         } catch (Exception $e) {
-            throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
     }
 
     /**
-     * @return Error\Mapper|IMapper
+     * @return ErrorMapper
      * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getErrorMapper()
+    private function getErrorMapper(): ErrorMapper
     {
-        return $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class);
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 
 

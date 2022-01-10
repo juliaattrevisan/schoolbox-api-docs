@@ -60,7 +60,7 @@ class Campus implements HydratorInterface
                     }
                 }
             }
-            if (!empty($campusList)) {
+            if (count($campusList) > 0) {
                 $user->setCampusCollection($campusList);
             }
         }

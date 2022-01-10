@@ -1448,17 +1448,6 @@ class Leave_Controller extends Controller
      * @param string $dateStart
      * @param string $dateEnd
      * @throws ApplicationException\NotFound if house isn't found
-     * @return array              $return
-     * @var HouseResidential      $return['house']
-     * @var string                $return['dateStart']
-     * @var string                $return['dateEnd']
-     * @var string                $return['reportTimespan']
-     * @var Alaress_Date_Format   $return['reportStart']
-     * @var Alaress_Date_Format   $return['reportFinish']
-     * @var \Schoolbox\Collection $return['requestList']
-     * @var Leave_Request         $return['requestList'][]
-     * @var \Schoolbox\Collection $return['houseList']
-     * @var HouseResidential      $return['houseList'][]
      */
     public function executeHouseReport($houseId, $timespan, $dateStart, $dateEnd)
     {

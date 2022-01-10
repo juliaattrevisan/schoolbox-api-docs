@@ -82,7 +82,7 @@ class Connection
 
 
     /**
-     * @var PromiseInterface
+     * @var PromiseInterface|null
      */
     private $connectionPromise;
 

@@ -99,7 +99,7 @@ class DueWorkStatus extends TestCase
             $countStates++;
         }
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected count: 1, Actual count: $countStates.";
+        $message = "User: {$participant->getUser()->getUsername()}, Expected count: 1, Actual count: $countStates.";
         $this->assertEquals(1, $countStates, $message);
     }
 

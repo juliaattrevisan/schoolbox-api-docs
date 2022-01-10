@@ -100,6 +100,8 @@ class Base implements ITransactor
             throw $this->buildNotInTransactionException();
         }
         if ($this->strategy->commit()) {
+            // inTransaction is volatile (may have changed since the last call)
+            /** @phpstan-ignore-next-line */
             if (!$this->inTransaction()) {
                 // Are all transactions complete? Run hooks FIFO
                 // (Clear the stack before running, because otherwise a commit
@@ -134,6 +136,8 @@ class Base implements ITransactor
             throw $this->buildNotInTransactionException();
         }
         if ($this->strategy->rollback()) {
+            // inTransaction is volatile (may have changed since the last call)
+            /** @phpstan-ignore-next-line */
             if (!$this->inTransaction()) {
                 // Are all transactions complete?
                 // Discard all hooks

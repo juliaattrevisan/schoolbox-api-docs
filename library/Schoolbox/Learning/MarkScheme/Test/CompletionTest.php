@@ -218,7 +218,7 @@ class CompletionTest extends TestCase
 
 
     /**
-     * @return \mixed[][]
+     * @return array
      * @throws \InvalidArgumentException
      */
     public function provider_humanReadable_withResponse(): array
