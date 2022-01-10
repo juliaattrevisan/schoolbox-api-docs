@@ -381,6 +381,11 @@ parameters:
 			path: library/Alaress/Mail/AbstractMailer.php
 
 		-
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: library/Alaress/Mail/AbstractMailer.php
+
+		-
 			message: "#^Variable \\$emailAddresses might not be defined\\.$#"
 			count: 1
 			path: library/Alaress/Mail/AbstractMailer.php
@@ -2747,6 +2752,11 @@ parameters:
 
 		-
 			message: "#^Method HtmlTemplate\\:\\:setFile\\(\\) should return bool but returns string\\.$#"
+			count: 1
+			path: library/HtmlTemplate.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/HtmlTemplate.php
 
@@ -5336,6 +5346,11 @@ parameters:
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
 		-
+			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
+			count: 3
+			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
+
+		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 6
 			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
@@ -6136,12 +6151,27 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php
 
 		-
+			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/IAssessable.php
+
+		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/IFeedback.php
 
 		-
+			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/IFeedback.php
+
+		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/IResponse.php
+
+		-
+			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/IResponse.php
 
@@ -6452,6 +6482,11 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Classes/ClassList.php
+
+		-
+			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Classes/ClassList.php
 
@@ -6772,6 +6807,11 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
+			count: 1
+			path: library/Schoolbox/LearningAnalytics/Module.php
+
+		-
+			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
 			count: 1
 			path: library/Schoolbox/LearningAnalytics/Module.php
 
