@@ -1,8 +1,7 @@
 #!/bin/bash
 # Schoolbox Restore
 # Description:
-#       Allows for restoring database and data files from another install or
-#       backup of Schoolbox.
+#       Allows for restoring database and data files from another install or backup of Schoolbox.
 #       Backup source as defined in /etc/schoolbox-backup-cifs.conf
 #       Remote sources as defined in /root/.ssh/config
 #
@@ -20,7 +19,10 @@ fi
 # Names of config that should be preserved when performing a restoration
 readonly PRESERVED_CONFIG=(
   # Retrieve some of the Schoolbox config from MySQL using provided credentials
-  "site_hostname" "site_domain" "amqp_user" "amqp_pass" "amqp_vhost"
+  "site_hostname" "site_domain" "site_type" "title"
+
+  # AMQP credentials
+  "amqp_user" "amqp_pass" "amqp_vhost"
 
   # External DB Config
   "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
@@ -40,9 +42,10 @@ readonly PRESERVED_CONFIG=(
   # Others
   "xml_dir" "file_dir"  "api_key"
 );
-# Associative array of config to preserve during restoration. Maps config_name to config_value.
-declare -A sql_config=();
-declare alaress_password;
+
+declare -A sql_config=();                # Associative array of config to preserve during restoration. Maps config_name to config_value.
+declare alaress_password;                # 'alaress' admin user password
+declare destination_site_type;           # site_type of instance we are restoring into
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
@@ -71,9 +74,19 @@ get_destination_instance_id(){
       i=0
       for instance in $instance_list; do
         ((i++))
-        echo "$i. $instance" >&2
+        echo -n "$i. $instance (" >&2
+        hostnames=$(INSTANCE_ID="$instance" schoolbox-read-instances --ini "$ini_file" --option hostnames)
+        hostname_idx=0
+        for hostname in $hostnames; do
+          ((hostname_idx++))
+          if [[ $hostname_idx -gt 1 ]]; then
+            echo -n "," >&2
+          fi
+          echo -n "$hostname" >&2
+        done
+        echo ")" >&2
       done
-      read -r -p 'Choice: ' choice
+      read -r -p "Choice (1-$i): " choice
       if [[ $choice -lt 1 ]] || [[ $choice -gt $i ]]; then
         echo "Invalid choice" >&2
       else
@@ -85,7 +98,13 @@ get_destination_instance_id(){
     echo "$instance_list"
   fi
 }
-destination_instance_id="$(get_destination_instance_id)"
+
+# Determine which instance to restore into
+if [[ -n $INSTANCE_ID ]]; then
+  destination_instance_id=$INSTANCE_ID
+else
+  destination_instance_id="$(get_destination_instance_id)"
+fi
 if [[ -z "$destination_instance_id" ]]; then
   echo "Unable to derive destination instance_id" >&2
   exit 1
@@ -128,40 +147,53 @@ readconf() {
 	tempsqldb=$(schoolbox-conf --conf="$tempconffile" --option=SQL_db);
 }
 declare temp_ini_file;
+
+# Reads SQL credentials from ini file
+# Selects instance in order of preference:
+# 1. As specified explicitly by param
+# 2. If only a single instance found in ini file
+# 3. If multiple instances in ini file, prompt user to select
+# prompt user to select
 read_ini() {
-  # Collect Credentials from $temp_ini_file
-  instance_list=$(schoolbox-read-instances --ini "$temp_ini_file" --option instance-list)
-  if [[ $(echo "$instance_list" | wc -l) -gt 1 ]]; then
-    # Multiple instances in instances.ini file. Prompt user to select an instance.
-    valid_selection=0
-    while [[ $valid_selection == 0 ]]; do
-      line_idx=0
-      for instance_id in $instance_list; do
-        ((line_idx++))
-        echo -n "$line_idx: $instance_id ("
-        hostnames=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option hostnames)
-        hostname_idx=0
-        for hostname in $hostnames; do
-          ((hostname_idx++))
-          if [[ $hostname_idx -gt 1 ]]; then
-            echo -n ","
-          fi
-          echo -n "$hostname"
+  local instance_id=$1
+
+  # Was instance_id not explicitly declared?
+  if [[ -z $instance_id ]]; then
+    # Collect Credentials from $temp_ini_file
+    instance_list=$(schoolbox-read-instances --ini "$temp_ini_file" --option instance-list)
+    if [[ $(echo "$instance_list" | wc -l) -gt 1 ]]; then
+      # Multiple instances in instances.ini file. Prompt user to select an instance.
+      valid_selection=0
+      while [[ $valid_selection == 0 ]]; do
+        line_idx=0
+        for instance_id in $instance_list; do
+          ((line_idx++))
+          echo -n "$line_idx: $instance_id ("
+          hostnames=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option hostnames)
+          hostname_idx=0
+          for hostname in $hostnames; do
+            ((hostname_idx++))
+            if [[ $hostname_idx -gt 1 ]]; then
+              echo -n ","
+            fi
+            echo -n "$hostname"
+          done
+          echo ")"
         done
-        echo ")"
+        read -r -p "Choice (1-$line_idx): " instance_id_idx
+        if [[ $instance_id_idx -lt 1 ]] || [[ $instance_id_idx -gt $line_idx ]]; then
+          echo "Invalid selection, enter a value from (1-$line_idx)" >&2
+        else
+          valid_selection=1
+          instance_id=$(echo "$instance_list" | head -n "$instance_id_idx" | tail -n 1)
+        fi
       done
-      read -r -p "Option (1-$line_idx): " instance_id_idx
-      if [[ $instance_id_idx -lt 1 ]] || [[ $instance_id_idx -gt $line_idx ]]; then
-        echo "Invalid selection, enter a value from (1-$line_idx)" >&2
-      else
-        valid_selection=1
-        instance_id=$(echo "$instance_list" | head -n "$instance_id_idx" | tail -n 1)
-      fi
-    done
-  else
-    # Only 1 instance in instances.ini file
-    instance_id=$instance_list
+    else
+      # Only 1 instance in instances.ini file
+      instance_id=$instance_list
+    fi
   fi
+
   tempsqluser=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_user);
   tempsqlpasswd=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_passwd);
   tempsqlhost=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_host);
@@ -211,20 +243,29 @@ truncateTables() {
 }
 
 liveCheck() {
-	echo "Making sure this is a dev server..."
+  echo "Checking site_type of instance being restored to..."
 
-	if [ "$package" = "schoolboxdev" ]; then
-    echo "Looks like it is a dev server!"
-  elif [ "$package" = 'vagrant' ]; then
-    echo "Looks like it is a vagrant server!"
+  if [[ $package == 'schoolboxdev' ]]; then
+    temp_ini_file="/etc/schoolboxdev/instances.ini"
   else
+    temp_ini_file="/etc/schoolbox/instances.ini"
+  fi
+  read_ini "$destination_instance_id"
+  destination_site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
+
+  if [[ $destination_site_type == 'dev' ]]; then
+    echo "Looks like it is a vagrant instance. Ok." >&2
+  elif [[ $destination_site_type == 'stg' ]]; then
+    echo "Looks like it is a STG instance. Ok." >&2
+  else
+    echo "Destination site_type: '$destination_site_type'" >&2
 		if [ "$syncType" != "local" ]; then
       echo -e "\033[0;33m";
-			echo "Not a dev server. Just in case, pretty sure you don't want to run a sync from the dev to the live server. If you really really do, run the restore script with the -local flag to override";
+			echo "Not a DEV or STG instance. Just in case, pretty sure you don't want to run a sync from the STG to the PRD server. If you really really do, run the restore script with the -local flag to override";
       echo -e "\033[0m";
 			exit 1;
 		else
-			echo "You have chosen to retore a local backup to this server. Proceed with caution";
+			echo "You have chosen to restore a local backup to this server. Proceed with caution";
 		fi
 	fi
 }
@@ -386,6 +427,7 @@ do
     if scp $host:/etc/schoolbox/instances.ini /tmp >/dev/null 2>&1; then
       remote_found=1
       temp_ini_file="/tmp/instances.ini"
+      echo ""
       read_ini
     # fallback to old conf arch.
     elif scp $host:/etc/schoolbox/conf.php /tmp >/dev/null 2>&1; then
@@ -798,8 +840,7 @@ setdebugstacktrace () {
   mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='debug_show_stack_trace'";
 }
 titleprefix='';
-if [ "$package" = 'vagrant' ];
-then
+if [ "$destination_site_type" = 'dev' ]; then
 	titleprefix='[Vagrant]';
 	updatetitle;
 	setmailcatcher;
@@ -807,8 +848,7 @@ then
 	setdebugstacktrace;
 	truncateTables;
 fi
-if [ "$package" = 'schoolboxdev' ];
-then
+if [ "$destination_site_type" = 'stg' ]; then
 	titleprefix='[Staging]';
 	updatetitle;
 	setmailcatcher;
@@ -824,9 +864,10 @@ if [[ $syncType == "db" ]]; then
 fi
 
 # If a shared host, need to truncate etherpad to prevent updates/deletes from staging destroying production data
-if [ -f /usr/share/schoolbox/www/index.php ] && [ -f /usr/share/schoolboxdev/www/index.php ]; then
-    echo "Shared stg/prd host detected, truncating 'etherpad_pad' table";
-    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE etherpad_pad";
+# (First test is old single-instance arch, second test is new multi-instance arch)
+if { [ -f /usr/share/schoolbox/www/index.php ] && [ -f /usr/share/schoolboxdev/www/index.php ]; } || { [ -f /etc/schoolbox/instances.ini ] && [[ $(schoolbox-read-instances --option instance-list | wc -l) -gt 1 ]] ;}; then
+  echo "Shared stg/prd host detected, truncating 'etherpad_pad' table";
+  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE etherpad_pad";
 fi
 
 # Restart nginx
@@ -845,7 +886,7 @@ fi
 
 # Restart schoolbox services
 echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
-"$package"cloud-restart-daemons "$destination_instance_id";
+/usr/share/"$package"/tools/notif/allrestart "$destination_instance_id"
 
 echo -e "Rebuilding cron jobs (because timezone may be different in new DB). Assuming this host is primary"
 schoolboxcloud-rebuild-cronjobs --site-root "$instdir" --is-primary-host 1

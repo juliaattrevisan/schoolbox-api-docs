@@ -217,7 +217,6 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
 --s3-referer "$s3Referer" \
---site-root '/vagrant' \
 --skip-bucket-copy \
 --sql-host 'localhost' \
 --sql-schema 'schoolbox' \

@@ -2,7 +2,7 @@
 # Ensures all data dirs in instances for this package exist on the host's filesystem
 # Optionally can run for just specified instances, otherwise run for all in package
 # Usage:
-#   schoolbox-create-data-dirs.sh  [--instance [INSTANCE_ID]] [--instance [INSTANCE_ID]] [-v|--verbose] [-h|--help]
+#   create-data-dirs.sh  [--instance [INSTANCE_ID]] [--instance [INSTANCE_ID]] [-v|--verbose] [-h|--help]
 #
 # @copyright   Copyright 2021, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
