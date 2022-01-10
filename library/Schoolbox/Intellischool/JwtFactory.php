@@ -60,6 +60,11 @@ class JwtFactory
     private string $cohortDashboardBaseUrl;
 
     /**
+     * This instance's base URL for Intellischool task adherence dashboards.
+     */
+    private string $taskDashboardBaseUrl;
+
+    /**
      * Constructor
      *
      * @param string $privateKey
@@ -67,19 +72,22 @@ class JwtFactory
      * @param string $deploymentId
      * @param string $learnerDashboardBaseUrl
      * @param string $cohortDashboardBaseUrl
+     * @param string $taskDashboardBaseUrl
      */
     public function __construct(
         string $privateKey,
         string $privateKeySigningAlgorithm,
         string $deploymentId,
         string $learnerDashboardBaseUrl,
-        string $cohortDashboardBaseUrl
+        string $cohortDashboardBaseUrl,
+        string $taskDashboardBaseUrl
     ) {
         $this->privateKey                 = $privateKey;
         $this->privateKeySigningAlgorithm = $privateKeySigningAlgorithm;
         $this->deploymentId               = $deploymentId;
         $this->learnerDashboardBaseUrl    = $learnerDashboardBaseUrl;
         $this->cohortDashboardBaseUrl     = $cohortDashboardBaseUrl;
+        $this->taskDashboardBaseUrl       = $taskDashboardBaseUrl;
     }
 
     /**
@@ -209,5 +217,25 @@ class JwtFactory
             'exp' => (clone $now)->addSeconds(300)->getUnixTimeStamp(),
         ];
         return array_merge($userClaims, $timeClaims, $defaultClaims);
+    }
+
+    /**
+     * Build a JWT for the task adherence dashboard.
+     *
+     * @param User   $currentUser
+     * @param string $cohortType
+     * @param string $cohortIdentifier
+     * @return string
+     */
+    public function generateTaskUrl(User $currentUser, string $cohortType, string $cohortIdentifier): string
+    {
+        $claims = $this->buildBaseClaims($currentUser);
+        $claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] = sprintf(
+            '%s/%s:%s',
+            $this->taskDashboardBaseUrl,
+            $cohortType,
+            $cohortIdentifier,
+        );
+        return JWT::encode($claims, $this->privateKey, $this->privateKeySigningAlgorithm);
     }
 }

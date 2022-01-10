@@ -46,6 +46,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL, $this->getConfig()),
         );
         $staffPermission = new Rule\Any(
             new Rule\IsSuperuser(),
@@ -112,6 +113,13 @@ class Module extends BaseModule
             'getCohortProfile',
             new Rule\All($basePermission, $staffPermission),
         );
+        //Task Adherence Dashboard
+        $this->register(
+            BaseModule::METHOD_GET,
+            "/task",
+            'getTaskDashboard',
+            new Rule\All($basePermission, $staffPermission),
+        );
     }
 
     /**
@@ -132,6 +140,7 @@ class Module extends BaseModule
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
                         );
                     }),
                 ]
