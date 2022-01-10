@@ -23,7 +23,6 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -169,7 +168,7 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         Gotenberg\Client $pdfGenerator,
-        \Schoolbox\Learning\Turnitin\File\Mapper $turnitinFileMapper,
+        Turnitin\File\Mapper $turnitinFileMapper,
         Assessment\Feedback\IFeedbackDataSource $feedbackDataSource
     ) {
         parent::__construct(
@@ -195,7 +194,7 @@ class Controller extends Assessment\Controller
         $this->kamiMapper            = $kamiMapper;
         $this->pdfGenerator          = $pdfGenerator;
         $this->turnitinFileMapper    = $turnitinFileMapper;
-        $this->feedbackDataSource = $feedbackDataSource;
+        $this->feedbackDataSource    = $feedbackDataSource;
     }
 
 
@@ -240,7 +239,7 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
-     * @param IAssessable $assessment
+     * @param Model $assessment
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
@@ -287,7 +286,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @param User              $student
      * @throws MapperException
      * @throws PDOException
@@ -330,7 +329,7 @@ class Controller extends Assessment\Controller
                     // All feedbacks ought to be due work feedbacks,
                     // and thus have a rubric grid
                     // TODO this returns false if I use the alias, but works correctly if I use the fully qualified name - why?
-                    if ($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
+                    if ($feedback instanceof Feedback\Model) {
                         $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
                     }
                 }
@@ -501,7 +500,7 @@ class Controller extends Assessment\Controller
     /**
      * Shows a rubric overview
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @throws DomainException
      * @throws MapperException
      * @throws RouteNotFound
@@ -560,7 +559,7 @@ class Controller extends Assessment\Controller
     /**
      * Downloads a rubric overview
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @throws DefinitionException
      * @throws DomainException
      * @throws InvalidArgumentException
@@ -751,7 +750,7 @@ class Controller extends Assessment\Controller
     /**
      * Displays a form enabling a student to create Submission for a Due Work
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @param User              $student
      * @throws ServiceNotFound If unable to locate HTML web Output in DI
      * @since 165
@@ -774,7 +773,7 @@ class Controller extends Assessment\Controller
             $feedback = $participant->findMostRecentSelfAssessedFeedback();
         }
 
-        if ($feedback) {
+        if ($feedback instanceof Feedback\Model) {
             $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
         }
 
@@ -795,7 +794,6 @@ class Controller extends Assessment\Controller
          */
         $latestResponse = null;
         $editorContents = '';
-        $dangerZone     = null;
 
         $attachZoneFactory = new Assessment\Attachzone\Factory();
 
@@ -1593,7 +1591,7 @@ class Controller extends Assessment\Controller
     /**
      * Update particular fields of an existing IAssessable
      *
-     * @param IAssessable $assessment
+     * @param Model $assessment
      * @return void
      * @throws InvalidStatusCode
      * @throws PDOException
@@ -1604,7 +1602,6 @@ class Controller extends Assessment\Controller
         /* TODO: Make this more generalised
          * For now the only utility here is to update Skip Unsubmitted setting
          */
-        /** @var DueWork $assessment */
         if ((int)$this->getRequest()->post['showSubmittedOnly']) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;
@@ -1625,7 +1622,6 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->status->setCode(204);
         $this->getResponse()->content->set($this->buildJsonOutput(null));
-        return;
     }
 
 
