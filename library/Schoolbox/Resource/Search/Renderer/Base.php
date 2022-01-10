@@ -77,10 +77,10 @@ abstract class Base
                 $this->getPage()->setVar(array(
                     'TYPE_CLASS' => ''
                 ));
-            } elseif (!$mapperResult->getCount()) {
-                $this->getPage()->setVar(array(
-                    'TYPE_CLASS' => 'hide'
-                ));
+//            } elseif (!$mapperResult->getCount()) {
+//                $this->getPage()->setVar(array(
+//                    'TYPE_CLASS' => 'hide'
+//                ));
             } else {
                 $this->getPage()->setVar(array(
                     'TYPE_CLASS' => ''
