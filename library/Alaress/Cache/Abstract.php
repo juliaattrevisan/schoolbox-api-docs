@@ -37,7 +37,7 @@ abstract class Alaress_Cache_Abstract
      * The duration of a cached version before it becomes expired
      * This is a duration measured in seconds
      *
-     * @var null
+     * @var int|null
      */
     protected $cachedTime = 3600;
 
