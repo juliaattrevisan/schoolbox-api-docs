@@ -759,10 +759,10 @@ class Profile implements IStrategy
      *
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
-     * @return string|null
+     * @return string
      * @throws \InvalidArgumentException
      */
-    private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): ?string
+    private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): string
     {
 
         /* Find another endpoint who can tell us the answer

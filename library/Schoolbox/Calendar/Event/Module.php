@@ -200,7 +200,7 @@ class Module extends BaseModule
      * @throws Mapper\Exception\Deleted
      * @throws InvalidArgumentException
      */
-    private function preloadEvent(array $params): ?array
+    private function preloadEvent(array $params): array
     {
         return ['event' => $this->getEventMapper()->findById($params['eventId'])];
     }
