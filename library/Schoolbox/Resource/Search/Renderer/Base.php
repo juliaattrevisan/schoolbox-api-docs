@@ -65,33 +65,18 @@ abstract class Base
     public function renderTab(MapperResult $mapperResult, $type)
     {
         if ($mapperResult->getCount()) {
-            $this->getPage()->setVar(array(
-                'TYPE_TYPE' => $this->getType(),
-                'TYPE_NAME' => $this->getTabName(),
+            $this->getPage()->setVar([
+                'TYPE_TYPE'  => $this->getType(),
+                'TYPE_NAME'  => $this->getTabName(),
                 'TYPE_COUNT' => $mapperResult->getCount(),
-            ));
-
-            /* Rage these styles in, because of css specificity
-             */
-            if ($this->getType() == 'all') {
-                $this->getPage()->setVar(array(
-                    'TYPE_CLASS' => ''
-                ));
-//            } elseif (!$mapperResult->getCount()) {
-//                $this->getPage()->setVar(array(
-//                    'TYPE_CLASS' => 'hide'
-//                ));
-            } else {
-                $this->getPage()->setVar(array(
-                    'TYPE_CLASS' => ''
-                ));
-            }
+                'TYPE_CLASS' => '',
+            ]);
 
             $this->getPage()->parse('type_block', 'type', true);
 
-            $this->getPage()->setVar(array(
+            $this->getPage()->setVar([
                 'RESULT_TYPE' => $this->getType(),
-            ));
+            ]);
 
             $this->getPage()->parse('result_block', 'result', true);
         }
