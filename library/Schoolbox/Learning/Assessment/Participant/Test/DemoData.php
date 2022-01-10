@@ -1242,81 +1242,133 @@ class DemoData
         switch ($userChar) {
             case 'A':
                 $user->setFirstname('Andrew (Student)');
+                $user->setLastname('Andrew (Student)');
+                $user->setUsername('Andrew (Student)');
                 break;
             case 'B':
                 $user->setFirstname('Barry (Student)');
+                $user->setLastname('Barry (Student)');
+                $user->setUsername('Barry (Student)');
                 break;
             case 'C':
                 $user->setFirstname('Charlie (Student)');
+                $user->setLastname('Charlie (Student)');
+                $user->setUsername('Charlie (Student)');
                 break;
             case 'D':
                 $user->setFirstname('David (Student)');
+                $user->setLastname('David (Student)');
+                $user->setUsername('David (Student)');
                 break;
             case 'E':
                 $user->setFirstname('Ethan (Student)');
+                $user->setLastname('Ethan (Student)');
+                $user->setUsername('Ethan (Student)');
                 break;
             case 'F':
                 $user->setFirstname('Fred (Student)');
+                $user->setLastname('Fred (Student)');
+                $user->setUsername('Fred (Student)');
                 break;
             case 'G':
                 $user->setFirstname('Gary (Student)');
+                $user->setLastname('Gary (Student)');
+                $user->setUsername('Gary (Student)');
                 break;
             case 'H':
                 $user->setFirstname('Harry (Student)');
+                $user->setLastname('Harry (Student)');
+                $user->setUsername('Harry (Student)');
                 break;
             case 'I':
                 $user->setFirstname('Irwin (Student)');
+                $user->setLastname('Irwin (Student)');
+                $user->setUsername('Irwin (Student)');
                 break;
             case 'J':
                 $user->setFirstname('Jake (Student)');
+                $user->setLastname('Jake (Student)');
+                $user->setUsername('Jake (Student)');
                 break;
             case 'K':
                 $user->setFirstname('Kate (Student)');
+                $user->setLastname('Kate (Student)');
+                $user->setUsername('Kate (Student)');
                 break;
             case 'L':
                 $user->setFirstname('Liam (Student)');
+                $user->setLastname('Liam (Student)');
+                $user->setUsername('Liam (Student)');
                 break;
             case 'M':
                 $user->setFirstname('Mary (Student)');
+                $user->setLastname('Mary (Student)');
+                $user->setUsername('Mary (Student)');
                 break;
             case 'N':
                 $user->setFirstname('Nate (Student)');
+                $user->setLastname('Nate (Student)');
+                $user->setUsername('Nate (Student)');
                 break;
             case 'O':
                 $user->setFirstname('Olly (Student)');
+                $user->setLastname('Olly (Student)');
+                $user->setUsername('Olly (Student)');
                 break;
             case 'P':
                 $user->setFirstname('Pete (Student)');
+                $user->setLastname('Pete (Student)');
+                $user->setUsername('Pete (Student)');
                 break;
             case 'Q':
                 $user->setFirstname('Quinn (Student)');
+                $user->setLastname('Quinn (Student)');
+                $user->setUsername('Quinn (Student)');
                 break;
             case 'R':
                 $user->setFirstname('Rory (Student)');
+                $user->setLastname('Rory (Student)');
+                $user->setUsername('Rory (Student)');
                 break;
             case 'S':
                 $user->setFirstname('Steve (Student)');
+                $user->setLastname('Steve (Student)');
+                $user->setUsername('Steve (Student)');
                 break;
             case 'T':
                 $user->setFirstname('Tom (Student)');
+                $user->setLastname('Tom (Student)');
+                $user->setUsername('Tom (Student)');
                 break;
             case 'U':
                 $user->setFirstname('Ursula (Student)');
+                $user->setLastname('Ursula (Student)');
+                $user->setUsername('Ursula (Student)');
                 break;
             case 'V':
                 $user->setFirstname('Veronica (Student)');
+                $user->setLastname('Veronica (Student)');
+                $user->setUsername('Veronica (Student)');
                 break;
             case 'W':
                 $user->setFirstname('Wally (Student)');
+                $user->setLastname('Wally (Student)');
+                $user->setUsername('Wally (Student)');
                 break;
             case 'X':
                 $user->setFirstname('Xavier (Student)');
+                $user->setLastname('Xavier (Student)');
+                $user->setUsername('Xavier (Student)');
                 break;
             case 'Y':
                 $user->setFirstname('Yvonne (Student)');
+                $user->setLastname('Yvonne (Student)');
+                $user->setUsername('Yvonne (Student)');
                 break;
             case 'Z':
                 $user->setFirstname('Zoe (Student)');
+                $user->setLastname('Zoe (Student)');
+                $user->setUsername('Zoe (Student)');
                 break;
             case '0':
             case '1':
@@ -1329,7 +1381,9 @@ class DemoData
             case '8':
             case '9':
                 $user->setFirstname(sprintf('%d (Student)', $userChar));
-                break;
+                $user->setLastname(sprintf('%d (Student)', $userChar));
+                $user->setUsername(sprintf('%d (Student)', $userChar));
+            break;
             default:
                 throw new InvalidArgumentException("Unknown userChar: $userChar");
         }
