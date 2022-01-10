@@ -169,7 +169,7 @@ abstract class AbstractMailer implements IMailer
 
         /** @var User $user */
         $user = $sessionData['user'];
-        $this->setFrom($user->getEmail(), $user->formatName());
+        $this->setFrom($user->getEmail() ?? '', $user->formatName());
 
         return $this;
     }
