@@ -3201,11 +3201,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Controller.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with Alaress_Date_Format will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/AssessmentPair.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Import\\\\AssessmentPair\\:\\:getSubPairs\\(\\) should return iterable\\<static\\(Schoolbox\\\\Assessment\\\\Course\\\\Import\\\\AssessmentPair\\)\\>&Schoolbox\\\\GenericCollection but returns \\(iterable\\<Schoolbox\\\\Assessment\\\\Course\\\\Import\\\\AssessmentPair\\>&Schoolbox\\\\GenericCollection\\)\\|null\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/AssessmentPair.php
@@ -6437,7 +6432,7 @@ parameters:
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
-			count: 3
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/Test/ParticipantLinker.php
 
 		-
