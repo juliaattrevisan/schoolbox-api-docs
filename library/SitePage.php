@@ -41,7 +41,7 @@ class SitePage extends Page
     /** @var bool $lite */
     private $lite;
 
-    /** @var User $user */
+    /** @var User|null $user */
     private $user;
 
     /** @var ConfigLoader */

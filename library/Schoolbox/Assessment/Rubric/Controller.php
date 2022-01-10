@@ -414,8 +414,9 @@ class Controller extends BaseController
         }
 
         $assessment->setCapabilityMarkType($markType)
-                   ->setCapabilityGradeGroup($gradeGroup)
-                   ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
+                   ->setCapabilityGradeGroup($gradeGroup);
+        // @phpstan-ignore-next-line: getBool can return null
+        $assessment->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($assessment, false),

@@ -20,7 +20,7 @@ class ThemedHtml extends Html
      *
      * If not set via `setTab`, it uses the version from the response.
      *
-     * @var string
+     * @var string|null
      */
     protected $tab = null;
 
@@ -29,7 +29,7 @@ class ThemedHtml extends Html
      *
      * If not set via `setTitle`, it uses the version from the response.
      *
-     * @var string
+     * @var string|null
      */
     protected $title = null;
 
