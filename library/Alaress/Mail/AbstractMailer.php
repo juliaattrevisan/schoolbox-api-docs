@@ -121,7 +121,7 @@ abstract class AbstractMailer implements IMailer
                 }
             }
         } else {
-            foreach (self::parseAddressString($to)[self::KEY_VALID] as $address => $name) {
+            foreach (self::parseAddressString($to ?? '')[self::KEY_VALID] as $address => $name) {
                 $this->email->addTo(new Address($address, $name ?? ''));
             }
         }
