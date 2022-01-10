@@ -60,9 +60,8 @@ abstract class Base
      * Render clickable tab menu
      *
      * @param MapperResult $mapperResult
-     * @param string|null $type
      */
-    public function renderTab(MapperResult $mapperResult, $type)
+    public function renderTab(MapperResult $mapperResult)
     {
         if ($mapperResult->getCount()) {
             $this->getPage()->setVar([
