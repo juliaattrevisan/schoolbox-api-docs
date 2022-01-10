@@ -129,4 +129,22 @@ class Group
     {
         return $this->forceFollow;
     }
+
+    /**
+     * get the text representaion of the group type (public, private, moderated)
+     * @return string
+     */
+    public function getTypeString(): string
+    {
+        switch ($this->type) {
+            case Group::MODERATED_GROUP:
+                return 'moderated';
+            case Group::FREE_GROUP:
+                return 'free';
+            case Group::PRIVATE_GROUP:
+                return 'private';
+            default:
+                return 'error';
+        }
+    }
 }

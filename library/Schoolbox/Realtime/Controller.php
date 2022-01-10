@@ -212,55 +212,7 @@ class Controller extends BaseController
      */
     public function calculateFollowment()
     {
-        // as much as we'd like get this as cached in session, we can't include subjects here
-        $accesses = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());
 
-        $folderIds = $accesses->getColumnValues('serviceIdentifier');
-
-        /** @var \Schoolbox\Collection|Folder\Model[] $folders */
-        $folders = $this->getFolderMapper()->findByColumn('id', $folderIds)->sortBy('name', 'asc');
-        $service = UserAccess::SERVICE_HOMEPAGE;
-
-        $muted = [
-            'unfollow' => $this->getUser()->getId(),
-            'disabled' => 0,
-        ];
-
-        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
-        foreach ($muted as $k => $id) {
-            $muted[$k] = $this->getRerouteOverrideMapper()
-                ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                ->map(
-                    function ($override) use ($routeKeyRegex) {
-                        /** @var RerouteOverride $override */
-                        preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                        return is_array($matches) ? $matches[1] : null;
-                    },
-                    false
-                )
-                ->getAll();
-        }
-
-        $followment = [];
-
-        // following
-        foreach ($folders as $folder) {
-            $forced = false;
-
-            if ($grp = $folder->getGroup()) {
-                $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
-            }
-
-            $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
-
-            $followment[$folder->getId()] = [
-                'name'   => $folder->getName(),
-                'follow' => $follow,
-                'force'  => $forced,
-            ];
-        }
-
-        return $followment;
     }
 
 

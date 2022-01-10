@@ -33,7 +33,7 @@ class Controller extends BaseController
      *
      * @api GET /resource/newgroups
      */
-    public function newGroups(): void
+    public function getNewGroups(): void
     {
         //grab list of all possibly groups the user can choose to be part of, and list them.
         //displaying included information (notification / favorite)
@@ -76,7 +76,6 @@ class Controller extends BaseController
         $folders = $folderMapper->findByColumnList(['id' => $groupIds]);
 
         // build output array
-        $userAccess     = [];
         $possibleGroups = [];
         /* @var UserAccess|Group $group */
         foreach ($folders as $folder) {
@@ -119,7 +118,7 @@ class Controller extends BaseController
                 'isNotificationsOn' => $notificationsList[$folder->getId()]['follow'] ?: false,
                 'isForceFollow'     => $notificationsList[$folder->getId()]['force'] ?: false,
                 'isFavourite'       => $isFavourite,
-                'type'              => $this->getGroupType($folder->getGroup()->getType()),
+                'type'              => $folder->getGroup()->getTypeString(),
                 'isAccessAdmin'     => ($access === UserAccess::ACCESS_FULL),
                 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
                 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
@@ -143,6 +142,46 @@ class Controller extends BaseController
     }
 
     /**
+     * @api POST /groups/add
+     */
+    public function postMyGroupAdd()
+    {
+        //check post to confirm everything is there
+        $post = $this->getRequest()->post->getArrayCopy();
+
+        try {
+            $userGroup = $accessMapper->findOneByColumnList([
+                                                                'uid' => $user->getId(),
+                                                                'sid' => $post['group'],
+                                                            ]);
+        } catch (MapperException\NotFound $e) {
+            //don't place the user into the group unless we are specifically requested to add the user.
+            $userGroup = new UserAccess();
+            $userGroup->setServiceIdentifier($post['group'])
+                      ->setUser($user)
+                      ->setService(UserAccess::SERVICE_HOMEPAGE)
+                      ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
+                      ->setFavourite(false);
+            if ($group->isFree()) {
+                $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
+            }
+            //save group object
+            $accessMapper->save($userGroup);
+
+
+        }
+        return $this->getResponse()->content->set(
+            $this->buildJsonOutput([
+                                       'group'              => $post['group'],
+                                       'user'               => $user->getId(),
+                                       'isFavourite'        => $userGroup->getFavourite(),
+                                       'isNotificationsOn'  => true,
+                                       'enrolmentStatus'    => $this->getEnrollmentText($userGroup),
+                                   ])
+        );
+    }
+
+    /**
      * edit's a users enrolmentStatus into a group
      *
      * @api POST /my
@@ -161,9 +200,7 @@ class Controller extends BaseController
         //check post to confirm everything is there
         $post = $this->getRequest()->post->getArrayCopy();
 
-        if (
-            !isset($post['group'])
-        ) {
+        if (!isset($post['group'])) {
             return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
         }
 
@@ -266,9 +303,55 @@ class Controller extends BaseController
      */
     protected function getNotifications(\Schoolbox\User $user): array
     {
-        $con = new \Schoolbox\Realtime\Controller();
-        $con->setUser($user);
-        return $con->calculateFollowment();
+        // as much as we'd like get this as cached in session, we can't include subjects here
+        $accesses = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());
+
+        $folderIds = $accesses->getColumnValues('serviceIdentifier');
+
+        /** @var \Schoolbox\Collection|Folder\Model[] $folders */
+        $folders = $this->getFolderMapper()->findByColumn('id', $folderIds)->sortBy('name', 'asc');
+        $service = UserAccess::SERVICE_HOMEPAGE;
+
+        $muted = [
+            'unfollow' => $this->getUser()->getId(),
+            'disabled' => 0,
+        ];
+
+        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
+        foreach ($muted as $k => $id) {
+            $muted[$k] = $this->getRerouteOverrideMapper()
+                              ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
+                              ->map(
+                                  function ($override) use ($routeKeyRegex) {
+                                      /** @var RerouteOverride $override */
+                                      preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
+                                      return is_array($matches) ? $matches[1] : null;
+                                  },
+                                  false
+                              )
+                              ->getAll();
+        }
+
+        $followment = [];
+
+        // following
+        foreach ($folders as $folder) {
+            $forced = false;
+
+            if ($grp = $folder->getGroup()) {
+                $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
+            }
+
+            $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
+
+            $followment[$folder->getId()] = [
+                'name'   => $folder->getName(),
+                'follow' => $follow,
+                'force'  => $forced,
+            ];
+        }
+
+        return $followment;
     }
 
     /**
@@ -314,33 +397,16 @@ class Controller extends BaseController
      * @param null|UserAccess $userGroup
      * @return string
      */
-    protected function getEnrollmentText($userGroup): string
+    protected function getEnrollmentText(?UserAccess $userGroup): string
     {
         if ($userGroup === null) {
             return 'notEnrolled';
         }
         //get enrolmentStatus, could be enrolled, can join, or pending
         $enrollment = $userGroup->getAccessLevel() ? 'enrolled' : 'notEnrolled';
-        if (($userGroup->getAccessLevel() == UserAccess::ACCESS_DENY)) {
+        if (($userGroup->getAccessLevel() === UserAccess::ACCESS_DENY)) {
             $enrollment = 'pending';
         }
         return $enrollment;
-    }
-
-    /**
-     * get the text representaion of the group type (public, private, moderated)
-     */
-    protected function getGroupType(int $type): string
-    {
-        switch ($type) {
-            case Group::MODERATED_GROUP:
-                return 'moderated';
-            case Group::FREE_GROUP:
-                return 'free';
-            case Group::PRIVATE_GROUP:
-                return 'private';
-            default:
-                return 'error';
-        }
     }
 }
