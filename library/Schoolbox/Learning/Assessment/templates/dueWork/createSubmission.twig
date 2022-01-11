@@ -324,7 +324,15 @@ Data:
                 {% include '@learningDueWorkResponse/inlineGrading/selfAssessment.twig' %}
             {% endif %}
 
-            {# If a due work doesn't accept online submissions at all, students may still be able to self-reflect, but we don't want them seeing the submission field. #}
+            {# If a due work doesn't accept online submissions at all,
+             # students may still be able to self-reflect, but we don't want
+             # them seeing the submission field.
+             #
+             # The "responseId" hidden input is required even if the due work
+             # doesn't accept submissions, because the input needs to be
+             # populated when the student publishes their self-assessment.
+             #}
+            <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}"/>
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
 
@@ -338,7 +346,6 @@ Data:
                 </div>
                 <div class="row">
                     <div class="small-12 island">
-                            <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}"/>
                             <section>
                                 <div class="content">
                                     {# Submitted my own work checkbox #}
