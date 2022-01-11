@@ -24,7 +24,6 @@ use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
-use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -84,15 +83,6 @@ class Module extends BaseModule
         $hasKamiAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             $this->buildRuleCanAccessKami(),
-            new CanViewAssessable(new Visibility(Access::getInstance()))
-        );
-
-        $hasSelfAccess = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                $this->buildRuleHasWriteAccess(),
-                new CanSelfAssess()
-            ),
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
