@@ -137,7 +137,7 @@
         }
 
         $(document).on("click", ".dz-error [data-close]", function() {
-            $(this).parents('li').fadeOut('slow');
+            $(this).parents('li, [data-dz-template-item]').fadeOut('slow');
         });
         
         var myDropzone = new Dropzone(this.element, {

@@ -14,9 +14,9 @@
         :can-edit="{{ canEdit ? 'true' : 'false' }}"
         :component-instance-config="{{ componentInstanceConfig|json_encode }}"
         :files="{{ files|json_encode }}"
-        :selected-filters="{{ filter|json_encode }}"
+        :preset-filters="{{ filter|json_encode }}"
+        referrer="{{ referrer }}"
         :source-folder-id="{{ sourceFolderID }}"
-        :component-id="{{ componentID }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js"></script>

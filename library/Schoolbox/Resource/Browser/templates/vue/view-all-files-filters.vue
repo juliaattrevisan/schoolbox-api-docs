@@ -1,12 +1,11 @@
 <script>
 
 /**
- * Contains the similarity report filters, score and status
+ * Contains the file type filters, as they can be changed in view-all-files.vue, 
+ * they are maintained through the selectedFilters prop
  */
 
-import { Event } from 'vue-tables-2-premium';
-import fileTypes from './viewAllFilesFileTypes';
-import filterEvents from './viewAllFilesFilterEvents';
+import fileTypes from './viewAllFilesFileTypes.js';
 
 export default {
 
@@ -17,87 +16,56 @@ export default {
         }
     },
 
-    data () {
-        return {
-            isDocumentChecked: true,
-            isAudioChecked: true,
-            isVideoChecked: true,
-            isImageChecked: true,
-            isOtherChecked: true,
-        }
+    computed: {
+
+        /**
+         * To reflect the selection status of filter type document
+         */
+        isDocumentChecked () {
+            return this.selectedFilters.includes(fileTypes.DOCUMENT);
+        },
+
+        /**
+         * To reflect the selection status of filter type audio
+         */
+        isAudioChecked () {
+            return this.selectedFilters.includes(fileTypes.AUDIO);
+        },
+
+        /**
+         * To reflect the selection status of filter type video
+         */
+        isVideoChecked () {
+            return this.selectedFilters.includes(fileTypes.VIDEO);
+        },
+
+        /**
+         * To reflect the selection status of filter type image
+         */
+        isImageChecked () {
+            return this.selectedFilters.includes(fileTypes.IMAGE);
+        },
+
+        /**
+         * To reflect the selection status of filter type other
+         */
+        isOtherChecked () {
+            return this.selectedFilters.includes(fileTypes.OTHER);
+        },
+
     },
 
     created () {
         this.fileTypes = fileTypes; //to be able to reference the types within the <template>
     },
 
-    mounted () {
-        this.initFilterStatus();
-        this.$nextTick(() => this.updateAllFilters()); //nextTick to allow the data to be populated prior to filtering
-    },
-
     methods: {
         
         /**
-         * To display which filters are currently selected on startup
+         * Notify view-all-files.vue of the change so it can add/remove from selectedFilters
          */
-        initFilterStatus () {
-            this.isDocumentChecked = this.selectedFilters.includes(fileTypes.DOCUMENT);
-            this.isAudioChecked = this.selectedFilters.includes(fileTypes.AUDIO);
-            this.isVideoChecked = this.selectedFilters.includes(fileTypes.VIDEO);
-            this.isImageChecked = this.selectedFilters.includes(fileTypes.IMAGE);
-            this.isOtherChecked = this.selectedFilters.includes(fileTypes.OTHER);
-        },
-
-        /**
-         * Trigger all filters based on the current selections
-         */
-        updateAllFilters () {
-            this.onDocumentChange();
-            this.onAudioChange();
-            this.onVideoChange();
-            this.onImageChange();
-            this.onOtherChange();
-        },
-
-        /**
-         * Toggle the display of files of type document
-         */
-        onDocumentChange () {
-            const filterParam = this.isDocumentChecked ? '' : fileTypes.DOCUMENT; 
-            Event.$emit(`vue-tables.filter::${filterEvents.DOCUMENT_CHECKED}`, filterParam); //picked up by view-all-files.vue 
-        },
-
-        /**
-         * Toggle the display of files of type audio
-         */
-        onAudioChange () {
-            const filterParam = this.isAudioChecked ? '' : fileTypes.AUDIO; 
-            Event.$emit(`vue-tables.filter::${filterEvents.AUDIO_CHECKED}`, filterParam); //picked up by view-all-files.vue 
-        },
-
-        /**
-         * Toggle the display of files of type video
-         */
-        onVideoChange () {
-            const filterParam = this.isVideoChecked ? '' : fileTypes.VIDEO; 
-            Event.$emit(`vue-tables.filter::${filterEvents.VIDEO_CHECKED}`, filterParam); //picked up by view-all-files.vue 
-        },
-
-        /**
-         * Toggle the display of files of type image
-         */
-        onImageChange () {
-            const filterParam = this.isImageChecked ? '' : fileTypes.IMAGE; 
-            Event.$emit(`vue-tables.filter::${filterEvents.IMAGE_CHECKED}`, filterParam); //picked up by view-all-files.vue 
-        },
-
-        /**
-         * Toggle the display of files of type document
-         */
-        onOtherChange () {
-            const filterParam = this.isOtherChecked ? '' : fileTypes.OTHER; 
-            Event.$emit(`vue-tables.filter::${filterEvents.OTHER_CHECKED}`, filterParam); //picked up by view-all-files.vue 
+        onFilterChange (fileType) {
+            this.$emit('on-filter-change', fileType); //picked up by view-all-files.vue 
         },
 
     }
@@ -112,23 +80,23 @@ export default {
 
             <ul class="option-list">
                 <li>
-                    <input type="checkbox" id="document-toggle" v-model="isDocumentChecked" @change="onDocumentChange()">
+                    <input type="checkbox" id="document-toggle" :checked="isDocumentChecked" @change="onFilterChange(fileTypes.DOCUMENT)">
                     <label for="document-toggle">Document</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="audio-toggle" v-model="isAudioChecked" @change="onAudioChange()">
+                    <input type="checkbox" id="audio-toggle" :checked="isAudioChecked" @change="onFilterChange(fileTypes.AUDIO)">
                     <label for="audio-toggle">Audio</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="video-toggle" v-model="isVideoChecked" @change="onVideoChange()">
+                    <input type="checkbox" id="video-toggle" :checked="isVideoChecked" @change="onFilterChange(fileTypes.VIDEO)">
                     <label for="video-toggle">Video</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="image-toggle" v-model="isImageChecked" @change="onImageChange()">
+                    <input type="checkbox" id="image-toggle" :checked="isImageChecked" @change="onFilterChange(fileTypes.IMAGE)">
                     <label for="image-toggle">Image</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="other-toggle" v-model="isOtherChecked" @change="onOtherChange()">
+                    <input type="checkbox" id="other-toggle" :checked="isOtherChecked" @change="onFilterChange(fileTypes.OTHER)">
                     <label for="other-toggle">Other</label>
                 </li>
             </ul>

@@ -4,16 +4,24 @@
  * Presents all the files within a homepage file component in a filterable table
  */
 
-import filterEvents from './viewAllFilesFilterEvents.js';
+import { Event } from 'vue-tables-2-premium';
+import fileTypes from './viewAllFilesFileTypes.js';
 import ViewAllFilesFilters from './view-all-files-filters.vue';
 import ViewAllFilesRowName from './view-all-files-row-name.vue';
 import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
+import ViewAllFilesDropzone from './view-all-files-dropzone.vue';
+import ViewAllFilesDeleteFiles from './view-all-files-delete-files.vue';
 import footerUI from '@vue/components/vueTables2/mixinFooterUI.js';
+
+const SB_SELECTED_FILTERS_STORAGE = 'sb_viewAllFilesSelectedFilters'
+
 
 export default {
 
     components: {
-        ViewAllFilesFilters
+        ViewAllFilesFilters,
+        ViewAllFilesDropzone,
+        ViewAllFilesDeleteFiles,
     },
 
     mixins: [
@@ -33,8 +41,12 @@ export default {
             type: Array,
             required: true,
         },
-        selectedFilters: { //the list of currently selected filters passed through
+        presetFilters: { //the list of currently selected filters passed through
             type: Array,
+            required: true,
+        },
+        referrer: { //to know whether we are coming from 'component' or elsewhere
+            type: String,
             required: true,
         },
         sourceFolderId: { //to know where to upload files to
@@ -45,7 +57,7 @@ export default {
 
     data () {
         return {
-            collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
+            selectedFilters: [],
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 columnsClasses: {
@@ -54,23 +66,23 @@ export default {
                 },
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
-                        name: filterEvents.DOCUMENT_CHECKED,
+                        name: fileTypes.DOCUMENT,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.AUDIO_CHECKED,
+                        name: fileTypes.AUDIO,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.VIDEO_CHECKED,
+                        name: fileTypes.VIDEO,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.IMAGE_CHECKED,
+                        name: fileTypes.IMAGE,
                         callback: (row, query) => row.type !== query
                     },
                     {
-                        name: filterEvents.OTHER_CHECKED,
+                        name: fileTypes.OTHER,
                         callback: (row, query) => row.type !== query
                     },
                 ],
@@ -106,6 +118,12 @@ export default {
                 perPage: 100,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
+                rowClassCallback: (row) => { //to differentiate newly uploaded files so it's clear where they've been placed in the table
+                    return row.isNew ? 'new-file-upload' : '';
+                },
+                selectable: {
+                    mode: this.canEdit ? 'multiple' : '' //to enable multi-select for those with permission
+                },
                 sortable: ['name', 'dateModified.formatted'], //the edit column doesn't need to be sortable
                 sortIcon: {
                     is: 'glyphicon-sort',
@@ -125,25 +143,41 @@ export default {
                 },
             },
             tableColumns: this.getTableColumns(),
+            collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
+            selectedFiles: [], //keep track of which rows could be deleted/downloaded
+            isShiftKeySelected: false, //to multi-select fields
+            hasSelectedShiftKey: false, //to hide a UI note
         }
     },
 
+    computed: {
+
+        /**
+         * Whether there's saved session storage and we aren't coming
+         * from the component (as the component settings take precedence)
+         *
+         * @returns { Boolean }
+         */
+        useSessionStorage () {
+            return sessionStorage.getItem(this.selectedFiltersStorage)
+                   && this.referrer !== 'component';
+        }
+
+    },
+
+    created () {
+        this.initSelectedFilters();
+    },
+
     mounted () {
+        this.initShiftKeyDetection();
         this.initTable();
-        this.onTableLoaded();
     },
 
     methods: {
 
         /**
-         * Populate the table with the files list
-         */
-        initTable () {
-            this.tableData = this.files;
-        },
-
-        /**
-         * The edit column is only display to those that have permission
+         * The edit column is only displayed to those that have permission
          *
          * @returns { Array }
          */
@@ -156,51 +190,226 @@ export default {
         },
 
         /**
+         * Check if the filters are stored in session storage
+         */
+        initSelectedFilters () {
+            this.selectedFiltersStorage = `${SB_SELECTED_FILTERS_STORAGE}_${this.sourceFolderId}`;
+            if (this.useSessionStorage) {
+                this.selectedFilters = this.getFiltersSessionStorage();
+            } else {
+                this.selectedFilters = [...this.presetFilters];
+            }
+        },
+
+        /**
+         * pull the filters from local storage
+         */
+        getFiltersSessionStorage () {
+            const filtersSessionStorage = sessionStorage.getItem(this.selectedFiltersStorage);
+            return filtersSessionStorage.split(',');
+        },
+
+        /**
+         * To hide a UI note informing of shift-selection once pressed once
+         */
+        initShiftKeyDetection () {
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = true;
+                }
+            });
+            document.addEventListener('keyup', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = false;
+                }
+            });
+        },
+
+        /**
+         * Populate the table with the files list
+         */
+        initTable () {
+            this.tableData = this.files.map((file) => file = { ...file, isNew: false } ); //add isNew so can differentiate newly uploaded files
+            this.onTableLoaded();
+        },
+
+        /**
          * To update the table to show the UI in the footer
          */
         onTableLoaded () {
             this.$nextTick(() => {
                 this.footerUI_update();
-                this.initDropZone();
+                this.initFilterDisplay();
+                if (this.canEdit) {
+                    this.$refs.dropzone.initDropzone();
+                }
             });
         },
 
         /**
-         *
+         * To only show those files within the currently filtered list
          */
-        initDropZone () {
-            $('#dropzone').fileDrop({
-                previewsContainer: '#view-all-files [data-dz-container]',
-                previewTemplate: '#view-all-files [data-dz-template]',
-                reloadContent: false,
-                sending: (file, xhr, formData) => {
-                    const fileDescription = file.name.substr(0, file.name.lastIndexOf('.'));
-                    const uploadDescription = fileDescription.length > 0 ? fileDescription : file.name; //ensure there's a file name, otherwise just add the extension
-                    formData.append('description', uploadDescription);
-                    formData.append('category', this.sourceFolderId);
-                    formData.append('comment', '');
-                    formData.append('hidden', 0);
-                },
-                complete: (file) => {
-                    file.previewElement.querySelector('[data-dz-thumbnail]').setAttribute('src', `/ajax/mime/${file.type}`);
-                },
-                success: (file, response) => {
-                    /**
-                     * when you go to the edit link, theis needs a returnUrl so the edit page knows where to send the user after they have edited/deleted the file
-                     * we shall append this here to all newly uploaded files
-                     */
-                    response.editUrl  = response.editUrl + '?returnUrl=' + encodeURIComponent(btoa(window.location.pathname));
-                    this.files.push(response);
-                    const previewElement = file.previewElement;
-                    previewElement.remove();
-                },
-                error: (file, response) => {
-                    document.querySelector('.dz-error [data-close]').classList.remove('hide');
-                    file.previewElement.classList.remove('dz-processing');
-                    file.previewElement.querySelector('[data-dz-status]').textContent = response.error;
-                }
+        initFilterDisplay () {
+            if (!this.selectedFilters.includes(fileTypes.DOCUMENT)) {
+                Event.$emit(`vue-tables.filter::${fileTypes.DOCUMENT}`, fileTypes.DOCUMENT);
+            }
+            if (!this.selectedFilters.includes(fileTypes.AUDIO)) {
+                Event.$emit(`vue-tables.filter::${fileTypes.AUDIO}`, fileTypes.AUDIO);
+            }
+            if (!this.selectedFilters.includes(fileTypes.VIDEO)) {
+                Event.$emit(`vue-tables.filter::${fileTypes.VIDEO}`, fileTypes.VIDEO);
+            }
+            if (!this.selectedFilters.includes(fileTypes.IMAGE)) {
+                Event.$emit(`vue-tables.filter::${fileTypes.IMAGE}`, fileTypes.IMAGE);
+            }
+            if (!this.selectedFilters.includes(fileTypes.OTHER)) {
+                Event.$emit(`vue-tables.filter::${fileTypes.OTHER}`, fileTypes.OTHER);
+            }
+        },
+
+        /**
+         * To keep track of selected rows
+         */
+        onRowSelected (event) {
+            this.selectedFiles = event;
+            if (this.selectedFiles.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+                this.hasSelectedShiftKey = true;
+            }
+        },
+
+        /**
+         * Add/remove from selectedFilters and fire an event for the table
+         *
+         * @param { String }
+         */
+        onFilterChange (fileType) {
+            this.updateSelectedFilters(fileType);
+            this.dispatchFilterEvent(fileType);
+            this.updateSessionStorage();
+            this.markAllFilesAsOld();
+        },
+
+        /**
+         * Add/remove from selectedFilters
+         *
+         * @param { String }
+         */
+        updateSelectedFilters (fileType) {
+            if (this.selectedFilters.includes(fileType)) {
+                this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== fileType);
+            } else {
+                this.selectedFilters = [...this.selectedFilters, fileType];
+            }
+        },
+
+        /**
+         * Modify what's displayed in the table, showing or hiding a filter type
+         * depending on whether it's in the selected filters
+         *
+         * @param { String }
+         */
+        dispatchFilterEvent (fileType) {
+            const filterParam = this.selectedFilters.includes(fileType) ? '' : fileType ;
+            Event.$emit(`vue-tables.filter::${fileType}`, filterParam);
+        },
+
+        /**
+         * Save the modified filters in the session storage to allow returning to the correct
+         * selected files if returning to the page from editing a file
+         */
+        updateSessionStorage () {
+            const selectedFiltersAsString = this.selectedFilters.join(',');
+            sessionStorage.setItem(this.selectedFiltersStorage, selectedFiltersAsString);
+        },
+
+        /**
+         * Perform on any further user interaction, like updating filters, sorting or searching
+         * Otherwise the animation used to clearly show where new files have been added will be
+         * replayed on any state change
+         *
+         * @param { Object }
+         */
+        markAllFilesAsOld () {
+            this.$nextTick(() => {
+                this.tableData.forEach((file) => {
+                    file.isNew = false;
+                })
             });
         },
+
+        /**
+         * Add the file to the table, ensuring it's visible by
+         * checking on the relevant filter if not already active
+         *
+         * @param { Object }
+         */
+        onFileSuccess (file) {
+            this.checkFileFilterIsActive(file);
+            this.addFileToTable(file);
+            this.$refs.table.resetQuery();
+        },
+
+        /**
+         * For example, ensure the Image filter is active if a jpeg is dropped in
+         * Otherwise when the file is uploaded it just looks like the file disappears
+         * as it's not in the currently filtered list
+         *
+         * @param { Object }
+         */
+        checkFileFilterIsActive (file) {
+            if (!this.selectedFilters.includes(file.type)) {
+                this.selectedFilters = [...this.selectedFilters, file.type];
+                Event.$emit(`vue-tables.filter::${file.type}`, '');
+                this.updateSessionStorage();
+            }
+        },
+
+        /**
+         * Add the new file into the table, marking it as new to allow the file to animate into the table to show its now
+         * And add returnUrl so the edit page knows where to send the user after they have edited/deleted the file
+         *
+         * @param { Object }
+         */
+        addFileToTable (file) {
+            const newFile = {
+                ...file,
+                isNew: true,
+                editUrl: `${file.editUrl}?returnUrl=${encodeURIComponent(btoa(window.location.pathname))}`
+            };
+            this.tableData = [...this.tableData, newFile];
+        },
+
+        /**
+         * Files have been deleted, so clear them from the table and clear the selection
+         */
+        onFilesDeleted () {
+            this.tableData = this.getUpdatedRowsAfterUserDeletion();
+            this.markAllFilesAsOld();
+            this.clearRowSelection();
+        },
+
+        /**
+         * To update the row display after deletion
+         *
+         * @returns { Array }
+         */
+        getUpdatedRowsAfterUserDeletion () {
+            return this.tableData.filter((file) => {
+                if (this.selectedFiles.some((rowToDelete) => rowToDelete.id === file.id)) { //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
+                    return false;
+                }
+                return true;
+            });
+        },
+
+        /**
+         * Clear the selection
+         */
+        clearRowSelection () {
+            this.selectedFiles = [];
+            this.$refs.table.resetSelectedRows();
+        },
+
 
     },
 
@@ -216,7 +425,7 @@ export default {
 
             <div class="dropzone-wrap">
 
-                <form class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
+                <form v-if="canEdit" class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
                     <div class="dz-default dz-message">You can drag files into this space.</div>
                 </form>
 
@@ -225,31 +434,24 @@ export default {
                     :data="tableData"
                     :columns="tableColumns"
                     :options="tableOptions"
+                    @select="onRowSelected"
+                    @filter="markAllFilesAsOld"
+                    @sorted="markAllFilesAsOld"
                 >
                     <div slot="beforeTable">
                         <view-all-files-filters
                             :selected-filters="selectedFilters"
+                            @on-filter-change="onFilterChange"
                         />
                     </div>
                     <div slot="afterTable">
-                        <div class="dropped-files-container">
-                            <div data-dz-container=""></div>
-                            <div data-dz-template="" class="hide">
-                                <div>
-                                    <div class="card small-12">
-                                        <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                        <img data-dz-thumbnail="" class="mime" src="/static/images/foundation/preloader.gif" alt="file loading spinner">
-                                        <p data-dz-name=""></p>
-                                        <p class="meta" data-dz-status="">Uploading...</p>
-                                        <div class="progress dz-progress">
-                                            <span class="meter dz-upload" style="width:0;"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <view-all-files-dropzone
+                            v-if="canEdit"
+                            ref="dropzone"
+                            dropzone-selector="#dropzone"
+                            :source-folder-id="sourceFolderId"
+                            @on-file-uploaded="onFileSuccess"
+                        />
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
                         <div class="component-action">
                             <section>
@@ -261,6 +463,15 @@ export default {
 
             </div>
 
+            <view-all-files-delete-files
+                v-if="canEdit"
+                :selected-files="selectedFiles"
+                :is-shift-key-selected="isShiftKeySelected"
+                :has-selected-shift-key="hasSelectedShiftKey"
+                @on-files-deleted="onFilesDeleted"
+                @on-selection-cleared="clearRowSelection"
+            />
+
         </div>
 
     </div>
@@ -269,6 +480,7 @@ export default {
 
 <style lang="scss">
 
+@import 'www/static/css/foundation/utils/_colors.scss';
 @import '@vue/components/vueTables2/vueTables2';
 
 .VueTables table {
@@ -277,6 +489,7 @@ export default {
 
 .VueTables__search {
     padding-bottom: 0.5rem; //to put the view-all-files-filters.vue up closer to the search input
+    width: 100%;
 }
 
 .VueTables__search-field label {
@@ -287,12 +500,16 @@ export default {
     margin-bottom: 0; //to put the view-all-files-filters.vue up closer to the search input
 }
 
-.VueTables__table td {
-    padding: 0.25rem 0.5rem 0.25rem 0;
+.VueTables__table td, .VueTables__select-all {
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
     vertical-align: middle;
     @media (max-width: 700px) {
         padding: 0.5rem 0.5rem 0 0;
     }
+}
+
+.VueTables__select-row {
+    width: 30px;
 }
 
 .date-modified-td {
@@ -305,18 +522,9 @@ export default {
     }
 }
 
-.edit-td {
+.VueTables__table .edit-td {
+    padding-left: 0; //bring it inline with the right side border
     width: 2.5rem; //keep the edit icon on the right side
-}
-
-.dropped-files-container {
-    background: white;
-    ul li {
-        list-style-type: none;
-    }
-    .card {
-        background: white;
-    }
 }
 
 .VueTables__table-footer {
@@ -325,6 +533,17 @@ export default {
 
 .component-action {
     margin-bottom: 2rem; //add margin as it's below the table-footer
+}
+
+.VueTables__table tr.new-file-upload { //have to be pretty specific to overwrite foundation rules...
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    animation-name: fadeOutBackgroundColour;
+}
+
+@keyframes fadeOutBackgroundColour {
+    0% { background-color: $success-color; }
+    100% { background-color: white; }
 }
 
 </style>
