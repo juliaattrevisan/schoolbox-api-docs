@@ -15,6 +15,11 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Permission\Access\Access;
 
 /**
  * Class Module
@@ -61,7 +66,12 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-
+                    'groupMapper'               => $this->getMapperFactory()->getLazy(GroupMapper::class),
+                    'userAccessMapper'          => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'folderMapper'              => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'accessHelper'              => $this->getMapperFactory()->getLazy(Access::class),
+                    'timetable_ColourMapper'    => $this->getMapperFactory()->getLazy(\Timetable_ColourMapper::class),
+                    'reRouteOverrideMapper'     => $this->getMapperFactory()->getLazy(RerouteOverrideMapper::class),
                 ]
             )
         );

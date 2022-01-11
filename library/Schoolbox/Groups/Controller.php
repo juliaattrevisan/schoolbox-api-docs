@@ -34,40 +34,24 @@ class Controller extends BaseController
     const NOTENROLLED   = 'notEnrolled';
     const PENDING       = 'pending';
 
-    /**
-     * @var GroupMapper
-     */
-    private $groupMapper;
-
-    /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
-
-    /**
-     * @var FolderMapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var Access
-     */
-    private $accessHelper;
-
-    /**
-     * @var Timetable_ColourMapper
-     */
-    private $timetable_ColourMapper;
+    private GroupMapper $groupMapper;
+    private UserAccessMapper $userAccessMapper;
+    private FolderMapper $folderMapper;
+    private Access $accessHelper;
+    private Timetable_ColourMapper $timetable_ColourMapper;
+    private RerouteOverrideMapper $reRouteOverrideMapper;
 
     /**
      * constructor for dependency injection
      */
-    public function __construct()
+    public function __construct($groupMapper, $userAccessMapper, $folderMapper, $accessHelper, $timetable_ColourMapper, $reRouteOverrideMapper)
     {
-        $groupMapper;
-        $accessMapper;
-        $folderMapper;
-        $accessHelper;
+        $this->groupMapper              = $groupMapper;
+        $this->userAccessMapper         = $userAccessMapper;
+        $this->folderMapper             = $folderMapper;
+        $this->accessHelper             = $accessHelper;
+        $this->timetable_ColourMapper   = $timetable_ColourMapper;
+        $this->reRouteOverrideMapper    = $reRouteOverrideMapper;
     }
 
     /**
@@ -80,17 +64,11 @@ class Controller extends BaseController
         //grab list of all possibly groups the user can choose to be part of, and list them.
         //displaying included information (notification / favorite)
 
-        //helpers
-        $groupMapper    = GroupMapper::getInstance();
-        $accessMapper   = UserAccessMapper::getInstance();
-        $folderMapper   = FolderMapper::getInstance();
-        $accessHelper   = Access::getInstance();
-
         $user = $this->getUser();
 
         //colours for groups with no colours
         /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = Timetable_ColourMapper::getInstance()->findAll();
+        $colourList = $this->timetable_ColourMapper->findAll();
         $colourIndex = 0;
         $colourFactory = new ColorFactory();
         $colourCache   = new GenericCollection(Color::class);
@@ -98,13 +76,13 @@ class Controller extends BaseController
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
         /** @var GenericCollection|UserAccess[] $userPerms */
-        $userPerms = $accessMapper->findByColumnList([
+        $userPerms = $this->userAccessMapper->findByColumnList([
             'uid'     => $user->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
         ])->indexBy('serviceIdentifier');
 
         //get list of all possible public groups
-        $groups = $groupMapper->findByColumnList([
+        $groups = $this->groupMapper->findByColumnList([
             'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
         ]);
         $groupIds = array_unique(array_merge($userPerms->keys(), $groups->keys()));
@@ -113,7 +91,7 @@ class Controller extends BaseController
         $notificationsList = $this->getNotifications($user);
 
         //build the folder list object with hydration
-        $folders = $folderMapper->findByColumnList(['id' => $groupIds]);
+        $folders = $this->folderMapper->findByColumnList(['id' => $groupIds]);
 
         // build output array
         $possibleGroups = [];
@@ -141,7 +119,7 @@ class Controller extends BaseController
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
             //get access
-            $access = $accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
+            $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
             if (UserAccess::ACCESS_WRITE <= $access) {
                 $modifyLink = $this->getRouter()->generate(
                     'folder.getFolderModify',
@@ -190,13 +168,13 @@ class Controller extends BaseController
         $post = $this->getRequest()->post->getArrayCopy();
 
         try {
-            $userGroup = $accessMapper->findOneByColumnList([
+            $userGroup = $this->userAccessMapper->findOneByColumnList([
                                                                 'uid' => $user->getId(),
                                                                 'sid' => $post['group'],
                                                             ]);
         } catch (MapperException\NotFound $e) {
             //don't place the user into the group unless we are specifically requested to add the user.
-            $userGroup = $accessMapper->createModel();
+            $userGroup = $this->userAccessMapper->createModel();
             $userGroup->setServiceIdentifier($post['group'])
                       ->setUser($user)
                       ->setService(UserAccess::SERVICE_HOMEPAGE)
@@ -206,7 +184,7 @@ class Controller extends BaseController
                 $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
             }
             //save group object
-            $accessMapper->save($userGroup);
+            $this->userAccessMapper->save($userGroup);
 
 
         }
@@ -244,18 +222,13 @@ class Controller extends BaseController
             return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
         }
 
-        //helpers
-        $accessMapper   = UserAccessMapper::getInstance();
-        $groupMapper    = GroupMapper::getInstance();
-
-        /** @var \Schoolbox\User $user */
         $user = $this->getUser();
 
         /* @var Group $group */
-        $group = $groupMapper->findById($post['group']);
+        $group = $this->groupMapper->findById($post['group']);
 
         try {
-            $userGroup = $accessMapper->findOneByColumnList([
+            $userGroup = $this->userAccessMapper->findOneByColumnList([
                 'uid' => $user->getId(),
                 'sid' => $post['group'],
             ]);
@@ -274,7 +247,7 @@ class Controller extends BaseController
                 $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
             }
             //save group object
-            $accessMapper->save($userGroup);
+            $this->userAccessMapper->save($userGroup);
 
             return $this->getResponse()->content->set(
                 $this->buildJsonOutput([
@@ -291,7 +264,7 @@ class Controller extends BaseController
             if ($group->isPrivate()) {
                 return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'No Permission to leave group']));
             }
-            $accessMapper->delete($userGroup);
+            $this->userAccessMapper->delete($userGroup);
             return $this->getResponse()->content->set($this->buildJsonOutput([
                 'user'              => $user->getId(),
                 'group'             => $post['group'],
@@ -307,7 +280,7 @@ class Controller extends BaseController
                 $userGroup->setFavourite((bool)$post['isFavourite']);
             }
             //save group object
-            $accessMapper->save($userGroup);
+            $this->userAccessMapper->save($userGroup);
 
             //subscribe/remove notifications
             if (isset($post['isNotificationsOn'])) {
@@ -341,12 +314,12 @@ class Controller extends BaseController
     protected function getNotifications(\Schoolbox\User $user): array
     {
         // as much as we'd like get this as cached in session, we can't include subjects here
-        $accesses = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());
+        $accesses = $this->userAccessMapper->findAllGroupsForUser($this->getUser());
 
         $folderIds = $accesses->getColumnValues('serviceIdentifier');
 
         /** @var \Schoolbox\Collection|Folder\Model[] $folders */
-        $folders = $this->getFolderMapper()->findByColumn('id', $folderIds)->sortBy('name', 'asc');
+        $folders = $this->folderMapper->findByColumn('id', $folderIds)->sortBy('name', 'asc');
         $service = UserAccess::SERVICE_HOMEPAGE;
 
         $muted = [
@@ -356,7 +329,7 @@ class Controller extends BaseController
 
         $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
         foreach ($muted as $k => $id) {
-            $muted[$k] = $this->getRerouteOverrideMapper()
+            $muted[$k] = $this->reRouteOverrideMapper
                               ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
                               ->map(
                                   function ($override) use ($routeKeyRegex) {
@@ -400,11 +373,10 @@ class Controller extends BaseController
     protected function setNotification(int $group, \Schoolbox\User $user, bool $isNotificationOn): array
     {
         //helpers
-        $reRouteOverideMapper = RerouteOverrideMapper::getInstance();
         $serviceKey =  'service.' . UserAccess::SERVICE_HOMEPAGE . ".$group";
 
         //see if the object already exists in the db, if so grab it to edit.
-        $muteObj = $reRouteOverideMapper->findByColumnList([
+        $muteObj = $this->reRouteOverrideMapper->findByColumnList([
             'msg_route_key' => $serviceKey,
             'user_id'       => $user->getId(),
             'delivery'      => RoutePermission::MUTE
@@ -413,7 +385,7 @@ class Controller extends BaseController
         ///if user does not want notifications/follow for the group, create the mute object, and none exists currently
         if (false === $isNotificationOn && 0 === $muteObj->count()) {
             //create the mute object
-            $muteObj = $reRouteOverideMapper->createModel()
+            $muteObj = $this->reRouteOverrideMapper->createModel()
                 ->setUser($user)
                 ->setRouteKey($serviceKey)
                 ->setDelivery([ RoutePermission::MUTE ])
@@ -423,7 +395,7 @@ class Controller extends BaseController
         //if the user does want notifications/follows and there is an muteobject entry, lets remove that now.
         if (true === $isNotificationOn && 0 < $muteObj->count()) {
             //delete the mute
-            $reRouteOverideMapper->delete($muteObj);
+            $this->reRouteOverrideMapper->delete($muteObj);
         }
 
         return $this->getNotifications($user);
