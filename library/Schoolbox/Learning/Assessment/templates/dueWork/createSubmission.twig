@@ -17,24 +17,26 @@ Data:
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-        let form          = $('#editor-form'),
-            formSaveLabel = form.find('[data-save-draft]'),
-            acceptsOnline = {{ acceptsOnline ? 'true' : 'false' }};
+        let $form          = $('#editor-form'),
+            $formSaveLabel = $form.find('[data-save-draft]'),
+            acceptsOnline  = {{ acceptsOnline ? 'true' : 'false' }};
         if (Number('{{ errorMessage|length }}') > 0) {
             // Just show error message in perma-toast
-            formSaveLabel.toastActivate({
+            $formSaveLabel.toastActivate({
                 text: 'Error: {{ errorMessage }}',
                 css: 'alert'
             });
-            formSaveLabel.toastTimeout({
+            $formSaveLabel.toastTimeout({
                 text: 'Error: {{ errorMessage }}',
                 css: 'alert',
                 duration: 5000
             });
         }
+
         // Autosave on type to ensure that change gets saved
         let autosaveTimeout = null;
         let textBoxContent = '';
+
         // Method for setting up autosave - clears existing event, and creates new one.
         let initAutosave = function () {
             clearTimeout(autosaveTimeout);
@@ -42,9 +44,12 @@ Data:
                 autosavePresubmit();
             }, 5 * 1000);
         };
+
+        // Method for suspending autosave: clear the old event
         let suspendAutosave = function () {
             clearTimeout(autosaveTimeout);
         };
+
         // The autosave pre-submit method - called by the autosave method. Calls the actual submit method if the textbox has changed.
         let autosavePresubmit = function () {
             // Has the text box changed? If not check again later (re-init the autosave counter)
@@ -57,19 +62,20 @@ Data:
                 autosaveAjaxSubmit();
             }
         };
-        let submitButton = $("[data-action-save]");
+        let $submitButton = $("[data-action-save]");
+
         // The autosave submit method
         let autosaveAjaxSubmit = function () {
             /* Disable actual submit button
              */
-            submitButton.prop('disabled', true);
+            $submitButton.prop('disabled', true);
             // Submit form via AJAX
-            let formContents = form.serializeArray();
+            let formContents = $form.serializeArray();
             formContents.push({name: 'saveDraft', value: '1'});
             if (acceptsOnline) {
                 formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});
             }
-            formSaveLabel.toastActivate({
+            $formSaveLabel.toastActivate({
                 text: 'Autosaving'
             });
             $.ajax({
@@ -81,20 +87,20 @@ Data:
                     initAutosave();
                     /* Re-enable submit
                      */
-                    submitButton.prop('disabled', false);
+                    $submitButton.prop('disabled', false);
                 },
                 success: function (responseText) {
                     /* Recycle the id ><
                      */
-                    form.find('input[name=responseId]').val(responseText.id);
-                    formSaveLabel.toastTimeout({
+                    $form.find('input[name=responseId]').val(responseText.id);
+                    $formSaveLabel.toastTimeout({
                         text: 'Draft Saved',
                         css: 'success'
                     });
                 },
                 error: function (response) {
                     let temp = $.parseJSON(response.responseText);
-                    formSaveLabel.toastTimeout({
+                    $formSaveLabel.toastTimeout({
                         text: 'Error: ' + temp.message,
                         css: 'alert'
                     });
@@ -102,6 +108,7 @@ Data:
                 dataType: 'json'
             });
         };
+
         /**
          * Can this form be submitted?
          *
@@ -119,10 +126,10 @@ Data:
                 return true;
             }
             let inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length,
-                submittedInPersonCheckbox = form.find('#editor-submittedInPerson');
-            return (Boolean)(inlineLen || filesLen || submittedInPersonCheckbox.prop('checked'));
+                filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+            return (Boolean)(inlineLen || filesLen || $form.find('#editor-submittedInPerson').prop('checked'));
         };
+
         /* Spawn editors
          */
         $.fn.alaressEditor({
@@ -132,16 +139,21 @@ Data:
                 autosavePresubmit(element);
             }
         });
+
         // For self-assessments - save a draft when the rubric or comment box is updated
         $("#self-assessment-feedback").change(function() {
             autosaveAjaxSubmit();
         });
+
         // Empty submission dialog
-        let emptyDialog = $('#empty-dialog');
-        emptyDialog.on('click', '[data-interaction="close"]', function (e) {
+        let $emptyDialog = $('#empty-dialog');
+        $emptyDialog.on('click', '[data-interaction="close"]', function (e) {
             e.preventDefault();
-            emptyDialog.foundation('reveal', 'close');
+            $emptyDialog.foundation('reveal', 'close');
         });
+
+        // Empty self-assessment comment dialog
+
         // Confirm dialog (if it exists)
         let $confirmDialog = $('#confirm-dialog'),
             $acceptButton  = $confirmDialog.find('[data-accept]'),
@@ -149,7 +161,6 @@ Data:
             $buttons       = $().add($acceptButton).add($rejectButton),
             enableButtons  = function () { $buttons.removeClass('disabled'); },
             disableButtons = function () { $buttons.addClass('disabled'); },
-            $submitButton  = form.find(':submit'),
             submittingText = 'Submitting... please wait',
             submitForm     = function () {
                 // Disable the submit button and add 'working' text
@@ -157,15 +168,16 @@ Data:
                     .prop('disabled', true)
                     .val(submittingText);
                 // Make the form's inputs readonly (NOT disabled)
-                form.find('input, select, textarea').prop('readonly', true);
+                $form.find('input, select, textarea').prop('readonly', true);
                 if (acceptsOnline) {
                     CKEDITOR.instances['editor-body'].setReadOnly(true);
                 }
                 // Disable draft autosaving
                 suspendAutosave();
                 // Submit the form
-                form.submit();
+                $form.submit();
             };
+
         // Confirm dialog accept/reject
         $acceptButton.click(function (event) {
             disableButtons();
@@ -177,31 +189,31 @@ Data:
             event.preventDefault();
             $confirmDialog.foundation('reveal', 'close');
         });
+
         // Submit form
-        submitButton.click(function (e) {
+        $submitButton.click(function (e) {
             if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
                 e.preventDefault();
-                emptyDialog.foundation('reveal', 'open');
-            }
-            else if ($confirmDialog.length) {
+                $emptyDialog.foundation('reveal', 'open');
+            } else if ($confirmDialog.length) {
                 // wait! display confirm modal
                 e.preventDefault();
                 enableButtons();
                 $confirmDialog.foundation('reveal').foundation('reveal', 'open');
-            }
-            else {
+            } else {
                 // checks pass: go for broke
                 submitForm();
             }
         });
+
         // Disable ckeditor and attachzone if 'submitted in person' checked
-        $('#editor-submittedInPerson').click(function(element){
+        $('#editor-submittedInPerson').click(function (element) {
             if(this.checked){
                 $('#submission-upload').hide('slow');
                 $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
                 $('#editor-body').attr('disabled', true);
-                if(CKEDITOR.instances['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
+                if (CKEDITOR.instances['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
                     $('#submit-warning').show('slow');
                 } else {
                     $('#submit-warning').hide('slow');
