@@ -40,23 +40,22 @@ class IsCoachOfTeam implements IAuthorizationRule
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        /* Viewing the Team Match Page
-         * sportsfixturesResult.getResultForTeam
-         *
-         * When you're viewing the Create form
-         * sportsfixturesResult.getCreateFormForTeam
-         */
         if (($params['context'] instanceof Matchup) && (is_numeric($params['teamId']))) {
+            /* Viewing the Team Match Page
+             * sportsfixturesResult.getResultForTeam
+             *
+             * When you're viewing the Create form
+             * sportsfixturesResult.getCreateFormForTeam
+             */
             $matchup = $params['context'];
             $teamId = $params['teamId'];
-        }
-        /* When you're viewing the Modify Form
-         * sportsfixturesResult.getModifyForm
-         *
-         * When you're persisting data from the Update form
-         * sportsfixturesResult.updateEntity
-         */
-        else if ($params['entity'] instanceof Result) {
+        } else if ($params['entity'] instanceof Result) {
+            /* When you're viewing the Modify Form
+             * sportsfixturesResult.getModifyForm
+             *
+             * When you're persisting data from the Update form
+             * sportsfixturesResult.updateEntity
+             */
 
             /** @var Result $result */
             $result = $params['entity'];
