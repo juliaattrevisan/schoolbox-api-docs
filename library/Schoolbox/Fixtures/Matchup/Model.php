@@ -68,7 +68,7 @@ class Model implements ISoftDeletable
     protected $awayTeamResult;
 
 
-    /** @var Collection|ItineraryItem[] */
+    /** @var Collection|null */
     protected $itinerary;
 
     /**
@@ -251,7 +251,7 @@ class Model implements ISoftDeletable
      * @param null|Result $result
      * @return static
      */
-    public function setHomeTeamResult(Result $result)
+    public function setHomeTeamResult(?Result $result)
     {
         $this->homeTeamResult = $result;
         return $this;
@@ -270,7 +270,7 @@ class Model implements ISoftDeletable
      * @param null|Result $result
      * @return static
      */
-    public function setAwayTeamResult(Result $result)
+    public function setAwayTeamResult(?Result $result)
     {
         $this->awayTeamResult = $result;
         return $this;
@@ -378,7 +378,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return Collection|ItineraryItem[]
+     * @return Collection|null
      */
     public function getItinerary()
     {

@@ -185,7 +185,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Collection|Matchup[] $matches */
+        /** @var GenericCollection|Matchup[] $matches */
         $matches = $this->createCollection();
 
         /** @var Collection|Division[] $divisions */

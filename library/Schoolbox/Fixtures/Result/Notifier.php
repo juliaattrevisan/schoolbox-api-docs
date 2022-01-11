@@ -36,9 +36,9 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'resultUpdated';
 
     /**
-     * @var MatchupMapper $matchMapper
+     * @var MatchupMapper $matchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * @var ResultMapper $resultMapper
@@ -68,8 +68,8 @@ class Notifier extends AbstractModuleNotifier
         if (empty($dependencies['resultMapper'])) {
             $dependencies['resultMapper'] = ResultMapper::getInstance();
         }
-        if (empty($dependencies['matchMapper'])) {
-            $dependencies['matchMapper'] = MatchupMapper::getInstance();
+        if (empty($dependencies['matchupMapper'])) {
+            $dependencies['matchupMapper'] = MatchupMapper::getInstance();
         }
         if (empty($dependencies['divisionMapper'])) {
             $dependencies['divisionMapper'] = DivisionMapper::getInstance();
@@ -223,7 +223,7 @@ class Notifier extends AbstractModuleNotifier
         /** @var Result $result */
         $result = $this->resultMapper->findById($result->getId());
         /** @var Matchup $matchup */
-        $matchup = $this->matchMapper->findById($result->getMatchup()->getId());
+        $matchup = $this->matchupMapper->findById($result->getMatchup()->getId());
         /** @var Division $division */
         $division = $this->divisionMapper->findById($matchup->getDivision()->getId());
         /** @var Sport $sport */

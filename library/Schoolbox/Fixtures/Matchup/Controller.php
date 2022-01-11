@@ -114,8 +114,6 @@ class Controller extends AbstractController
 
         /**
          * Each item is a Collection of matches, indexed by seasonId
-         *
-         * @var Collection|Matchup[][] $seasonMatches
          */
         $seasonMatches = new Collection();
 
@@ -397,8 +395,8 @@ class Controller extends AbstractController
      *     Team $return[0]
      *     School $return[1]
      *
-     * @param $teamId
-     * @param $prefix
+     * @param string $teamId
+     * @param string $prefix
      * @return array
      * @throws MapperException
      * @throws MapperException\Deleted
