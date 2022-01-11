@@ -7137,11 +7137,15 @@ parameters:
 
 		-
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6966a35197e... removed phpstan fix, due to git conflict [SA-12873]
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Controller.php
 
 		-
+<<<<<<< HEAD
 			message: "#^Property Schoolbox\\\\Realtime\\\\Controller\\:\\:\\$config \\(Schoolbox\\\\Realtime\\\\Config\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Controller.php
@@ -7149,6 +7153,8 @@ parameters:
 		-
 =======
 >>>>>>> bf8b98bfb73... updated comments, endpoint routes, phpstan issue, cleaned response array for notify / favourites [SA-12873]
+=======
+>>>>>>> 6966a35197e... removed phpstan fix, due to git conflict [SA-12873]
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 7
 			path: library/Schoolbox/Realtime/Controller.php
