@@ -91,21 +91,4 @@
     </div>
 </section>
 
-<div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
-    <h2 id="empty-dialog-title">
-        Are you sure you wish to submit an incomplete
-        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
-    </h2>
-    <p>
-        It is preferable to provide a
-        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
-        comment. Please confirm that you wish to provide no comment.
-    </p>
-    <ul class="flex-list buttons">
-        <li><a class="button submit" data-interaction="enable">Yes</a></li>
-        <li><a class="button" data-interaction="close">No</a></li>
-    </ul>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
 <script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js" type="text/javascript"></script>
