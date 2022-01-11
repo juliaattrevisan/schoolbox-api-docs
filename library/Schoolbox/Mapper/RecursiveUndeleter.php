@@ -264,7 +264,7 @@ class RecursiveUndeleter
             Fixtures\Division\User\Mapper::class => 'division_id',
         ],
         Fixtures\Division\User\Mapper::class            => [],
-        Fixtures\Match\Mapper::class                    => [
+        Fixtures\Matchup\Mapper::class                    => [
             Fixtures\ItineraryItem\Mapper::class => 'match_id',
             Fixtures\Result\Mapper::class        => 'match_id',
         ],
@@ -272,7 +272,7 @@ class RecursiveUndeleter
         Fixtures\Result\Mapper::class                   => [],
         Fixtures\Season\Mapper::class                   => [
             Fixtures\Division\Mapper::class => 'season_id',
-            Fixtures\Match\Mapper::class    => 'season_id',
+            Fixtures\Matchup\Mapper::class    => 'season_id',
         ],
         Fixtures\Sport\Mapper::class                    => [
             Fixtures\Division\Mapper::class => 'sport_id',

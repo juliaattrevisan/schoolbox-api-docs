@@ -37,9 +37,9 @@ class Controller extends AbstractController
     protected $divisionMapper;
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * Controller constructor.

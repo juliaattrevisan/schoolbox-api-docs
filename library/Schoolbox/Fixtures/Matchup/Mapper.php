@@ -102,7 +102,7 @@ class Mapper extends BaseMapper
 
         // ensure the itinerary items all point to the correct match (ie. this one)
         foreach ($matchup->getItinerary() as $item) {
-            $item->setMatch($matchup);
+            $item->setMatchup($matchup);
         }
 
         return $this->cascadeJoin('itinerary', ['match_id' => $matchup->getId()], $matchup->getItinerary());
