@@ -274,7 +274,7 @@ class Folder extends SimpleStrategy
      */
     public function canViewArticleAudiencedToEntityValue(User $user, ?string $entityValue, string $modifier): bool
     {
-        if (null === $entityValue) {
+        if (null === $entityValue || $modifier !== Audience\Model::RELATIONSHIP_SELF) {
             // No users have special relationships to no folder
             return false;
         }
