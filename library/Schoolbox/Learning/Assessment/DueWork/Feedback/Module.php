@@ -20,7 +20,6 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -61,7 +60,6 @@ class Module extends BaseModule
                 }, $this->getAccess()),
                 new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
             ),
-            new CanSelfAssess()
         );
 
         $canGiveFeedbackForAssessment = new Rule\Any(
