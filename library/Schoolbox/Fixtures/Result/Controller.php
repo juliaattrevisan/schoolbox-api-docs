@@ -21,9 +21,9 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Match\Weather as MatchWeather;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
+use Schoolbox\Fixtures\Matchup\Weather as MatchupWeather;
 use Schoolbox\Fixtures\Result\Model as Result;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Status\Mapper as StatusMapper;
@@ -52,9 +52,9 @@ class Controller extends AbstractController
     protected $divisionMapper;
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * @var TeamMapper
@@ -84,7 +84,7 @@ class Controller extends AbstractController
         parent::__construct(ResultMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
-        $this->setMatchMapper(MatchMapper::getInstance());
+        $this->setMatchupMapper(MatchupMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstanceByName('sportsfixtures_school', 'id', 'name'));
@@ -105,7 +105,7 @@ class Controller extends AbstractController
     {
         if (empty($context)) {
             try {
-                $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
+                $context = $this->getMatchupMapper()->findById($entity->getMatchup()->getId());
             } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
             }
@@ -165,14 +165,14 @@ class Controller extends AbstractController
     /**
      * List of Results and the Match they are in
      *
-     * @param Match $context
+     * @param Matchup $context
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Router\Exception\RouteNotFound|\Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)
     {
         try {
-            /** @var Match $context */
+            /** @var Matchup $context */
             $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
@@ -233,7 +233,7 @@ class Controller extends AbstractController
      * the Results for the specified Team
      *
      * @api /fixtures/matches/:matchId/results/:teamId
-     * @param Match $context
+     * @param Matchup $context
      * @param Team $team
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
@@ -241,14 +241,14 @@ class Controller extends AbstractController
     public function getResultForTeam($context, $team)
     {
         try {
-            /** @var Match $context */
-            $match = $this->getMatchMapper()->findById($context->getId());
+            /** @var Matchup $context */
+            $matchup = $this->getMatchupMapper()->findById($context->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
 
         try {
-            $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
+            $division = $this->getDivisionMapper()->findById($matchup->getDivision()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
@@ -275,11 +275,11 @@ class Controller extends AbstractController
         /* Find faceless home team, ram it into a Team instance
          * This saves endless shenanigans in front-end land
          */
-        if (!$match->getHomeTeam()) {
-            if ($match->getHomeSchool()) {
-                $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getHomeSchool()->getName());
+        if (!$matchup->getHomeTeam()) {
+            if ($matchup->getHomeSchool()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($matchup->getHomeSchool()->getName());
 
-                $match->setHomeTeam($facelessTeam);
+                $matchup->setHomeTeam($facelessTeam);
             } else {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
@@ -288,11 +288,11 @@ class Controller extends AbstractController
         /* Find faceless away team, ram it into a Team instance
          * This saves endless shenanigans in front-end land
          */
-        if (!$match->getAwayTeam()) {
-            if ($match->getAwaySchool()) {
-                $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getAwaySchool()->getName());
+        if (!$matchup->getAwayTeam()) {
+            if ($matchup->getAwaySchool()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($matchup->getAwaySchool()->getName());
 
-                $match->setAwayTeam($facelessTeam);
+                $matchup->setAwayTeam($facelessTeam);
             } else {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
@@ -300,11 +300,11 @@ class Controller extends AbstractController
 
         /* Tell me the weather
          */
-        /** @var Match $match */
+        /** @var Matchup $matchup */
         $apiKey = $this->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigLoader()->get('weather_api_url');
         $weatherClient = new WeatherstackClient($apiKey, $apiUrl);
-        $forecast = new MatchWeather($match, $weatherClient);
+        $forecast = new MatchupWeather($matchup, $weatherClient);
         $forecast->loadForecast();
 
         /* Determine whether you've got write access or not
@@ -318,7 +318,7 @@ class Controller extends AbstractController
                 [
                     'sport'          => $sport,
                     'division'       => $division,
-                    'match'          => $match,
+                    'match'          => $matchup,
                     'schoolMapper'   => $this->getSchoolTagCloudMapper(),
                     'team'           => $team,
                     'teamMetadata'   => $teamMetadata,
@@ -384,7 +384,7 @@ class Controller extends AbstractController
      * Display form for create/update Results
      *
      * @param Result $entity
-     * @param Match $context
+     * @param Matchup $context
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
@@ -393,21 +393,21 @@ class Controller extends AbstractController
     {
         // For clarity
         $result = $entity;
-        $match  = $context;
+        $matchup = $context;
 
         // If updating existing results
         if ($result->getId()) {
-            $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
-            $result->setMatch($match);
+            $matchup = MatchupMapper::getInstance()->findById($result->getMatchup()->getId());
+            $result->setMatchup($matchup);
 
             // Don't permit update of archived results
-            if ($match->getSeason()->isArchived()) {
+            if ($matchup->getSeason()->isArchived()) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
             }
         }
 
         // Don't permit creation of results for archived matches
-        if (!$result->getId() && $match->getSeason()->isArchived()) {
+        if (!$result->getId() && $matchup->getSeason()->isArchived()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
@@ -417,7 +417,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $this->getCreateFormForTeam($result, $team, $match);
+        $this->getCreateFormForTeam($result, $team, $matchup);
     }
 
     /**
@@ -434,7 +434,7 @@ class Controller extends AbstractController
     {
         try {
             $matchId = $this->getRequest()->post['matchId'];
-            $match   = $this->getMatchMapper()->findById($matchId);
+            $matchup = $this->getMatchupMapper()->findById($matchId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
@@ -458,7 +458,7 @@ class Controller extends AbstractController
             $status = $this->getStatusMapper()->createModel();
         }
 
-        $this->saveResult($match, $team, $status, $this->getRequest()->post['description'], $entity);
+        $this->saveResult($matchup, $team, $status, $this->getRequest()->post['description'], $entity);
 
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
@@ -474,8 +474,8 @@ class Controller extends AbstractController
     /**
      * Save Result data to db
      *
-     * @param Match  $match
-     * @param Team   $team
+     * @param Matchup $matchup
+     * @param Team $team
      * @param Status $status
      * @param string $description
      * @param Result $result
@@ -483,9 +483,9 @@ class Controller extends AbstractController
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function saveResult(Match $match, Team $team, Status $status, $description, Result $result)
+    private function saveResult(Matchup $matchup, Team $team, Status $status, $description, Result $result)
     {
-        $result->setMatch($match);
+        $result->setMatchup($matchup);
         $result->setTeam($team);
         $result->setStatus($status);
         $result->setDescription($description);
@@ -530,19 +530,19 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return MatchMapper
+     * @return MatchupMapper
      */
-    protected function getMatchMapper()
+    protected function getMatchupMapper()
     {
-        return $this->matchMapper;
+        return $this->matchupMapper;
     }
 
     /**
-     * @param MatchMapper $matchMapper
+     * @param MatchupMapper $matchupMapper
      */
-    protected function setMatchMapper($matchMapper)
+    protected function setMatchupMapper($matchupMapper)
     {
-        $this->matchMapper = $matchMapper;
+        $this->matchupMapper = $matchupMapper;
     }
 
     /**

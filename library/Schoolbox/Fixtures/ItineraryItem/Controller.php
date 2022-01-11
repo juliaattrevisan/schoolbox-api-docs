@@ -14,8 +14,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 
@@ -40,9 +40,9 @@ class Controller extends AbstractController
 
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
 
     /**
@@ -59,7 +59,7 @@ class Controller extends AbstractController
         parent::__construct(ItineraryItemMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
-        $this->setMatchMapper(MatchMapper::getInstance());
+        $this->setMatchupMapper(MatchupMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -67,14 +67,14 @@ class Controller extends AbstractController
     /**
      * List of ItineraryItems and the Match they are in
      *
-     * @param Match $context
+     * @param Matchup $context
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)
     {
         try {
-            /** @var Match $context */
+            /** @var Matchup $context */
             $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
@@ -111,13 +111,13 @@ class Controller extends AbstractController
     public function getEntity($entity)
     {
         try {
-            $match = $this->getMatchMapper()->findById($entity->getMatch()->getId());
+            $matchup = $this->getMatchupMapper()->findById($entity->getMatchup()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
 
         try {
-            $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
+            $division = $this->getDivisionMapper()->findById($matchup->getDivision()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
@@ -131,7 +131,7 @@ class Controller extends AbstractController
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/entity.twig', [
             'sport'         => $sport,
             'division'      => $division,
-            'match'         => $match,
+            'match'         => $matchup,
             'itineraryItem' => $entity
         ]));
     }
@@ -141,7 +141,7 @@ class Controller extends AbstractController
      * Display form for create/update Itinerary Items
      *
      * @param Model $entity
-     * @param Match $context
+     * @param Matchup $context
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Application\Exception\Exception
      */
@@ -149,7 +149,7 @@ class Controller extends AbstractController
     {
         if (empty($context)) {
             try {
-                $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
+                $context = $this->getMatchupMapper()->findById($entity->getMatchup()->getId());
             } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
             }
@@ -192,7 +192,7 @@ class Controller extends AbstractController
     {
         try {
             $matchId = $this->getRequest()->post['matchId'];
-            $match   = $this->getMatchMapper()->findById($matchId);
+            $matchup = $this->getMatchupMapper()->findById($matchId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
@@ -204,7 +204,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $this->saveItineraryItem($match, $this->getRequest()->post['description'], $startAt, $entity);
+        $this->saveItineraryItem($matchup, $this->getRequest()->post['description'], $startAt, $entity);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getModifyForm', [
             'entityId' => $matchId
@@ -215,7 +215,7 @@ class Controller extends AbstractController
     /**
      * Save ItineraryItem data to db
      *
-     * @param Match               $match
+     * @param Matchup             $matchup
      * @param string              $description
      * @param Alaress_Date_Format $startAt
      * @param Model               $itineraryItem
@@ -223,9 +223,9 @@ class Controller extends AbstractController
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function saveItineraryItem(Match $match, $description, \Alaress_Date_Format $startAt, ItineraryItem $itineraryItem)
+    private function saveItineraryItem(Matchup $matchup, $description, \Alaress_Date_Format $startAt, ItineraryItem $itineraryItem)
     {
-        $itineraryItem->setMatch($match);
+        $itineraryItem->setMatchup($matchup);
         $itineraryItem->setDescription($description);
         $itineraryItem->setStartAt($startAt);
         $itineraryItem->setUpdatedAt(Alaress_Date_Format::now());
@@ -270,19 +270,19 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return MatchMapper
+     * @return MatchupMapper
      */
-    public function getMatchMapper()
+    public function getMatchupMapper()
     {
-        return $this->matchMapper;
+        return $this->matchupMapper;
     }
 
     /**
-     * @param MatchMapper $matchMapper
+     * @param MatchupMapper $matchupMapper
      */
-    public function setMatchMapper($matchMapper)
+    public function setMatchupMapper($matchupMapper)
     {
-        $this->matchMapper = $matchMapper;
+        $this->matchupMapper = $matchupMapper;
     }
 
     /**

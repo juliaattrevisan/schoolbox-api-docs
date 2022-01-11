@@ -12,7 +12,7 @@ namespace Schoolbox\Fixtures\Team\Metadata;
 
 use Schoolbox\Fixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
 use Schoolbox\Fixtures\Team\Metadata\Strategy\Historic as HistoricStrategy;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\UserMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
@@ -24,29 +24,29 @@ use Schoolbox\Fixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
 class Factory
 {
     /**
-     * @var Match
+     * @var Matchup
      */
-    private $match;
+    private $matchup;
 
     /**
      * Factory constructor.
      *
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    public function __construct(Match $match)
+    public function __construct(Matchup $matchup)
     {
-        $this->setMatch($match);
+        $this->setMatchup($matchup);
     }
 
     /**
-     * If this is < 0, then the Match's start datetime is in the past
+     * If this is < 0, then the Matchup's start datetime is in the past
      * ie. it has already occurred
      *
      * @return Metadata
      */
     public function produce()
     {
-        $diff = \Alaress_Date_Format::now()->diffInSeconds($this->getMatch()->getStartAt(), false);
+        $diff = \Alaress_Date_Format::now()->diffInSeconds($this->getMatchup()->getStartAt(), false);
 
         if ($diff > 0) {
             $metadata = $this->produceCurrent();
@@ -67,12 +67,12 @@ class Factory
     /**
      * Produce a Metadata using the Current Strategy
      *
-     * You can call this explicitly to bypass the Match Start check
+     * You can call this explicitly to bypass the Matchup Start check
      */
     public function produceCurrent()
     {
-        return new Metadata($this->getMatch(), new CurrentStrategy(
-            $this->getMatch(),
+        return new Metadata($this->getMatchup(), new CurrentStrategy(
+            $this->getMatchup(),
             UserMapper::getInstance(),
             TeamPlayerMapper::getInstance(),
             TeamPositionMapper::getInstance(),
@@ -83,13 +83,13 @@ class Factory
     /**
      * Produce a Metadata using the Historic Strategy
      *
-     * You can call this explicitly to bypass the Match Start check
+     * You can call this explicitly to bypass the Matchup Start check
      * forcing Metadata to read from the snapshot tables
      */
     public function produceHistoric()
     {
-        return new Metadata($this->getMatch(), new HistoricStrategy(
-            $this->getMatch(),
+        return new Metadata($this->getMatchup(), new HistoricStrategy(
+            $this->getMatchup(),
             TeamParticipantMapper::getInstance(),
             TeamPositionParticipantMapper::getInstance(),
             TeamCoachParticipantMapper::getInstance()
@@ -100,18 +100,18 @@ class Factory
      */
 
     /**
-     * @return Match
+     * @return Matchup
      */
-    private function getMatch()
+    private function getMatchup()
     {
-        return $this->match;
+        return $this->matchup;
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    private function setMatch($match)
+    private function setMatchup($matchup)
     {
-        $this->match = $match;
+        $this->matchup = $matchup;
     }
 }

@@ -8,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Fixtures\Match;
+namespace Schoolbox\Fixtures\Matchup;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;

@@ -16,9 +16,9 @@ use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Match\Model as MatchModel;
-use Schoolbox\Fixtures\Match\Notifier\Helper as NotifierHelper;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
+use Schoolbox\Fixtures\Matchup\Model as MatchupModel;
+use Schoolbox\Fixtures\Matchup\Notifier\Helper as NotifierHelper;
 use Schoolbox\User;
 
 /**
@@ -42,7 +42,7 @@ class Notifier extends AbstractModuleNotifier
     public function loadDependencies($dependencies = null)
     {
         $dependencies['notifierHelper'] = new NotifierHelper(
-            MatchMapper::getInstance(),
+            MatchupMapper::getInstance(),
             DivisionMapper::getInstance(),
             SportMapper::getInstance(),
             TeamPlayerMapper::getInstance(),
@@ -171,17 +171,17 @@ class Notifier extends AbstractModuleNotifier
     private function internalNotifyStudent(Model $itinerary, User $effector): Envelope
     {
         // Generic notification to team's participants that itinerary has updated
-        $match    = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
+        $matchup  = $this->notifierHelper->hydrateMatch($itinerary->getMatchup());
         $envelope = new Envelope();
-        if ($this->isNotifyTriggeredByMatchCreate($itinerary, $match)) {
+        if ($this->isNotifyTriggeredByMatchCreate($itinerary, $matchup)) {
             return $envelope;
         }
 
         return $this->notifierHelper->postToTeams(
             $envelope,
-            $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
+            $this->notifierHelper->buildBuilder($matchup, $effector, $this->getSlug(), self::TRIGGER_CREATED)
                                  ->setTitle('Your upcoming :sport match :match itinerary has been changed'),
-            $match
+            $matchup
         );
     }
 
@@ -198,17 +198,17 @@ class Notifier extends AbstractModuleNotifier
     private function internalNotifyParent(Model $itinerary, User $effector): Envelope
     {
         // Generic notification to team's participants that itinerary has updated
-        $match = $this->notifierHelper->hydrateMatch($itinerary->getMatch());
+        $matchup = $this->notifierHelper->hydrateMatch($itinerary->getMatchup());
         $envelope = new Envelope();
-        if ($this->isNotifyTriggeredByMatchCreate($itinerary, $match)) {
+        if ($this->isNotifyTriggeredByMatchCreate($itinerary, $matchup)) {
             return $envelope;
         }
 
         return $this->notifierHelper->postToParentsOfTeams(
             new Envelope(),
-            $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
+            $this->notifierHelper->buildBuilder($matchup, $effector, $this->getSlug(), self::TRIGGER_CREATED)
                                  ->setTitle(':child\'s upcoming :sport match :match itinerary has been changed'),
-            $match
+            $matchup
         );
     }
 
@@ -229,12 +229,12 @@ class Notifier extends AbstractModuleNotifier
      * itinerary item?
      *
      * @param Model      $itinerary
-     * @param MatchModel $match
+     * @param MatchupModel $matchup
      * @return bool
      */
-    private function isNotifyTriggeredByMatchCreate(Model $itinerary, MatchModel $match): bool
+    private function isNotifyTriggeredByMatchCreate(Model $itinerary, MatchupModel $matchup): bool
     {
-        return $itinerary->getUpdatedAt()->eq($match->getCreatedAt());
+        return $itinerary->getUpdatedAt()->eq($matchup->getCreatedAt());
     }
 
     /**

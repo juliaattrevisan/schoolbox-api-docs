@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Fixtures\Match;
+namespace Schoolbox\Fixtures\Matchup;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;

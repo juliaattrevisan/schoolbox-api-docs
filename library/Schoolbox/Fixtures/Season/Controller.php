@@ -16,7 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Season\Model as Season;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Collection;
 
 /**
@@ -49,7 +49,7 @@ class Controller extends AbstractController
         parent::__construct(SeasonMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
-        $this->setMatchMapper(MatchMapper::getInstance());
+        $this->setMatchupMapper(MatchupMapper::getInstance());
     }
 
     /**
@@ -262,11 +262,11 @@ class Controller extends AbstractController
             $this->getDivisionMapper()->save($divisions);
 
             // Move any matches to other season
-            $matches = $this->getMatchMapper()->findByColumn('season_id', $seasonId);
+            $matches = $this->getMatchupMapper()->findByColumn('season_id', $seasonId);
             foreach ($matches as $match) {
                 $match->setSeason($otherSeason);
             }
-            $this->getMatchMapper()->save($matches);
+            $this->getMatchupMapper()->save($matches);
         }
 
         // Either season now has no linked divisions/matches, or caller specified to cascade the delete
@@ -406,20 +406,20 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return MatchMapper
+     * @return MatchupMapper
      */
-    protected function getMatchMapper()
+    protected function getMatchupMapper()
     {
-        return $this->matchMapper;
+        return $this->matchupMapper;
     }
 
     /**
-     * @param MatchMapper $matchMapper
+     * @param MatchupMapper $matchupMapper
      * @return static
      */
-    protected function setMatchMapper($matchMapper)
+    protected function setMatchupMapper($matchupMapper)
     {
-        $this->matchMapper = $matchMapper;
+        $this->matchupMapper = $matchupMapper;
         return $this;
     }
 }

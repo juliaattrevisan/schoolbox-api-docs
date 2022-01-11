@@ -21,14 +21,14 @@ use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
 use Schoolbox\Fixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
 use Schoolbox\Fixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 
 class Historic implements IMetadataStrategy
 {
     /**
-     * @var Match
+     * @var Matchup
      */
-    private $match;
+    private $matchup;
 
     /**
      * @var TeamParticipantMapper
@@ -48,14 +48,14 @@ class Historic implements IMetadataStrategy
     /**
      * Historic constructor.
      *
-     * @param Match $match
+     * @param Matchup $matchup
      * @param TeamParticipantMapper $teamParticipantMapper
      * @param TeamPositionParticipantMapper $teamPositionParticipantMapper
      * @param TeamCoachParticipantMapper $teamCoachParticipantMapper
      */
-    public function __construct(Match $match, TeamParticipantMapper $teamParticipantMapper, TeamPositionParticipantMapper $teamPositionParticipantMapper, TeamCoachParticipantMapper $teamCoachParticipantMapper)
+    public function __construct(Matchup $matchup, TeamParticipantMapper $teamParticipantMapper, TeamPositionParticipantMapper $teamPositionParticipantMapper, TeamCoachParticipantMapper $teamCoachParticipantMapper)
     {
-        $this->setMatch($match);
+        $this->setMatchup($matchup);
         $this->setTeamParticipantMapper($teamParticipantMapper);
         $this->setTeamPositionParticipantMapper($teamPositionParticipantMapper);
         $this->setTeamCoachParticipantMapper($teamCoachParticipantMapper);
@@ -70,7 +70,7 @@ class Historic implements IMetadataStrategy
     public function getAllPlayers(Team $team)
     {
         return $this->getTeamParticipantMapper()->findByColumnList([
-            'match_id' => $this->getMatch()->getId(),
+            'match_id' => $this->getMatchup()->getId(),
             'team_id' => $team->getId()
         ], [
             'order' => [
@@ -88,7 +88,7 @@ class Historic implements IMetadataStrategy
     public function getAllPositions(Team $team)
     {
         return $this->getTeamPositionParticipantMapper()->findByColumnList([
-            'match_id' => $this->getMatch()->getId(),
+            'match_id' => $this->getMatchup()->getId(),
             'team_id' => $team->getId()
         ], [
             'order' => [
@@ -106,7 +106,7 @@ class Historic implements IMetadataStrategy
     public function getAllCoaches(Team $team)
     {
         return $this->getTeamCoachParticipantMapper()->findByColumnList([
-            'match_id' => $this->getMatch()->getId(),
+            'match_id' => $this->getMatchup()->getId(),
             'team_id' => $team->getId()
         ], [
             'order' => [
@@ -167,18 +167,18 @@ class Historic implements IMetadataStrategy
     }
 
     /**
-     * @return Match
+     * @return Matchup
      */
-    public function getMatch()
+    public function getMatchup()
     {
-        return $this->match;
+        return $this->matchup;
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    private function setMatch($match)
+    private function setMatchup($matchup)
     {
-        $this->match = $match;
+        $this->matchup = $matchup;
     }
 }

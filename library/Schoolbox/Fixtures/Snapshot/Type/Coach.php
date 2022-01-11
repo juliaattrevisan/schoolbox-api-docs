@@ -52,10 +52,10 @@ class Coach implements ISnapshot
      */
     public function snapshot()
     {
-        $match = $this->getMetadata()->getMatch();
+        $matchup = $this->getMetadata()->getMatchup();
 
         /** @var Team $currentTeam */
-        foreach ($match->getAllTeams() as $currentTeam) {
+        foreach ($matchup->getAllTeams() as $currentTeam) {
             if (is_numeric($currentTeam->getId())) {
                 /* Delete all the existing Coaches for the Team
                  * then re-add them, in case the snapshot already
@@ -64,7 +64,7 @@ class Coach implements ISnapshot
                  * @param Team $team
                  */
                 $this->getParticipantMapper()->deleteByColumnList([
-                    'match_id' => $match->getId(),
+                    'match_id' => $matchup->getId(),
                     'team_id' => $currentTeam->getId(),
 
                     /* Bug in deleteByColumnList?
@@ -79,7 +79,7 @@ class Coach implements ISnapshot
 
                     /** @var ParticipantCoach $participantCoach */
                     $participantCoach = $this->getParticipantMapper()->createModel();
-                    $participantCoach->setMatch($match);
+                    $participantCoach->setMatchup($matchup);
                     $participantCoach->setTeam($currentTeam);
                     $participantCoach->setUser($currentCoach->getUser());
                     $participantCoach->setName($currentCoach->getName());

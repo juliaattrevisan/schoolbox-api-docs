@@ -13,7 +13,7 @@ namespace Schoolbox\Fixtures\Team\Player\Participant;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Team\Model as Team;
 
 /**
@@ -29,9 +29,9 @@ class Model implements ISoftDeletable
     use ModelTrait\DeletedAtDate;
 
     /**
-     * @var Match
+     * @var Matchup
      */
-    protected $match;
+    protected $matchup;
 
     /**
      * @var Team
@@ -62,19 +62,19 @@ class Model implements ISoftDeletable
      */
 
     /**
-     * @return Match
+     * @return Matchup
      */
-    public function getMatch()
+    public function getMatchup()
     {
-        return $this->match;
+        return $this->matchup;
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    public function setMatch($match)
+    public function setMatchup($matchup)
     {
-        $this->match = $match;
+        $this->matchup = $matchup;
     }
 
     /**

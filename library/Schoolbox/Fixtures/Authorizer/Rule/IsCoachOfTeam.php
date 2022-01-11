@@ -14,8 +14,8 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Fixtures\Coach\Model as Coach;
-use Schoolbox\Fixtures\Match\Model as Match;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Result\Model as Result;
 use Schoolbox\Fixtures\Team\Metadata\Factory;
 
@@ -46,8 +46,8 @@ class IsCoachOfTeam implements IAuthorizationRule
          * When you're viewing the Create form
          * sportsfixturesResult.getCreateFormForTeam
          */
-        if (($params['context'] instanceof Match) && (is_numeric($params['teamId']))) {
-            $match  = $params['context'];
+        if (($params['context'] instanceof Matchup) && (is_numeric($params['teamId']))) {
+            $matchup = $params['context'];
             $teamId = $params['teamId'];
         }
         /* When you're viewing the Modify Form
@@ -61,8 +61,8 @@ class IsCoachOfTeam implements IAuthorizationRule
             /** @var Result $result */
             $result = $params['entity'];
 
-            /** @var Match $match */
-            $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
+            /** @var Matchup $matchup */
+            $matchup = MatchupMapper::getInstance()->findById($result->getMatchup()->getId());
             $teamId = $result->getTeam()->getId();
         } else {
             throw new Unauthorized();
@@ -70,7 +70,7 @@ class IsCoachOfTeam implements IAuthorizationRule
 
         /* Coaches of the Team specified
          */
-        $factory = new Factory($match);
+        $factory = new Factory($matchup);
         $teamMetadata = $factory->produce();
 
         $allCoaches = $teamMetadata->getCoaches()->getOffset($teamId);

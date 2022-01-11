@@ -12,7 +12,7 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Status\Model as Status;
@@ -35,7 +35,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
+        $this->joins('match_id', MatchupMapper::class, 'id', null, null, 'matchup', 'match');
         $this->joins('status_id', StatusMapper::class, 'id', null, null, 'status', 'status');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->uses('description', self::TYPE_STRING);

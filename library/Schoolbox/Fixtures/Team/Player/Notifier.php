@@ -22,7 +22,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Fixtures\Team\Player\Model as TeamPlayer;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -38,9 +38,9 @@ class Notifier extends AbstractModuleNotifier
     protected $teamMapper;
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * @var UserMapper
@@ -69,7 +69,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         if (empty($dependencies['matchMapper'])) {
-            $dependencies['matchMapper'] = MatchMapper::getInstance();
+            $dependencies['matchMapper'] = MatchupMapper::getInstance();
         }
 
         if (empty($dependencies['userMapper'])) {
@@ -95,9 +95,9 @@ class Notifier extends AbstractModuleNotifier
             case Mapper::METHOD_DELETE:
                 $team = $this->getTeamMapper()->findById($bundle->getEvent()->getObject()->getTeam()->getId());
                 try {
-                    $match = $this->getMatchMapper()->findNextMatch($team);
+                    $matchup = $this->getMatchupMapper()->findNextMatch($team);
 
-                    $diff = \Alaress_Date_Format::now()->diffInHours($match->getStartAt());
+                    $diff = \Alaress_Date_Format::now()->diffInHours($matchup->getStartAt());
 
                     if ($diff > 0 && $diff < 24) {
                         $bundle->attach(self::TRIGGER_REMOVED, self::IMMEDIATELY);
@@ -185,12 +185,12 @@ class Notifier extends AbstractModuleNotifier
      */
     private function notifyRemovedFromTeam(User $effector, TeamPlayer $teamPlayer, Team $team, $title, array $params)
     {
-        $match = $this->getMatchMapper()->findNextMatch($team);
+        $matchup = $this->getMatchupMapper()->findNextMatch($team);
 
         $bob = new Builder();
         $bob->setTitle($title)
             ->setParams($params)
-            ->setHref($team->getUrl() ? : "/fixtures/match/{$match->getId()}/results/{$team->getId()}")
+            ->setHref($team->getUrl() ? : "/fixtures/match/{$matchup->getId()}/results/{$team->getId()}")
             ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $teamPlayer->getId(), self::TRIGGER_REMOVED) ])
@@ -220,19 +220,19 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @return MatchMapper
+     * @return MatchupMapper
      */
-    public function getMatchMapper()
+    public function getMatchupMapper()
     {
-        return $this->matchMapper;
+        return $this->matchupMapper;
     }
 
     /**
-     * @param MatchMapper $matchMapper
+     * @param MatchupMapper $matchupMapper
      */
-    public function setMatchMapper($matchMapper)
+    public function setMatchupMapper($matchupMapper)
     {
-        $this->matchMapper = $matchMapper;
+        $this->matchupMapper = $matchupMapper;
     }
 
     /**

@@ -11,7 +11,7 @@ namespace Schoolbox\Fixtures\Result;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Alaress_Date_Format;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Status\Model as Status;
 
@@ -28,8 +28,8 @@ class Model implements ISoftDeletable
     /** @var int */
     protected $id;
 
-    /** @var Match $match */
-    protected $match;
+    /** @var Matchup $matchup */
+    protected $matchup;
 
     /** @var Team $team */
     protected $team;
@@ -107,19 +107,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Match
+     * @return Matchup
      */
-    public function getMatch()
+    public function getMatchup()
     {
-        return $this->match;
+        return $this->matchup;
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    public function setMatch($match)
+    public function setMatchup($matchup)
     {
-        $this->match = $match;
+        $this->matchup = $matchup;
     }
 
     /**

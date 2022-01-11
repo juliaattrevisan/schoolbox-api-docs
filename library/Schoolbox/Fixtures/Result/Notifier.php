@@ -23,8 +23,8 @@ use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Sport\Model as Sport;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Result\Model as Result;
 use Schoolbox\User;
@@ -36,7 +36,7 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'resultUpdated';
 
     /**
-     * @var MatchMapper $matchMapper
+     * @var MatchupMapper $matchMapper
      */
     protected $matchMapper;
 
@@ -69,7 +69,7 @@ class Notifier extends AbstractModuleNotifier
             $dependencies['resultMapper'] = ResultMapper::getInstance();
         }
         if (empty($dependencies['matchMapper'])) {
-            $dependencies['matchMapper'] = MatchMapper::getInstance();
+            $dependencies['matchMapper'] = MatchupMapper::getInstance();
         }
         if (empty($dependencies['divisionMapper'])) {
             $dependencies['divisionMapper'] = DivisionMapper::getInstance();
@@ -175,10 +175,10 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var Result $result */
         $result = $this->resultMapper->findById($result->getId());
-        /** @var Match $match */
-        $match = $this->matchMapper->findById($result->getMatch()->getId());
+        /** @var Matchup $matchup */
+        $matchup = $this->matchupMapper->findById($result->getMatchup()->getId());
         /** @var Division $division */
-        $division = $this->divisionMapper->findById($match->getDivision()->getId());
+        $division = $this->divisionMapper->findById($matchup->getDivision()->getId());
         /** @var Sport $sport */
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
@@ -187,22 +187,22 @@ class Notifier extends AbstractModuleNotifier
         $bob->setTitle('Results have been updated for :child\'s :sport match :match')
             ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
+            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $matchup->getId(), self::TRIGGER_CREATED) ])
             ->setNamespace($this->getSlug())
         ;
 
         //Target parents of all teams
-        foreach ($match->getAllTeams() as $team) {
+        foreach ($matchup->getAllTeams() as $team) {
             $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
 
             /** @var TeamPlayer $teamPlayer */
             foreach ($teamPlayers as $teamPlayer) {
-                $href = "/fixtures/matches/{$match->getId()}/results/{$team->getId()}";
+                $href = "/fixtures/matches/{$matchup->getId()}/results/{$team->getId()}";
                 $bob->setHref($href)
                     ->setParams([
                                     'child' => new UserParam($teamPlayer->getUser()),
                                     'sport' => new Param($sport->getName()),
-                                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                                    'match' => new Param($matchup->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
                                 ]);
                 $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
             }
@@ -222,10 +222,10 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var Result $result */
         $result = $this->resultMapper->findById($result->getId());
-        /** @var Match $match */
-        $match = $this->matchMapper->findById($result->getMatch()->getId());
+        /** @var Matchup $matchup */
+        $matchup = $this->matchMapper->findById($result->getMatchup()->getId());
         /** @var Division $division */
-        $division = $this->divisionMapper->findById($match->getDivision()->getId());
+        $division = $this->divisionMapper->findById($matchup->getDivision()->getId());
         /** @var Sport $sport */
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
@@ -234,22 +234,22 @@ class Notifier extends AbstractModuleNotifier
         $bob->setTitle('Results have been updated for your :sport match :match')
             ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
+            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $matchup->getId(), self::TRIGGER_CREATED) ])
             ->setNamespace($this->getSlug())
         ;
 
         // Target players of all teams
-        foreach ($match->getAllTeams() as $team) {
+        foreach ($matchup->getAllTeams() as $team) {
             $this->log->info("ID: " . $team->getId());
             $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
 
             /** @var TeamPlayer $teamPlayer */
             foreach ($teamPlayers as $teamPlayer) {
-                $href = "/fixtures/matches/{$match->getId()}/results/{$team->getId()}";
+                $href = "/fixtures/matches/{$matchup->getId()}/results/{$team->getId()}";
                 $bob->setHref($href)
                     ->setParams([
                                     'sport' => new Param($sport->getName()),
-                                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                                    'match' => new Param($matchup->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
                                 ]);
                 $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
             }
@@ -262,11 +262,11 @@ class Notifier extends AbstractModuleNotifier
      */
 
     /**
-     * @param MatchMapper $mapper
+     * @param MatchupMapper $mapper
      */
-    protected function setMatchMapper($mapper)
+    protected function setMatchupMapper($mapper)
     {
-        $this->matchMapper = $mapper;
+        $this->matchupMapper = $mapper;
     }
 
     /**
