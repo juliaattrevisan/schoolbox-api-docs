@@ -87,6 +87,7 @@ class Controller extends BaseController
         $groups   = $this->groupMapper->findByColumnList([
                                                              'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
                                                          ]);
+        //ids of all groups, both available to the user, and those they are enrolled in
         $groupIds = array_unique(array_merge($userPerms->keys(), $groups->keys()));
 
         //build notifications
@@ -105,7 +106,7 @@ class Controller extends BaseController
                 $isFavourite = $userPerms[$folder->getId()]->getFavourite();
             }
 
-            //nullable fields cause something have no defaults...
+            //nullable fields cause something to have no defaults...
             $imageHash = null;
             if ($folder->getCoverImage()) {
                 $imageHash = $folder->getCoverImage()->getHash();
@@ -120,7 +121,8 @@ class Controller extends BaseController
                 //add colour to folder, and continue the cycle of colour infices
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
-            //get access
+
+            //get group edit access, for the edit link
             $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
             if (UserAccess::ACCESS_WRITE <= $access) {
                 $modifyLink = $this->getRouter()->generate(
@@ -156,7 +158,10 @@ class Controller extends BaseController
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@groups/groups.twig', [
                 'groupList' => $possibleGroups,
-                'endpoint'  => $this->getRouter()->generate('groups.newGroups'),
+                'endpointAdd'  => $this->getRouter()->generate('groups.postMyGroupAdd'),
+                'endpointDelete'  => $this->getRouter()->generate('groups.postMyGroupDelete'),
+                'endpointNotify'  => $this->getRouter()->generate('groups.postMyGroupNotify'),
+                'endpointFavourite'  => $this->getRouter()->generate('groups.postMyGroupFavourite'),
             ])
         );
     }
@@ -185,6 +190,7 @@ class Controller extends BaseController
                 ->asArray();
             $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
         } catch (MapperException\NotFound $e) {
             //add the user to the group
             $userGroup = $this->userAccessMapper->createModel();
@@ -192,7 +198,7 @@ class Controller extends BaseController
                       ->setUser($user)
                       ->setService(UserAccess::SERVICE_HOMEPAGE)
                       ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
-                      ->setFavourite(false);
+                      ->setFavourite(false); //default to no favourite groups.
             if ($group->isFree()) {
                 $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
             }
@@ -238,7 +244,7 @@ class Controller extends BaseController
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return;
         }
-        //grab the user enrolment in the group, so they can be removed.
+        //remove the user group / favourite
         $this->userAccessMapper->delete($userGroup);
         $this->getResponse()->content->set(
             $this->buildJsonOutput([
@@ -251,7 +257,7 @@ class Controller extends BaseController
     }
 
     /**
-     * edit the user notofication preferences
+     * edit the user notification preferences
      * @api POST /groups/notify
      */
     public function postMyGroupNotify(): void
@@ -276,14 +282,16 @@ class Controller extends BaseController
                 ->asArray();
             $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return;
         }
+
+        //update the notification to what the user sets.
         $notificationsList = $this->setNotification($group->getFolder()->getId(), $user, (bool)$post['isNotificationsOn']);
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput([
                                        'group'             => $post['group'],
                                        'user'              => $user->getId(),
-                                       'isFavourite'       => $userGroup->getFavourite(),
                                        'isNotificationsOn' => $notificationsList[$group->getFolder()->getId()]['follow'] ?: false,
                                        'isForceFollow'     => $notificationsList[$group->getFolder()->getId()]['force'] ?: false,
                                        'access'            => $this->getEnrollmentText($userGroup),
@@ -313,22 +321,22 @@ class Controller extends BaseController
 
         //save group object
         $this->userAccessMapper->save($userGroup);
-        $notificationsList = $this->getNotifications($user);
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput([
                                        'group'             => $post['group'],
                                        'user'              => $user->getId(),
                                        'isFavourite'       => $userGroup->getFavourite(),
-                                       'isNotificationsOn' => $notificationsList[$group->getFolder()->getId()]['follow'] ?: false,
-                                       'isForceFollow'     => $notificationsList[$group->getFolder()->getId()]['force'] ?: false,
                                        'access'            => $this->getEnrollmentText($userGroup),
                                    ])
         );
     }
 
     /**
-     * grabs all groups the user is part of and are following
+     * grabs all groups the user is part of and are following\
+     * originally from `calculateFollowment` in library/Schoolbox/Realtime/Controller.php
+     * I am now the only place using this, and cleaned it up.
+     *
      * @param \Schoolbox\User $user
      * @return array
      */
@@ -337,7 +345,7 @@ class Controller extends BaseController
         // as much as we'd like get this as cached in session, we can't include subjects here
         $accesses = $this->userAccessMapper->findAllGroupsForUser($this->getUser());
 
-        $folderIds = $accesses->getColumnValues('serviceIdentifier');
+        $folderIds = $accesses->getPropertyValues('serviceIdentifier');
 
         /** @var \Schoolbox\Collection|FolderModel[] $folders */
         $folders = $this->folderMapper->findByColumn('id', $folderIds)->sortBy('name', 'asc');

@@ -7136,6 +7136,7 @@ parameters:
 			path: library/Schoolbox/Realtime/Config.php
 
 		-
+<<<<<<< HEAD
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Controller.php
@@ -7146,6 +7147,8 @@ parameters:
 			path: library/Schoolbox/Realtime/Controller.php
 
 		-
+=======
+>>>>>>> bf8b98bfb73... updated comments, endpoint routes, phpstan issue, cleaned response array for notify / favourites [SA-12873]
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 7
 			path: library/Schoolbox/Realtime/Controller.php
