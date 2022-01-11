@@ -917,8 +917,8 @@ class Controller extends Assessment\Controller
      * Save a Response, on behalf of a User, for a particular Assessment.
      * If the assessment has self-reflection/assessment, this will also save any feedback the student gave themselves.
      *
-     * @param IAssessable|Model $assessment
-     * @param User              $student
+     * @param Model $assessment
+     * @param User  $student
      * @return void
      * @throws Exception
      * @throws InvalidStatusCode
@@ -1311,7 +1311,7 @@ class Controller extends Assessment\Controller
      * Creates an empty SOBO. Needs a different route to postCreateResponse()
      * to cater for different auth rules.
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @param User              $student
      * @api   POST /learning/assessments/:assessmentId/:studentId/received
      * @since 17.0
