@@ -68,16 +68,7 @@ $app = new class extends CliTool\App
     public function run(): void
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
-            echo <<<HELP
-
-Assigns parents of students into the students' folders, thus bundling students and their parents together.
-You can specify any csv file that follows the structure described in classes.csv
-Optionally you can use parameter --students to also install students into specified folders
-
-Usage: parentClassAccess.php -f classes.csv [--students]
-
-
-HELP;
+            $this->printHelp();
             exit;
         }
 
@@ -229,6 +220,37 @@ HELP;
                 $this->getLogger()->notice($e->getMessage(), ['exception' => $e]);
             }
         }
+    }
+
+    /**
+     * Prints a help message to STDOUT
+     *
+     * @return void
+     */
+    private function printHelp(): void
+    {
+        $optShortFile    = rtrim(self::OPT_SHORT_FILE, ':');
+        $optLongStudents = self::OPT_LONG_STUDENTS;
+        $optShortPerform = CliTool\Kernel::OPT_SHORT_PERFORM;
+        $optLongPerform  = CliTool\Kernel::OPT_LONG_PERFORM;
+        $optLongHelp  = self::OPT_LONG_HELP;
+        echo <<<HELP
+
+Synopsis:
+  Assigns parents of students into the students' folders, thus bundling students and their parents together.
+  You can specify any csv file that follows the structure described in classes.csv
+  Optionally you can use parameter --students to also install students into specified folders
+
+Usage:
+  ./parentClassAccess.php -$optShortFile classes.csv [--$optLongStudents] [--$optLongHelp] [--$optLongPerform]
+
+Options:
+  -$optShortFile             Required. Path to CSV file
+  -$optShortPerform, --$optLongPerform  Optional. Without this flag, tool will only simulate changes
+  --$optLongStudents     Optional. If present, create group membership for student class members
+  --$optLongHelp         Optional. Print this help message and exit
+
+HELP;
     }
 
 
