@@ -285,7 +285,7 @@ function reload_binding_cache(){
     {
       instance_log_file_2=/var/log/schoolbox/"$i"/upgrade.log;
       log "binding cache refresh starting for instance $i - logging to $instance_log_file_2";
-      ${package}cloud-reload-binding-cache "$i" >> "$instance_log_file_2" 2>&1;
+      /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php --instance="$i" >> "$instance_log_file_2" 2>&1;
       log "binding cache refresh finished for instance $i";
     } &
     done;
