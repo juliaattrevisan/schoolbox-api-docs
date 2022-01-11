@@ -152,7 +152,23 @@ Data:
             $emptyDialog.foundation('reveal', 'close');
         });
 
-        // Empty self-assessment comment dialog
+        // Empty self-assessment comment dialog (if it exists)
+        let $emptySelfAssessmentDialog    = $('#empty-self-assessment-comment-dialog'),
+            showEmptySelfAssessmentDialog = function () {
+                return $emptySelfAssessmentDialog.length > 0 && $form.find('[name="comment"]').val().length === 0;
+            };
+        $emptySelfAssessmentDialog.click(
+            '[data-accept]',
+            function (event) {
+                event.preventDefault();
+                showConfirmOrSubmitForm();
+            });
+        $emptySelfAssessmentDialog.click(
+            '[data-reject]',
+            function (event) {
+                event.preventDefault();
+                $emptySelfAssessmentDialog.foundation('reveal', 'close');
+            });
 
         // Confirm dialog (if it exists)
         let $confirmDialog = $('#confirm-dialog'),
@@ -176,6 +192,17 @@ Data:
                 suspendAutosave();
                 // Submit the form
                 $form.submit();
+            },
+            showConfirmOrSubmitForm = function () {
+                if ($confirmDialog.length) {
+                    // wait! display confirm modal
+                    // event.preventDefault();
+                    enableButtons();
+                    $confirmDialog.foundation('reveal').foundation('reveal', 'open');
+                } else {
+                    // checks pass: go for broke
+                    submitForm();
+                }
             };
 
         // Confirm dialog accept/reject
@@ -192,18 +219,16 @@ Data:
 
         // Submit form
         $submitButton.click(function (e) {
+            e.preventDefault();
             if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
-                e.preventDefault();
                 $emptyDialog.foundation('reveal', 'open');
-            } else if ($confirmDialog.length) {
-                // wait! display confirm modal
-                e.preventDefault();
+            } else if (showEmptySelfAssessmentDialog()) {
+                // wait! display empty self-assess modal
                 enableButtons();
-                $confirmDialog.foundation('reveal').foundation('reveal', 'open');
+                $emptySelfAssessmentDialog.foundation('reveal', 'open');
             } else {
-                // checks pass: go for broke
-                submitForm();
+                showConfirmOrSubmitForm();
             }
         });
 
@@ -315,22 +340,24 @@ Data:
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
 
-                <div id="empty-self-assessment-comment-dialog" class="reveal-modal" data-reveal role="dialog">
-                    <h2 id="empty-self-assessment-comment-dialog-title">
-                        Are you sure you wish to submit an incomplete
-                        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
-                    </h2>
-                    <p>
-                        It is preferable to provide a
-                        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
-                        comment. Please confirm that you wish to provide no comment.
-                    </p>
-                    <ul class="flex-list buttons">
-                        <li><a class="button submit" data-interaction="enable">Yes</a></li>
-                        <li><a class="button" data-interaction="close">No</a></li>
-                    </ul>
-                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                </div>
+                {% if assessment.selfAssessable %}
+                    <div id="empty-self-assessment-comment-dialog" class="reveal-modal" data-reveal role="dialog">
+                        <h2 id="empty-self-assessment-comment-dialog-title">
+                            Are you sure you wish to submit an incomplete
+                            {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
+                        </h2>
+                        <p>
+                            It is preferable to provide a
+                            {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
+                            comment. Please confirm that you wish to provide no comment.
+                        </p>
+                        <ul class="flex-list buttons">
+                            <li><a class="button submit" data-accept>Yes</a></li>
+                            <li><a class="button" data-reject>No</a></li>
+                        </ul>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                    </div>
+                {% endif %}
 
                 {% if policy|length %}
                 <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
