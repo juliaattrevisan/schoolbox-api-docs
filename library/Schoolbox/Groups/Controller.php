@@ -57,19 +57,17 @@ class Controller extends BaseController
     }
 
     /**
-     * Displays all available new groups, and allows the user to join / leave groups
+     * Displays all available groups, including public and moderated, and if they are a member private groups
+     * included information (notification / favorite)
      *
      * @api GET /resource/newgroups
      */
     public function getNewGroups(): void
     {
-        //grab list of all possibly groups the user can choose to be part of, and list them.
-        //displaying included information (notification / favorite)
-
         $user = $this->getUser();
 
         //colours for groups with no colours
-        /* Get Timetable colours to use as random colours for null set folders */
+        /* Get Timetable colours to use as random colours for folders */
         $colourList    = $this->timetable_ColourMapper->findAll();
         $colourIndex   = 0;
         $colourFactory = new ColorFactory();
@@ -77,7 +75,6 @@ class Controller extends BaseController
 
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        /** @var GenericCollection|UserAccess[] $userPerms */
         $userPerms = $this->userAccessMapper->findByColumnList([
                                                                    'uid'     => $user->getId(),
                                                                    'service' => UserAccess::SERVICE_HOMEPAGE,
@@ -87,10 +84,10 @@ class Controller extends BaseController
         $groups   = $this->groupMapper->findByColumnList([
                                                              'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
                                                          ]);
-        //ids of all groups, both available to the user, and those they are enrolled in
+        //combine to show list of all groups, both available to the user, and those they are enrolled in
         $groupIds = array_unique(array_merge($userPerms->keys(), $groups->keys()));
 
-        //build notifications
+        //build notifications (will notify by default, the user will have to opt out)
         $notificationsList = $this->getNotifications($user);
 
         //build the folder list object with hydration
@@ -100,13 +97,16 @@ class Controller extends BaseController
         $possibleGroups = [];
         /* @var UserAccess|Group $group */
         foreach ($folders as $folder) {
-            //favourite
+            /**
+             * default favourite to false, as the use is not a member of the group
+             * then confirm with the $userPerms array to see if the user has that group as a favourite
+             */
             $isFavourite = false;
             if ($userPerms[$folder->getId()]) {
                 $isFavourite = $userPerms[$folder->getId()]->getFavourite();
             }
 
-            //nullable fields cause something to have no defaults...
+            //nullable image cause something to have no defaults...
             $imageHash = null;
             if ($folder->getCoverImage()) {
                 $imageHash = $folder->getCoverImage()->getHash();
@@ -118,12 +118,14 @@ class Controller extends BaseController
                     $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
                 }
                 $folder->setColour($colourCache->getOffset($hexColour));
-                //add colour to folder, and continue the cycle of colour infices
+                //add colour to folder, and continue the cycle of colour indices
+                //remember the % (modulo) returns the remainder of the equation and just ignores how many loops it can do
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
 
-            //get group edit access, for the edit link
             $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
+
+            //get group edit access, for the edit link
             if (UserAccess::ACCESS_WRITE <= $access) {
                 $modifyLink = $this->getRouter()->generate(
                     'folder.getFolderModify',
@@ -158,6 +160,7 @@ class Controller extends BaseController
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@groups/groups.twig', [
                 'groupList' => $possibleGroups,
+                //send all the endpoint routes, to make it easier for frontend.
                 'endpointAdd'  => $this->getRouter()->generate('groups.postMyGroupAdd'),
                 'endpointDelete'  => $this->getRouter()->generate('groups.postMyGroupDelete'),
                 'endpointNotify'  => $this->getRouter()->generate('groups.postMyGroupNotify'),
@@ -179,6 +182,10 @@ class Controller extends BaseController
             return; //exit early the group doesn't exist
         }
 
+        /**
+         * check if the user is already a member of the group, if so, exit
+         * don't trust the groups object in the session, that doesn't update till the user signs-in again.
+         */
         try {
             $userGroup = $this->userAccessMapper->findOneByColumnList([
                                                                           'uid' => $user->getId(),
@@ -246,6 +253,12 @@ class Controller extends BaseController
         }
         //remove the user group / favourite
         $this->userAccessMapper->delete($userGroup);
+
+        /**
+         * remove the mute for the user / group this will remove the mute entry from the database.
+         */
+        $this->setNotification($post['group'], $user, true);
+
         $this->getResponse()->content->set(
             $this->buildJsonOutput([
                                        'user'            => $user->getId(),
@@ -274,8 +287,11 @@ class Controller extends BaseController
             return;  //exit early the user is not part of this group
         }
 
-        //subscribe/remove notifications
-        //check if the user can actually unsubscribe from notifications
+        /**
+         * add/remove notifications
+         * check if the user can actually unsubscribe from notifications
+         * if they are unable to error and exit early
+         */
         if ($group->getForceFollow()) {
             $problem = (new ApiProblem('No Permission to unfollow group'))
                 ->setStatus(400)
@@ -286,14 +302,14 @@ class Controller extends BaseController
         }
 
         //update the notification to what the user sets.
-        $notificationsList = $this->setNotification($group->getFolder()->getId(), $user, (bool)$post['isNotificationsOn']);
+        $this->setNotification($group->getFolder()->getId(), $user, (bool)$post['isNotificationsOn']);
+        $notificationsList = $this->getNotifications($user);
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput([
                                        'group'             => $post['group'],
                                        'user'              => $user->getId(),
-                                       'isNotificationsOn' => $notificationsList[$group->getFolder()->getId()]['follow'] ?: false,
-                                       'isForceFollow'     => $notificationsList[$group->getFolder()->getId()]['force'] ?: false,
+                                       'isNotificationsOn' => (bool)$post['isNotificationsOn'],
                                        'access'            => $this->getEnrollmentText($userGroup),
                                    ])
         );
@@ -333,9 +349,13 @@ class Controller extends BaseController
     }
 
     /**
-     * grabs all groups the user is part of and are following\
+     * grabs all groups the user is part of and are following, included any that are force follow
      * originally from `calculateFollowment` in library/Schoolbox/Realtime/Controller.php
-     * I am now the only place using this, and cleaned it up.
+     * this is now the only place using this code so it was moved here, and cleaned up.
+     *
+     * NOTE: this uses the msg_reroute_override table, and that lists groups that have been muted.
+     * by default the user will receive notifications for all groups they are a member of, unless they mute them
+     * (if those groups are not set to force follow)
      *
      * @param \Schoolbox\User $user
      * @return array
@@ -347,7 +367,6 @@ class Controller extends BaseController
 
         $folderIds = $accesses->getPropertyValues('serviceIdentifier');
 
-        /** @var \Schoolbox\Collection|FolderModel[] $folders */
         $folders = $this->folderMapper->findByColumn('id', $folderIds)->sortBy('name', 'asc');
         $service = UserAccess::SERVICE_HOMEPAGE;
 
@@ -357,6 +376,10 @@ class Controller extends BaseController
         ];
 
         $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
+        /**
+         * loops through all groups the user is part of, and looks to see if they have a mute set in `msg_reroute_override` for that group
+         * then will remember that as a muted group
+         */
         foreach ($muted as $k => $id) {
             $muted[$k] = $this->reRouteOverrideMapper
                 ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
@@ -398,7 +421,7 @@ class Controller extends BaseController
      * @param User $user
      * @param bool $isNotificationOn
      */
-    protected function setNotification(int $group, \Schoolbox\User $user, bool $isNotificationOn): array
+    protected function setNotification(int $group, \Schoolbox\User $user, bool $isNotificationOn): void
     {
         //helpers
         $serviceKey = 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$group";
@@ -410,7 +433,11 @@ class Controller extends BaseController
                                                                       'delivery'      => RoutePermission::MUTE,
                                                                   ]);
 
-        ///if user does not want notifications/follow for the group, create the mute object, and none exists currently
+        /**
+         * if user DOES NOT want notifications/follow for the group
+         * they are currently not already muting the group
+         * create the mute object
+         */
         if (false === $isNotificationOn && 0 === $muteObj->count()) {
             //create the mute object
             $muteObj = $this->reRouteOverrideMapper->createModel()
@@ -420,13 +447,15 @@ class Controller extends BaseController
             $this->reRouteOverrideMapper->save($muteObj);
         }
 
-        //if the user does want notifications/follows and there is an muteobject entry, lets remove that now.
+        /**
+         * if user DOES want notifications/follow for the group
+         * they are currently muting the group
+         * delete the mute object
+         */
         if (true === $isNotificationOn && 0 < $muteObj->count()) {
             //delete the mute
             $this->reRouteOverrideMapper->delete($muteObj);
         }
-
-        return $this->getNotifications($user);
     }
 
     /**
@@ -448,7 +477,8 @@ class Controller extends BaseController
     }
 
     /**
-     * grab user/group objects with error checking, if the user has not specified a group, or they are not part of.
+     * grab group objects with error checking:
+     * does the group actually exist?
      *
      * @param null|int $groupId
      * @return null | Group
@@ -471,6 +501,12 @@ class Controller extends BaseController
 
     /**
      * get the user group object
+     *
+     * check if the user is already a member of the group, if so, return the object
+     * else return an error as they are not a member, and exit
+     *
+     * don't trust the groups object in the session, that doesn't update till the user signs-in again.
+     *
      * @param User $user
      * @param int  $groupId
      * @return null|UserAccess
