@@ -28,6 +28,48 @@ use Timetable_ColourMapper;
 
 class Controller extends BaseController
 {
+
+    //sting const's for enrolment text
+    const ENROLLED      = 'enrolled';
+    const NOTENROLLED   = 'notEnrolled';
+    const PENDING       = 'pending';
+
+    /**
+     * @var GroupMapper
+     */
+    private $groupMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * @var FolderMapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var Access
+     */
+    private $accessHelper;
+
+    /**
+     * @var Timetable_ColourMapper
+     */
+    private $timetable_ColourMapper;
+
+    /**
+     * constructor for dependency injection
+     */
+    public function __construct()
+    {
+        $groupMapper;
+        $accessMapper;
+        $folderMapper;
+        $accessHelper;
+    }
+
     /**
      * Displays all available new groups, and allows the user to join / leave groups
      *
@@ -44,7 +86,6 @@ class Controller extends BaseController
         $folderMapper   = FolderMapper::getInstance();
         $accessHelper   = Access::getInstance();
 
-        /** @var \Schoolbox\User $user */
         $user = $this->getUser();
 
         //colours for groups with no colours
@@ -61,13 +102,12 @@ class Controller extends BaseController
             'uid'     => $user->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
         ])->indexBy('serviceIdentifier');
-        $groupIds = $userPerms->keys();
 
         //get list of all possible public groups
         $groups = $groupMapper->findByColumnList([
             'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
         ]);
-        $groupIds = array_unique(array_merge($groupIds, $groups->keys()));
+        $groupIds = array_unique(array_merge($userPerms->keys(), $groups->keys()));
 
         //build notifications
         $notificationsList = $this->getNotifications($user);
@@ -97,10 +137,11 @@ class Controller extends BaseController
                     $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
                 }
                 $folder->setColour($colourCache->getOffset($hexColour));
+                //add colour to folder, and continue the cycle of colour infices
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
             //get access
-            $access = $accessHelper->getFolderAccess($user, $folder->getId()) ?: null;
+            $access = $accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
             if (UserAccess::ACCESS_WRITE <= $access) {
                 $modifyLink = $this->getRouter()->generate(
                     'folder.getFolderModify',
@@ -109,7 +150,7 @@ class Controller extends BaseController
             } else {
                 $modifyLink = false;
             }
-            $tmp                    = [
+            $possibleGroups[] = [
                 'id'                => $folder->getId(),
                 'name'              => $folder->getName(),
                 'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folder->getId()]),
@@ -125,7 +166,6 @@ class Controller extends BaseController
                 'isPrivate'         => $folder->getGroup()->isPrivate(),
                 'modifyLink'        => $modifyLink,
             ];
-            $possibleGroups[] = $tmp;
         }
 
         //sort the groups
@@ -156,7 +196,7 @@ class Controller extends BaseController
                                                             ]);
         } catch (MapperException\NotFound $e) {
             //don't place the user into the group unless we are specifically requested to add the user.
-            $userGroup = new UserAccess();
+            $userGroup = $accessMapper->createModel();
             $userGroup->setServiceIdentifier($post['group'])
                       ->setUser($user)
                       ->setService(UserAccess::SERVICE_HOMEPAGE)
@@ -214,9 +254,6 @@ class Controller extends BaseController
         /* @var Group $group */
         $group = $groupMapper->findById($post['group']);
 
-        //get group object
-        $userGroup = false;
-
         try {
             $userGroup = $accessMapper->findOneByColumnList([
                 'uid' => $user->getId(),
@@ -259,7 +296,7 @@ class Controller extends BaseController
                 'user'              => $user->getId(),
                 'group'             => $post['group'],
                 'action'            => 'delete',
-                'enrolmentStatus'   => 'notEnrolled',
+                'enrolmentStatus'   => self::NOTENROLLED,
             ]));
         }
 
@@ -376,11 +413,11 @@ class Controller extends BaseController
         ///if user does not want notifications/follow for the group, create the mute object, and none exists currently
         if (false === $isNotificationOn && 0 === $muteObj->count()) {
             //create the mute object
-            $muteObj = new RerouteOverride();
-            $muteObj->setUser($user);
-            $muteObj->setRouteKey($serviceKey);
-            $muteObj->setDelivery([ RoutePermission::MUTE ]);
-            $reRouteOverideMapper->save($muteObj);
+            $muteObj = $reRouteOverideMapper->createModel()
+                ->setUser($user)
+                ->setRouteKey($serviceKey)
+                ->setDelivery([ RoutePermission::MUTE ])
+                ->save($muteObj);
         }
 
         //if the user does want notifications/follows and there is an muteobject entry, lets remove that now.
@@ -400,12 +437,12 @@ class Controller extends BaseController
     protected function getEnrollmentText(?UserAccess $userGroup): string
     {
         if ($userGroup === null) {
-            return 'notEnrolled';
+            return self::NOTENROLLED;
         }
         //get enrolmentStatus, could be enrolled, can join, or pending
-        $enrollment = $userGroup->getAccessLevel() ? 'enrolled' : 'notEnrolled';
+        $enrollment = $userGroup->getAccessLevel() ? self::ENROLLED : self::NOTENROLLED;
         if (($userGroup->getAccessLevel() === UserAccess::ACCESS_DENY)) {
-            $enrollment = 'pending';
+            $enrollment = self::PENDING;
         }
         return $enrollment;
     }
