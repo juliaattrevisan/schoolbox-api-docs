@@ -5206,39 +5206,14 @@ parameters:
 			path: library/Schoolbox/Fixtures/Landing/Module.php
 
 		-
-			message: "#^Cannot call method sortBy\\(\\) on array\\<Schoolbox\\\\Fixtures\\\\Match\\\\Model\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Match/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Match/Controller.php
-
-		-
-			message: "#^Method Schoolbox\\\\Fixtures\\\\Match\\\\Mapper\\:\\:hydrateSelect\\(\\) should return iterable\\<Schoolbox\\\\Fixtures\\\\Match\\\\Model\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Fixtures\\\\Match\\\\Model\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Match/Mapper.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between iterable\\<Schoolbox\\\\Fixtures\\\\ItineraryItem\\\\Model\\>&Schoolbox\\\\Collection and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Match/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$result with type Schoolbox\\\\Fixtures\\\\Result\\\\Model\\|null is not subtype of native type Schoolbox\\\\Fixtures\\\\Result\\\\Model\\.$#"
-			count: 2
-			path: library/Schoolbox/Fixtures/Match/Model.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
-			path: library/Schoolbox/Fixtures/Match/Notifier.php
+			path: library/Schoolbox/Fixtures/Matchup/Notifier.php
 
 		-
 			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\BuilderInterface\\:\\:setNamespace\\(\\)\\.$#"
 			count: 1
-			path: library/Schoolbox/Fixtures/Match/Notifier/Helper.php
+			path: library/Schoolbox/Fixtures/Matchup/Notifier/Helper.php
 
 		-
 			message: "#^If condition is always true\\.$#"
