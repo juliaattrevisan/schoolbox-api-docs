@@ -159,7 +159,7 @@ export default {
          * @returns { Boolean }
          */
         useSessionStorage () {
-            return sessionStorage.getItem(this.selectedFiltersStorage) 
+            return sessionStorage.getItem(this.selectedFiltersStorage)
                    && this.referrer !== 'component';
         }
 
@@ -489,6 +489,7 @@ export default {
 
 .VueTables__search {
     padding-bottom: 0.5rem; //to put the view-all-files-filters.vue up closer to the search input
+    width: 100%;
 }
 
 .VueTables__search-field label {
