@@ -1,6 +1,0 @@
-# Directories.
-bin /usr/share/mailcatcher
-cache /usr/share/mailcatcher
-gems /usr/share/mailcatcher
-specifications /usr/share/mailcatcher
-mailcatcher.service /lib/systemd/system

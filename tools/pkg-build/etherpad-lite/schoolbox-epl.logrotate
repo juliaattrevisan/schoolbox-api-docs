@@ -1,8 +1,0 @@
-/var/log/schoolbox-epl/access.log /var/log/schoolbox-epl/error.log {
-  daily
-  rotate 7
-  missingok
-  copytruncate
-  compress
-  missingok
-}

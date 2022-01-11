@@ -4,7 +4,6 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/ga
 readonly LOG="/usr/bin/alaress-logger"
 readonly L_ERROR=400;
 
-declare package
 declare dryrun=''
 
 error(){
@@ -35,13 +34,9 @@ parse_args() {
   this_file=$(readlink -f "$0");
   this_dir=${this_file%/*};
   site_root=$(readlink -f "$this_dir"/../../../)
-  if [[ ${site_root##*/} == 'schoolboxdev' ]]; then
-    package='schoolboxdev'
-  else
-    package='schoolbox'
-  fi
-  if [[ ! -f "/etc/$package/instances.ini" ]]; then
-    error "File not found: '/etc/$package/instances.ini'"
+
+  if [[ ! -f "/etc/schoolbox/instances.ini" ]]; then
+    error "File not found: '/etc/schoolbox/instances.ini'"
     errors='1'
   fi
   if [[ "$errors" == '1' ]]; then
@@ -51,11 +46,11 @@ parse_args() {
 }
 
 deploy(){
-  INSTANCE_ID=$INSTANCE_ID php /usr/share/"$package"/tools/eportfolio/import.php -u3 -r1 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
-  INSTANCE_ID=$INSTANCE_ID php /usr/share/"$package"/tools/eportfolio/import.php -u3 -r16 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
-  INSTANCE_ID=$INSTANCE_ID php /usr/share/"$package"/tools/eportfolio/import.php -u3 -r13 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
-  INSTANCE_ID=$INSTANCE_ID php /usr/share/"$package"/tools/eportfolio/import.php -u3 -r18 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
-  INSTANCE_ID=$INSTANCE_ID php /usr/share/"$package"/tools/eportfolio/import.php -u3 -r6 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
+  INSTANCE_ID=$INSTANCE_ID php /usr/share/schoolbox/tools/eportfolio/import.php -u3 -r1 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
+  INSTANCE_ID=$INSTANCE_ID php /usr/share/schoolbox/tools/eportfolio/import.php -u3 -r16 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
+  INSTANCE_ID=$INSTANCE_ID php /usr/share/schoolbox/tools/eportfolio/import.php -u3 -r13 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
+  INSTANCE_ID=$INSTANCE_ID php /usr/share/schoolbox/tools/eportfolio/import.php -u3 -r18 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
+  INSTANCE_ID=$INSTANCE_ID php /usr/share/schoolbox/tools/eportfolio/import.php -u3 -r6 -p800 "$dryrun" --skip-duplicates --enable-eportfolio;
 }
 
 main (){

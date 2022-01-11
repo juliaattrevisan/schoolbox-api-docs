@@ -261,9 +261,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;
 cd $cachedir;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing npx if not already installed";
-/vagrant/tools/npx.sh
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
 npmfile='';
