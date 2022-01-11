@@ -12,6 +12,7 @@ namespace Schoolbox\Groups;
 use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -19,6 +20,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
@@ -30,9 +32,9 @@ class Controller extends BaseController
 {
 
     //sting const's for enrolment text
-    const ENROLLED      = 'enrolled';
-    const NOTENROLLED   = 'notEnrolled';
-    const PENDING       = 'pending';
+    const ENROLLED    = 'enrolled';
+    const NOTENROLLED = 'notEnrolled';
+    const PENDING     = 'pending';
 
     private GroupMapper $groupMapper;
     private UserAccessMapper $userAccessMapper;
@@ -46,12 +48,12 @@ class Controller extends BaseController
      */
     public function __construct($groupMapper, $userAccessMapper, $folderMapper, $accessHelper, $timetable_ColourMapper, $reRouteOverrideMapper)
     {
-        $this->groupMapper              = $groupMapper;
-        $this->userAccessMapper         = $userAccessMapper;
-        $this->folderMapper             = $folderMapper;
-        $this->accessHelper             = $accessHelper;
-        $this->timetable_ColourMapper   = $timetable_ColourMapper;
-        $this->reRouteOverrideMapper    = $reRouteOverrideMapper;
+        $this->groupMapper            = $groupMapper;
+        $this->userAccessMapper       = $userAccessMapper;
+        $this->folderMapper           = $folderMapper;
+        $this->accessHelper           = $accessHelper;
+        $this->timetable_ColourMapper = $timetable_ColourMapper;
+        $this->reRouteOverrideMapper  = $reRouteOverrideMapper;
     }
 
     /**
@@ -68,8 +70,8 @@ class Controller extends BaseController
 
         //colours for groups with no colours
         /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = $this->timetable_ColourMapper->findAll();
-        $colourIndex = 0;
+        $colourList    = $this->timetable_ColourMapper->findAll();
+        $colourIndex   = 0;
         $colourFactory = new ColorFactory();
         $colourCache   = new GenericCollection(Color::class);
 
@@ -77,14 +79,14 @@ class Controller extends BaseController
         // Get the groups the user is currently a member, their enrolment type and favourite status
         /** @var GenericCollection|UserAccess[] $userPerms */
         $userPerms = $this->userAccessMapper->findByColumnList([
-            'uid'     => $user->getId(),
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-        ])->indexBy('serviceIdentifier');
+                                                                   'uid'     => $user->getId(),
+                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
+                                                               ])->indexBy('serviceIdentifier');
 
         //get list of all possible public groups
-        $groups = $this->groupMapper->findByColumnList([
-            'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
-        ]);
+        $groups   = $this->groupMapper->findByColumnList([
+                                                             'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
+                                                         ]);
         $groupIds = array_unique(array_merge($userPerms->keys(), $groups->keys()));
 
         //build notifications
@@ -104,7 +106,7 @@ class Controller extends BaseController
             }
 
             //nullable fields cause something have no defaults...
-            $imageHash  = null;
+            $imageHash = null;
             if ($folder->getCoverImage()) {
                 $imageHash = $folder->getCoverImage()->getHash();
             }
@@ -153,8 +155,8 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@groups/groups.twig', [
-                'groupList'  => $possibleGroups,
-                'endpoint'   => $this->getRouter()->generate('groups.newGroups'),
+                'groupList' => $possibleGroups,
+                'endpoint'  => $this->getRouter()->generate('groups.newGroups'),
             ])
         );
     }
@@ -162,18 +164,29 @@ class Controller extends BaseController
     /**
      * @api POST /groups/add
      */
-    public function postMyGroupAdd()
+    public function postMyGroupAdd(): void
     {
-        //check post to confirm everything is there
-        $post = $this->getRequest()->post->getArrayCopy();
+        //grab the post / user and group objects to make things easier
+        $post  = $this->getRequest()->post->getArrayCopy();
+        $user  = $this->getUser();
+        $group = $this->getGroup($post['group']);
+        if (null === $group) {
+            return; //exit early the group doesn't exist
+        }
 
         try {
             $userGroup = $this->userAccessMapper->findOneByColumnList([
-                                                                'uid' => $user->getId(),
-                                                                'sid' => $post['group'],
-                                                            ]);
+                                                                          'uid' => $user->getId(),
+                                                                          'sid' => $post['group'],
+                                                                      ]);
+            //user is already part of the group, error out.
+            $problem = (new ApiProblem('User is already part of the group'))
+                ->setStatus(400)
+                ->asArray();
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
         } catch (MapperException\NotFound $e) {
-            //don't place the user into the group unless we are specifically requested to add the user.
+            //add the user to the group
             $userGroup = $this->userAccessMapper->createModel();
             $userGroup->setServiceIdentifier($post['group'])
                       ->setUser($user)
@@ -186,124 +199,132 @@ class Controller extends BaseController
             //save group object
             $this->userAccessMapper->save($userGroup);
 
-
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput([
+                                           'group'             => $post['group'],
+                                           'user'              => $user->getId(),
+                                           'isFavourite'       => $userGroup->getFavourite(),
+                                           'isNotificationsOn' => true,
+                                           //notifications default to on, you have to opt out in a separate request
+                                           'enrolmentStatus'   => $this->getEnrollmentText($userGroup),
+                                       ])
+            );
         }
-        return $this->getResponse()->content->set(
+    }
+
+    /**
+     * remove the user from the group
+     * @api POST /groups/delete
+     */
+    public function postMyGroupDelete(): void
+    {
+        //grab the post / user and group objects to make things easier
+        $post  = $this->getRequest()->post->getArrayCopy();
+        $user  = $this->getUser();
+        $group = $this->getGroup($post['group']);
+        if (null === $group) {
+            return; //exit early the group doesn't exist
+        }
+        $userGroup = $this->getUserGroup($user, $post['group']);
+        if (null === $userGroup) {
+            return; //exit early the user is not part of this group
+        }
+
+        if ($group->isPrivate()) {
+            $problem = (new ApiProblem('No Permission to leave group'))
+                ->setStatus(400)
+                ->asArray();
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return;
+        }
+        //grab the user enrolment in the group, so they can be removed.
+        $this->userAccessMapper->delete($userGroup);
+        $this->getResponse()->content->set(
             $this->buildJsonOutput([
-                                       'group'              => $post['group'],
-                                       'user'               => $user->getId(),
-                                       'isFavourite'        => $userGroup->getFavourite(),
-                                       'isNotificationsOn'  => true,
-                                       'enrolmentStatus'    => $this->getEnrollmentText($userGroup),
+                                       'user'            => $user->getId(),
+                                       'group'           => $post['group'],
+                                       'action'          => 'delete',
+                                       'enrolmentStatus' => self::NOTENROLLED,
                                    ])
         );
     }
 
     /**
-     * edit's a users enrolmentStatus into a group
-     *
-     * @api POST /my
+     * edit the user notofication preferences
+     * @api POST /groups/notify
      */
-    public function postMyGroup()
+    public function postMyGroupNotify(): void
     {
-        /**
-         * post should contain:
-         * group id
-         * action (add, remove, edit)
-         * subscribe/notifications (true, false)
-         * favourite (true, false)
-         *
-         * need to check for the existence of the user/group relationship then modify it, or create a new entry
-         */
-        //check post to confirm everything is there
-        $post = $this->getRequest()->post->getArrayCopy();
-
-        if (!isset($post['group'])) {
-            return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Missing attributes']));
+        //grab the post / user and group objects to make things easier
+        $post  = $this->getRequest()->post->getArrayCopy();
+        $user  = $this->getUser();
+        $group = $this->getGroup($post['group']);
+        if (null === $group) {
+            return; //exit early the group doesn't exist
+        }
+        $userGroup = $this->getUserGroup($user, $post['group']);
+        if (null === $userGroup) {
+            return;  //exit early the user is not part of this group
         }
 
-        $user = $this->getUser();
-
-        /* @var Group $group */
-        $group = $this->groupMapper->findById($post['group']);
-
-        try {
-            $userGroup = $this->userAccessMapper->findOneByColumnList([
-                'uid' => $user->getId(),
-                'sid' => $post['group'],
-            ]);
-        } catch (MapperException\NotFound $e) {
-            //don't place the user into the group unless we are specifically requested to add the user.
-            if ($post['action'] !== 'add') {
-                return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'User is not a member of this group']));
-            }
-            $userGroup = new UserAccess();
-            $userGroup->setServiceIdentifier($post['group'])
-                ->setUser($user)
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
-                ->setFavourite(false);
-            if ($group->isFree()) {
-                $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
-            }
-            //save group object
-            $this->userAccessMapper->save($userGroup);
-
-            return $this->getResponse()->content->set(
-                $this->buildJsonOutput([
-                   'group'              => $post['group'],
-                   'user'               => $user->getId(),
-                   'isFavourite'        => $userGroup->getFavourite(),
-                   'isNotificationsOn'  => true,
-                   'enrolmentStatus'    => $this->getEnrollmentText($userGroup),
-                ])
-            );
+        //subscribe/remove notifications
+        //check if the user can actually unsubscribe from notifications
+        if ($group->getForceFollow()) {
+            $problem = (new ApiProblem('No Permission to unfollow group'))
+                ->setStatus(400)
+                ->asArray();
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
         }
-        //add / remove user from group
-        if ('delete' === $post['action']) {
-            if ($group->isPrivate()) {
-                return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'No Permission to leave group']));
-            }
-            $this->userAccessMapper->delete($userGroup);
-            return $this->getResponse()->content->set($this->buildJsonOutput([
-                'user'              => $user->getId(),
-                'group'             => $post['group'],
-                'action'            => 'delete',
-                'enrolmentStatus'   => self::NOTENROLLED,
-            ]));
+        $notificationsList = $this->setNotification($group->getFolder()->getId(), $user, (bool)$post['isNotificationsOn']);
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput([
+                                       'group'             => $post['group'],
+                                       'user'              => $user->getId(),
+                                       'isFavourite'       => $userGroup->getFavourite(),
+                                       'isNotificationsOn' => $notificationsList[$group->getFolder()->getId()]['follow'] ?: false,
+                                       'isForceFollow'     => $notificationsList[$group->getFolder()->getId()]['force'] ?: false,
+                                       'access'            => $this->getEnrollmentText($userGroup),
+                                   ])
+        );
+    }
+
+    /**
+     * edit group favourite
+     */
+    public function postMyGroupFavourite(): void
+    {
+        //grab the post / user and group objects to make things easier
+        $post  = $this->getRequest()->post->getArrayCopy();
+        $user  = $this->getUser();
+        $group = $this->getGroup($post['group']);
+        if (null === $group) {
+            return; //exit early the group doesn't exist
+        }
+        $userGroup = $this->getUserGroup($user, $post['group']);
+        if (null === $userGroup) {
+            return;  //exit early the user is not part of this group
         }
 
-        //must be edit functions
-        if ($post['action'] === 'edit') {
-            if (isset($post['isFavourite'])) {
-                //make/remove favourite
-                $userGroup->setFavourite((bool)$post['isFavourite']);
-            }
-            //save group object
-            $this->userAccessMapper->save($userGroup);
+        //make/remove favourite
+        $userGroup->setFavourite((bool)$post['isFavourite']);
 
-            //subscribe/remove notifications
-            if (isset($post['isNotificationsOn'])) {
-                //check if the user can actually unsubscribe from notifications
-                if ($group->getForceFollow()) {
-                    return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'No Permission to unfollow group']));
-                }
-                $notificationsList = $this->setNotification($group->getFolder()->getId(), $user, (bool)$post['isNotificationsOn']);
-            }
-            $notificationsList = $this->getNotifications($user);
+        //save group object
+        $this->userAccessMapper->save($userGroup);
+        $notificationsList = $this->getNotifications($user);
 
-            return $this->getResponse()->content->set(
-                $this->buildJsonOutput([
-                    'group'             => $post['group'],
-                    'user'              => $user->getId(),
-                    'isFavourite'       => $userGroup->getFavourite(),
-                    'isNotificationsOn' => $notificationsList[$group->getFolder()->getId()]['follow'] ?: false,
-                    'isForceFollow'     => $notificationsList[$group->getFolder()->getId()]['force'] ?: false,
-                    'access'            => $this->getEnrollmentText($userGroup),
-                ])
-            );
-        }
-        return $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'empty state, something went wrong.']));
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput([
+                                       'group'             => $post['group'],
+                                       'user'              => $user->getId(),
+                                       'isFavourite'       => $userGroup->getFavourite(),
+                                       'isNotificationsOn' => $notificationsList[$group->getFolder()->getId()]['follow'] ?: false,
+                                       'isForceFollow'     => $notificationsList[$group->getFolder()->getId()]['force'] ?: false,
+                                       'access'            => $this->getEnrollmentText($userGroup),
+                                   ])
+        );
     }
 
     /**
@@ -318,7 +339,7 @@ class Controller extends BaseController
 
         $folderIds = $accesses->getColumnValues('serviceIdentifier');
 
-        /** @var \Schoolbox\Collection|Folder\Model[] $folders */
+        /** @var \Schoolbox\Collection|FolderModel[] $folders */
         $folders = $this->folderMapper->findByColumn('id', $folderIds)->sortBy('name', 'asc');
         $service = UserAccess::SERVICE_HOMEPAGE;
 
@@ -330,27 +351,24 @@ class Controller extends BaseController
         $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
         foreach ($muted as $k => $id) {
             $muted[$k] = $this->reRouteOverrideMapper
-                              ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                              ->map(
-                                  function ($override) use ($routeKeyRegex) {
-                                      /** @var RerouteOverride $override */
-                                      preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                                      return is_array($matches) ? $matches[1] : null;
-                                  },
-                                  false
-                              )
-                              ->getAll();
+                ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
+                ->map(
+                    function ($override) use ($routeKeyRegex) {
+                        /** @var RerouteOverride $override */
+                        preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
+                        return is_array($matches) ? $matches[1] : null;
+                    },
+                    false
+                )
+                ->getAll();
         }
 
         $followment = [];
 
         // following
         foreach ($folders as $folder) {
-            $forced = false;
-
-            if ($grp = $folder->getGroup()) {
-                $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
-            }
+            $grp    = $folder->getGroup();
+            $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
 
             $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
 
@@ -366,30 +384,30 @@ class Controller extends BaseController
 
     /**
      * follows / unfollows a group
-     * @param int $group
+     * @param int  $group
      * @param User $user
      * @param bool $isNotificationOn
      */
     protected function setNotification(int $group, \Schoolbox\User $user, bool $isNotificationOn): array
     {
         //helpers
-        $serviceKey =  'service.' . UserAccess::SERVICE_HOMEPAGE . ".$group";
+        $serviceKey = 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$group";
 
         //see if the object already exists in the db, if so grab it to edit.
         $muteObj = $this->reRouteOverrideMapper->findByColumnList([
-            'msg_route_key' => $serviceKey,
-            'user_id'       => $user->getId(),
-            'delivery'      => RoutePermission::MUTE
-        ]);
+                                                                      'msg_route_key' => $serviceKey,
+                                                                      'user_id'       => $user->getId(),
+                                                                      'delivery'      => RoutePermission::MUTE,
+                                                                  ]);
 
         ///if user does not want notifications/follow for the group, create the mute object, and none exists currently
         if (false === $isNotificationOn && 0 === $muteObj->count()) {
             //create the mute object
             $muteObj = $this->reRouteOverrideMapper->createModel()
-                ->setUser($user)
-                ->setRouteKey($serviceKey)
-                ->setDelivery([ RoutePermission::MUTE ])
-                ->save($muteObj);
+                                                   ->setUser($user)
+                                                   ->setRouteKey($serviceKey)
+                                                   ->setDelivery([RoutePermission::MUTE]);
+            $this->reRouteOverrideMapper->save($muteObj);
         }
 
         //if the user does want notifications/follows and there is an muteobject entry, lets remove that now.
@@ -417,5 +435,50 @@ class Controller extends BaseController
             $enrollment = self::PENDING;
         }
         return $enrollment;
+    }
+
+    /**
+     * grab user/group objects with error checking, if the user has not specified a group, or they are not part of.
+     *
+     * @param null|int $groupId
+     * @return null | Group
+     */
+    protected function getGroup(?int $groupId): ?Group
+    {
+        try {
+            /** @var Group $group */
+            $group = $this->groupMapper->findById($groupId);
+            return $group;
+        } catch (MapperException\NotFound $e) {
+            $problem = (new ApiProblem('Group does not exist'))
+                ->setStatus(400)
+                ->asArray();
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return null;
+        }
+    }
+
+    /**
+     * get the user group object
+     * @param User $user
+     * @param int  $groupId
+     * @return null|UserAccess
+     */
+    protected function getUserGroup(User $user, int $groupId): ?UserAccess
+    {
+        try {
+            return $this->userAccessMapper->findOneByColumnList([
+                                                                    'uid' => $user->getId(),
+                                                                    'sid' => $groupId,
+                                                                ]);
+        } catch (MapperException\NotFound $e) {
+            $problem = (new ApiProblem('User is not part of the group'))
+                ->setStatus(400)
+                ->asArray();
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return null;
+        }
     }
 }

@@ -204,18 +204,6 @@ class Controller extends BaseController
         return $this->config;
     }
 
-
-    /**
-     * Does this user have
-     *
-     * @return array
-     */
-    public function calculateFollowment()
-    {
-
-    }
-
-
     /**
      * Shows the message configuration form
      *
