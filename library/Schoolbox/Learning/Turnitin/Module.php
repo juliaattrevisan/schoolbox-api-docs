@@ -11,12 +11,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Learning\Turnitin;
-use Twig\Error\LoaderError;
 
 /**
  * Turnitin Webhooks route through this controller
@@ -50,16 +48,6 @@ class Module extends BaseModule
 //        $this->register('POST', '/upload-complete', 'postUploadComplete', $postPerms);
 //        $this->register('POST', '/report-complete', 'postReportComplete', $postPerms);
 //        $this->register('POST', '/report-updated', 'postReportUpdated', $postPerms);
-    }
-
-
-    /**
-     * @param IChainLoader $templateLoader
-     * @throws LoaderError
-     */
-    public function initTemplatePaths(IChainLoader $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
