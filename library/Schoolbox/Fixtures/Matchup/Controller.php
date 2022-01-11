@@ -390,22 +390,29 @@ class Controller extends AbstractController
         return $c;
     }
 
+
     /**
-     * @param string $teamId
-     * @param string $prefix
-     * @return array $return
-     * @var Team $return[0]
-     * @var School $return[1]
+     * Returns a (Team, School) tuple, using stub instances where required
+     * to fulfil this struct
+     *     Team $return[0]
+     *     School $return[1]
+     *
+     * @param $teamId
+     * @param $prefix
+     * @return array
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     protected function calculateTeam($teamId, $prefix = TagCloudMapper::SCHOOL_PREFIX)
     {
         if (preg_match("/$prefix(.*)/", $teamId, $matches)) {
             // Away team is a faceless school, save the team as null
             return [$this->getTeamMapper()->createModel(), $this->getSchoolMapper()->findById($matches[1])];
-        } else {
-            return [$this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel()];
         }
+
+        return [$this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel()];
     }
+
 
     /**
      * Save Match data to db
