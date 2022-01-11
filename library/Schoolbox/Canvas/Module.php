@@ -46,7 +46,16 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector): void
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'canvasUrl' => $this->getConfig()->get('canvas_url'),
+                    'bearerToken' => $this->getConfig()->get('canvas_bearer_token'),
+                ]
+            )
+        );
     }
 
 

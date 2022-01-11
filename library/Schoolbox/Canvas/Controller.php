@@ -15,12 +15,19 @@ use External\Canvas\Importer\Api;
 
 class Controller extends Base
 {
+
+    private string $bearerToken;
+    private string $canvasUrl;
+
     /**
      * Controller constructor.
-     *
+     * @param string $canvasUrl
+     * @param string $bearerToken
      */
-    public function __construct()
+    public function __construct(string $canvasUrl, string $bearerToken)
     {
+        $this->canvasUrl    = $canvasUrl;
+        $this->bearerToken  = $bearerToken;
     }
 
 
@@ -73,9 +80,7 @@ class Controller extends Base
 //                                                                             'assignments' => $assignments,
 //                                                                         ]));
 
-        $key = '1031~pbBe6G8P4R18723FsgmZsOX1KvOU2ka7GntkBt9rucM0Xl7znok2Pmsc6xh2QMu0';
-        $host = 'https://canvas.newington.nsw.edu.au';
-        $connection =  new Api($host, $key);
+        $connection =  new Api($this->canvasUrl, $this->bearerToken);
 
         //grab user
         $user = $this->getUser();
