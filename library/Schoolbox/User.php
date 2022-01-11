@@ -54,14 +54,14 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      *
      * @var string|null
      */
-    private ?string $firstname;
+    private ?string $firstname = null;
 
     /**
      * The user's last name (a.k.a. surname).
      *
      * It's expected but not mandatory that it is not null.
      */
-    private ?string $lastname;
+    private ?string $lastname = null;
 
     /** @var null|string */
     private $externalId;
@@ -82,7 +82,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * The user's encoded password: may be null if they have no password for
      * logging in.
      */
-    private ?string $password;
+    private ?string $password = null;
 
     /**
      * Retrievable version of the user's password.
