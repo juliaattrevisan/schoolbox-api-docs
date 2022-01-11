@@ -392,6 +392,8 @@ class Controller extends BaseController
 
     /**
      * follows / unfollows a group
+     * uses have follow (have notifications set) by default
+     * they require to opt out.
      * @param int  $group
      * @param User $user
      * @param bool $isNotificationOn
