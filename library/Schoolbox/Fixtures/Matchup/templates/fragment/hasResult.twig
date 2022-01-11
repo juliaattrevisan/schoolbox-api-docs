@@ -26,12 +26,10 @@
             <div class="actions-small-2 row">
                 <div class="list-item">
                     <div class="small-12 columns">
-                        <h4>{{ team.name }}{% if teamResult.status.id %} - {{ teamResult.status.name }}{% endif %}</h4>
+                        <h4>{{ team.name }}{% if teamResult.status and teamResult.status.id %} - {{ teamResult.status.name }}{% endif %}</h4>
                         {{ teamResult.description|purify }}
                     </div>
                 </div>
-
-
                 <nav>
                     {% if hasMatchModify and not match.season.isArchived %}
                     <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: teamResult.id}) }}" class="icon-modify" title="Modify"></a>
