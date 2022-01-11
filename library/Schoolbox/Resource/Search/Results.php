@@ -115,6 +115,15 @@ class Results implements Searchable
     {
         $result = new Collection();
 
+        /* Single-digit keywords are allowed by User Handler, but not any of the
+         * Mappers in this class which all fulfil the MIN_SEARCH_LENGTH requirement
+         * (you can't search for single-digit numerics here)
+         *
+         * This allows $registry to be populated with possibilities, but also causes
+         * $result to be an empty collection, returning a null when naively accessed
+         * via getOffset() - you have to check that getOffset() returned you something
+         * that could return a search result before blindly using it
+         */
         if (strlen((string)$keyword) >= self::MIN_SEARCH_LENGTH) {
             /* Run search() on each minion in the registry if 'all' is selected
              * or if this particular minion was chosen specifically (e.g. 'link')
@@ -140,7 +149,9 @@ class Results implements Searchable
             if (($this->type === 'all') || ($currentDefinition->getType() === $this->type)) {
                 $searcher = $this->result->getOffset($currentDefinition->getType());
 
-                $currentDefinition->getRenderer()->renderTab($searcher);
+                if (null !== $searcher) {
+                    $currentDefinition->getRenderer()->renderTab($searcher);
+                }
             }
         }
     }
@@ -155,7 +166,9 @@ class Results implements Searchable
             if (($this->type === 'all') || ($currentDefinition->getType() === $this->type)) {
                 $searcher = $this->result->getOffset($currentDefinition->getType());
 
-                $currentDefinition->getRenderer()->render($searcher, $this->type);
+                if (null !== $searcher) {
+                    $currentDefinition->getRenderer()->render($searcher, $this->type);
+                }
             }
         }
     }
@@ -176,9 +189,11 @@ class Results implements Searchable
             if (($this->type === 'all') || ($currentDefinition->getType() === $this->type)) {
                 $searcher = $this->result->getOffset($currentDefinition->getType());
 
-                $currentDefinition->getRenderer()->renderPagination($searcher, $currentPage);
+                if (null !== $searcher) {
+                    $currentDefinition->getRenderer()->renderPagination($searcher, $currentPage);
 
-                break;
+                    break;
+                }
             }
         }
     }
