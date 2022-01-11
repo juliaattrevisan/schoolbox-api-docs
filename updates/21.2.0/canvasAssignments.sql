@@ -40,5 +40,5 @@ VALUES (
            'true',
            'false',
            'settings',
-           (SELECT sequence+1 FROM config WHERE name = 'canvas_data_api_secret')
+           (SELECT sequence+1 FROM config c WHERE name = 'canvas_data_api_secret')
        );
