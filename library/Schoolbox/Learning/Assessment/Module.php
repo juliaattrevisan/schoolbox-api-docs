@@ -40,7 +40,6 @@ use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
-use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
@@ -616,10 +615,7 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                     new IsAssessmentOpen(),
-                    new Rule\Any(
-                        new CanRespondToAssessment($this->getAccess()),
-                        new CanSelfAssess()
-                    )
+                    new CanRespondToAssessment($this->getAccess()),
                 )
             )
         );
