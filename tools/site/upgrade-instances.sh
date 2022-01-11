@@ -253,7 +253,7 @@ function rebuild_and_restart_daemons(){
       /usr/local/bin/schoolbox-rebuild-daemons --socketd-ports "$socketd_ports" -v
     fi
     for instance in $instance_list; do
-      ${package}cloud-restart-daemons "$instance";
+      INSTANCE_ID="$instance" /usr/share/schoolbox/tools/notif/allrestart
     done
   else
     log "---skipping daemon restart on secondary host---";
