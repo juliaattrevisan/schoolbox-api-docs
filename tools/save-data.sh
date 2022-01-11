@@ -161,6 +161,9 @@ cleanup_initial_dataset(){
     done
   fi
 }
+truncate_instance_registry_table(){
+    mysql schoolbox -e "TRUNCATE instance_registry";
+}
 
 # Cleanup deleted + log files
 cleanup_deleted_and_log_files(){
@@ -262,6 +265,7 @@ main(){
   log "Saving data as: '$dataset.tar.gz'";
   mkdir -p $CACHE_DIR;
   cleanup_initial_dataset
+  truncate_instance_registry_table
   cleanup_deleted_and_log_files
   cleanup_vagrant
   stop_services;
