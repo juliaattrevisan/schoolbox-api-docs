@@ -77,15 +77,6 @@ class CanSelfAssess extends AbstractParticipationRule
             throw new Unauthorized('', Error\Mapper::ERROR_NO_SELF_ASSESS);
         }
 
-        // TODO - this is ambiguous. The response being self-assessed should be specified in the route args
-        $mostRecentResponse = $participant->findMostRecentResponse();
-
-        /* Error when there are no responses at all
-         */
-        if (!$mostRecentResponse) {
-            throw new Unauthorized('', Error\Mapper::ERROR_COMPLETE_BEFORE_SELF_REFLECT);
-        }
-
         // If a due work passes this gauntlet: it's self-assessable
         return true;
     }
