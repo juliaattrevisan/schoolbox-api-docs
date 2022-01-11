@@ -306,8 +306,7 @@ class Folder extends SimpleStrategy
         try {
             // Other users can moderate if folder exists, and user has WRITE+ perm
             return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
-        } /** @noinspection BadExceptionsProcessingInspection */
-        catch (Mapper\Exception\Deleted | Mapper\Exception\NotFound $e) {
+        } catch (Mapper\Exception\Deleted | Mapper\Exception\NotFound $e) {
             // If deleted or not found, then cannot be moderated
             return false;
         }
@@ -451,8 +450,7 @@ class Folder extends SimpleStrategy
             $folder = (new FolderModel())->setId((int)$folderId);
             try {
                 $nnianFolder = $nnian->findNearestNonInheritingAncestralNode($folder);
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Mapper\Exception\Deleted $e) {
+            } catch (Mapper\Exception\Deleted $e) {
                 // Ignore deleted folders
                 continue;
             }
