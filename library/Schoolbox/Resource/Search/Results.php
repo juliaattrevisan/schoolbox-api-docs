@@ -150,7 +150,7 @@ class Results implements Searchable
                 $searcher = $this->result->getOffset($currentDefinition->getType());
 
                 if (null !== $searcher) {
-                    $currentDefinition->getRenderer()->renderTab($searcher, $this->type);
+                    $currentDefinition->getRenderer()->renderTab($searcher);
                 }
             }
         }
