@@ -3,7 +3,6 @@
 # 7 Non-teaching Staff
 # 8 Support Registered
 # 13 Prospects
-set -x
 
 declare hashes=("02e74016681e294cc39938665bfb2b7fcac2d5ac" "07f4123f169da13a26389d3abdf61614aac68853"
   "1587ead84e1bafbbc4268effbaa4b50842f199db" "197050de22c7204c89efc25cfbfeeb736f6779b1" "3bac01cff1de2a5033f82f41e70d1aa3ffdf1fc1"
@@ -18,7 +17,6 @@ declare hashes=("02e74016681e294cc39938665bfb2b7fcac2d5ac" "07f4123f169da13a2638
   "e7d4dfab9492feb7f049b8772998402145a6e15e" "ee1a98bdb62736c687ead53f9b4e4b102a071b7a" "f0b1317c9f0811a8b10a43f9a8b4d2ca11da191c"
   "f9fa0b4fe67c890e089dc041f379ef61a76b5879" "fe3c0af58f070998a4ce7dd2823f707374f1241c"
 )
-declare instance_id;
 
 readonly LOG="/usr/bin/alaress-logger"
 readonly L_INFO=200
@@ -39,12 +37,6 @@ parse_args() {
     error "No INSTANCE_ID PROVIDED"
     errors='1'
   fi
-  local this_file;
-  local this_dir;
-  instance_id=$INSTANCE_ID
-  this_file=$(readlink -f "$0");
-  this_dir=${this_file%/*};
-  site_root=$(readlink -f "$this_dir"/../../../)
 
   if [[ ! -f "/etc/schoolbox/instances.ini" ]]; then
     error "File not found: '/etc/schoolbox/instances.ini'"
@@ -57,17 +49,16 @@ parse_args() {
 }
 
 set_image() {
-  sql_host=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_host)
-  sql_user=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_user)
-  sql_pass=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_passwd)
-  sql_db=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_db)
+  sql_host=$(schoolbox-read-instances --option SQL_host)
+  sql_user=$(schoolbox-read-instances --option SQL_user)
+  sql_pass=$(schoolbox-read-instances --option SQL_passwd)
+  sql_db=$(schoolbox-read-instances --option SQL_db)
 
-  for i in $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "
-    select synergy_id from user where group_id in ('6','7','8','13') and synergy_id is not null and synergy_id != '' and " 2>/dev/null); do
+  for i in $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "SELECT synergy_id FROM user WHERE group_id in ('6','7','8','13') AND synergy_id IS NOT NULL AND synergy_id != ''" 2>/dev/null); do
     rand=$((RANDOM % ${#hashes[@]} + 1))
     hash=${hashes[$rand]}
     log "setting profile image for user $i as $hash"
-    if [[ ! $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "update user set portrait_hash = $hash where synergy_id  = $1") ]]; then
+    if [[ ! $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET portrait_hash = '$hash' WHERE synergy_id = '$i'") ]]; then
       error "Couldn't set image for user $i"
     fi
   done

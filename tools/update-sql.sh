@@ -15,7 +15,6 @@ readonly L_ERROR=400
 readonly UNSUPPORTED_FROM_MAJOR='20.1' # Require force if upgrading a schema at this version or below
 
 # Global vars
-declare site_root                # Schoolbox root dir
 declare sql_user
 declare sql_pass
 declare sql_host
@@ -53,12 +52,6 @@ check_run_as_root(){
 
 # Derive global vars that will be used by multiple subsequent functions
 derive_global_vars(){
-  file_path=$(readlink -f "$0");
-  full_path=${file_path%/*};
-
-  site_root=$(readlink -f "$full_path"/../);
-
-
   if [ ! -f "/etc/schoolbox/instances.ini" ]; then
     error "No ini found at '/etc/schoolbox/instances.ini";
     error "No cache directories cleaned";
@@ -68,10 +61,10 @@ derive_global_vars(){
   log "Using db credentials from: '/etc/schoolbox/instances.ini'";
 
   # Collect Credentials
-  sql_user=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_user);
-  sql_pass=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_passwd);
-  sql_host=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_host);
-  sql_db=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_db);
+  sql_user=$(schoolbox-read-instances --option SQL_user);
+  sql_pass=$(schoolbox-read-instances --option SQL_passwd);
+  sql_host=$(schoolbox-read-instances --option SQL_host);
+  sql_db=$(schoolbox-read-instances --option SQL_db);
 }
 
 # Check we could detect current and desired SQL versions
@@ -89,8 +82,8 @@ check_sql_versions(){
   fi
 
   # Ensure all required update dirs are present in this package. Never allow this.
-  if [[ ! -e $site_root/updates/"$sql_ver" ]]; then
-    error "Current SQL version update dir not found: '$site_root/updates/$sql_ver'"
+  if [[ ! -e /usr/share/schoolbox/updates/"$sql_ver" ]]; then
+    error "Current SQL version update dir not found: '/usr/share/schoolbox/updates/$sql_ver'"
     error "Cannot guarantee all required intervening update dirs are present!"
     error "You are probably trying to upgrade a dataset that is too old for this code version."
     error " * Upgrades:        You must only upgrade a single major version at a time."
@@ -177,7 +170,7 @@ execute_upgrade_scripts(){
     log "Running update $release";
 
     # Run SQL update scripts for this release
-    for script in $(find "${site_root}/updates/$release" -type f  | grep -E "(.+\.sql|.+\.php)$" | sort); do
+    for script in $(find "/usr/share/schoolbox/updates/$release" -type f  | grep -E "(.+\.sql|.+\.php)$" | sort); do
       execute_upgrade_script "$script"
     done
 
@@ -219,7 +212,7 @@ check_start_end_dirs(){
 
 # Ensure all required resources are available before running scripts, hard fail if not
 check_system_dependencies(){
-  "$site_root"/tools/notif/syscheck.php -v;
+  /usr/share/schoolbox/tools/notif/syscheck.php -v;
   sys_check_exit_code=$?
   if [ $sys_check_exit_code -ne 0 ]; then
     error "Error: all system dependencies must be available to start the update"
@@ -235,7 +228,7 @@ main(){
   derive_global_vars "$@"
 
   # Build update version list, derive latest version, collect current SQL version
-  version_list=$(find "$site_root"/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
+  version_list=$(find /usr/share/schoolbox/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
   new_ver=$(echo "$version_list" | tail -n 1)
   sql_ver=$(mysql -u "$sql_user" -p"$sql_pass" -h "$sql_host" "$sql_db" -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2);
   check_sql_versions "$new_ver" "$sql_ver"

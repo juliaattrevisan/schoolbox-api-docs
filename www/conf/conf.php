@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 define('SITE_root', dirname(__DIR__, 2));
 define('WEB_root', SITE_root . '/www');
-$package      = 'schoolbox';
 
 // Are we executing in the context of a specific tenant/instance?
-$instances  = parse_ini_file("/etc/$package/instances.ini", true);
+$instances  = parse_ini_file("/etc/schoolbox/instances.ini", true);
 $instanceId = null;
 $dbHost     = null;
 $dbSchema   = null;
@@ -66,7 +65,7 @@ define('SQL_passwd', $dbPass);
 define('SQL_dsn', 'mysql:host=' . SQL_host . ';dbname=' . SQL_db);
 
 # Per Schoolbox install config, common across all instances
-$config = parse_ini_file("/etc/$package/config.ini");
+$config = parse_ini_file("/etc/schoolbox/config.ini");
 define('TEMPLATE_body', $config['TEMPLATE_body']);
 define('TEMPLATE_content', $config['TEMPLATE_content']);
 define('SENTRY_TOKEN', $config['SENTRY_TOKEN']);

@@ -121,13 +121,13 @@ function parse_global_vars(){
     exit 1
   fi
   if [[ -z $instance_list ]]; then
-    if ! instance_list=$(schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option instance-list | sort); then
+    if ! instance_list=$(schoolbox-read-instances --option instance-list | sort); then
       error "Unable to parse instance list from ini file: '/etc/schoolbox/instances.ini'"
       exit 1;
     fi
   fi
   for i in $instance_list; do
-    if ! INSTANCE_ID=$i schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option INSTANCE_ID; then
+    if ! INSTANCE_ID=$i schoolbox-read-instances --option INSTANCE_ID; then
       error "instance id $i is invalid!"
       exit 1;
     fi
@@ -185,10 +185,10 @@ function upgrade_instances(){
 
     if [[ $is_primary_host == '1' ]]; then
       echo "$(date) - checking saml certificate" >> "$instance_log_file";
-      sql_user=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_user);
-      sql_pass=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_passwd);
-      sql_host=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_host);
-      sql_schema=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_db);
+      sql_user=$(INSTANCE_ID="$i" schoolbox-read-instances --option SQL_user);
+      sql_pass=$(INSTANCE_ID="$i" schoolbox-read-instances --option SQL_passwd);
+      sql_host=$(INSTANCE_ID="$i" schoolbox-read-instances --option SQL_host);
+      sql_schema=$(INSTANCE_ID="$i" schoolbox-read-instances --option SQL_db);
 
       if ! saml_public_cert=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "SELECT value FROM config WHERE name='saml_public_cert'"); then
         error "Unable to fetch 'saml_public_cert' from database" >> "$instance_log_file" 2>&1

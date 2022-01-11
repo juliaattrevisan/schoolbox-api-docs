@@ -130,16 +130,13 @@ function validate_instances(){
 
 # Derive global vars
 function parse_global_vars() {
-  this_file=$(readlink -f "$0");
-  this_dir=${this_file%/*};
-  install_dir=$(readlink -f "$this_dir"/../../)
 
   ini_file="/etc/schoolbox/instances.ini"
   if [[ ! -f $ini_file ]]; then
     error "No instances.ini file found at '$ini_file'"
     exit 1
   fi
-  if ! instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list | sort); then
+  if ! instance_list=$(schoolbox-read-instances --option instance-list | sort); then
     error "Unable to parse instance list from ini file: '$ini_file'"
     exit 1;
   fi
@@ -151,22 +148,22 @@ function parse_global_vars() {
 function parse_sql_credentials(){
   local instance_id=$1;
 
-  sql_user=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$ini_file" --option SQL_user);
+  sql_user=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --option SQL_user);
   if [ -z "$sql_user" ]; then
     error "Unable to derive an SQL_user"
     errors='1'
   fi
-  sql_pass=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$ini_file" --option SQL_passwd);
+  sql_pass=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --option SQL_passwd);
   if [ -z "$sql_pass" ]; then
     error "Unable to derive an SQL_passwd"
     errors='1'
   fi
-  sql_host=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$ini_file" --option SQL_host);
+  sql_host=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --option SQL_host);
   if [ -z "$sql_host" ]; then
     error "Unable to derive an SQL_host"
     errors='1'
   fi
-  sql_schema=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$ini_file" --option SQL_db);
+  sql_schema=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --option SQL_db);
   if [ -z "$sql_schema" ]; then
     error "Unable to derive an SQL_db"
     errors='1'
