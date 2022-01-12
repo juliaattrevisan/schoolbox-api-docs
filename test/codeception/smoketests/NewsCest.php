@@ -492,7 +492,6 @@ class NewsCest
      * Check if only parents of students from that class can view the news article
      * keeping as incomplete until I get the answer on how this permission works to either
      * get the test updated or issue fixed (then removing the incomplete from this code)
-     * @incomplete
      * @param IntegrationTester $i
      */
     public function checkClassesAudience(IntegrationTester $i): void
@@ -527,13 +526,13 @@ class NewsCest
         #THEN
         $i->seeResponseCodeIs(401);
 
-        //impersonating Jack Coles(secondary teacher) to ensure the news article is NOT visible to him
+        //impersonating Jack Coles(teacher with read access to the foler) to ensure the news article is visible to him
         #GIVEN
         $i->impersonateUser(22);
         #WHEN
         $i->sendGet('/news/' . $articleID);
         #THEN
-        $i->seeResponseCodeIs(401);
+        $i->seeResponseCodeIs(200);
 
         //impersonating Jenni Reed(parent) to ensure the news article is visible to her
         #GIVEN
