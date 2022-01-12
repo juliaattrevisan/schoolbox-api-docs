@@ -27,30 +27,12 @@ class HierarchyTool extends CliTool\App
 
 
     /**
-     * --flag
-     *
-     * An example arg that's a boolean on/off
-     */
-    private const OPT_LONG_FLAG = 'flag';
-
-
-    /**
-     * --input
-     *
-     * An example arg that has an actual value, denoted by the colon
-     */
-    private const OPT_LONG_INPUT = 'input:';
-
-
-    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
-            self::OPT_LONG_HELP,
-            self::OPT_LONG_FLAG,
-            self::OPT_LONG_INPUT
+            self::OPT_LONG_HELP
         ];
     }
 
@@ -63,16 +45,16 @@ class HierarchyTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Write an explanation about what your tool does and what arguments it accepts
+Import Clipboard Category/Subcategory/Teams into schoolbox Divisions/Teams equivalent.
 
-Usage: example.php [--flag] [--input mytest.txt]
-        --flag      Example flag (on/off)
-        --input     Example input value (arg which has user-inputted value)
+Usage: hierarchy.php
 
 
 HELP;
             exit;
         }
+
+        $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
 
         try {
             $composites = (new Factory(
