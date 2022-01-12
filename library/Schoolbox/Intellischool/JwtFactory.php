@@ -202,7 +202,7 @@ class JwtFactory
         }
 
         $defaultClaims = [
-            'iss'                                                           => 'https://test.simonschools.net/',
+            'iss'                                                           => 'https://demo.schoolbox.cloud',
             'aud'                                                           => 'https://core.intellischool.net/auth/lti',
             'https://purl.imsglobal.org/spec/lti/claim/version'             => '1.3.0',
             'https://purl.imsglobal.org/spec/lti/claim/message_type'        => 'LtiResourceLinkRequest',
