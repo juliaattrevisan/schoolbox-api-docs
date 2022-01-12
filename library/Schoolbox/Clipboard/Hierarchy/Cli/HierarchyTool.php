@@ -12,6 +12,9 @@ namespace Schoolbox\Clipboard\Hierarchy\Cli;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Clipboard\Hierarchy\Factory;
 
+/**
+ * Encapsulated cli tool
+ */
 class HierarchyTool extends CliTool\App
 {
 
@@ -71,16 +74,18 @@ HELP;
             exit;
         }
 
-        /* FIXME Main algorithm goes here
-         */
-        $this->getLogger()->info('Script commencing.');
+        try {
+            $composites = (new Factory(
+                $this->getLogger(),
+                $this->perform(),
+                (string)$this->getConfig()->get('clipboard_endpoint_host'),
+                (string)$this->getConfig()->get('clipboard_endpoint_token'),
+            ))->produce();
+        } catch (\DomainException $e) {
+            $this->getLogger()->warning($e->getMessage());
 
-        $composites = (new Factory(
-            $this->getLogger(),
-            $this->perform(),
-            $this->getConfig()->get('clipboard_endpoint_host'),
-            $this->getConfig()->get('clipboard_endpoint_token'),
-        ))->produce();
+            return;
+        }
 
         foreach ($composites as $composite) {
             $composite->import();

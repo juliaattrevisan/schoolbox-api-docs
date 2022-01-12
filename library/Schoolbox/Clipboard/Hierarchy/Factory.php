@@ -76,9 +76,22 @@ class Factory
      *
      * @return GenericCollection
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \DomainException
      */
     public function produce(): GenericCollection
     {
+        /* Check the required pieces existed
+         */
+        if ('' === $this->host) {
+            throw new \DomainException('Missing Clipboard host url; exiting');
+        }
+
+        if ('' === $this->token) {
+            throw new \DomainException('Missing Clipboard authentication token; exiting');
+        }
+
+        /* Otherwise, carry onwards
+         */
         $this->log->info('Accessing api endpoint');
 
         /* Spawn an IApi instance
