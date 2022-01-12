@@ -178,24 +178,6 @@ Data:
             $emptyDialog.foundation('reveal', 'close');
         });
 
-        // // Empty self-assessment comment dialog (if it exists)
-        // let $emptySelfAssessmentDialog    = $('#empty-self-assessment-comment-dialog'),
-        //     showEmptySelfAssessmentDialog = function () {
-        //         return $emptySelfAssessmentDialog.length > 0 && $form.find('[name="comment"]').val().length === 0;
-        //     };
-        // $emptySelfAssessmentDialog.click(
-        //     '[data-accept]',
-        //     function (event) {
-        //         event.preventDefault();
-        //         showConfirmOrSubmitForm();
-        //     });
-        // $emptySelfAssessmentDialog.click(
-        //     '[data-reject]',
-        //     function (event) {
-        //         event.preventDefault();
-        //         $emptySelfAssessmentDialog.foundation('reveal', 'close');
-        //     });
-
         // Confirm dialog (if it exists)
         let $confirmDialog = $('#confirm-dialog'),
             $acceptButton  = $confirmDialog.find('[data-accept]'),
@@ -219,19 +201,6 @@ Data:
                 // Submit the form
                 $form.submit();
             };
-            // ,
-            // showConfirmOrSubmitForm = function () {
-            //     if ($confirmDialog.length) {
-            //         // wait! display confirm modal
-            //         // event.preventDefault();
-            //         enableButtons();
-            //         $confirmDialog.foundation('reveal', 'open');
-            //         // $confirmDialog.foundation('reveal').foundation('reveal', 'open');
-            //     } else {
-            //         // checks pass: go for broke
-            //         submitForm();
-            //     }
-            // };
 
         // Confirm dialog accept/reject
         $acceptButton.click(function (event) {
@@ -374,48 +343,6 @@ Data:
                     <a class="button full-width" data-interaction="close">OK</a>
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
-
-{#                {% if assessment.selfAssessable %}#}
-{#                    <div id="empty-self-assessment-comment-dialog" class="reveal-modal" data-reveal role="dialog">#}
-{#                        <h2 id="empty-self-assessment-comment-dialog-title">#}
-{#                            Are you sure you wish to submit an incomplete#}
-{#                            {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?#}
-{#                        </h2>#}
-{#                        <p>#}
-{#                            It is preferable to provide a#}
-{#                            {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}#}
-{#                            comment. Please confirm that you wish to provide no comment.#}
-{#                        </p>#}
-
-{#                        {% if policy|length %}#}
-{#                            <hr />#}
-{#                            <p>{{ policy | purify }}</p>#}
-{#                            <ul class="flex-list buttons">#}
-{#                                <li><a href="#" class="button submit" data-accept>Yes, I agree</a></li>#}
-{#                                <li><a href="#" class="button" data-reject>Cancel</a></li>#}
-{#                            </ul>#}
-{#                        {% else %}#}
-{#                            <ul class="flex-list buttons">#}
-{#                                <li><a class="button submit" data-accept>Yes</a></li>#}
-{#                                <li><a class="button" data-reject>No</a></li>#}
-{#                            </ul>#}
-{#                        {% endif %}#}
-{#                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>#}
-{#                    </div>#}
-{#                {% endif %}#}
-
-{#                {% elseif policy|length %}#}
-{#                    <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">#}
-{#                        <p>{{ policy | purify }}</p>#}
-{#                        <ul class="flex-list buttons">#}
-{#                            <li><a class="button submit" data-accept>Yes, I agree</a></li>#}
-{#                            <li><a class="button" data-reject>Cancel</a></li>#}
-{#                        </ul>#}
-{#                    </div>#}
-{#                {% endif %}#}
-
-
-
 
                 <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
                     {% if policy | length %}
