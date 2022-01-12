@@ -43,6 +43,10 @@ class Api implements IApi
      */
     private const NUM_RETRY = 3;
 
+    /**
+     * customisable number of times to retry after failing, will default to NUM_RETRY
+     */
+    private int $failRetry;
 
     /**
      * @var string
@@ -61,11 +65,13 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $bearerToken
+     * @param int $failRetry (optional) default to NUM_RETRY
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $bearerToken)
+    public function __construct(string $host, string $bearerToken, int $failRetry = self::NUM_RETRY)
     {
         $this->host = $host;
+        $this->failRetry = $failRetry;
 
         /* Authorization Bearer token
          * This is generated from inside the Canvas application itself
@@ -118,7 +124,7 @@ class Api implements IApi
 
         /* Try multiple times in case server dies for a random reason
          */
-        while ($fails < self::NUM_RETRY) {
+        while ($fails < $this->failRetry) {
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {

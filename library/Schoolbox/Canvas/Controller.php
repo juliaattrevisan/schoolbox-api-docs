@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Canvas;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use External\Canvas\Importer\Api;
 
 class Controller extends Base
@@ -80,7 +81,7 @@ class Controller extends Base
 //                                                                             'assignments' => $assignments,
 //                                                                         ]));
 
-        $connection =  new Api($this->canvasUrl, $this->bearerToken);
+        $connection =  new Api($this->canvasUrl, $this->bearerToken, 1);
 
         //grab user
         $user = $this->getUser();
@@ -89,15 +90,21 @@ class Controller extends Base
 //        $userId = urlencode('sis_user_id:142898');
 
         if ($userId === 'sis_user_id:') {
-            return $this->getResponse()->content->set($this->buildJsonOutput([
-                                                                                 'error' => 'No External User ID',
-                                                                             ]));
+            $problem = new ApiProblem("No External User ID");
+            $problem->setStatus(400);
+            return $this->getResponse()->content->set(
+                $this->buildJsonOutput($problem->asArray())
+            );
         }
         //get date 30 days in the future
         $endDate = gmdate("Y-m-d\TH:i:s", date_create('+1 Month')->getTimestamp());
         try {
         //get courses for user
         //get assignments for user
+            /**
+             * https://canvas.instructure.com/doc/api/courses.html#method.courses.user_index
+             * grab all courses for the user, where the course is available, and the user is enrolled
+             */
             $courses = $connection->retrieve('get', "/api/v1/users/${userId}/courses", [
             'state'             => 'available',
             'enrollment_state'  => 'active',
@@ -105,6 +112,9 @@ class Controller extends Base
             $coursesArr = [];
             $course10Count = 0;
             $courseCount = 0;
+            /**
+             * split the courses into groups of 10, as the canvas API has a limit of 10 context_codes (courses)
+             */
             foreach ($courses as $course) {
                 $coursesArr[$course10Count][] = "course_{$course['id']}";
                 $courseCount++;
@@ -112,9 +122,18 @@ class Controller extends Base
                     $course10Count++;
                 }
             }
-        //split at groups of 10 courses
-        //create arrays of a max 10 courses in each, then request the assignments from calendar using those events
 
+            /**
+             * grab the list of assignments from each group of 10 courses
+             * https://canvas.instructure.com/doc/api/calendar_events.html#method.calendar_events_api.user_index
+             * specify:
+             * type = assignment
+             * start_date will default to today.
+             * end_date 1 month in the future
+             * list of courses as context_codes
+             * specify the user using as_user_id (using the canvas api masquerade ability)
+             * https://canvas.instructure.com/doc/api/file.masquerading.html
+             */
             foreach ($coursesArr as $course10) {
                 $courseParm = "context_codes[]=" . join('&context_codes[]=', $course10);
                 $tempAssign = $connection->retrieve('get', "/api/v1/calendar_events?{$courseParm}&type=assignment&end_date={$endDate}&as_user_id={$userId}", []);
@@ -126,14 +145,14 @@ class Controller extends Base
                 $date = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $assignment['end_at']);
                 $assignments[$id]['end_at'] = $date->format("Y/m/d H:i");
             }
-        } catch (\RuntimeException $e) {
-            return $this->getResponse()->content->set($this->buildJsonOutput([
-                                                                          'error' => $e->getMessage(),
-                                                                      ]));
-        } catch (\DomainException $e) {
-            return $this->getResponse()->content->set($this->buildJsonOutput([
-                                                                          'error' => 'Unable to access server',
-                                                                      ]));
+        } catch (\RuntimeException | \DomainException $e) {
+            //catch both Runtime and Domain Exceptions
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus(400);
+            $this->getResponse()->status->setCode(400);
+            return $this->getResponse()->content->set(
+                $this->buildJsonOutput($problem->asArray())
+            );
         }
         //send as json to frontend
         return $this->getResponse()->content->set($this->buildJsonOutput([
