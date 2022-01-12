@@ -2546,11 +2546,6 @@ parameters:
 			path: library/External/Synergetic/Markbook.php
 
 		-
-			message: "#^Expression in empty\\(\\) is not falsy\\.$#"
-			count: 3
-			path: library/External/Synergetic/Pastoral.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/External/Synergetic/Pastoral.php
