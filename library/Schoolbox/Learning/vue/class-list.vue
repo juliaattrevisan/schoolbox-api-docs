@@ -275,8 +275,10 @@ export default {
 
             try {
                 const response = await fetch(this.getStudentListsEndpoint);
-                this.studentLists = await response.json();
-                this.studentLists = this.studentLists.map((student) => { // Set all students to checked by default
+                const responseData = await response.json();
+                debugger;
+                this.studentLists = responseData.map((student) => { // Set all students to checked by default
+                    
                     student.isChecked = true;
                     return student;
                 });
