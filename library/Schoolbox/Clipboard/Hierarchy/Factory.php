@@ -105,6 +105,7 @@ class Factory
 
         /* TODO: Add strats
          */
+        $bus->add(new Team($this->log, $this->perform, $api));
 
         return $bus;
     }
