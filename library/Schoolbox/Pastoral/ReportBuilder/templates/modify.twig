@@ -6,9 +6,9 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-[ 'Reports',            routeLookup('pastoralReportBuilder.getIndex') ],
-[ pageTitle ]
+    [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
+    [ 'Reports',            routeLookup('pastoralReportBuilder.getIndex') ],
+    [ pageTitle ]
 ) }}
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
@@ -94,21 +94,25 @@
             <section>
                 <fieldset class="radiolist content">
                     <div class="small-12 large-6 columns">
-                        <input type="radio" name="date-option" id="relative-dates-option" value="relative" {% if report.usesRelativeDate %}checked{% endif %}/>
+                        <input type="radio" name="date-option" id="relative-dates-option" value="relative"
+                               {% if report.usesRelativeDate %}checked{% endif %}/>
                         <label for="relative-dates-option">Use relative date range</label>
                     </div>
                     <div class="small-12 large-6 columns">
-                        <input type="radio" name="date-option" id="absolute-dates-option" value="absolute" {% if not report.usesRelativeDate %}checked{% endif %}/>
+                        <input type="radio" name="date-option" id="absolute-dates-option" value="absolute"
+                               {% if not report.usesRelativeDate %}checked{% endif %}/>
                         <label for="absolute-dates-option">Use fixed date range</label>
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
-                    <div id="relative-dates" class="small-12 columns{% if not report.usesRelativeDate %} hide{% endif %}">
+                    <div id="relative-dates"
+                         class="small-12 columns{% if not report.usesRelativeDate %} hide{% endif %}">
                         <label for="relative-dates-dropdown">Time period</label>
                         <select id="relative-dates-dropdown" name="relative-dates-dropdown">
                             {% for value,label in datePresets %}
-                                <option value="{{value}}" {% if selectedRelativeDate == value %}selected{% endif %}>{{label}}</option>
+                                <option value="{{ value }}"
+                                        {% if selectedRelativeDate == value %}selected{% endif %}>{{ label }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -134,78 +138,138 @@
 
                 </fieldset>
             </section>
-            <label>
-                <h2 class="subheader">
-                    <span class="required-with-tip">Record Types</span>
-                </h2>
-            </label>
-            <p class="meta">Select the record types you want to appear in the report</p>
-            <section>
-                <div class="small-12 columns content">
-                    <div class="checklist">
-                        <ul class="option-list">
-                            <li>
-                                <input id="type-all" type="checkbox" data-check-all-type>
-                                <label for="type-all">Select All</label>
-                            </li>
-                            {% for type in types %}
-                                <li>
-                                    <div class="pastoral-types">
-                                        <input id="type-{{ type.id }}"
-                                            name="types[]"
-                                            value="{{ type.id }}"
-                                            type="checkbox"
-                                            {% for typeSelected in (report.types ?? []) | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
-                                            data-check-type
-                                        >
+            <div class="row">
+                <div class="small-12  {% if config.pastoral_action_enable %}medium-6{% endif %} columns">
+                    <label>
+                        <h2 class="subheader">
+                            <span class="required-with-tip">Record Types</span>
+                        </h2>
+                    </label>
+                    <p class="meta">Select the record types you want to appear in the report</p>
+                    <section>
+                        <div class="small-12 columns content">
+                            <div class="checklist">
+                                <ul class="option-list">
+                                    <li>
+                                        <input id="type-all" type="checkbox" data-check-all-type>
+                                        <label for="type-all">Select All</label>
+                                    </li>
+                                    {% for type in types %}
+                                        <li>
+                                            <div class="pastoral-types">
+                                                <input id="type-{{ type.id }}"
+                                                       name="types[]"
+                                                       value="{{ type.id }}"
+                                                       type="checkbox"
+                                                       {% for typeSelected in (report.types ?? []) | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
+                                                       data-check-type
+                                                >
 
-                                        {% set hasSubTypes = false %}
-                                        {% for subtype in subTypes %}
-                                            {% if subtype.pastoralType.id == type.id %}
-                                                {% set hasSubTypes = true %}
-                                            {% endif %}
-                                        {% endfor %}
+                                                {% set hasSubTypes = false %}
+                                                {% for subtype in subTypes %}
+                                                    {% if subtype.pastoralType.id == type.id %}
+                                                        {% set hasSubTypes = true %}
+                                                    {% endif %}
+                                                {% endfor %}
 
-                                        {% if hasSubTypes %}
-                                            <label for="type-{{ type.id }}" title="Select to reveal sub-types">
-                                                {{ type.name }}
-                                                <i class="icon-click-view size-8"></i>
-                                            </label>
-                                        {% else %}
-                                            <label for="type-{{ type.id }}">
-                                                {{ type.name }}
-                                            </label>
-                                        {% endif %}
-
-                                        <div class="checklist" data-pastoral-subtype>
-                                            <ul class="option-list">
-                                            {% for subtype in subTypes %}
-
-                                                {% if subtype.pastoralType.id == type.id %}
-                                                    <li>
-                                                        <input id="subtype-{{ subtype.id }}"
-                                                            name="subtypes[]"
-                                                            value="{{ subtype.id }}"
-                                                            type="checkbox"
-                                                            {% for subtypeSelected in (report.subtypes ?? []) | filter(subtypeSelected => subtypeSelected.id == subtype.id ) %}checked{% endfor %}
-                                                            data-check-subtype
-                                                        >
-                                                        <label for="subtype-{{ subtype.id }}">
-                                                            {{ subtype.name }}
-                                                        </label>
-                                                    </li>
+                                                {% if hasSubTypes %}
+                                                    <label for="type-{{ type.id }}" title="Select to reveal sub-types">
+                                                        {{ type.name }}
+                                                        <i class="icon-click-view size-8"></i>
+                                                    </label>
+                                                {% else %}
+                                                    <label for="type-{{ type.id }}">
+                                                        {{ type.name }}
+                                                    </label>
                                                 {% endif %}
 
-                                            {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                                                <div class="checklist" data-pastoral-subtype>
+                                                    <ul class="option-list">
+                                                        {% for subtype in subTypes %}
+
+                                                            {% if subtype.pastoralType.id == type.id %}
+                                                                <li>
+                                                                    <input id="subtype-{{ subtype.id }}"
+                                                                           name="subtypes[]"
+                                                                           value="{{ subtype.id }}"
+                                                                           type="checkbox"
+                                                                           {% for subtypeSelected in (report.subtypes ?? []) | filter(subtypeSelected => subtypeSelected.id == subtype.id ) %}checked{% endfor %}
+                                                                           data-check-subtype
+                                                                    >
+                                                                    <label for="subtype-{{ subtype.id }}">
+                                                                        {{ subtype.name }}
+                                                                    </label>
+                                                                </li>
+                                                            {% endif %}
+
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-            </section>
+                {% if config.pastoral_action_enable %}
+                    <div class="small-12 medium-6 columns">
+                        <h2 class="subheader">Actions</h2>
+                        <p class="meta">Filter the report based on pending actions to be completed</p>
+                        <section>
+                            <fieldset class="radiolist content">
+                                <div class="small-12 large-6 columns">
+                                    <input type="radio" name="includeUncompletedActionsOnly"
+                                           id="includeCompletedActionsOnly" value="0"
+                                           {% if not report.includeUncompletedActionsOnly %}checked{% endif %} />
+                                    <label for="includeCompletedActionsOnly">Any State</label>
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <input type="radio" name="includeUncompletedActionsOnly"
+                                           id="includeUncompletedActionsOnly" value="1"
+                                           {% if report.includeUncompletedActionsOnly %}checked{% endif %} />
+                                    <label for="includeUncompletedActionsOnly">Pending Only</label>
+                                </div>
+                            </fieldset>
+                            <fieldset class="content">
+                                <div class="small-12 columns">
+                                    <div class="checklist">
+                                        <ul class="option-list">
+                                            <li>
+                                                <input id="action-all" type="checkbox" data-check-all-action>
+                                                <label for="action-all">Select All</label>
+                                            </li>
+                                            <li>
+                                                <input id="includeRecordsWithoutAction"
+                                                       name="includeRecordsWithoutAction"
+                                                       value="1"
+                                                       type="checkbox"
+                                                       {% if report.includeRecordsWithoutAction %}checked{% endif %}
+                                                       data-check-action
+                                                >
+                                                <label for="includeRecordsWithoutAction">(No action)</label>
+                                            </li>
+                                            {% for action in actions %}
+                                                <li>
+                                                    <input id="action-{{ action.id }}"
+                                                           name="actions[]"
+                                                           value="{{ action.id }}"
+                                                           type="checkbox"
+                                                           {% for actionSelected in (report.actions ?? []) | filter(actionSelected => actionSelected == action) %}checked{% endfor %}
+                                                           data-check-action
+                                                    >
+                                                    <label for="action-{{ action.id }}">{{ action.name }}</label>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </section>
+                    </div>
+                {% endif %}
+            </div>
 
             {# Pastoral moderators get an additional option to only show records in which they are involved #}
 
@@ -254,26 +318,26 @@
                                     </li>
                                     <li>
                                         <input id="includeStudentsWithoutYear"
-                                            name="includeStudentsWithoutYear"
-                                            value="1"
-                                            type="checkbox"
-                                            {% if report.includeStudentsWithoutYear %}checked{% endif %}
-                                            data-check-year
+                                               name="includeStudentsWithoutYear"
+                                               value="1"
+                                               type="checkbox"
+                                               {% if report.includeStudentsWithoutYear %}checked{% endif %}
+                                               data-check-year
                                         >
                                         <label for="includeStudentsWithoutYear">(No Year Level)</label>
                                     </li>
                                     {% for year in years %}
                                         <li>
                                             <input id="year-{{ year.id }}"
-                                                name="years[]"
-                                                value="{{ year.id }}"
-                                                type="checkbox"
-                                                {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected == year.id ) %}checked{% endfor %}
-                                                data-check-year
+                                                   name="years[]"
+                                                   value="{{ year.id }}"
+                                                   type="checkbox"
+                                                   {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected == year.id ) %}checked{% endfor %}
+                                                   data-check-year
                                             >
                                             <label for="year-{{ year.id }}">{{ year.name }}</label>
                                         </li>
-                                {% endfor %}
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
@@ -298,22 +362,22 @@
                                     </li>
                                     <li>
                                         <input id="includeStudentsWithoutHouse"
-                                            name="includeStudentsWithoutHouse"
-                                            value="1"
-                                            type="checkbox"
-                                            {% if report.includeStudentsWithoutHouse %}checked{% endif %}
-                                            data-check-house
+                                               name="includeStudentsWithoutHouse"
+                                               value="1"
+                                               type="checkbox"
+                                               {% if report.includeStudentsWithoutHouse %}checked{% endif %}
+                                               data-check-house
                                         >
                                         <label for="includeStudentsWithoutHouse">(No House)</label>
                                     </li>
                                     {% for house in houses %}
                                         <li>
                                             <input id="house-{{ house.id }}"
-                                                name="houses[]"
-                                                value="{{ house.id }}"
-                                                type="checkbox"
-                                                {% for houseSelected in (report.houses ?? []) | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
-                                                data-check-house
+                                                   name="houses[]"
+                                                   value="{{ house.id }}"
+                                                   type="checkbox"
+                                                   {% for houseSelected in (report.houses ?? []) | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
+                                                   data-check-house
                                             >
                                             <label for="house-{{ house.id }}">{{ house.house }}</label>
                                         </li>
@@ -356,60 +420,6 @@
                         </div>
                     </section>
                 </div>
-                {% if config.pastoral_action_enable %}
-                    <div class="small-12 medium-6 columns">
-                        <h2 class="subheader">Actions</h2>
-                        <p class="meta">Select the actions you want included in the report</p>
-
-                        <section>
-                            <div class="small-12 columns content">
-                                <div class="checklist">
-                                    <ul class="option-list">
-                                        <li>
-                                            <input id="includeUncompletedActionsOnly"
-                                                   name="includeUncompletedActionsOnly"
-                                                   value="1"
-                                                   type="checkbox"
-                                                   {% if report.includeUncompletedActionsOnly %}checked{% endif %}
-                                            >
-                                            <label for="includeUncompletedActionsOnly">Match only uncompleted actions</label>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="checklist">
-                                    <ul class="option-list">
-                                        <li>
-                                            <input id="action-all" type="checkbox" data-check-all-action>
-                                            <label for="action-all">Select All</label>
-                                        </li>
-                                        <li>
-                                            <input id="includeRecordsWithoutAction"
-                                                   name="includeRecordsWithoutAction"
-                                                   value="1"
-                                                   type="checkbox"
-                                                   {% if report.includeRecordsWithoutAction %}checked{% endif %}
-                                                   data-check-action
-                                            >
-                                            <label for="includeRecordsWithoutAction">(No action)</label>
-                                        </li>
-                                        {% for action in actions %}
-                                            <li>
-                                                <input id="action-{{ action.id }}"
-                                                       name="actions[]"
-                                                       value="{{ action.id }}"
-                                                       type="checkbox"
-                                                       {% for actionSelected in (report.actions ?? []) | filter(actionSelected => actionSelected == action) %}checked{% endfor %}
-                                                       data-check-action
-                                                >
-                                                <label for="action-{{ action.id }}">{{ action.name }}</label>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                {% endif %}
             </div>
 
             <h2 class="subheader">Sort Order</h2>
@@ -554,16 +564,17 @@
                             </label>
                             <ul class="option-list">
                                 {% for group in groups %}
-                                <li>
-                                    <input type="hidden" name="group[{{ group.id }}]" value="0"/>
-                                    <input type="checkbox"
-                                           name="group[{{ group.id }}]"
-                                           {% for reportGroup in (report.groups ?? []) | filter(reportGroup=>reportGroup.id == group.id) %}checked{% endfor %}
-                                           id="group[{{ group.id }}]"
-                                           value="1"
-                                    />
-                                    <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
-                                </li>
+                                    <li>
+                                        <input type="hidden" name="group[{{ group.id }}]" value="0"/>
+                                        <input type="checkbox"
+                                               name="group[{{ group.id }}]"
+                                               {% for reportGroup in (report.groups ?? []) | filter(reportGroup=>reportGroup.id == group.id) %}checked{% endfor %}
+                                               id="group[{{ group.id }}]"
+                                               value="1"
+                                        />
+                                        <label for="group[{{ group.id }}]"
+                                               class="checkbox-label">{{ group.name }}</label>
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -588,7 +599,7 @@
 
         // Initial setup: if any parent types are already checked (from saved data), show their subtypes
         // otherwise hide the subtypes to save space
-        $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+        $(parentCheckboxSelector).each(function (index, parentCheckbox) {
             if ($(parentCheckbox).is(':checked')) {
                 // ...show the subtypes for this type
                 $(parentCheckbox).siblings(childGroupSelector).show();
@@ -600,7 +611,7 @@
 
         // When a parent type checkbox is changed, show or hide its subtypes
         // and check them by default when shown
-        $(parentCheckboxSelector).change(function(e) {
+        $(parentCheckboxSelector).change(function (e) {
             var parentCheckbox = e.target;
             var $subCheckboxes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
@@ -609,20 +620,20 @@
                 $(parentCheckbox).siblings(childGroupSelector).show();
 
                 // ...and check them by default
-                $subCheckboxes.each(function(index, subCheckbox) {
+                $subCheckboxes.each(function (index, subCheckbox) {
                     $(subCheckbox).prop('checked', true);
                 });
 
                 $(parentCheckbox).siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
             } else {
                 // ...hide the subtypes for this type
-                $subCheckboxes.each(function(index, subCheckbox) {
+                $subCheckboxes.each(function (index, subCheckbox) {
                     $(subCheckbox).prop('checked', false);
                     $(parentCheckbox).siblings(childGroupSelector).hide();
                 });
 
                 // ...and uncheck them (causes all sorts of problems with select all otherwise)
-                $subCheckboxes.each(function(index, subCheckbox) {
+                $subCheckboxes.each(function (index, subCheckbox) {
                     $(subCheckbox).prop('checked', false);
                 });
 
@@ -633,10 +644,10 @@
 
         // When a subtype checkbox is changed, find out if any subtypes in that group are still checked
         // and if not, uncheck the parent and hide the subtypes
-        $(parentCheckboxSelector).each(function(index, parentCheckbox) {
+        $(parentCheckboxSelector).each(function (index, parentCheckbox) {
             var $subtypes = $(parentCheckbox).siblings(childGroupSelector).find(childCheckboxSelector);
 
-            $subtypes.change(function() {
+            $subtypes.change(function () {
                 if ($subtypes.filter(":checked").length < 1) {
                     $(parentCheckbox).prop("checked", false);
                     $subtypes.parent(childGroupSelector).hide();
@@ -650,14 +661,14 @@
         })
 
         // Hide/show the relevant date range picker based on the user's radio button selection
-        $("input[type='radio'][name='date-option']").change(function(e) {
-           if ($("#relative-dates-option").is(":checked")) {
-               $("#relative-dates").removeClass("hide");
-               $("#absolute-dates").addClass("hide");
-           } else {
-               $("#absolute-dates").removeClass("hide");
-               $("#relative-dates").addClass("hide");
-           }
+        $("input[type='radio'][name='date-option']").change(function (e) {
+            if ($("#relative-dates-option").is(":checked")) {
+                $("#relative-dates").removeClass("hide");
+                $("#absolute-dates").addClass("hide");
+            } else {
+                $("#absolute-dates").removeClass("hide");
+                $("#relative-dates").addClass("hide");
+            }
         });
 
 
@@ -715,7 +726,7 @@
             multiple: true,
             selectize: {
                 preload: true,
-                load: function(query, callback) {
+                load: function (query, callback) {
 
                     /* This provides a preliminary list of suggestions for when selectize gets focus
                      * but there's no parameter upon which to search (initial conditions). This also
@@ -726,10 +737,10 @@
                         url: '/ajax/tags/pastoral',
                         type: 'GET',
                         dataType: 'json',
-                        data: { query: query }
-                    }).done(function(result) {
+                        data: {query: query}
+                    }).done(function (result) {
                         callback(result)
-                    }).fail(function() {
+                    }).fail(function () {
                         callback()
                     })
                 }
@@ -756,7 +767,7 @@
             ]
         });
 
-        {# Generate the report after a little sanity checking#}
+        {# Generate the report after a little sanity checking #}
 
         $reportForm.alaressValidate({
             rules: {
@@ -801,10 +812,10 @@
             submitHandler: function (form) {
                 {# Prior to submitting the form we need to set the hidden `order` #}
                 var order = $.makeArray(
-                    $('#sort-order').children('li')
-                        .map(function () {
-                            return $(this).data('order');
-                        })
+                        $('#sort-order').children('li')
+                                .map(function () {
+                                    return $(this).data('order');
+                                })
                 );
 
                 $('#order').val(order.join(','));
