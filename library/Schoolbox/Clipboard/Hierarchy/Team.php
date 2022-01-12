@@ -70,18 +70,20 @@ class Team implements IStrategy
     {
         $teams = $this->api->retrieve('GET', 'teams', []);
 
-        foreach ($teams as $team) {
+        foreach ($teams['data'] as $team) {
             $teamCategory = $team['category']['name'] ?? '';
             $teamSubcategory = $team['subcategory']['name'] ?? '';
+            $teamActivity = $team['activity']['name'] ?? '';
 
             /* Try to manufacture a division title
              */
-            $divisionName = $this->divisionCodec->encode($teamCategory, $teamSubcategory);
+            $divisionName = $this->divisionCodec->encode($teamCategory, $teamSubcategory, $teamActivity);
 
             $this->log->debug(sprintf(
-                'Encoded category/subcategory (%s, %s) into schoolbox division name: %s',
+                'Encoded category/subcategory/activity (%s, %s, %s) into schoolbox division name: %s',
                 $teamCategory,
                 $teamSubcategory,
+                $teamActivity,
                 $divisionName
             ));
 

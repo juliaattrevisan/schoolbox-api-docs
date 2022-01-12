@@ -24,9 +24,10 @@ class Division
      *
      * @param string $category
      * @param string $subcategory
+     * @param string $activity
      * @return string
      */
-    public function encode(string $category, string $subcategory): string
+    public function encode(string $category, string $subcategory, string $activity): string
     {
         /* Optional Category and Optional Subcategory
          *
@@ -34,7 +35,7 @@ class Division
          *  because the api docs suggest both category and subcategory are optional
          */
         if ('' === $category && '' === $subcategory) {
-            return 'Undefined division';
+            return $activity;
         }
 
         /* Optional Category; use Subcategory alone
