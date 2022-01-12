@@ -274,11 +274,16 @@ class Folder extends SimpleStrategy
      */
     public function canViewArticleAudiencedToEntityValue(User $user, ?string $entityValue, string $modifier): bool
     {
-        if (null === $entityValue || $modifier !== Audience\Model::RELATIONSHIP_SELF) {
+        if (null === $entityValue) {
             // No users have special relationships to no folder
             return false;
         }
-        // Note we don't care about teacher/parent modifier. The user must still have READ perm to the page
+        if ($modifier !== Audience\Model::RELATIONSHIP_SELF) {
+            // If this is segment is for parents or teachers:
+            // it is not intended for the current user.
+            return false;
+        }
+        // The user must still have READ perm to the page
         return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
     }
 
