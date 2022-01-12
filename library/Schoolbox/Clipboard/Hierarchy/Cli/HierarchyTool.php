@@ -70,6 +70,7 @@ HELP;
         }
 
         /* TODO Wrap in transaction
+         * TODO Wrap in lock file
          */
         foreach ($composites as $composite) {
             $composite->import();
