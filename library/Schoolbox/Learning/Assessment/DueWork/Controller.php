@@ -882,7 +882,9 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@learningAssessment/dueWork/createSubmission.twig', $data)
+                '@learningAssessment/dueWork/createSubmission.twig',
+                $data
+            )
         );
     }
 
@@ -1088,7 +1090,8 @@ class Controller extends Assessment\Controller
             $mostRecentFeedback = $participant->findMostRecentSelfAssessedFeedback();
             // Check whether the latest feedback has rubric data set.
             $hasRubric = isset($rq->post['rubric']);
-            if ($mostRecentFeedback !== null
+            if (
+                $mostRecentFeedback !== null
                 && $mostRecentFeedback->getAssessable() instanceof Model
                 && $mostRecentFeedback->getAssessable()->getUseRubric()
             ) {
