@@ -47,6 +47,24 @@ class Team implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Season\Mapper
+     */
+    private \Schoolbox\Fixtures\Season\Mapper $seasonMapper;
+
+
+    /**
+     * @var \Schoolbox\Fixtures\Sport\Mapper
+     */
+    private \Schoolbox\Fixtures\Sport\Mapper $sportMapper;
+
+
+    /**
+     * @var \Schoolbox\Fixtures\Division\Mapper
+     */
+    private \Schoolbox\Fixtures\Division\Mapper $divisionMapper;
+
+
+    /**
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param IApi            $api
@@ -60,6 +78,10 @@ class Team implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->divisionCodec = new Codec\Division();
+
+        $this->seasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $this->sportMapper = \Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $this->divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
     }
 
 
@@ -68,6 +90,11 @@ class Team implements IStrategy
      */
     public function import(): void
     {
+
+        /* TODO: I guess have a yearlong season
+         */
+        $season = $this->seasonMapper->findById(1);
+
         /* Set up a local cache for (sport, division, team) tuples
          */
         $lookup = [];
@@ -91,13 +118,50 @@ class Team implements IStrategy
                 $divisionName
             ));
 
-            /* TODO: Spawn a Sport if it doesn't exist
-             *  or reuse an existing one if it existed
+            /* Try to spawn a corresponding Sport instance
              */
+            $sportName = $team['activity']['name'];
 
-            /* TODO: Spawn a Division if it doesn't exist
-             *  or reuse an existing one if it existed
+            if (!isset($lookup[$sportName])) {
+                try {
+                    $sport = $this->sportMapper->findOneByColumn('name', $sportName);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $sport = $this->sportMapper->createModel()
+                        ->setName($sportName);
+
+                    $this->sportMapper->save($sport);
+                }
+
+                $lookup[$sportName] = [
+                    'instance' => $sport,
+                    'divisions' => []
+                ];
+            } else {
+                $sport = $lookup[$sportName]['instance'];
+            }
+
+            /* Try to spawn a corresponding Division instance
              */
+            if (!isset($lookup[$sportName]['divisions'][$divisionName])) {
+                try {
+                    $division = $this->divisionMapper->findOneByColumnList([
+                        'name' => $divisionName,
+                        'sport_id' => $sport->getId()
+                    ]);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $division = $this->divisionMapper->createModel()
+                        ->setName($divisionName)
+                        ->setSeason($season)
+                        ->setSport($sport);
+
+                    $this->divisionMapper->save($division);
+                }
+
+                $lookup[$sportName]['divisions'][$divisionName] = $division;
+            } else {
+                $division = $lookup[$sportName]['divisions'][$divisionName];
+            }
         }
     }
 }
+
