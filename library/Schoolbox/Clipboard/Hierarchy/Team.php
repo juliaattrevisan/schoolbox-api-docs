@@ -68,6 +68,10 @@ class Team implements IStrategy
      */
     public function import(): void
     {
+        /* Set up a local cache for (sport, division, team) tuples
+         */
+        $lookup = [];
+
         $teams = $this->api->retrieve('GET', 'teams', []);
 
         foreach ($teams['data'] as $team) {
@@ -89,6 +93,7 @@ class Team implements IStrategy
 
             /* TODO: Spawn a Sport if it doesn't exist
              *  or reuse an existing one if it existed
+             */
 
             /* TODO: Spawn a Division if it doesn't exist
              *  or reuse an existing one if it existed
