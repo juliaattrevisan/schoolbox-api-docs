@@ -3161,11 +3161,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
 
 		-
-			message: "#^Variable \\$box in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkNotifier.php
-
-		-
 			message: "#^Variable \\$submissionMapper in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SingleFile/Mapper.php
@@ -5964,36 +5959,6 @@ parameters:
 			message: "#^Left side of && is always true\\.$#"
 			count: 4
 			path: library/Schoolbox/Learning/Assessment/Dehydrator.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:assertAcceptSubmission\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getSimilarityCheckEnabled\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseRubric\\(\\)\\.$#"
-			count: 3
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:isAcceptNone\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:isSelfAssessable\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setRubricGrid\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
 
 		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"

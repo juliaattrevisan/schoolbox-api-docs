@@ -1123,7 +1123,11 @@ class Controller extends Assessment\Controller
                 // TODO do we want to allow students self reflecting to undo their feedback?
                 // The only way this could happen is if they gave themselves feedback in a draft, then came back and deleted the draft feedback completely and submitted
                 $isNewFeedback = $feedback->getId() === null;
-                if (!$hasRubric && !$isNewFeedback && $feedback->isEmpty()) {
+                if (
+                    !$hasRubric
+                    && !$isNewFeedback
+                    && $feedback->isEmpty()
+                ) {
                     $this->feedbackDataSource->delete($feedback);
                 } else {
                     $this->feedbackDataSource->save($feedback);
@@ -1166,7 +1170,7 @@ class Controller extends Assessment\Controller
          */
         $detachedFunction = null;
 
-        if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+        if ($isFinal && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             /* Only one of these can be active at a time, but both universes can co-exist
              * Specifically enable turnitin if its api key was set
              */
@@ -1239,7 +1243,10 @@ class Controller extends Assessment\Controller
                  * Self-reflection's plagscan stubs saving .......happens elsewhere
                  * Similarity Check must be enabled
                  */
-                if ($isFinal && $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+                if (
+                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                    && $response->getId()
+                ) {
                     foreach ($response->getAllFiles() as $currentFile) {
                         if (!$currentFile->getEditableInline()) {
                             $plagscanMapper->saveNewPlagscanStub($currentFile);
@@ -1254,8 +1261,11 @@ class Controller extends Assessment\Controller
                     [
                         'format' => 'noContent',
                         'postOutput' => [
-                            function () use ($plagscanMapper, $isFinal, $reviewRoute, $response, $assessment) {
-                                if ($isFinal && $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+                            function () use ($plagscanMapper, $reviewRoute, $response) {
+                                if (
+                                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                                    && $response->getId()
+                                ) {
                                     foreach ($response->getAllFiles() as $currentFile) {
                                         $filename = $plagscanMapper->plagscanFilename($currentFile);
 
