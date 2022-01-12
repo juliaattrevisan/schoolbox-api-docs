@@ -20,7 +20,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
@@ -40,20 +39,26 @@ class Controller extends BaseController
     private UserAccessMapper $userAccessMapper;
     private FolderMapper $folderMapper;
     private Access $accessHelper;
-    private Timetable_ColourMapper $timetable_ColourMapper;
+    private Timetable_ColourMapper $timetableColourMapper;
     private RerouteOverrideMapper $reRouteOverrideMapper;
 
     /**
      * constructor for dependency injection
      */
-    public function __construct($groupMapper, $userAccessMapper, $folderMapper, $accessHelper, $timetable_ColourMapper, $reRouteOverrideMapper)
-    {
-        $this->groupMapper            = $groupMapper;
-        $this->userAccessMapper       = $userAccessMapper;
-        $this->folderMapper           = $folderMapper;
-        $this->accessHelper           = $accessHelper;
-        $this->timetable_ColourMapper = $timetable_ColourMapper;
-        $this->reRouteOverrideMapper  = $reRouteOverrideMapper;
+    public function __construct(
+        GroupMapper $groupMapper,
+        UserAccessMapper $userAccessMapper,
+        FolderMapper $folderMapper,
+        Access $accessHelper,
+        Timetable_ColourMapper $timetableColourMapper,
+        RerouteOverrideMapper $reRouteOverrideMapper
+    ) {
+        $this->groupMapper              = $groupMapper;
+        $this->userAccessMapper         = $userAccessMapper;
+        $this->folderMapper             = $folderMapper;
+        $this->accessHelper             = $accessHelper;
+        $this->timetableColourMapper    = $timetableColourMapper;
+        $this->reRouteOverrideMapper    = $reRouteOverrideMapper;
     }
 
     /**
@@ -68,7 +73,7 @@ class Controller extends BaseController
 
         //colours for groups with no colours
         /* Get Timetable colours to use as random colours for folders */
-        $colourList    = $this->timetable_ColourMapper->findAll();
+        $colourList    = $this->timetableColourMapper->findAll();
         $colourIndex   = 0;
         $colourFactory = new ColorFactory();
         $colourCache   = new GenericCollection(Color::class);
@@ -95,8 +100,15 @@ class Controller extends BaseController
 
         // build output array
         $possibleGroups = [];
-        /* @var UserAccess|Group $group */
         foreach ($folders as $folder) {
+            /**
+             * some folders/groups may be broken
+             * (sales data folder 62, is apparently a group, but does not have a db entry in userGroups, and has no 'access' set
+             * so lets check if the group object / settings exist and if not ignore that folder
+             */
+            if (null === $folder->getGroup()) {
+                continue;
+            }
             /**
              * default favourite to false, as the use is not a member of the group
              * then confirm with the $userPerms array to see if the user has that group as a favourite
@@ -399,7 +411,15 @@ class Controller extends BaseController
         // following
         foreach ($folders as $folder) {
             $grp    = $folder->getGroup();
-            $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
+            /**
+             * some folders/groups may be broken
+             * (sales data folder 62, is apparently a group, but does not have a db entry in userGroups, and has no 'access' set
+             * so lets check if the group object / settings exist and if not ignore that folder
+             */
+            $forced = false;
+            if (null !== $grp) {
+                $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
+            }
 
             $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
 
