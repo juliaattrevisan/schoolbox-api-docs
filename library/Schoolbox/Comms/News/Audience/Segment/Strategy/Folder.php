@@ -278,7 +278,12 @@ class Folder extends SimpleStrategy
             // No users have special relationships to no folder
             return false;
         }
-        // Note we don't care about teacher/parent modifier. The user must still have READ perm to the page
+        if ($modifier !== Audience\Model::RELATIONSHIP_SELF) {
+            // If this is segment is for parents or teachers:
+            // it is not intended for the current user.
+            return false;
+        }
+        // The user must still have READ perm to the page
         return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
     }
 
@@ -306,8 +311,7 @@ class Folder extends SimpleStrategy
         try {
             // Other users can moderate if folder exists, and user has WRITE+ perm
             return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
-        } /** @noinspection BadExceptionsProcessingInspection */
-        catch (Mapper\Exception\Deleted | Mapper\Exception\NotFound $e) {
+        } catch (Mapper\Exception\Deleted | Mapper\Exception\NotFound $e) {
             // If deleted or not found, then cannot be moderated
             return false;
         }
@@ -451,8 +455,7 @@ class Folder extends SimpleStrategy
             $folder = (new FolderModel())->setId((int)$folderId);
             try {
                 $nnianFolder = $nnian->findNearestNonInheritingAncestralNode($folder);
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Mapper\Exception\Deleted $e) {
+            } catch (Mapper\Exception\Deleted $e) {
                 // Ignore deleted folders
                 continue;
             }
