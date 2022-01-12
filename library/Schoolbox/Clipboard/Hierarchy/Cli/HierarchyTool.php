@@ -69,6 +69,8 @@ HELP;
             return;
         }
 
+        /* TODO Wrap in transaction
+         */
         foreach ($composites as $composite) {
             $composite->import();
         }
