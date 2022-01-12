@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDOStatement;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -60,10 +61,14 @@ class Mapper extends BaseMapper
         $this->uses('years', self::TYPE_STRING, null, 'yearsCsv');
         $this->uses('houses', self::TYPE_STRING, null, 'housesCsv');
         $this->uses('campuses', self::TYPE_STRING, null, 'campusesCsv');
+        $this->uses('actions', self::TYPE_STRING, null, 'actionsCsv');
 
         // Are students with no year or house included?
         $this->uses('include_students_without_year', self::TYPE_BOOLEAN);
         $this->uses('include_students_without_house', self::TYPE_BOOLEAN);
+
+        $this->uses('include_records_without_action', self::TYPE_BOOLEAN);
+        $this->uses('include_uncompleted_actions_only', self::TYPE_BOOLEAN);
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -179,7 +184,9 @@ class Mapper extends BaseMapper
             $model->setGroups($this->getCollection(PastoralGroupMapper::getInstance(), $row['groups']));
             $model->setHouses($this->getCollection(\HouseMapper::getInstance(), $row['houses']));
             $model->setCampuses($this->getCollection(CampusMapper::getInstance(), $row['campuses']));
-
+            if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $model->setActions($this->getCollection(\Schoolbox\Pastoral\Action\Mapper::getInstance(), $row['actions']));
+            }
             $collection->add($model);
         }
 

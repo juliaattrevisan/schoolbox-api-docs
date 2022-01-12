@@ -3,7 +3,7 @@
 <ul class="breadcrumb hide-on-print">
     <li><a href="{{ routeLookup('pastoral.getIndex') }}">{{ locale.pastoralCare.proper }}</a></li>
     <li><a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Reports</a></li>
-    <li class="active"><a href="#">{{ report.name }}</a></li>
+    <li class="active"><span>{{ report.name }}</span></li>
 </ul>
 
 <div class="row actions-small-1">
@@ -66,6 +66,12 @@
                                             {{ access.group.name }}{% if not loop.last %},{% endif %}
                                         {% endif %}
                                     {% endfor %}
+
+                                    {# Pastoral action #}
+                                    {% if config.pastoral_action_enable and record.uncompletedActionCount > 0 %}
+                                        | {% set count = record.uncompletedActionCount %}
+                                        {{ count }} follow up action{{ count == 1 ? '' : 's' }} remaining
+                                    {% endif %}
                                 </p>
                             </div>
 

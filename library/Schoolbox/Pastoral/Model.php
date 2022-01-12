@@ -203,6 +203,15 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
+     * Returns uncompleted action count
+     * @return int
+     */
+    public function getUncompletedActionCount(): int
+    {
+        return $this->getRecordActions()->filterBy('completed', 0)->count();
+    }
+
+    /**
      * @param string|null $bodyPrivate
      *
      * @return self
@@ -373,7 +382,7 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return PastoralType
+     * @return null|PastoralType
      */
     public function getType()
     {
