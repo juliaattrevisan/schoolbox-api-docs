@@ -65,6 +65,12 @@ class Team implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Team\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Mapper $teamMapper;
+
+
+    /**
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param IApi            $api
@@ -82,6 +88,7 @@ class Team implements IStrategy
         $this->seasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
         $this->sportMapper = \Schoolbox\Fixtures\Sport\Mapper::getInstance();
         $this->divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $this->teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
     }
 
 
@@ -102,9 +109,10 @@ class Team implements IStrategy
         $teams = $this->api->retrieve('GET', 'teams', []);
 
         foreach ($teams['data'] as $team) {
+            $teamActivity = $team['activity']['name'] ?? '';
             $teamCategory = $team['category']['name'] ?? '';
             $teamSubcategory = $team['subcategory']['name'] ?? '';
-            $teamActivity = $team['activity']['name'] ?? '';
+            $teamName = $team['name'];
 
             /* Try to manufacture a division title
              */
@@ -157,10 +165,44 @@ class Team implements IStrategy
                     $this->divisionMapper->save($division);
                 }
 
-                $lookup[$sportName]['divisions'][$divisionName] = $division;
+                $lookup[$sportName]['divisions'][$divisionName] = [
+                    'instance' => $division,
+                    'teams' => []
+                ];
             } else {
-                $division = $lookup[$sportName]['divisions'][$divisionName];
+                $division = $lookup[$sportName]['divisions'][$divisionName]['instance'];
             }
+
+            /* Try to spawn a corresponding Team instance
+             */
+            if (!isset($lookup[$sportName]['divisions'][$divisionName]['teams'][$teamName])) {
+                try {
+                    $team = $this->teamMapper->findOneByColumnList([
+                        'name' => $teamName,
+                        'division_id' => $division->getId()
+                    ]);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $team = $this->teamMapper->createModel()
+                        ->setName($teamName)
+                        ->setDivision($division);
+
+                    $this->teamMapper->save($team);
+                }
+
+                $lookup[$sportName]['divisions'][$divisionName]['teams'][$teamName]['instance'] = $team;
+            } else {
+                $team = $lookup[$sportName]['divisions'][$divisionName]['teams'][$teamName]['instance'];
+            }
+
+            $this->log->debug(sprintf(
+                'Sport: %s %s, Division: %s %s, Team: %s %s',
+                $sport->getId(),
+                $sport->getName(),
+                $division->getId(),
+                $division->getName(),
+                $team->getId(),
+                $team->getName()
+            ));
         }
     }
 }
