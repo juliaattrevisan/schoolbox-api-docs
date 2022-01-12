@@ -60,9 +60,6 @@ class Controller extends Base
     /** @var ReturnedWorkMapper */
     private $returnedWorkMapper;
 
-    /** @var Plagscan\Mapper */
-    private $plagscanMapper;
-
     /**
      * Controller constructor.
      *
@@ -73,7 +70,6 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param RubricDataSource      $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
-     * @param Plagscan\Mapper       $plagscanMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -82,8 +78,7 @@ class Controller extends Base
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
         RubricDataSource $rubricMapper,
-        ReturnedWorkMapper $returnedWorkMapper,
-        Plagscan\Mapper $plagscanMapper
+        ReturnedWorkMapper $returnedWorkMapper
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -92,7 +87,6 @@ class Controller extends Base
         $this->userMapper            = $userMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->returnedWorkMapper    = $returnedWorkMapper;
-        $this->plagscanMapper        = $plagscanMapper;
     }
 
     /**
