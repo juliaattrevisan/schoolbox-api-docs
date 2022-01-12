@@ -87,7 +87,10 @@ class Team implements IStrategy
                 $divisionName
             ));
 
-            /* TODO: Spawn a division if it doesn't exist
+            /* TODO: Spawn a Sport if it doesn't exist
+             *  or reuse an existing one if it existed
+
+            /* TODO: Spawn a Division if it doesn't exist
              *  or reuse an existing one if it existed
              */
         }

@@ -35,7 +35,7 @@ class Division
          *  because the api docs suggest both category and subcategory are optional
          */
         if ('' === $category && '' === $subcategory) {
-            return $activity;
+            return "{$activity} Division";
         }
 
         /* Optional Category; use Subcategory alone
