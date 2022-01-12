@@ -250,9 +250,7 @@ class PastoralCest
         $student_jreed = $i->grabUser('jreed');
         $heading = 'Automated Test Pastoral Record visibility Role Teacher General and Parent Deny ' . time();
         $teacher_role    = $i->grabRoleByTitle('Teacher');
-        var_dump($teacher_role->getId());
         $parent_role = $i->grabRoleByTitle('Parent');
-        var_dump($parent_role->getId());
 
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
@@ -440,8 +438,13 @@ class PastoralCest
     public function addPastoralType(IntegrationTester $i): void
     {
 
-        #GIVEN a new pastoral type is created
+        #GIVEN new pastoral types are created
         $name = 'Automated Pastoral Type ' . time();
+        $id = $i->grabNumRecords('lu_pastoral_type');
+        $createPastoralType = new Payload\Admin\Lists\PastoralTypes($name, $id);
+        $i->sendRequest($createPastoralType);
+        $i->seeResponseCodeIs(200);
+        $name = 'Automated Pastoral Type 2' . time();
         $id = $i->grabNumRecords('lu_pastoral_type');
         $createPastoralType = new Payload\Admin\Lists\PastoralTypes($name, $id);
         $i->sendRequest($createPastoralType);
@@ -472,9 +475,14 @@ class PastoralCest
     public function addPastoralSubType(IntegrationTester $i): void
     {
 
-        #GIVEN a new pastoral type is created
+        #GIVEN some new pastoral type are created
         $pastoralType = 4;
         $subTypeName = 'Automated Pastoral Bullying Sub Type ' . time();
+        $id = $i->grabNumRecords('lu_pastoral_subtype');
+        $createPastoralSubType = new Payload\Admin\Lists\PastoralSubType($pastoralType, $subTypeName, $id);
+        $i->sendRequest($createPastoralSubType);
+        $i->seeResponseCodeIs(200);
+        $subTypeName = 'Automated Pastoral Bullying Sub Type 2' . time();
         $id = $i->grabNumRecords('lu_pastoral_subtype');
         $createPastoralSubType = new Payload\Admin\Lists\PastoralSubType($pastoralType, $subTypeName, $id);
         $i->sendRequest($createPastoralSubType);
@@ -482,7 +490,7 @@ class PastoralCest
 
         #WHEN sending a request to create a new pastoral record with the new pastoral type
         $student_jreed = $i->grabUser('jreed');
-        $heading = 'Automated Test Pastoral Record Pastoral Sub Type ' . time();
+        $heading = 'Automated Test Pastoral Record Pastoral Sub Type 2' . time();
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
         $createPastoral->setPastoralType($pastoralType);
@@ -505,7 +513,7 @@ class PastoralCest
     public function addPastoralActions(IntegrationTester $i): void
     {
 
-        #GIVEN a new pastoral type is created
+        #GIVEN a news pastoral action is created
         $i->updateInDatabase('config', array('value' => '1'), array('name' => 'pastoral_action_enable'));
         $pastoralName = 'Automated Pastoral Action' . time();
         $id = $i->grabNumRecords('lu_pastoral_action');
@@ -517,12 +525,23 @@ class PastoralCest
         #THEN the pastoral action is added
         $i->seeResponseCodeIs(200);
 
+        #GIVEN another pastoral action is created
+        $pastoralName = 'Automated Pastoral Action' . time();
+        $id = $i->grabNumRecords('lu_pastoral_action');
+        $createPastoraAction = new Payload\Admin\Lists\PastoralActions($pastoralName, $id);
+
+        #WHEN the pastoral action request is sent
+        $i->sendRequest($createPastoraAction);
+
+        #THEN the pastoral action is added
+        $i->seeResponseCodeIs(200);
+
         #WHEN sending a request to create a new pastoral record with the pastoral action
-        $i->haveInDatabase('pastoral_type_action', array('type_id' => 2, 'subtype_id' => null,'action_id' => 6));
+        $i->haveInDatabase('pastoral_type_action', array('type_id' => 2, 'subtype_id' => null,'action_id' => $id));
         $student_jreed = $i->grabUser('jreed');
         $heading = 'Automated Test Pastoral Record with a Pastoral Action ' . time();
         $pastoralType = 2;
-        $pastoralAction = 6;
+        $pastoralAction = $id;
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
         $createPastoral->setPastoralType($pastoralType);
