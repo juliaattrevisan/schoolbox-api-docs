@@ -50,7 +50,7 @@ class Model implements ISoftDeletable, Sequential
     private ?string $icon = null;
 
 
-    /** @var DocumentClassification */
+    /** @var DocumentClassification|null */
     protected $documentClassification;
 
     /** @var string */
@@ -88,7 +88,7 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return DocumentClassification
+     * @return DocumentClassification|null
      */
     public function getDocumentClassification()
     {
