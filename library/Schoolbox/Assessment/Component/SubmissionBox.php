@@ -40,7 +40,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public const MARK_VISIBILITY_STAFF_STUDENT_PARENT = 2;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $id;
 
@@ -334,7 +334,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param  int $id
+     * @param  int|null $id
      * @return $this
      */
     public function setId($id)
@@ -344,7 +344,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {

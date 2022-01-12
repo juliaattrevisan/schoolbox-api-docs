@@ -3146,11 +3146,6 @@ parameters:
 			path: library/Schoolbox/Application/WebRequest/Kernel.php
 
 		-
-			message: "#^Property Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\ReturnedWorkMapper\\:\\:getSubmissionBoxMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBoxMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
