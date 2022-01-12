@@ -1175,7 +1175,7 @@ class FixturesCest
 
         $i->sendRequest($createMatch);
 
-        $matchMapper = \Schoolbox\Fixtures\Match\Mapper::getInstance();
+        $matchMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
         $matchModel = $matchMapper->findOneByColumn('name', $matchName);
 
         $matchName = 'AutoTest Match Update ' . $timestamp;
@@ -1253,7 +1253,7 @@ class FixturesCest
 
         $i->sendRequest($createMatch);
 
-        $matchMapper = \Schoolbox\Fixtures\Match\Mapper::getInstance();
+        $matchMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
         $matchModel = $matchMapper->findOneByColumn('name', $matchName);
 
         $deleteMatch = new Payload\Fixtures\Match\Delete($matchModel);
@@ -1328,7 +1328,7 @@ class FixturesCest
 
         $i->sendRequest($createMatch);
 
-        $matchMapper = \Schoolbox\Fixtures\Match\Mapper::getInstance();
+        $matchMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
         $matchModel = $matchMapper->findOneByColumn('name', $matchName);
 
         $createResult = new Payload\Fixtures\Match\Result\Create($matchModel, $teamModel);
@@ -1402,7 +1402,7 @@ class FixturesCest
 
         $i->sendRequest($createMatch);
 
-        $matchMapper = \Schoolbox\Fixtures\Match\Mapper::getInstance();
+        $matchMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
         $matchModel = $matchMapper->findOneByColumn('name', $matchName);
 
         $createResult = new Payload\Fixtures\Match\Result\Create($matchModel, $teamModel);
@@ -1485,7 +1485,7 @@ class FixturesCest
 
         $i->sendRequest($createMatch);
 
-        $matchMapper = \Schoolbox\Fixtures\Match\Mapper::getInstance();
+        $matchMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
         $matchModel = $matchMapper->findOneByColumn('name', $matchName);
 
         $createResult = new Payload\Fixtures\Match\Result\Create($matchModel, $teamModel);

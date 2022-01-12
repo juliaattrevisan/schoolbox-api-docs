@@ -23,7 +23,7 @@ class Update extends Request
 
         $this->setReferer('/fixtures/results/' . $this->result->getId() . '/edit');
 
-        $this->setFormParam('matchId', $this->result->getMatch()->getId());
+        $this->setFormParam('matchId', $this->result->getMatchup()->getId());
         $this->setFormParam('teamId', $this->result->getTeam()->getId());
         $this->setFormParam('resultId', $this->result->getId());
         $this->setFormParam('statusId', 1);
