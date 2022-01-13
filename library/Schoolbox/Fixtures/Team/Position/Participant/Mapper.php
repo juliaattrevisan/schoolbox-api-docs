@@ -31,7 +31,7 @@ class Mapper extends BaseMapper
         $this->hasTable('sportsfixtures_team_participantposition');
         $this->hasModel(ParticipantPosition::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('match_id', MatchupMapper::class, 'id', null, null, 'match', 'match');
+        $this->joins('match_id', MatchupMapper::class, 'id', null, null, 'matchup', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('name', self::TYPE_STRING);
