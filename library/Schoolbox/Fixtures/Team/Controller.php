@@ -10,6 +10,7 @@ namespace Schoolbox\Fixtures\Team;
 
 use Alaress\Web\Controller\Exception;
 use Aura\Di\Exception\ServiceNotFound;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -331,23 +332,65 @@ class Controller extends AbstractController
      */
     private function getJsonList(Division $context = null)
     {
-        $query = $this->getRequest()->query->get('query');
-
-        if ($context === null) {
-            $database = $this->getMapper()->getDatabase();
-            $pb       = $this->getMapper()->getPredicateBuilder();
-            $pb->like('name', "%{$database->getQuoter()->escapeForLike($query)}%");
-            $allTeams = $this->getMapper()->findByPredicates($pb);
-        } else {
-            $allTeams = $this->getMapper()->findByName($context->getId(), $query);
-        }
+        $query = trim($this->getRequest()->query->get('query'));
 
         $teams = [];
+        if ($context === null) {
+            /**
+             * searching for an arbitrary keyword match
+             * across teams / divisions / sports via a custom query
+             * will not create a Team instance
+             */
+            if ('' === $query) {
+                //empty query exit early
+                $problem = new ApiProblem('Empty Search');
+                $problem->setStatus(400);
+                $this->getResponse()->status->setCode(400);
+                return $this->getResponse()->content->set($this->buildJsonOutput($problem->asArray()));
+            }
+            $database = $this->getMapper()->getDatabase();
+            $queryLike = "%{$database->getQuoter()->escapeForLike($query)}%";
+            //build query to check all possible options Team, sport, division
+            $query = "
+            SELECT st.id as teamID, ss.name AS sport, sd.name AS division, st.name AS team
+            FROM sportsfixtures_division as sd
+            JOIN sportsfixtures_sport ss on ss.id = sd.sport_id
+            JOIN sportsfixtures_team st on sd.id = st.division_id
+            WHERE st.name like :search
+                OR ss.name like :search
+                OR sd.name like :search;
+            ";
+            $ex = $database->prepare($query);
+            $ex->execute(['search' => $queryLike]);
+            $allTeams = $ex->fetchAll();
 
-        /** @var Team $currentTeam */
-        foreach ($allTeams as $currentTeam) {
-            $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
+            //build the $teams array
+            /** @var array|Team $currentTeam */
+            foreach ($allTeams as $currentTeam) {
+                $teams[] = [
+                    'id' => $currentTeam['teamID'],
+                    'name' => "{$currentTeam['team']} ({$currentTeam['sport']} / {$currentTeam['division']})"
+                ];
+            }
+        } else {
+            /**
+             * Standard query for finding teams by division id
+             */
+            $allTeams = $this->getMapper()->findByName($context->getId(), $query);
+
+            //build the $teams array
+            /** @var array|Team $currentTeam */
+            foreach ($allTeams as $currentTeam) {
+                $teams[] = [
+                    'id' => $currentTeam->getId(),
+                    'name' => "{$currentTeam->getName()} ({$currentTeam->getDivision()->getSport()->getName()} / {$currentTeam->getDivision()->getName()})"
+                ];
+            }
         }
+        /**
+         * Both methods above, $teams is a multidimensional array
+         * just continue
+         */
 
         // If the 'schools' parameter is set we also want to add schools from the tag cloud
 
