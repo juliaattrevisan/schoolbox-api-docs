@@ -9,17 +9,39 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Season\Model;
-
 
 /**
  * Remember an arbitrary $data array via a string $key
  *
- * This is also used as a caching mechanism to retrieve sports,
+ * This is also used as a caching mechanism to retrieve seasons, sports,
  * divisions and teams without polling the db
+ *
+ * $lookup = [
+ *     sport name => [
+ *         instance => \Schoolbox\Fixtures\Sport\Model
+ *         divisions => [
+ *             division name => [
+ *                 instance => \Schoolbox\Fixtures\Division\Model
+ *                 teams => [
+ *                     team name => [
+ *                         instance => \Schoolbox\Fixtures\Team\Model
+ *                     ]
+ *                 ]
+ *             ]
+ *         ]
+ *     ]
+ * ]
  */
 class Registry
 {
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
 
     /**
      * Set up a local cache for (sport, division, team) tuples
@@ -54,17 +76,25 @@ class Registry
 
 
     /**
+     * Recall an instance of sport/division/team from schoolbox,
+     * storing it in a local cache so these imports go faster
+     *
+     * Also spawns an arbitrary Season to encompass everything we import
+     *
+     * @param LoggerInterface                     $log
      * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
      * @param \Schoolbox\Fixtures\Division\Mapper $divisionMapper
      * @param \Schoolbox\Fixtures\Team\Mapper     $teamMapper
      */
     public function __construct(
+        LoggerInterface $log,
         \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
         \Schoolbox\Fixtures\Team\Mapper $teamMapper
     ) {
+        $this->log = $log;
         $this->seasonMapper = $seasonMapper;
         $this->sportMapper = $sportMapper;
         $this->divisionMapper = $divisionMapper;
@@ -91,16 +121,30 @@ class Registry
          * all future events sent by Clipboard, including ones that broach summer
          * break and to allow future planning beyond
          */
-        $start = \Alaress_Date_Format::now()->startOfYear();
-        $end = \Alaress_Date_Format::now()->startOfYear()->addYears(2);
+        $start = \Alaress_Date_Format::now()->startOfYear()->startOfDay();
+        $end = \Alaress_Date_Format::now()->startOfYear()->startOfDay()->addYears(2);
 
         try {
             $season = $this->seasonMapper->findOneByColumn('name', $seasonName);
+
+            $this->log->debug(sprintf(
+                'Reusing existing season %s %s-%s',
+                $season->getName(),
+                $season->getStart()->getDatabase(),
+                $season->getEnd()->getDatabase()
+            ));
         } catch (\Schoolbox\Mapper\Exception $e) {
             $season = $this->seasonMapper->createModel()
                 ->setName($seasonName)
                 ->setStart($start)
                 ->setEnd($end);
+
+            $this->log->debug(sprintf(
+                'Creating new season %s %s-%s',
+                $season->getName(),
+                $season->getStart()->getDatabase(),
+                $season->getEnd()->getDatabase()
+            ));
 
             $this->seasonMapper->save($season);
         }
@@ -124,9 +168,19 @@ class Registry
         if (!isset($this->lookup[$sportName])) {
             try {
                 $sport = $this->sportMapper->findOneByColumn('name', $sportName);
+
+                $this->log->debug(sprintf(
+                    'Reusing existing sport %s',
+                    $sport->getName()
+                ));
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $sport = $this->sportMapper->createModel()
                     ->setName($sportName);
+
+                $this->log->debug(sprintf(
+                    'Creating new sport %s',
+                    $sport->getName()
+                ));
 
                 $this->sportMapper->save($sport);
             }
@@ -166,11 +220,23 @@ class Registry
                     'name' => $divisionName,
                     'sport_id' => $sport->getId()
                 ]);
+
+                $this->log->debug(sprintf(
+                    'Reusing existing division %s in sport %s',
+                    $division->getName(),
+                    $sport->getName()
+                ));
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $division = $this->divisionMapper->createModel()
                     ->setName($divisionName)
                     ->setSeason($season)
                     ->setSport($sport);
+
+                $this->log->debug(sprintf(
+                    'Creating new division %s in sport %s',
+                    $division->getName(),
+                    $sport->getName()
+                ));
 
                 $this->divisionMapper->save($division);
             }
@@ -210,10 +276,22 @@ class Registry
                     'name' => $teamName,
                     'division_id' => $division->getId()
                 ]);
+
+                $this->log->debug(sprintf(
+                    'Reusing existing team %s in division %s',
+                    $team->getName(),
+                    $division->getName()
+                ));
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $team = $this->teamMapper->createModel()
                     ->setName($teamName)
                     ->setDivision($division);
+
+                $this->log->debug(sprintf(
+                    'Creating new team %s in division %s',
+                    $team->getName(),
+                    $division->getName()
+                ));
 
                 $this->teamMapper->save($team);
             }

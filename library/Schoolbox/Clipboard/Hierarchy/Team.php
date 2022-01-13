@@ -107,6 +107,7 @@ class Team implements IStrategy
         /* Set up a local cache for (sport, division, team) tuples
          */
         $registry = new Registry(
+            $this->log,
             $this->seasonMapper,
             $this->sportMapper,
             $this->divisionMapper,
@@ -121,7 +122,14 @@ class Team implements IStrategy
         /* Consume data from Clipboard endpoint - each team comes with info about
          * its own hierarchy so map them to schoolbox conepts as best we can
          */
-        $teams = $this->api->retrieve('GET', 'teams', []);
+        $endpoint = 'teams';
+
+        $this->log->info(sprintf(
+            'Downloading data from endpoint: %s (this might take a while)',
+            $endpoint
+        ));
+
+        $teams = $this->api->retrieve('GET', $endpoint, []);
 
         foreach ($teams['data'] as $team) {
             $teamActivity = $team['activity']['name'] ?? '';
@@ -153,14 +161,14 @@ class Team implements IStrategy
              */
             $team = $registry->recallTeam($sport, $division, $teamName);
 
-            $this->log->debug(sprintf(
-                'Sport: %s %s, Division: %s %s, Team: %s %s',
-                $sport->getId(),
+            $this->log->info(sprintf(
+                'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
                 $sport->getName(),
-                $division->getId(),
+                $sport->getId(),
                 $division->getName(),
-                $team->getId(),
-                $team->getName()
+                $division->getId(),
+                $team->getName(),
+                $team->getId()
             ));
         }
     }
