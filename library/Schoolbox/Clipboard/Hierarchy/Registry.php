@@ -139,7 +139,9 @@ class Registry
              * deleted from clipboard when this import ran,
              * but reappeared again before this orphaned data was completely removed
              */
-            $season = $e->getDeletedObject()->setDeletedAt(null);
+            /** @var \Schoolbox\Fixtures\Season\Model $season */
+            $season = $e->getDeletedObject();
+            $season ->setDeletedAt(null);
 
             $this->log->debug(sprintf(
                 'Resurrecting previously-deleted season %s',
@@ -198,7 +200,9 @@ class Registry
                  * deleted from clipboard when this import ran,
                  * but reappeared again before this orphaned data was completely removed
                  */
-                $sport = $e->getDeletedObject()->setDeletedAt(null);
+                /** @var \Schoolbox\Fixtures\Sport\Model $sport */
+                $sport = $e->getDeletedObject();
+                $sport->setDeletedAt(null);
 
                 $this->log->debug(sprintf(
                     'Resurrecting previously-deleted sport %s',
@@ -265,7 +269,9 @@ class Registry
                  * deleted from clipboard when this import ran,
                  * but reappeared again before this orphaned data was completely removed
                  */
-                $division = $e->getDeletedObject()->setDeletedAt(null);
+                /** @var \Schoolbox\Fixtures\Division\Model $division */
+                $division = $e->getDeletedObject();
+                $division->setDeletedAt(null);
 
                 $this->log->debug(sprintf(
                     'Resurrecting previously-deleted division %s in sport %s',
@@ -336,7 +342,9 @@ class Registry
                  * deleted from clipboard when this import ran,
                  * but reappeared again before this orphaned data was completely removed
                  */
-                $team = $e->getDeletedObject()->setDeletedAt(null);
+                /** @var \Schoolbox\Fixtures\Team\Model $team */
+                $team = $e->getDeletedObject();
+                $team->setDeletedAt(null);
 
                 $this->log->debug(sprintf(
                     'Resurrecting previously-deleted team %s in division %s',
