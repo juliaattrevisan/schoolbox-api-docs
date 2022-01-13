@@ -13,6 +13,7 @@ use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\User;
 use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\ParseException;
+use Schoolbox\Calendar\EventTypeMapper;
 
 /**
  * Class Calendar_Api_EventType_Event_Vcal_Default
@@ -24,6 +25,12 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
      * This indicates the event was cancelled
      */
     public const STATUS_CANCELLED = 'CANCELLED';
+
+
+    /**
+     * @var EventTypeMapper
+     */
+    protected $eventTypeMapper;
 
 
     /**
@@ -42,6 +49,11 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
     {
         parent::__construct($connectorId, $user, $viewer);
         $this->allLuEventTypes = (new Calendar())->getTypeList();
+
+        /* This should be injected, but it means making a vast change to the constructor here
+         * and in multiple other locations...
+         */
+        $this->eventTypeMapper = EventTypeMapper::getInstance();
     }
 
     /**
@@ -292,7 +304,11 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             }
         }
         if (empty($metaDetails)) {
-            $metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+            /* Find the first meaningful luEventType since we didn't match by name previously
+             */
+            $eventTypeId = $this->eventTypeMapper->findFirstMeaningfulId($decodedConfig->getLuEventType());
+
+            $metaDetails = $this->findLuEventType($eventTypeId);
         }
 
         $event = new Event();
