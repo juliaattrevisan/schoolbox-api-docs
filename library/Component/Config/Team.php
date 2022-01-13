@@ -27,8 +27,11 @@ class Component_Config_Team extends Component_Config_Abstract
 
         try {
             $team = $teamMapper->findById($configValue);
+            $teamName = "{$team->getName()} ({$team->getDivision()->getSport()->getName()} / {$team->getDivision()->getName()})";
         } catch (\Exception $e) {
             $team = new TeamModel();
+            //don't break when using a blank team, as the sport / division will not exist
+            $teamName = '';
         }
 
         /* Because you can have multiple textbox components displaying the
@@ -38,7 +41,7 @@ class Component_Config_Team extends Component_Config_Abstract
         $page->setVar(
             array(
                 'COMPONENT_TEAM_ID'      => $team->getId(),
-                'COMPONENT_TEAM_NAME'    => "{$team->getName()} ({$team->getDivision()->getSport()->getName()} / {$team->getDivision()->getName()})"
+                'COMPONENT_TEAM_NAME'    => $teamName
             )
         );
     }

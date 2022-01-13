@@ -10,6 +10,7 @@ namespace Schoolbox\Fixtures\Team;
 
 use Alaress\Web\Controller\Exception;
 use Aura\Di\Exception\ServiceNotFound;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -331,9 +332,15 @@ class Controller extends AbstractController
      */
     private function getJsonList(Division $context = null)
     {
-        $query = $this->getRequest()->query->get('query');
+        $query = trim($this->getRequest()->query->get('query'));
 
         if ($context === null) {
+            if ('' === $query) {
+                $problem = new ApiProblem('Empty Search');
+                $problem->setStatus(400);
+                $this->getResponse()->status->setCode(400);
+                return $this->getResponse()->content->set($this->buildJsonOutput($problem->asArray()));
+            }
             $database = $this->getMapper()->getDatabase();
             $queryLike = "%{$database->getQuoter()->escapeForLike($query)}%";
             //build query to check all possible options Team, sport, division
