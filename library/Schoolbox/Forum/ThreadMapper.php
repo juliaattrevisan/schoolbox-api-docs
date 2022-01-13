@@ -70,7 +70,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface
         $this->hasMap(array(
                 'column'     => 'locked',
                 'property'   => 'locked',
-                'type'       => self::TYPE_STRING
+                'type'       => self::TYPE_BOOL_ENUM
             ));
 
         $this->hasMap(array(
