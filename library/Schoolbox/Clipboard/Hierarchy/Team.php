@@ -29,14 +29,6 @@ class Team implements IStrategy
 
 
     /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
      * @var IApi
      */
     private IApi $api;
@@ -74,16 +66,13 @@ class Team implements IStrategy
 
     /**
      * @param LoggerInterface $log
-     * @param bool            $perform
      * @param IApi            $api
      */
     public function __construct(
         LoggerInterface $log,
-        bool $perform,
         IApi $api
     ) {
         $this->log = $log;
-        $this->perform = $perform;
         $this->api = $api;
         $this->divisionCodec = new Codec\Division();
 
