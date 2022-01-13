@@ -18,7 +18,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
 
-
 /**
  * Encapsulated cli tool
  */
@@ -101,6 +100,10 @@ HELP;
         if ($acquired) {
             $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
 
+            /* Used to shank a database instance
+             */
+            $db = \Schoolbox\UserMapper::getInstance()->getDatabase();
+
             try {
                 $composites = (new Factory(
                     $this->getLogger(),
@@ -114,8 +117,10 @@ HELP;
                 return;
             }
 
-            /* TODO Wrap in transaction
+            /* Wrap in transaction so changes are atomic
              */
+            $db->beginTransaction();
+
             foreach ($composites as $composite) {
                 $composite->import();
 
@@ -127,7 +132,13 @@ HELP;
                 $lock->refresh();
             }
 
-            if (!$this->perform()) {
+            /* Only commit changes in Perform mode
+             */
+            if ($this->perform()) {
+                $db->commit();
+            } else {
+                $db->rollBack();
+
                 $this->getLogger()->info('Planning finished.');
             }
 
