@@ -75,8 +75,9 @@ class Factory
      * of the clipboard Hierarchy
      *
      * @return GenericCollection
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     public function produce(): GenericCollection
     {
@@ -101,12 +102,9 @@ class Factory
         /* Set up composite bus - everybody's xml gets on board and shuttled off
          * into schoolbox town
          */
-        $bus = new GenericCollection(IStrategy::class);
-
-        /* TODO: Add strats
-         */
-        $bus->add(new Team($this->log, $this->perform, $api));
-
-        return $bus;
+        return (new GenericCollection(IStrategy::class))
+            ->add(new Prepare($this->log))
+            ->add(new Team($this->log, $this->perform, $api))
+            ->add(new Cleanup($this->log));
     }
 }

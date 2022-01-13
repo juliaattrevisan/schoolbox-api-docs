@@ -112,7 +112,7 @@ class Team implements IStrategy
             $this->sportMapper,
             $this->divisionMapper,
             $this->teamMapper
-        );;
+        );
 
         /* I guess have an ultralong season to basically remove it from typical usage
          * This season basically encompasses everything so we only need to spawn it once
@@ -120,7 +120,7 @@ class Team implements IStrategy
         $season = $registry->recallSeason();
 
         /* Consume data from Clipboard endpoint - each team comes with info about
-         * its own hierarchy so map them to schoolbox conepts as best we can
+         * its own hierarchy so map them to schoolbox concepts as best we can
          */
         $endpoint = 'teams';
 

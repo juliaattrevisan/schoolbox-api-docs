@@ -125,7 +125,11 @@ class Registry
         $end = \Alaress_Date_Format::now()->startOfYear()->startOfDay()->addYears(2);
 
         try {
-            $season = $this->seasonMapper->findOneByColumn('name', $seasonName);
+            $season = $this->seasonMapper->findOneByColumn('name', $seasonName, [
+                'deleted' => true
+            ])->setDeletedAt(null);
+
+            $this->seasonMapper->save($season);
 
             $this->log->debug(sprintf(
                 'Reusing existing season %s %s-%s',
@@ -167,7 +171,16 @@ class Registry
     {
         if (!isset($this->lookup[$sportName])) {
             try {
-                $sport = $this->sportMapper->findOneByColumn('name', $sportName);
+                /* Resurrect it from a previously soft-deleted state
+                 * if it was previously imported from clipboard,
+                 * deleted from clipboard when this import ran,
+                 * but reappeared again before this orphaned data was completely removed
+                 */
+                $sport = $this->sportMapper->findOneByColumn('name', $sportName, [
+                    'deleted' => true
+                ])->setDeletedAt(null);
+
+                $this->sportMapper->save($sport);
 
                 $this->log->debug(sprintf(
                     'Reusing existing sport %s',
@@ -215,18 +228,29 @@ class Registry
         string $divisionName
     ): \Schoolbox\Fixtures\Division\Model {
         if (!isset($this->lookup[$sport->getName()]['divisions'][$divisionName])) {
-            try {
-                $division = $this->divisionMapper->findOneByColumnList([
-                    'name' => $divisionName,
-                    'sport_id' => $sport->getId()
-                ]);
+            $division = $this->divisionMapper->findByColumnList([
+                'name' => $divisionName,
+                'sport_id' => $sport->getId()
+            ], [
+                'deleted' => true
+            ])->first();
+
+            if (null !== $division) {
+                /* Resurrect it from a previously soft-deleted state
+                 * if it was previously imported from clipboard,
+                 * deleted from clipboard when this import ran,
+                 * but reappeared again before this orphaned data was completely removed
+                 */
+                $division->setDeletedAt(null);
+
+                $this->divisionMapper->save($division);
 
                 $this->log->debug(sprintf(
                     'Reusing existing division %s in sport %s',
                     $division->getName(),
                     $sport->getName()
                 ));
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } else {
                 $division = $this->divisionMapper->createModel()
                     ->setName($divisionName)
                     ->setSeason($season)
@@ -271,18 +295,29 @@ class Registry
         string $teamName
     ): \Schoolbox\Fixtures\Team\Model {
         if (!isset($this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamName])) {
-            try {
-                $team = $this->teamMapper->findOneByColumnList([
-                    'name' => $teamName,
-                    'division_id' => $division->getId()
-                ]);
+            $team = $this->teamMapper->findByColumnList([
+                'name' => $teamName,
+                'division_id' => $division->getId()
+            ], [
+                'deleted' => true
+            ])->first();
+
+            if (null !== $team) {
+                /* Resurrect it from a previously soft-deleted state
+                 * if it was previously imported from clipboard,
+                 * deleted from clipboard when this import ran,
+                 * but reappeared again before this orphaned data was completely removed
+                 */
+                $team->setDeletedAt(null);
+
+                $this->teamMapper->save($team);
 
                 $this->log->debug(sprintf(
                     'Reusing existing team %s in division %s',
                     $team->getName(),
                     $division->getName()
                 ));
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } else {
                 $team = $this->teamMapper->createModel()
                     ->setName($teamName)
                     ->setDivision($division);
