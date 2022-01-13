@@ -65,6 +65,7 @@ class Base implements OutputInterface
      */
     public function preprocessOutput()
     {
+        $this->response->headers->add('X-Puppet-Cert-Name', getenv('puppet_cert_name'));
     }
 
     /**
