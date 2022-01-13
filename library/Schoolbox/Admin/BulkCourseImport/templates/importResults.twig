@@ -1,0 +1,58 @@
+{#
+array allBreadcrumbs
+array results
+bool  perform
+#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="row">
+            <div class="small-12 island">
+                <h1>Import Courses</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="large-12 columns">
+                {% if not perform %}
+                    <div data-alert="" class="alert-box warning">
+                        This is a preview only. Repeat with 'Apply Changes' enabled to persist changes.
+                    </div>
+                {% else %}
+                    <div data-alert="" class="alert-box success">
+                        The import was successfully completed.
+                    </div>
+                {% endif %}
+            </div>
+            <div class="large-12 columns">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Unit Spec</th>
+                        <th>Folder</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for result in results %}
+                        <tr>
+                            <td>
+                                <a href="/homepage/{{ result.specification.folder.id }}">{{ result.specification.title }}</a>
+                            </td>
+                            <td>
+                                <a href="/homepage/{{ result.folder.id }}">{{ result.folder.name }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ routeLookupIfAuthorized('adminBulkCourseImport.getIndex') }}" class="button icon-previous">Return
+                    to Bulk Course Import</a>
+            </div>
+        </div>
+    </div>
+</div>

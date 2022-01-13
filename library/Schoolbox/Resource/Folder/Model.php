@@ -541,7 +541,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
 
     /**
-     * @return CourseSpecification
+     * @return CourseSpecification|null
      */
     public function getCourseSpecification()
     {
@@ -577,7 +577,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return UnitSpecification
+     * @return UnitSpecification|null
      */
     public function getUnitSpecification()
     {

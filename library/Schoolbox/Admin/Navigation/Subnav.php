@@ -348,6 +348,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
+                    '/adminv2/bulkCourseImport'                => [
+                        'name'        => 'Bulk Course Import',
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'children'    => [],
+                        'description' => '',
+                    ],
                     '/adminv2/rollover'                      => [
                         'name'        => 'Class Rollover',
                         'visible'     => true,
