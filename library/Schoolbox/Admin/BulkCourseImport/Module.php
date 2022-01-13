@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -82,8 +83,8 @@ class Module extends BaseModule
             'importFactory'              => $injector->lazyNew(
                 ImportFactory::class,
                 [
-                    'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                    'replicator'            => $injector->lazyNew(
+                    'assessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
+                    'replicator'                      => $injector->lazyNew(
                         Replicator::class,
                         [
                             'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
@@ -91,6 +92,11 @@ class Module extends BaseModule
                             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
                         ]
                     ),
+                    'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                    'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
+                    'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(\Component_InstanceMapper::class),
+                    'componentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(\Component_ConfigDefinitionMapper::class),
+                    'componentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(\Component_ConfigMapper::class),
                 ]
             ),
             'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),

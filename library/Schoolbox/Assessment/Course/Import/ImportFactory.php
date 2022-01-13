@@ -31,7 +31,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementa
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -63,8 +62,6 @@ class ImportFactory
 
     private CourseImplementationMapper $courseImplementationMapper;
 
-    private UnitSpecificationMapper $unitSpecificationMapper;
-
     private UnitImplementationMapper $unitImplementationMapper;
 
     private \Component_InstanceMapper $componentInstanceMapper;
@@ -80,7 +77,6 @@ class ImportFactory
         MapperProxy $assessmentMapperProxy,
         Replicator $replicator,
         CourseImplementationMapper $courseImplementationMapper,
-        UnitSpecificationMapper $unitSpecificationMapper,
         UnitImplementationMapper $unitImplementationMapper,
         \Component_InstanceMapper $componentInstanceMapper,
         \Component_ConfigDefinitionMapper $componentConfigDefinitionMapper,
@@ -90,7 +86,6 @@ class ImportFactory
         $this->replicator                      = $replicator;
         $this->courseImplementationMapper      = $courseImplementationMapper;
         $this->unitImplementationMapper        = $unitImplementationMapper;
-        $this->unitSpecificationMapper         = $unitSpecificationMapper;
         $this->componentInstanceMapper         = $componentInstanceMapper;
         $this->componentConfigDefinitionMapper = $componentConfigDefinitionMapper;
         $this->componentConfigInstanceMapper   = $componentConfigInstanceMapper;

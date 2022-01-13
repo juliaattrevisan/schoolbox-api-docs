@@ -106,11 +106,10 @@ class Module extends \Alaress\Module\Module
                         'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
                     ]),
                     'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                    'unitSpecificationMapper'         => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
                     'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
                     'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
                     'componentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(Component_ConfigDefinitionMapper::class),
-                    'componentConfigInstanceMapper'   => $this->getMapperFactory()->get(Component_ConfigMapper::class),
+                    'componentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
                 ]),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
             ])

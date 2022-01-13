@@ -98,7 +98,7 @@ class Controller extends Base
     }
 
     /**
-     * Create folders and render results
+     * Import courses and render results
      *
      * @throws MapperException
      * @throws RouteNotFound
