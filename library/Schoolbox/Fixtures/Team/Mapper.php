@@ -44,7 +44,6 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-//        $this->joins('division_id.sport_id', Sport\Mapper::class, 'id', null, null, 'sport', 'sport');
         $this->joinsVia(
             'sportsfixtures_team_coach',
             Coach\Mapper::class,

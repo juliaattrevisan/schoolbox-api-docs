@@ -334,8 +334,15 @@ class Controller extends AbstractController
     {
         $query = trim($this->getRequest()->query->get('query'));
 
+        $teams = [];
         if ($context === null) {
+            /**
+             * searching for an arbitrary keyword match
+             * across teams / divisions / sports via a custom query
+             * will not create a Team instance
+             */
             if ('' === $query) {
+                //empty query exit early
                 $problem = new ApiProblem('Empty Search');
                 $problem->setStatus(400);
                 $this->getResponse()->status->setCode(400);
@@ -356,26 +363,34 @@ class Controller extends AbstractController
             $ex = $database->prepare($query);
             $ex->execute(['search' => $queryLike]);
             $allTeams = $ex->fetchAll();
-        } else {
-            $allTeams = $this->getMapper()->findByName($context->getId(), $query);
-        }
 
-        $teams = [];
-
-        /** @var array|Team $currentTeam */
-        foreach ($allTeams as $currentTeam) {
-            if (null === $context) {
+            //build the $teams array
+            /** @var array|Team $currentTeam */
+            foreach ($allTeams as $currentTeam) {
                 $teams[] = [
                     'id' => $currentTeam['teamID'],
                     'name' => "{$currentTeam['team']} ({$currentTeam['sport']} / {$currentTeam['division']})"
                 ];
-                continue;
             }
-            $teams[] = [
-                'id' => $currentTeam->getId(),
-                'name' => "{$currentTeam->getName()} ({$currentTeam->getDivision()->getSport()->getName()} / {$currentTeam->getDivision()->getName()})"
-            ];
+        } else {
+            /**
+             * Standard query for finding teams by division id
+             */
+            $allTeams = $this->getMapper()->findByName($context->getId(), $query);
+
+            //build the $teams array
+            /** @var array|Team $currentTeam */
+            foreach ($allTeams as $currentTeam) {
+                $teams[] = [
+                    'id' => $currentTeam->getId(),
+                    'name' => "{$currentTeam->getName()} ({$currentTeam->getDivision()->getSport()->getName()} / {$currentTeam->getDivision()->getName()})"
+                ];
+            }
         }
+        /**
+         * Both methods above, $teams is a multidimensional array
+         * just continue
+         */
 
         // If the 'schools' parameter is set we also want to add schools from the tag cloud
 
