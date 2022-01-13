@@ -7,6 +7,10 @@
         // The component instance ID
         componentInstanceId: null,
 
+        // The component title bar:
+        // update this with the selected LTI content's title
+        $componentTitle: $(),
+
         // The toaster
         $toast: $(),
 
@@ -16,7 +20,20 @@
         // The preloader: displays when waiting for something to happen
         $ltiSelectPreloader: $(),
 
-        // The LTI iframe
+        // The LTI link:
+        // if the selected provider launches in a window, show this instead of
+        // the iframe when content is selected.
+        $ltiLink: $(),
+
+        // Text to display in the LTI link before content is selected
+        linkTextBeforeContentSelected: 'Select content to embed',
+
+        // Text to display in the LTI link after content is selected
+        linkTextAfterContentSelected: 'Launch embedded tool',
+
+        // The LTI iframe:
+        // show the content selector in here, as well as the selected content
+        // (if the provider launches in an iframe).
         $ltiIframe: $(),
 
         // Provider ID placeholder: required when generating a URL when the LTI
@@ -68,94 +85,112 @@
     }
 
     /**
+     * Event for clicking of an LTI provider button.
+     *
+     * This event:
+     * * dynamically updates the component
+     * * launches the LTI request
+     *
+     * @param {jQuery} $button
+     */
+    LtiComponent.prototype.onClickProvider = function ($button) {
+        let self                         = this,
+            params                       = self.params,
+            providerId                   = $button.attr('data-provider'),
+            providerVersion              = $button.attr('data-provider-version'),
+            isProvider1p1                = providerVersion === '1.1',
+            isProvider1p3                = providerVersion === '1.3',
+            providerTarget               = $button.attr('data-provider-target'),
+            isProviderTargetIframe       = providerTarget === 'iframe',
+            isProviderTargetWindow       = providerTarget === 'window',
+            providerLaunchUrl            = $button.attr('data-provider-launch-url'),
+            postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
+            postComponentProviderParams  = {};
+
+        // Display toast
+        params.$toast.toastActivate({text: 'Loading LTI Provider...'});
+
+        // Display a preloader
+        params.$ltiSelectProvider.hide();
+        params.$ltiSelectPreloader.show();
+
+        // Inject the launch URL if there is one:
+        // this bypasses content selection and displays the resource link
+        // directly.
+        if (isProvider1p3 && providerLaunchUrl) {
+            postComponentProviderParams.url = providerLaunchUrl;
+        }
+
+        // Post and process the result
+        $.post(
+            postComponentProviderBaseUrl.replace(
+                params.providerIdPlaceholder,
+                providerId
+            ),
+            postComponentProviderParams
+        ).done(function (result) {
+            // Hide preloader
+            params.$ltiSelectPreloader.hide();
+
+            params.$toast.toastTimeout({text:'Component loaded'});
+
+            // Update selected provider name in component configuration settings
+            self.$element.find(':input[name="ltiprovider"]').val(providerId);
+
+            // Update heading
+            self.$element.find(':input[name="componentname"]').val(result.providerName);
+
+            // Update URL (even if it's empty)
+            self.$element.find(':input[name="url"]').val(result.url);
+
+            // Update component heading
+            params.$componentTitle.text(result.providerName);
+
+            // What kind of provider is this?
+            // 1.1: use ltiConsumer.getLaunch
+            // 1.3 with a URL: use ltiPlatformContext.getLaunchResourceLinkRequestForFolder
+            //                 (include custom parameters)
+            // 1.3 with no URL: use ltiPlatformContext.getGenerateDeepLinkingRequestForFolder
+            let launchUrl = '';
+            if (isProvider1p1) {
+                launchUrl = params.lti1p1LaunchUrl;
+            } else if (isProvider1p3) {
+                if (result.url) {
+                    launchUrl = params.lti1p3LaunchUrl;
+                } else {
+                    launchUrl = params.lti1p3DeepLinkingUrl;
+                }
+            }
+
+            // Launch LTI in the iframe/link and make it visible
+            // Add context param too
+            launchUrl = new URL(launchUrl.replace(params.providerIdPlaceholder, providerId), window.location);
+            launchUrl.searchParams.append('context', self.buildComponentContext());
+            if (isProviderTargetIframe) {
+                params.$ltiIframe.attr('src', launchUrl.toString());
+                params.$ltiIframe.show();
+            } else if (isProviderTargetWindow) {
+                params.$ltiLink.attr('href', launchUrl.toString())
+                               .text(params.linkTextBeforeContentSelected)
+                               .show();
+                params.$ltiLink.parent().show();
+
+            }
+        }).fail(function () {
+            // This shouldn't happen, but just in case something goes wrong
+            params.$ltiSelectProvider.show();
+            params.$ltiSelectPreloader.hide();
+            params.$toast.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});
+        });
+    };
+
+    /**
      * Set up the LTI component's listener.
      */
     LtiComponent.prototype.setupClickListener = function () {
         let self = this;
         self.$element.on('click.ltiComponent', '[data-provider]', function () {
-            // When a provider is clicked:
-            // we need to dynamically update the component and launch the LTI
-            // request in its iframe.
-            let $button                      = $(this),
-                params                       = self.params,
-                providerId                   = $button.attr('data-provider'),
-                providerVersion              = $button.attr('data-provider-version'),
-                isProvider1p1                = providerVersion === '1.1',
-                isProvider1p3                = providerVersion === '1.3',
-                providerLaunchUrl            = $button.attr('data-provider-launch-url'),
-                postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
-                postComponentProviderParams  = {};
-
-            // Display toast
-            params.$toast.toastActivate({text: 'Loading LTI Provider...'});
-
-            // Display a preloader
-            params.$ltiSelectProvider.hide();
-            params.$ltiSelectPreloader.show();
-
-            // Inject the launch URL if there is one:
-            // this bypasses content selection and displays the resource link
-            // directly.
-            if (isProvider1p3 && providerLaunchUrl) {
-                postComponentProviderParams.url = providerLaunchUrl;
-            }
-
-            // Post and process the result
-            $.post(
-                postComponentProviderBaseUrl.replace(
-                    params.providerIdPlaceholder,
-                    providerId
-                ),
-                postComponentProviderParams
-            ).done(function (result) {
-                // Hide preloader
-                params.$ltiSelectPreloader.hide();
-
-                params.$toast.toastTimeout({text:'Component loaded'});
-
-                // Update selected provider name in component configuration settings
-                self.$element.find(':input[name="ltiprovider"]').val(providerId);
-
-                // Update heading
-                self.$element.find(':input[name="componentname"]').val(result.providerName);
-
-                // Update URL (even if it's empty)
-                self.$element.find(':input[name="url"]').val(result.url);
-
-                // Update component heading
-                $('#component-title-' + String(params.componentInstanceId)).html(result.providerName);
-
-                // What kind of provider is this?
-                // 1.1: use ltiConsumer.getLaunch
-                // 1.3 with a URL: use ltiPlatformContext.getLaunchResourceLinkRequestForFolder
-                //                 (include custom parameters)
-                // 1.3 with no URL: use ltiPlatformContext.getGenerateDeepLinkingRequestForFolder
-                let launchUrl = '';
-                if (isProvider1p1) {
-                    launchUrl = params.lti1p1LaunchUrl;
-                } else if (isProvider1p3) {
-                    if (result.url) {
-                        launchUrl = params.lti1p3LaunchUrl;
-                    } else {
-                        launchUrl = params.lti1p3DeepLinkingUrl;
-                    }
-                }
-
-                // Launch LTI in the iframe and make it visible
-                // Add context param too
-                launchUrl = new URL(launchUrl.replace(params.providerIdPlaceholder, providerId), window.location);
-                launchUrl.searchParams.append('context', self.buildComponentContext())
-                params.$ltiIframe.attr(
-                    'src',
-                    launchUrl.toString()
-                );
-                params.$ltiIframe.show();
-            }).fail(function () {
-                // This shouldn't happen, but just in case something goes wrong
-                params.$ltiSelectProvider.show();
-                params.$ltiSelectPreloader.hide();
-                params.$toast.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});
-            });
+            self.onClickProvider($(this));
         });
     };
 
@@ -184,7 +219,8 @@
 
                     // Not a deep linking response: ignore this message
                     if (messageType === self.params.deepLinkingResponseMessageType
-                        && context === self.buildComponentContext()) {
+                        && context === self.buildComponentContext()
+                    ) {
                         // Look at the first resource link, set values based on that
                         if (resourceLink) {
                             let url = resourceLink?.url ?? tool?.launchUrl;
@@ -218,13 +254,18 @@
         let params                       = this.params,
             postComponentProviderBaseUrl = params.postComponentProviderBaseUrl,
             postComponentProviderParams  = {
-                url:    url,
-                custom: JSON.stringify(resourceLink?.custom ?? {}),
+                url:           url,
+                description:   JSON.stringify(resourceLink?.custom ?? {}),
+                componentname: resourceLink?.title,
             };
 
         // Update URL and custom fields (even if empty)
-        this.$element.find(':input[name="description"]').val(postComponentProviderParams.custom);
+        this.$element.find(':input[name="componentname"]').val(postComponentProviderParams.componentname);
+        this.$element.find(':input[name="description"]').val(postComponentProviderParams.description);
         this.$element.find(':input[name="url"]').val(url);
+
+        // Update title
+        params.$componentTitle.text(postComponentProviderParams.componentname);
 
         $.post(
             postComponentProviderBaseUrl.replace(
@@ -233,13 +274,14 @@
             ),
             postComponentProviderParams
         ).done(function () {
-            params.$ltiIframe.attr(
-                'src',
-                params.lti1p3LaunchUrl.replace(
-                    params.providerIdPlaceholder,
-                    String(providerId)
-                )
+            let launchUrl = params.lti1p3LaunchUrl.replace(
+                params.providerIdPlaceholder,
+                String(providerId)
             );
+            // TODO determine whether to update the link or iframe?
+            params.$ltiIframe.attr('src', launchUrl);
+            params.$ltiLink.attr('href', launchUrl)
+                           .text(params.linkTextAfterContentSelected);
         });
     };
 
@@ -249,13 +291,14 @@
      * @param {Number} providerId
      */
     LtiComponent.prototype.deepLinkCancel = function (providerId) {
-        this.params.$ltiIframe.attr(
-            'src',
-            this.params.lti1p3DeepLinkingUrl.replace(
-                this.params.providerIdPlaceholder,
-                String(providerId)
-            )
-        )
+        let deepLinkingUrl = this.params.lti1p3DeepLinkingUrl.replace(
+            this.params.providerIdPlaceholder,
+            String(providerId)
+        );
+        // TODO determine whether to update the link or iframe?
+        this.params.$ltiIframe.attr('src', deepLinkingUrl);
+        this.params.$ltiLink.attr('href', deepLinkingUrl)
+                            .text(this.params.linkTextBeforeContentSelected);
     };
 
     /**

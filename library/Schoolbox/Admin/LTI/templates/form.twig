@@ -128,6 +128,19 @@
             </ul>
         </div>
 
+        <div class="small-12 large-6 end columns">
+            <label for="target1p3-{{ identifier }}">
+                Target
+            </label>
+            <select data-lti-version="{{ providerLtiVersion13 }}"
+                    id="target1p3-{{ identifier }}"
+                    name="target1p3">
+                <option {% if provider is defined and provider.isTargetIframe %}selected{% endif %}
+                        value="{{ providerTargetIframe }}">Iframe</option>
+                <option {% if provider is defined and provider.isTargetWindow %}selected{% endif %}
+                        value="{{ providerTargetWindow }}">New tab/window</option>
+            </select>
+        </div>
     </fieldset>
 
     {# 1.3 read-only Schoolbox instance fields #}
@@ -280,7 +293,7 @@
                    name="secret"
                    value="{{ provider.secret ?? '' }}">
         </div>
-        <div class="small-12 columns">
+        <div class="small-12 large-6 columns">
             <label for="launch_type-{{ identifier }}">
                 LTI Request Type
             </label>
@@ -289,6 +302,19 @@
                     name="launch_type">
                 <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_BASIC' %}selected{% endif %} value="LTI_LAUNCH_TYPE_BASIC">Basic Launch</option>
                 <option {% if provider is defined and provider.launchType == 'LTI_LAUNCH_TYPE_PICKER' %}selected{% endif %} value="LTI_LAUNCH_TYPE_PICKER">Picker</option>
+            </select>
+        </div>
+        <div class="small-12 large-6 end columns">
+            <label for="target1p1-{{ identifier }}">
+                Target
+            </label>
+            <select data-lti-version="{{ providerLtiVersion11 }}"
+                    id="target1p1-{{ identifier }}"
+                    name="target1p1">
+                <option {% if provider is defined and provider.isTargetIframe %}selected{% endif %}
+                        value="{{ providerTargetIframe }}">Iframe</option>
+                <option {% if provider is defined and provider.isTargetWindow %}selected{% endif %}
+                        value="{{ providerTargetWindow }}">New tab/window</option>
             </select>
         </div>
     </fieldset>

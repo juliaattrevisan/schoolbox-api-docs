@@ -19,10 +19,25 @@
     {% autoescape 'js' %}
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
-            window.top.postMessage(
+            let openingWindow, closeCurrentWindow;
+            if (window.opener) {
+                // this link was opened in a new tab/window: close this window
+                openingWindow = window.opener;
+                closeCurrentWindow = true;
+            } else {
+                // this link was opened in an iframe: keep this window open
+                openingWindow = window.top;
+                closeCurrentWindow = false;
+            }
+
+            openingWindow.postMessage(
                 {{ payload | json_encode | raw }},
                 window.location.origin
             );
+
+            if (closeCurrentWindow) {
+                window.close();
+            }
         });
     </script>
     {% endautoescape %}

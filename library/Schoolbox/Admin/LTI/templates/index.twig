@@ -26,6 +26,8 @@
                     provider:              provider,
                     providerLtiVersion11:  providerLtiVersion11,
                     providerLtiVersion13:  providerLtiVersion13,
+                    providerTargetIframe:  providerTargetIframe,
+                    providerTargetWindow:  providerTargetWindow,
                     identifier:            loop.index0,
                     issuer:                issuer,
                     oidcAuthenticationUrl: oidcAuthenticationUrl,
@@ -50,6 +52,8 @@
     {% include '@adminLti/form.twig' with {
         providerLtiVersion11:  providerLtiVersion11,
         providerLtiVersion13:  providerLtiVersion13,
+        providerTargetIframe:  providerTargetIframe,
+        providerTargetWindow:  providerTargetWindow,
         identifier:            providers|length,
         issuer:                issuer,
         oidcAuthenticationUrl: oidcAuthenticationUrl,

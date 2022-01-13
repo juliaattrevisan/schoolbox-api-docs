@@ -1,0 +1,35 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        {# Dynamically adjust iframe height based on the amount of height available: minimum 500px #}
+        {% set iframeSrc = routeLookupIfAuthorized(
+            'learningAssessment.getLaunchAssessmentAsStudent',
+            {
+                assessment:   assessment,
+                assessmentId: assessment.id,
+                student:      student,
+                studentId:    student.id,
+            }
+        ) %}
+        {% if iframeSrc %}
+            {% autoescape 'js' %}
+                <script type="text/javascript">
+                    $(function () {
+                        // How much space is left for the iframe?
+                        let iframe        = document.getElementById('lti-iframe'),
+                            iframeRect    = iframe.getBoundingClientRect(),
+                            container     = document.getElementById('container'),
+                            containerRect = container.getBoundingClientRect(),
+                            iframeHeight  = containerRect.height - (iframeRect.top - containerRect.top);
+                        iframe.style.height = String(iframeHeight) + 'px';
+                        iframe.src          = '{{ iframeSrc }}?height=' + String(iframeHeight);
+                    });
+                </script>
+            {% endautoescape %}
+            <iframe id="lti-iframe"></iframe>
+        {% endif %}
+    </div>
+</div>

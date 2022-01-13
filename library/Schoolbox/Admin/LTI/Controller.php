@@ -83,6 +83,8 @@ class Controller extends ConfigController
                     'providers'             => $this->providerMapper->findAll(),
                     'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
                     'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
+                    'providerTargetIframe'  => Provider::TARGET_IFRAME,
+                    'providerTargetWindow'  => Provider::TARGET_WINDOW,
                     'configContext'         => $configContext,
                     'issuer'                => $baseUrl->toString(),
                     'oidcAuthenticationUrl' => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOidcAuthenticationRequest')),
@@ -144,7 +146,8 @@ class Controller extends ConfigController
             $provider->setLtiVersion($post['lti_version']);
         }
 
-        $provider->setName($post['name']);
+        // Common fields
+        $provider = $provider->setName($post['name']);
 
         // LTI 1.3 fields
         $provider = $provider
@@ -165,6 +168,9 @@ class Controller extends ConfigController
                     ? false
                     : $post->getBool('available_for_assessment', false)
             );
+        if ($provider->isLtiVersion13()) {
+            $provider = $provider->setTarget($post['target1p3']);
+        }
 
         // LTI 1.1 fields, including XML
         $provider = $provider
@@ -175,6 +181,9 @@ class Controller extends ConfigController
             ->setLaunchType($post['launch_type'])
             ->setIcon($post['icon'])
             ->setUrl($post['url']);
+        if ($provider->isLtiVersion11()) {
+            $provider = $provider->setTarget($post['target1p1']);
+        }
         if ($post['xml']) {
             try {
                 $xmlContent = @file_get_contents($post['xml']);

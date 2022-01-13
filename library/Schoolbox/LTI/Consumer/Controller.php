@@ -159,14 +159,30 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER, $provider->getId());
-        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $provider->getName());
+        $this->updateComponentValue(
+            $component,
+            LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER,
+            $provider->getId(),
+        );
+        $this->updateComponentValue(
+            $component,
+            LtiComponent::COMPONENT_CONFIG_TITLE,
+            $post[LtiComponent::COMPONENT_CONFIG_TITLE] ?? $provider->getName(),
+        );
 
-        if (isset($post['url'])) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $post['url']);
+        if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL])) {
+            $this->updateComponentValue(
+                $component,
+                LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL,
+                $post[LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL],
+            );
         }
-        if (isset($post['custom'])) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS, $post['custom']);
+        if (isset($post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS])) {
+            $this->updateComponentValue(
+                $component,
+                LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS,
+                $post[LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS],
+            );
         }
 
         $this->getResponse()->content->set([
@@ -441,7 +457,7 @@ class Controller extends Base
             'context_title'                          => $folder->getName(),
             'context_label'                          => $folder->getCodeString(),
             'launch_presentation_locale'             => 'en-US',
-            'launch_presentation_document_target'    => 'iframe',
+            'launch_presentation_document_target'    => $provider->getTarget(),
             'launch_presentation_return_url'         => $launchPresentationReturnUrl,
             'ext_content_return_types'               => $returnTypes,
             'ext_content_return_url'                 => $extContentReturnUrl,
@@ -480,20 +496,6 @@ class Controller extends Base
                         'providerId'  => $provider->getId(),
                     ]),
             ]);
-        }
-
-        // ---------------------------------------------------------------------------------------------------
-        // Learning Field custom URL mangling
-        // ---------------------------------------------------------------------------------------------------
-
-        if (strtolower($provider->getUrl()) == 'https://bc.vitalsource.com/books/book') {
-            $custom = $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_CUSTOM_PARAMETERS);
-
-            preg_match('/\/books\/([A-Z0-9]+)\//i', $custom, $matches);
-            $launch_data['custom_vbid'] = $matches[1];
-
-            preg_match('/\/pageid\/(.*)/i', $custom, $matches);
-            $launch_data['custom_book_location'] = 'pageid/' . $matches[1];
         }
 
         // ---------------------------------------------------------------------------------------------------

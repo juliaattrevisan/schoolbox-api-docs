@@ -14,6 +14,7 @@ use Component_ControllerAbstract;
 use JsonException;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
@@ -161,22 +162,22 @@ class Controller extends BaseController
         }
 
         // Build the launch request for the resource link
-        $repository     = $this->registrations->find($tool->getDeploymentId());
-        $messageBuilder = new LtiResourceLinkLaunchRequestBuilder();
-        $message        = $messageBuilder->buildLtiResourceLinkLaunchRequest(
+        $repository       = $this->registrations->find($tool->getDeploymentId());
+        $messageBuilder   = new LtiResourceLinkLaunchRequestBuilder();
+        $additionalClaims = $this->buildAdditionalClaims(
+            $folder,
+            $componentCustomClaims,
+            $this->getUser(),
+        );
+        $additionalClaims[] = $this->buildLaunchPresentationClaim($tool, $component);
+        $message            = $messageBuilder->buildLtiResourceLinkLaunchRequest(
             $resourceLink,
             $repository,
             $this->userCodec->encode($this->getUser()),
             null,
             $this->buildRoles($folder),
-            $this->buildAdditionalClaims(
-                $folder,
-                $componentCustomClaims,
-                $this->getUser(),
-            ),
+            $additionalClaims,
         );
-
-        // Custom claims for component:
 
         // Send the request
         $this->response->content->set(
@@ -217,7 +218,7 @@ class Controller extends BaseController
         $deepLinkingSettings = new DeepLinkingSettings(
             $returnUrl,
             [LtiResourceLinkInterface::TYPE,],
-            ['window', 'iframe'],
+            [$tool->getTarget(),],
             null,
             false,
             false,
@@ -351,5 +352,29 @@ class Controller extends BaseController
         }
 
         return $claims;
+    }
+
+    /**
+     * Build a launch presentation claim for the given tool within the given
+     * component.
+     *
+     * @param ToolModel                    $tool
+     * @param Component_ControllerAbstract $component
+     * @return LaunchPresentationClaim
+     */
+    private function buildLaunchPresentationClaim(
+        ToolModel $tool,
+        Component_ControllerAbstract $component
+    ): LaunchPresentationClaim {
+        return new LaunchPresentationClaim(
+            $tool->getTarget(),
+            $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
+            null,
+            sprintf(
+                '/homepage/%d#component%d',
+                $component->getInstance()->getIdentifier(),
+                $component->getInstance()->getId(),
+            ),
+        );
     }
 }

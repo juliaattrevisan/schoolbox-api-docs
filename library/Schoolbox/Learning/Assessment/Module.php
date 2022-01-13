@@ -197,7 +197,25 @@ class Module extends BaseModule
         // TODO extract to a different module:
         //      they are only here so that they can use the standard assessment preloads and permissions
 
-        // LTI assessment launch
+        // LTI assessment launch intermediaries, depending on the tool target:
+        // * iframe: open launch in an iframe
+        // * window: redirect to launch
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/lti/status",
+            'getLtiStatusLaunch',
+            $canViewStatus,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/$studentParam/lti/submit",
+            'getLtiCreateResponseLaunch',
+            $canSubmit,
+            $preloadParticipant,
+        );
+
+        // LTI assessment launch: launch the LTI tool itself
         $this->register(
             self::METHOD_GET,
             "$assRoute/lti/launch/instructor",

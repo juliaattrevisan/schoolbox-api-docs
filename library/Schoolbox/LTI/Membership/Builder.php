@@ -457,7 +457,7 @@ class Builder implements MembershipServiceServerBuilderInterface
         // Inject claims from the assessment:
         // http://www.imsglobal.org/spec/lti-nrps/v2p0#message-section
         $message = [];
-        $claims  = $this->launchFactory->buildAdditionalClaims($assessment, $user, $user);
+        $claims  = $this->launchFactory->buildAdditionalClaims($assessment, $user, $user, null);
         foreach ($claims as $claim) {
             $message[$claim::getClaimName()] = $claim->normalize();
         }
