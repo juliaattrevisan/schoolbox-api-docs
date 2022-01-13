@@ -28,14 +28,6 @@ class Factory
 
 
     /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
      * Clipboard host url, from the config var
      *
      * @var string
@@ -53,18 +45,15 @@ class Factory
 
     /**
      * @param LoggerInterface $log
-     * @param bool            $perform
      * @param string          $host
      * @param string          $token
      */
     public function __construct(
         LoggerInterface $log,
-        bool $perform,
         string $host,
         string $token
     ) {
         $this->log = $log;
-        $this->perform = $perform;
         $this->host = $host;
         $this->token = $token;
     }
@@ -104,7 +93,7 @@ class Factory
          */
         return (new GenericCollection(IStrategy::class))
             ->add(new Prepare($this->log))
-            ->add(new Team($this->log, $this->perform, $api))
+            ->add(new Team($this->log, $api))
             ->add(new Cleanup($this->log));
     }
 }

@@ -107,7 +107,6 @@ HELP;
             try {
                 $composites = (new Factory(
                     $this->getLogger(),
-                    $this->perform(),
                     (string)$this->getConfig()->get('clipboard_endpoint_host'),
                     (string)$this->getConfig()->get('clipboard_endpoint_token'),
                 ))->produce();
