@@ -523,11 +523,8 @@ class UserAccessMapper extends Mapper
             'service' => UserAccess::SERVICE_HOMEPAGE,
             'uid' => $user->getId(),
             'favourite' => 1,
-        ));
+        ))->indexBy('serviceIdentifer')->keys();
 
-        foreach ($userAccess as $row) {
-            $favourites[] = $row->getServiceIdentifier();
-        }
         return $favourites;
     }
 }
