@@ -65,7 +65,7 @@ if (isset($_GET['sls'])) {
 
     $errors = $auth->getErrors();
     if (!empty($errors)) {
-        error(ErrorMapper::ERROR_PROCESSING, implode("\n", $errors));
+        error(ErrorMapper::ERROR_PROCESSING, implode("\n", $errors) . ": {$auth->getLastErrorReason()}");
     }
 
     $sessionHandler = new Session();
