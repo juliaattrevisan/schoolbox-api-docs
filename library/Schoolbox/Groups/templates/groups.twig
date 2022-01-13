@@ -1,6 +1,9 @@
 <div id="manage-groups-container">
     <manage-groups
-        endpoint="{{ endpoint }}"
+        endpoint-add="{{ endpointAdd }}"
+        endpoint-delete="{{ endpointDelete }}"
+        endpoint-notify="{{ endpointNotify }}"
+        endpoint-favourite="{{ endpointFavourite }}"
         :groups="{{ groupList|json_encode }}"
     />
 </div>

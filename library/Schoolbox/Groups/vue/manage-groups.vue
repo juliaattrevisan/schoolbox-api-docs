@@ -21,7 +21,19 @@ export default {
     },
 
     props: {
-        endpoint: { //to call join/leave/favourite etc a group
+        endpointAdd: { //to join a group
+            type: String,
+            required: true,
+        },
+        endpointDelete: { //to leave a group
+            type: String,
+            required: true,
+        },
+        endpointNotify: { //to update a groups notification status
+            type: String,
+            required: true,
+        },
+        endpointFavourite: { //to update a groups favourite status
             type: String,
             required: true,
         },
@@ -144,7 +156,10 @@ export default {
             <manage-groups-item 
                 v-for="group in filteredGroups" 
                 :key="group.id" 
-                :endpoint="endpoint"
+                :endpoint-add="endpointAdd"
+                :endpoint-delete="endpointDelete"
+                :endpoint-notify="endpointNotify"
+                :endpoint-favourite="endpointFavourite"
                 :group="group"
                 @on-edit-start="onGroupEditStart"
                 @on-edit-success="onGroupEditSuccess"

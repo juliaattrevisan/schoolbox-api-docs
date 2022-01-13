@@ -14,7 +14,19 @@ import { addGroupToSideMenu, removeGroupFromSideMenu } from '../js/modifyGroupSi
 export default {
 
     props: {
-        endpoint: { //to join/leave/favourite etc a group
+        endpointAdd: { //to join a group
+            type: String,
+            required: true,
+        },
+        endpointDelete: { //to leave a group
+            type: String,
+            required: true,
+        },
+        endpointNotify: { //to update a groups notification status
+            type: String,
+            required: true,
+        },
+        endpointFavourite: { //to update a groups favourite status
             type: String,
             required: true,
         },
@@ -123,17 +135,18 @@ export default {
         /**
          * A simple wrapper to handle the shared post request behaviour
          * 
+         * @param { String }
          * @param { Object }
          * 
          * @returns { Object }
          */
-        async getResponseData (appendList) {
+        async getResponseData (endpoint, appendList = {}) {
             const formData = new FormData();
             formData.append('group', this.group.id);
             for (const [key, value] of Object.entries(appendList)) {
                 formData.append(`${key}`, `${value}`);
             }
-            const response = await fetch(this.endpoint, { method: 'POST', body: formData });
+            const response = await fetch(endpoint, { method: 'POST', body: formData });
             return await response.json();
         },
 
@@ -144,7 +157,7 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Joining group...');
             try {
-                const responseData = await this.getResponseData({ action: 'add' });
+                const responseData = await this.getResponseData(this.endpointAdd);
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -166,7 +179,7 @@ export default {
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Leaving group...');
             try {
-                const responseData = await this.getResponseData({ action: 'delete' });
+                const responseData = await this.getResponseData(this.endpointDelete);
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -207,7 +220,7 @@ export default {
         async removeFromFavourites () {
             this.$emit('on-edit-start', 'Removing from favourites...');
             try {
-                const responseData = await this.getResponseData({ action: 'edit', isFavourite: '0' });
+                const responseData = await this.getResponseData(this.endpointFavourite, { isFavourite: '0' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -227,7 +240,7 @@ export default {
         async addToFavourites () {
             this.$emit('on-edit-start', 'Adding to favourites...');
             try {
-                const responseData = await this.getResponseData({ action: 'edit', isFavourite: '1' });
+                const responseData = await this.getResponseData(this.endpointFavourite, { isFavourite: '1' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -263,7 +276,7 @@ export default {
         async removeFromNotifications () {
             this.$emit('on-edit-start', 'Remove from notifications...');
             try {
-                const responseData = await this.getResponseData({ action: 'edit', isNotificationsOn: '0' });
+                const responseData = await this.getResponseData(this.endpointNotify, { isNotificationsOn: '0' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
@@ -282,7 +295,7 @@ export default {
         async addToNotifications () {
             this.$emit('on-edit-start', 'Adding to notifications...');
             try {
-                const responseData = await this.getResponseData({ action: 'edit', isNotificationsOn: '1' });
+                const responseData = await this.getResponseData(this.endpointNotify, { isNotificationsOn: '1' });
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
                 } else {
