@@ -51,7 +51,8 @@ class Cleanup implements IStrategy
     /**
      * @param LoggerInterface $log
      */
-    public function __construct(LoggerInterface $log) {
+    public function __construct(LoggerInterface $log)
+    {
         $this->log = $log;
 
         $this->seasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
