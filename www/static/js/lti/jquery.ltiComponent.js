@@ -29,7 +29,7 @@
         linkTextBeforeContentSelected: 'Select content to embed',
 
         // Text to display in the LTI link after content is selected
-        linkTextAfterContentSelected: 'View embedded content',
+        linkTextAfterContentSelected: 'Launch embedded tool',
 
         // The LTI iframe:
         // show the content selector in here, as well as the selected content
@@ -173,6 +173,8 @@
                 params.$ltiLink.attr('href', launchUrl.toString())
                                .text(params.linkTextBeforeContentSelected)
                                .show();
+                params.$ltiLink.parent().show();
+
             }
         }).fail(function () {
             // This shouldn't happen, but just in case something goes wrong
