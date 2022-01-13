@@ -94,6 +94,10 @@ class Team implements IStrategy
 
     /**
      * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
@@ -104,7 +108,12 @@ class Team implements IStrategy
 
         /* Set up a local cache for (sport, division, team) tuples
          */
-        $lookup = [];
+        $registry = new Registry(
+            $this->seasonMapper,
+            $this->sportMapper,
+            $this->divisionMapper,
+            $this->teamMapper
+        );;
 
         $teams = $this->api->retrieve('GET', 'teams', []);
 
@@ -128,71 +137,15 @@ class Team implements IStrategy
 
             /* Try to spawn a corresponding Sport instance
              */
-            $sportName = $team['activity']['name'];
-
-            if (!isset($lookup[$sportName])) {
-                try {
-                    $sport = $this->sportMapper->findOneByColumn('name', $sportName);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $sport = $this->sportMapper->createModel()
-                        ->setName($sportName);
-
-                    $this->sportMapper->save($sport);
-                }
-
-                $lookup[$sportName] = [
-                    'instance' => $sport,
-                    'divisions' => []
-                ];
-            } else {
-                $sport = $lookup[$sportName]['instance'];
-            }
+            $sport = $registry->recallSport($teamActivity);
 
             /* Try to spawn a corresponding Division instance
              */
-            if (!isset($lookup[$sportName]['divisions'][$divisionName])) {
-                try {
-                    $division = $this->divisionMapper->findOneByColumnList([
-                        'name' => $divisionName,
-                        'sport_id' => $sport->getId()
-                    ]);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $division = $this->divisionMapper->createModel()
-                        ->setName($divisionName)
-                        ->setSeason($season)
-                        ->setSport($sport);
-
-                    $this->divisionMapper->save($division);
-                }
-
-                $lookup[$sportName]['divisions'][$divisionName] = [
-                    'instance' => $division,
-                    'teams' => []
-                ];
-            } else {
-                $division = $lookup[$sportName]['divisions'][$divisionName]['instance'];
-            }
+            $division = $registry->recallDivision($season, $sport, $divisionName);
 
             /* Try to spawn a corresponding Team instance
              */
-            if (!isset($lookup[$sportName]['divisions'][$divisionName]['teams'][$teamName])) {
-                try {
-                    $team = $this->teamMapper->findOneByColumnList([
-                        'name' => $teamName,
-                        'division_id' => $division->getId()
-                    ]);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $team = $this->teamMapper->createModel()
-                        ->setName($teamName)
-                        ->setDivision($division);
-
-                    $this->teamMapper->save($team);
-                }
-
-                $lookup[$sportName]['divisions'][$divisionName]['teams'][$teamName]['instance'] = $team;
-            } else {
-                $team = $lookup[$sportName]['divisions'][$divisionName]['teams'][$teamName]['instance'];
-            }
+            $team = $registry->recallTeam($sport, $division, $teamName);
 
             $this->log->debug(sprintf(
                 'Sport: %s %s, Division: %s %s, Team: %s %s',
