@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy;
@@ -102,10 +104,6 @@ class Team implements IStrategy
     public function import(): void
     {
 
-        /* TODO: I guess have a yearlong season
-         */
-        $season = $this->seasonMapper->findById(1);
-
         /* Set up a local cache for (sport, division, team) tuples
          */
         $registry = new Registry(
@@ -115,6 +113,14 @@ class Team implements IStrategy
             $this->teamMapper
         );;
 
+        /* I guess have an ultralong season to basically remove it from typical usage
+         * This season basically encompasses everything so we only need to spawn it once
+         */
+        $season = $registry->recallSeason();
+
+        /* Consume data from Clipboard endpoint - each team comes with info about
+         * its own hierarchy so map them to schoolbox conepts as best we can
+         */
         $teams = $this->api->retrieve('GET', 'teams', []);
 
         foreach ($teams['data'] as $team) {
@@ -159,4 +165,3 @@ class Team implements IStrategy
         }
     }
 }
-

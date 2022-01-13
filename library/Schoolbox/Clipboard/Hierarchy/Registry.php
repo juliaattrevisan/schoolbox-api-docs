@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy;
@@ -67,6 +69,43 @@ class Registry
         $this->sportMapper = $sportMapper;
         $this->divisionMapper = $divisionMapper;
         $this->teamMapper = $teamMapper;
+    }
+
+
+    /**
+     * Spawn a corresponding season if it doesn't already exist
+     *
+     * This is a special usage that I've hardcoded here; Clipboard removed their Seasons
+     * but we still have ours
+     *
+     * @return Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function recallSeason(): \Schoolbox\Fixtures\Season\Model
+    {
+        $seasonName = 'Clipboard Events';
+
+        /* Season starts this year and lasts 2 years to basically encompass
+         * all future events sent by Clipboard, including ones that broach summer
+         * break and to allow future planning beyond
+         */
+        $start = \Alaress_Date_Format::now()->startOfYear();
+        $end = \Alaress_Date_Format::now()->startOfYear()->addYears(2);
+
+        try {
+            $season = $this->seasonMapper->findOneByColumn('name', $seasonName);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $season = $this->seasonMapper->createModel()
+                ->setName($seasonName)
+                ->setStart($start)
+                ->setEnd($end);
+
+            $this->seasonMapper->save($season);
+        }
+
+        return $season;
     }
 
 
