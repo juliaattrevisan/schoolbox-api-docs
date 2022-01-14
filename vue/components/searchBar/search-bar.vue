@@ -1,6 +1,5 @@
 <script>
 
-import axios from 'axios';
 import ResultMeta from './search-bar-results-meta';
 import debounce from 'lodash/debounce';
 
@@ -136,9 +135,11 @@ export default {
          * so not sending on every key press
          */
         filterResults: debounce(function () {
-            axios.get(this.paths.searchEndpoint + this.keyword).then((response) => {
-                this.totalCount = response.data.totalCount;
-                this.results = response.data.results;
+            fetch(this.paths.searchEndpoint + this.keyword)
+            .then((response) => response.json())
+            .then((data) => {
+                this.totalCount = data.totalCount;
+                this.results = data.results;
             }).finally(() => {
                 this.isLoading = false;
             }).catch((error) => {

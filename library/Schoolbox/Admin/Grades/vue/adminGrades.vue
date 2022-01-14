@@ -1,6 +1,5 @@
 <script>
 
-import axios from 'axios'
 import RevealModal from "@vue/components/reveal-modal";
 import Toast from "@vue/components/toast";
 
@@ -46,7 +45,7 @@ export default {
          *
          * @param {Number} groupIndex The index of the group to remove
          */
-        deleteGradeGroup(groupIndex) {
+        async deleteGradeGroup(groupIndex) {
             this.$refs.toast.activate('Deleting Grade Group...');
 
             let currentGradeGroup = this.gradeGroups[groupIndex];
@@ -67,20 +66,23 @@ export default {
             /**
              * this grade group has been persisted, so we need to remove it and any associated grade levels
              */
-            let adjustedGradeGroups = this.gradeGroups.filter((v) => v.id !== currentGradeGroup.id);
+            const adjustedGradeGroups = this.gradeGroups.filter((v) => v.id !== currentGradeGroup.id);
 
-            axios.delete(currentGradeGroup._links.delete)
-                .then(() => {
-                    this.gradeGroups = [];
-                    this.$refs.toast.timeout('Group `' + currentGradeGroup.name + '` successfully removed', true);
-                    this.$nextTick(() => {
-                        this.gradeGroups = adjustedGradeGroups;
-                    });
-                })
-                .catch(() => this.$refs.toast.timeout('Failed to remove Grade Group', false))
-                .finally(() => {
-                    this.closeDeleteGradeGroupModal()
-                })
+            try {
+                await fetch(currentGradeGroup._links.delete, {
+                    method: 'DELETE',
+                });
+                this.gradeGroups = [];
+                this.$refs.toast.timeout(`Group ${currentGradeGroup.name} successfully removed`, true);
+                this.$nextTick(() => {
+                    this.gradeGroups = adjustedGradeGroups;
+                });
+            } catch (error) {
+                this.$refs.toast.timeout('Failed to remove Grade Group', false);
+            } finally {
+                this.closeDeleteGradeGroupModal();
+            }
+
 
             this.applyValidator();
         },
@@ -123,7 +125,7 @@ export default {
          * @param {Number} groupIndex The index of the group to remove from
          * @param {Number} levelIndex The index of the level to remove
          */
-        deleteGradeLevel(groupIndex, levelIndex) {
+        async deleteGradeLevel(groupIndex, levelIndex) {
             this.$refs.toast.activate('Deleting Grade...');
 
             let currentGradeLevel = this.gradeGroups[groupIndex].levels[levelIndex];
@@ -144,17 +146,20 @@ export default {
             /**
              * this grade level has been persisted, so we need to delete it
              */
-            let adjustedGradeLevels = this.gradeGroups[groupIndex].levels.filter((v) => v.id !== currentGradeLevel.id);
+            const adjustedGradeLevels = this.gradeGroups[groupIndex].levels.filter((v) => v.id !== currentGradeLevel.id);
 
-            axios.delete(currentGradeLevel._links.delete)
-                .then(() => {
-                    this.gradeGroups[groupIndex].levels = [];
-                    this.$refs.toast.timeout('Group `' + currentGradeLevel.caption + '` successfully removed', true);
-                    this.$nextTick(() => {
-                        this.gradeGroups[groupIndex].levels = adjustedGradeLevels;
-                    });
-                })
-                .catch(() => this.$refs.toast.timeout('Failed to remove grade level', false))
+            try {
+                await fetch(currentGradeLevel._links.delete, {
+                    method: 'DELETE',
+                });
+                this.gradeGroups[groupIndex].levels = [];
+                this.$refs.toast.timeout(`Group ${currentGradeLevel.caption} successfully removed`, true);
+                this.$nextTick(() => {
+                    this.gradeGroups[groupIndex].levels = adjustedGradeLevels;
+                });
+            } catch (error) {
+                this.$refs.toast.timeout('Failed to remove grade level', false);
+            } 
 
             this.applyValidator();
         },
@@ -183,21 +188,28 @@ export default {
         /**
          * Persist the grades in the form, only if their values are valid.
          */
-        persist() {
+        async persist() {
             if (!this.validator.form()) {
                 return;
             }
 
             this.saveInProgress = true;
             this.$refs.toast.activate('Saving...');
-            axios
-                .post(this.config.postUrl, this.gradeGroups)
-                .then(response => {
-                    this.gradeGroups = response.data
-                    this.$refs.toast.timeout('Saved', true, 2000);
-                })
-                .catch(() => this.$refs.toast.timeout('Save failed', false, 5000))
-                .finally(() => this.saveInProgress = false)
+            try {
+                const response = await fetch(this.config.postUrl, {
+                    method: 'POST', 
+                    body: JSON.stringify(this.gradeGroups), 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                this.gradeGroups = await response.json();
+                this.$refs.toast.timeout('Saved', true, 2000);
+            } catch (error) {
+                this.$refs.toast.timeout('Save failed', false, 5000);
+            } finally {
+                this.saveInProgress = false;
+            }
         }
     }
 }

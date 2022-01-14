@@ -1,7 +1,5 @@
 <script>
 
-import axios  from 'axios';
-import duration from 'dayjs/plugin/duration';
 import MediaArticle from '@vue/components/media-article';
 import Storage from '@vue/components/storage';
 import CommentThread from './comment-thread';
@@ -12,6 +10,7 @@ import BadgeImage from "../../../Badge/vue/badge-image";
 import foundationMixin from "@vue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
 import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+
 
 export default {
     components: {
@@ -76,19 +75,23 @@ export default {
         /**
          * Appends learning evidence to the data list.
          */
-        append(cursor) {
-            let params = {};
+        async append (cursor) {
+            const params = {};
             if (cursor) {
                 params.cursor = cursor;
             }
-            axios
-                .get(this.config.routes.getFeed, {params})
-                .then(response => {
-                    this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
-                    this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
-                    this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
-                })
-                .finally(() => this.showSkeletonLoader = false);
+            try {
+                const response = await fetch(this.config.routes.getFeed + '?' + new URLSearchParams(params));
+                const responseData = await response.json();
+                this.data = this.data.concat(responseData.data ? responseData.data : [])
+                this.metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
+                this.metadata.cursor = responseData.metadata?.cursor ? responseData.metadata.cursor : null;
+            } catch (error) {
+                console.warn(error);
+                this.loading = false;
+            } finally {
+                this.showSkeletonLoader = false
+            }
         },
 
         /**
@@ -184,9 +187,8 @@ export default {
          *
          * @param {Object} evidence
          */
-        deleteEvidence(evidence) {
+        async deleteEvidence (evidence) {
             this.$refs.toast.activate('Deleting...');
-
 
             //awards, other things may also be deleted in the future, so ensure this is also the right data type
             const removeEvidenceToDelete = (data) => {
@@ -195,26 +197,27 @@ export default {
                 }
                 return data.object.id !== evidence.object.id
             }
-            let newData = this.data.filter(removeEvidenceToDelete);
+            const newData = this.data.filter(removeEvidenceToDelete);
 
             // Replacing the data in place in the same tick causes issues with
             // the MediaElement player and Foundation dropdowns for some reason.
             // Clear it first; then replace it with the filtered data in the
             // next tick.
-            axios
-                .delete(evidence.object._links.delete)
-                .then(() => {
-                    this.data = [];
-                    this.$refs.toast.timeout('Deleted', true);
-                    this.$nextTick(() => {
-                        this.data = newData;
-                        this.metadata.count  -= 1;
-                    });
-                })
-                .catch(() => this.$refs.toast.timeout('Could not delete', false))
-                .finally(() => {
-                    this.$refs.deleteModal.close();
-                })
+            try {
+                await fetch(evidence.object._links.delete, {
+                    method: 'DELETE'
+                });
+                this.data = [];
+                this.$refs.toast.timeout('Deleted', true);
+                this.$nextTick(() => {
+                    this.data = newData;
+                    this.metadata.count -= 1;
+                });
+            } catch (error) {
+                this.$refs.toast.timeout('Could not delete', false)
+            } finally {
+                this.$refs.deleteModal.close();
+            }
         },
 
 

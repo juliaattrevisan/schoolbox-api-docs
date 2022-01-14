@@ -10,8 +10,6 @@
  *
  */
 
-import Vue from 'vue';
-import axios from 'axios';
 
 export default {
 
@@ -372,23 +370,25 @@ export default {
          * @param {AudienceOption} audienceOption
          * @param {function} callback
          */
-        loadAudienceOptions (audienceOption, callback) {
+        async loadAudienceOptions (audienceOption, callback) {
             // Request a list of options with the uri listed in the object above
-            axios.get(audienceOption.ajax).then((response) => {
+            fetch(audienceOption.ajax)
+            .then((response) => response.json())
+            .then((data) => {
                 // Ensure we received expected payload
                 if(
-                    undefined === response.data.availableModifiers ||
-                    undefined === response.data.canTargetNull ||
-                    undefined === response.data.valueLabels
+                    undefined === data.availableModifiers ||
+                    undefined === data.canTargetNull ||
+                    undefined === data.valueLabels
                 ) {
-                    throw new Error('Unable to process AJAX payload: ' + response);
+                    throw new Error('Unable to process AJAX payload: ' + data);
                 }
                 // Cache the options
-                audienceOption.availableModifiers = response.data.availableModifiers;
+                audienceOption.availableModifiers = data.availableModifiers;
                 audienceOption.isLoaded           = true;
 
-                audienceOption.canTargetNull      = response.data.canTargetNull;
-                audienceOption.valueLabels        = response.data.valueLabels;
+                audienceOption.canTargetNull      = data.canTargetNull;
+                audienceOption.valueLabels        = data.valueLabels;
 
                 callback();
             }).catch((error) => {

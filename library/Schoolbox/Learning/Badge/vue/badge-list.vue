@@ -1,6 +1,5 @@
 <script>
 
-import axios from 'axios';
 import Toast from '@vue/components/toast';
 import RevealModal from '@vue/components/reveal-modal';
 import BadgeAward from "../Award/vue/badgeAward";
@@ -176,22 +175,23 @@ export default {
         /**
          * Perform delete
          */
-        deleteBadge () {
+        async deleteBadge () {
             this.$refs.toast.activate('Deleting badge...');
-            let newData = this.data.filter((v) => v.id !== this.currentBadge.id);
-            axios.delete(this.currentBadge._links.delete)
-                .then(() => {
-                    this.data = [];
-                    this.$refs.toast.timeout('Badge successfully deleted', true);
-                    this.$nextTick(() => {
-                        this.data = newData;
-                        this.metadata.count -= 1;
-                    });
-                })
-                .catch(() => this.$refs.toast.timeout('Failed to delete badge', false))
-                .finally(() => {
-                    this.closeDeleteModal()
-                })
+            try {
+                const response = await fetch(this.currentBadge._links.delete, {
+                    method: 'DELETE',
+                });
+                //this is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that with DELETE
+                await response.text(); 
+                this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
+                this.metadata.count -= 1;
+                this.$refs.toast.timeout('Badge successfully deleted', true);
+            } catch (error) {
+                console.warn(error);
+                this.$refs.toast.timeout('Failed to delete badge', false);
+            } finally {
+                this.closeDeleteModal();
+            }
         },
 
         /**
@@ -403,7 +403,7 @@ export default {
 
         <reveal-modal ref="deleteModal">
             <template v-if="currentBadge">
-                <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&lsquo;</strong></h2>
+                <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&rsquo;</strong></h2>
                 <div class="alert-box alert icon-alert">WARNING! Any users who have been awarded this badge will have it removed from their collection.</div>
                 <p>Are you sure you wish to delete the badge '{{ currentBadge.name }}'?</p>
                 <ul class="flex-list buttons">

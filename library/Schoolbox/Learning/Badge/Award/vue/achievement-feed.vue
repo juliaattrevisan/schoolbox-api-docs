@@ -1,5 +1,4 @@
 <script>
-import axios from "axios";
 import AwardDetailModal from './award-detail-modal';
 import AchievementWithdrawModal from "./award-achievement-withdraw-modal";
 import BadgeImage from './../../vue/badge-image';
@@ -157,19 +156,17 @@ export default {
         /**
          * Fetch the list of awards
          */
-        updateAwards() {
-            let self = this;
-
+        async updateAwards() {
             /* Access the feed endpoint, grab the awards for the user
              */
-            axios.get(this.config.routes.getAwardFeed, {})
-                .then(response => {
-                    self.data = [];
-                    self.$nextTick(() => {
-                        self.data = response.data;
-                    });
-                })
-                .finally(() => this.loading = false);
+            try {
+                const response = await fetch(this.config.routes.getAwardFeed);
+                this.data = await response.json();
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.loading = false;
+            }    
         },
 
         /**

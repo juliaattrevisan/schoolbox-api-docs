@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import filesize from 'filesize';
 import RevealModal from '@vue/components/reveal-modal';
 import Toast from '@vue/components/toast';
@@ -142,10 +141,11 @@ export default {
         async loadRows () {
             this.loading = true;
             try {
-                const response = await axios.get(this.endpoint);
-                this.allData = response.data;
-                this.loading = false;
+                const response = await fetch(this.endpoint);
+                this.allData = await response.json();
             } catch (error) {
+                console.warn(error);
+            } finally {
                 this.loading = false; 
             }
         },
@@ -192,7 +192,7 @@ export default {
 
                 /* Asynchronously access the endpoint to delete the thing
                 */
-                await axios.get(this.fileUrlToDelete);
+                await fetch(this.fileUrlToDelete);
 
                 /* Remove the element from the allData stack
                  */

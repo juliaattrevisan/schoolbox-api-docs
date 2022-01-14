@@ -1,7 +1,5 @@
 <script>
     import AudiencesModal from './audiences-modal';
-    import qs from 'qs';
-    import axios from 'axios';
     import debounce from 'lodash/debounce';
 
     /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
@@ -212,52 +210,47 @@
              * @param id        the user's id
              * @param fullname  the user's name
              */
-            rsvpCreate(id, fullname) {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
+            async rsvpCreate (id, fullname) {
 
-                let request = {
-                    url: ENDPOINTS.createAttendancePath(this.event.id),
-                    data:  qs.stringify({guests: id}),
-                    method: 'post',
-                    responseType: 'json'
-                }
-
-                /* A toast - to your valour, my sword, and our victory together
-                 */
+                const toast = $('[data-toast]');
                 toast.toastActivate({
                     text: 'Creating invitation...'
                 });
 
-                axios.request(request)
-                        .then(function (response) {
+                try {
+                    const response = await fetch(ENDPOINTS.createAttendancePath(this.event.id), {
+                        method: 'POST', 
+                        body: this.getRsvpCreateFormData(id), 
+                    });
+                    const responseData = await response.json();
+                    this.updateCountsFromPayload(responseData); //Update data with the result from async request
+                    this.guests = responseData.attendees.guests;
+                    toast.toastTimeout({
+                        text: `${fullname} has been invited`,
+                        css: 'success'
+                    });
+                } catch (error) {
+                    toast.toastTimeout({
+                        text: `Unable to invite ${fullname}; please try again.`,
+                        css: 'alert'
+                    });
+                    console.warn(error);
+                } finally {
+                    this.selected = []; //Clear selection after async outcome
+                }
 
-                            /* Update data with the result from async request
-                             */
-                            self.updateCountsFromPayload(response.data);
-                            self.guests = response.data.attendees.guests;
-
-                            toast.toastTimeout({
-                                text: fullname + ' has been invited',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to invite ' + fullname + '; please try again.',
-                                    css: 'alert'
-                                });
-                            }
-                        })
-                        .then(function() {
-
-                            /* Clear selection after async outcome
-                             */
-                            self.selected = [];
-                        });
             },
 
+            /**
+             * Get the form data
+             *
+             * @param id        the user's id
+             */
+            getRsvpCreateFormData (id) {
+                const formData = new FormData();
+                formData.append('guests', id);
+                return formData;
+            },
 
             /**
              * Remove an invitation
@@ -265,64 +258,53 @@
              * @param id    the user's id
              * @param name  the user's name
              */
-            rsvpDelete(id, name) {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
+            async rsvpDelete (id, name) {
 
-                let request = {
-                    url: ENDPOINTS.rsvpDeletePath(this.event.id),
-                    data:  qs.stringify({userId: id}),
-                    method: 'post',
-                    responseType: 'json'
-                }
-
-                /* A toast - to your valour, my sword, and our victory together
-                 */
+                const toast = $('[data-toast]');
                 toast.toastActivate({
                     text: 'Removing invitation...'
                 });
 
-                axios.request(request)
-                        .then(function (response) {
-                            let userId = response.data.currentUser.user.id;
+                try {
+                    const response = await fetch(ENDPOINTS.rsvpDeletePath(this.event.id), {
+                        method: 'POST', 
+                        body: this.getRsvpDeleteFormData(id), 
+                    });
+                    const responseData = await response.json();
+                    const userId = responseData.currentUser.user.id;
 
-                            for (let i = 0; i < self.guests.length; i++) {
-                                if (self.guests[i].id === id) {
+                    this.guests = this.guests.filter((guest) => guest.id !== id); //to remove the guest from the list
 
-                                    /* Remove invitation from list
-                                     */
-                                    self.guests.splice(i, 1);
+                    if (id === userId) { //If you removed yourself from the list, reset your currentAttendanceStatus to null
+                        this.currentAttendanceStatus = null;
+                    }
 
-                                    /* If you removed yourself from the list,
-                                     * reset your currentAttendanceStatus to null
-                                     */
-                                    if (id === userId) {
-                                        self.currentAttendanceStatus = null;
-                                    }
+                    this.updateCountsFromPayload(responseData); //Update data with the result from async request
 
-                                    break;
-                                }
-                            }
+                    toast.toastTimeout({
+                        text: `${name} has been uninvited`,
+                        css: 'success'
+                    });
+                } catch (error) {
+                    toast.toastTimeout({
+                        text: `Unable to uninvite ${fullname}; please try again.`,
+                        css: 'alert'
+                    });
+                    console.warn(error);
+                }
 
-                            /* Update data with the result from async request
-                             */
-                            self.updateCountsFromPayload(response.data);
-
-                            toast.toastTimeout({
-                                text: name + ' has been uninvited',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to uninvite ' + name + '; please try again.',
-                                    css: 'alert'
-                                });
-                            }
-                        });
             },
 
+            /**
+             * Get the form data
+             *
+             * @param id        the user's id
+             */
+            getRsvpDeleteFormData (id) {
+                const formData = new FormData();
+                formData.append('userId', id);
+                return formData;
+            },
 
             /**
              * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
@@ -330,54 +312,40 @@
              * @param status    the new status
              * @param endpoint  the endpoint to send this new status
              */
-            rsvp(status, endpoint) {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
+            async rsvp (status, endpoint) {
+                
+                this.isTransacting = true; //Set a flag to prevent async spammage
 
-                /* Set a flag to prevent async spammage
-                 */
-                self.isTransacting = true;
-
-                let request = {
-                    url: endpoint,
-                    method: 'post',
-                    responseType: 'json'
-                }
-
-                /* A toast - to your valour, my sword, and our victory together
-                 */
+                const toast = $('[data-toast]');
                 toast.toastActivate({
                     text: 'Updating invitation...'
                 });
 
-                axios.request(request)
-                        .then(function (response) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST', 
+                    });
+                    const responseData = await response.json();
+                    
+                    this.currentAttendanceStatus = status; //Update data with the result from async request
+                    this.updateCountsFromPayload(responseData);
+                    this.guests = responseData.attendees.guests;
 
-                            /* Update data with the result from async request
-                             */
-                            self.currentAttendanceStatus = status;
-                            self.updateCountsFromPayload(response.data);
-                            self.guests = response.data.attendees.guests;
+                    toast.toastTimeout({
+                        text: 'Invitation successfully updated',
+                        css: 'success'
+                    });
 
-                            toast.toastTimeout({
-                                text: 'Invitation successfully updated',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to update invitation. ' + error.response.data.message,
-                                    css: 'alert'
-                                });
-                            }
-                        })
-                        .then(function (response) {
+                } catch (error) {
+                    toast.toastTimeout({
+                        text: 'Unable to update invitation.',
+                        css: 'alert'
+                    });
+                    console.warn(error);
+                } finally {
+                    this.isTransacting = false; //Reset flag
+                }
 
-                            /* Reset flag
-                             */
-                            self.isTransacting = false;
-                        });
             },
 
 
@@ -424,8 +392,8 @@
 
                 /* To invite others, you must
                  *   - be a staff member or the config var lets you invite others
-                 *   - be able to edit the event (you're its author)
                  *   - have available places
+                 *   - be able to edit the event (you're its author)
                  */
                 if (this.canInvite && this.canModify()) {
                     if ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax)) {
@@ -494,14 +462,13 @@
              * Perform async request and load results into component
              */
             search: debounce(function(loading, query, vm) {
-                axios.get(ENDPOINTS.URL_SELECTIZE, {
-                    params: {
-                        query: query,
-                        groupID: 0
-                    }
-                })
-                .then(function(response) {
-                    vm.options = response.data;
+                fetch(ENDPOINTS.URL_SELECTIZE + '?' + new URLSearchParams({
+                    query: query,
+                    groupID: 0
+                }))
+                .then((response) => response.json())
+                .then((data) => {
+                    vm.options = data;
                     loading(false);
                 });
             }, 350),

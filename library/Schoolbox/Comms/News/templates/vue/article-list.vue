@@ -4,7 +4,6 @@
     import LayoutListReversed from './layout-list-reversed.vue';
     import LayoutCard from './layout-card.vue';
     import articleListMixin from './article-list-mixin';
-    import axios from 'axios';
 
     export default {
         name: "article-list",
@@ -59,31 +58,34 @@
             }
         },
         mounted: function () {
-            var self = this;
 
-            axios.get(self.data.getSavedArticlesRoute, {headers: getHeaders}).then(function(response) {
-                self.savedArticleIds = response.data;
-            }).catch(function (error) {
-                console.log(error);
+            fetch(this.data.getSavedArticlesRoute)
+            .then((response) => response.json())
+            .then((data) => {
+                this.savedArticleIds = data;
+            }).catch((error) => {
+                console.warn(error);
             });
-
+            
             // Find some articles
-            axios.get(self.data.getArticlesRoute, {headers: getHeaders}).then(function(response) {
-                var articles = response.data;
+            fetch(this.data.getArticlesRoute)
+            .then((response) => response.json())
+            .then((data) => {
+                const articles = data;
 
-                self.articlesLoading = false;
-                self.allArticles = articles;
-                self.filteredArticles = articles;
+                this.articlesLoading = false;
+                this.allArticles = articles;
+                this.filteredArticles = articles;
 
                 // Start an array of topics, with All
-                var topics = [
-                    self.data.topicAll
+                const topics = [
+                    this.data.topicAll
                 ];
 
                 // Add topics from the articles returned
-                var topicsAdded = [];
-                articles.map(function(article) {
-                    article.topics.map(function(topic) {
+                const topicsAdded = [];
+                articles.map((article) => {
+                    article.topics.map((topic) => {
                         if (topicsAdded.indexOf(topic.slug) === -1) {
                             topicsAdded.push(topic.slug);
                             // WARNING: do not remove the space inside the braces below, phplib will eat it
@@ -93,53 +95,53 @@
                 });
 
                 // Sort topics based on sequence
-                topics.sort(function(a, b) {
+                topics.sort((a, b) => {
                     return a.sequence - b.sequence;
                 });
 
                 // Send the array to Vue
-                self.topics = topics;
+                this.topics = topics;
 
                 // Set default selected tab (if not already set via twig above)
-                if (!self.tabSelected) {
-                    if (self.data.showTopicByDefault && self.topics[1]) {
-                        self.tabSelected = self.topics[1].slug;
+                if (!this.tabSelected) {
+                    if (this.data.showTopicByDefault && this.topics[1]) {
+                        this.tabSelected = this.topics[1].slug;
                     } else {
-                        self.tabSelected = self.topicAll.slug;
+                        this.tabSelected = this.topicAll.slug;
                     }
                 }
-                self.initialTopic = self.tabSelected;
+                this.initialTopic = this.tabSelected;
 
                 // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
-                if (self.tabSelected !== self.data.topicAll.slug) {
-                    self.onTabChange(self.tabSelected, true, true);
+                if (this.tabSelected !== this.data.topicAll.slug) {
+                    this.onTabChange(this.tabSelected, true, true);
                 }
-                if (self.page > 1) {
-                    self.onPaginate(self.page, true);
+                if (this.page > 1) {
+                    this.onPaginate(this.page, true);
                 }
 
-            }).catch(function (error) {
-                console.log(error);
+            }).catch((error) => {
+                console.warn(error);
             });
 
             // Listen for window state change
-            if (self.data.modifyWindowState) {
-                window.onpopstate = function(event) {
+            if (this.data.modifyWindowState) {
+                window.onpopstate = (event) => {
                     if (!event.state) {
                         // Return to defaults
-                        self.page = self.data.initialPage;
-                        self.onPaginate(self.page, true);
-                        self.tabSelected = self.initialTopic;
-                        self.onTabChange(self.tabSelected, true, true);
+                        this.page = this.data.initialPage;
+                        this.onPaginate(this.page, true);
+                        this.tabSelected = this.initialTopic;
+                        this.onTabChange(this.tabSelected, true, true);
                     } else {
                         if (event.state.page) {
-                            self.page = event.state.page;
-                            self.onPaginate(event.state.page, true);
+                            this.page = event.state.page;
+                            this.onPaginate(event.state.page, true);
                         }
 
                         if (event.state.tab) {
-                            self.tabSelected = event.state.tab;
-                            self.onTabChange(event.state.tab, true, true);
+                            this.tabSelected = event.state.tab;
+                            this.onTabChange(event.state.tab, true, true);
                         }
                     }
                 };
