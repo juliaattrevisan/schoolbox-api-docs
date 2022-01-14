@@ -141,6 +141,7 @@ class Module extends BaseModule
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
+                            $this->getConfig()
                         );
                     }),
                 ]
