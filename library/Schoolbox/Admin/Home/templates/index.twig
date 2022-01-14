@@ -268,13 +268,17 @@
                                     <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
                                 </div>
                             </li>
-                            {% if certExpiry < 30 %}
-                                {%  set certMessage = 'Expires in ' ~ certExpiry ~ ' days' %}
+                            {% if certExpiry < 0 %}
+                                {% set certMessage = 'Expired' %}
+                            {% elseif certExpiry < 30 %}
+                                {% set certMessage = 'Expires in ' ~ certExpiry ~ ' days' %}
+                                {% if isCustomCert %}
+                                    {% set certMessage = 'Unmanaged. ' ~ certMessage %}
+                                {% endif %}
+                            {% elseif isCustomCert %}
+                                {% set certMessage = 'Unmanaged' %}
                             {% else %}
                                 {% set certMessage = 'Valid' %}
-                            {% endif %}
-                            {% if isCustomCert %}
-                                {% set certMessage = 'Unmanaged ' ~ certMessage %}
                             {% endif %}
                             <li>
                                 <div class="small-5 columns content">
