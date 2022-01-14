@@ -52,18 +52,18 @@ class CsvImporter
     }
 
     /**
-     * @param IStorage $csvFile
+     * @param resource $resourceStream
      * @param string   $defaultDueTime
      * @param bool     $perform
      * @return array
      * @throws MapperException
      * @throws MapperException\Deleted
      */
-    public function import(IStorage $csvFile, string $defaultDueTime, bool $perform): array
+    public function import($resourceStream, string $defaultDueTime, bool $perform): array
     {
         $this->folderMapper->getDatabase()->beginTransaction();
 
-        $csv = (new Reader($csvFile->readStream()))->setLoadFromFirst(true);
+        $csv = (new Reader($resourceStream))->setLoadFromFirst(true);
 
         // [unit_spec_id][class_folder_id]['open_date']
         // [unit_spec_id][class_folder_id]['close_date']

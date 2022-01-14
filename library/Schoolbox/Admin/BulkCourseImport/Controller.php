@@ -129,7 +129,7 @@ class Controller extends Base
             $this->unitSpecificationMapper,
             $this->importFactory,
             $this->assessmentMapperProxy,
-        ))->import($csvFile, $defaultDueTime, $performMode);
+        ))->import($csvFile->readStream(), $defaultDueTime, $performMode);
 
         // Render this thing out
         $this->getResponse()->content->set(
