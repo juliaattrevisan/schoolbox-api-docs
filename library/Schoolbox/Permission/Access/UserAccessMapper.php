@@ -510,21 +510,4 @@ class UserAccessMapper extends Mapper
         }
         return $userCollection;
     }
-
-    /**
-     * Get favourite for userID
-     * @param User $user
-     * @return array
-     */
-    public function getFavourites(User $user): array
-    {
-        $favourites = [];
-        $userAccess = $this->findByColumnList(array(
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'uid' => $user->getId(),
-            'favourite' => 1,
-        ))->indexBy('serviceIdentifer')->keys();
-
-        return $favourites;
-    }
 }

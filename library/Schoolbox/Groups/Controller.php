@@ -488,12 +488,25 @@ class Controller extends BaseController
         if ($userGroup === null) {
             return self::NOTENROLLED;
         }
-        //get enrolmentStatus, could be enrolled, can join, or pending
-        $enrollment = $userGroup->getAccessLevel() ? self::ENROLLED : self::NOTENROLLED;
-        if (($userGroup->getAccessLevel() === UserAccess::ACCESS_DENY)) {
-            $enrollment = self::PENDING;
+
+        /**
+         * if the group perm is ACCESS_DENY that are just pending
+         */
+        if (UserAccess::ACCESS_DENY === $userGroup->getAccessLevel()) {
+            return self::PENDING;
         }
-        return $enrollment;
+
+        /**
+         * ACCESS_READ perm is enrolled, so that is helpful
+         */
+        if (UserAccess::ACCESS_READ <= $userGroup->getAccessLevel()) {
+            return self::ENROLLED;
+        }
+
+        /**
+         * to help php stan with is return issue, and to catch any failures of the above
+         */
+        return self::NOTENROLLED;
     }
 
     /**
