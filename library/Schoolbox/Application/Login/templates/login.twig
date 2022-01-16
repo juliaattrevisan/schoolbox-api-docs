@@ -124,7 +124,9 @@
                     {% endif %}
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
+                        {% block sso %}
                     <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
+                        {% endblock %}
                     {% endif %}
                 </div>
             </div>

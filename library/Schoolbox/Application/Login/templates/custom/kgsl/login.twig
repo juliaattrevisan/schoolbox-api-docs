@@ -1,0 +1,4 @@
+{% extends '@login:core/login.twig' %}
+{% block sso %}
+<a href="/saml/index.php?{{ requestParams|escape }}" class="submit">Login using Single Sign-On<br>(Staff and Students Only)</a>
+{% endblock %}

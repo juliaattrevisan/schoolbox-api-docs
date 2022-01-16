@@ -111,6 +111,11 @@ $login-img-max-height: 12rem !default; // 192px
             margin-top: 1rem;
         }
 
+        a.submit {
+            color: $login-form-background-contrast;
+            margin-top: 0;
+        }
+
         .login-links {
             p:first-of-type {
                 margin: .75rem 0 1rem 0;
