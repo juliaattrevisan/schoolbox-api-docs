@@ -254,17 +254,28 @@ class ScheduleIterator implements Iterator
      */
     private function findTeacher(string $teacherCode): array
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$teacherCode}')]");
+        $defaultTeacher = [
+            'title' => '',
+            'firstname' => '(unknown teacher)',
+            'surname' => '',
+            'username' => '',
+        ];
+
+        /* $teacherCode is empty; there wasn't a specified Teacher
+         * in the schedule; return Unknown Teacher as default case
+         */
+        if ('' === $teacherCode) {
+            return $defaultTeacher;
+        }
+
+        /* Otherwise, go hunting for them
+         */
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$teacherCode}']]");
 
         /* Unknown teacher: can't find it via its setCode
          */
         if (empty($node)) {
-            return [
-                'title' => '',
-                'firstname' => '(unknown teacher)',
-                'surname' => '',
-                'username' => '',
-            ];
+            return $defaultTeacher;
         }
 
         $teacher = $node[0];
