@@ -21,6 +21,21 @@ require __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    /**
+     * Print help
+     */
+    private const OPT_SHORT_HELP = 'h';
+
+    /**
+     * Print help
+     */
+    private const OPT_LONG_HELP  = 'help';
+
+    /**
+     * sort by key pattern, instead of by size
+     */
+    private const OPT_SORT_BY_KEY_PATTERN = 'sort-by-key-pattern';
+
     private const COLUMN_KEY_PATTERN = 'keyPattern';
     private const COLUMN_PAYLOAD = 'payload';
     private const COLUMN_TOTAL_COUNT = 'totalCount';
@@ -107,10 +122,44 @@ $app = new class extends CliTool\App
         '^accessToken:' . INSTANCE_ID . ':.+',
     ];
 
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [self::OPT_LONG_HELP, self::OPT_SORT_BY_KEY_PATTERN,];
+    }
 
     /** @inheritDoc */
     public function run(): void
     {
+
+        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
+            echo <<<HELP
+            Synopsis:
+                Report upon Redis usage.
+
+            Usage:
+                ./report.php [--sort-by-key-pattern] [-h] [--help]
+
+            Options:
+                --sort-by-key-pattern:
+                    If provided, sort the report alphabetically by key pattern:
+                    otherwise, sort by the data size (largest first).
+                -h, --help:
+                    Print this help text
+            HELP;
+            exit;
+        }
+
         $redis = \Alaress\Redis::getClientInstance();
         if (!$redis) {
             $this->getLogger()->error("Unable to fetch redis connection");
@@ -239,8 +288,12 @@ $app = new class extends CliTool\App
             }
         }
 
-        usort($aggregated, static function (array $a, array $b): int {
-            return $b[self::COLUMN_DATA_SIZE] <=> $a[self::COLUMN_DATA_SIZE];
+
+        $sortByKeyPattern = $this->getOpt(self::OPT_SORT_BY_KEY_PATTERN);
+        usort($aggregated, static function (array $a, array $b) use ($sortByKeyPattern): int {
+            return $sortByKeyPattern
+                ? strnatcasecmp($a[self::COLUMN_KEY_PATTERN], $b[self::COLUMN_KEY_PATTERN])
+                : ($b[self::COLUMN_DATA_SIZE] <=> $a[self::COLUMN_DATA_SIZE]);
         });
 
 
