@@ -31,18 +31,24 @@ $app = new class extends CliTool\App
     private const COLUMN_AVERAGE_TTL = 'averageTtl';
     private const COLUMN_DATA_SIZE = 'dataSize';
 
-    private const DATA_TYPES = [
-        self::COLUMN_KEY_PATTERN    => 'string',
-        self::COLUMN_PAYLOAD        => 'string',
-        self::COLUMN_TOTAL_COUNT    => 'int',
-        self::COLUMN_NO_TTL_COUNT   => 'int',
-        self::COLUMN_WITH_TTL_COUNT => 'int',
-        self::COLUMN_MIN_TTL        => 'int',
-        self::COLUMN_MAX_TTL        => 'int',
-        self::COLUMN_AVERAGE_TTL    => 'int',
-        self::COLUMN_DATA_SIZE      => 'int',
+    /**
+     * Column alignments
+     */
+    private const ALIGNMENTS = [
+        self::COLUMN_KEY_PATTERN    => STR_PAD_RIGHT,
+        self::COLUMN_PAYLOAD        => STR_PAD_RIGHT,
+        self::COLUMN_TOTAL_COUNT    => STR_PAD_LEFT,
+        self::COLUMN_NO_TTL_COUNT   => STR_PAD_LEFT,
+        self::COLUMN_WITH_TTL_COUNT => STR_PAD_LEFT,
+        self::COLUMN_MIN_TTL        => STR_PAD_LEFT,
+        self::COLUMN_MAX_TTL        => STR_PAD_LEFT,
+        self::COLUMN_AVERAGE_TTL    => STR_PAD_LEFT,
+        self::COLUMN_DATA_SIZE      => STR_PAD_LEFT,
     ];
 
+    /**
+     * Column labels
+     */
     private const LABELS = [
         self::COLUMN_KEY_PATTERN    => 'Key Pattern',
         self::COLUMN_PAYLOAD        => 'Payload',
@@ -285,7 +291,7 @@ $app = new class extends CliTool\App
             $columnTitle = self::LABELS[$columnKey];
             $width       = $columnWidths[$columnKey];
             $table[0][]  = str_pad('', $width, '*');
-            $table[1][]  = str_pad($columnTitle, $width, ' ', STR_PAD_LEFT);
+            $table[1][]  = str_pad($columnTitle, $width, ' ', self::ALIGNMENTS[$columnKey]);
             $table[2][]  = str_pad('', $width, '-');
         }
 
@@ -297,7 +303,7 @@ $app = new class extends CliTool\App
             }
             foreach ($row as $columnKey => $columnValue) {
                 $width                      = $columnWidths[$columnKey];
-                $table[$nextRow + $rowId][] = str_pad((string)$columnValue, $width, ' ', STR_PAD_LEFT);
+                $table[$nextRow + $rowId][] = str_pad((string)$columnValue, $width, ' ', self::ALIGNMENTS[$columnKey]);
             }
         }
 
@@ -308,7 +314,7 @@ $app = new class extends CliTool\App
             $columnValue = $aggregated[count($aggregated) - 1][$columnKey];
 
             $table[$nextRow][]     = str_pad('', $width, '-');
-            $table[$nextRow + 1][] = str_pad((string)$columnValue, $width, ' ', STR_PAD_LEFT);
+            $table[$nextRow + 1][] = str_pad((string)$columnValue, $width, ' ', self::ALIGNMENTS[$columnKey]);
             $table[$nextRow + 2][] = str_pad('', $width, '_');
         }
 
