@@ -130,7 +130,7 @@ export default {
                                 <select name="group" v-model="form.group">
                                     <option value="">-- select --</option>
                                     <option v-for="group in groups" :value="group.id" :key="group.id">
-                                        {{ group.name }} <template v-if="group.code">({{ group.code }})</template>
+                                        {{ group.name }}
                                     </option>
                                 </select>
                             </label>
