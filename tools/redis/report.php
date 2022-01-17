@@ -19,7 +19,41 @@ require __DIR__ . '/../../conf/core/require.php';
  * * key type TTLs
  * * key type data usage
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\App
+{
+    private const COLUMN_KEY_PATTERN = 'keyPattern';
+    private const COLUMN_PAYLOAD = 'payload';
+    private const COLUMN_TOTAL_COUNT = 'totalCount';
+    private const COLUMN_NO_TTL_COUNT = 'noTtlCount';
+    private const COLUMN_WITH_TTL_COUNT = 'withTtlCount';
+    private const COLUMN_MIN_TTL = 'minTtl';
+    private const COLUMN_MAX_TTL = 'maxTtl';
+    private const COLUMN_AVERAGE_TTL = 'averageTtl';
+    private const COLUMN_DATA_SIZE = 'dataSize';
+
+    private const DATA_TYPES = [
+        self::COLUMN_KEY_PATTERN    => 'string',
+        self::COLUMN_PAYLOAD        => 'string',
+        self::COLUMN_TOTAL_COUNT    => 'int',
+        self::COLUMN_NO_TTL_COUNT   => 'int',
+        self::COLUMN_WITH_TTL_COUNT => 'int',
+        self::COLUMN_MIN_TTL        => 'int',
+        self::COLUMN_MAX_TTL        => 'int',
+        self::COLUMN_AVERAGE_TTL    => 'int',
+        self::COLUMN_DATA_SIZE      => 'int',
+    ];
+
+    private const LABELS = [
+        self::COLUMN_KEY_PATTERN    => 'Key Pattern',
+        self::COLUMN_PAYLOAD        => 'Payload',
+        self::COLUMN_TOTAL_COUNT    => 'Total Count',
+        self::COLUMN_NO_TTL_COUNT   => 'No TTL Count',
+        self::COLUMN_WITH_TTL_COUNT => 'With TTL Count',
+        self::COLUMN_MIN_TTL        => 'Min TTL',
+        self::COLUMN_MAX_TTL        => 'Max TTL',
+        self::COLUMN_AVERAGE_TTL    => 'Average TTL',
+        self::COLUMN_DATA_SIZE      => 'Data Size',
+    ];
 
     // Recognised key patterns
     private const KEY_PATTERNS = [
@@ -184,21 +218,21 @@ $app = new class extends CliTool\App {
                 }
 
                 $aggregated[] = [
-                    'Key Pattern'    => $pattern,
-                    'Payload'        => $payload,
-                    'Total Count'    => count($matches),
-                    'No TTL Count'   => $countNoTtl,
-                    'With TTL Count' => $countHasTtl,
-                    'Min TTL'        => $minTtl ?? '-',
-                    'Max TTL'        => $maxTtl ?? '-',
-                    'Average TTL'    => $countHasTtl === 0 ? '-' : (int)($sumTtl / $countHasTtl),
-                    'Data Size'      => $sumLength,
+                    self::COLUMN_KEY_PATTERN    => $pattern,
+                    self::COLUMN_PAYLOAD        => $payload,
+                    self::COLUMN_TOTAL_COUNT    => count($matches),
+                    self::COLUMN_NO_TTL_COUNT   => $countNoTtl,
+                    self::COLUMN_WITH_TTL_COUNT => $countHasTtl,
+                    self::COLUMN_MIN_TTL        => $minTtl ?? '-',
+                    self::COLUMN_MAX_TTL        => $maxTtl ?? '-',
+                    self::COLUMN_AVERAGE_TTL    => $countHasTtl === 0 ? '-' : (int)($sumTtl / $countHasTtl),
+                    self::COLUMN_DATA_SIZE      => $sumLength,
                 ];
             }
         }
 
         usort($aggregated, static function (array $a, array $b): int {
-            return $b['Data Size'] <=> $a['Data Size'];
+            return $b[self::COLUMN_DATA_SIZE] <=> $a[self::COLUMN_DATA_SIZE];
         });
 
 
@@ -238,8 +272,8 @@ $app = new class extends CliTool\App {
         // Calculate column widths from widest column header or value
         $columnWidths = [];
         foreach ($aggregated as $row) {
-            foreach ($row as $columnTitle => $columnValue) {
-                $columnWidths[$columnTitle] = max(strlen((string)$columnValue), $columnWidths[$columnTitle] ?? 0, strlen((string)$columnTitle));
+            foreach ($row as $columnKey => $columnValue) {
+                $columnWidths[$columnKey] = max(strlen((string)$columnValue), $columnWidths[$columnKey] ?? 0, strlen((string)$columnKey));
             }
         }
 
@@ -247,11 +281,12 @@ $app = new class extends CliTool\App {
         $table = [];
 
         // Column headers
-        foreach (array_keys($aggregated[0]) as $columnTitle) {
-            $width      = $columnWidths[$columnTitle];
-            $table[0][] = str_pad('', $width, '*');
-            $table[1][] = str_pad($columnTitle, $width, ' ', STR_PAD_LEFT);
-            $table[2][] = str_pad('', $width, '-');
+        foreach (array_keys($aggregated[0]) as $columnKey) {
+            $columnTitle = self::LABELS[$columnKey];
+            $width       = $columnWidths[$columnKey];
+            $table[0][]  = str_pad('', $width, '*');
+            $table[1][]  = str_pad($columnTitle, $width, ' ', STR_PAD_LEFT);
+            $table[2][]  = str_pad('', $width, '-');
         }
 
         // Column Data
@@ -260,17 +295,17 @@ $app = new class extends CliTool\App {
             if ($rowId === count($aggregated) - 1) {
                 break;
             }
-            foreach ($row as $columnTitle => $columnValue) {
-                $width                      = $columnWidths[$columnTitle];
+            foreach ($row as $columnKey => $columnValue) {
+                $width                      = $columnWidths[$columnKey];
                 $table[$nextRow + $rowId][] = str_pad((string)$columnValue, $width, ' ', STR_PAD_LEFT);
             }
         }
 
         // Column Footer
         $nextRow = count($table);
-        foreach (array_keys($aggregated[0]) as $columnTitle) {
-            $width       = $columnWidths[$columnTitle];
-            $columnValue = $aggregated[count($aggregated) - 1][$columnTitle];
+        foreach (array_keys($aggregated[0]) as $columnKey) {
+            $width       = $columnWidths[$columnKey];
+            $columnValue = $aggregated[count($aggregated) - 1][$columnKey];
 
             $table[$nextRow][]     = str_pad('', $width, '-');
             $table[$nextRow + 1][] = str_pad((string)$columnValue, $width, ' ', STR_PAD_LEFT);
