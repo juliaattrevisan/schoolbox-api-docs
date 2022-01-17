@@ -14,6 +14,7 @@
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\User;
 use Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -199,6 +200,17 @@ class ResponseFile
 
         try {
             // Finished processing. Get a fresh view session
+
+            /* If we're in an archived period, make this read only
+             */
+            $term = Mapper::getInstance()->findForDate($file->getSubmission()->getAssessable()->getDueAt());
+
+            if ($term->getArchived()) {
+                return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user, false);
+            }
+
+            /* Otherwise present it with edit options
+             */
             return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user, true);
         } catch (Kami\Exception\EmptyApiKeyException $e) {
             // Should be impossible here due to short-circuit at start of method.
