@@ -14,7 +14,6 @@
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\User;
 use Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -46,15 +45,22 @@ class ResponseFile
 
 
     /**
+     * @var \Schoolbox\Assessment\Term\Mapper
+     */
+    private \Schoolbox\Assessment\Term\Mapper $termMapper;
+
+    /**
      * ResponseFile constructor.
      *
      * @param Kami\Mapper    $kamiMapper
      * @param Kami\Connector $kamiConnector
+     * @param \Schoolbox\Assessment\Term\Mapper $termMapper
      */
-    public function __construct(Kami\Mapper $kamiMapper, Kami\Connector $kamiConnector)
+    public function __construct(Kami\Mapper $kamiMapper, Kami\Connector $kamiConnector, \Schoolbox\Assessment\Term\Mapper $termMapper)
     {
         $this->kamiMapper    = $kamiMapper;
         $this->kamiConnector = $kamiConnector;
+        $this->termMapper = $termMapper;
     }
 
 
@@ -203,7 +209,7 @@ class ResponseFile
 
             /* If we're in an archived period, make this read only
              */
-            $term = Mapper::getInstance()->findForDate($file->getSubmission()->getAssessable()->getDueAt());
+            $term = $this->termMapper->findForDate($file->getSubmission()->getAssessable()->getDueAt());
 
             if ($term->getArchived()) {
                 return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user, false);
