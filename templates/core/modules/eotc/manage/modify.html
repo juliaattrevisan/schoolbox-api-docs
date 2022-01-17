@@ -47,12 +47,12 @@
                 modal.foundation('reveal', 'open');
 
                 modal.find('[data-rams-ok]').click(function(event) {
-                    self.attr('checked', false);
+                    self.prop('checked', false);
                     $('#ramsModal').foundation('reveal', 'close');
                 });
 
                 modal.find('[data-rams-cancel]').click(function(event) {
-                    self.attr('checked', true);
+                    self.prop('checked', true);
                     $('#ramsModal').foundation('reveal', 'close');
                 });
 
