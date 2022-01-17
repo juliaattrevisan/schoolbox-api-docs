@@ -115,7 +115,7 @@ abstract class AbstractSubSource implements IFeedbackDataSource
 
 
     /**
-     * Add assessment into each feedback
+     * Add assessment into each feedback (and its response, if it is set)
      *
      * @param Collection|IFeedback[][] $feedbacks
      * @param Collection|IAssessable[] $assessments
@@ -127,6 +127,15 @@ abstract class AbstractSubSource implements IFeedbackDataSource
             if (isset($feedbacks[$assessment->getId()])) {
                 foreach ($feedbacks[$assessment->getId()] as $feedback) {
                     $feedback->setAssessable($assessment);
+
+                    // Also add assessment into the feedback's response,
+                    // if it exists in `$assessments`
+                    if ($feedback->getResponse()) {
+                        $responseAssessment = $assessments[$feedback->getResponse()->getAssessable()->getId()] ?? null;
+                        if ($responseAssessment) {
+                            $feedback->getResponse()->setAssessable($responseAssessment);
+                        }
+                    }
                 }
             }
         }
