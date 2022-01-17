@@ -289,11 +289,6 @@ Data:
                 </section>
             {% endif %}
 
-            {# If this is a self-reflectable assessment, and is being submitted by the student, include the section for self-reflecting #}
-            {% if requiresReflection %}
-                {% include '@learningDueWorkResponse/inlineGrading/selfAssessment.twig' %}
-            {% endif %}
-
             {# If a due work doesn't accept online submissions at all,
              # students may still be able to self-reflect, but we don't want
              # them seeing the submission field.
@@ -379,6 +374,11 @@ Data:
                         </ul>
                     {% endif %}
                 </div>
+            {% endif %}
+
+            {# If this is a self-reflectable assessment, and is being submitted by the student, include the section for self-reflecting #}
+            {% if requiresReflection %}
+                {% include '@learningDueWorkResponse/inlineGrading/selfAssessment.twig' %}
             {% endif %}
 
             <input type="submit"
