@@ -15,6 +15,10 @@ use Predis;
 
 class Redis
 {
+    /**
+     * Prefix all function call Redis keys with this value.
+     */
+    private const FUNCTION_CALL_CACHE_PREFIX = 'fc';
 
     /**
      * @var static
@@ -111,7 +115,8 @@ class Redis
     /**
      * Caches results of a function call in Redis.
      *
-     * The result is stored in "$base_key:sha256(serialize($params))".
+     * The result is stored in:
+     * "fc:$this->instanceId:$base_key:sha256(serialize($params))".
      *
      * @param string   $base_key The base of the key to store the result in.
      * @param callable $callback A callable that returns a value to be cached,
@@ -132,7 +137,13 @@ class Redis
         }
 
         $redis = $this->client;
-        $key   = $base_key . ':' . $this->instanceId . ':' . hash('sha256', serialize($params));
+        $key   = sprintf(
+            '%s:%s:%s:%s',
+            self::FUNCTION_CALL_CACHE_PREFIX,
+            $this->instanceId,
+            $base_key,
+            hash('sha256', serialize($params)),
+        );
 
         // Would use Redis hashes, but individual keys don't have expiry.
         $is_result_called = false;

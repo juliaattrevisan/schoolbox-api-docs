@@ -19,9 +19,66 @@ require __DIR__ . '/../../conf/core/require.php';
  * * key type TTLs
  * * key type data usage
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\App
+{
+    /**
+     * Print help
+     */
+    private const OPT_SHORT_HELP = 'h';
 
-    // Recognised key patterns
+    /**
+     * Print help
+     */
+    private const OPT_LONG_HELP  = 'help';
+
+    /**
+     * sort by key pattern, instead of by size
+     */
+    private const OPT_SORT_BY_KEY_PATTERN = 'sort-by-key-pattern';
+
+    private const COLUMN_KEY_PATTERN = 'keyPattern';
+    private const COLUMN_PAYLOAD = 'payload';
+    private const COLUMN_TOTAL_COUNT = 'totalCount';
+    private const COLUMN_NO_TTL_COUNT = 'noTtlCount';
+    private const COLUMN_WITH_TTL_COUNT = 'withTtlCount';
+    private const COLUMN_MIN_TTL = 'minTtl';
+    private const COLUMN_MAX_TTL = 'maxTtl';
+    private const COLUMN_AVERAGE_TTL = 'averageTtl';
+    private const COLUMN_DATA_SIZE = 'dataSize';
+
+    /**
+     * Column alignments
+     */
+    private const ALIGNMENTS = [
+        self::COLUMN_KEY_PATTERN    => STR_PAD_RIGHT,
+        self::COLUMN_PAYLOAD        => STR_PAD_RIGHT,
+        self::COLUMN_TOTAL_COUNT    => STR_PAD_LEFT,
+        self::COLUMN_NO_TTL_COUNT   => STR_PAD_LEFT,
+        self::COLUMN_WITH_TTL_COUNT => STR_PAD_LEFT,
+        self::COLUMN_MIN_TTL        => STR_PAD_LEFT,
+        self::COLUMN_MAX_TTL        => STR_PAD_LEFT,
+        self::COLUMN_AVERAGE_TTL    => STR_PAD_LEFT,
+        self::COLUMN_DATA_SIZE      => STR_PAD_LEFT,
+    ];
+
+    /**
+     * Column labels
+     */
+    private const LABELS = [
+        self::COLUMN_KEY_PATTERN    => 'Key Pattern',
+        self::COLUMN_PAYLOAD        => 'Payload',
+        self::COLUMN_TOTAL_COUNT    => 'Total Count',
+        self::COLUMN_NO_TTL_COUNT   => 'No TTL Count',
+        self::COLUMN_WITH_TTL_COUNT => 'With TTL Count',
+        self::COLUMN_MIN_TTL        => 'Min TTL',
+        self::COLUMN_MAX_TTL        => 'Max TTL',
+        self::COLUMN_AVERAGE_TTL    => 'Average TTL',
+        self::COLUMN_DATA_SIZE      => 'Data Size',
+    ];
+
+    /**
+     * Recognised key patterns
+     */
     private const KEY_PATTERNS = [
         '^msg:' . INSTANCE_ID . ':m:.+',
         '^pad:g\.',
@@ -35,7 +92,14 @@ $app = new class extends CliTool\App {
         '^author2sessions:',
         '^mapper2author:',
         '^group2sessions:g\.',
+        // Old and new scrub
         '^scrub.html:',
+        '^scrub.htmlAbsoluteUri:',
+        '^fc:' . INSTANCE_ID . ':scrub.html:',
+        '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
+        // Old and new Verso API
+        '^verso_api',
+        '^fc:' . INSTANCE_ID . ':verso_api:',
         '^sessionstorage:',
         '^globalAuthor:',
         '^ueberDB:keys:',
@@ -51,15 +115,51 @@ $app = new class extends CliTool\App {
         "^schedule:" . INSTANCE_ID . ":index",
         "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
         "^groups$",
+        // Old and new external
         "^External_.+",
+        '^fc:' . INSTANCE_ID . ':External_',
         "^vcal.[0-9a-f]{64}",
         '^accessToken:' . INSTANCE_ID . ':.+',
     ];
 
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [self::OPT_LONG_HELP, self::OPT_SORT_BY_KEY_PATTERN,];
+    }
 
     /** @inheritDoc */
     public function run(): void
     {
+
+        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
+            echo <<<HELP
+            Synopsis:
+                Report upon Redis usage.
+
+            Usage:
+                ./report.php [--sort-by-key-pattern] [-h] [--help]
+
+            Options:
+                --sort-by-key-pattern:
+                    If provided, sort the report alphabetically by key pattern:
+                    otherwise, sort by the data size (largest first).
+                -h, --help:
+                    Print this help text
+            HELP;
+            exit;
+        }
+
         $redis = \Alaress\Redis::getClientInstance();
         if (!$redis) {
             $this->getLogger()->error("Unable to fetch redis connection");
@@ -175,21 +275,25 @@ $app = new class extends CliTool\App {
                 }
 
                 $aggregated[] = [
-                    'Key Pattern'    => $pattern,
-                    'Payload'        => $payload,
-                    'Total Count'    => count($matches),
-                    'No TTL Count'   => $countNoTtl,
-                    'With TTL Count' => $countHasTtl,
-                    'Min TTL'        => $minTtl ?? '-',
-                    'Max TTL'        => $maxTtl ?? '-',
-                    'Average TTL'    => $countHasTtl === 0 ? '-' : (int)($sumTtl / $countHasTtl),
-                    'Data Size'      => $sumLength,
+                    self::COLUMN_KEY_PATTERN    => $pattern,
+                    self::COLUMN_PAYLOAD        => $payload,
+                    self::COLUMN_TOTAL_COUNT    => count($matches),
+                    self::COLUMN_NO_TTL_COUNT   => $countNoTtl,
+                    self::COLUMN_WITH_TTL_COUNT => $countHasTtl,
+                    self::COLUMN_MIN_TTL        => $minTtl ?? '-',
+                    self::COLUMN_MAX_TTL        => $maxTtl ?? '-',
+                    self::COLUMN_AVERAGE_TTL    => $countHasTtl === 0 ? '-' : (int)($sumTtl / $countHasTtl),
+                    self::COLUMN_DATA_SIZE      => $sumLength,
                 ];
             }
         }
 
-        usort($aggregated, static function (array $a, array $b): int {
-            return $b['Data Size'] <=> $a['Data Size'];
+
+        $sortByKeyPattern = $this->getOpt(self::OPT_SORT_BY_KEY_PATTERN);
+        usort($aggregated, static function (array $a, array $b) use ($sortByKeyPattern): int {
+            return $sortByKeyPattern
+                ? strnatcasecmp($a[self::COLUMN_KEY_PATTERN], $b[self::COLUMN_KEY_PATTERN])
+                : ($b[self::COLUMN_DATA_SIZE] <=> $a[self::COLUMN_DATA_SIZE]);
         });
 
 
@@ -229,8 +333,13 @@ $app = new class extends CliTool\App {
         // Calculate column widths from widest column header or value
         $columnWidths = [];
         foreach ($aggregated as $row) {
-            foreach ($row as $columnTitle => $columnValue) {
-                $columnWidths[$columnTitle] = max(strlen((string)$columnValue), $columnWidths[$columnTitle] ?? 0, strlen((string)$columnTitle));
+            foreach ($row as $columnKey => $columnValue) {
+                $columnTitle = self::LABELS[$columnKey];
+                $columnWidths[$columnKey] = max(
+                    strlen((string)$columnValue),
+                    $columnWidths[$columnKey] ?? 0,
+                    strlen($columnTitle),
+                );
             }
         }
 
@@ -238,11 +347,12 @@ $app = new class extends CliTool\App {
         $table = [];
 
         // Column headers
-        foreach (array_keys($aggregated[0]) as $columnTitle) {
-            $width      = $columnWidths[$columnTitle];
-            $table[0][] = str_pad('', $width, '*');
-            $table[1][] = str_pad($columnTitle, $width, ' ', STR_PAD_LEFT);
-            $table[2][] = str_pad('', $width, '-');
+        foreach (array_keys($aggregated[0]) as $columnKey) {
+            $columnTitle = self::LABELS[$columnKey];
+            $width       = $columnWidths[$columnKey];
+            $table[0][]  = str_pad('', $width, '*');
+            $table[1][]  = str_pad($columnTitle, $width, ' ', STR_PAD_BOTH);
+            $table[2][]  = str_pad('', $width, '-');
         }
 
         // Column Data
@@ -251,20 +361,20 @@ $app = new class extends CliTool\App {
             if ($rowId === count($aggregated) - 1) {
                 break;
             }
-            foreach ($row as $columnTitle => $columnValue) {
-                $width                      = $columnWidths[$columnTitle];
-                $table[$nextRow + $rowId][] = str_pad((string)$columnValue, $width, ' ', STR_PAD_LEFT);
+            foreach ($row as $columnKey => $columnValue) {
+                $width                      = $columnWidths[$columnKey];
+                $table[$nextRow + $rowId][] = str_pad((string)$columnValue, $width, ' ', self::ALIGNMENTS[$columnKey]);
             }
         }
 
         // Column Footer
         $nextRow = count($table);
-        foreach (array_keys($aggregated[0]) as $columnTitle) {
-            $width       = $columnWidths[$columnTitle];
-            $columnValue = $aggregated[count($aggregated) - 1][$columnTitle];
+        foreach (array_keys($aggregated[0]) as $columnKey) {
+            $width       = $columnWidths[$columnKey];
+            $columnValue = $aggregated[count($aggregated) - 1][$columnKey];
 
             $table[$nextRow][]     = str_pad('', $width, '-');
-            $table[$nextRow + 1][] = str_pad((string)$columnValue, $width, ' ', STR_PAD_LEFT);
+            $table[$nextRow + 1][] = str_pad((string)$columnValue, $width, ' ', self::ALIGNMENTS[$columnKey]);
             $table[$nextRow + 2][] = str_pad('', $width, '_');
         }
 
