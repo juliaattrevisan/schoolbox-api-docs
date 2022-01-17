@@ -53,7 +53,6 @@ class Module extends BaseModule
                 [
                     'canvasUrl' => $this->getConfig()->get('canvas_url'),
                     'bearerToken' => $this->getConfig()->get('canvas_bearer_token'),
-                    'timezone' => $this->getConfig()->get('date_timezone'),
                 ]
             )
         );
