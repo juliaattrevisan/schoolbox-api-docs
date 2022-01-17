@@ -35,7 +35,10 @@ $app = new class extends CliTool\App {
         '^author2sessions:',
         '^mapper2author:',
         '^group2sessions:g\.',
+        // Old scrub
         '^scrub.html:',
+        // New scrub
+        '^fc:' . INSTANCE_ID . ':scrub.html:',
         '^sessionstorage:',
         '^globalAuthor:',
         '^ueberDB:keys:',
@@ -51,7 +54,10 @@ $app = new class extends CliTool\App {
         "^schedule:" . INSTANCE_ID . ":index",
         "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
         "^groups$",
+        // Old external
         "^External_.+",
+        // New external
+        '^fc:' . INSTANCE_ID . ':External_',
         "^vcal.[0-9a-f]{64}",
         '^accessToken:' . INSTANCE_ID . ':.+',
     ];
