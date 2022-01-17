@@ -286,6 +286,12 @@
                          #}
                         <script>
                             $(function() {
+                                /* Init the attendance options based on dropdown's current value
+                                 */
+                                if ('{{ attendanceLevelNoAttendance }}' == $('#attendanceLevelSelector').val()) {
+                                    $('#attendance-guests').hide();
+                                }
+
                                 $('#attendanceLevelSelector').on('change', function(event) {
                                     if ($(this).val() == '{{ attendanceLevelNoAttendance }}') {
                                         $('#attendance-guests').hide();
