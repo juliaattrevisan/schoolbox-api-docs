@@ -14,13 +14,10 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Transformer;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
-//use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DomainObject;
-use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback
@@ -125,10 +122,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
              * This relation is optional
              */
             if ($submissionReturn->getSubmission()) {
-//                $feedback->setResponse(
-//                    (new DueWorkResponse())
-//                        ->setId($submissionReturn->getSubmission()->getId())
-//                );
                 $feedback->setResponse(
                     (new Transformer())->transformModel($submissionReturn->getSubmission())
                 );
@@ -183,9 +176,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                         $this->getInternalValue($domainObject->getAssessable()->getId())
                     )
                 );
-//                $dataModel->setSubmission(
-//                    (new Submission())->setId($domainObject->getResponse()->getId())
-//                );
             }
 
             // Add all files

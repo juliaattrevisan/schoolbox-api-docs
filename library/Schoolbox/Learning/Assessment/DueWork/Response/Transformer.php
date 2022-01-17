@@ -9,11 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as Model;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DomainObject;
 
@@ -69,7 +67,6 @@ class Transformer
             ->setSubmissionBox(
                 (new DueWorkDataObject())
                     ->setId($submissionBoxId)
-//                    ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
             )
             ->setSubmittedBy($domainObject->getSubmittedBy())
             ->setOwner($domainObject->getSubmittedOnBehalfOf())
