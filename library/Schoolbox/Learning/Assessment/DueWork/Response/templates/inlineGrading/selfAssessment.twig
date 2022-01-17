@@ -13,18 +13,6 @@
     {% set selfAssessText = 'assess and' %}
 {% endif %}
 
-{# Instructions #}
-<div class="row">
-    <div class="small-12 columns">
-        <p>Use the {{ rubricText }} comment box below to {{ selfAssessText }} reflect on your own work.</p>
-        <div class="alert-box warning">
-            Note: your {{ assessment.selfGradable ? locale.selfAssessment : locale.selfReflection }}
-            will automatically save to draft, but
-            <strong>will not be submitted until you press the Submit for Feedback button.</strong>
-        </div>
-    </div>
-</div>
-
 {# Feedback form section #}
 <section id="self-assessment-feedback">
     {# Rubric #}
