@@ -155,7 +155,9 @@ $app = new class extends CliTool\App
                     If provided, sort the report alphabetically by key pattern:
                     otherwise, sort by the data size (largest first).
                 -h, --help:
-                    Print this help text
+                    Print this help text.
+
+
             HELP;
             exit;
         }
