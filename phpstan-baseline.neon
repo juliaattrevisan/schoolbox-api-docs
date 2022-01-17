@@ -7141,6 +7141,11 @@ parameters:
 			path: library/Schoolbox/Realtime/Controller.php
 
 		-
+			message: "#^Property Schoolbox\\\\Realtime\\\\Controller\\:\\:\\$config \\(Schoolbox\\\\Realtime\\\\Config\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: library/Schoolbox/Realtime/Controller.php
+
+		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 7
 			path: library/Schoolbox/Realtime/Controller.php
