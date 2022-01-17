@@ -457,6 +457,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-live-marks:before {
+    content: '\e927';
+    font-family: $font-family-icon;
+}
+
 .icon-itineraryitem:before,
 .icon-list:before {
     content: '\e63b';
@@ -492,6 +497,11 @@
 
 .icon-match:before {
     content: '\e903';
+    font-family: $font-family-icon;
+}
+
+.icon-medical:before {
+    content: "\e926";
     font-family: $font-family-icon;
 }
 
@@ -841,6 +851,12 @@
 .icon-view:before,
 .icon-eye:before {
     content: '\e675';
+    font-family: $font-family-icon;
+}
+
+.icon-view-hollow:before,
+.icon-eye-hollow:before {
+    content: '\e925';
     font-family: $font-family-icon;
 }
 
