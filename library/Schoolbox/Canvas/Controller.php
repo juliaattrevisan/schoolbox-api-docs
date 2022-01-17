@@ -12,6 +12,7 @@ namespace Schoolbox\Canvas;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use DateTimeZone;
 use External\Canvas\Importer\Api;
 
 class Controller extends Base
@@ -19,16 +20,19 @@ class Controller extends Base
 
     private string $bearerToken;
     private string $canvasUrl;
+    private string $timezone;
 
     /**
      * Controller constructor.
      * @param string $canvasUrl
      * @param string $bearerToken
+     * @param string $timezone
      */
-    public function __construct(string $canvasUrl, string $bearerToken)
+    public function __construct(string $canvasUrl, string $bearerToken, string $timezone)
     {
         $this->canvasUrl    = $canvasUrl;
         $this->bearerToken  = $bearerToken;
+        $this->timezone     = $timezone;
     }
 
 
@@ -142,7 +146,10 @@ class Controller extends Base
 
             //fix end_date for assignments to make it more user friendly...
             foreach ($assignments as $id => $assignment) {
-                $date = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $assignment['end_at']);
+                //date is UTC based, so lets set that here, and update to the instance TZ
+                $date = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $assignment['end_at'], new DateTimeZone("UTC"));
+                //fix timezone for current location
+                $date = $date->setTimezone(new DateTimeZone($this->timezone));
                 $assignments[$id]['end_at'] = $date->format("Y/m/d H:i");
             }
         } catch (\RuntimeException | \DomainException $e) {
