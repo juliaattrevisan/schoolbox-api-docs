@@ -61,7 +61,9 @@ $app = new class extends CliTool\App
         self::COLUMN_DATA_SIZE      => 'Data Size',
     ];
 
-    // Recognised key patterns
+    /**
+     * Recognised key patterns
+     */
     private const KEY_PATTERNS = [
         '^msg:' . INSTANCE_ID . ':m:.+',
         '^pad:g\.',
@@ -279,7 +281,12 @@ $app = new class extends CliTool\App
         $columnWidths = [];
         foreach ($aggregated as $row) {
             foreach ($row as $columnKey => $columnValue) {
-                $columnWidths[$columnKey] = max(strlen((string)$columnValue), $columnWidths[$columnKey] ?? 0, strlen((string)$columnKey));
+                $columnTitle = self::LABELS[$columnKey];
+                $columnWidths[$columnKey] = max(
+                    strlen((string)$columnValue),
+                    $columnWidths[$columnKey] ?? 0,
+                    strlen($columnTitle),
+                );
             }
         }
 
@@ -291,7 +298,7 @@ $app = new class extends CliTool\App
             $columnTitle = self::LABELS[$columnKey];
             $width       = $columnWidths[$columnKey];
             $table[0][]  = str_pad('', $width, '*');
-            $table[1][]  = str_pad($columnTitle, $width, ' ', self::ALIGNMENTS[$columnKey]);
+            $table[1][]  = str_pad($columnTitle, $width, ' ', STR_PAD_BOTH);
             $table[2][]  = str_pad('', $width, '-');
         }
 
