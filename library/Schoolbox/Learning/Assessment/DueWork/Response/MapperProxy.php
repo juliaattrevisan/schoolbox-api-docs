@@ -97,10 +97,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dueWorkResponses = new GenericCollection(DomainObject::class);
 
         foreach ($mapperModels as $studentSubmission) {
+            $transformer ??= new Transformer();
             $dueWorkResponses->add(
-                (new Transformer())->transformModel(
-                    $studentSubmission,
-                )
+                $transformer->transformModel($studentSubmission)
             );
         }
 
@@ -138,8 +137,9 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dataModels = $this->getMapper()->createCollection();
 
         foreach ($domainObjects as $domainObject) {
+            $transformer ??= new Transformer();
             $dataModels->add(
-                (new Transformer())->transformDomainObject(
+                $transformer->transformDomainObject(
                     $domainObject,
                     $this->getInternalValue($domainObject->getAssessable()->getId())
                 )

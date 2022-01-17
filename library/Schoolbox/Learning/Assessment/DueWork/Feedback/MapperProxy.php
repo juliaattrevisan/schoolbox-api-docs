@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork\Response\Transformer;
+use Schoolbox\Learning\Assessment\DueWork\Response\Transformer as ResponseTransformer;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
@@ -100,7 +100,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dueWorkFeedbacks = new GenericCollection(DomainObject::class);
 
         foreach ($mapperModels as $submissionReturn) {
-            $feedback = (new DomainObject())
+            $responseTransformer ??= new ResponseTransformer();
+            $feedback            = (new DomainObject())
                 ->setId($submissionReturn->getId())
                 ->setAssessable((new DueWork())->setId($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId()))
                 ->setReviewee($submissionReturn->getOwner())
@@ -123,7 +124,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
              */
             if ($submissionReturn->getSubmission()) {
                 $feedback->setResponse(
-                    (new Transformer())->transformModel($submissionReturn->getSubmission())
+                    $responseTransformer->transformModel($submissionReturn->getSubmission())
                 );
             }
 
@@ -147,7 +148,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dataModels = $this->getMapper()->createCollection();
 
         foreach ($domainObjects as $domainObject) {
-            $dataModel = $this->getMapper()->createModel()
+            $responseTransformer ??= new ResponseTransformer();
+            $dataModel           = $this->getMapper()->createModel()
                 ->setId($domainObject->getId())
                 ->setSubmissionBox(
                     (new DueWorkDataObject())
@@ -171,7 +173,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             // This feedback doesn't have to be tied to a particular response.
             if ($domainObject->getResponse() instanceof IResponse) {
                 $dataModel->setSubmission(
-                    (new Transformer())->transformDomainObject(
+                    $responseTransformer->transformDomainObject(
                         $domainObject->getResponse(),
                         $this->getInternalValue($domainObject->getAssessable()->getId())
                     )
