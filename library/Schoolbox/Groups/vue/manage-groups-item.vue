@@ -54,6 +54,15 @@ export default {
         },
 
         /**
+         * Shouldn't be able to join/leave a group when an admin
+         * 
+         * @returns { Boolean }
+         */
+        isAdmin () {
+            return this.group.isAccessAdmin;
+        },
+
+        /**
          * To show whether the group is a favourite or not
          * 
          * @returns { Boolean }
@@ -86,7 +95,8 @@ export default {
          * @returns { Boolean }
          */
         isEnrolled () {
-            return this.group.type === groupTypes.FREE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return (this.group.type === groupTypes.FREE || this.group.type === groupTypes.MODERATED) 
+                    && this.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
@@ -349,7 +359,8 @@ export default {
                     </template>
                 </div>
                 <transition name="fade" mode="out-in">
-                    <div v-if="isPrivate" class="expand private" key="private">Private</div>
+                    <div v-if="isAdmin" class="expand private" key="admin">Group Admin</div>
+                    <div v-else-if="isPrivate" class="expand private" key="private">Private</div>
                     <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave" :disabled="isProcessing">Leave</button>
                     <div v-else-if="isMembershipPending" class="expand membership-pending" key="membershipPending">Membership pending</div>
                     <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join" :disabled="isProcessing">Request to join</button>
