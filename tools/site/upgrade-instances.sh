@@ -250,13 +250,13 @@ function rebuild_cron_jobs(){
   fi
 
   if [[ $verbose == 0 ]] && [[ $single_instance_mode == 0 ]]; then
-    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host"
+    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host"
   elif [[ $verbose == 0 ]] && [[ $single_instance_mode == 1 ]]; then
-    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" --instance "$instance_list"
+    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host" --instance "$instance_list"
   elif [[ $verbose == 1 ]] && [[ $single_instance_mode == 0 ]]; then
-    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" -v
+    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host" -v
   else
-    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" --instance "$instance_list" -v
+    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host" --instance "$instance_list" -v
   fi
 }
 

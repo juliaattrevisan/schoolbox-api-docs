@@ -54,7 +54,7 @@ restart_services() {
   log "Restarting Services";
   service nginx restart
   /vagrant/tools/notif/allrestart
-  /usr/local/bin/schoolboxcloud-rebuild-cronjobs --site-root /vagrant --is-primary-host 1
+  /usr/local/bin/schoolboxcloud-rebuild-cronjobs --is-primary-host 1
 }
 
 # Prepare instance to be archived so it can be deployed to new SB environments
