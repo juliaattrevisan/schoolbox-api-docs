@@ -1,0 +1,1 @@
+INSERT INTO `package` (`title`, `description`, `location`, `installed`) VALUES ('Victorian Curriculum', 'Attaches codes to the Victorian Curriculum to allow for the mapping of these to learning resources.', 'VictorianCurriculum', '0');
