@@ -64,10 +64,27 @@ class Badges
     }
 
     /**
-     * click an option Odify in the dropdown
+     * click an option Modify in the dropdown
      */
     public function clickDropdownModify($badgeNumber): void
     {
         $this->tester->click('a[href="/learning/badge/' . $badgeNumber . '/update"]');
+    }
+
+    /**
+     * click an option Delete in the dropdown
+     */
+    public function clickDropdownDelete(): void
+    {
+        $this->tester->click(Locator::lastElement('a.icon-delete'));
+    }
+
+
+    /**
+     * click Delete button on confirmation dialog
+     */
+    public function clickConfirmDelete(): void
+    {
+        $this->tester->click(Locator::lastElement('a.button.submit'));
     }
 }

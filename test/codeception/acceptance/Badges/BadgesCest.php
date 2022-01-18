@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Badges;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 use Page\Badges\Badges;
 use Page\Badges\CreateBadge;
 use Exception;
@@ -85,5 +86,27 @@ class BadgesCest
         $badges->waitAddBadgeButtonToBePresented();
         $badges->verifyTextIsPresented('Automation Badge Updated');
         $badges->verifyTextIsPresented($category);
+    }
+
+    /**
+
+     * @param AcceptanceTester $i
+     * @throws Exception
+     * @depends modifyBadge
+     * on /learning/badge select Modify badge
+     * update the title
+     * update the category
+     * Click Modify Badge
+     * Ensure the Badge title and category are properly presented in the /learning/badge screen
+     */
+    public function deleteBadge(AcceptanceTester $i)
+    {
+        $badges = new Badges($i);
+        $badgeId = $i->grabNumRecords('badge');
+        $badges->clickBadgeDropdown($badgeId);
+        $badges->clickDropdownDelete();
+        $badges->clickConfirmDelete();
+        $badges->waitAddBadgeButtonToBePresented();
+        $i->cantSee('Automation Badge Updated');
     }
 }
