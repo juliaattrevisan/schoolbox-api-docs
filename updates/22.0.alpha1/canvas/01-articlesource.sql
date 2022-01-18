@@ -10,6 +10,12 @@ CREATE TABLE `comms_news_article_source` (
   `deleted_at` DATETIME NULL,
   UNIQUE INDEX `article_id_UNIQUE` (`article_id` ASC),
   INDEX `source_name` (`source_name` ASC),
-  INDEX `guid` (`guid` ASC))
+  INDEX `guid` (`guid` ASC),
+    CONSTRAINT `fk_article_id_comms_news_article_id`
+        FOREIGN KEY (`article_id`)
+        REFERENCES `comms_news_article` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+  )
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
