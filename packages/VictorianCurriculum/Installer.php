@@ -25,13 +25,6 @@ class Installer implements IPackageInstall
 
 
     /**
-     * Name of a root node in the curriculum_node table
-     * to which all csv rows are a subset
-     */
-    private const PARENT_NODE_NAME = 'Victorian Curriculum';
-
-
-    /**
      * Install the contents of the source file into the db
      * $user is unused in this installer.
      *
