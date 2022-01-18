@@ -118,13 +118,20 @@ class Team implements IStrategy
             $endpoint
         ));
 
-        $teams = $this->api->retrieve('GET', $endpoint, []);
+        $teams = $this->api->retrieve('GET', $endpoint, [
+            'includeStudents' => 'true',
+            'includePositions' => 'true'
+        ]);
 
         foreach ($teams['data'] as $team) {
             $teamActivity = $team['activity']['name'] ?? '';
             $teamCategory = $team['category']['name'] ?? '';
             $teamSubcategory = $team['subcategory']['name'] ?? '';
             $teamName = $team['name'];
+
+            if ($teamName === 'Senior Training Squad') {
+                print_r($team);
+            }
 
             /* Try to manufacture a division title
              */
