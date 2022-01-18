@@ -13,7 +13,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
 
-
 /**
  * Class Api
  *
@@ -148,7 +147,6 @@ class Api implements IApi
                  * Find out what guzzle calculated as the endpoint + query string params
                  */
 //                print_r($url);
-
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 
