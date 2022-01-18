@@ -9,7 +9,7 @@ namespace Payload\Fixtures\Match\Result;
 
 use Payload\Request;
 use Payload\PostTrait;
-use Schoolbox\Fixtures\Match\Model;
+use Schoolbox\Fixtures\Matchup\Model;
 
 class Create extends Request
 {
