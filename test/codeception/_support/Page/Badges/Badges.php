@@ -23,6 +23,13 @@ class Badges
         $this->tester = $i;
     }
 
+    /**
+     * wait Create Badge button to be presented
+     */
+    public function waitAddBadgeButtonToBePresented(): void
+    {
+        $this->tester->waitForElementVisible(self::BUTTON_ADD, 2);
+    }
 
     /**
      * click Create Badge button
@@ -35,8 +42,32 @@ class Badges
     /**
      * verify badge name
      */
-    public function verifyBadgeName($badgeName): void
+    public function verifyTextIsPresented($text): void
     {
-        $this->tester->canSee($badgeName);
+        $this->tester->canSee($text);
+    }
+
+    /**
+     * Click a badge dropdown
+     */
+    public function clickBadgeDropdown($badgeNumber): void
+    {
+        $this->tester->click('a[data-dropdown="badge-' . $badgeNumber . '-dropdown"]');
+    }
+
+    /**
+     * click an option in the dropdown (Award Achievement, Set Goal, etc)
+     */
+    public function clickDropdownOption($dropdownOption): void
+    {
+        $this->tester->click('a.icon-' . $dropdownOption);
+    }
+
+    /**
+     * click an option Odify in the dropdown
+     */
+    public function clickDropdownModify($badgeNumber): void
+    {
+        $this->tester->click('a[href="/learning/badge/' . $badgeNumber . '/update"]');
     }
 }

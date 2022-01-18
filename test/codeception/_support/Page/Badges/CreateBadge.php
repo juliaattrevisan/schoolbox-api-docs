@@ -79,7 +79,6 @@ class CreateBadge
      */
     public function clickCategoryItem(string $category): void
     {
-        //'option[label="Learning"]'
         $this->tester->click('option[label="' . $category . '"]');
     }
 
