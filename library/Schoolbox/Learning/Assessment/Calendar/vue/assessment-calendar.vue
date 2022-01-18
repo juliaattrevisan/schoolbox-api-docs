@@ -189,7 +189,6 @@ export default {
             },
             buttonText: {
                 today:'Today',
-                resourceTimelineSemester: 'Semester',
             },
             customButtons: {
                 customNext: {
@@ -565,6 +564,7 @@ export default {
          * @param {Boolean} updateDate
          */
         switchView(viewType, updateDate) {
+            this.updateSelectedCustomButton(viewType);
             /**
              * Since clicking of month and week view needs to be customised, so that initial loading of month or week
              * view goes to the current date.
@@ -594,9 +594,26 @@ export default {
             }).then((result) => {
                 this.viewDidMount()
                 this.fullCalendarHelper_onLoading(false);
-
                 return result;
             });
+        },
+
+        /**
+         * As this calendar uses FullCalendars Custom Buttons for Month and Week views, the active class styling doesn't appear to be 
+         * automatically applied like it is for standard buttons. So we currently need to apply manually in this instance.  
+         * Without this ths Month and Week view buttons don't appear with active styling like they do in the other calendars. 
+         * @param {String}  viewType
+         */
+        updateSelectedCustomButton (viewType) {
+            this.$el.querySelectorAll('.fc-button-primary').forEach((element) => {
+                element.classList.remove('fc-button-active');
+            });
+            const activeButtonSelectors = { //use the existing viewType to target the buttons, FC applies a unique custom class to each button  
+                [VIEW_RESOURCE_TIMELINE_SEMESTER]: '.fc-resourceTimelineSemester-button',
+                [VIEW_DAY_GRID_MONTH]: '.fc-customDayGridMonth-button',
+                [VIEW_RESOURCE_TIMELINE_WEEK]: '.fc-customResourceTimelineWeek-button',
+            }
+            this.$el.querySelector(activeButtonSelectors[viewType]).classList.add('fc-button-active');
         },
 
         /**
