@@ -88,7 +88,7 @@ class Factory
          */
         $api = new Api($this->host, $this->token);
 
-        /* Set up composite bus - everybody's xml gets on board and shuttled off
+        /* Set up composite bus - everybody's data gets on board and shuttled off
          * into schoolbox town
          */
         return (new GenericCollection(IStrategy::class))
