@@ -267,7 +267,8 @@ class PostMapper extends Mapper implements FeedableMapperInterface
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
             $post = $this->hydrate($row)
-                ->setOwner($this->hydrateJoin($row, 'owner', 'owner'));
+                ->setOwner($this->hydrateJoin($row, 'owner', 'owner'))
+                ->setThread($this->hydrateJoin($row, 'thread', 'thread'));
             /**
              * check if the post has a parent, if so, hydrate
              */
