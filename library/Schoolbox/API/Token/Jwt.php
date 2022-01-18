@@ -83,10 +83,10 @@ class Jwt
             'iss' => (new Factory($this->config))->buildFullyQualified()->getHost(),
             'sub' => $user->getUsername(),
         ];
-        if (isset($expiry)) {
+        if ($expiry !== null && !$expiry->isNull()) {
             $claims['exp'] = $expiry;
         }
-        if (isset($jwtId)) {
+        if ($jwtId !== null) {
             $claims['jti'] = $jwtId;
         }
         return JwtLibrary::encode(
