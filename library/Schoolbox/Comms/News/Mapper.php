@@ -103,7 +103,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->hasJoin(
             'source',
             [
-                'multiple'  => true,
+                'multiple'  => false,
                 'mapper'    => Source\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'article_id',
