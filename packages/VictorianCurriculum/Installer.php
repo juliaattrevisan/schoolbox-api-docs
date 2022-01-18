@@ -68,50 +68,22 @@ class Installer implements IPackageInstall
         $curriculumMapper = Node\Mapper::getInstance();
         $parentLookup = [];
 
-        /* Find a curriculum_node called "Victorian Curriculum"
-         * If it doesn't exist, create it; this is a parent node
-         * for all the ones that follow from the csv
+        /* Special cast for broken csv
+         * I had to forcibly insert Victorian Curriculum as node 0
+         * Hence the specific check for !== 'NULL'
          */
-        try {
-            $rootParentNode = $curriculumMapper->findOneByColumn('name', self::PARENT_NODE_NAME);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $rootParentNode = $curriculumMapper->createModel()
-                ->setName(self::PARENT_NODE_NAME)
-                ->setOrder(0);
-
-            $curriculumMapper->save($rootParentNode);
-        }
-
-        $parentLookup[0] = $rootParentNode->getId();
-
         foreach ($csv as $row) {
-            try {
-                if (0 !== (int)$row['curriculum_node_parent_id']) {
-                    $rootParentNodeId = $parentLookup[$row['curriculum_node_parent_id']];
-                } else {
-                    $rootParentNodeId = 0;
-                }
+            $node = $curriculumMapper->createModel()
+                ->setParent($row['curriculum_node_parent_id'] !== 'NULL' ? $parentLookup[$row['curriculum_node_parent_id']] : null)
+                ->setName($row['name'])
+                ->setDescription($row['description'])
+                ->setCode($row['code'])
+                ->setOrder($row['order']);
 
-                $node = $curriculumMapper->createModel()
-                    ->setParent($rootParentNodeId)
-                    ->setName($row['name'])
-                    ->setDescription($row['description'])
-                    ->setCode($row['code'])
-                    ->setOrder($row['order']);
+            $curriculumMapper->save($node);
 
-//                $curriculumMapper->save($node);
-
-                print_r(sprintf(
-                    "Creating node %s with parent id %s\n",
-                    $row['name'],
-                    $rootParentNodeId
-                ));
-
-                // Store the inserted ID so we can link children to it
-                $parentLookup[$row['id']] = $node->getId();
-            } catch (\Throwable $e) {
-                print_r("\n{$e->getMessage()}");
-            }
+            // Store the inserted ID so we can link children to it
+            $parentLookup[$row['id']] = $node->getId();
         }
     }
 }

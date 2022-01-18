@@ -1,12 +1,13 @@
 id,curriculum_node_parent_id,curriculum_learning_level_id,curriculum_learning_area_id,name,code,reference,order,description,created_at,modified_at,deleted_at
-1,NULL,NULL,NULL,"The Arts",,,0,,"2021-01-06 09:04:16","2021-01-06 09:04:16",NULL
-2,NULL,NULL,NULL,English,,,0,,"2021-01-06 09:04:23","2021-01-06 09:04:23",NULL
-3,NULL,NULL,NULL,"Health and Physical Education",,,0,,"2021-01-06 09:04:31","2021-01-06 09:04:31",NULL
-4,NULL,NULL,NULL,"The Humanities",,,0,,"2021-01-06 09:04:38","2021-01-06 09:04:38",NULL
-5,NULL,NULL,NULL,Languages,,,0,,"2021-01-06 09:04:48","2021-01-06 09:04:48",NULL
-6,NULL,NULL,NULL,Mathematics,,,0,,"2021-01-06 09:04:55","2021-01-06 09:04:55",NULL
-7,NULL,NULL,NULL,Science,,,0,,"2021-01-06 09:05:01","2021-01-06 09:05:01",NULL
-8,NULL,NULL,NULL,Technologies,,,0,,"2021-01-06 09:05:07","2021-01-06 09:05:07",NULL
+0,NULL,NULL,NULL,"Victorian Curriculum",,,0,,"2021-01-06 09:04:16","2021-01-06 09:04:16",NULL
+1,0,NULL,NULL,"The Arts",,,0,,"2021-01-06 09:04:16","2021-01-06 09:04:16",NULL
+2,0,NULL,NULL,English,,,0,,"2021-01-06 09:04:23","2021-01-06 09:04:23",NULL
+3,0,NULL,NULL,"Health and Physical Education",,,0,,"2021-01-06 09:04:31","2021-01-06 09:04:31",NULL
+4,0,NULL,NULL,"The Humanities",,,0,,"2021-01-06 09:04:38","2021-01-06 09:04:38",NULL
+5,0,NULL,NULL,Languages,,,0,,"2021-01-06 09:04:48","2021-01-06 09:04:48",NULL
+6,0,NULL,NULL,Mathematics,,,0,,"2021-01-06 09:04:55","2021-01-06 09:04:55",NULL
+7,0,NULL,NULL,Science,,,0,,"2021-01-06 09:05:01","2021-01-06 09:05:01",NULL
+8,0,NULL,NULL,Technologies,,,0,,"2021-01-06 09:05:07","2021-01-06 09:05:07",NULL
 9,2,NULL,NULL,English,,,0,,"2021-01-06 09:05:16","2021-01-06 09:05:16",NULL
 10,2,NULL,NULL,"English as an Additional Language (EAL)",,,0,,"2021-01-06 09:05:36","2021-01-06 09:05:36",NULL
 11,8,NULL,NULL,"Design and Technologies",,,0,,"2021-01-06 09:06:01","2021-01-06 09:06:01",NULL
