@@ -97,7 +97,7 @@ class Controller extends Base
             );
         }
         //get date 30 days in the future
-        $endDate = gmdate("Y-m-d\TH:i:s", date_create('+1 Month')->getTimestamp());
+        $endDate = gmdate("Y-m-d\TH:i:s", date_create('+2 Month')->getTimestamp());
         try {
         //get courses for user
         //get assignments for user
@@ -142,8 +142,11 @@ class Controller extends Base
 
             //fix end_date for assignments to make it more user friendly...
             foreach ($assignments as $id => $assignment) {
-                $date = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $assignment['end_at']);
-                $assignments[$id]['end_at'] = $date->format("Y/m/d H:i");
+                /**
+                 * fix date format, from UTC ($assignment['end_at']) to localtime
+                 */
+                $date = \Alaress_Date_Format::newFromTimestamp(strtotime($assignment['end_at']));
+                $assignments[$id]['end_at'] = $date->getLocal();
             }
         } catch (\RuntimeException | \DomainException $e) {
             //catch both Runtime and Domain Exceptions

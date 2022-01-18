@@ -150,16 +150,34 @@ class Api implements IApi
              */
             if (401 === $response->getStatusCode()) {
                 throw new RuntimeException(sprintf(
-                                               'No Permission %s %s: %s. Payload: %s',
-                                               $method,
-                                               $response->getStatusCode(),
-                                               $response->getReasonPhrase(),
-                                               base64_encode(json_encode([
-                                                                             'method' => $method,
-                                                                             'route' => $route,
-                                                                             'queryArgs' => $queryArgs
-                                                                         ], JSON_THROW_ON_ERROR))
-                                           ), $response->getStatusCode());
+                    'No Permission %s %s: %s. Payload: %s',
+                    $method,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    base64_encode(json_encode([
+                                                 'method' => $method,
+                                                 'route' => $route,
+                                                 'queryArgs' => $queryArgs
+                                             ], JSON_THROW_ON_ERROR))
+                ), $response->getStatusCode());
+            }
+
+            /**
+             * if 404, the user may not exist, or be a permanent error
+             * so just fail
+             */
+            if (404 === $response->getStatusCode()) {
+                throw new RuntimeException(sprintf(
+                    'Permanent Failure, does the user exist? %s %s: %s. Payload: %s',
+                    $method,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    base64_encode(json_encode([
+                                                     'method' => $method,
+                                                     'route' => $route,
+                                                     'queryArgs' => $queryArgs
+                                                 ], JSON_THROW_ON_ERROR))
+                ), $response->getStatusCode());
             }
 
             /* Successful response from server, but it might not send a valid data payload back
@@ -193,18 +211,18 @@ class Api implements IApi
                  * replay the request
                  */
                 throw new RuntimeException(sprintf(
-                                               'Bad endpoint %s %s: %s %s after %s retries. Payload: %s',
-                                               $method,
-                                               $route,
-                                               $response->getStatusCode(),
-                                               $response->getReasonPhrase(),
-                                               self::NUM_RETRY,
-                                               base64_encode(json_encode([
-                                                                             'method' => $method,
-                                                                             'route' => $route,
-                                                                             'queryArgs' => $queryArgs
-                                                                         ], JSON_THROW_ON_ERROR))
-                                           ));
+                    'Bad endpoint %s %s: %s %s after %s retries. Payload: %s',
+                    $method,
+                    $route,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    self::NUM_RETRY,
+                    base64_encode(json_encode([
+                                                 'method' => $method,
+                                                 'route' => $route,
+                                                 'queryArgs' => $queryArgs
+                                             ], JSON_THROW_ON_ERROR))
+                ));
             }
         }
 
@@ -212,11 +230,11 @@ class Api implements IApi
          * and we couldn't even get a payload
          */
         throw new RuntimeException(sprintf(
-                                       'Bad endpoint %s %s: could not establish connection to server after %s retries. %s',
-                                       $method,
-                                       $route,
-                                       self::NUM_RETRY,
-                                       $lastGuzzleError
-                                   ));
+            'Bad endpoint %s %s: could not establish connection to server after %s retries. %s',
+            $method,
+            $route,
+            self::NUM_RETRY,
+            $lastGuzzleError
+        ));
     }
 }

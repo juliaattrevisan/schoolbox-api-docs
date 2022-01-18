@@ -66,5 +66,4 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
 }
