@@ -142,7 +142,7 @@ class Team implements IStrategy
         foreach ($teams['data'] as $teamData) {
             /* Sport identifiers
              */
-            $teamActivityId = $teamData['activity']['id'];
+            $teamActivityId = (int)$teamData['activity']['id'];
             $teamActivity = $teamData['activity']['name'] ?? '';
 
             /* Division identifiers
@@ -196,7 +196,7 @@ class Team implements IStrategy
              * Positions, accumulate them into the corresponding Sport
              */
             foreach ($teamData['positions'] as $positionData) {
-                $position = $registry->recallPosition($sport, $positionData['id'], $positionData['name']);
+                $position = $registry->recallPosition($sport, (int)$positionData['id'], $positionData['name']);
             }
         }
     }
