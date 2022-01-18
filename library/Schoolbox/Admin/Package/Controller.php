@@ -74,7 +74,6 @@ class Controller extends Base
                 $installer->install($this->getUser());
             } catch (\Throwable $e) {
                 $db->rollBack();
-                print_r($e->getMessage());
                 throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to install package, rolling back.");
             }
             $db->commit();
