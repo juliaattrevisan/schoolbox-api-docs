@@ -14,6 +14,8 @@ Data:
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 
+{% set isSubmitOnBehalfOf = USER.id != student.id %}
+
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
@@ -21,7 +23,8 @@ Data:
             $formSaveLabel    = $form.find('[data-save-draft]'),
             acceptsOnline     = {{ acceptsOnline ? 'true' : 'false' }},
             hasPolicy         = {{ (policy | length) > 0 ? 'true' : 'false' }},
-            hasSelfAssessment = {{ assessment.selfAssessable ? 'true' : 'false' }};
+            hasSelfAssessment = {{ assessment.selfAssessable ? 'true' : 'false' }},
+            submitOnBehalfOf  = {{ isSubmitOnBehalfOf ? 'true' : 'false' }};
         if (Number('{{ errorMessage|length }}') > 0) {
             // Just show error message in perma-toast
             $formSaveLabel.toastActivate({
@@ -135,13 +138,17 @@ Data:
         /**
          * Can this form be submitted after confirmation?
          *
-         * States which require confirmation:
+         * Submit on behalf of never requires a confirmation: otherwise, these
+         * states require confirmation:
          * * there's a policy
          * * this is a self-assessment, and the comment is empty
          *
          * @returns {Boolean}
          */
         let questionSubmit = function () {
+            if (submitOnBehalfOf) {
+                return false;
+            }
             if (hasPolicy) {
                 return true;
             }
@@ -150,6 +157,7 @@ Data:
 
         /**
          * Is this submission a self-assessment, and is the comment empty?
+         *
          * @returns {Boolean}
          */
         let isSelfAssessmentCommentEmpty = function () {
@@ -270,7 +278,6 @@ Data:
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% set isSubmitOnBehalfOf = USER.id != student.id %}
 {% set requiresReflection = not isSubmitOnBehalfOf and assessment.selfAssessable %}
 
 <div class="row" id="assessment-status">
@@ -308,35 +315,38 @@ Data:
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
 
-                <div class="row">
-                    <div class="small-12 columns">
-                        <p>To submit your work you may upload files or optionally use the editor to type directly.</p>
-                        <div class="alert-box warning">
-                            Note: your work will automatically save to draft, but
-                            <strong>will not be submitted until you press the &ldquo;Submit for feedback&rdquo; button.</strong>
+                {% if not isSubmitOnBehalfOf %}
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <p>To submit your work you may upload files or optionally use the editor to type directly.</p>
+                            <div class="alert-box warning">
+                                Note: your work will automatically save to draft, but
+                                <strong>will not be submitted until you press the &ldquo;Submit for feedback&rdquo; button.</strong>
+                            </div>
                         </div>
                     </div>
-                </div>
+                {% endif %}
+
                 <div class="row">
                     <div class="small-12 island">
-                            <section>
-                                <div class="content">
-                                    {# Submitted my own work checkbox #}
-                                    <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
-                                    <label for="editor-submittedInPerson" class="checkbox-label">
-                                        {% if isSubmitOnBehalfOf %}
-                                            {{ student.firstName }} has submitted their work in person
-                                        {% else %}
-                                            I have submitted my work in person, and don't need to upload or use the editor
-                                        {% endif %}
-                                    </label>
-                                    <p id="submit-warning" style="display:none" class="alert alert-box icon-alert">Any previously entered data or uploaded files will not be submitted.</p>
-                                    <div id="submission-upload">
-                                        <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-                                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                                    </div>
+                        <section>
+                            <div class="content">
+                                {# Submitted my own work checkbox #}
+                                <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
+                                <label for="editor-submittedInPerson" class="checkbox-label">
+                                    {% if isSubmitOnBehalfOf %}
+                                        {{ student.firstName }} has submitted their work in person
+                                    {% else %}
+                                        I have submitted my work in person, and don't need to upload or use the editor
+                                    {% endif %}
+                                </label>
+                                <p id="submit-warning" style="display:none" class="alert alert-box icon-alert">Any previously entered data or uploaded files will not be submitted.</p>
+                                <div id="submission-upload">
+                                    <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                                 </div>
-                            </section>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
