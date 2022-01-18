@@ -18,6 +18,8 @@ interface IPackageInstall
 {
     /**
      * This function is called to install a package
+     * $user is typically the currently-logged-in user, if you needed that for something
+     *
      * @param User $user
      */
     public function install(User $user): void;
