@@ -68,8 +68,8 @@ class Notifier extends AbstractModuleNotifier
             $dependencies['teamMapper'] = TeamMapper::getInstance();
         }
 
-        if (empty($dependencies['matchMapper'])) {
-            $dependencies['matchMapper'] = MatchupMapper::getInstance();
+        if (empty($dependencies['matchupMapper'])) {
+            $dependencies['matchupMapper'] = MatchupMapper::getInstance();
         }
 
         if (empty($dependencies['userMapper'])) {
