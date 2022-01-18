@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 use External\Canvas\Importer\Announcements;
-use External\Canvas\Importer\Api2;
+use External\Canvas\Importer\Api;
 use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Application\CliTool;
 
@@ -82,7 +82,7 @@ HELP;
 
         (new Announcements(
             new CanvasDb(),
-            new Api2(
+            new Api(
                 $this->getOpt(self::OPT_LONG_TOKEN),
                 $this->getConfig()->get('canvas_url')
             ),

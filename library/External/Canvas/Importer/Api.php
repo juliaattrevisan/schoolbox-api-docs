@@ -24,7 +24,7 @@ class Api implements IApi
     /**
      * Request timeout
      */
-    private const DEFAULT_TIMEOUT = 30;
+    private const DEFAULT_TIMEOUT = 300;
 
 
     /**
@@ -45,12 +45,6 @@ class Api implements IApi
 
 
     /**
-     * customisable number of times to retry after failing, will default to NUM_RETRY
-     */
-    private int $failRetry;
-
-
-    /**
      * @var string
      */
     private string $host;
@@ -65,15 +59,13 @@ class Api implements IApi
     /**
      * Constructor.
      *
-     * @param string $host
      * @param string $bearerToken
-     * @param int $failRetry (optional) default to NUM_RETRY
+     * @param string $host
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $bearerToken, int $failRetry = self::NUM_RETRY)
+    public function __construct(string $bearerToken, string $host)
     {
         $this->host = $host;
-        $this->failRetry = $failRetry;
 
         /* Authorization Bearer token
          * This is generated from inside the Canvas application itself
@@ -126,7 +118,7 @@ class Api implements IApi
 
         /* Try multiple times in case server dies for a random reason
          */
-        while ($fails < $this->failRetry) {
+        while ($fails < self::NUM_RETRY) {
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
@@ -157,8 +149,13 @@ class Api implements IApi
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     base64_encode(json_encode([
+                        /* These were requested by suds
+                        */
                         'method' => $method,
                         'route' => $route,
+
+                        /* This was generated and sent to canvas
+                        */
                         'queryArgs' => $queryArgs
                     ], JSON_THROW_ON_ERROR))
                 ), $response->getStatusCode());
