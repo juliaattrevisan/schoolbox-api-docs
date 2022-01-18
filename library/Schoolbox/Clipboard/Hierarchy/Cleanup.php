@@ -55,17 +55,27 @@ class Cleanup implements IStrategy
 
 
     /**
-     * @param LoggerInterface $log
+     * @param LoggerInterface                     $log
+     * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
+     * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
+     * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
+     * @param \Schoolbox\Fixtures\Division\Mapper $divisionMapper
+     * @param \Schoolbox\Fixtures\Team\Mapper     $teamMapper
      */
-    public function __construct(LoggerInterface $log)
-    {
+    public function __construct(
+        LoggerInterface $log,
+        \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
+        \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
+        \Schoolbox\Fixtures\Position\Mapper $positionMapper,
+        \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
+        \Schoolbox\Fixtures\Team\Mapper $teamMapper
+    ) {
         $this->log = $log;
-
-        $this->seasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
-        $this->sportMapper = \Schoolbox\Fixtures\Sport\Mapper::getInstance();
-        $this->positionMapper = \Schoolbox\Fixtures\Position\Mapper::getInstance();
-        $this->divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
-        $this->teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $this->seasonMapper = $seasonMapper;
+        $this->sportMapper = $sportMapper;
+        $this->positionMapper = $positionMapper;
+        $this->divisionMapper = $divisionMapper;
+        $this->teamMapper = $teamMapper;
     }
 
 

@@ -91,7 +91,6 @@ class Team implements IStrategy
         $this->log = $log;
         $this->api = $api;
         $this->divisionCodec = new Codec\Division();
-
         $this->seasonMapper = $seasonMapper;
         $this->sportMapper = $sportMapper;
         $this->positionMapper = $positionMapper;
