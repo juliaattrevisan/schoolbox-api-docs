@@ -19,6 +19,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
+use Schoolbox\Url\Factory;
 use Schoolbox\UserMapper;
 
 /**
@@ -141,7 +142,7 @@ class Module extends BaseModule
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
-                            $this->getConfig()
+                            (new Factory($this->getConfig()))->buildFullyQualified()->toString()
                         );
                     }),
                 ]

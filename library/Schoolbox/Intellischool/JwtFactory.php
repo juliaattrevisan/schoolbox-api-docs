@@ -11,10 +11,8 @@ namespace Schoolbox\Intellischool;
 
 use Alaress_Date_Format;
 use Firebase\JWT\JWT;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Url\Factory;
 
 /**
  * Factory for JWTs for authenticating with Intellischool.
@@ -67,9 +65,9 @@ class JwtFactory
     private string $taskDashboardBaseUrl;
 
     /**
-     * The config loader, for building fully qualified domains for Issuer Certs.
+     * The fqdn for the issuer
      */
-    private IConfigLoader $configLoader;
+    private string $jwtIssuer;
 
     /**
      * Constructor
@@ -80,7 +78,7 @@ class JwtFactory
      * @param string $learnerDashboardBaseUrl
      * @param string $cohortDashboardBaseUrl
      * @param string $taskDashboardBaseUrl
-     * @param IConfigLoader $configLoader
+     * @param string $jwtIssuer
      */
     public function __construct(
         string $privateKey,
@@ -89,7 +87,7 @@ class JwtFactory
         string $learnerDashboardBaseUrl,
         string $cohortDashboardBaseUrl,
         string $taskDashboardBaseUrl,
-        IConfigLoader $configLoader
+        string $jwtIssuer
     ) {
         $this->privateKey                 = $privateKey;
         $this->privateKeySigningAlgorithm = $privateKeySigningAlgorithm;
@@ -97,7 +95,7 @@ class JwtFactory
         $this->learnerDashboardBaseUrl    = $learnerDashboardBaseUrl;
         $this->cohortDashboardBaseUrl     = $cohortDashboardBaseUrl;
         $this->taskDashboardBaseUrl       = $taskDashboardBaseUrl;
-        $this->configLoader               = $configLoader;
+        $this->jwtIssuer               = $jwtIssuer;
     }
 
     /**
@@ -212,7 +210,7 @@ class JwtFactory
         }
 
         $defaultClaims = [
-            'iss'                                                           => (new Factory($this->configLoader))->buildFullyQualified()->toString(),
+            'iss'                                                           => $this->jwtIssuer,
             'aud'                                                           => 'https://core.intellischool.net/auth/lti',
             'https://purl.imsglobal.org/spec/lti/claim/version'             => '1.3.0',
             'https://purl.imsglobal.org/spec/lti/claim/message_type'        => 'LtiResourceLinkRequest',
