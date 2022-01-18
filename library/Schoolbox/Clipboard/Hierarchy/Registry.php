@@ -232,6 +232,12 @@ class Registry
                 ));
             }
 
+            /* Dodge around the postsave callback which respawns positions that we
+             * set as 0000-00-00 in Prepare by saving them again. This prevents
+             * Cleanup from finding unused Positions and softdeleting them
+             */
+            $sport->setPositions(null);
+
             /* We saw this during the import and thus we should keep it
              */
             $this->sportMapper->save($sport);

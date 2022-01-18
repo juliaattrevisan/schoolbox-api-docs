@@ -39,6 +39,12 @@ class Prepare implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Position\Mapper 
+     */
+    private \Schoolbox\Fixtures\Position\Mapper $positionMapper;
+
+
+    /**
      * @var \Schoolbox\Fixtures\Division\Mapper
      */
     private \Schoolbox\Fixtures\Division\Mapper $divisionMapper;
@@ -59,6 +65,7 @@ class Prepare implements IStrategy
 
         $this->seasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
         $this->sportMapper = \Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $this->positionMapper = \Schoolbox\Fixtures\Position\Mapper::getInstance();
         $this->divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
         $this->teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
     }
@@ -73,9 +80,10 @@ class Prepare implements IStrategy
     {
         $this->seasonMapper->getDatabase()->query("UPDATE {$this->seasonMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
         $this->sportMapper->getDatabase()->query("UPDATE {$this->sportMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+        $this->positionMapper->getDatabase()->query("UPDATE {$this->positionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
         $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
         $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
 
-        $this->log->info('Preparing existing seasons, sports, divisions and teams for create/update');
+        $this->log->info('Preparing existing seasons, sports, positions, divisions and teams for create/update');
     }
 }
