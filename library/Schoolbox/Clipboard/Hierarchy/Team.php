@@ -173,13 +173,13 @@ class Team implements IStrategy
 
             /* Try to spawn a corresponding Division instance
              */
-            $division = $registry->recallDivision($season, $sport, $divisionName);
+            $division = $registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
 
             /* Try to spawn a corresponding Team instance
              * $teamId is used later to figure out who vs who, when importing Matchups
              * Teams are indexed by ids for this particular usage, unlike others
              */
-            $team = $registry->recallTeam($sport, $division, $teamId, $teamName);
+            $team = $registry->recallTeam($teamActivityId, $division, $teamId, $teamName);
 
             $this->log->info(sprintf(
                 'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
@@ -196,7 +196,7 @@ class Team implements IStrategy
              * Positions, accumulate them into the corresponding Sport
              */
             foreach ($teamData['positions'] as $positionData) {
-                $position = $registry->recallPosition($sport, (int)$positionData['id'], $positionData['name']);
+                $position = $registry->recallPosition($teamActivityId, $sport, (int)$positionData['id'], $positionData['name']);
             }
         }
     }
