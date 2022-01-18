@@ -334,6 +334,7 @@ class Registry
      * @param \Schoolbox\Fixtures\Sport\Model    $sport
      * @param \Schoolbox\Fixtures\Division\Model $division
      * @param string                             $teamName
+     * @param int                                $teamId
      * @return \Schoolbox\Fixtures\Team\Model
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
@@ -342,9 +343,10 @@ class Registry
     public function recallTeam(
         \Schoolbox\Fixtures\Sport\Model $sport,
         \Schoolbox\Fixtures\Division\Model $division,
-        string $teamName
+        string $teamName,
+        int $teamId
     ): \Schoolbox\Fixtures\Team\Model {
-        if (!isset($this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamName])) {
+        if (!isset($this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamId])) {
             try {
                 $team = $this->teamMapper->findOneByColumnList([
                     'name' => $teamName,
@@ -387,9 +389,9 @@ class Registry
              */
             $this->teamMapper->save($team);
 
-            $this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamName]['instance'] = $team;
+            $this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamId]['instance'] = $team;
         } else {
-            $team = $this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamName]['instance'];
+            $team = $this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamId]['instance'];
         }
 
         return $team;
@@ -458,5 +460,19 @@ class Registry
         }
 
         return $position;
+    }
+
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Lets you see what the lookup is like, while you're populating it
+     *
+     * @return array
+     */
+    public function getLookup(): array
+    {
+        return $this->lookup;
     }
 }

@@ -144,6 +144,7 @@ class Team implements IStrategy
             $teamCategory = $teamData['category']['name'] ?? '';
             $teamSubcategory = $teamData['subcategory']['name'] ?? '';
             $teamName = $teamData['name'];
+            $teamId = (int)$teamData['id'];
 
             /* Try to manufacture a division title
              */
@@ -166,8 +167,10 @@ class Team implements IStrategy
             $division = $registry->recallDivision($season, $sport, $divisionName);
 
             /* Try to spawn a corresponding Team instance
+             * $teamId is used later to figure out who vs who, when importing Matchups
+             * Teams are indexed by ids for this particular usage, unlike others
              */
-            $team = $registry->recallTeam($sport, $division, $teamName);
+            $team = $registry->recallTeam($sport, $division, $teamName, $teamId);
 
             $this->log->info(sprintf(
                 'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
@@ -187,5 +190,7 @@ class Team implements IStrategy
                 $position = $registry->recallPosition($sport, $positionData['name']);
             }
         }
+
+        print_r($registry->getLookup());
     }
 }
