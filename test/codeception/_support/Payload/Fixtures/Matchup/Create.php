@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Payload\Fixtures\Match;
+namespace Payload\Fixtures\Matchup;
 
 use Payload\Request;
 use Payload\PostTrait;

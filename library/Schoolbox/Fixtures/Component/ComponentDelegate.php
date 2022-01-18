@@ -20,8 +20,8 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Result\Model as Result;
 use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
@@ -46,9 +46,9 @@ class ComponentDelegate
     protected $teamParticipantMapper;
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * @var ResultMapper
@@ -73,7 +73,7 @@ class ComponentDelegate
             ->setTeamMapper(TeamMapper::getInstance())
             ->setTeamPlayerMapper(TeamPlayerMapper::getInstance())
             ->setTeamParticipantMapper(TeamParticipantMapper::getInstance())
-            ->setMatchMapper(MatchMapper::getInstance())
+            ->setMatchupMapper(MatchupMapper::getInstance())
             ->setResultMapper(ResultMapper::getInstance());
     }
 
@@ -84,7 +84,7 @@ class ComponentDelegate
      * @param array $userIds
      * @param bool  $includeHistorical Whether to return matches in the past
      * @param int   $days
-     * @return Collection|Match[]
+     * @return Collection|Matchup[]
      * @throws Exception
      */
     public function getMatchesForUsers(array $userIds, bool $includeHistorical, int $days)
@@ -154,7 +154,7 @@ class ComponentDelegate
         if ($statement->execute($params)) {
             $result = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
-            return $this->sortMatches($this->getMatchMapper()->findByColumn('id', $result));
+            return $this->sortMatches($this->getMatchupMapper()->findByColumn('id', $result));
         }
 
         return new Collection();
@@ -165,7 +165,7 @@ class ComponentDelegate
      * @param int  $teamId
      * @param bool $includeHistorical Whether to also return matches that have been played
      * @param int  $days
-     * @return Collection|Match[]
+     * @return Collection|Matchup[]
      * @throws UnexpectedValueException
      */
     public function getTeamMatches(int $teamId, bool $includeHistorical, int $days)
@@ -180,7 +180,7 @@ class ComponentDelegate
 
         /* Remember the relevant matches and whether they were in the past
          */
-        /** @var Collection|Match[] $matches */
+        /** @var Collection|Matchup[] $matches */
         $matches = new Collection();
 
         if (!$teamId) {
@@ -194,22 +194,22 @@ class ComponentDelegate
              */
             $team = $this->getTeamMapper()->findById($teamId);
 
-            $homeMatches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
-            $awayMatches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
+            $homeMatches = $this->getMatchupMapper()->findByColumn('home_team_id', $team->getId());
+            $awayMatches = $this->getMatchupMapper()->findByColumn('away_team_id', $team->getId());
 
-            /** @var Collection|Match[] $allMatches */
+            /** @var Collection|Matchup[] $allMatches */
             $allMatches = $homeMatches->mergeUnique($awayMatches, 'id');
 
             // Filter matches
-            foreach ($allMatches as $match) {
-                $matchDay = clone $match->getStartAt();
+            foreach ($allMatches as $matchup) {
+                $matchDay = clone $matchup->getStartAt();
                 $matchDay->endOfDay();
 
                 if ($includeHistorical && $matchDay->isPast()) {
                     /* Include matches previously played
                      */
-                    $matches[$match->getId()] = $match;
-                    $playedMatchIds[] = $match->getId();
+                    $matches[$matchup->getId()] = $matchup;
+                    $playedMatchIds[] = $matchup->getId();
                 } elseif ($matchDay->isFuture()) {
                     /* If no threshold was specified, add it to the list
                      * This shows all future matches
@@ -219,7 +219,7 @@ class ComponentDelegate
                      * If it does, add it to the list
                      */
                     if (null === $threshold || $matchDay->lte($threshold)) {
-                        $matches[$match->getId()] = $match;
+                        $matches[$matchup->getId()] = $matchup;
                     }
                 }
             }
@@ -231,7 +231,7 @@ class ComponentDelegate
                 $results = $this->getResultMapper()->findByColumnList(['match_id' => $playedMatchIds]);
 
                 foreach ($results as $result) {
-                    $matches[$result->getMatch()->getId()]->getResults()[$result->getTeam()->getId()] = $result;
+                    $matches[$result->getMatchup()->getId()]->getResults()[$result->getTeam()->getId()] = $result;
                 }
             }
 
@@ -245,15 +245,15 @@ class ComponentDelegate
     /**
      * Sort matches chronologically
      *
-     * @param Collection|Match[] $matches
-     * @return Collection|Match[]
+     * @param Collection|Matchup[] $matches
+     * @return Collection|Matchup[]
      */
     public function sortMatches(Collection $matches)
     {
         // Sort matches by date order
         $matches->sortByCallback(function ($a, $b) {
-            /** @var Match $a */
-            /** @var Match $b */
+            /** @var Matchup $a */
+            /** @var Matchup $b */
             return ($a->getStartAt()->compare($b->getStartAt()));
         });
 
@@ -318,20 +318,20 @@ class ComponentDelegate
     }
 
     /**
-     * @return MatchMapper
+     * @return MatchupMapper
      */
-    public function getMatchMapper()
+    public function getMatchupMapper()
     {
-        return $this->matchMapper;
+        return $this->matchupMapper;
     }
 
     /**
-     * @param MatchMapper $matchMapper
+     * @param MatchupMapper $matchupMapper
      * @return static
      */
-    public function setMatchMapper($matchMapper)
+    public function setMatchupMapper($matchupMapper)
     {
-        $this->matchMapper = $matchMapper;
+        $this->matchupMapper = $matchupMapper;
         return $this;
     }
 

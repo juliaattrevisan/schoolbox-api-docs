@@ -21,14 +21,14 @@ use Schoolbox\Fixtures\Coach\TagCloud as CoachTagCloud;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 
 class Current implements IMetadataStrategy
 {
     /**
-     * @var Match
+     * @var Matchup
      */
-    private $match;
+    private $matchup;
 
     /**
      * @var UserMapper
@@ -53,15 +53,15 @@ class Current implements IMetadataStrategy
     /**
      * Current constructor.
      *
-     * @param Match $match
+     * @param Matchup $matchup
      * @param UserMapper $userMapper
      * @param TeamPlayerMapper $teamPlayerMapper
      * @param TeamPositionMapper $teamPositionMapper
      * @param CoachMapper $coachMapper
      */
-    public function __construct(Match $match, UserMapper $userMapper, TeamPlayerMapper $teamPlayerMapper, TeamPositionMapper $teamPositionMapper, CoachMapper $coachMapper)
+    public function __construct(Matchup $matchup, UserMapper $userMapper, TeamPlayerMapper $teamPlayerMapper, TeamPositionMapper $teamPositionMapper, CoachMapper $coachMapper)
     {
-        $this->setMatch($match);
+        $this->setMatchup($matchup);
         $this->setUserMapper($userMapper);
         $this->setTeamPlayerMapper($teamPlayerMapper);
         $this->setTeamPositionMapper($teamPositionMapper);
@@ -177,18 +177,18 @@ class Current implements IMetadataStrategy
     }
 
     /**
-     * @return Match
+     * @return Matchup
      */
-    public function getMatch()
+    public function getMatchup()
     {
-        return $this->match;
+        return $this->matchup;
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    private function setMatch($match)
+    private function setMatchup($matchup)
     {
-        $this->match = $match;
+        $this->matchup = $matchup;
     }
 }

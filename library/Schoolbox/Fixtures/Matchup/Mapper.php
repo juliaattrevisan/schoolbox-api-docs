@@ -8,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Fixtures\Match;
+namespace Schoolbox\Fixtures\Matchup;
 
 use OutOfBoundsException;
 use PDO;
@@ -16,7 +16,7 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Season\Model as Season;
@@ -90,33 +90,33 @@ class Mapper extends BaseMapper
      *  - any records that exist in memory are to be persisted to the DB;
      *  - any records that exist in DB but not memory are to be deleted.
      *
-     * @param Model $match
+     * @param Model $matchup
      * @return bool
      */
-    public function saveItinerary(Match $match)
+    public function saveItinerary(Matchup $matchup)
     {
-        if ($match->getItinerary() === null) {
+        if ($matchup->getItinerary() === null) {
             // Don't attempt to save if join is not hydrated
             return true;
         }
 
         // ensure the itinerary items all point to the correct match (ie. this one)
-        foreach ($match->getItinerary() as $item) {
-            $item->setMatch($match);
+        foreach ($matchup->getItinerary() as $item) {
+            $item->setMatchup($matchup);
         }
 
-        return $this->cascadeJoin('itinerary', ['match_id' => $match->getId()], $match->getItinerary());
+        return $this->cascadeJoin('itinerary', ['match_id' => $matchup->getId()], $matchup->getItinerary());
     }
 
     /**
      * Delete all Itinerary Items associated with this Match
      * when it's being deleted
      *
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    public function deleteItineraryItems(Match $match)
+    public function deleteItineraryItems(Matchup $matchup)
     {
-        $allItineraryItems = ItineraryItemMapper::getInstance()->findByColumn('match_id', $match->getId());
+        $allItineraryItems = ItineraryItemMapper::getInstance()->findByColumn('match_id', $matchup->getId());
 
         foreach ($allItineraryItems as $currentItineraryItem) {
             ItineraryItemMapper::getInstance()->delete($currentItineraryItem);
@@ -126,11 +126,11 @@ class Mapper extends BaseMapper
     /**
      * Delete all Results associated with this Match
      *
-     * @param Model $match
+     * @param Model $matchup
      */
-    public function deleteResults(Match $match)
+    public function deleteResults(Matchup $matchup)
     {
-        $allResults = ResultMapper::getInstance()->findByColumn('match_id', $match->getId());
+        $allResults = ResultMapper::getInstance()->findByColumn('match_id', $matchup->getId());
 
         foreach ($allResults as $currentResult) {
             ResultMapper::getInstance()->delete($currentResult);
@@ -185,7 +185,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Collection|Match[] $matches */
+        /** @var GenericCollection|Matchup[] $matches */
         $matches = $this->createCollection();
 
         /** @var Collection|Division[] $divisions */
@@ -212,50 +212,50 @@ class Mapper extends BaseMapper
             /* Set up us the match in the collection
              * Only hydrate all this stuff if it never existed previously
              */
-            if (!($matches->getOffset($matchId) instanceof Match)) {
-                /** @var Match $match */
-                $match = $this->hydrate($row);
+            if (!($matches->getOffset($matchId) instanceof Matchup)) {
+                /** @var Matchup $matchup */
+                $matchup = $this->hydrate($row);
 
                 if (!$divisions->getOffset($row['division_id']) instanceof Division) {
                     $divisions->setOffset($row['division_id'], $this->hydrateJoin($row, 'division', 'd'));
                 }
-                $match->setDivision($divisions->getOffset($row['division_id']));
+                $matchup->setDivision($divisions->getOffset($row['division_id']));
 
                 if (!$seasons->getOffset($row['season_id']) instanceof Season) {
                     $seasons->setOffset($row['season_id'], $this->hydrateJoin($row, 'season', 's'));
                 }
-                $match->setSeason($seasons->getOffset($row['season_id']));
+                $matchup->setSeason($seasons->getOffset($row['season_id']));
 
                 if (!$venues->getOffset($row['venue_id']) instanceof Venue) {
                     $venues->setOffset($row['venue_id'], $this->hydrateJoin($row, 'venue', 'v'));
                 }
-                $match->setVenue($venues->getOffset($row['venue_id']));
+                $matchup->setVenue($venues->getOffset($row['venue_id']));
 
                 // Optional relationship
                 if (!$teams->getOffset($row['home_team_id']) instanceof Team) {
                     $teams->setOffset($row['home_team_id'], $this->hydrateJoin($row, 'home_team', 'h'));
                 }
-                $match->setHomeTeam($teams->getOffset($row['home_team_id']));
+                $matchup->setHomeTeam($teams->getOffset($row['home_team_id']));
 
                 // Optional relationship
                 if (!$teams->getOffset($row['away_team_id']) instanceof Team) {
                     $teams->setOffset($row['away_team_id'], $this->hydrateJoin($row, 'away_team', 'a'));
                 }
-                $match->setAwayTeam($teams->getOffset($row['away_team_id']));
+                $matchup->setAwayTeam($teams->getOffset($row['away_team_id']));
 
                 // Optional relationship
                 if (!$schools->getOffset($row['home_school_id']) instanceof School) {
                     $schools->setOffset($row['home_school_id'], $this->hydrateJoin($row, 'home_school', 'hs'));
                 }
-                $match->setHomeSchool($schools->getOffset($row['home_school_id']));
+                $matchup->setHomeSchool($schools->getOffset($row['home_school_id']));
 
                 // Optional relationship
                 if (!$schools->getOffset($row['away_school_id']) instanceof School) {
                     $schools->setOffset($row['away_school_id'], $this->hydrateJoin($row, 'away_school', 'as'));
                 }
-                $match->setAwaySchool($schools->getOffset($row['away_school_id']));
+                $matchup->setAwaySchool($schools->getOffset($row['away_school_id']));
 
-                $matches->setOffset($match->getId(), $match);
+                $matches->setOffset($matchup->getId(), $matchup);
             }
 
             /* Append all Result instances as you go
@@ -316,7 +316,7 @@ class Mapper extends BaseMapper
      *
      * @param Team $team
      * @throws OutOfBoundsException
-     * @return Match
+     * @return Matchup
      */
     public function findNextMatch(Team $team)
     {
@@ -348,9 +348,9 @@ class Mapper extends BaseMapper
     /**
      * Match notifications
      * @see  \Schoolbox\Mapper::raiseNotification()
-     * @param Match  $object
+     * @param Matchup $object
      * @param string $verb
-     * @param Match  $previous
+     * @param Matchup $previous
      * @return bool
      * @throws \Exception
      */
@@ -375,8 +375,8 @@ class Mapper extends BaseMapper
 
     /**
      * Diff Match objects for notification purpose.
-     * @param Match $object
-     * @param Match $previous
+     * @param Matchup $object
+     * @param Matchup $previous
      * @return array
      * @throws Exception
      */

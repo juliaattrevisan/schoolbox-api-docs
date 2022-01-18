@@ -23,8 +23,8 @@ use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use Schoolbox\Fixtures\Venue\Model as Venue;
@@ -151,9 +151,9 @@ class Controller extends Base
     protected $userMapper;
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * @var VenueMapper
@@ -211,7 +211,7 @@ class Controller extends Base
     public function __construct()
     {
         $this->setUserMapper(UserMapper::getInstance());
-        $this->setMatchMapper(MatchMapper::getInstance());
+        $this->setMatchupMapper(MatchupMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setCoachMapper(CoachMapper::getInstance());
         $this->setSeasonMapper(SeasonMapper::getInstance());
@@ -1317,7 +1317,7 @@ class Controller extends Base
 
                     if (!$error) {
                         try {
-                            $match = $this->getMatchMapper()->findOneByColumnList([
+                            $matchup = $this->getMatchupMapper()->findOneByColumnList([
                                 'division_id' => $division->getId(),
                                 'season_id' => $season->getId(),
                                 'venue_id' => $venue->getId(),
@@ -1329,31 +1329,31 @@ class Controller extends Base
                             ], $this->disableCache);
                             $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                         } catch (MapperException $e) {
-                            $match = new Match();
+                            $matchup = new Matchup();
                             $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                         }
 
-                        $match->setDivision($division);
-                        $match->setSeason($season);
-                        $match->setVenue($venue);
-                        $match->setName($row[4]);
-                        $match->setStartAt($this->makeDateTime($row[5], $row[6]));
-                        $match->setNotes($row[10]);
+                        $matchup->setDivision($division);
+                        $matchup->setSeason($season);
+                        $matchup->setVenue($venue);
+                        $matchup->setName($row[4]);
+                        $matchup->setStartAt($this->makeDateTime($row[5], $row[6]));
+                        $matchup->setNotes($row[10]);
 
                         if ($teamHome != null) {
-                            $match->setHomeTeam($teamHome);
+                            $matchup->setHomeTeam($teamHome);
                         }
                         if ($teamAway != null) {
-                            $match->setAwayTeam($teamAway);
+                            $matchup->setAwayTeam($teamAway);
                         }
                         if ($schoolHome != null) {
-                            $match->setHomeSchool($schoolHome);
+                            $matchup->setHomeSchool($schoolHome);
                         }
                         if ($schoolAway != null) {
-                            $match->setAwaySchool($schoolAway);
+                            $matchup->setAwaySchool($schoolAway);
                         }
 
-                        $this->getMatchMapper()->save($match);
+                        $this->getMatchupMapper()->save($matchup);
 
                         // Grab itinerary items for the match and save them
 
@@ -1419,15 +1419,15 @@ class Controller extends Base
                         /* Save all the things
                          * First, empty all the itinerary items then resave them
                          */
-                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "PURGING: Removing all itinerary items for match '{$match->getDisplayName()}'");
-                        $this->getItineraryItemMapper()->deleteByColumn('match_id', $match->getId());
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "PURGING: Removing all itinerary items for match '{$matchup->getDisplayName()}'");
+                        $this->getItineraryItemMapper()->deleteByColumn('match_id', $matchup->getId());
 
                         foreach ($items as $item) {
                             if (!empty(trim($item['description']))) {
                                 $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$item['description']}'");
 
                                 $itineraryItem = new ItineraryItem();
-                                $itineraryItem->setMatch($match);
+                                $itineraryItem->setMatchup($matchup);
                                 $itineraryItem->setStartAt($item['datetime']);
                                 $itineraryItem->setDescription($item['description']);
 
@@ -1627,20 +1627,20 @@ class Controller extends Base
     }
 
     /**
-     * @return MatchMapper
+     * @return MatchupMapper
      */
-    public function getMatchMapper()
+    public function getMatchupMapper()
     {
-        return $this->matchMapper;
+        return $this->matchupMapper;
     }
 
     /**
-     * @param MatchMapper $matchMapper
+     * @param MatchupMapper $matchupMapper
      * @return static
      */
-    public function setMatchMapper($matchMapper)
+    public function setMatchupMapper($matchupMapper)
     {
-        $this->matchMapper = $matchMapper;
+        $this->matchupMapper = $matchupMapper;
         return $this;
     }
 

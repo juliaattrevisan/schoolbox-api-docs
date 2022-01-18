@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Payload\Fixtures\Match\Result;
+namespace Payload\Fixtures\Matchup\Result;
 
 use Payload\Request;
 use Payload\PostTrait;
@@ -20,7 +20,7 @@ class Delete extends Request
     {
         $this->result = $result;
 
-        $this->setReferer('/fixtures/matches/' . $this->result->getMatch()->getId() . '/results/45' . $this->result->getId());
+        $this->setReferer('/fixtures/matches/' . $this->result->getMatchup()->getId() . '/results/45' . $this->result->getId());
     }
 
     public function getUrl(): string

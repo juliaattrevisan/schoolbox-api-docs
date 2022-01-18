@@ -13,7 +13,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Fixtures\Authorizer\Rule\IsSeasonNotArchived;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;

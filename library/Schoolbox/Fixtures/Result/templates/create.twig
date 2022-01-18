@@ -27,7 +27,7 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Fixtures</a></li>
     <li><a href="#">{{ sport.name }}</a></li>
-    <li><a href="3">{{ division.name }}</a></li>
+    <li><a href="#">{{ division.name }}</a></li>
     <li><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchHeading.generate(match) }}</a></li>
     {% if result.id %}
         <li class="active"><span>Result for {{ team.name }}</span></li>

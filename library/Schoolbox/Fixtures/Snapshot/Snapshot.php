@@ -19,7 +19,7 @@
 namespace Schoolbox\Fixtures\Snapshot;
 
 use Schoolbox\Collection;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Team\Metadata\Factory;
 use Schoolbox\Fixtures\Snapshot\Type\Coach as SnapshotCoach;
 use Schoolbox\Fixtures\Snapshot\Type\Player as SnapshotPlayer;
@@ -39,9 +39,9 @@ class Snapshot implements ISnapshot
     /**
      * Snapshot constructor.
      *
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    public function __construct(Match $match)
+    public function __construct(Matchup $matchup)
     {
         $this->setRegistry(new Collection());
 
@@ -50,7 +50,7 @@ class Snapshot implements ISnapshot
          * Get the current coach/player/position config (metadata)
          * Load it into snapshot classes and fire away
          */
-        $factory = new Factory($match);
+        $factory = new Factory($matchup);
         $metadata = $factory->produceCurrent();
 
         $this->getRegistry()->add(new SnapshotCoach($metadata, ParticipantCoachMapper::getInstance()));

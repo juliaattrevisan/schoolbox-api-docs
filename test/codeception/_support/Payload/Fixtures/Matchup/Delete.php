@@ -5,18 +5,19 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Payload\Fixtures\Match;
+namespace Payload\Fixtures\Matchup;
 
 use Payload\Request;
 use Payload\PostTrait;
+use Schoolbox\Fixtures\Matchup\Model;
 
 class Delete extends Request
 {
     use PostTrait;
 
-    private \Schoolbox\Fixtures\Match\Model $match;
+    private Model $match;
 
-    public function __construct(\Schoolbox\Fixtures\Match\Model $match)
+    public function __construct(Model $match)
     {
         $this->match = $match;
 

@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Fixtures\Match\Notifier;
+namespace Schoolbox\Fixtures\Matchup\Notifier;
 
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -16,8 +16,8 @@ use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Notification\Instance\Builder;
 use Schoolbox\User;
 use Monolog\Logger;
@@ -31,9 +31,9 @@ class Helper
 {
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * @var DivisionMapper
@@ -59,20 +59,20 @@ class Helper
     /**
      * Constructor
      *
-     * @param MatchMapper      $matchMapper
+     * @param MatchupMapper    $matchupMapper
      * @param DivisionMapper   $divisionMapper
      * @param SportMapper      $sportMapper
      * @param TeamPlayerMapper $teamPlayerMapper
      * @param TeamMapper       $teamMapper
      */
     public function __construct(
-        MatchMapper $matchMapper,
+        MatchupMapper $matchupMapper,
         DivisionMapper $divisionMapper,
         SportMapper $sportMapper,
         TeamPlayerMapper $teamPlayerMapper,
         TeamMapper $teamMapper
     ) {
-        $this->matchMapper      = $matchMapper;
+        $this->matchupMapper    = $matchupMapper;
         $this->divisionMapper   = $divisionMapper;
         $this->sportMapper      = $sportMapper;
         $this->teamPlayerMapper = $teamPlayerMapper;
@@ -93,15 +93,15 @@ class Helper
     }
 
     /**
-     * @param Match $match
-     * @return Match
+     * @param Matchup $matchup
+     * @return Matchup
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function hydrateMatch(Match $match)
+    public function hydrateMatch(Matchup $matchup)
     {
-        /** @var Match $hydratedMatch */
-        $hydratedMatch = $this->matchMapper->findById($match->getId());
+        /** @var Matchup $hydratedMatch */
+        $hydratedMatch = $this->matchupMapper->findById($matchup->getId());
         $division      = $this->divisionMapper->findById($hydratedMatch->getDivision()->getId());
         $sport         = $this->sportMapper->findById($division->getSport()->getId());
         $division->setSport($sport);
@@ -142,18 +142,18 @@ class Helper
     /**
      * Builds a generic notification builder for this match.
      *
-     * @param Match      $match
+     * @param Matchup    $matchup
      * @param User       $effector
      * @param string     $namespace
      * @param string     $trigger
      * @return Builder
      */
-    public function buildBuilder(Match $match, User $effector, $namespace, $trigger)
+    public function buildBuilder(Matchup $matchup, User $effector, $namespace, $trigger)
     {
         $bob = new Builder($effector);
-        $bob->setSportParam($match->getDivision()->getSport())
+        $bob->setSportParam($matchup->getDivision()->getSport())
             ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $namespace, $match->getId(), $trigger) ])
+            ->setTopics([ sprintf('%s.%d.%s', $namespace, $matchup->getId(), $trigger) ])
             ->setNamespace($namespace)
         ;
         return $bob;
@@ -209,17 +209,17 @@ class Helper
      *
      * @param Envelope $envelope
      * @param Builder  $bob
-     * @param Match    $match
+     * @param Matchup  $matchup
      * @param int      $stacking The stacking setting to use for the match parameter
      * @return Envelope
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      */
-    public function postToTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
+    public function postToTeams(Envelope $envelope, Builder $bob, Matchup $matchup, $stacking = Param::STACKING_REPLACE)
     {
-        foreach ($match->getAllTeams() as $team) {
-            $bob->setMatchHref($match, $team)
-                ->setMatchParam($match, $team, $stacking);
+        foreach ($matchup->getAllTeams() as $team) {
+            $bob->setMatchHref($matchup, $team)
+                ->setMatchParam($matchup, $team, $stacking);
             $this->postToTeam($envelope, $bob, $team);
         }
         return $envelope;
@@ -230,17 +230,17 @@ class Helper
      *
      * @param Envelope $envelope
      * @param Builder  $bob
-     * @param Match    $match
+     * @param Matchup  $matchup
      * @param int      $stacking The stacking setting to use for the match parameter
      * @return Envelope
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      */
-    public function postToParentsOfTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
+    public function postToParentsOfTeams(Envelope $envelope, Builder $bob, Matchup $matchup, $stacking = Param::STACKING_REPLACE)
     {
-        foreach ($match->getAllTeams() as $team) {
-            $bob->setMatchHref($match, $team)
-                ->setMatchParam($match, $team, $stacking);
+        foreach ($matchup->getAllTeams() as $team) {
+            $bob->setMatchHref($matchup, $team)
+                ->setMatchParam($matchup, $team, $stacking);
             $this->postToParentsOfTeam($envelope, $bob, $team);
         }
         return $envelope;

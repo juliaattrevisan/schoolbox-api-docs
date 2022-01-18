@@ -18,7 +18,7 @@ use Schoolbox\Fixtures\Team\Module as TeamModule;
 use Schoolbox\Fixtures\School\Module as SchoolModule;
 use Schoolbox\Fixtures\Position\Module as PositionModule;
 use Schoolbox\Fixtures\Venue\Module as VenueModule;
-use Schoolbox\Fixtures\Match\Module as MatchModule;
+use Schoolbox\Fixtures\Matchup\Module as MatchupModule;
 use Schoolbox\Fixtures\ItineraryItem\Module as ItineraryItemModule;
 use Schoolbox\Fixtures\Component\Homepage\Module as HomepageModule;
 use Schoolbox\Fixtures\Component\Dashboard\Module as DashboardModule;
@@ -71,16 +71,16 @@ class SportsFixtures implements ModuleConfigInterface
             $positionModule = new PositionModule($di, $sportModule);
             $positionModule->init("/$namespace");
 
-            $matchModule = new MatchModule($di, $divisionModule);
-            $matchModule->init("/$namespace");
+            $matchupModule = new MatchupModule($di, $divisionModule);
+            $matchupModule->init("/$namespace");
 
             $venueModule = new VenueModule($di);
             $venueModule->init("/$namespace");
 
-            $itineraryItemModule = new ItineraryItemModule($di, $matchModule);
+            $itineraryItemModule = new ItineraryItemModule($di, $matchupModule);
             $itineraryItemModule->init("/$namespace");
 
-            $resultModule = new ResultModule($di, $matchModule);
+            $resultModule = new ResultModule($di, $matchupModule);
             $resultModule->init("/$namespace");
 
             $statusModule = new StatusModule($di, $resultModule);

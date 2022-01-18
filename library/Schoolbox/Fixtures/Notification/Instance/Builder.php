@@ -14,7 +14,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\User as User;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Sport\Model as Sport;
 use Schoolbox\Fixtures\Team\Model as Team;
 
@@ -53,53 +53,53 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      * @param Team $team
      * @return self
      */
-    public function setMatchHref(Match $match, Team $team)
+    public function setMatchHref(Matchup $matchup, Team $team)
     {
-        $this->setHref($this->buildHrefForMatch($match, $team));
+        $this->setHref($this->buildHrefForMatch($matchup, $team));
         return $this;
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      * @param Team $team
      * @param int $stacking
      * @return self
      */
-    public function setMatchParam(Match $match, Team $team, $stacking = Param::STACKING_REPLACE)
+    public function setMatchParam(Matchup $matchup, Team $team, $stacking = Param::STACKING_REPLACE)
     {
-        $this->internalBuilder->setParam('match', $this->buildMatchParam($match, $team, $stacking));
+        $this->internalBuilder->setParam('match', $this->buildMatchParam($matchup, $team, $stacking));
         return $this;
     }
 
     /**
      * Builds the href for the results page for this match and team.
      *
-     * @param Match $match
+     * @param Matchup $matchup
      * @param Team $team
      * @return string
      */
-    public function buildHrefForMatch(Match $match, Team $team)
+    public function buildHrefForMatch(Matchup $matchup, Team $team)
     {
-        return "/fixtures/matches/{$match->getId()}/results/{$team->getId()}";
+        return "/fixtures/matches/{$matchup->getId()}/results/{$team->getId()}";
     }
 
     /**
      * Builds a parameter for this notifier's builder's "match" parameter.
      *
-     * @param Match $match
+     * @param Matchup $matchup
      * @param Team $team
      * @param int $stacking
      * @return Param
      */
-    public function buildMatchParam(Match $match, Team $team, $stacking = Param::STACKING_REPLACE)
+    public function buildMatchParam(Matchup $matchup, Team $team, $stacking = Param::STACKING_REPLACE)
     {
         $ts   = microtime(true);
-        $href = $this->buildHrefForMatch($match, $team);
-        return new Param($match->getName(), "{$href}?{$ts}", $stacking);
+        $href = $this->buildHrefForMatch($matchup, $team);
+        return new Param($matchup->getName(), "{$href}?{$ts}", $stacking);
     }
 
     /** Pass-through to internal builder's setters */

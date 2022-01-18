@@ -19,7 +19,6 @@ use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Role;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Authorizer\Rule\IsCoachOfTeam;
 

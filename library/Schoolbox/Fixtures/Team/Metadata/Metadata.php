@@ -6,7 +6,7 @@
  * Strategy Design Pattern
  *
  * Determines whether to show the Current dynamic team composition
- * or to show the snapshot (Historic) composition as saved at Match
+ * or to show the snapshot (Historic) composition as saved at Matchup
  * start time; uses Factory to load Strategy
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -21,15 +21,15 @@ use Schoolbox\Collection;
 use Schoolbox\Fixtures\Team\Position\Model as TeamPosition;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Player\Model as TeamPlayer;
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Fixtures\Team\Position\Participant\Model as TeamPositionParticipant;
 
 class Metadata
 {
     /**
-     * @var Match
+     * @var Matchup
      */
-    protected $match;
+    protected $matchup;
 
     /**
      * @var Collection
@@ -54,12 +54,12 @@ class Metadata
     /**
      * Metadata constructor.
      *
-     * @param Match $match
+     * @param Matchup $matchup
      * @param IMetadataStrategy $strategy
      */
-    public function __construct(Match $match, IMetadataStrategy $strategy)
+    public function __construct(Matchup $matchup, IMetadataStrategy $strategy)
     {
-        $this->setMatch($match);
+        $this->setMatchup($matchup);
         $this->setPlayers(new Collection());
         $this->setCoaches(new Collection());
         $this->setPositions(new Collection());
@@ -73,7 +73,7 @@ class Metadata
      */
     public function collect()
     {
-        foreach ($this->getMatch()->getAllTeams() as $team) {
+        foreach ($this->getMatchup()->getAllTeams() as $team) {
             $this->collectForTeam($team);
         }
     }
@@ -209,18 +209,18 @@ class Metadata
     }
 
     /**
-     * @return Match
+     * @return Matchup
      */
-    public function getMatch()
+    public function getMatchup()
     {
-        return $this->match;
+        return $this->matchup;
     }
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      */
-    private function setMatch($match)
+    private function setMatchup($matchup)
     {
-        $this->match = $match;
+        $this->matchup = $matchup;
     }
 }

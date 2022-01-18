@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Fixtures\Match;
+namespace Schoolbox\Fixtures\Matchup;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Exception;
@@ -21,8 +21,8 @@ use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Match\Model as Match;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use Schoolbox\Fixtures\Venue\Model as Venue;
@@ -54,9 +54,9 @@ class Controller extends AbstractController
     protected $teamMapper;
 
     /**
-     * @var MatchMapper
+     * @var MatchupMapper
      */
-    protected $matchMapper;
+    protected $matchupMapper;
 
     /**
      * @var VenueMapper
@@ -83,7 +83,7 @@ class Controller extends AbstractController
      */
     public function __construct()
     {
-        parent::__construct(MatchMapper::getInstance());
+        parent::__construct(MatchupMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setSeasonMapper(SeasonMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
@@ -114,8 +114,6 @@ class Controller extends AbstractController
 
         /**
          * Each item is a Collection of matches, indexed by seasonId
-         *
-         * @var Collection|Match[][] $seasonMatches
          */
         $seasonMatches = new Collection();
 
@@ -124,7 +122,7 @@ class Controller extends AbstractController
 
         /* Accumulate faceless schools and group by season
          */
-        /** @var Match $currentMatch */
+        /** @var Matchup $currentMatch */
         foreach ($allMatches as $currentMatch) {
             if ($currentMatch->getSeason()->getId() == $division->getSeason()->getId()) {
                 $isMatchesInCurrentSeason = true;
@@ -186,7 +184,7 @@ class Controller extends AbstractController
      * Populate the Response object with a form that provides a means to mutate the given (new) entity.
      * Only text/html is Accept-able.
      *
-     * @param Match $entity
+     * @param Matchup $entity
      * @param Division $context
      * @throws Exception
      * @return void
@@ -220,7 +218,7 @@ class Controller extends AbstractController
      * Only text/html is Accept-able.
      * If entity is deleted, respond with '410 Gone'
      *
-     * @param Match $entity
+     * @param Matchup $entity
      * @throws Exception
      * @return void
      */
@@ -249,28 +247,28 @@ class Controller extends AbstractController
 
 
     /**
-     * @param Match $match
+     * @param Matchup $matchup
      * @param Division $division
      * @return void
      */
-    protected function getForm($match, $division = null)
+    protected function getForm($matchup, $division = null)
     {
         // Do not permit creation or modification of matches in archived seasons.
-        if ($match->getSeason()->isArchived()) {
+        if ($matchup->getSeason()->isArchived()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
-        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
+        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $matchup->getId(), [
             'order' => [
                 'start_at' => 'asc'
             ]
         ]);
-        $match->setItinerary($allItineraryItems);
+        $matchup->setItinerary($allItineraryItems);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
-            'match'     => $match,
+            'match'     => $matchup,
             'tagPrefix' => TagCloudMapper::SCHOOL_PREFIX,
-            'action'    => $match->getId() ? 'Modify' : 'Create'
+            'action'    => $matchup->getId() ? 'Modify' : 'Create'
         ]));
     }
 
@@ -295,9 +293,9 @@ class Controller extends AbstractController
     }
 
     /**
-     * Modify a Match
+     * Modify a Matchup
      *
-     * @param Match $entity
+     * @param Matchup $entity
      */
     public function persistEntity($entity)
     {
@@ -380,7 +378,7 @@ class Controller extends AbstractController
 
             $it = new ItineraryItem();
             $it->setId($itPost['itemId'][$i]);
-            $it->setMatch((new Match())->setId($itPost['matchId'][$i]));
+            $it->setMatchup((new Matchup())->setId($itPost['matchId'][$i]));
             $it->setDescription($itPost['description'][$i]);
             $it->setStartAt($datetime);
 
@@ -390,27 +388,34 @@ class Controller extends AbstractController
         return $c;
     }
 
+
     /**
+     * Returns a (Team, School) tuple, using stub instances where required
+     * to fulfil this struct
+     *     Team $return[0]
+     *     School $return[1]
+     *
      * @param string $teamId
      * @param string $prefix
-     * @return array $return
-     * @var Team $return[0]
-     * @var School $return[1]
+     * @return array
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     protected function calculateTeam($teamId, $prefix = TagCloudMapper::SCHOOL_PREFIX)
     {
         if (preg_match("/$prefix(.*)/", $teamId, $matches)) {
             // Away team is a faceless school, save the team as null
             return [$this->getTeamMapper()->createModel(), $this->getSchoolMapper()->findById($matches[1])];
-        } else {
-            return [$this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel()];
         }
+
+        return [$this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel()];
     }
+
 
     /**
      * Save Match data to db
      *
-     * @param Model $match
+     * @param Model $matchup
      * @param Division $division
      * @param string $name
      * @param Season $season ,
@@ -423,9 +428,9 @@ class Controller extends AbstractController
      * @param string $notes
      * @param Collection|ItineraryItem[] $itinerary
      */
-    private function saveMatch(Match $match, Division $division, $name, Season $season, Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, School $homeSchool, School $awaySchool, Venue $venue, $notes, Collection $itinerary)
+    private function saveMatch(Matchup $matchup, Division $division, $name, Season $season, Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, School $homeSchool, School $awaySchool, Venue $venue, $notes, Collection $itinerary)
     {
-        $match
+        $matchup
             ->setDivision($division)
             ->setName($name)
             ->setSeason($season)
@@ -439,7 +444,7 @@ class Controller extends AbstractController
             ->setUpdatedAt(\Alaress_Date_Format::now())
             ->setItinerary($itinerary);
 
-        $this->getMapper()->save($match);
+        $this->getMapper()->save($matchup);
     }
 
     /* Getters/Setters
@@ -518,20 +523,20 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return MatchMapper
+     * @return MatchupMapper
      */
-    public function getMatchMapper()
+    public function getMatchupMapper()
     {
-        return $this->matchMapper;
+        return $this->matchupMapper;
     }
 
     /**
-     * @param MatchMapper $matchMapper
+     * @param MatchupMapper $matchupMapper
      * @return static
      */
-    public function setMatchMapper($matchMapper)
+    public function setMatchMapper($matchupMapper)
     {
-        $this->matchMapper = $matchMapper;
+        $this->matchupMapper = $matchupMapper;
         return $this;
     }
 

@@ -8,18 +8,18 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Fixtures\Match;
+namespace Schoolbox\Fixtures\Matchup;
 
-use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Matchup\Model as Matchup;
 use Schoolbox\Weather\WeatherstackClient;
 
 class Weather
 {
 
     /**
-     * @var Match
+     * @var Matchup
      */
-    private $match;
+    private $matchup;
 
     /**
      * Forecast length. If the match occurs beyond this many days
@@ -67,13 +67,13 @@ class Weather
     /**
      * Weather constructor.
      *
-     * @param Match              $match
+     * @param Matchup            $matchup
      * @param WeatherstackClient $api
      */
-    public function __construct(Match $match, WeatherstackClient $api)
+    public function __construct(Matchup $matchup, WeatherstackClient $api)
     {
-        $this->match = $match;
-        $this->api   = $api;
+        $this->matchup = $matchup;
+        $this->api = $api;
     }
 
     /**
@@ -82,7 +82,7 @@ class Weather
      */
     public function loadForecast(): void
     {
-        $forecast = $this->findWeather($this->match);
+        $forecast = $this->findWeather($this->matchup);
 
         if (!empty($forecast)) {
             $this->icon      = $forecast['hourly'][4]['weather_icons'][0];
@@ -94,13 +94,13 @@ class Weather
     /**
      * Find the weather forecast for this particular day
      *
-     * @param Match $match
+     * @param Matchup $matchup
      * @return array
      */
-    private function findWeather(Match $match): array
+    private function findWeather(Matchup $matchup): array
     {
-        $matchDayDiff = \Alaress_Date_Format::now()->diffInDays($match->getStartAt(), false);
-        $matchDay     = $match->getStartAt();
+        $matchDayDiff = \Alaress_Date_Format::now()->diffInDays($matchup->getStartAt(), false);
+        $matchDay     = $matchup->getStartAt();
 
         /* Only return data if the match hasn't already occurred
          */
@@ -109,7 +109,7 @@ class Weather
              * Don't bother if the match day is too far into the future (10 days)
              */
             if ($matchDayDiff < $this->forecastLength) {
-                $forecast = $this->api->getForecastByDate($matchDay, $match->getVenue()->getLatitude(), $match->getVenue()->getLongitude());
+                $forecast = $this->api->getForecastByDate($matchDay, $matchup->getVenue()->getLatitude(), $matchup->getVenue()->getLongitude());
                 if (!empty($forecast)) {
                     $this->hasResults = true;
                 }

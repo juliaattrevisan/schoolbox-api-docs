@@ -5,11 +5,11 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Payload\Fixtures\Match\Result;
+namespace Payload\Fixtures\Matchup\Result;
 
 use Payload\Request;
 use Payload\PostTrait;
-use Schoolbox\Fixtures\Match\Model;
+use Schoolbox\Fixtures\Matchup\Model;
 
 class Create extends Request
 {

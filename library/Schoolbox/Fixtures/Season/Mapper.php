@@ -10,7 +10,7 @@ namespace Schoolbox\Fixtures\Season;
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchupMapper;
 use Schoolbox\Fixtures\Season\Model as Season;
 use Schoolbox\Mapper as BaseMapper;
 
@@ -61,7 +61,7 @@ class Mapper extends BaseMapper
      */
     public function deleteMatches(Season $season)
     {
-        MatchMapper::getInstance()->deleteByColumn('season_id', $season->getId(), ['cache' => false]);
+        MatchupMapper::getInstance()->deleteByColumn('season_id', $season->getId(), ['cache' => false]);
     }
 
     /**
@@ -126,7 +126,7 @@ class Mapper extends BaseMapper
             WHERE true";
 
         if (!$getDeletedMatches) {
-            $query .= " AND " . MatchMapper::getInstance()->getSoftDeleteSql(null, 'm');
+            $query .= " AND " . MatchupMapper::getInstance()->getSoftDeleteSql(null, 'm');
         }
 
         if (!$getDeletedSeasons) {
