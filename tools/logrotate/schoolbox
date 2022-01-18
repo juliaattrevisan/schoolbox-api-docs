@@ -1,57 +1,30 @@
-/var/log/schoolbox-sync*.log {
-	daily
-	missingok
-	rotate 30
-	compress
-	delaycompress
+/var/log/schoolbox/*/sis-scheduler.log /var/log/schoolbox/*/ups.log {
+    daily
+    missingok
+    rotate 30
+    compress
 }
 
-/var/log/schoolbox/binder*.log /var/log/schoolbox/ups*.log {
-	daily
-	missingok
-	rotate 7
-	compress
+
+/var/log/schoolbox/*/etherpad-sync.log /var/log/schoolbox/*/mysql-optimize.log /var/log/schoolbox/*/cache-cleanup.log  /var/log/schoolbox/*/set-config-data-dirs-perms.log /var/log/schoolbox/*/preparseVcalSubscription.log /var/log/schoolbox/*/ups-cleanup.log /var/log/schoolbox/*/stats.log /var/log/schoolbox/*/binder.log /var/log/schoolbox/*/notif-restart.log /var/log/schoolbox/*/transform-cleanup.log /var/log/schoolbox/*/intellischool.log /var/log/schoolbox/*/geosnapshot.log /var/log/schoolbox/*/remove-old-triggers.log {
+    weekly
+    missingok
+    rotate 4
+    compress
 }
 
-/var/log/schoolbox/quiz*.log /var/log/schoolbox/plagscan*.log /var/log/schoolbox/docman*.log /var/log/schoolbox/etherpad-sync*.log /var/log/schoolbox/remove-old-triggers.log {
-	monthly
-	missingok
-	rotate 2
-	compress
-}
 
-/var/log/schoolbox/upgrade.log {
+/var/log/schoolbox/*/quiz.log /var/log/schoolbox/*/kami.log  /var/log/schoolbox/*/plagscan.log /var/log/schoolbox/*/turnitin.log /var/log/schoolbox/*/docman.log /var/log/schoolbox/*/transcode.log /var/log/schoolbox/*/image-processor.log {
 	monthly
 	missingok
 	rotate 6
 	compress
 }
 
-/var/log/schoolbox/*/upgrade.log {
+/var/log/schoolbox/upgrade.log /var/log/schoolbox/*/upgrade.log {
 	monthly
 	missingok
 	rotate 6
 	compress
 }
 
-/var/lib/schoolbox/cache/logs/*.log {
-	monthly
-	missingok
-	rotate 6
-	compress
-}
-
-/var/log/schoolbox/cache-cleanup*.log  /var/log/schoolbox/set-config-data-dirs-perms*.log {
-	weekly
-	missingok
-	rotate 5
-	compress
-}
-
-/var/log/schoolbox/digestd*.log /var/log/schoolbox/scheduled*.log /var/log/schoolbox/socketd*.log /var/log/schoolbox/routed*.log /var/log/schoolbox/belld*.log {
-	size 100M
-	copytruncate
-	missingok
-	rotate 14
-	compress
-}
