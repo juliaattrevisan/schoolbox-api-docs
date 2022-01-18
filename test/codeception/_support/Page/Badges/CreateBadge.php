@@ -29,8 +29,7 @@ class CreateBadge
      */
     public function typeName($badgeName): void
     {
-        $this->tester->click(self::BADGE_NAME);
-        $this->tester->type($badgeName);
+        $this->tester->fillField(self::BADGE_NAME, $badgeName);
     }
 
     /**

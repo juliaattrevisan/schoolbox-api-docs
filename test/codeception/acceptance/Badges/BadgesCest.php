@@ -79,7 +79,7 @@ class BadgesCest
         $badgeId = $i->grabNumRecords('badge');
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownModify($badgeId);
-        $createBadge->typeName(' Updated');
+        $createBadge->typeName('Automation Badge Updated');
         $createBadge->clickCategoryDropDown();
         $createBadge->clickCategoryItem($category);
         $createBadge->clickCreateBadgeButton();
