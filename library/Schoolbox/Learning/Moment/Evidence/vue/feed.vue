@@ -462,7 +462,7 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you wish to delete this Learning Moment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteEvidence(currentlyDeletingEvidence)" id="delete-learning-moment" class="button submit">Delete</a></li>
+                <li><a @click.prevent="deleteEvidence(currentlyDeletingEvidence)" id="confirm-delete-learning-moment" class="button submit">Delete</a></li>
                 <li><a @click.prevent="$refs.deleteModal.close()" class="button">Cancel</a></li>
             </ul>
         </reveal-modal>
