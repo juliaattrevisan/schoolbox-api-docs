@@ -140,11 +140,20 @@ class Team implements IStrategy
         ]);
 
         foreach ($teams['data'] as $teamData) {
+            /* Sport identifiers
+             */
+            $teamActivityId = $teamData['activity']['id'];
             $teamActivity = $teamData['activity']['name'] ?? '';
+
+            /* Division identifiers
+             */
             $teamCategory = $teamData['category']['name'] ?? '';
             $teamSubcategory = $teamData['subcategory']['name'] ?? '';
-            $teamName = $teamData['name'];
+
+            /* Team identifiers
+             */
             $teamId = (int)$teamData['id'];
+            $teamName = $teamData['name'];
 
             /* Try to manufacture a division title
              */
@@ -160,7 +169,7 @@ class Team implements IStrategy
 
             /* Try to spawn a corresponding Sport instance
              */
-            $sport = $registry->recallSport($teamActivity);
+            $sport = $registry->recallSport($teamActivityId, $teamActivity);
 
             /* Try to spawn a corresponding Division instance
              */
@@ -170,7 +179,7 @@ class Team implements IStrategy
              * $teamId is used later to figure out who vs who, when importing Matchups
              * Teams are indexed by ids for this particular usage, unlike others
              */
-            $team = $registry->recallTeam($sport, $division, $teamName, $teamId);
+            $team = $registry->recallTeam($sport, $division, $teamId, $teamName);
 
             $this->log->info(sprintf(
                 'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
@@ -187,10 +196,8 @@ class Team implements IStrategy
              * Positions, accumulate them into the corresponding Sport
              */
             foreach ($teamData['positions'] as $positionData) {
-                $position = $registry->recallPosition($sport, $positionData['name']);
+                $position = $registry->recallPosition($sport, $positionData['id'], $positionData['name']);
             }
         }
-
-        print_r($registry->getLookup());
     }
 }

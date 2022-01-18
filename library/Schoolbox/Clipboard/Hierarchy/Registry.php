@@ -19,10 +19,10 @@ use Schoolbox\Fixtures\Season\Model;
  * divisions and teams without polling the db
  *
  * $lookup = [
- *     sport name => [
+ *     sport id => [
  *         instance => \Schoolbox\Fixtures\Sport\Model
  *         positions => [
- *             position name => [
+ *             position id => [
  *                 instance => \Schoolbox\Fixtures\Position\Model
  *             ]
  *         ]
@@ -30,7 +30,7 @@ use Schoolbox\Fixtures\Season\Model;
  *             division name => [
  *                 instance => \Schoolbox\Fixtures\Division\Model
  *                 teams => [
- *                     team name => [
+ *                     team id => [
  *                         instance => \Schoolbox\Fixtures\Team\Model
  *                     ]
  *                 ]
@@ -187,15 +187,16 @@ class Registry
      * Find the Sport instance corresponding to $sportName,
      * spawning and remembering it if we didn't encounter it previously
      *
+     * @param int    $sportId
      * @param string $sportName
      * @return \Schoolbox\Fixtures\Sport\Model
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function recallSport(string $sportName): \Schoolbox\Fixtures\Sport\Model
+    public function recallSport(int $sportId, string $sportName): \Schoolbox\Fixtures\Sport\Model
     {
-        if (!isset($this->lookup[$sportName])) {
+        if (!isset($this->lookup[$sportId])) {
             try {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
@@ -242,12 +243,12 @@ class Registry
              */
             $this->sportMapper->save($sport);
 
-            $this->lookup[$sportName] = [
+            $this->lookup[$sportId] = [
                 'instance' => $sport,
                 'divisions' => []
             ];
         } else {
-            $sport = $this->lookup[$sportName]['instance'];
+            $sport = $this->lookup[$sportId]['instance'];
         }
 
         return $sport;
@@ -343,8 +344,8 @@ class Registry
     public function recallTeam(
         \Schoolbox\Fixtures\Sport\Model $sport,
         \Schoolbox\Fixtures\Division\Model $division,
-        string $teamName,
-        int $teamId
+        int $teamId,
+        string $teamName
     ): \Schoolbox\Fixtures\Team\Model {
         if (!isset($this->lookup[$sport->getName()]['divisions'][$division->getName()]['teams'][$teamId])) {
             try {
@@ -409,9 +410,9 @@ class Registry
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function recallPosition(\Schoolbox\Fixtures\Sport\Model $sport, string $positionName): \Schoolbox\Fixtures\Position\Model
+    public function recallPosition(\Schoolbox\Fixtures\Sport\Model $sport, int $positionId, string $positionName): \Schoolbox\Fixtures\Position\Model
     {
-        if (!isset($this->lookup[$sport->getName()]['positions'][$positionName])) {
+        if (!isset($this->lookup[$sport->getName()]['positions'][$positionId])) {
             try {
                 $position = $this->positionMapper->findOneByColumnList([
                     'name' => $positionName,
@@ -454,9 +455,9 @@ class Registry
              */
             $this->positionMapper->save($position);
 
-            $this->lookup[$sport->getName()]['positions'][$position->getName()]['instance'] = $position;
+            $this->lookup[$sport->getName()]['positions'][$positionId]['instance'] = $position;
         } else {
-            $position = $this->lookup[$sport->getName()]['positions'][$positionName]['instance'];
+            $position = $this->lookup[$sport->getName()]['positions'][$positionId]['instance'];
         }
 
         return $position;
