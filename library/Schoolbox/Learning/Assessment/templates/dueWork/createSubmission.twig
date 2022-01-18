@@ -153,7 +153,14 @@ Data:
          * @returns {Boolean}
          */
         let isSelfAssessmentCommentEmpty = function () {
-            return hasSelfAssessment && $form.find('[name="comment"]').val().length === 0;
+            if (hasSelfAssessment) {
+                return true;
+            }
+            let $commentInput = $form.find('[name="comment"]');
+            if ($commentInput.length === 0) {
+                return true;
+            }
+            return $commentInput.val().length === 0;
         };
 
         /* Spawn editors
