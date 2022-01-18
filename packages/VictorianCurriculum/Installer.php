@@ -50,15 +50,27 @@ class Installer implements IPackageInstall
         $curriculumMapper = Node\Mapper::getInstance();
         $parentLookup = [];
 
-        foreach ($csv as $row) {
-            $node = $curriculumMapper->createModel()
-                ->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null)
-                ->setName($row['name'])
-                ->setDescription($row['description'])
-                ->setCode($row['code'])
-                ->setOrder($row['order']);
+        $i = 1;
 
-            $curriculumMapper->save($node);
+        foreach ($csv as $row) {
+            try {
+                $node = $curriculumMapper->createModel()
+                    ->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null)
+                    ->setName($row['name'])
+                    ->setDescription($row['description'])
+                    ->setCode($row['code'])
+                    ->setOrder($row['order']);
+
+                $curriculumMapper->save($node);
+                $i++;
+            } catch (\Throwable $e) {
+                print_r(sprintf(
+                    'Row %s has a problem',
+                    $i
+                ));
+
+                print_r($row);
+            }
 
             //Store the inserted ID so we can link children to it
             $parentLookup[$row['id']] = $node->getId();
