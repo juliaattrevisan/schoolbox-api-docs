@@ -170,7 +170,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         puppet.options = "--verbose --debug"
     end
     puppet.facter = {
-      "suppress_instance_configuration" => true
+      "suppress_instance_configuration" => true,
+      "primary_php_majver" => "8.0",
     }
   end
 
