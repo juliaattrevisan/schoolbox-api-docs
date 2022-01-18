@@ -324,6 +324,8 @@ class Announcements
          * $courseCodes as a hash lookup
          */
         foreach ($announcements as $announcement) {
+            $owner = null;
+
             /* Refresh lock
              */
             if (null !== $this->lock) {
@@ -373,52 +375,61 @@ class Announcements
             /* Figure out the external id of the person who owns this
              * The external id should match someone in schoolbox.user (hopefully)
              * but if it can't, it'll fall back to $defaultOwner
+             *
+             * Shamefully the author id might not exist in canvas...
              */
-            $endpoint = sprintf(
-                'api/v1/users/%s',
-                $announcement['author']['id']
-            );
-
-            $this->logDebug(sprintf(
-                '%s announcement %s: searching for article author %s (id %s) in canvas endpoint %s',
-                $announcement['context_code'],
-                $announcement['id'],
-                $announcement['author']['display_name'],
-                $announcement['author']['id'],
-                $endpoint
-            ));
-
-            /* Inspect canvas for this author
-             */
-            try {
-                $announcementOwner = $this->api->retrieve('GET', $endpoint, []);
-            } catch (\RuntimeException $e) {
-                $this->logDebug(sprintf(
-                    '%s announcement %s: endpoint %s error - %s; skipping',
-                    $announcement['context_code'],
-                    $announcement['id'],
-                    $endpoint,
-                    $e->getMessage()
-                ));
-
-                continue;
-            }
-
-            /* Inspect schoolbox for this owner
-             */
-            try {
-                $owner = $this->userMapper->findByExternalId($announcementOwner['sis_user_id']);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                /* noop: owner not found in schoolbox; assign default
-                 */
-                $owner = null;
+            if ('' !== trim($announcement['author']['id'])) {
+                $endpoint = sprintf(
+                    'api/v1/users/%s',
+                    $announcement['author']['id']
+                );
 
                 $this->logDebug(sprintf(
-                    '%s announcement %s: author %s (externalId/sis_user_id %s) not found in schoolbox users - reverting to default ownership by %s',
+                    '%s announcement %s: searching for article author %s (id %s) in canvas endpoint %s',
                     $announcement['context_code'],
                     $announcement['id'],
                     $announcement['author']['display_name'],
-                    $announcementOwner['sis_user_id'],
+                    $announcement['author']['id'],
+                    $endpoint
+                ));
+
+                /* Inspect canvas for this author
+                 */
+                try {
+                    $announcementOwner = $this->api->retrieve('GET', $endpoint, []);
+                } catch (\RuntimeException $e) {
+                    $this->logDebug(sprintf(
+                        '%s announcement %s: endpoint %s error - %s; skipping',
+                        $announcement['context_code'],
+                        $announcement['id'],
+                        $endpoint,
+                        $e->getMessage()
+                    ));
+
+                    continue;
+                }
+
+                /* Inspect schoolbox for this owner
+                 */
+                try {
+                    $owner = $this->userMapper->findByExternalId($announcementOwner['sis_user_id']);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    /* noop: owner not found in schoolbox; assign default
+                     */
+                    $this->logDebug(sprintf(
+                        '%s announcement %s: author %s (externalId/sis_user_id %s) not found in schoolbox users - reverting to default ownership by %s',
+                        $announcement['context_code'],
+                        $announcement['id'],
+                        $announcement['author']['display_name'],
+                        $announcementOwner['sis_user_id'],
+                        $defaultOwner->getFullName()
+                    ));
+                }
+            } else {
+                $this->logDebug(sprintf(
+                    '%s announcement %s: author did not have an id - reverting to default ownership by %s',
+                    $announcement['context_code'],
+                    $announcement['id'],
                     $defaultOwner->getFullName()
                 ));
             }
