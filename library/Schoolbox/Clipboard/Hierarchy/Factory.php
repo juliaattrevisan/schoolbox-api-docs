@@ -93,7 +93,15 @@ class Factory
          */
         return (new GenericCollection(IStrategy::class))
             ->add(new Prepare($this->log))
-            ->add(new Team($this->log, $api))
+            ->add(new Team(
+                $this->log,
+                $api,
+                \Schoolbox\Fixtures\Season\Mapper::getInstance(),
+                \Schoolbox\Fixtures\Sport\Mapper::getInstance(),
+                \Schoolbox\Fixtures\Position\Mapper::getInstance(),
+                \Schoolbox\Fixtures\Division\Mapper::getInstance(),
+                \Schoolbox\Fixtures\Team\Mapper::getInstance()
+            ))
             ->add(new Cleanup($this->log));
     }
 }
