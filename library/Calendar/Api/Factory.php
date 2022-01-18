@@ -199,7 +199,8 @@ class Calendar_Api_Factory
                     $user,
                     $viewer,
                     $this->assessmentDataSource,
-                    new Visibility(Access::getInstance())
+                    new Visibility(Access::getInstance()),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance()
                 );
 
             /* These don't have connector configs
@@ -218,14 +219,15 @@ class Calendar_Api_Factory
                     $viewer,
                     $this->assessmentDataSource,
                     new Visibility(Access::getInstance()),
-                    new Timetable_ColourManager(Timetable_ColourMapper::getInstance()->findAll())
+                    new Timetable_ColourManager(Timetable_ColourMapper::getInstance()->findAll()),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance()
                 );
             case Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class:
-                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $viewer, $this->configLoader);
+                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $viewer, $this->configLoader, \Schoolbox\Calendar\EventTypeMapper::getInstance());
             case Calendar_Api_EventType_Timetable_Room::class:
                 return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, $viewer, new External_Timetable());
             case Calendar_Api_EventType_TimetableDays_External_Default::class:
-                return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user, $viewer);
+                return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance());
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");
         }

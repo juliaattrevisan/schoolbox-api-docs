@@ -27,13 +27,25 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
 
 
     /**
+     * @var \Schoolbox\Calendar\EventTypeMapper
+     */
+    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
+
+
+    /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user, User $viewer, IConfigLoader $configLoader)
-    {
+    public function __construct(
+        int $connectorId,
+        User $user,
+        User $viewer,
+        IConfigLoader $configLoader,
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper
+    ) {
         parent::__construct($connectorId, $user, $viewer);
         $this->externalTimetable = new External_Timetable();
         $this->configLoader = $configLoader;
+        $this->eventTypeMapper = $eventTypeMapper;
     }
 
 
@@ -77,14 +89,19 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 $days = max(0, $decodedConfig->getDuration());
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
-            /* TODO Repair assumption about default luEventType id
-             *  You can't really make this assumption, because someone could have
-             *  soft-deleted the first luEventType record; arbitrarily assigning 1
-             *  could put events into a deleted event type; instead, you could get
-             *  the full set, then pop the first of its elements
+            /* Something went awry with loadConnectorConfiguration()
+             * Can't determine what event type this would be
              */
-            $eventType = 1;
+            $eventType = null;
         }
+
+        /* Ensure $eventType is valid, finding first available one if it is invalid.
+         * If you can't find one, we can't assign anything to the events from this subscription
+         * so just return the empty stack; there's no way we could categorise those events
+         *
+         * getLuEventType() can return a deleted event type identifier.
+         */
+        $eventType = $this->eventTypeMapper->findFirstMeaningfulId($eventType);
 
         /* Do a detection on $allowedEventTypes, if provided and meaningful
          */

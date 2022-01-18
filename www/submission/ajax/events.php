@@ -41,7 +41,8 @@ $calendarApi          = new Calendar_Api_EventType_Submission_Schoolbox_ForDueWo
     $viewer,
     $assessmentDataSource,
     $visibility,
-    $colourManager
+    $colourManager,
+    \Schoolbox\Calendar\EventTypeMapper::getInstance()
 );
 $renderer             = new Renderer(
     $calendarApi,

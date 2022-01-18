@@ -20,13 +20,6 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 {
 
     /**
-     * Default id for an event type that was chosen in admin, but doesn't exist anymore
-     *
-     * @var int
-     */
-    private const DEFAULT_EVENTTYPE_ID = 1;
-
-    /**
      * A string to indicate the source from which this event emerged
      *
      * @var string
@@ -89,8 +82,19 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $decodedConfig = $config->decodeConfig();
             $defaultEventType = $decodedConfig->getLuEventType();
         } catch (MapperException $e) {
-            $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
+            /* Something went awry with loadConnectorConfiguration()
+             * Can't determine what event type this would be
+             */
+            $defaultEventType = null;
         }
+
+        /* Ensure $eventType is valid, finding first available one if it is invalid.
+         * If you can't find one, we can't assign anything to the events from this subscription
+         * so just return the empty stack; there's no way we could categorise those events
+         *
+         * getLuEventType() can return a deleted event type identifier.
+         */
+        $defaultEventType = $this->eventTypeMapper->findFirstMeaningfulId($defaultEventType);
 
         /* Do a detection on $allowedEventTypes, if provided and meaningful
          */

@@ -248,7 +248,7 @@ try {
 
             $api = buildApiClass(
                 Calendar_Api_EventType_Submission_Schoolbox_Default::class,
-                [$user, $viewer, $assessmentDataSource, $visibility],
+                [$user, $viewer, $assessmentDataSource, $visibility, \Schoolbox\Calendar\EventTypeMapper::getInstance()],
                 true,
                 $sentry
             );
@@ -259,7 +259,7 @@ try {
         case 'timetable':
             $api = buildApiClass(
                 Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                [$user, $viewer, $kernel->getDependencyInjector()->get('config')],
+                [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
                 true,
                 $sentry
             );
@@ -272,7 +272,7 @@ try {
         case 'timetabledays':
             $api = buildApiClass(
                 Calendar_Api_EventType_TimetableDays_External_Default::class,
-                [$user, $viewer],
+                [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance()],
                 true,
                 $sentry
             );

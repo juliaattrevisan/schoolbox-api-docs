@@ -76,4 +76,34 @@ class EventTypeMapper extends Schoolbox\Mapper
     {
         return ['sequence' => 'ASC'];
     }
+
+
+    /**
+     * If $eventTypeId corresponds to an existing and extant luEventType,
+     * return that
+     *
+     * Otherwise, find the first available luEventType and return its id
+     *
+     * If your luEventType is empty, return null
+     *
+     * @param int|null $eventTypeId
+     * @return int|null
+     */
+    public function findFirstMeaningfulId(?int $eventTypeId): ?int
+    {
+        try {
+            $eventTypeExists = $this->findById($eventTypeId);
+            $id = $eventTypeExists->getId();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $firstEventType = $this->findAll()->first();
+
+            if (!$firstEventType) {
+                return null;
+            }
+
+            $id = $firstEventType->getId();
+        }
+
+        return $id;
+    }
 }
