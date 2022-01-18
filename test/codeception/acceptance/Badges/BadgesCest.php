@@ -93,11 +93,9 @@ class BadgesCest
      * @param AcceptanceTester $i
      * @throws Exception
      * @depends modifyBadge
-     * on /learning/badge select Modify badge
-     * update the title
-     * update the category
-     * Click Modify Badge
-     * Ensure the Badge title and category are properly presented in the /learning/badge screen
+     * on /learning/badge click the Badge dropdown
+     * Click Delete and confirm it
+     * Ensure the Badge is no longer presented in the /learning/badge screen
      */
     public function deleteBadge(AcceptanceTester $i)
     {
@@ -106,7 +104,6 @@ class BadgesCest
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownDelete();
         $badges->clickConfirmDelete();
-        $badges->waitAddBadgeButtonToBePresented();
         $i->cantSee('Automation Badge Updated');
     }
 }
