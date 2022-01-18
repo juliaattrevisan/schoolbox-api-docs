@@ -53,6 +53,12 @@ class Team implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Position\Mapper
+     */
+    private \Schoolbox\Fixtures\Position\Mapper $positionMapper;
+
+
+    /**
      * @var \Schoolbox\Fixtures\Division\Mapper
      */
     private \Schoolbox\Fixtures\Division\Mapper $divisionMapper;
@@ -78,6 +84,7 @@ class Team implements IStrategy
 
         $this->seasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
         $this->sportMapper = \Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $this->positionMapper = \Schoolbox\Fixtures\Position\Mapper::getInstance();
         $this->divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
         $this->teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
     }
@@ -99,6 +106,7 @@ class Team implements IStrategy
             $this->log,
             $this->seasonMapper,
             $this->sportMapper,
+            $this->positionMapper,
             $this->divisionMapper,
             $this->teamMapper
         );
@@ -119,19 +127,14 @@ class Team implements IStrategy
         ));
 
         $teams = $this->api->retrieve('GET', $endpoint, [
-            'includeStudents' => 'true',
             'includePositions' => 'true'
         ]);
 
-        foreach ($teams['data'] as $team) {
-            $teamActivity = $team['activity']['name'] ?? '';
-            $teamCategory = $team['category']['name'] ?? '';
-            $teamSubcategory = $team['subcategory']['name'] ?? '';
-            $teamName = $team['name'];
-
-            if ($teamName === 'Senior Training Squad') {
-                print_r($team);
-            }
+        foreach ($teams['data'] as $teamData) {
+            $teamActivity = $teamData['activity']['name'] ?? '';
+            $teamCategory = $teamData['category']['name'] ?? '';
+            $teamSubcategory = $teamData['subcategory']['name'] ?? '';
+            $teamName = $teamData['name'];
 
             /* Try to manufacture a division title
              */
@@ -166,6 +169,14 @@ class Team implements IStrategy
                 $team->getName(),
                 $team->getId()
             ));
+
+            /* Each team has a set of positions, but we attribute Positions to
+             * the sport in schoolbox. Inspect each team and from its list of
+             * Positions, accumulate them into the corresponding Sport
+             */
+            foreach ($teamData['positions'] as $positionData) {
+                $position = $registry->recallPosition($sport, $positionData['name']);
+            }
         }
     }
 }

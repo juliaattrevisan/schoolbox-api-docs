@@ -21,6 +21,11 @@ use Schoolbox\Fixtures\Season\Model;
  * $lookup = [
  *     sport name => [
  *         instance => \Schoolbox\Fixtures\Sport\Model
+ *         positions => [
+ *             position name => [
+ *                 instance => \Schoolbox\Fixtures\Position\Model
+ *             ]
+ *         ]
  *         divisions => [
  *             division name => [
  *                 instance => \Schoolbox\Fixtures\Division\Model
@@ -64,6 +69,12 @@ class Registry
 
 
     /**
+     * @var \Schoolbox\Fixtures\Position\Mapper
+     */
+    private \Schoolbox\Fixtures\Position\Mapper $positionMapper;
+
+
+    /**
      * @var \Schoolbox\Fixtures\Division\Mapper
      */
     private \Schoolbox\Fixtures\Division\Mapper $divisionMapper;
@@ -84,6 +95,7 @@ class Registry
      * @param LoggerInterface                     $log
      * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
+     * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
      * @param \Schoolbox\Fixtures\Division\Mapper $divisionMapper
      * @param \Schoolbox\Fixtures\Team\Mapper     $teamMapper
      */
@@ -91,12 +103,14 @@ class Registry
         LoggerInterface $log,
         \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
+        \Schoolbox\Fixtures\Position\Mapper $positionMapper,
         \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
         \Schoolbox\Fixtures\Team\Mapper $teamMapper
     ) {
         $this->log = $log;
         $this->seasonMapper = $seasonMapper;
         $this->sportMapper = $sportMapper;
+        $this->positionMapper = $positionMapper;
         $this->divisionMapper = $divisionMapper;
         $this->teamMapper = $teamMapper;
     }
@@ -373,5 +387,70 @@ class Registry
         }
 
         return $team;
+    }
+
+
+    /**
+     * Find the Position instance corresponding to $sport,
+     * spawning and remembering it if we didn't encounter it previously
+     *
+     * @param \Schoolbox\Fixtures\Sport\Model $sport
+     * @param string                          $positionName
+     * @return \Schoolbox\Fixtures\Position\Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function recallPosition(\Schoolbox\Fixtures\Sport\Model $sport, string $positionName): \Schoolbox\Fixtures\Position\Model
+    {
+        if (!isset($this->lookup[$sport->getName()]['positions'][$positionName])) {
+            try {
+                $position = $this->positionMapper->findOneByColumnList([
+                    'name' => $positionName,
+                    'sport_id' => $sport->getId()
+                ]);
+
+                $this->log->debug(sprintf(
+                    'Reusing existing position %s in sport %s',
+                    $position->getName(),
+                    $sport->getName()
+                ));
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                /* Resurrect it from a previously soft-deleted state
+                 * if it was previously imported from clipboard,
+                 * deleted from clipboard when this import ran,
+                 * but reappeared again before this orphaned data was completely removed
+                 */
+                /** @var \Schoolbox\Fixtures\Position\Model $position */
+                $position = $e->getDeletedObject();
+                $position->setDeletedAt(null);
+
+                $this->log->debug(sprintf(
+                    'Resurrecting previously-deleted position %s in sport %s',
+                    $position->getName(),
+                    $sport->getName()
+                ));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $position = $this->positionMapper->createModel()
+                    ->setName($positionName)
+                    ->setSport($sport);
+
+                $this->log->debug(sprintf(
+                    'Creating new position %s in sport %s',
+                    $position->getName(),
+                    $sport->getName()
+                ));
+            }
+
+            /* We saw this during the import and thus we should keep it
+             */
+            $this->positionMapper->save($position);
+
+            $this->lookup[$sport->getName()]['positions'][$position->getName()]['instance'] = $position;
+        } else {
+            $position = $this->lookup[$sport->getName()]['positions'][$positionName]['instance'];
+        }
+
+        return $position;
     }
 }

@@ -137,9 +137,9 @@ class Api implements IApi
                     /* Debugging:
                      * Find out what guzzle calculated as the endpoint + query string params
                      */
-                    $options['on_stats'] = function (TransferStats $stats) use (&$url) {
-                        $url = $stats->getEffectiveUri();
-                    };
+//                    $options['on_stats'] = function (TransferStats $stats) use (&$url) {
+//                        $url = $stats->getEffectiveUri();
+//                    };
                 }
 
                 $response = $this->client->request($method, $endpoint, $options);
@@ -147,7 +147,8 @@ class Api implements IApi
                 /* Debugging:
                  * Find out what guzzle calculated as the endpoint + query string params
                  */
-                print_r($url);
+//                print_r($url);
+
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 
