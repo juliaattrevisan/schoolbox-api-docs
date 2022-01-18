@@ -38,8 +38,8 @@ class Thread implements ISoftDeletable
     /** @var string */
     protected $deleted = 'false';
 
-    /** @var string */
-    protected $locked = 'false';
+    /** @var bool */
+    protected $locked = false;
 
     /** @var int */
     protected $views = 0;
@@ -181,7 +181,7 @@ class Thread implements ISoftDeletable
 
 
     /**
-     * @param string $locked
+     * @param bool $locked
      * @return self
      */
     public function setLocked($locked)
@@ -192,7 +192,7 @@ class Thread implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return bool
      */
     public function getLocked()
     {
