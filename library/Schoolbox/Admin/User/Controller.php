@@ -19,7 +19,6 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Role;
 use Scrub;
 use UnexpectedValueException;
-use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
@@ -113,9 +112,9 @@ class Controller extends Base
 
 
     /**
-     * @var Jwt
+     * @var User\Token\Mapper
      */
-    private $tokenBuilder;
+    private $tokenMapper;
 
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
@@ -248,7 +247,7 @@ class Controller extends Base
      * @param RoleMapper             $roleMapper
      * @param HouseResidentialMapper $houseResidentialMapper
      * @param HouseMapper            $houseMapper
-     * @param Jwt                    $tokenBuilder
+     * @param User\Token\Mapper      $tokenMapper
      * @param YearLevel\Mapper       $yearLevelMapper
      */
     public function __construct(
@@ -263,7 +262,7 @@ class Controller extends Base
         RoleMapper $roleMapper,
         HouseResidentialMapper $houseResidentialMapper,
         HouseMapper $houseMapper,
-        Jwt $tokenBuilder,
+        User\Token\Mapper $tokenMapper,
         YearLevel\Mapper $yearLevelMapper
     ) {
         $this->cmsLogMapper = $cmsLogMapper;
@@ -277,7 +276,7 @@ class Controller extends Base
         $this->roleMapper = $roleMapper;
         $this->houseResidentialMapper = $houseResidentialMapper;
         $this->houseMapper = $houseMapper;
-        $this->tokenBuilder = $tokenBuilder;
+        $this->tokenMapper = $tokenMapper;
         $this->yearLevelMapper = $yearLevelMapper;
     }
 
@@ -371,7 +370,7 @@ class Controller extends Base
                 ]),
                 'portraitZone' => $portraitZone,
                 'isSchoolboxAdmin' => $user->getUsername() === UserMapper::USERNAME_ALARESS_ADMIN,
-                'token' => $this->tokenBuilder->generate($user),
+                'token' => $this->tokenMapper->findByColumn('user_id', $user->getId()),
             ],
             'title' => 'Admin - Users'
         ]);

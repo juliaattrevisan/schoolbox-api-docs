@@ -64,14 +64,15 @@ class Jwt
     /**
      * Generates a JWT for this user.
      *
-     * @param User     $user
-     * @param int|null $lifetime         If provided, the JWT expires after this
+     * @param User                     $user
+     * @param Alaress_Date_Format|null $expiry           If provided, the JWT expires after this
+     * @param string|null              $jwtId
      *                                   many seconds.
-     * @param array    $additionalClaims Any extra claims to make beyond the
-     *                                   standard 'iss', 'sub', 'exp'
+     * @param array                    $additionalClaims Any extra claims to make beyond the
+     *                                   standard 'iss', 'sub', 'exp'. 'jti'
      * @return string
      */
-    public function generate(User $user, ?int $lifetime = null, array $additionalClaims = []): string
+    public function generate(User $user, ?\Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = []): string
     {
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
@@ -82,8 +83,11 @@ class Jwt
             'iss' => (new Factory($this->config))->buildFullyQualified()->getHost(),
             'sub' => $user->getUsername(),
         ];
-        if (isset($lifetime)) {
-            $claims['exp'] = Alaress_Date_Format::now()->addSeconds($lifetime)->getUnixTimeStamp();
+        if (isset($expiry)) {
+            $claims['exp'] = $expiry;
+        }
+        if (isset($jwtId)) {
+            $claims['jti'] = $jwtId;
         }
         return JwtLibrary::encode(
             array_merge($claims, $additionalClaims),
