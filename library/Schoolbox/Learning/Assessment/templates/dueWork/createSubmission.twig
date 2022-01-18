@@ -161,8 +161,8 @@ Data:
          * @returns {Boolean}
          */
         let isSelfAssessmentCommentEmpty = function () {
-            if (hasSelfAssessment) {
-                return true;
+            if (!hasSelfAssessment) {
+                return false;
             }
             let $commentInput = $form.find('[name="comment"]');
             if ($commentInput.length === 0) {
