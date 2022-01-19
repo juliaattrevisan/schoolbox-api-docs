@@ -89,6 +89,9 @@ class Redirect
          * They can visit a link to canvas
          * Parents can't
          */
+        if (!$user->getRole()->isStaff() && !$user->getRole()->isStudent()) {
+            return null;
+        }
 
         /* For the given assessment, look at the external id
          * If there's one there, try to look in canvas cache db
