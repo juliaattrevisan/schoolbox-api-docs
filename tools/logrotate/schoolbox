@@ -6,7 +6,7 @@
 }
 
 
-/var/log/schoolbox/*/etherpad-sync.log /var/log/schoolbox/*/mysql-optimize.log /var/log/schoolbox/*/cache-cleanup.log  /var/log/schoolbox/*/set-config-data-dirs-perms.log /var/log/schoolbox/*/preparseVcalSubscription.log /var/log/schoolbox/*/ups-cleanup.log /var/log/schoolbox/*/stats.log /var/log/schoolbox/*/binder.log /var/log/schoolbox/*/notif-restart.log /var/log/schoolbox/*/transform-cleanup.log /var/log/schoolbox/*/intellischool.log /var/log/schoolbox/*/geosnapshot.log /var/log/schoolbox/*/remove-old-triggers.log {
+/var/log/schoolbox/*/etherpad-sync.log /var/log/schoolbox/*/mysql-optimize.log /var/log/schoolbox/*/cache-cleanup.log  /var/log/schoolbox/*/set-config-data-dirs-perms.log /var/log/schoolbox/*/preparseVcalSubscription.log /var/log/schoolbox/*/ups-cleanup.log /var/log/schoolbox/*/stats.log /var/log/schoolbox/*/binder.log /var/log/schoolbox/*/notif-restart.log /var/log/schoolbox/*/transform-cleanup.log /var/log/schoolbox/*/intellischool.log /var/log/schoolbox/*/geosnapshot.log /var/log/schoolbox/*/remove-old-triggers.log /var/log/schoolbox/*/liss.log /var/log/schoolbox/*/saml.log /var/log/schoolbox/*/audit.log {
     weekly
     missingok
     rotate 4
