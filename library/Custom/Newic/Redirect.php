@@ -84,6 +84,8 @@ class Redirect
         \Schoolbox\User $user,
         IAssessable $assessment
     ): ?string {
+        $canvasId = '';
+
         /* If the currently logged in user is staff or students,
          * They can visit a link to canvas
          * Parents can't
@@ -103,54 +105,16 @@ class Redirect
         if ($assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
             /** \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
             $canvasId = trim((string)$assessment->getExternalId());
-
-            if ('' === $canvasId) {
-                return null;
-            }
-
-            $prefix = $this->generateFirstAvailableRedirect($assessment->getBaseContext()->getFolder());
-
-            /* If we didn't find a meaningful $prefix, the folder code doesn't exist in canvas
-             * so we can't construct the first part of the url; get the heck out of here
-             * Otherwise, continue and append the assessment suffix
-             */
-            if (null === $prefix) {
-                return null;
-            }
-
-            /* Find out if external_id exists in canvas as an assignment identifier
-             */
-            $query = "
-                SELECT *
-                FROM assignment_dim
-                WHERE canvas_id = :assignmentCanvasId  
-            ";
-
-            $statement = $this->canvasDb->build()->prepareQuery($query);
-
-            $statement->execute([
-                'assignmentCanvasId' => $canvasId
-            ]);
-
-            $row = $statement->fetch();
-
-            /* No assignment found; exit
-             */
-            if (!$row) {
-                return null;
-            }
-
-            return sprintf(
-                '%s/assignments/%s',
-                rtrim($prefix, '/'),
-                $row['canvas_id']
-            );
         }
 
         /* Quizzes have an external id somewhere
          */
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+            /** \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
+            $canvasId = trim((string)$assessment->getExternalId());
+        }
 
-        /* For the given assessment, look at the external id
+        /* For the given duework/quiz assessment, look at the external id
          * If there's one there, try to look in canvas cache db
          * to see where it should go. You'll need $folder to figure
          * out the class code too.
@@ -159,11 +123,47 @@ class Redirect
          * can be used to generate the first half of the url
          * to which you can append /assignments/123456
          */
+        if ('' === $canvasId) {
+            return null;
+        }
 
-        /* Otherwise return null
-         * No applicable canvas redirects
+        $prefix = $this->generateFirstAvailableRedirect($assessment->getBaseContext()->getFolder());
+
+        /* If we didn't find a meaningful $prefix, the folder code doesn't exist in canvas
+         * so we can't construct the first part of the url; get the heck out of here
+         * Otherwise, continue and append the assessment suffix
          */
-        return null;
+        if (null === $prefix) {
+            return null;
+        }
+
+        /* Find out if external_id exists in canvas as an assignment identifier
+         */
+        $query = "
+            SELECT *
+            FROM assignment_dim
+            WHERE canvas_id = :assignmentCanvasId  
+        ";
+
+        $statement = $this->canvasDb->build()->prepareQuery($query);
+
+        $statement->execute([
+            'assignmentCanvasId' => $canvasId
+        ]);
+
+        $row = $statement->fetch();
+
+        /* No assignment found; exit
+         */
+        if (!$row) {
+            return null;
+        }
+
+        return sprintf(
+            '%s/assignments/%s',
+            rtrim($prefix, '/'),
+            $row['canvas_id']
+        );
     }
 
 
