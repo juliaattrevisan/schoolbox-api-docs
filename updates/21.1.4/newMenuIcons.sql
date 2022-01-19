@@ -1,0 +1,1 @@
+INSERT INTO menu_icons (name, title) VALUES ('view-hollow','Not Visible'),('live-marks','Grade Report'),('medical','Medical');
