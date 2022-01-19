@@ -378,12 +378,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // folder inheritance is enabled OR inheritance has changed
 
             // TODO desingleton these
-            $redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
-            $log = new NullLogger();
+            $redis      = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
+            $log        = new NullLogger();
+            $redisQueue = Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH);
 
             // update the cache
             // TODO replace with $di('subscriptionCache')
-            $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log));
+            $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log), $redisQueue);
 
             $cache->cacheRedirects(INSTANCE_ID);
         }

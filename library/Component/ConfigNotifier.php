@@ -185,12 +185,13 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
         // The routing subscription loader is stored in Redis, not jst cached
         // TODO desingleton these
-        $redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
-        $log = new NullLogger();
+        $redis      = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
+        $log        = new NullLogger();
+        $redisQueue = Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH);
 
         // update the cache
         // TODO replace with $di('subscriptionCache')
-        $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log));
+        $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log), $redisQueue);
 
         $cache->cacheRedirects(INSTANCE_ID);
     }
