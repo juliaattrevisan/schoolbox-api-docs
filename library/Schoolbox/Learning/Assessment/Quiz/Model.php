@@ -66,6 +66,13 @@ class Model extends AbstractAssessment
      */
     private $completionMessage;
 
+    /**
+     * External system identifier
+     *
+     * @var null|string
+     */
+    private $externalId;
+
 
     /**
      * @return string
