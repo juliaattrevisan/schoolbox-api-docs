@@ -489,7 +489,6 @@ export default {
 
 .VueTables__search {
     padding-bottom: 0.5rem; //to put the view-all-files-filters.vue up closer to the search input
-    width: 100%;
 }
 
 .VueTables__search-field label {
