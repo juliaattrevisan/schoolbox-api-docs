@@ -1,95 +1,30 @@
-{% extends '@learningDueWorkResponse/inlineGrading/standard.twig' %}
+<h2 class="subheader">
+    {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
+</h2>
 
-{# Go back to the assessment's summary screen, I guess? #}
-{% block nextUrl %}
-<script>
-    var nextUrl = '{{ routeLookup("learningAssessment.getSummary", {assessmentId: assessment.id, studentId: participant.user.id}) }}';
-</script>
-{% endblock %}
+{% set gradable = selfAssess and 'none' != markSchemeName | lower %}
 
-{# No participant carousel in self-assessment #}
-{% block participantCarousel %}{% endblock %}
+{% set rubricText = ''  %}
+{% set selfAssessText = '' %}
+{% if assessment.useRubric %}
+    {% set rubricText = 'rubric and'  %}
+{% endif %}
+{% if selfAssess %}
+    {% set selfAssessText = 'assess and' %}
+{% endif %}
 
-{# No delete capability in self-assessment #}
-{% block meta %}
-    {% include '@learningDueWorkResponse/inlineGrading/fragments/meta.twig' with {
-        title: locale.selfAssessment.proper ~ ' for',
-        assessment: assessment,
-        participant: participant,
-        responseList: responseList ?? null,
-        response: response,
-        readonly: readonly,
-        deleteRoute: false,
-        summaryRoute: false
-    } only %}
-{% endblock %}
-
-{# Different button text in self-assessment #}
-{% block dynamicFeedback %}
-    {% include '@learningDueWorkResponse/inlineGrading/fragments/dynamicFeedback.twig' with {
-        publishText: 'Submit ' ~ locale.selfAssessment,
-        publishingText: 'Submitting ' ~ locale.selfAssessment ~ '...',
-        publishedText: 'Submitted ' ~ locale.selfAssessment
-    } only %}
-{% endblock %}
-
-{# No response list in self-assessment #}
-{% block responseList %}{% endblock %}
-
-{# No response file preview in self-assessment #}
-{% block responseFilePreview %}{% endblock %}
-
-{# No response file list in self-assessment #}
-{% block responseFileList %}{% endblock %}
-
-{# No subheading in self-assessment #}
-{% block subheading %}{% endblock %}
-
-{# Instructions for the self-assessment #}
-{% block instructions %}
-    {% set text = assessment.useRubric ? 'rubric and' : '' %}
-
-
-    <ul class="train-line">
-        <li>
-            <a><span class="icon-due-work"></span>Submission</a>
-        </li>
-        <li class="current-stop">
-            <a>
-                <span class="icon-blog"></span>
-                {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
-            </a>
-        </li>
-    </ul>
-    <div class="row">
-        <div class="small-12 columns">
-            <div class="alert-box">{% apply spaceless %}
-                Use the {{ text }} comment box below to submit a {{ locale.selfAssessment.singularForm }} before you submit this
-                work to your teacher for feedback.
-                {% endapply %}</div>
-        </div>
-    </div>
-{% endblock %}
-
-{# Maybe out of date message doesn't exist here #}
-{% block mightBeOutofDate %}{% endblock %}
-
-{# A hole for readonly self-reflection content #}
-{% block readonlyFeedback %}{% endblock %}
-
-{# Show totals in self-assessment #}
-{% block rubricGrid %}
-    {% set showDescriptorValue = true %}
-    {% set showRubricTotal = true %}
-    {% set showGroupTotal = assessment.markPerCapability %}
-    {% set self = 'selfAssessment' %}
-
+{# Feedback form section #}
+<section id="self-assessment-feedback">
+    {# Rubric #}
     {% if assessment.useRubric %}
         <fieldset class="content">
             {% set rubricTemplate = readonly
                 ? 'grid.twig'
                 : 'grid-markable.twig'
             %}
+
+            {% set rubricMarkedGrid = feedback is not null ? feedback.rubricMarkedGrid : null %}
+
             {% include '@rubric/' ~ rubricTemplate with {
                 rubricGrid: assessment.rubricGrid,
                 rubricMarkedGrid: feedback.rubricMarkedGrid ?? null,
@@ -98,7 +33,6 @@
                 showDescriptorValue: showDescriptorValue,
                 showGroupTotal: showGroupTotal,
                 showRubricTotal: showRubricTotal,
-                self: self,
                 studentView: true,
                 selfAssessmentFeedback: selfAssessmentFeedback ?? null,
                 selfAssess: selfAssess,
@@ -107,51 +41,42 @@
             } only %}
         </fieldset>
     {% endif %}
-{% endblock %}
 
-{# Comment box #}
-{% block comment %}
-    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
+    {# Grades input combobox #}
+    {% if gradable %}
+        <div class="small-12 medium-3 column">
+            <label>{{ locale.grades.proper }}
+                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
+                    participant: participant,
+                    feedback: feedback,
+                    markScheme: assessment.markScheme,
+                    tabIndex: 1,
+                    errors: errors,
+                    readonly: readonly
+                } only %}
+            </label>
+
+            {% if assessment.useRubric and not readonly %}
+                {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
+                    locale: locale,
+                    rubricId: assessment.rubricGrid.id,
+                } only %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {# Feedback comment textarea #}
+    <div class="small-12{% if gradable %} medium-9{% endif %} column">
         {% include '@learningAssessment/dueWork/comment.twig' with {
             tabIndex: 2,
             readonly: readonly,
-            selfAssessment: true,
             participant: participant,
             feedback: feedback,
+            selfAssessment: selfAssess,
+            selfReflection: selfReflect,
             blindMode: false
         } only %}
     </div>
-{% endblock %}
+</section>
 
-{# No resubmission required checkbox for self-assessments #}
-{% block resubmissionRequired %}{% endblock resubmissionRequired %}
-
-{# Action Bar #}
-{% block actionButtons %}
-    {% apply spaceless %}
-        {% set buttons %}
-            <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-            {% if not readonly %}
-                <a class="button" data-draft="publish" data-has-empty-check="true"></a>
-                <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
-                    <h2 id="empty-dialog-title">Are you sure you wish to submit an incomplete {{ locale.selfReflection.singularForm }}?</h2>
-                    <p>It is preferable to provide a {{ locale.selfReflection.singularForm }} comment. Please confirm that you wish to provide no comment.</p>
-                    <ul class="flex-list buttons">
-                        <li><a class="button submit" data-interaction="enable">Yes</a></li>
-                        <li><a class="button" data-interaction="close">No</a></li>
-                    </ul>
-                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                </div>
-            {% endif %}
-        {% endset %}
-    {% endapply %}
-
-    {% include '@learningAssessment/fragments/actionBar.twig' with {
-        actionStyle:  '',
-        buttons: buttons,
-        participant: participant
-    } only %}
-{% endblock %}
-
-{# No Feedback files for self-assessment #}
-{% block attachzone %}{% endblock %}
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js" type="text/javascript"></script>

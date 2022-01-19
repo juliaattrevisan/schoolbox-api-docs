@@ -1,35 +1,31 @@
 {# if submitted, try going to inline grader #}
 {% set url     = null %}
 {% set tooltip = null %}
+
+{% set createSubmissionRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+    assessmentId: currentInteraction.assessable.id,
+    assessment: currentInteraction.assessable,
+    studentId: participant.user.id,
+    student: participant.user
+}) %}
+
+{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
+    assessmentId: currentInteraction.assessable.id,
+    studentId:    participant.user.id,
+    responseId:   currentInteraction.id,
+    response:     currentInteraction,
+    assessment:   currentInteraction.assessable,
+    student:      participant.user
+}) %}
+
 {% if currentInteraction.isSubmitted %}
-    {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
-        assessmentId: currentInteraction.assessable.id,
-        studentId:    participant.user.id,
-        responseId:   currentInteraction.id,
-        response:     currentInteraction,
-        assessment:   currentInteraction.assessable,
-        student:      participant.user
-    }) %}
-    {% if url %}
-        {% set tooltip = 'View in Inline Grader' %}
-    {% endif %}
-{# else this is a draft #}
+    {# If it's published, provide a link for teachers to view the submission in the inline grader #}
+    {% set url = viewSubmissionRoute %}
+    {% set tooltip = 'View in Inline Grader' %}
 {% else %}
-    {# does it belong to current user? #}
-    {% if currentInteraction.submittedOnBehalfOf.id == USER.id %}
-        {# try to resume at 'submit response' page #}
-        {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
-            assessmentId: currentInteraction.assessable.id,
-            studentId: participant.user.id,
-            responseId: currentInteraction.Id,
-            response: currentInteraction,
-            assessment: currentInteraction.assessable,
-            student: participant.user
-        }) %}
-        {% if url %}
-            {% set tooltip = 'Resume Submission' %}
-        {% endif %}
-    {% endif %}
+    {# If this is a draft submission, provide a link to resume #}
+    {% set url = createSubmissionRoute %}
+    {% set tooltip = 'Resume submission' %}
 {% endif %}
 
 {% if not url %}

@@ -24,7 +24,6 @@ use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
-use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -87,15 +86,6 @@ class Module extends BaseModule
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
-        $hasSelfAccess = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                $this->buildRuleHasWriteAccess(),
-                new CanSelfAssess()
-            ),
-            new CanViewAssessable(new Visibility(Access::getInstance()))
-        );
-
         $hasSimilarityAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -118,7 +108,6 @@ class Module extends BaseModule
 
         $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasWriteAccess, $preloadParticipant); // a || r
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
-        $this->register('GET', $participantPattern . '/responses/self/{responseId:\d+}', 'getParticularResponseForSelfReflection', $hasSelfAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r

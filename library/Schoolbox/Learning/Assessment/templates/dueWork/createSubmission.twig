@@ -14,51 +14,51 @@ Data:
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 
+{% set isSubmitOnBehalfOf = USER.id != student.id %}
+
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-
-        var form          = $('#editor-form'),
-            formSaveLabel = form.find('[data-save-draft]');
-
+        let $form             = $('#editor-form'),
+            $formSaveLabel    = $form.find('[data-save-draft]'),
+            acceptsOnline     = {{ acceptsOnline ? 'true' : 'false' }},
+            hasPolicy         = {{ (policy | length) > 0 ? 'true' : 'false' }},
+            hasSelfAssessment = {{ assessment.selfAssessable ? 'true' : 'false' }},
+            submitOnBehalfOf  = {{ isSubmitOnBehalfOf ? 'true' : 'false' }};
         if (Number('{{ errorMessage|length }}') > 0) {
             // Just show error message in perma-toast
-            formSaveLabel.toastActivate({
-                text: 'Error: {{ errorMessage|e('js') }}',
+            $formSaveLabel.toastActivate({
+                text: 'Error: {{ errorMessage }}',
                 css: 'alert'
             });
-            formSaveLabel.toastTimeout({
-                text: 'Error: {{ errorMessage|e('js') }}',
+            $formSaveLabel.toastTimeout({
+                text: 'Error: {{ errorMessage }}',
                 css: 'alert',
                 duration: 5000
             });
         }
 
         // Autosave on type to ensure that change gets saved
-
-        var autosaveTimeout = null;
-        var textBoxContent = '';
+        let autosaveTimeout = null;
+        let textBoxContent = '';
 
         // Method for setting up autosave - clears existing event, and creates new one.
-
-        var initAutosave = function () {
+        let initAutosave = function () {
             clearTimeout(autosaveTimeout);
-
             autosaveTimeout = setTimeout(function () {
                 autosavePresubmit();
             }, 5 * 1000);
         };
 
-        var suspendAutosave = function () {
+        // Method for suspending autosave: clear the old event
+        let suspendAutosave = function () {
             clearTimeout(autosaveTimeout);
         };
 
         // The autosave pre-submit method - called by the autosave method. Calls the actual submit method if the textbox has changed.
-
-        var autosavePresubmit = function () {
-
+        let autosavePresubmit = function () {
             // Has the text box changed? If not check again later (re-init the autosave counter)
-            var currentContent = CKEDITOR.instances['editor-body'].getData();
-
+            let currentContent = CKEDITOR.instances['editor-body'].getData();
             if (currentContent === textBoxContent) {
                 initAutosave();
             }
@@ -67,26 +67,22 @@ Data:
                 autosaveAjaxSubmit();
             }
         };
-
-        var submitButtons = $("[data-action-save], [data-action-self-reflect]");
+        let $submitButton = $("[data-action-save]");
 
         // The autosave submit method
-
-        var autosaveAjaxSubmit = function () {
-
+        let autosaveAjaxSubmit = function () {
             /* Disable actual submit button
              */
-            submitButtons.prop('disabled', true);
-
+            $submitButton.prop('disabled', true);
             // Submit form via AJAX
-            var formContents = form.serializeArray();
+            let formContents = $form.serializeArray();
             formContents.push({name: 'saveDraft', value: '1'});
-            formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});
-
-            formSaveLabel.toastActivate({
+            if (acceptsOnline) {
+                formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});
+            }
+            $formSaveLabel.toastActivate({
                 text: 'Autosaving'
             });
-
             $.ajax({
                 type: "POST",
                 url: '{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: student.id}) }}',
@@ -94,25 +90,22 @@ Data:
                 complete: function () {
                     // Re-init the autosave
                     initAutosave();
-
                     /* Re-enable submit
                      */
-                    submitButtons.prop('disabled', false);
+                    $submitButton.prop('disabled', false);
                 },
                 success: function (responseText) {
-
                     /* Recycle the id ><
                      */
-                    form.find('input[name=responseId]').val(responseText.id);
-                    formSaveLabel.toastTimeout({
+                    $form.find('input[name=responseId]').val(responseText.id);
+                    $formSaveLabel.toastTimeout({
                         text: 'Draft Saved',
                         css: 'success'
                     });
                 },
                 error: function (response) {
-                    var temp = $.parseJSON(response.responseText);
-
-                    formSaveLabel.toastTimeout({
+                    let temp = $.parseJSON(response.responseText);
+                    $formSaveLabel.toastTimeout({
                         text: 'Error: ' + temp.message,
                         css: 'alert'
                     });
@@ -125,17 +118,57 @@ Data:
          * Can this form be submitted?
          *
          * At least one of below must be true:
+         * * The due work doesn't accept online submit, but does support
+         *   self-assessment
          * * There's content in the inline editor
          * * There's at least one file uploaded
          * * The "Submitted in person" checkbox is checked
          *
          * @return Boolean
          */
-        var allowSubmit = function() {
-            var inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length,
-                submittedInPersonCheckbox = form.find('#editor-submittedInPerson');
-            return (Boolean)(inlineLen || filesLen || submittedInPersonCheckbox.prop('checked'));
+        let allowSubmit = function() {
+            if (!acceptsOnline) {
+                return true;
+            }
+            let inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+                filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+            return (Boolean)(inlineLen || filesLen || $form.find('#editor-submittedInPerson').prop('checked'));
+        };
+
+        /**
+         * Can this form be submitted after confirmation?
+         *
+         * Submit on behalf of never requires a confirmation: otherwise, these
+         * states require confirmation:
+         * * there's a policy
+         * * this is a self-assessment, and the comment is empty
+         *
+         * @returns {Boolean}
+         */
+        let questionSubmit = function () {
+            if (submitOnBehalfOf) {
+                return false;
+            }
+            if (hasPolicy) {
+                return true;
+            }
+            return isSelfAssessmentCommentEmpty();
+        }
+
+        /**
+         * Is this submission a self-assessment, and is the comment empty?
+         *
+         * @returns {Boolean}
+         */
+        let isSelfAssessmentCommentEmpty = function () {
+            if (!hasSelfAssessment) {
+                return false;
+            }
+            let $commentInput = $form.find('[name="comment"]');
+            if ($commentInput.length === 0) {
+                return true;
+            }
+            return $commentInput.val().length === 0;
         };
 
         /* Spawn editors
@@ -148,37 +181,40 @@ Data:
             }
         });
 
+        // For self-assessments - save a draft when the rubric or comment box is updated
+        $("#self-assessment-feedback").change(function() {
+            autosaveAjaxSubmit();
+        });
+
         // Empty submission dialog
-        var emptyDialog = $('#empty-dialog');
-        emptyDialog.on('click', '[data-interaction="close"]', function (e) {
+        let $emptyDialog = $('#empty-dialog');
+        $emptyDialog.on('click', '[data-interaction="close"]', function (e) {
             e.preventDefault();
-            emptyDialog.foundation('reveal', 'close');
+            $emptyDialog.foundation('reveal', 'close');
         });
 
         // Confirm dialog (if it exists)
-        var $confirmDialog  = $('#confirm-dialog'),
-            $acceptButton   = $confirmDialog.find('[data-accept]'),
-            $rejectButton   = $confirmDialog.find('[data-reject]'),
-            $buttons        = $().add($acceptButton).add($rejectButton),
+        let $confirmDialog = $('#confirm-dialog'),
+            $acceptButton  = $confirmDialog.find('[data-accept]'),
+            $rejectButton  = $confirmDialog.find('[data-reject]'),
+            $buttons       = $().add($acceptButton).add($rejectButton),
             enableButtons  = function () { $buttons.removeClass('disabled'); },
             disableButtons = function () { $buttons.addClass('disabled'); },
-            $submitButton   = form.find(':submit'),
             submittingText = 'Submitting... please wait',
             submitForm     = function () {
                 // Disable the submit button and add 'working' text
                 $submitButton
                     .prop('disabled', true)
                     .val(submittingText);
-
                 // Make the form's inputs readonly (NOT disabled)
-                form.find('input, select, textarea').prop('readonly', true);
-                CKEDITOR.instances['editor-body'].setReadOnly(true);
-
+                $form.find('input, select, textarea').prop('readonly', true);
+                if (acceptsOnline) {
+                    CKEDITOR.instances['editor-body'].setReadOnly(true);
+                }
                 // Disable draft autosaving
                 suspendAutosave();
-
                 // Submit the form
-                form.submit();
+                $form.submit();
             };
 
         // Confirm dialog accept/reject
@@ -188,38 +224,40 @@ Data:
             event.preventDefault();
             submitForm();
         });
-
         $rejectButton.click(function (event) {
             event.preventDefault();
             $confirmDialog.foundation('reveal', 'close');
         });
 
         // Submit form
-        submitButtons.click(function (e) {
+        $submitButton.click(function (e) {
+            e.preventDefault();
             if (!allowSubmit()) {
                 // prevent submission without SOMETHING to submit
-                e.preventDefault();
-                emptyDialog.foundation('reveal', 'open');
-            }
-            else if ($confirmDialog.length) {
+                $emptyDialog.foundation('reveal', 'open');
+            } else if (questionSubmit()) {
                 // wait! display confirm modal
-                e.preventDefault();
                 enableButtons();
-                $confirmDialog.foundation('reveal').foundation('reveal', 'open');
-            }
-            else {
+
+                // Possibly show the confirm dialog's self-assess comment empty?
+                $confirmDialog
+                    .find('#confirm-empty-self-assessment-comment')
+                    .toggleClass('hide', !isSelfAssessmentCommentEmpty());
+
+                $confirmDialog.foundation('reveal', 'open');
+            } else {
                 // checks pass: go for broke
                 submitForm();
             }
         });
 
-        //Disable rest of form if 'submitted in person' checked
-        $('#editor-submittedInPerson').click(function(element){
+        // Disable ckeditor and attachzone if 'submitted in person' checked
+        $('#editor-submittedInPerson').click(function (element) {
             if(this.checked){
                 $('#submission-upload').hide('slow');
                 $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
                 $('#editor-body').attr('disabled', true);
-                if(CKEDITOR.instances['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
+                if (CKEDITOR.instances['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
                     $('#submit-warning').show('slow');
                 } else {
                     $('#submit-warning').hide('slow');
@@ -233,15 +271,16 @@ Data:
         });
     });
 </script>
+{% endautoescape %}
+
 <!-- END custom_head -->
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% set isSubmitOnBehalfOf = USER.id != student.id %}
 {% set requiresReflection = not isSubmitOnBehalfOf and assessment.selfAssessable %}
 
-<div class="row">
+<div class="row" id="assessment-status">
     <div class="small-12 island">
 
         {% if errorMessage %}
@@ -256,94 +295,119 @@ Data:
             {% include '@learning/fragments/meta/workType.twig' %}
         </ul>
 
-        {% if requiresReflection %}
-        <ul class="train-line">
-            <li class="current-stop">
-                <a><span class="icon-due-work"></span>Submission</a>
-            </li>
-            <li>
-                <a>
-                    <span class="icon-blog"></span>
-                    {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
-                </a>
-            </li>
-        </ul>
-        {% endif %}
+        <form id="editor-form" data-feedback-form="{{ participant.user.id }}" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
+            {% set description = participant ? participant.description : assessment.description %}
+            {% if description | length %}
+                <section class="content">
+                    {{ description | purify }}
+                </section>
+            {% endif %}
 
-        {% set description = participant ? participant.description : assessment.description %}
-        {% if description | length %}
-        <section class="content">
-            {{ description | purify }}
-        </section>
-        {% endif %}
-        <h2 class="subheader">Submit Response</h2>
+            {# If a due work doesn't accept online submissions at all,
+             # students may still be able to self-reflect, but we don't want
+             # them seeing the submission field.
+             #
+             # The "responseId" hidden input is required even if the due work
+             # doesn't accept submissions, because the input needs to be
+             # populated when the student publishes their self-assessment.
+             #}
+            <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}"/>
+            {% if acceptsOnline or isSubmitOnBehalfOf %}
+                <h2 class="subheader">Submit Work</h2>
 
-        <div class="row">
-            <div class="small-12 columns">
-                <div class="alert-box">
-                    {% if requiresReflection %}
-                        To submit your work you may upload files or optionally use the editor to type directly.
-                        Content you create will automatically save to draft, but will <strong>not be submitted</strong>
-                        until you finish your reflection on your work.
-                    {% else %}
-                        To submit your work you may upload files or optionally use the editor to type directly.
-                        Content you create will automatically save to draft, but will <strong>not be submitted</strong>
-                        until you press the Submit For Assessment button.
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 island">
-                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
-                    <input type="hidden" name="responseId" value="{{ response.id ?? '' }}"/>
-                    <section>
-                        <div class="content">
-                            {# Submitted my own work checkbox #}
-                            <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
-                            <label for="editor-submittedInPerson" class="checkbox-label">
-                                {% if isSubmitOnBehalfOf %}
-                                    {{ student.firstName }} has submitted their work in person
-                                {% else %}
-                                    I have submitted my work in person, and don't need to upload or use the editor
-                                {% endif %}
-                            </label>
-                            <p id="submit-warning" style="display:none" class="alert alert-box icon-alert">Any previously entered data or uploaded files will not be submitted.</p>
-                            <div id="submission-upload">
-                                <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-                                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                {% if not isSubmitOnBehalfOf %}
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <div class="alert-box">
+                                To submit your work you may upload files or
+                                optionally use the editor to type directly.
+                                Content you create will automatically save to
+                                draft, but will <strong>not be submitted</strong>
+                                until you press the &ldquo;Submit for assessment&rdquo; button.
                             </div>
                         </div>
-                    </section>
+                    </div>
+                {% endif %}
 
-                    {%- if requiresReflection -%}
-                        <input type="submit" value="Next" data-action-self-reflect />
-                    {%- else -%}
-                        <input type="submit"
-                               value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
-                               data-action-save />
-                    {%- endif -%}
+                <div class="row">
+                    <div class="small-12 island">
+                        <section>
+                            <div class="content">
+                                {# Submitted my own work checkbox #}
+                                <input id="editor-submittedInPerson" name="submitted_in_person" type="checkbox" />
+                                <label for="editor-submittedInPerson" class="checkbox-label">
+                                    {% if isSubmitOnBehalfOf %}
+                                        {{ student.firstName }} has submitted their work in person
+                                    {% else %}
+                                        I have submitted my work in person, and don't need to upload or use the editor
+                                    {% endif %}
+                                </label>
+                                <p id="submit-warning" style="display:none" class="alert alert-box icon-alert">Any previously entered data or uploaded files will not be submitted.</p>
+                                <div id="submission-upload">
+                                    <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
 
-                    <div class="toast" data-alert data-save-draft></div>
-                </form>
-            </div>
-        </div>
+                <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
+                    <h2 id="empty-dialog-title">Nothing To Submit</h2>
+                    <p>You haven't supplied any content for your submission. Provide files and/or edit online and try again.</p>
+                    <a class="button full-width" data-interaction="close">OK</a>
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
 
-        <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
-            <h2 id="empty-dialog-title">Nothing To Submit</h2>
-            <p>You haven't supplied any content for your submission. Provide files and/or edit online and try again.</p>
-            <a class="button full-width" data-interaction="close">OK</a>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
+                <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
+                    {% if policy | length %}
+                        <p>{{ policy | purify }}</p>
+                        {% if assessment.selfAssessable %}
+                            <p id="confirm-empty-self-assessment-comment" class="hide">
+                                (You should also provide a
+                                {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
+                                comment.)
+                            </p>
+                        {% endif %}
+                        <ul class="flex-list buttons">
+                            <li><a class="button submit" data-accept>Yes, I agree</a></li>
+                            <li><a class="button" data-reject>Cancel</a></li>
+                        </ul>
+                    {% else %}
+                        {% if assessment.selfAssessable %}
+                            <div id="confirm-empty-self-assessment-comment" class="hide">
+                                <h2>
+                                    Are you sure you wish to submit an incomplete
+                                    {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
+                                </h2>
 
-        {% if policy|length %}
-        <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
-            <p>{{ policy | purify }}</p>
-            <ul class="flex-list buttons">
-                <li><a href="#" class="button submit" data-accept>Yes, I agree</a></li>
-                <li><a href="#"class="button" data-reject>Cancel</a></li>
-            </ul>
-        </div>
-        {% endif %}
+                                <p>
+                                    It is preferable to provide a
+                                    {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
+                                    comment. Please confirm that you wish to provide no comment.
+                                </p>
+                            </div>
+                        {% endif %}
+                        <ul class="flex-list buttons">
+                            <li><a class="button submit" data-accept>Yes</a></li>
+                            <li><a class="button" data-reject>No</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# If this is a self-reflectable assessment, and is being submitted by the student, include the section for self-reflecting #}
+            {% if requiresReflection %}
+                {% include '@learningDueWorkResponse/inlineGrading/selfAssessment.twig' %}
+            {% endif %}
+
+            <input type="submit"
+                   value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
+                   data-action-save />
+
+            <div class="toast" data-alert data-save-draft></div>
+
+        </form>
+
     </div>
 </div>

@@ -87,7 +87,6 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle): void
     {
-
         /** @var ReturnedWork $mark */
         $mark = $bundle->getEvent()->getObject();
 
@@ -96,8 +95,14 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             return;
         }
 
-        /** @var SubmissionBox $box */
+        // Is this return a self-assessment? If so, don't notify about it:
+        // a notification ought to have been raised for the due work response.
+        if ($mark->isSelfAssess()) {
+            return;
+        }
+
         try {
+            /** @var SubmissionBox $box */
             $box = $this->boxMapper->findByIdWithFallback($mark->getSubmissionBox()->getId());
         } catch (Mapper\Exception $e) {
             return;

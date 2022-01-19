@@ -23,13 +23,13 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -50,10 +50,10 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradableWithResponse;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
 use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
@@ -91,6 +91,7 @@ class Controller extends Assessment\Controller
     private $rubricMapper;
 
     /** @var DueWorkResponseMapper */
+
     private $dueWorkResponseMapper;
 
     /** @var ParticipantMapper */
@@ -119,6 +120,9 @@ class Controller extends Assessment\Controller
     private \Schoolbox\Learning\Turnitin\File\Mapper $turnitinFileMapper;
 
 
+    /** @var Assessment\Feedback\IFeedbackDataSource */
+    private $feedbackDataSource;
+
     /**
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
@@ -141,6 +145,7 @@ class Controller extends Assessment\Controller
      * @param Replicator                    $replicator
      * @param Gotenberg\Client              $pdfGenerator
      * @param Turnitin\File\Mapper          $turnitinFileMapper
+     * @param Assessment\Feedback\IFeedbackDataSource $feedbackDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -163,7 +168,8 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         Gotenberg\Client $pdfGenerator,
-        \Schoolbox\Learning\Turnitin\File\Mapper $turnitinFileMapper
+        Turnitin\File\Mapper $turnitinFileMapper,
+        Assessment\Feedback\IFeedbackDataSource $feedbackDataSource
     ) {
         parent::__construct(
             $userMapper,
@@ -188,6 +194,7 @@ class Controller extends Assessment\Controller
         $this->kamiMapper            = $kamiMapper;
         $this->pdfGenerator          = $pdfGenerator;
         $this->turnitinFileMapper    = $turnitinFileMapper;
+        $this->feedbackDataSource    = $feedbackDataSource;
     }
 
 
@@ -232,7 +239,7 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
-     * @param IAssessable $assessment
+     * @param Model $assessment
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
@@ -256,7 +263,8 @@ class Controller extends Assessment\Controller
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
-
+            'selfReflect'       => false,
+            'selfAssess'         => false,
             /* Find the first valid Blind Review url
              */
             'blindReviewUrl'    => (new StudentCarousel\Blind(
@@ -278,7 +286,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @param User              $student
      * @throws MapperException
      * @throws PDOException
@@ -320,6 +328,7 @@ class Controller extends Assessment\Controller
                 foreach ($participant->getAllFeedbacks() as $feedback) {
                     // All feedbacks ought to be due work feedbacks,
                     // and thus have a rubric grid
+                    // TODO this returns false if I use the alias, but works correctly if I use the fully qualified name - why?
                     if ($feedback instanceof Feedback\Model) {
                         $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
                     }
@@ -491,7 +500,7 @@ class Controller extends Assessment\Controller
     /**
      * Shows a rubric overview
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @throws DomainException
      * @throws MapperException
      * @throws RouteNotFound
@@ -550,7 +559,7 @@ class Controller extends Assessment\Controller
     /**
      * Downloads a rubric overview
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @throws DefinitionException
      * @throws DomainException
      * @throws InvalidArgumentException
@@ -741,7 +750,7 @@ class Controller extends Assessment\Controller
     /**
      * Displays a form enabling a student to create Submission for a Due Work
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @param User              $student
      * @throws ServiceNotFound If unable to locate HTML web Output in DI
      * @since 165
@@ -749,7 +758,30 @@ class Controller extends Assessment\Controller
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
+        $acceptsOnlineSubmissions = $assessment->getAcceptOnline();
         $participant = $assessment->getParticipantIfExtant($student);
+
+        $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        if ($assessment->isSelfReflectableOnly()) {
+            $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+        } elseif ($assessment->isSelfAssessable()) {
+            $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+        }
+
+        $feedback = null;
+        if ($reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+            $feedback = $participant->findMostRecentSelfAssessedFeedback();
+        }
+
+        if ($feedback instanceof Feedback\Model) {
+            $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+        }
+
+        // Attach rubrics data
+        $rubricMapper = RubricDataSource::getInstance();
+        if ($assessment->getUseRubric()) {
+            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
+        }
 
         /* Find all the records spawned by $participant
          *
@@ -762,7 +794,6 @@ class Controller extends Assessment\Controller
          */
         $latestResponse = null;
         $editorContents = '';
-        $dangerZone     = null;
 
         $attachZoneFactory = new Assessment\Attachzone\Factory();
 
@@ -802,30 +833,57 @@ class Controller extends Assessment\Controller
             $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
         }
 
-        /* Pump into twig land
-         */
+        // Is the page being displayed in readonly mode?
+        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+
         // For some reason I can't use get/setFlash?
         $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
         $this->getSession()->getSegment(static::class)->set('errorMessage', null);
+
+        // Are we self assessing or only self reflecting?
+        $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+        $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+
+        $data = [
+            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                [
+                    'Create Response for ' . $assessment->getTitle(),
+                    '',
+                ]
+            ),
+            'assessment' => $assessment,
+            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+
+            /* I need this, otherwise Combobox dies catastrophically
+             */
+            'errors' => [],
+
+            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'reviewRoute'       => $reviewRoute,
+            'studentView'       => true,
+            'student'        => $student,
+            'participant'    => $participant,
+            'feedback'       => $feedback,
+            'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
+            'response'       => $latestResponse,
+            'editorContents' => $editorContents,
+            'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
+            'errorMessage'   => $errorMessage,
+            'readonly'      => $isInteractionLocked,
+            'selfReflect'    => $selfReflect,
+            'selfAssess'     => $selfAssess,
+            'acceptsOnline'  => $acceptsOnlineSubmissions,
+
+            /* Only show these things if the assessment is self-gradable */
+            'showDescriptorValue' => $selfAssess,
+            'showGroupTotal' => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
+            'showRubricTotal' => $selfAssess
+        ];
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/dueWork/createSubmission.twig',
-                [
-                'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                    [
-                        'Create Response for ' . $assessment->getTitle(),
-                        '',
-                    ]
-                ),
-                'assessment'     => $assessment,
-                'student'        => $student,
-                'participant'    => $participant,
-                'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
-                'response'       => $latestResponse,
-                'editorContents' => $editorContents,
-                'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
-                'errorMessage'   => $errorMessage,
-                ]
+                $data
             )
         );
     }
@@ -858,10 +916,11 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Save a Response, on behalf of a User, for a particular Assessment
+     * Save a Response, on behalf of a User, for a particular Assessment.
+     * If the assessment has self-reflection/assessment, this will also save any feedback the student gave themselves.
      *
-     * @param IAssessable|Model $assessment
-     * @param User              $student
+     * @param Model $assessment
+     * @param User  $student
      * @return void
      * @throws Exception
      * @throws InvalidStatusCode
@@ -970,18 +1029,13 @@ class Controller extends Assessment\Controller
             }
         }
 
-        /* If we're saving the final version of the submission (ie. not a draft) ram the current datetime in
-         * If this requires self-assessment, then this will always be a draft;
-         * participant must finalise their response as part of self-review.
-         */
-        $participant    = $assessment->getParticipantIfExtant($student);
-        $selfAssessable = $participant ? (new ValidSelfAssessable())->isSatisfiedBy($this->getUser(), $participant) : false;
-
+        // If we're saving the final version of the submission (ie. not a draft) ram the current datetime in
         if ($isFinal) {
-            $validateSubmission = !$rq->post->getBool('submitted_in_person');
+            $acceptsOnline = $assessment->getAcceptOnline();
+            $notSubmittedInPerson = !$rq->post->getBool('submitted_in_person');
 
-            // verify that there should be any files attached; if not, that's a fail case
-            if ($validateSubmission && $response->getAllFiles()->count() === 0) {
+            // should there be files attached? fail if we didn't get any
+            if ($acceptsOnline && $notSubmittedInPerson && $response->getAllFiles()->count() === 0) {
                 $errorMessage = 'One or more files failed to attach to your submission; please try again.';
                 $redirect     = $this->getRouter()->generate(
                     'learningAssessment.getCreateResponseForm',
@@ -995,16 +1049,110 @@ class Controller extends Assessment\Controller
                 return;
             }
 
-            /* submitted_at is determined after the next step when creating a self-assessed or self-reflected
-             * response. Otherwise, proceed normally
-             */
-            if (!$selfAssessable) {
-                $response->setSubmittedAt(Alaress_Date_Format::now());
+            $response->setSubmittedAt(Alaress_Date_Format::now());
+        }
+
+        // Save the response before attempting to save any feedback: we need a response ID to be able to attach the feedback
+        $this->dueWorkResponseMapper->save($response);
+
+        // Check whether we are self-assessing, or only self-reflecting; default is the instructor route, which is neither
+        $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        if ($assessment->isSelfReflectableOnly()) {
+            $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
+        } elseif ($assessment->isSelfAssessable()) {
+            $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
+        }
+
+        /* Feedback vars */
+        $participant = null;
+        $comment = null;
+        $mark = null;
+        // Students can't mark themselves as requiring resubmission
+        $resubmissionRequired = false;
+        // Self-reflecters can't attach files to feedback, so this will always be null
+        $attachment = null;
+        // And we only need to know if the feedback was submitted from the inline grader in order to determine if
+        // we need to process attachments, so this is a nope too
+        $fromInlineGrader = false;
+        $publish = null;
+        $mostRecentFeedback = null;
+        $hasRubric = null;
+
+        // Only try to create a feedback if this due work uses self reflect
+        if ($reviewRoute != ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+            $participant = $assessment->getParticipant($student);
+            $comment     = $rq->post['comment'];
+            // There might not be a mark: due works may have mark type none, in which case no mark will be posted
+            $mark = $rq->post['mark'] ?? null;
+            // Awful hack because feedback factory expects a string (which it immediately casts to a bool) >.<
+            $publish = $isFinal ? '1' : '0';
+            // This gets used to decide whether to create a new feedback, or update an existing one
+            $mostRecentFeedback = $participant->findMostRecentSelfAssessedFeedback();
+            // Check whether the latest feedback has rubric data set.
+            $hasRubric = isset($rq->post['rubric']);
+            if (
+                $mostRecentFeedback !== null
+                && $mostRecentFeedback->getAssessable() instanceof Model
+                && $mostRecentFeedback->getAssessable()->getUseRubric()
+            ) {
+                $hasRubric = true;
+            }
+
+            $hasFeedbackContent = $mark || $comment || $hasRubric;
+
+            // only create a feedback if there's feedback content
+            if ($hasFeedbackContent) {
+                $dueWorkFeedbackFactory = new Feedback\Factory(
+                    $this->feedbackDataSource,
+                    $assessment->getParticipant($student),
+                    $this->getUser(),
+                    $mark,
+                    $resubmissionRequired,
+                    $comment,
+                    $publish,
+                    $attachment,
+                    $fromInlineGrader,
+                    $reviewRoute,
+                    $mostRecentFeedback,
+                    $response
+                );
+
+                $feedback      = $dueWorkFeedbackFactory->produce();
+
+                // Save the feedback, or delete it if the latest feedback is an...unfeedback
+                // TODO do we want to allow students self reflecting to undo their feedback?
+                // The only way this could happen is if they gave themselves feedback in a draft, then came back and deleted the draft feedback completely and submitted
+                $isNewFeedback = $feedback->getId() === null;
+                if (
+                    !$hasRubric
+                    && !$isNewFeedback
+                    && $feedback->isEmpty()
+                ) {
+                    $this->feedbackDataSource->delete($feedback);
+                } else {
+                    $this->feedbackDataSource->save($feedback);
+                }
+
+                // Process the rubric
+                $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
+
+                // Did we just give some rubric marks? Save them
+                if (\is_array($rq->post['rubric'])) {
+                    $markedGrid = $factory->buildFromPostData(
+                        $this->rubricMapper->retrieveMarkedGrid($feedback),
+                        $rq->post['rubric']
+                    );
+                    $this->rubricMapper->persistMarkedGrid($markedGrid);
+
+                    // Update the feedback with the rubric marks
+                    $feedback->setRubricMarkedGrid($markedGrid);
+                    $this->feedbackDataSource->save($feedback);
+                    $response->setAllFeedback($response->getAllFeedback()->add($feedback));
+                }
             }
         }
 
-        /* Do the actual saving
-         */
+        // Save the response
         $this->dueWorkResponseMapper->save($response);
 
         // If not a draft, check if any files should be uploaded to Kami
@@ -1022,7 +1170,7 @@ class Controller extends Assessment\Controller
          */
         $detachedFunction = null;
 
-        if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+        if ($isFinal && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             /* Only one of these can be active at a time, but both universes can co-exist
              * Specifically enable turnitin if its api key was set
              */
@@ -1090,21 +1238,44 @@ class Controller extends Assessment\Controller
                  */
                 $plagscanMapper = PlagscanMapper::getInstance();
 
-                foreach ($response->getAllFiles() as $currentFile) {
-                    if (!$currentFile->getEditableInline()) {
-                        $plagscanMapper->saveNewPlagscanStub($currentFile);
+                /* Plagscans should only spawn upon saving a Submitted IResponse instance
+                 * This screen is shared between self-reflection and non-self-reflection steps
+                 * Self-reflection's plagscan stubs saving .......happens elsewhere
+                 * Similarity Check must be enabled
+                 */
+                if (
+                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                    && $response->getId()
+                ) {
+                    foreach ($response->getAllFiles() as $currentFile) {
+                        if (!$currentFile->getEditableInline()) {
+                            $plagscanMapper->saveNewPlagscanStub($currentFile);
+                        }
                     }
                 }
 
-                /* Set up detached function so plagscan can continue in the background
+                /* Asynchronously shove it into plagscan so we don't make the user wait ages
+                 * for it to read 1 byte at a time >_<
                  */
-                $detachedFunction = static function () use ($plagscanMapper, $response) {
-                    foreach ($response->getAllFiles() as $currentFile) {
-                        $filename = $plagscanMapper->plagscanFilename($currentFile);
+                $this->getResponse()->content->set(
+                    [
+                        'format' => 'noContent',
+                        'postOutput' => [
+                            function () use ($plagscanMapper, $reviewRoute, $response) {
+                                if (
+                                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
+                                    && $response->getId()
+                                ) {
+                                    foreach ($response->getAllFiles() as $currentFile) {
+                                        $filename = $plagscanMapper->plagscanFilename($currentFile);
 
-                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
-                    }
-                };
+                                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                                    }
+                                }
+                            },
+                        ],
+                    ]
+                );
             }
         }
 
@@ -1133,31 +1304,16 @@ class Controller extends Assessment\Controller
             $rs->status->setCode(200);
             $rs->content->set($this->buildJsonOutput($result));
         } else {
-            /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
-             */
-            if ($selfAssessable) {
-                $rs->redirect->to(
-                    $this->getRouter()->generate(
-                        'learningDueWorkResponse.getParticularResponseForSelfReflection',
-                        [
-                            'assessmentId' => $assessment->getId(),
-                            'studentId'    => $student->getId(),
-                            'responseId'   => $response->getId(),
-                        ]
-                    )
-                );
-            } else {
-                // redirect after saving to Due Work Summary For Particular Student
-                $rs->redirect->to(
-                    $this->getRouter()->generate(
-                        'learningAssessment.getSummary',
-                        [
-                            'assessmentId' => $assessment->getId(),
-                            'studentId'    => $student->getId(),
-                        ]
-                    )
-                );
-            }
+            // Redirect after saving to Due Work Summary For Particular Student
+            $rs->redirect->to(
+                $this->getRouter()->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'assessmentId' => $assessment->getId(),
+                        'studentId'    => $student->getId(),
+                    ]
+                )
+            );
         }
     }
 
@@ -1168,7 +1324,7 @@ class Controller extends Assessment\Controller
      * Creates an empty SOBO. Needs a different route to postCreateResponse()
      * to cater for different auth rules.
      *
-     * @param IAssessable|Model $assessment
+     * @param Model $assessment
      * @param User              $student
      * @api   POST /learning/assessments/:assessmentId/:studentId/received
      * @since 17.0
@@ -1239,7 +1395,7 @@ class Controller extends Assessment\Controller
                     $response = $this->persistAcknowledgementResponse($assessment, $student, null);
                 }
 
-                $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
+                $route                = 'learningAssessment.getCreateResponseForm';
                 $params['response']   = $response;
                 $params['responseId'] = $response->getId();
             } else {
@@ -1448,7 +1604,7 @@ class Controller extends Assessment\Controller
     /**
      * Update particular fields of an existing IAssessable
      *
-     * @param IAssessable $assessment
+     * @param Model $assessment
      * @return void
      * @throws InvalidStatusCode
      * @throws PDOException
@@ -1459,7 +1615,6 @@ class Controller extends Assessment\Controller
         /* TODO: Make this more generalised
          * For now the only utility here is to update Skip Unsubmitted setting
          */
-        /** @var DueWork $assessment */
         if ((int)$this->getRequest()->post['showSubmittedOnly']) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;
@@ -1480,7 +1635,6 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->status->setCode(204);
         $this->getResponse()->content->set($this->buildJsonOutput(null));
-        return;
     }
 
 

@@ -3146,11 +3146,6 @@ parameters:
 			path: library/Schoolbox/Application/WebRequest/Kernel.php
 
 		-
-			message: "#^Property Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\ReturnedWorkMapper\\:\\:getSubmissionBoxMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBoxMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
@@ -3159,11 +3154,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBoxMapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
-
-		-
-			message: "#^Variable \\$box in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkNotifier.php
 
 		-
 			message: "#^Variable \\$submissionMapper in PHPDoc tag @var does not exist\\.$#"
@@ -3346,29 +3336,14 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/Module.php
 
 		-
-			message: "#^Comparison operation \"\\<\\=\\>\" between Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Model and int results in an error\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
 
 		-
-			message: "#^Property Schoolbox\\\\Assessment\\\\Course\\\\Task\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Task.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Course/TreeBuilder.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Participant/Plan/InteractionIntegrityChecker.php
 
 		-
 			message: "#^Variable \\$userMapper in PHPDoc tag @var does not exist\\.$#"
@@ -4024,11 +3999,6 @@ parameters:
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Comment/Model.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Thread/Context/BaseThreadLocator.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -5426,11 +5396,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
 
 		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between array and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/NotifierProxy.php
@@ -5941,36 +5906,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Dehydrator.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:assertAcceptSubmission\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getSimilarityCheckEnabled\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseRubric\\(\\)\\.$#"
-			count: 3
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:isAcceptNone\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:isSelfAssessable\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setRubricGrid\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
@@ -5987,16 +5922,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseRubric\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
-
-		-
-			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between int and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
 
@@ -6731,34 +6656,14 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Model.php
 
 		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Model.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\>&Schoolbox\\\\GenericCollection\\) and 0 will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Model.php
 
 		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Model.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Mapper.php
-
-		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
-
-		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Solution\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
 
 		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Solution\\\\Model\\:\\:\\$question \\(Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\) does not accept null\\.$#"
@@ -7869,11 +7774,6 @@ parameters:
 			message: "#^Call to function is_null\\(\\) with Schoolbox\\\\Resource\\\\HomepageTemplate will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/HomepageConfigMapper.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Link.php
 
 		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Link\\:\\:getHidden\\(\\) should return bool but returns int\\.$#"

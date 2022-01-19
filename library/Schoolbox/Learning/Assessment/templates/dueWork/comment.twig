@@ -12,9 +12,9 @@
     ]
 #}
 
-{% if selfAssessment is defined and selfAssessment %}
+{% if selfAssessment %}
     {% set placeholder = 'Your ' ~ locale.selfAssessment %}
-{% elseif selfReflection is defined and selfReflection %}
+{% elseif selfReflection %}
     {% set placeholder = 'Your ' ~ locale.selfReflection %}
 {% elseif readonly %}
     {% set placeholder = '(no comment given)' %}
