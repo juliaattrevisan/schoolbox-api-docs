@@ -69,6 +69,34 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     $this->localRedir("/homepage/{$prefix}/$code");
 }
 
+/* James gave me clearance to do this school-specific check on 19/01/2022
+ *
+ * Check whether you're Newington. If you are, see if your folder.code
+ * existed in canvas somewhere and got there if it does
+ */
+if ('newic' === strtolower($this->getDi()->get('config')->get('site_school_code'))) {
+    $folderCodes = $folder->getCodes();
+
+    /* Try each of the folder codes associated. If one of them matches a place in canvas,
+     * that's where we're going
+     */
+    $redirectTester = new \Custom\Newic\Redirect(
+        $this->getDi()->get('config')->get('canvas_url'),
+        new \External\Canvas\Importer\CanvasDb()
+    );
+
+    foreach ($folderCodes as $folderCode) {
+        $redirect = $redirectTester->redirect($folderCode->getCode());
+
+        if (null !== $redirect) {
+            $this->localRedir($redirect);
+        }
+    }
+
+    /* If you haven't redirected by now, just continue onwards...as if nothing happened
+     */
+}
+
 /* if we still have no category, advise that these are not the droids you're looking for
  *
  * Check that it's not softdeleted
