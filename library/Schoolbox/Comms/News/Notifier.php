@@ -258,6 +258,7 @@ class Notifier extends AbstractModuleNotifier
                 if (isset($diff['publishAt'])) {
                     // past -> past .. noop
                     // past -> future .. retract + re-attach
+                    // past -> future .. retract + re-attach
                     // future -> future .. detach + re-attach
                     // future -> past .. detach + re-attach
                     if ($previous->getPublishAt()->isFuture()) {

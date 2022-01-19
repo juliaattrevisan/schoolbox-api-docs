@@ -137,7 +137,7 @@
                         <li>
                             <a href='/calendar/{{ now.getURLDate() }}/{{ user.getId() }}'
                                class="icon-calendar"
-                            >Calendar</a>
+                            >{{ locale.calendar.proper }}</a>
                         </li>
                     {% endblock buttons_calendar %}
                     {% for button in customButtons %}
