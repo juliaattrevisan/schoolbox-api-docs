@@ -65,7 +65,7 @@
 </script>
 {% endautoescape %}
 
-<div class="row actions-small-1">
+<div class="row actions-small-2">
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
         {% include '@learningAssessment/meta.twig' with {
@@ -86,7 +86,8 @@
         modifyRoute: modifyRoute,
         canShowcase: canShowcase,
         isShowcased: isShowcased,
-        similarityReportRoute: similarityReportRoute
+        similarityReportRoute: similarityReportRoute,
+        exernalRedirectUrl: externalRedirectUrl
     } %}
 </div>
 
