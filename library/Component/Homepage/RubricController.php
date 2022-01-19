@@ -86,14 +86,14 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             foreach ($criteriaList as $criterion_group => $criterions) {
                 $this->setVar(
                     [
-                        'CRITERION_GROUP'         => Scrub::text($criterion_group),
+                        'CRITERION_GROUP'         => Scrub::markdown($criterion_group),
                         'rubric_descriptor_block' => '',
                     ]
                 );
 
                 foreach ($criterions as $crit) {
                     if (trim($crit->getName()) !== '') {
-                        $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));
+                        $this->setVar('CRITERION_NAME', Scrub::markdown($crit->getName()));
                         $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
                     }
                 }

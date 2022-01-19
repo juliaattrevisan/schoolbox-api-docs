@@ -28,7 +28,7 @@
     <tr>
         <th colspan="2"  scope="row">&nbsp;</th>
         {% for level in rubricGrid.levels %}
-        <th scope="col">{{ level.name }}</th>
+        <th scope="col">{{ level.name | markdown }}</th>
         {% endfor %}
     </tr>
     </thead>
@@ -50,11 +50,11 @@
             <tr>
                 {# yay html tables... -_-; #}
                 {% if rowspan %}
-                    <th class="rb-group-name"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name | nl2br }}</th>
+                    <th class="rb-group-name"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name | markdown }}</th>
                     {% set rowspan = 0 %}
                 {% endif %}
 
-                <th class="rb-criterion-name">{{ critUsage.indicator.name | nl2br }}</th>
+                <th class="rb-criterion-name">{{ critUsage.indicator.name | markdown }}</th>
 
                 {% set indicatorMark = rubricMarkedGrid
                     ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
@@ -85,7 +85,7 @@
                                              src="/portrait.php?id={{ learner.id }}&amp;size=square32"
                                              title="{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                                     {% endif %}
-                                    {{- descriptor.description|nl2br -}}
+                                    {{- descriptor.description | markdown -}}
                                 </span>
                                 {% if descriptor.hasValue and config.rubric_show_points and rubricGrid.showDescriptorValue and showDescriptorValue %}
                                     <span class="rb-value used" >

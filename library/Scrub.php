@@ -373,11 +373,17 @@ class Scrub
     private static function getLinkifyingMarkdownConverter(): CommonMark\MarkdownConverterInterface
     {
         if (!self::$markdownConverter instanceof CommonMark\MarkdownConverterInterface) {
-            $environment = new CommonMark\Environment();
+            $environment = new CommonMark\Environment\Environment(
+                [
+                    'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
+                    'allow_unsafe_links' => false,
+                    'max_nesting_level'  => 10,
+                ],
+            );
             // Need to add InlinesOnly, as adding only Autolink causes an error
             $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
             $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
-            self::$markdownConverter = new CommonMark\CommonMarkConverter(['html_input' => CommonMark\Environment::HTML_INPUT_STRIP, 'allow_unsafe_links' => false, 'max_nesting_level' => 10 ], $environment);
+            self::$markdownConverter = new CommonMark\MarkdownConverter($environment);
         }
         return self::$markdownConverter;
     }
@@ -394,6 +400,56 @@ class Scrub
     {
         return self::getLinkifyingMarkdownConverter()->convertToHtml($text);
     }
+
+
+    /**
+     * Create a cut-down Markdown converter which does little more than parse
+     * links out of text.
+     *
+     * @return CommonMark\MarkdownConverterInterface
+     */
+    private static function getMarkdownConverter(): CommonMark\MarkdownConverterInterface
+    {
+        if (!self::$markdownConverter instanceof CommonMark\MarkdownConverterInterface) {
+            $environment = new CommonMark\Environment\Environment(
+                [
+                    'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
+                    'allow_unsafe_links' => false,
+                    'max_nesting_level'  => 10,
+                ]
+            );
+            $environment->addExtension(new CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
+            $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
+            $environment->addExtension(new CommonMark\Extension\Strikethrough\StrikethroughExtension());
+            self::$markdownConverter = new CommonMark\MarkdownConverter($environment);
+        }
+        return self::$markdownConverter;
+    }
+
+
+    /**
+     * Supports markdown
+     *
+     * @param string $text
+     * @return string
+     */
+    public static function markdown(string $text): string
+    {
+        $text = self::getMarkdownConverter()->convertToHtml($text)->getContent();
+        $text = nl2br(trim($text));
+        // Removing extra <br /> tags in lists
+        $text = preg_replace('/\<ul>(\s*)\<br \/\>(\s*)<li>/', "<ul>\n<li>", $text);
+        $text = preg_replace('/\<ol>(\s*)\<br \/\>(\s*)<li>/', "<ol>\n<li>", $text);
+        $text = preg_replace('/\<\/li\>(\s*)\<br \/\>(\s*)<li>/', "</li>\n<li>", $text);
+        $text = preg_replace('/\<\/li\>(\s*)\<br \/\>(\s*)\<\/ul\>/', "</li>\n</ul>", $text);
+        $text = preg_replace('/\<\/li\>(\s*)\<br \/\>(\s*)\<\/ol\>/', "</li>\n</ol>", $text);
+        $text = preg_replace('/\<li\>(\s*)\<br \/\>(\s*)\<ul\>/', "<li>\n<ul>", $text);
+        $text = preg_replace('/\<li\>(\s*)\<br \/\>(\s*)\<ol\>/', "<li>\n<ol>", $text);
+        $text = preg_replace('/\<\/ul>(\s*)\<br \/\>(\s*)<\/li>/', "</ul>\n</li>", $text);
+        $text = preg_replace('/\<\/ol>(\s*)\<br \/\>(\s*)<\/li>/', "</ol>\n</li>", $text);
+        return $text;
+    }
+
 
     /**
      * Cleans crap out of input using HTMLPurifier.

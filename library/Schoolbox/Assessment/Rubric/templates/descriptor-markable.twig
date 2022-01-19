@@ -32,7 +32,7 @@
             {% endif %}
         {% endif %}
 
-        {{- descriptor.description|nl2br -}}
+        {{- descriptor.description | markdown -}}
     </span>
 
     {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
