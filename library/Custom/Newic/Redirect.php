@@ -51,7 +51,7 @@ class Redirect
      */
     public function __construct(string $canvasUrl, CanvasDb $canvasDb)
     {
-        $this->canvasUrl = $canvasUrl;
+        $this->canvasUrl = trim($canvasUrl);
         $this->canvasDb = $canvasDb;
     }
 
@@ -67,6 +67,12 @@ class Redirect
      */
     public function generateFirstAvailableRedirect(\Schoolbox\Resource\Folder\Model $folder): ?string
     {
+
+        /* I suppose you don't generate links to canvas if you didn't specify the url
+         */
+        if ('' === $this->canvasUrl) {
+            return null;
+        }
 
         /* Otherwise, test each folder code and expect one of them
          * might end up in canvas somewhere
