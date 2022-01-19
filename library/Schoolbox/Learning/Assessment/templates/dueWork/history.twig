@@ -1,5 +1,9 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{##
+ # @param array $externalRedirectUrl  A third party redirect url/application name tuple (url, name)
+ #}
+
 <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -51,6 +55,10 @@
         });
     });
 </script>
+
+{% if externalRedirectUrl %}
+<a href="{{ externalRedirectUrl.url }}" class="button icon-view alert full-width">{{ externalRedirectUrl.name }}</a>
+{% endif %}
 
 {% if timeline|length %}
 <div class="row">

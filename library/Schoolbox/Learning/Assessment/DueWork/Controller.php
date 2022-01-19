@@ -301,7 +301,7 @@ class Controller extends Assessment\Controller
     {
         /* Redirect to some kind of third party who spawned this assessment
          */
-        $externalRedirectUrl = '';
+        $externalRedirectUrl = null;
 
         if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getConfigLoader()->get('site_school_code'))) {
             $externalRedirectUrl = (new \Custom\Newic\Redirect(
@@ -382,6 +382,10 @@ class Controller extends Assessment\Controller
             /* Whether or not this assessment is showcased on the user's eportfolio
              */
             'isShowcased'            => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$student->getId()),
+
+            /* External Url for third party apps which might have generated this assessment
+             */
+            'externalRedirectUrl' => $externalRedirectUrl
         ];
 
         $routeArgs = [

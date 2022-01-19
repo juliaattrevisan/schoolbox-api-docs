@@ -12,7 +12,6 @@ use Alaress\IDatabase;
 use External\Canvas\Importer\CanvasDb;
 use Schoolbox\Learning\Assessment\IAssessable;
 
-
 /**
  * Redirect from schoolbox homepage to canvas somewhere
  * by checking the folder code against the local canvas db cache
@@ -77,13 +76,13 @@ class Redirect
      *
      * @param \Schoolbox\User $user
      * @param IAssessable     $assessment
-     * @return string|null
+     * @return array|null
      * @throws \Alaress\Database\Exception
      */
     public function generateAssessmentRedirect(
         \Schoolbox\User $user,
         IAssessable $assessment
-    ): ?string {
+    ): ?array {
         $canvasId = '';
 
         /* If the currently logged in user is staff or students,
@@ -159,11 +158,17 @@ class Redirect
             return null;
         }
 
-        return sprintf(
-            '%s/assignments/%s',
-            rtrim($prefix, '/'),
-            $row['canvas_id']
-        );
+        /* A tuple containing the name of the third party application which spawned this
+         * assessment, since external_id is system agnostic - not everyone uses Canvas
+         */
+        return [
+            'url' => sprintf(
+                '%s/assignments/%s',
+                rtrim($prefix, '/'),
+                $row['canvas_id']
+            ),
+            'name' => 'View in Canvas'
+        ];
     }
 
 
