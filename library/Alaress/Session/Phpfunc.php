@@ -71,7 +71,8 @@ class Phpfunc extends \Aura\Session\Phpfunc
                 $this->cookies,
                 session_get_cookie_params()
             ),
-            new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_CACHE))
+            // Remember me cookies are persistent
+            new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_STORAGE))
         );
         $username = $rememberer->retrieveUsername();
 
@@ -85,7 +86,12 @@ class Phpfunc extends \Aura\Session\Phpfunc
             // TODO replace cantankerous old handler
             $session = new \Session();
             $session->disableLoginLog();
-            return $session->create($username, true);
+
+            $created = $session->create($username);
+            if ($created) {
+                $rememberer->rememberUsername($username, Remember\Remember::DEFAULT_EXPIRY);
+            }
+            return $created;
         }
 
         return false;
