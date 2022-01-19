@@ -363,6 +363,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
+     * Post-save callback: refresh the notification redirect cache if either:
+     * * the folder inherits permissions
+     * * the folder previously inherited permissions, but no longer does
+     *
+     * TODO migrate to notifier, and then to taskd when that exists
+     *
      * @param Model $folder
      * @param Model $previous
      */

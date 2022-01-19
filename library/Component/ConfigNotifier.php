@@ -156,6 +156,14 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
 
     /**
+     * Rebuild the subscription cache if required.
+     *
+     * The subscription cache needs to be rebuilt if:
+     * * the component has an alt source
+     * * the component's definition includes a notification namespace
+     *
+     * TODO migrate to taskd when that exists
+     *
      * @param string             $query
      * @param Component_Instance $instance
      * @param int                $altSourceId
