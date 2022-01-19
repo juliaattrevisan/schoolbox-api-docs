@@ -78,6 +78,12 @@ class Kernel extends WebKernelAbstract
         Redis::getInstance(Redis::INSTANCE_STORAGE)->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
         $di->set('redis.storage', Redis::getClientInstance(Redis::INSTANCE_STORAGE));
 
+        // Redis queue publish (not persistent)
+        // (The subscription to this queue doesn't exist in the standard kernel,
+        //  only in the daemon kernel: this is because it requires the event
+        //  loop)
+        $di->set('redis.queue.pub', Redis::getClientInstance(Redis::INSTANCE_CACHE));
+
         // Default Redis connection:
         // uses cache, and raises a warning telling you to choose a connector
         $di->set('redis', $di->lazy(function () use ($di) {

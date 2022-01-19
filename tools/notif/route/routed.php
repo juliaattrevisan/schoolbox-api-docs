@@ -50,7 +50,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
             // also listen for signals
             /** @var Async\Client $asyncRedis */
-            $asyncRedis = $di->get('redis.async');
+            $asyncRedis = $di->get('redis.queue.sub');
             $dispatcher = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
 
             /** @var Routing\Cache\Redis\ReadCache $cache */
