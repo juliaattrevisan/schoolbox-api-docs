@@ -371,13 +371,13 @@ abstract class Kernel
         $di->set('redis.storage', Redis::getClientInstance(Redis::INSTANCE_STORAGE));
 
         // Default Redis connection:
-        // uses storage, and raises a warning telling you to choose a connector
+        // uses cache, and raises a warning telling you to choose a connector
         $di->set('redis', $di->lazy(function () use ($di) {
             trigger_error(
-                'The default "redis" connection is deprecated: use "redis.cache" for memory-only or "redis.storage" for persistent storage',
+                'The default "redis" connection is deprecated; falling back to using "redis.cache". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
                 E_USER_WARNING,
             );
-            return $di->get('redis.storage');
+            return $di->get('redis.cache');
         }));
 
         $di->set('amqp', $di->lazy(function () {
