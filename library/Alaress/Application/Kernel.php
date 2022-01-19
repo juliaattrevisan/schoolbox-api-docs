@@ -132,6 +132,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
@@ -1479,7 +1480,7 @@ abstract class Kernel
         ];
 
         $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
-            'redis' => $di->lazyGet('redis.cache'),
+            'redis' => $di->lazyGet('redis.storage'),
             'log'   => $di->lazyValue('logger')
         ];
 
@@ -1489,11 +1490,21 @@ abstract class Kernel
         ];
 
         $di->set('subscriptionCache', $di->lazyNew(WriteCache::class, [
-            'redis' => $di->lazyGet('redis.cache'),
+            'redis' => $di->lazyGet('redis.storage'),
             'log'   => $di->lazyValue('logger'),
             'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class)
         ]));
 
+        $di->set(
+            'subscriptionCache.readonly',
+            $di->lazyNew(
+                ReadCache::class,
+                [
+                    'redis' => $di->lazyGet('redis.storage'),
+                    'log'   => $di->lazyValue('logger'),
+                ]
+            )
+        );
 
 
         // install sentry
