@@ -43,10 +43,12 @@ class Api implements IApi
      */
     private const NUM_RETRY = 3;
 
+
     /**
      * customisable number of times to retry after failing, will default to NUM_RETRY
      */
     private int $failRetry;
+
 
     /**
      * @var string
@@ -96,12 +98,12 @@ class Api implements IApi
         ];
 
         return new Client([
-                              'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-                              'headers' => $headers,
-                              'base_uri' => $this->host,
-                              'timeout' => $timeout,
-                              'http_errors' => false,
-                          ]);
+            'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
+            'headers' => $headers,
+            'base_uri' => $this->host,
+            'timeout' => $timeout,
+            'http_errors' => false,
+        ]);
     }
 
 
@@ -155,10 +157,10 @@ class Api implements IApi
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     base64_encode(json_encode([
-                                                 'method' => $method,
-                                                 'route' => $route,
-                                                 'queryArgs' => $queryArgs
-                                             ], JSON_THROW_ON_ERROR))
+                        'method' => $method,
+                        'route' => $route,
+                        'queryArgs' => $queryArgs
+                    ], JSON_THROW_ON_ERROR))
                 ), $response->getStatusCode());
             }
 
@@ -218,10 +220,10 @@ class Api implements IApi
                     $response->getReasonPhrase(),
                     self::NUM_RETRY,
                     base64_encode(json_encode([
-                                                 'method' => $method,
-                                                 'route' => $route,
-                                                 'queryArgs' => $queryArgs
-                                             ], JSON_THROW_ON_ERROR))
+                        'method' => $method,
+                        'route' => $route,
+                        'queryArgs' => $queryArgs
+                    ], JSON_THROW_ON_ERROR))
                 ));
             }
         }
