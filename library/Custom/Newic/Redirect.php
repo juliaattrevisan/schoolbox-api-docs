@@ -112,7 +112,7 @@ class Redirect
             $query = "
                 SELECT *
                 FROM assignment_dim
-                WHERE canvas_id = :assignmentCanvasId  
+                WHERE canvas_id = :assessmentCanvasId  
             ";
 
             $canvasUrl = '%s/assignments/%s';
@@ -129,7 +129,7 @@ class Redirect
             $query = "
                 SELECT *
                 FROM quiz_dim
-                WHERE canvas_id = :assignmentCanvasId  
+                WHERE canvas_id = :assessmentCanvasId  
             ";
 
             $canvasUrl = '%s/quizzes/%s';
@@ -170,7 +170,7 @@ class Redirect
         $statement = $this->canvasDb->build()->prepareQuery($query);
 
         $statement->execute([
-            'assignmentCanvasId' => $canvasId
+            'assessmentCanvasId' => $canvasId
         ]);
 
         $row = $statement->fetch();
