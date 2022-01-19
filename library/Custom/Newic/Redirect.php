@@ -10,6 +10,8 @@ namespace Custom\Newic;
 
 use Alaress\IDatabase;
 use External\Canvas\Importer\CanvasDb;
+use Schoolbox\Learning\Assessment\IAssessable;
+
 
 /**
  * Redirect from schoolbox homepage to canvas somewhere
@@ -64,6 +66,44 @@ class Redirect
         $this->canvasUrl = trim($canvasUrl);
         $this->canvasDb = $canvasDb;
         $this->db = $db;
+    }
+
+
+    /**
+     * For the given user, folder, assessument,
+     * Find a corresponding url in canvas.
+     *
+     * If the user isn't allowed to go to canvas, immediately return null
+     *
+     * @param \Schoolbox\User                  $user
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param IAssessable                      $assessment
+     * @return string|null
+     */
+    public function generateAssessmentRedirect(
+        \Schoolbox\User $user,
+        \Schoolbox\Resource\Folder\Model $folder,
+        IAssessable $assessment
+    ): ?string {
+        /* If the currently logged in user is staff or students,
+         * They can visit a link to canvas
+         * Parents can't
+         */
+
+        /* For the given assessment, look at the external id
+         * If there's one there, try to look in canvas cache db
+         * to see where it should go. You'll need $folder to figure
+         * out the class code too.
+         *
+         * The existing function generateFirstAvailableRedirect()
+         * can be used to generate the first half of the url
+         * to which you can append /assignments/123456
+         */
+
+        /* Otherwise return null
+         * No applicable canvas redirects
+         */
+        return null;
     }
 
 
