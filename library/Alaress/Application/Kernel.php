@@ -363,10 +363,11 @@ abstract class Kernel
         $di->set('config', $di->lazyNew(ConfigLoader::class));
 
         // Redis cache (memory-only, not persistent)
-        Redis::getInstance(Redis::INSTANCE_CACHE)->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        Redis::getInstance(Redis::INSTANCE_CACHE)->connect($di->get('config')->get('redis_ephemeral_url'), null, INSTANCE_ID);
         $di->set('redis.cache', Redis::getClientInstance(Redis::INSTANCE_CACHE));
 
         // Redis storage (persisted to disk)
+        Redis::getInstance(Redis::INSTANCE_STORAGE)->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
         $di->set('redis.storage', Redis::getClientInstance(Redis::INSTANCE_STORAGE));
 
         // Default Redis connection:
