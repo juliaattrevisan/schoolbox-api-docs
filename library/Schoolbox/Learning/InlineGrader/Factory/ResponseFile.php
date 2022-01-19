@@ -45,15 +45,22 @@ class ResponseFile
 
 
     /**
+     * @var \Schoolbox\Assessment\Term\Mapper
+     */
+    private \Schoolbox\Assessment\Term\Mapper $termMapper;
+
+    /**
      * ResponseFile constructor.
      *
      * @param Kami\Mapper    $kamiMapper
      * @param Kami\Connector $kamiConnector
+     * @param \Schoolbox\Assessment\Term\Mapper $termMapper
      */
-    public function __construct(Kami\Mapper $kamiMapper, Kami\Connector $kamiConnector)
+    public function __construct(Kami\Mapper $kamiMapper, Kami\Connector $kamiConnector, \Schoolbox\Assessment\Term\Mapper $termMapper)
     {
         $this->kamiMapper    = $kamiMapper;
         $this->kamiConnector = $kamiConnector;
+        $this->termMapper = $termMapper;
     }
 
 
@@ -199,6 +206,17 @@ class ResponseFile
 
         try {
             // Finished processing. Get a fresh view session
+
+            /* If we're in an archived period, make this read only
+             */
+            $term = $this->termMapper->findForDate($file->getSubmission()->getAssessable()->getDueAt());
+
+            if ($term->getArchived()) {
+                return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user, false);
+            }
+
+            /* Otherwise present it with edit options
+             */
             return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user, true);
         } catch (Kami\Exception\EmptyApiKeyException $e) {
             // Should be impossible here due to short-circuit at start of method.

@@ -411,7 +411,8 @@ class Controller extends Base
         try {
             return (new Factory\ResponseFile(
                 $this->kamiMapper,
-                $this->kamiConnector
+                $this->kamiConnector,
+                $this->termMapper
             ))->produce($file, $this->getUser());
         } catch (\Exception $e) {
             // catching all exceptions, as we don't want to break inline grader.
