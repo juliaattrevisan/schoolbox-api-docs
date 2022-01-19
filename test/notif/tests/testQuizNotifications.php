@@ -319,6 +319,7 @@ class QuizNotifications extends AbstractNotificationTest
     {
         $router = new Router(new SubscriptionDictionary('.'));
 
+        // TODO replace with $di->get('subscriptionCache.readonly'), and set log
         (new ReadCache($this->redis, $this->log))->readIntoRouter(INSTANCE_ID, $router);
 
         $subscribers = array_keys($router->get("*.notify.service.1.$folderId.1.*"));

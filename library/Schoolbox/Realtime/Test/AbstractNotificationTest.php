@@ -271,6 +271,7 @@ abstract class AbstractNotificationTest extends AbstractTest
     {
         $loaderFactory = new Subscription\Loader\Factory($this->redis, $this->log);
 
+        // TODO replace with $di('subscriptionCache')
         $cache = new WriteCache($this->redis, $this->log, $loaderFactory);
         $cache->cacheAllUsers(INSTANCE_ID);
     }

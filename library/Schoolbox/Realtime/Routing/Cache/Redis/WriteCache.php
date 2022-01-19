@@ -1,10 +1,8 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Routing\Cache\Redis;
@@ -18,6 +16,9 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Realtime\Routing\Subscription;
 use UnderflowException;
 
+/**
+ * Writable cache of routes, backed by a Redis instance.
+ */
 class WriteCache extends ReadCache implements WritableCache
 {
     const SIGNAL_PATTERN = 'routed.%s.reload';

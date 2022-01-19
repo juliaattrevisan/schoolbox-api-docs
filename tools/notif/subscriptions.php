@@ -155,6 +155,7 @@ try {
          */
         private function loadRouter(IRouter $router)
         {
+            // TODO replace with $di->get('subscriptionCache.readonly'), and set log
             (new ReadCache($this->redis, $this->log))->readIntoRouter(INSTANCE_ID, $router);
 
             return $router;
