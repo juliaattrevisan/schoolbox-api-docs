@@ -96,12 +96,12 @@ class Api implements IApi
         ];
 
         return new Client([
-                              'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-                              'headers' => $headers,
-                              'base_uri' => $this->host,
-                              'timeout' => $timeout,
-                              'http_errors' => false,
-                          ]);
+            'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
+            'headers' => $headers,
+            'base_uri' => $this->host,
+            'timeout' => $timeout,
+            'http_errors' => false,
+        ]);
     }
 
 
@@ -150,15 +150,16 @@ class Api implements IApi
              */
             if (401 === $response->getStatusCode()) {
                 throw new RuntimeException(sprintf(
-                    'No Permission %s %s: %s. Payload: %s',
+                    'No Permission %s %s: %s %s. Payload: %s',
                     $method,
+                    $route,
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     base64_encode(json_encode([
-                                                 'method' => $method,
-                                                 'route' => $route,
-                                                 'queryArgs' => $queryArgs
-                                             ], JSON_THROW_ON_ERROR))
+                        'method' => $method,
+                        'route' => $route,
+                        'queryArgs' => $queryArgs
+                    ], JSON_THROW_ON_ERROR))
                 ), $response->getStatusCode());
             }
 
@@ -168,15 +169,16 @@ class Api implements IApi
              */
             if (404 === $response->getStatusCode()) {
                 throw new RuntimeException(sprintf(
-                    'Permanent Failure, does the user exist? %s %s: %s. Payload: %s',
+                    'Permanent Failure, does the user exist? %s %s: %s %s. Payload: %s',
                     $method,
+                    $route,
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     base64_encode(json_encode([
-                                                     'method' => $method,
-                                                     'route' => $route,
-                                                     'queryArgs' => $queryArgs
-                                                 ], JSON_THROW_ON_ERROR))
+                        'method' => $method,
+                        'route' => $route,
+                        'queryArgs' => $queryArgs
+                    ], JSON_THROW_ON_ERROR))
                 ), $response->getStatusCode());
             }
 
@@ -218,10 +220,10 @@ class Api implements IApi
                     $response->getReasonPhrase(),
                     self::NUM_RETRY,
                     base64_encode(json_encode([
-                                                 'method' => $method,
-                                                 'route' => $route,
-                                                 'queryArgs' => $queryArgs
-                                             ], JSON_THROW_ON_ERROR))
+                        'method' => $method,
+                        'route' => $route,
+                        'queryArgs' => $queryArgs
+                    ], JSON_THROW_ON_ERROR))
                 ));
             }
         }

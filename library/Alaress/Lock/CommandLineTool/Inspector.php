@@ -11,6 +11,7 @@ namespace Alaress\Lock\CommandLineTool;
 
 use Alaress\Image\Processor\Manager;
 use Alaress\Lock\InstanceLockFactory;
+use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
@@ -76,6 +77,10 @@ class Inspector extends CliTool\App
 
         //Intellischool CLI tool
         DataSync::LOCK_NAME      =>  'Intellischool Sync Handler (./tools/intellischool/dataSync.php)',
+
+        /* Canvas Announcements Importer
+         */
+        AnnouncementsTool::CANVAS_ANNOUNCEMENTS_LOCK_NAME => 'Canvas Announcements Importer (./tools/canvas/announcements.php)',
     ];
 
 

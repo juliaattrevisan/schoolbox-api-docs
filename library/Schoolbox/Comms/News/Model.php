@@ -17,8 +17,6 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Json\Api\AuraLink;
-use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -209,7 +207,16 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      *
      * @var int|null
      */
-    protected ?int $attachedFilesCount = null;
+    private ?int $attachedFilesCount = null;
+
+
+    /**
+     * Optional data about where this article spawned from
+     *
+     * @var Source\Model|null
+     */
+    private ?Source\Model $source = null;
+
 
     /**
      * Model constructor.
@@ -1167,6 +1174,26 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function setAttachedFilesCount(?int $attachedFilesCount): self
     {
         $this->attachedFilesCount = $attachedFilesCount;
+        return $this;
+    }
+
+
+    /**
+     * @return Source\Model|null
+     */
+    public function getSource(): ?Source\Model
+    {
+        return $this->source;
+    }
+
+
+    /**
+     * @param Source\Model|null $source
+     * @return Model
+     */
+    public function setSource(?Source\Model $source): self
+    {
+        $this->source = $source;
         return $this;
     }
 }
