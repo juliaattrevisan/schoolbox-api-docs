@@ -182,24 +182,6 @@ class Api implements IApi
                 ), $response->getStatusCode());
             }
 
-            /**
-             * if 404, the user may not exist, or be a permanent error
-             * so just fail
-             */
-            if (404 === $response->getStatusCode()) {
-                throw new RuntimeException(sprintf(
-                    'Permanent Failure, does the user exist? %s %s: %s. Payload: %s',
-                    $method,
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase(),
-                    base64_encode(json_encode([
-                                                     'method' => $method,
-                                                     'route' => $route,
-                                                     'queryArgs' => $queryArgs
-                                                 ], JSON_THROW_ON_ERROR))
-                ), $response->getStatusCode());
-            }
-
             /* Successful response from server, but it might not send a valid data payload back
              * so try to decode it. If it can't decode properly, return null
              */
