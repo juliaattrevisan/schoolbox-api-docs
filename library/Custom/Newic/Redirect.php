@@ -84,6 +84,8 @@ class Redirect
         IAssessable $assessment
     ): ?array {
         $canvasId = '';
+        $query = '';
+        $canvasUrl = '';
 
         /* If the currently logged in user is staff or students,
          * They can visit a link to canvas
@@ -104,6 +106,16 @@ class Redirect
         if ($assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
             /** \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
             $canvasId = trim((string)$assessment->getExternalId());
+
+            /* Find out if external_id exists in canvas as an assignment identifier
+             */
+            $query = "
+                SELECT *
+                FROM assignment_dim
+                WHERE canvas_id = :assignmentCanvasId  
+            ";
+
+            $canvasUrl = '%s/assignments/%s';
         }
 
         /* Quizzes have an external id somewhere
@@ -111,6 +123,16 @@ class Redirect
         if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
             /** \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
             $canvasId = trim((string)$assessment->getExternalId());
+
+            /* Find out if external_id exists in canvas as an assignment identifier
+             */
+            $query = "
+                SELECT *
+                FROM quiz_dim
+                WHERE canvas_id = :assignmentCanvasId  
+            ";
+
+            $canvasUrl = '%s/quizzes/%s';
         }
 
         /* For the given duework/quiz assessment, look at the external id
@@ -136,14 +158,15 @@ class Redirect
             return null;
         }
 
-        /* Find out if external_id exists in canvas as an assignment identifier
+        /* No query? No trabajo
+         * I suppose Projects might fall under this clause somehow
          */
-        $query = "
-            SELECT *
-            FROM assignment_dim
-            WHERE canvas_id = :assignmentCanvasId  
-        ";
+        if ('' === $query || '' === $canvasUrl) {
+            return null;
+        }
 
+        /* Otherwise continue shanking
+         */
         $statement = $this->canvasDb->build()->prepareQuery($query);
 
         $statement->execute([
@@ -163,7 +186,7 @@ class Redirect
          */
         return [
             'url' => sprintf(
-                '%s/assignments/%s',
+                $canvasUrl,
                 rtrim($prefix, '/'),
                 $row['canvas_id']
             ),

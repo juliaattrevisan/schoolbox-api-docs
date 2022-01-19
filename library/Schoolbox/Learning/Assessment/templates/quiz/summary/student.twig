@@ -25,9 +25,6 @@
     } %}
 </div>
 
-{# TODO But...this isn't the external_id that can be found in canvas????? wtf #}
-{{ dump(externalRedirectUrl) }}
-
 <div class="row">
     <div class="small-12 island">
         {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
