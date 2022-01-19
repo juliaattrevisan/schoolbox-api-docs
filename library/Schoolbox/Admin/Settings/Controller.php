@@ -201,7 +201,7 @@ class Controller extends ConfigController
         }
 
         if ($reloadReRouter || $dropNotifierConfigCache) {
-            $redisClient = Redis::getClientInstance(Redis::INSTANCE_CACHE);
+            $redisClient = Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH);
             if ($redisClient && $reloadReRouter) {
                 // Reload message router
                 $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
