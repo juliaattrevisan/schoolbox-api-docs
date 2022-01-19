@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Notification;
 use Alaress\Async\Test\AbstractTest;
 use Alaress\Redis;
 use OutOfBoundsException;
+use Predis\ClientInterface;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
@@ -53,8 +54,15 @@ abstract class AbstractNotificationTest extends AbstractTest
     const ALARESS_ADMIN         = 19;
 
 
-    /** @var \Predis\ClientInterface */
-    protected $redis;
+    /**
+     * Redis client for retrieving stored notifications.
+     */
+    protected ClientInterface $redis;
+
+    /**
+     * Redis client for publishing to queues.
+     */
+    private ClientInterface $redisQueue;
 
     /** @var User[] */
     private $userCache;
@@ -95,7 +103,9 @@ abstract class AbstractNotificationTest extends AbstractTest
     {
         parent::__construct($name, $data, $dataName);
 
-        $this->redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
+        // TODO should this be the cache or storage?
+        $this->redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
+        $this->redisQueue = Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH);
         $this->listFactory = new ListFactory(INSTANCE_ID, $this->redis);
     }
 
@@ -223,7 +233,7 @@ abstract class AbstractNotificationTest extends AbstractTest
      */
     protected function sendSignal($daemon, $signal, $payload = '')
     {
-        $this->redis->publish(sprintf('%s.%s.%s', $daemon, INSTANCE_ID, $signal), $payload);
+        $this->redisQueue->publish(sprintf('%s.%s.%s', $daemon, INSTANCE_ID, $signal), $payload);
     }
 
 
@@ -278,7 +288,7 @@ abstract class AbstractNotificationTest extends AbstractTest
             $this->redis,
             $this->log,
             $loaderFactory,
-            Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH),
+            $this->redisQueue,
         );
         $cache->cacheAllUsers(INSTANCE_ID);
     }
