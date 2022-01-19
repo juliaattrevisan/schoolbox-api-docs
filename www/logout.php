@@ -18,14 +18,8 @@ session_regenerate_id(true);
 session_destroy();
 
 // Destroy remember me cookie
-$rememberer = new Remember\Remember(
-    new Remember\Cookie(
-        Remember\Cookie::DEFAULT_COOKIE_NAME,
-        $_COOKIE,
-        session_get_cookie_params()
-    ),
-    new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_CACHE))
-);
+/** @var Remember\Remember $rememberer */
+$rememberer = $kernel->get('session.rememberer');
 $rememberer->forgetUsername();
 
 $samlLogoutUrl = trim(Config::get('saml_logout_url'));

@@ -321,15 +321,9 @@ class SitePage extends Page
         ) {
             // Catch users with the remember me cookie
             if ($this->config->get('session_remember')) {
-                $rememberer = new Remember\Remember(
-                    new Remember\Cookie(
-                        Remember\Cookie::DEFAULT_COOKIE_NAME,
-                        $_COOKIE,
-                        session_get_cookie_params()
-                    ),
-                    new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_CACHE))
-                );
-                $username = $rememberer->retrieveUsername();
+                /** @var Remember\Remember $rememberer */
+                $rememberer = $this->di->get('session.rememberer');
+                $username   = $rememberer->retrieveUsername();
 
                 if (strlen($username) === 0 || !$sessionHandler->create($username)) {
                     $sessionHandler->destroy();
