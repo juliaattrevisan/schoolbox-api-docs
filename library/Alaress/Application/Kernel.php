@@ -55,6 +55,7 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
+use Schoolbox\Auth\Remember;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
@@ -1677,7 +1678,7 @@ abstract class Kernel
 
 
     /**
-     * Consistently register the 'session' DI service
+     * Consistently register the 'session' and 'session.rememberer' DI services.
      *
      * @param Di\Container $di
      * @return Di\Container
@@ -1704,6 +1705,25 @@ abstract class Kernel
                 }
             )
         );
+
+        $di->set(
+            'session.rememberer',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var Predis\ClientInterface $redisStorage */
+                    $redisStorage = $di->get('redis.storage');
+                    return new Remember\Remember(
+                        new Remember\Cookie(
+                            Remember\Cookie::DEFAULT_COOKIE_NAME,
+                            $_COOKIE,
+                            session_get_cookie_params()
+                        ),
+                        new Remember\Redis(INSTANCE_ID, $redisStorage),
+                    );
+                }
+            )
+        );
+
         return $di;
     }
 
