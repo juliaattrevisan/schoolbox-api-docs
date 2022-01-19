@@ -110,7 +110,7 @@ just...delete Turnitin Group Attachments from them, so you can test freshly.
 
 This is a dev tool and should not be used in the normal scheme of things
 
-Usage: cleanser.php --start=300 --end=400 [--instance=INSTANCE_ID] 
+Usage: cleanser.php --start=300 --end=400 [--instance=INSTANCE_ID]
 
 
 HELP;
@@ -128,7 +128,7 @@ HELP;
          */
 
         /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis');
+        $redis      = $this->getDi()->get('redis.cache');
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);

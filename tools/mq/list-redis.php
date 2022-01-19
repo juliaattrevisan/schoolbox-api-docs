@@ -51,7 +51,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->instanceId = INSTANCE_ID;
         }
 
-        $this->redis = $this->getDi()->get('redis');
+        $this->redis = $this->getDi()->get('redis.cache');
 
         // non-blocking search of the keyspace for all messages
         $search = new Keyspace($this->redis, "msg:{$this->instanceId}:*");

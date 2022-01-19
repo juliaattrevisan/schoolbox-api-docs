@@ -78,7 +78,7 @@ class Module extends \Alaress\Module\Module
                         function () use ($injector) {
                             return (new BridgeFactory(
                                 $this->getConfig()->get('rubicon_atlas_api_token'),
-                                $injector->get('redis')
+                                $injector->get('redis.cache')
                             ))->build();
                         }
                     ),

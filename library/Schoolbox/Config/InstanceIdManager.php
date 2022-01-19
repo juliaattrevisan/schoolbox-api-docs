@@ -68,7 +68,7 @@ class InstanceIdManager extends CliTool\App
      */
     public function run(): void
     {
-        $this->redis = $this->getDi()->get('redis');
+        $this->redis = $this->getDi()->get('redis.cache');
 
         $newInstanceId = $this->getValidNewInstanceIdOrExit();
         $oldInstanceId = defined('INSTANCE_ID') ? INSTANCE_ID : '';

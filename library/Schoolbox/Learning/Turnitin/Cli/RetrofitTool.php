@@ -84,7 +84,7 @@ needed, put them into turnitin_report for processing. This occurs mainly when te
 activate Similarity Check after some students have submitted, but not others, and you
 needed to put those -others- into turnitin_report.
 
-Usage: retrofit.php --assessment=1234 [--instance=INSTANCE_ID] 
+Usage: retrofit.php --assessment=1234 [--instance=INSTANCE_ID]
 
 
 HELP;
@@ -95,7 +95,7 @@ HELP;
          */
 
         /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis');
+        $redis      = $this->getDi()->get('redis.cache');
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);

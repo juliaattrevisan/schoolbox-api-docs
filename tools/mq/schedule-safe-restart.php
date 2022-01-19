@@ -322,7 +322,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         $event = extractEvent($input);
 
         /** @var Redis|ClientInterface $redis */
-        $redis = $di->get('redis');
+        $redis = $di->get('redis.cache');
 
         $amqp  = Connector::getInstance();
 

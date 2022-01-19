@@ -52,7 +52,7 @@ $app = new class extends CliTool\App {
      */
     private function getRedisService(): ClientInterface
     {
-        $redis = $this->getDi()->get('redis');
+        $redis = $this->getDi()->get('redis.cache');
         if (!$redis instanceof ClientInterface) {
             $this->getLogger()->error("Unable to fetch redis connection");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);

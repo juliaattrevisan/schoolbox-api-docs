@@ -34,13 +34,13 @@ $kernel = new Daemon\Kernel(
 const HALP = <<<EOF
 Schoolbox Subscription Reader
 
-Usage: 
+Usage:
   ./subscriptions.php [-v[v[v]]][--instance=INSTANCE_ID][--user=USER_ID][--pattern=PATTERN]
 
 Options:
   -h, --help                    Display this help message
   -v[v[v]]]                     Various levels of verbosity
-  --user=USER_ID                The ID of a user: that user's subscriptions will be returned 
+  --user=USER_ID                The ID of a user: that user's subscriptions will be returned
   --pattern=PATTERN             A subscription pattern to search: all users subscribed will be returned
 
 Example patterns to search by (quotes are not required, btw):
@@ -70,7 +70,7 @@ try {
         public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
         {
             $this->log   = $log;
-            $this->redis = $di->get('redis');
+            $this->redis = $di->get('redis.cache');
 
             if ($opts['user'] && $opts['pattern']) {
                 $log->alert('Specify ONLY one of --user=:id or --pattern=:string');

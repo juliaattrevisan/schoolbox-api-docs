@@ -46,7 +46,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $conf = $di->get('config');
 
     /** @var ClientInterface $redis */
-    $redis = $di->get('redis');
+    $redis = $di->get('redis.cache');
 
     /** @var IClient $stomp */
     $stomp = $di->get('stomp');

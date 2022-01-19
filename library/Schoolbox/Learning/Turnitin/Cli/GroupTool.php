@@ -105,7 +105,7 @@ Find every Pending turnitin_group record and upload the associated files' binari
 to Turnitin. Turnitin Group Attachments are synonymous with our Schoolbox Submission
 Box Files (the attachments to Due Works)
 
-Transmission of Turnitin Group Attachments goes through these stages, with their 
+Transmission of Turnitin Group Attachments goes through these stages, with their
 status strings:
 
 1. Saved in schoolbox db with status Pending             [pending]
@@ -115,7 +115,7 @@ status strings:
 5. Contents finished sending to Turnitin                 [complete]
 
 You can optionally specify a group id to just affect that record alone, in case you need
-to fix a single record but not any others. The group id is the primary key of turnitin_group 
+to fix a single record but not any others. The group id is the primary key of turnitin_group
 and its status must be "pending", "group" or "group_attachment" for it to be found.
 
 You can optionally force retransmission of Pending, Group or Group Attachment statuses by using
@@ -139,7 +139,7 @@ HELP;
          */
 
         /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis');
+        $redis      = $this->getDi()->get('redis.cache');
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);

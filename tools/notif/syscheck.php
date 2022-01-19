@@ -59,7 +59,7 @@ try {
 
     try {
         // test redis is online
-        $r = $kernel->get('redis');
+        $r = $kernel->get('redis.cache');
         $r->executeCommand($r->createCommand('get', array('test')));
         $d->notice('Redis is online', array('char' => '+'));
     } catch (\Predis\PredisException $e) {

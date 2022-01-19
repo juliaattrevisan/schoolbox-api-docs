@@ -23,7 +23,7 @@ $app = new class extends CliTool\App
     public function run(): void
     {
         /** @var ClientInterface $redis */
-        $redis = $this->getDi()->get('redis');
+        $redis = $this->getDi()->get('redis.cache');
 
         // This script may run in two scenarios:
         // 1. Upgrade of existing instance (eg on-prem - possibly shared)

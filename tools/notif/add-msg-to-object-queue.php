@@ -52,7 +52,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->instanceId = INSTANCE_ID;
         }
 
-        $this->redis = $this->getDi()->get('redis');
+        $this->redis = $this->getDi()->get('redis.cache');
         $newsMapper = \Schoolbox\Comms\News\Mapper::getInstance();
         $planMapper = Schoolbox\Assessment\Participant\Plan\Mapper::getInstance();
 

@@ -43,7 +43,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
             $instances = [ INSTANCE_ID ];
 
             /** @var ClientInterface $redis */
-            $redis = $di->get('redis');
+            $redis = $di->get('redis.cache');
 
             /** @var AMQPInterface $amqp */
             $amqp = $di->get('amqp');

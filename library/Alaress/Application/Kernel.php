@@ -711,7 +711,7 @@ abstract class Kernel
             $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
 
             /** @var Predis\ClientInterface $redis */
-            $redis   = $di->get('redis');
+            $redis   = $di->get('redis.cache');
             $output  = new Output\ThemedHtml();
 
             /** @var Environment $templateEngine */
@@ -1478,7 +1478,7 @@ abstract class Kernel
         ];
 
         $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
-            'redis' => $di->lazyGet('redis'),
+            'redis' => $di->lazyGet('redis.cache'),
             'log'   => $di->lazyValue('logger')
         ];
 
@@ -1488,7 +1488,7 @@ abstract class Kernel
         ];
 
         $di->set('subscriptionCache', $di->lazyNew(WriteCache::class, [
-            'redis' => $di->lazyGet('redis'),
+            'redis' => $di->lazyGet('redis.cache'),
             'log'   => $di->lazyValue('logger'),
             'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class)
         ]));
@@ -1568,7 +1568,7 @@ abstract class Kernel
             'lockFactory',
             $di->lazy(function () use ($di) {
                 return new \Alaress\Lock\InstanceLockFactory(
-                    new LockFactory(new RedisStore($di->get('redis'))),
+                    new LockFactory(new RedisStore($di->get('redis.cache'))),
                     INSTANCE_ID
                 );
             })
@@ -1651,7 +1651,7 @@ abstract class Kernel
             'lti.accessTokenCache',
             $di->lazy(function () use ($di) {
                 /** @var Predis\ClientInterface $redis */
-                $redis = $di->get('redis');
+                $redis = $di->get('redis.cache');
                 /** @var RegistrationRepositoryInterface $registrationRepository */
                 $registrationRepository = $di->get('lti.registrations');
                 return new ItemPool(
@@ -1693,7 +1693,7 @@ abstract class Kernel
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
                     /** @var Predis\ClientInterface $redis */
-                    $redis = $di->get('redis');
+                    $redis = $di->get('redis.cache');
                     $factory = new Factory(
                         $_COOKIE,
                         $config,

@@ -63,7 +63,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->instanceId = INSTANCE_ID;
         }
 
-        $this->redis = $this->getDi()->get('redis');
+        $this->redis = $this->getDi()->get('redis.cache');
         $numKeys = $this->redis->dbsize();
         $this->getLogger()->info("Number of keys : {$numKeys}");
 

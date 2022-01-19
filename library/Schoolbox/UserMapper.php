@@ -823,7 +823,7 @@ class UserMapper extends Mapper
     public function deleteNotificationQueue(User $user)
     {
         /** @var ClientInterface $redis */
-        $redis   = self::getDi()->get('redis');
+        $redis   = self::getDi()->get('redis.cache');
         $factory = new Schoolbox\Realtime\MessageList\ListFactory(INSTANCE_ID, $redis);
         $factory->listed($user->getId())->drain();
         $factory->unread($user->getId())->drain();

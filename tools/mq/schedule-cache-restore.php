@@ -68,7 +68,7 @@ try {
                 $amqp = $di->get('amqp');
 
                 /** @var ClientInterface $redis */
-                $redis = $di->get('redis');
+                $redis = $di->get('redis.cache');
 
                 /** @var IClient $stomp */
                 $stomp = $di->get('stomp');
