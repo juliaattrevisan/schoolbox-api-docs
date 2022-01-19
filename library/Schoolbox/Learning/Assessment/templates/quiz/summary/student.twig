@@ -20,9 +20,13 @@
         viewRoute: viewRoute,
         modifyRoute: modifyRoute,
         canShowcase: false,
-        isShowcased: false
+        isShowcased: false,
+        externalRedirectUrl: externalRedirectUrl
     } %}
 </div>
+
+{# TODO But...this isn't the external_id that can be found in canvas????? wtf #}
+{{ dump(externalRedirectUrl) }}
 
 <div class="row">
     <div class="small-12 island">

@@ -83,7 +83,8 @@ class Quiz implements IAssessmentTypeTranslator
             ->setCompletionMessage($domainObject->getCompletionMessage())
             ->setDuration($domainObject->getDuration())
             ->setMaxAttempts($domainObject->getMaxAttempts())
-            ->setMarkVisibility($domainObject->getMarkVisibility());
+            ->setMarkVisibility($domainObject->getMarkVisibility())
+            ->setExternalId($domainObject->getExternalId());
     }
 
 
@@ -102,6 +103,7 @@ class Quiz implements IAssessmentTypeTranslator
             ->setMarkVisibility($dataModel->getMarkVisibility())
             ->setDuration($dataModel->getDuration())
             ->setCompletionMessage($dataModel->getCompletionMessage())
-            ->setCreator($dataModel->getUser());
+            ->setCreator($dataModel->getUser())
+            ->setExternalId($dataModel->getExternalId());
     }
 }

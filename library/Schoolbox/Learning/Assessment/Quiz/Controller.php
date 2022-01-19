@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
+use External\Canvas\Importer\CanvasDb;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
@@ -183,6 +184,20 @@ class Controller extends Assessment\Controller
     public function getSummary(IAssessable $assessment, User $student): void
     {
 
+        /* Redirect to some kind of third party who spawned this assessment
+         */
+        $externalRedirectUrl = null;
+
+        if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getConfigLoader()->get('site_school_code'))) {
+            $externalRedirectUrl = (new \Custom\Newic\Redirect(
+                $this->getConfigLoader()->get('canvas_url'),
+                new CanvasDb()
+            ))->generateAssessmentRedirect(
+                $this->getUser(),
+                $assessment
+            );
+        }
+
         /* Check if this assessment has a SEB requirement
          * If it does, send you to the download screen
          */
@@ -239,6 +254,10 @@ class Controller extends Assessment\Controller
                 $assessment,
                 $this->getConfigLoader()->get('restrict_student_submissions')
             ),
+
+            /* External Url for third party apps which might have generated this assessment
+             */
+            'externalRedirectUrl' => $externalRedirectUrl
         ];
 
         $this->getResponse()->content->set(
