@@ -35,6 +35,14 @@ class Redis
     public const INSTANCE_STORAGE = 'storage';
 
     /**
+     * Identifier for the queue publish Redis instance.
+     *
+     * Currently, this instance is the same as the cache-only instance: it has a
+     * separate identifier in case it is moved.
+     */
+    public const INSTANCE_QUEUE_PUBLISH = 'queuePublish';
+
+    /**
      * Prefix all function call Redis keys with this value.
      */
     private const FUNCTION_CALL_CACHE_PREFIX = 'fc';
@@ -77,6 +85,18 @@ class Redis
     public static function getInstance(string $name)
     {
         return (self::$instances[$name] ??= new self());
+    }
+
+    /**
+     * Aliases the connection `$connectionName` to `$aliasName`.
+     *
+     * @param string $connectionName
+     * @param string $aliasName
+     * @return void
+     */
+    public static function aliasInstance(string $connectionName, string $aliasName)
+    {
+        self::$instances[$aliasName] = self::$instances[$connectionName];
     }
 
     /**
