@@ -79,6 +79,10 @@ class Redis
     /**
      * Gets an instance of this wrapper.
      *
+     * TODO consider replacing with a separate CacheFunctionCall class
+     * (The only use of this class is for constructing and holding instances,
+     *  and for `cacheFunctionCall`.)
+     *
      * @param string $name The name of the instance to retrieve.
      * @return self
      */
