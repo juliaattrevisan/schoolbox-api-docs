@@ -71,7 +71,7 @@ class Kernel extends WebKernelAbstract
         $di->set('config', $di->lazyNew(ConfigLoader::class));
 
         // Redis cache (memory-only, not persistent)
-        Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        Redis::getInstance(Redis::INSTANCE_CACHE)->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
         $di->set('redis.cache', Redis::getClientInstance());
 
         // Redis storage (persisted to disk)

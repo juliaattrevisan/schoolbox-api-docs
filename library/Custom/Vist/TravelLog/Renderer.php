@@ -108,7 +108,14 @@ class Renderer
         $travelLogs = [];
 
         if ($this->isTravelLogAvailable($externalId)) {
-            $travelLogs = (new TravelLog($this->clientId, $this->clientSecret, Redis::getInstance()))->getForStudentCached($externalId, $this->cachingTimeout);
+            $travelLogs = (new TravelLog(
+                $this->clientId,
+                $this->clientSecret,
+                Redis::getInstance(Redis::INSTANCE_CACHE)
+            ))->getForStudentCached(
+                $externalId,
+                $this->cachingTimeout
+            );
 
             /* $travelLogs might be an array of error data when the externalId wasn't found
              * in the third party system:

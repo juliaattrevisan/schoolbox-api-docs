@@ -69,16 +69,19 @@ class Redis
     protected $instanceId = '';
 
     /**
-     * Gets singleton instance of this wrapper.
+     * Gets an instance of this wrapper.
+     *
+     * @param string $name
      *
      * @return self
      */
-    public static function getInstance()
+    public static function getInstance(string $name)
     {
-        if (!(self::$instance instanceof self)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+        return (self::$instances[$name] ??= new self());
+//        if (!(self::$instance instanceof self)) {
+//            self::$instance = new self();
+//        }
+//        return self::$instance;
     }
 
     /**
@@ -90,7 +93,7 @@ class Redis
      */
     public static function getClientInstance(): ?Predis\ClientInterface
     {
-        return static::getInstance()->getClient();
+        return static::getInstance(self::INSTANCE_CACHE)->getClient();
     }
 
     /**
