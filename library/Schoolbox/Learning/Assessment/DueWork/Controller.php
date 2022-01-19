@@ -15,6 +15,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
 use Eportfolio\ShowcaseMapper;
+use External\Canvas\Importer\CanvasDb;
 use ICollection;
 use InvalidArgumentException;
 use LogicException;
@@ -298,6 +299,19 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+        /* Redirect to some kind of third party who spawned this assessment
+         */
+        $externalRedirectUrl = '';
+
+        if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getConfigLoader()->get('site_school_code'))) {
+            $externalRedirectUrl = (new \Custom\Newic\Redirect(
+                $this->getConfigLoader()->get('canvas_url'),
+                new CanvasDb()
+            ))->generateAssessmentRedirect(
+                $this->getUser(),
+                $assessment
+            );
+        }
 
         /* Check if this assessment has a SEB requirement
          * If it does, send you to the download screen
