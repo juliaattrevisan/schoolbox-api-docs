@@ -53,8 +53,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
             $asyncRedis = $di->get('redis.async');
             $dispatcher = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
 
-            // TODO replace with $di->get('subscriptionCache.readonly'), and set log
-            $cache = new Routing\Cache\Redis\ReadCache($redis, $log);
+            /** @var Routing\Cache\Redis\ReadCache $cache */
+            $cache = $di->get('subscriptionCache.readonly');
+            $cache->setLog($log);
 
             // ensure endpoints exist
             foreach ($instances as $instance) {

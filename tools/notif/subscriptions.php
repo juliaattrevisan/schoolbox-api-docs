@@ -13,7 +13,6 @@ use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\IRouter;
 use Alaress\Routing\Router;
 use Aura\Di;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
@@ -61,8 +60,11 @@ try {
         /** @var LoggerInterface */
         private $log;
 
-        /** @var ClientInterface */
-        private $redis;
+        /**
+         * A read-only subscription cache: required so that user route
+         * subscriptions may be read into the router.
+         */
+        private ReadCache $subscriptionCache;
 
         /**
          * @inheritdoc
@@ -71,6 +73,11 @@ try {
         {
             $this->log   = $log;
             $this->redis = $di->get('redis.cache');
+
+            /** @var ReadCache $subscriptionCache */
+            $subscriptionCache = $di->get('subscriptionCache.readonly');
+            $subscriptionCache->setLog($log);
+            $this->subscriptionCache = $subscriptionCache;
 
             if ($opts['user'] && $opts['pattern']) {
                 $log->alert('Specify ONLY one of --user=:id or --pattern=:string');
@@ -155,9 +162,7 @@ try {
          */
         private function loadRouter(IRouter $router)
         {
-            // TODO replace with $di->get('subscriptionCache.readonly'), and set log
-            (new ReadCache($this->redis, $this->log))->readIntoRouter(INSTANCE_ID, $router);
-
+            $this->subscriptionCache->readIntoRouter(INSTANCE_ID, $router);
             return $router;
         }
     });
