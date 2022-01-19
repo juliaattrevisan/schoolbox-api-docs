@@ -15,12 +15,12 @@ use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Image;
 use Alaress\Image\Transformation\ITransformFactory;
 use Alaress\Lock\InstanceLockFactory;
-use Alaress\Redis;
 use Aura\Di as AuraDi;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PDO;
 use PDOException;
+use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Application\CliTool;
@@ -151,7 +151,15 @@ class Manager
      */
     private bool $isInterrupted = false;
 
+    /**
+     * This manager process' process ID.
+     */
     private int $managerPid;
+
+    /**
+     * Redis client, used for checking overlapping execution.
+     */
+    private ClientInterface $redis;
 
     /**
      * Local storage directory. Null if using awsS3 storage. No trailing slash.
@@ -177,6 +185,7 @@ class Manager
      * @param bool            $retryFailed
      * @param int             $attemptsPerTransform
      * @param int             $logLevel
+     * @param ClientInterface $redis
      */
     public function __construct(
         int $timeInterval,
@@ -185,7 +194,8 @@ class Manager
         LoggerInterface $logger,
         bool $retryFailed,
         int $attemptsPerTransform,
-        int $logLevel
+        int $logLevel,
+        ClientInterface $redis
     ) {
         $this->timeInterval         = $timeInterval;
         $this->imageCountLimit      = $imageCountLimit;
@@ -195,6 +205,7 @@ class Manager
         $this->attemptsPerTransform = $attemptsPerTransform;
         $this->logLevel             = $logLevel;
         $this->managerPid           = posix_getpid();
+        $this->redis                = $redis;
     }
 
     /**
@@ -216,7 +227,7 @@ class Manager
         pcntl_signal(SIGTERM, [$this, 'signalHandler']); // eg `kill PID`
         $this->startTime = time();
         $pdo             = $this->buildPdo();
-        $this->lock = $this->checkOverlappingExecution($pdo);
+        $this->lock = $this->checkOverlappingExecution();
         $this->localStorageDir = $this->deriveLocalStorageDir($pdo);
         $transformations = $this->generateTransformations($this->deriveHashList($pdo), $pdo);
         unset($pdo);
@@ -335,17 +346,13 @@ class Manager
     /**
      * Acquires a lock to prevent multiple overlapping executions of this manager
      *
-     * @param PDO $pdo
      * @return LockInterface
      * @throws LockException\InvalidArgumentException
      * @throws LockException\InvalidTtlException
      */
-    private function checkOverlappingExecution(PDO $pdo): LockInterface
+    private function checkOverlappingExecution(): LockInterface
     {
-        $redisUrl = $pdo->query("SELECT value FROM config WHERE name LIKE 'redis_url'")->fetchAll(PDO::FETCH_COLUMN)[0];
-        Redis::getInstance()->connect($redisUrl, null, INSTANCE_ID);
-        $redis               = Redis::getClientInstance();
-        $instanceLockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), INSTANCE_ID);
+        $instanceLockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($this->redis)), INSTANCE_ID);
         $timeout             = self::IMAGICK_TIME_LIMIT;
         $lock                = $instanceLockFactory->createLock(self::LOCK_NAME, $timeout);
 
