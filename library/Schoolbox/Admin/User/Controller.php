@@ -829,7 +829,7 @@ class Controller extends Base
             ->putMeta('ttl', 30)
             ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
 
-        (new RedisPublisher(Redis::getClientInstance(), INSTANCE_ID))->alertUser($userId, $bob->build());
+        (new RedisPublisher(Redis::getClientInstance(Redis::INSTANCE_CACHE), INSTANCE_ID))->alertUser($userId, $bob->build());
 
         // Redirect back to modify page
 

@@ -8,6 +8,7 @@
  * retraction of notifications.
  */
 
+use Alaress\Redis;
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
@@ -26,7 +27,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Redis Notif Messup', [
 ]);
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
-    $redis  = \Alaress\Redis::getClientInstance();
+    $redis  = Redis::getClientInstance(Redis::INSTANCE_CACHE);
     $count  = (int)$opts['count'];
     $expiry = (int)$opts['expiry'];
     $log->notice(sprintf('Creating %d junk keys with expiry %d seconds...', $count, $expiry));

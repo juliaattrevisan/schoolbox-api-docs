@@ -122,6 +122,6 @@ class ListFactory implements IListFactory, Serializable
     public function unserialize($serialized)
     {
         $this->instanceId = $serialized;
-        $this->redis = Redis::getClientInstance(); // TODO IoC
+        $this->redis = Redis::getClientInstance(Redis::INSTANCE_CACHE); // TODO IoC
     }
 }

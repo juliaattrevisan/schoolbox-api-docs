@@ -72,10 +72,10 @@ class Kernel extends WebKernelAbstract
 
         // Redis cache (memory-only, not persistent)
         Redis::getInstance(Redis::INSTANCE_CACHE)->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
-        $di->set('redis.cache', Redis::getClientInstance());
+        $di->set('redis.cache', Redis::getClientInstance(Redis::INSTANCE_CACHE));
 
         // Redis storage (persisted to disk)
-        $di->set('redis.storage', Redis::getClientInstance());
+        $di->set('redis.storage', Redis::getClientInstance(Redis::INSTANCE_STORAGE));
 
         // Default Redis connection:
         // uses storage, and raises a warning telling you to choose a connector

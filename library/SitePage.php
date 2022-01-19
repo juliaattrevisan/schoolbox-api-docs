@@ -1,6 +1,7 @@
 <?php
 
 use Alaress\Authorizer\Failure\Unauthenticated;
+use Alaress\Redis;
 use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -326,7 +327,7 @@ class SitePage extends Page
                         $_COOKIE,
                         session_get_cookie_params()
                     ),
-                    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
+                    new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_CACHE))
                 );
                 $username = $rememberer->retrieveUsername();
 

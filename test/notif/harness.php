@@ -45,7 +45,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $zsmith  = UserMapper::getInstance()->findById(151);
 
     // connections
-    $redis = Alaress\Redis::getClientInstance();
+    $redis = Alaress\Redis::getClientInstance(Alaress\Redis::INSTANCE_CACHE);
 
     // mappers
     $workMap = Component\SubmissionBoxMapper::getInstance();

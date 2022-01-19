@@ -163,7 +163,8 @@ class Report extends CliTool\App
             exit;
         }
 
-        $redis = Redis::getClientInstance();
+        // TODO report separately on cache and storage
+        $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
         if (!$redis) {
             $this->getLogger()->error("Unable to fetch redis connection");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);

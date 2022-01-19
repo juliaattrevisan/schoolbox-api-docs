@@ -232,7 +232,7 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
     $exit = 0;
 
     try {
-        $trigger = frame2trigger(Redis::getClientInstance(), $input);
+        $trigger = frame2trigger(Redis::getClientInstance(Redis::INSTANCE_CACHE), $input);
         $log->info(sprintf("Trigger '%s' will fire at %s; testing callbacks", $trigger->getIdString(), (new Alaress_Date_Format($trigger->getTimestamp(), 'U'))->getDatabase()));
 
         foreach ($trigger->getCallbacks() as $callback) {

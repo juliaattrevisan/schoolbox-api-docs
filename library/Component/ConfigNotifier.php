@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Redis;
 use Psr\Log\NullLogger;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -175,7 +176,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         }
 
         // TODO desingleton these
-        $redis = Alaress\Redis::getClientInstance();
+        $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
         $log = new NullLogger();
 
         // update the cache

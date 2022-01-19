@@ -71,7 +71,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
                 $this->cookies,
                 session_get_cookie_params()
             ),
-            new Remember\Redis(INSTANCE_ID, Redis::getClientInstance())
+            new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_CACHE))
         );
         $username = $rememberer->retrieveUsername();
 

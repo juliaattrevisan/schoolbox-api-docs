@@ -13,6 +13,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use Alaress\Redis;
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
@@ -371,7 +372,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // folder inheritance is enabled OR inheritance has changed
 
             // TODO desingleton these
-            $redis = Alaress\Redis::getClientInstance();
+            $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
             $log = new NullLogger();
 
             // update the cache

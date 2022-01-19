@@ -45,7 +45,7 @@ if (!isset($opts['d'])) {
     $signal = isset($opts['signal'])  ? $opts['signal']  : strtoupper(readline('Signal (name) to send [SIGPOLL]: ') ?: 'sigpoll');
 
     /** @var \Redis $redis */
-    $redis = Redis::getClientInstance();
+    $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
 
     $loop = isset($opts['loop']) ? (int)($opts['loop']) : 1;
 

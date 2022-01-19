@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Redis;
 use Schoolbox\Auth\Remember;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -118,7 +119,7 @@ class Session
                         $_COOKIE,
                         session_get_cookie_params()
                     ),
-                    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
+                    new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_CACHE))
                 );
                 $rememberer->rememberUsername($username, Remember\Remember::DEFAULT_EXPIRY);
             }

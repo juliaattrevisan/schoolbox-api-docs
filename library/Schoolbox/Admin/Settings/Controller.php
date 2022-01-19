@@ -9,14 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
+use Alaress\Redis;
 use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
-use Alaress;
 use Alaress\Database\Predicate;
 
 class Controller extends ConfigController
@@ -202,7 +201,7 @@ class Controller extends ConfigController
         }
 
         if ($reloadReRouter || $dropNotifierConfigCache) {
-            $redisClient = Alaress\Redis::getClientInstance();
+            $redisClient = Redis::getClientInstance(Redis::INSTANCE_CACHE);
             if ($redisClient && $reloadReRouter) {
                 // Reload message router
                 $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');

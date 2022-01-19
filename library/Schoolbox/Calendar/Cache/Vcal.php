@@ -14,7 +14,7 @@ use Calendar_Api_Config_Connector_Vcal as CalendarConfig;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
-use Predis\Client as RedisClient;
+use Predis\ClientInterface as RedisClient;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\ParseException;

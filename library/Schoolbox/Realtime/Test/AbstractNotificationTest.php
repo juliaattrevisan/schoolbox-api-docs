@@ -95,7 +95,7 @@ abstract class AbstractNotificationTest extends AbstractTest
     {
         parent::__construct($name, $data, $dataName);
 
-        $this->redis = Redis::getClientInstance();
+        $this->redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
         $this->listFactory = new ListFactory(INSTANCE_ID, $this->redis);
     }
 

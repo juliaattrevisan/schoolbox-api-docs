@@ -71,29 +71,25 @@ class Redis
     /**
      * Gets an instance of this wrapper.
      *
-     * @param string $name
-     *
+     * @param string $name The name of the instance to retrieve.
      * @return self
      */
     public static function getInstance(string $name)
     {
         return (self::$instances[$name] ??= new self());
-//        if (!(self::$instance instanceof self)) {
-//            self::$instance = new self();
-//        }
-//        return self::$instance;
     }
 
     /**
-     * Gets client within singleton instance.
+     * Gets client within a stored instance of this wrapper.
      *
-     * Will return null if connect() has not yet been called
+     * Will return null if connect() has not yet been called on that instance.
      *
+     * @param string $name The name of the instance to retrieve.
      * @return null|Predis\ClientInterface
      */
-    public static function getClientInstance(): ?Predis\ClientInterface
+    public static function getClientInstance(string $name): ?Predis\ClientInterface
     {
-        return static::getInstance(self::INSTANCE_CACHE)->getClient();
+        return static::getInstance($name)->getClient();
     }
 
     /**

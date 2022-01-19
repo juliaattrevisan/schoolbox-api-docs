@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Redis;
 use DomainException;
 use Exception;
 use Schoolbox\Mapper\DefinitionException;
@@ -140,7 +141,7 @@ class UserNotifier extends AbstractModuleNotifier
                     ->setUser($user)
             );
 
-            \Alaress\Redis::getClientInstance()->publish('routed.' . INSTANCE_ID . '.reload', $user->getId());
+            Redis::getClientInstance(Redis::INSTANCE_CACHE)->publish('routed.' . INSTANCE_ID . '.reload', $user->getId());
         } catch (DefinitionException $e) {
             // ur access mapper be broked, homeslice.
         }

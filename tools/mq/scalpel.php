@@ -11,6 +11,7 @@
 
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
+use Alaress\Redis;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Realtime\Notification\Decorator;
 
@@ -88,7 +89,7 @@ $app = new class extends CliTool\App{
      */
     private function checkRedis($args, $regexMode): void
     {
-        $redis = \Alaress\Redis::getClientInstance();
+        $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
         $decorator = new Decorator();
 
         if (!$redis) {

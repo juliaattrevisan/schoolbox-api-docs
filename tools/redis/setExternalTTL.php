@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Redis;
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
 
@@ -25,7 +26,7 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
-        $redis = \Alaress\Redis::getClientInstance();
+        $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
 
         if (!$redis) {
             $this->getLogger()->error("Unable to fetch redis connection");

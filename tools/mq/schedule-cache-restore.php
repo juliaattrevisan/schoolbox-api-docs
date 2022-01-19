@@ -11,6 +11,7 @@
  */
 
 use Alaress\Async\Stomp\IClient;
+use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
 use Predis\ClientInterface;
 use Schoolbox\Di\Configurator;
@@ -58,7 +59,7 @@ try {
 
             try {
                 // get the cache handler
-                $jit = new RedisCache(Alaress\Redis::getClientInstance(), $log, INSTANCE_ID);
+                $jit = new RedisCache(Redis::getClientInstance(Redis::INSTANCE_CACHE), $log, INSTANCE_ID);
                 $tff = new TriggerFactoryFactory(true);
 
                 $splitter = new Splitter(new NotifierInflector(new Configurator($di)), $tff);

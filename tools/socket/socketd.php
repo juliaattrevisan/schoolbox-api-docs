@@ -10,6 +10,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Redis;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
@@ -37,7 +38,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $conf = $opts['c'] ?? 'socketd.conf';
 
     /** @var Redis|ClientInterface $redis */
-    $redis = \Alaress\Redis::getClientInstance();
+    $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
 
     /** @var IConfigLoader $config */
     $config = $di->get('config');

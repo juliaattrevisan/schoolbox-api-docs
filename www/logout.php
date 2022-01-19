@@ -2,6 +2,7 @@
 
 //small script to logout users
 
+use Alaress\Redis;
 use Schoolbox\Auth\Remember;
 
 require_once '../conf/core/require.php';
@@ -23,7 +24,7 @@ $rememberer = new Remember\Remember(
         $_COOKIE,
         session_get_cookie_params()
     ),
-    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
+    new Remember\Redis(INSTANCE_ID, Redis::getClientInstance(Redis::INSTANCE_CACHE))
 );
 $rememberer->forgetUsername();
 
