@@ -41,6 +41,6 @@ class Markdown
      */
     public function __invoke($text)
     {
-        return $this->converter->convertToHtml($text);
+        return $this->converter->convertToHtml($text)->getContent();
     }
 }
