@@ -378,7 +378,7 @@ class Announcements
              *
              * Shamefully the author id might not exist in canvas...
              */
-            if ('' !== trim($announcement['author']['id'])) {
+            if ('' !== trim((string)$announcement['author']['id'])) {
                 $endpoint = sprintf(
                     'api/v1/users/%s',
                     $announcement['author']['id']
