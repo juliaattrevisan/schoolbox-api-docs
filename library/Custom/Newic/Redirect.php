@@ -12,9 +12,19 @@ use External\Canvas\Importer\CanvasDb;
 
 /**
  * Redirect from schoolbox homepage to canvas somewhere
+ * by checking the folder code against the local canvas db cache
+ *
+ * If there's a matching course, manufacture a url to that place in
+ * canvas instance; otherwise return null
  */
 class Redirect
 {
+
+    /**
+     * Newington identifier
+     */
+    public const SITE_SCHOOL_CODE = 'newic';
+
 
     /**
      * The host url for canvas instance at this school
@@ -47,18 +57,53 @@ class Redirect
 
 
     /**
+     * For all the folder codes available to $folder,
+     * Try to redirect to canvas - one of the might go somewhere meaningful
+     * especially if you created it directly in schoolbox expecting it to "just work"
+     *
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @return string|null
+     * @throws \Alaress\Database\Exception
+     */
+    public function generateFirstAvailableRedirect(\Schoolbox\Resource\Folder\Model $folder): ?string
+    {
+
+        /* Otherwise, test each folder code and expect one of them
+         * might end up in canvas somewhere
+         */
+        $folderCodes = $folder->getCodes();
+
+        /* Try each of the folder codes associated. If one of them matches a place in canvas,
+         * that's where we're going. There's supposed to be a 1:1 relationship but I don't...
+         * I don't really trust that opinion
+         */
+        foreach ($folderCodes as $folderCode) {
+            $redirect = $this->generateRedirect($folderCode->getCode());
+
+            if (null !== $redirect) {
+                return $redirect;
+            }
+        }
+
+        /* No redirects found
+         */
+        return null;
+    }
+
+    /**
      * Redirect from schoolbox homepage to canvas somewhere
      *
      * @throws \Alaress\Database\Exception
      */
-    public function redirect(string $folderCode): ?string
+    private function generateRedirect(string $folderCode): ?string
     {
-
         /* Append the current year, because that's a canvas convention apparently
          */
-        $currentYear = date('Y');
-
-        $courseCode = "{$folderCode}{$currentYear}";
+        $courseCode = sprintf(
+            '%s%s',
+            $folderCode,
+            date('Y')
+        );
 
         /* Find out if $folderCode exists in canvas as a course identifier
          */
@@ -74,11 +119,11 @@ class Redirect
             'courseCode' => $courseCode
         ]);
 
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+        $row = $statement->fetch();
 
         /* If $row is null, it didn't exist in canvas
          */
-        if (null === $row) {
+        if (!$row) {
             return null;
         }
 

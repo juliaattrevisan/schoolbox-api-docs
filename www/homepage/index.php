@@ -74,26 +74,18 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
  * Check whether you're Newington. If you are, see if your folder.code
  * existed in canvas somewhere and got there if it does
  */
-if ('newic' === strtolower($this->getDi()->get('config')->get('site_school_code'))) {
-    $folderCodes = $folder->getCodes();
-
-    /* Try each of the folder codes associated. If one of them matches a place in canvas,
-     * that's where we're going
-     */
-    $redirectTester = new \Custom\Newic\Redirect(
+if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getDi()->get('config')->get('site_school_code'))) {
+    $redirect = (new \Custom\Newic\Redirect(
         $this->getDi()->get('config')->get('canvas_url'),
         new \External\Canvas\Importer\CanvasDb()
-    );
+    ))->generateFirstAvailableRedirect($folder);
 
-    foreach ($folderCodes as $folderCode) {
-        $redirect = $redirectTester->redirect($folderCode->getCode());
-
-        if (null !== $redirect) {
-            $this->localRedir($redirect);
-        }
+    if (null !== $redirect) {
+        $this->localRedir($redirect);
     }
 
-    /* If you haven't redirected by now, just continue onwards...as if nothing happened
+    /* If you haven't redirected by now, just continue onwards...
+     * as if nothing happened
      */
 }
 
