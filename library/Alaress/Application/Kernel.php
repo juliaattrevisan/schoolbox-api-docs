@@ -1693,13 +1693,13 @@ abstract class Kernel
                 function () use ($di) {
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    /** @var Predis\ClientInterface $redis */
-                    $redis = $di->get('redis.cache');
+                    /** @var Remember\Remember $rememberer */
+                    $rememberer = $di->get('session.rememberer');
                     $factory = new Factory(
                         $_COOKIE,
                         $config,
-                        $redis,
-                        $_SERVER['REQUEST_TIME']
+                        $rememberer,
+                        $_SERVER['REQUEST_TIME'],
                     );
                     return $factory->build();
                 }
