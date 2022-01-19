@@ -148,6 +148,13 @@ class Redirect
             return null;
         }
 
+        /* No query? No trabajo
+         * I suppose Projects might fall under this clause somehow
+         */
+        if ('' === $query || '' === $canvasUrl) {
+            return null;
+        }
+
         $prefix = $this->generateFirstAvailableRedirect($assessment->getBaseContext()->getFolder());
 
         /* If we didn't find a meaningful $prefix, the folder code doesn't exist in canvas
@@ -155,13 +162,6 @@ class Redirect
          * Otherwise, continue and append the assessment suffix
          */
         if (null === $prefix) {
-            return null;
-        }
-
-        /* No query? No trabajo
-         * I suppose Projects might fall under this clause somehow
-         */
-        if ('' === $query || '' === $canvasUrl) {
             return null;
         }
 
