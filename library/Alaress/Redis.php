@@ -16,14 +16,40 @@ use Predis;
 class Redis
 {
     /**
+     * Identifier for the cache-only Redis instance.
+     *
+     * This instance is memory-only and thus suitable only as a cache: it does
+     * not write to permanent storage. This means it's much faster than the
+     * storage instance, though.
+     */
+    public const INSTANCE_CACHE = 'cache';
+
+    /**
+     * Identifier for the storage Redis instance.
+     *
+     * This instance writes to permanent storage: this means it is suitable for
+     * storing persistent data. The process of writing to permanent storage
+     * makes this instance slower and less efficient than the cache-only
+     * instance, so this should only be used when persistence is required.
+     */
+    public const INSTANCE_STORAGE = 'storage';
+
+    /**
      * Prefix all function call Redis keys with this value.
      */
     private const FUNCTION_CALL_CACHE_PREFIX = 'fc';
 
     /**
-     * @var static
+     * @var self
      */
     protected static $instance;
+
+    /**
+     * A list of instances.
+     *
+     * @var array<string, self>
+     */
+    protected static $instances = [];
 
     /**
      * Will be null prior to connect() being called
@@ -45,14 +71,14 @@ class Redis
     /**
      * Gets singleton instance of this wrapper.
      *
-     * @return static
+     * @return self
      */
     public static function getInstance()
     {
-        if (!(static::$instance instanceof static)) {
-            static::$instance = new static();
+        if (!(self::$instance instanceof self)) {
+            self::$instance = new self();
         }
-        return static::$instance;
+        return self::$instance;
     }
 
     /**
