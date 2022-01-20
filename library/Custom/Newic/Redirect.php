@@ -10,8 +10,6 @@ namespace Custom\Newic;
 
 use Alaress\IDatabase;
 use External\Canvas\Importer\CanvasDb;
-use External\IConnector;
-
 
 /**
  * Redirect from schoolbox homepage to canvas somewhere
