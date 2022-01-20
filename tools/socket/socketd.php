@@ -37,8 +37,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';
 
-    /** @var Redis|ClientInterface $redis */
     $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
+    $redisStorage = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
 
     /** @var IConfigLoader $config */
     $config = $di->get('config');
@@ -60,6 +60,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         new PhpHandler(),
         $log,
         $redis,
+        $redisStorage,
         $asyncRedis,
         $config->get('session_length'),
         $db,

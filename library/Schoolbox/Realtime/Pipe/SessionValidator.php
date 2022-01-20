@@ -135,11 +135,8 @@ class SessionValidator
         }
 
         // this has the potential to throw CommunicationException
-        $redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
-        $redisCommand  = $redis->createCommand('get', [ $prefix . $token ]);
-        $redisResponse = $redis->executeCommand($redisCommand);
-//        $redisCommand  = $this->redis->createCommand('get', [ $prefix . $token ]);
-//        $redisResponse = $this->redis->executeCommand($redisCommand);
+        $redisCommand  = $this->redis->createCommand('get', [ $prefix . $token ]);
+        $redisResponse = $this->redis->executeCommand($redisCommand);
 
         if (!$redisResponse) {
             throw new SessionException("No session found for given $label.");
