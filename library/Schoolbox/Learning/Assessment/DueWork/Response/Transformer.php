@@ -17,7 +17,11 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DomainObject;
 
 /**
- * Class Transformer
+ * Transformer helper for converting due work responses between the domain
+ * object and model formats.
+ *
+ * Required so that the feedback's response is transformed in the same manner
+ * that the response itself is.
  */
 class Transformer
 {
