@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Redis;
 use Predis\ClientInterface;
 use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;
@@ -134,8 +135,11 @@ class SessionValidator
         }
 
         // this has the potential to throw CommunicationException
-        $redisCommand  = $this->redis->createCommand('get', [ $prefix . $token ]);
-        $redisResponse = $this->redis->executeCommand($redisCommand);
+        $redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
+        $redisCommand  = $redis->createCommand('get', [ $prefix . $token ]);
+        $redisResponse = $redis->executeCommand($redisCommand);
+//        $redisCommand  = $this->redis->createCommand('get', [ $prefix . $token ]);
+//        $redisResponse = $this->redis->executeCommand($redisCommand);
 
         if (!$redisResponse) {
             throw new SessionException("No session found for given $label.");
