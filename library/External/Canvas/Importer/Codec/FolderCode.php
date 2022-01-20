@@ -49,6 +49,24 @@ class FolderCode
          */
         preg_match("/(.*){$currentYear}$/", $canvasCourseCode, $matches);
 
+        /* For IB International Baccalaureate, some of their subjects run over multiple years
+         * The canvas course_dim.code value could have a suffix in the future, but that should
+         * display in the current year
+         *
+         * e.g. 11SCIPIBHLA2023 is a course_dim.code which might run over multiple years and
+         * should be found for 2022 as well as when the current year becomes 2023
+         *
+         * Also helps support a rollover phasing when schools start next year's stuff in
+         * this year, and their codes won't match the current year.
+         */
+        if (!isset($matches[1])) {
+            /* Try next year
+             */
+            $nextYear = $currentYear + 1;
+
+            preg_match("/(.*){$nextYear}$/", $canvasCourseCode, $matches);
+        }
+
         /* Potentially refine this to throw \InvalidArgumentException for invalid $canvasCourseCodes
          * and/or \OutOfRangeException for $canvasCourseCodes outside the current year
          */
