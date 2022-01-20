@@ -514,7 +514,7 @@ class Controller extends Base\Base
         $specId    = isset($data['spec_id']) ? (int)$data['spec_id'] : null;
         $implId    = isset($data['impl_id']) ? (int)$data['impl_id'] : null;
         $isChecked = isset($data['checked']);
-        $dateData  = $data['dates'] ?? null;
+        $dateData  = $data['dates'] ?? [];
         $subData   = $data['a'] ?? null;
 
         // Base Case #1 - Is item unchecked, and un-imported?
