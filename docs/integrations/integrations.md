@@ -63,4 +63,4 @@ You can find some crontab logging in your vagrant when you're testing/debugging.
 
 > vagrant ssh
 >
-> sudo tail /var/lib/schoolbox/cache/logs/sis-scheduler-vagrantx.log -n100 -f
+> sudo tail /var/log/schoolbox/vagrantx/sis-scheduler.log -n100 -f

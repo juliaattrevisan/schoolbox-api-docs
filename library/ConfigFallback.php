@@ -16,7 +16,7 @@ class ConfigFallback implements \Schoolbox\IConfigLoader
     {
         $this->cfg = array(
             'mail_support_address'  => 'support@alaress.com.au',
-            'logs_dir'              => SITE_root . '/data/cache/logs',
+            'logs_dir'              => '/var/log/schoolbox/'.INSTANCE_ID.'/',
             'debug_mode'            => true
         );
     }

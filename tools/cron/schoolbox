@@ -13,64 +13,64 @@
 MAILTO="support@schoolbox.com.au"
 
 # Image Processing - Every 5 minutes. Standard transforms + timed-out web request transforms
-*/5 * * * *	www-data    /usr/share/schoolbox/tools/image/processor.php -vvv >> /var/lib/schoolbox/cache/logs/image-processor.log 2>&1
+*/5 * * * *	www-data    /usr/share/schoolbox/tools/image/processor.php -vvv >> /var/log/schoolbox/image-processor.log 2>&1
 
 # Image Processing - Nightly at 1am. Failed transforms are retried.
-0 1 * * *	www-data    /usr/share/schoolbox/tools/image/processor.php --retry-failed -vvv >> /var/lib/schoolbox/cache/logs/image-processor-failed.log 2>&1
+0 1 * * *	www-data    /usr/share/schoolbox/tools/image/processor.php --retry-failed -vvv >> /var/log/schoolbox/image-processor.log 2>&1
 
 # Video Processing
-*/2 * * * *	www-data	php /usr/share/schoolbox/tools/video/processor.php >> /var/lib/schoolbox/cache/logs/transcode.log 2>&1
+*/2 * * * *	www-data	php /usr/share/schoolbox/tools/video/processor.php >> /var/log/schoolbox/transcode.log 2>&1
 
 # Cleanup cache  files (minify,zip,stream) (once a week on a Sunday)
 0 1 * * 0	root	/usr/share/schoolbox/tools/clean-cache-dir.sh >> /var/log/schoolbox/cache-cleanup.log 2>&1
 
 # Cleanup UPS log files (once a week on a Sunday)
-20 3 * * 0	root	/usr/share/schoolbox/tools/ups/cleanup.php -p -vv >> /var/log/schoolbox/cache-cleanup.log 2>&1
+20 3 * * 0	www-data	/usr/share/schoolbox/tools/ups/cleanup.php -p -vv >> /var/log/schoolbox/ups-cleanup.log 2>&1
 
 # Plagscan callback - every hour
-0 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/lib/schoolbox/cache/logs/plagscan.log 2>&1
+0 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/log/schoolbox/plagscan.log 2>&1
 
 # Plagscan file upload - every 3 hours
-14 */3 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/plagscan/submit.php >> /var/lib/schoolbox/cache/logs/plagscan.log 2>&1
+14 */3 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/plagscan/submit.php >> /var/log/schoolbox/plagscan.log 2>&1
 
 # Turnitin group attachments - every 15 min
-*/15 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/group.php --force >> /var/lib/schoolbox/cache/logs/turnitin.log 2>&1
+*/15 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/group.php --force >> /var/log/schoolbox/turnitin.log 2>&1
 
 # Turnitin transmitter - every 1 hour
-13 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/transmit.php --force >> /var/lib/schoolbox/cache/logs/turnitin.log 2>&1
+13 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/transmit.php --force >> /var/log/schoolbox/turnitin.log 2>&1
 
 # Turnitin reporter - every 10min
-*/10 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/report.php >> /var/lib/schoolbox/cache/logs/turnitin.log 2>&1
+*/10 * * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/turnitin/report.php >> /var/log/schoolbox/turnitin.log 2>&1
 
 # Geosnapshot Redactions - daily at 8:08pm I guess
-8 20 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/geosnapshot/redaction.php --perform >> /var/lib/schoolbox/cache/logs/geosnapshot.log 2>&1
+8 20 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/geosnapshot/redaction.php --perform >> /var/log/schoolbox/geosnapshot.log 2>&1
 
 # Etherpad - sync back to MySQL - every hour
-0 * * * *	root	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
+0 * * * *	www-data	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
 
 # Complete quizzes that have expired
-*/20 * * * *	root	php /usr/share/schoolbox/tools/quiz/autoFinish.php >> /var/log/schoolbox/quiz.log 2>&1
+*/20 * * * *	www-data	php /usr/share/schoolbox/tools/quiz/autoFinish.php >> /var/log/schoolbox/quiz.log 2>&1
 
 # Pastoral DocMan upload - Every 5 minutes
-*/5 * * * *     root    php /usr/share/schoolbox/tools/docman/pastoralUpload.php >> /var/log/schoolbox/docman.log 2>&1
+*/5 * * * *     www-data    php /usr/share/schoolbox/tools/docman/pastoralUpload.php >> /var/log/schoolbox/docman.log 2>&1
 
 # Kami - Upload 'pending' documents every 3 minute
-*/3 * * * *   www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform -v >> /var/lib/schoolbox/cache/logs/kami.log 2>&1
+*/3 * * * *   www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform -v >> /var/log/schoolbox/kami.log 2>&1
 
 # Kami - Retry any 'failed' every day at 2:17am (offset by 2min from uploader)
-17 2 * * *    www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform --retry-failed -v >> /var/lib/schoolbox/cache/logs/kami-retry-failed.log 2>&1
+17 2 * * *    www-data    php /usr/share/schoolbox/tools/kami/upload.php --perform --retry-failed -v >> /var/log/schoolbox/kami.log 2>&1
 
 # SIS Data Importer - every hour
-0 * * * *	www-data	php /usr/share/schoolbox/tools/synchronise/scheduler.php >> /var/lib/schoolbox/cache/logs/sis-scheduler.log 2>&1
+0 * * * *	www-data	php /usr/share/schoolbox/tools/synchronise/scheduler.php >> /var/log/schoolbox/sis-scheduler.log 2>&1
 
 # Calendar: pre-parse any vCal files every 2 hours
-35 */2 * * *    www-data    /usr/share/schoolbox/tools/calendar/preparseVcalSubscription.php -v >> /var/lib/schoolbox/cache/logs/preparseVcalSubscription.log 2>&1
+35 */2 * * *    www-data    /usr/share/schoolbox/tools/calendar/preparseVcalSubscription.php -v >> /var/log/schoolbox/preparseVcalSubscription.log 2>&1
 
 # Data dir ownership - every 10 min - skip storage dir (just a hack until we fix this properly)
 */10 * * * * root /usr/share/schoolbox/tools/set-config-data-dirs-perms.sh --skip storage_dir --owner www-data --group www-data >> /var/log/schoolbox/set-config-data-dirs-perms.log 2>&1
 
 # Data dir ownership - nightly at 23:10 - only storage dir (just a hack until we fix this properly)
-10 23 * * * root /usr/share/schoolbox/tools/set-config-data-dirs-perms.sh --dir storage_dir --owner www-data --group www-data >> /var/log/schoolbox/set-config-storage-dir-perms.log 2>&1
+10 23 * * * root /usr/share/schoolbox/tools/set-config-data-dirs-perms.sh --dir storage_dir --owner www-data --group www-data >> /var/log/schoolbox/set-config-data-dirs-perms.log 2>&1
 
 # Submit system metrics to telegraf server every day at 3:15am
 # Pipe OUTPUT from php as INPUT to curl. Pipe ERROR from php + STDOUT/STDERR from curl to log file
@@ -95,6 +95,6 @@ MAILTO="support@schoolbox.com.au"
 0 2 * * * root /usr/share/schoolbox/tools/storage/transform-cleanup.php -p >> /var/log/schoolbox/transform-cleanup.log 2>&1
 
 # Intellischool Sync - every 30min
-*/30 * * * *	www-data	/usr/local/bin/jitter 600 php /usr/share/schoolbox/tools/intellischool/dataSync.php --force >> /var/lib/schoolbox/cache/logs/intellischool.log 2>&1
+*/30 * * * *	www-data	/usr/local/bin/jitter 600 php /usr/share/schoolbox/tools/intellischool/dataSync.php --force >> /var/log/schoolbox/intellischool.log 2>&1
 
 # End of file - do not delete

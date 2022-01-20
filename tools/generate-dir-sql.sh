@@ -39,5 +39,4 @@ echo "UPDATE config SET value='$instance_data_dir/files'          WHERE name='ba
 echo "UPDATE config SET value='$instance_data_dir/cache/zip'      WHERE name='zip_dir';"
 echo "UPDATE config SET value='$instance_data_dir/cache/stream'   WHERE name='stream_dir';"
 echo "UPDATE config SET value='$instance_data_dir/cache/portrait' WHERE name='portrait_dir';"
-echo "UPDATE config SET value='$instance_data_dir/cache/logs'     WHERE name='logs_dir';"
 echo "UPDATE config SET value='$instance_data_dir/storage'        WHERE name='storage_dir';"
