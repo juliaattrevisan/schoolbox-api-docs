@@ -59,6 +59,8 @@ $app = new class extends CliTool\App {
             'student_submissions' => 'SELECT COUNT(*) FROM student_submission WHERE deleted_at IS NULL',
             'feedback_self_graded' => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
             'feedback_teacher'  => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "instructor"',
+            'lti_response'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_response = 1',
+            'lti_feedback'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_feedback = 1',
             'course_unit_implementations' => 'SELECT count(*) FROM course_unit_implementation ci WHERE ci.deleted_at IS NULL',
             'course_unit_specifications'  => 'SELECT count(*) FROM course_unit_specification cs WHERE cs.deleted_at IS NULL',
             'course_specifications'       => 'SELECT COUNT(*) FROM course_specification WHERE deleted_at IS NULL',
@@ -72,6 +74,7 @@ $app = new class extends CliTool\App {
             'due_works'         => 'SELECT count(*) FROM submission_box sb JOIN assessment a ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL',
             'projects'          => 'SELECT count(*) FROM project JOIN assessment a ON a.id = project.assessment_id WHERE a.deleted_at IS NULL',
             'tasks'             => 'SELECT count(*) FROM task JOIN assessment a ON a.id = task.assessment_id WHERE a.deleted_at IS NULL',
+            'lti_assessment'    => 'SELECT count(*) FROM lti_assessment JOIN assessment a on lti_assessment.assessment_id = a.id WHERE a.deleted_at IS NULL',
             'due_work_rubrics'  => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND use_rubric = 1',
             'due_work_self_assessments' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND self_reviewability != "none"',
             'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
@@ -83,7 +86,8 @@ $app = new class extends CliTool\App {
             'plagscan_errors'   => 'SELECT count(*) FROM plagscan_document WHERE status = -1 and deleted_at is null',
             'kami_docs'         => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "done" and deleted_at is null',
             'kami_errors'         => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "error" and deleted_at is null',
-
+            'turnitin_docs'     => 'SELECT count(*) FROM turnitin_report WHERE status = "complete" and deleted_at is null',
+            'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
 
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
@@ -132,6 +136,12 @@ $app = new class extends CliTool\App {
             //Pastoral
             'pastoral_records'  => 'SELECT count(*) FROM `pastoral` WHERE deleted_at IS NULL',
             'pastoral_groups'   => 'SELECT count(*) FROM `pastoral_group` WHERE deleted_at IS NULL',
+            'pastoral_flags'   => 'SELECT COUNT(*) FROM lu_pastoral_type lpt LEFT JOIN lu_pastoral_subtype lps on lpt.id = lps.pastoral_type_id WHERE (lpt.icon IS NOT NULL OR lps.icon IS NOT NULL) AND lpt.deleted_at IS NULL AND lps.deleted_at IS NULL ',
+            'pastoral_templates'   => 'SELECT COUNT(*) FROM lu_pastoral_type lpt LEFT JOIN lu_pastoral_subtype lps on lpt.id = lps.pastoral_type_id WHERE
+            ((lpt.template IS NOT NULL AND  lpt.template != "") OR (lps.template IS NOT NULL AND lps.template != "")) AND lpt.deleted_at IS NULL AND lps.deleted_at IS NULL',
+            'pastoral_actions_total'  => 'SELECT COUNT(*) FROM pastoral_record_action WHERE deleted_at IS NULL',
+            'pastoral_actions_completed' => 'SELECT COUNT(*) FROM pastoral_record_action WHERE completed = 1 AND deleted_at IS NULL',
+            'pastoral_comment'   => 'SELECT COUNT(*) FROM pastoral_comment WHERE deleted_at IS NULL',
 
             //EOTC
             'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
