@@ -528,57 +528,9 @@ class Controller extends Base
         /**
          * grab all assignments for folderIds
          * with all the required information:
-         *
-         * from the v_assessment_relation table grab all entries for a folder_id, confirm their implementation / specification, course / unit ids, and save them
-            grab folder details for the current folder
-
-            grab folder.name from folder where folder_id
-            grab folder_code.code from folder_code where folder_id
-            grab lu_year_level.name from lu_year_level where lu_year_level.id = folder_year_level.year_level_id and folder_year_level.folder_id
-
-            from the assessment object grab title, course_managed (common assessment task), work type name from lu_work_type where work_type_id matches id
-
-            from the submission_box object
-            grab
-            submission_grade_group name where submission_grade_group_id matches id and submission_mark_type hr_name = letter
-            submission_mark_type hr_name where mark_type = submission_mark_type.mark_type_id
-            use_rubric, accept_submissions, multi_submission, similarity_check_enabled
-            rubric_capability.name where rubric_capability.id = rubric_capability_usage.rubric_capability_id and submission_box.id = rubric_capability_usage.submission_box_id
-         *
-         *
-         * the sql should be similar to:
-         * SELECT
-        v_assessment_relation.assessment_id AS assessmentId,
-        assessment.title AS assessmentTitle,
-        v_assessment_relation.folder_id AS folderID,
-        lu_work_type.name AS assessmentWorkType,
-        v_assessment_relation.course_implementation_id AS course_implementation_id,
-        v_assessment_relation.course_unit_implementation_id AS course_unit_implementation_id,
-        v_assessment_relation.course_specification_id AS course_specification_id,
-        v_assessment_relation.course_unit_specification_id AS course_unit_specification_id,
-        submission_box.accept_submission AS acceptSubmission,
-        submission_box.multi_submission AS multiSubmission,
-        submission_box.use_rubric AS useRubric,
-        submission_box.similarity_check_enabled AS simCheck,
-        markTypeTable.hr_name AS markType,
-        gradeGroupTable.name AS gradeGroup,
-        assessment.course_managed AS commonAssessment,
-        capabilityMarkTypeTable.hr_name AS capabilityMarkType,
-        capabilityGradeGroupTable.name AS capabilityGradeGroup
-
-        FROM v_assessment_relation
-        JOIN assessment ON assessment_id = assessment.id
-        JOIN submission_box ON assessment.id = submission_box.assessment_id
-        JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
-        LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
-        LEFT JOIN submission_mark_type as capabilityMarkTypeTable ON submission_box.rubric_capability_mark_type_id = capabilityMarkTypeTable.mark_type_id
-        LEFT JOIN submission_grade_group as gradeGroupTable ON submission_box.submission_grade_group_id = gradeGroupTable.id
-        LEFT JOIN submission_grade_group as capabilityGradeGroupTable ON submission_box.rubric_capability_grade_group_id = capabilityGradeGroupTable.id
-        WHERE v_assessment_relation.folder_id = 83
          */
 
         //grab all assignments and associated data
-
         $statement = $this->database->prepareQuery("SELECT
         v_assessment_relation.assessment_id AS assessmentId,
         assessment.title AS assessmentTitle,
@@ -624,28 +576,31 @@ class Controller extends Base
          * send csv data to the client
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            //grab course specification or implementationId
+            //grab COURSE specificationId or implementationId
             $courseFolderId = null;
             if (null !== $row['course_specification_id']) {
                 $courseFolderId = $row['course_specification_id'];
             } elseif (null !== $row['course_implementation_id']) {
                 $courseFolderId = $row['course_implementation_id'];
             }
-            //grab unit specification or implementationId
+
+            //grab UNIT specificationId or implementationId
             $unitCourseFolderId = null;
             if (null !== $row['course_unit_specification_id']) {
                 $unitCourseFolderId = $row['course_unit_specification_id'];
             } elseif (null !== $row['course_unit_implementation_id']) {
                 $unitCourseFolderId = $row['course_unit_implementation_id'];
             }
-            //workout why style of online submissions
+
+            //work out number of online submissions
             $onlineSubs = 'None';
             if ($row['multiSubmission']) {
                 $onlineSubs = 'Multiple';
             } elseif ($row['acceptSubmission']) {
                 $onlineSubs = 'Single';
             }
-            //Grading Scheme Scale, only show if using letter grade
+
+            //Grading and Capability Grading Scheme Scale, only show if using letter grade
             $markGradingSchemeScale = null;
             if ('Letter Grade' === $row['markType']) {
                 $markGradingSchemeScale = $row['gradeGroup'];
@@ -654,6 +609,8 @@ class Controller extends Base
             if ('Letter Grade' === $row['capabilityMarkType']) {
                 $capabilityGradeSchemeScale = $row['capabilityGradeGroup'];
             }
+
+            //build the row and send
             fputcsv($fp, [
                 $row['assessmentId'],
                 $row['assessmentTitle'],
@@ -674,9 +631,17 @@ class Controller extends Base
                 $capabilityGradeSchemeScale
             ]);
         }
+
+        //all done, close the file and exit
         fclose($fp);
         exit(1);
     }
+
+    /**
+     * Helper function to make it easier to read string bool than 1 / 0 in the csv export
+     * @param bool $value
+     * @return string
+     */
     private function boolToString(bool $value): string
     {
         switch ($value) {
