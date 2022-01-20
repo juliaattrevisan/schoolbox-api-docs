@@ -77,7 +77,8 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
 if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getDi()->get('config')->get('site_school_code'))) {
     $redirect = (new \Custom\Newic\Redirect(
         (string)$this->getDi()->get('config')->get(\Schoolbox\Config\ConfigMapper::_CANVAS_URL),
-        new \External\Canvas\Importer\CanvasDb()
+        new \External\Canvas\Importer\CanvasDb(),
+        $folderMapper->getDatabase()
     ))->generateFirstAvailableRedirect($folder);
 
     if (null !== $redirect) {

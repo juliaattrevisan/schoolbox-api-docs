@@ -8,7 +8,10 @@
 
 namespace Custom\Newic;
 
+use Alaress\IDatabase;
 use External\Canvas\Importer\CanvasDb;
+use External\IConnector;
+
 
 /**
  * Redirect from schoolbox homepage to canvas somewhere
@@ -44,15 +47,25 @@ class Redirect
 
 
     /**
+     * A direct connection to our local schoolbox db
+     *
+     * @var IDatabase
+     */
+    private IDatabase $db;
+
+
+    /**
      * Constructor.
      *
-     * @param string   $canvasUrl
-     * @param CanvasDb $canvasDb
+     * @param string     $canvasUrl
+     * @param CanvasDb   $canvasDb
+     * @param IDatabase  $db
      */
-    public function __construct(string $canvasUrl, CanvasDb $canvasDb)
+    public function __construct(string $canvasUrl, CanvasDb $canvasDb, IDatabase $db)
     {
         $this->canvasUrl = trim($canvasUrl);
         $this->canvasDb = $canvasDb;
+        $this->db = $db;
     }
 
 
@@ -104,12 +117,57 @@ class Redirect
     private function generateRedirect(string $folderCode): ?string
     {
         /* Append the current year, because that's a canvas convention apparently
+         * The original naive approach was to just go to the destination:
+         *
+                $courseCode = sprintf(
+                    '%s%s',
+                    $folderCode,
+                    date('Y')
+                );
          */
-        $courseCode = sprintf(
-            '%s%s',
-            $folderCode,
-            date('Y')
-        );
+        $query = "
+            SELECT f2.name
+            FROM folder_code fc
+            INNER JOIN folder f ON fc.folder_id = f.id
+            INNER JOIN course_implementation ci ON ci.folder_id = f.id
+            INNER JOIN course_specification cs ON ci.course_specification_id = cs.id
+            INNER JOIN folder f2 ON cs.folder_id = f2.id
+            WHERE fc.code = :folderCode
+            GROUP BY name
+        ";
+
+        $statement = $this->db->prepare($query);
+
+        $statement->execute([
+            'folderCode' => $folderCode
+        ]);
+
+        $row = $statement->fetch();
+
+        /* Couldn't find a course specification folder that matches $folderCode
+         * Something in the join tree didn't match, returning a null set
+         */
+        if (!$row) {
+            return null;
+        }
+
+        /* Otherwise, you get back a folder name like this:
+
+         * 11 IB Chemistry B 2022 (canvas-course-group-11SCICIBHLB2022)
+         *
+         * Now you have to regex out the course code
+         */
+        preg_match('/canvas-course-group-([A-za-z0-9]+)/', $row['name'], $matches);
+
+        /* Couldn't match the regex on the folder name
+         */
+        if (!isset($matches[1])) {
+            return null;
+        }
+
+        /* Otherwise, keep digging out the course code
+         */
+        $courseCode = $matches[1];
 
         /* Find out if $folderCode exists in canvas as a course identifier
          * Only care about the states "claimed" and "available", according to the cox
