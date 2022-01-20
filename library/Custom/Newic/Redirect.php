@@ -152,7 +152,7 @@ class Redirect
         }
 
         /* Otherwise, you get back a folder name like this:
-
+         *
          * 11 IB Chemistry B 2022 (canvas-course-group-11SCICIBHLB2022)
          *
          * Now you have to regex out the course code
