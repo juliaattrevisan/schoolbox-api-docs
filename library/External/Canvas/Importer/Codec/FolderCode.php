@@ -62,7 +62,7 @@ class FolderCode
         if (!isset($matches[1])) {
             /* Try next year
              */
-            $nextYear = $currentYear+1;
+            $nextYear = $currentYear + 1;
 
             preg_match("/(.*){$nextYear}$/", $canvasCourseCode, $matches);
         }
