@@ -506,7 +506,7 @@ class Controller extends Base
     }
 
     /**
-     * displays / downloads csv of all assessments within a folder
+     * downloads csv of all assessments within a folder
      *
      *
      * @api   GET /learning/assessment-audit/{folder}
@@ -579,7 +579,7 @@ class Controller extends Base
         $statement = $this->database->prepareQuery("SELECT
         v_assessment_relation.assessment_id AS assessmentId,
         assessment.title AS assessmentTitle,
-       v_assessment_relation.folder_id AS folderID,
+        v_assessment_relation.folder_id AS folderID,
         lu_work_type.name AS assessmentWorkType,
         v_assessment_relation.course_implementation_id AS course_implementation_id,
         v_assessment_relation.course_unit_implementation_id AS course_unit_implementation_id,
@@ -589,18 +589,20 @@ class Controller extends Base
         submission_box.multi_submission AS multiSubmission,
         submission_box.use_rubric AS useRubric,
         submission_box.similarity_check_enabled AS simCheck,
-        submission_mark_type.hr_name AS markType,
-        submission_grade_group.name AS gradeGroup,
+        markTypeTable.hr_name AS markType,
+        gradeGroupTable.name AS gradeGroup,
         assessment.course_managed AS commonAssessment,
-        submission_box.rubric_capability_mark_type_id AS capabilityMarkType,
-        submission_box.rubric_capability_grade_group_id AS capabilityGradeGroup
+        capabilityMarkTypeTable.hr_name AS capabilityMarkType,
+        capabilityGradeGroupTable.name AS capabilityGradeGroup
 
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
         JOIN submission_box ON assessment.id = submission_box.assessment_id
         JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
-        JOIN submission_mark_type ON submission_box.mark_type = submission_mark_type.mark_type_id
-        JOIN submission_grade_group ON submission_box.submission_grade_group_id = submission_grade_group.id
+        LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
+        LEFT JOIN submission_mark_type as capabilityMarkTypeTable ON submission_box.rubric_capability_mark_type_id = capabilityMarkTypeTable.mark_type_id
+        LEFT JOIN submission_grade_group as gradeGroupTable ON submission_box.submission_grade_group_id = gradeGroupTable.id
+        LEFT JOIN submission_grade_group as capabilityGradeGroupTable ON submission_box.rubric_capability_grade_group_id = capabilityGradeGroupTable.id
         WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")");
 
 
@@ -614,7 +616,7 @@ class Controller extends Base
         $fp = fopen("php://output", 'w');
         fputcsv($fp, $rowHeadings);
 
-        $exe = $statement->execute();
+        $statement->execute();
         /**
          * send csv data to the client
          */
@@ -640,12 +642,21 @@ class Controller extends Base
             } elseif ($row['acceptSubmission']) {
                 $onlineSubs = 'Single';
             }
+            //Grading Scheme Scale, only show if using letter grade
+            $markGradingSchemeScale = null;
+            if ('Letter Grade' === $row['markType']) {
+                $markGradingSchemeScale = $row['gradeGroup'];
+            }
+            $capabilityGradeSchemeScale = null;
+            if ('Letter Grade' === $row['capabilityMarkType']) {
+                $capabilityGradeSchemeScale = $row['capabilityGradeGroup'];
+            }
             fputcsv($fp, [
                 $row['assessmentId'],
                 $row['assessmentTitle'],
                 $row['folderID'],
                 $allFolders[$row['folderID']]->getName(),
-                'yearLevels',
+                implode(',', $allFolders[$row['folderID']]->getYearLevels()->getPropertyValues('name')),
                 $allFolders[$row['folderID']]->getCodeString(),
                 $courseFolderId,
                 $unitCourseFolderId,
@@ -654,10 +665,10 @@ class Controller extends Base
                 $onlineSubs,
                 $this->boolToString($row['simCheck']),
                 $row['markType'],
-                $row['gradeGroup'],
+                $markGradingSchemeScale,
                 $this->boolToString($row['useRubric']),
                 $row['capabilityMarkType'],
-                $row['capabilityGradeGroup']
+                $capabilityGradeSchemeScale
             ]);
         }
         fclose($fp);
