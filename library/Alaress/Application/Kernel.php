@@ -1496,11 +1496,18 @@ abstract class Kernel
             'setGenerator'  => $di->lazyNew(\Schoolbox\Notif\Queue\Bindings\Generator::class)
         ];
 
-        $di->set('subscriptionCache', $di->lazyNew(WriteCache::class, [
-            'redis' => $di->lazyGet('redis.storage'),
-            'log'   => $di->lazyValue('logger'),
-            'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class)
-        ]));
+        $di->set(
+            'subscriptionCache',
+            $di->lazyNew(
+                WriteCache::class,
+                [
+                    'redis'         => $di->lazyGet('redis.storage'),
+                    'log'           => $di->lazyValue('logger'),
+                    'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class),
+                    'redisQueue'    => $di->lazyGet('redis.queue.pub'),
+                ]
+            )
+        );
 
         $di->set(
             'subscriptionCache.readonly',
