@@ -15,41 +15,20 @@
 namespace Calendar\Event\Type\Submission;
 
 use Calendar\Event\Type\EventBase;
-use Custom\Mggs\Calendar\Event\Type\Submission as Mggs;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Event extends EventBase
 {
-    /**
-     * Format for rendering events for the MGGS PBL calendar.
-     */
-    public const RENDER_FORMAT_JSON_PBL = 'pbl-javascript';
-
 
     /* Contextual: The owner of the submission box
       */
     protected $authorId   = -1;
     protected $authorName = '';
 
-    /**
-     * Category which the event is related to
-     * @var Folder
-     */
-    protected $category = -1;
-
     /* TODO: Hardcoded?
      */
     protected $eventType = 'Due Work';
-
-    /**
-     * Is this an online assessment or not?
-     *
-     * @todo Debate whether this should be shoehorned into a submission event
-     *
-     * @var bool
-     */
-    protected $is_assessment = false;
 
     /**
      * The assessment that this event relates to.
@@ -101,38 +80,6 @@ class Event extends EventBase
     }
 
     /**
-     * @deprecated
-     * @param bool $is_assessment
-     *
-     * @return $this
-     */
-    public function setIsAssessment($is_assessment)
-    {
-//        $this->is_assessment = $is_assessment;
-        return $this;
-    }
-
-    /**
-     * @deprecated
-     * @return bool
-     */
-    public function getIsAssessment()
-    {
-        return true;
-//        return $this->is_assessment;
-    }
-
-    /**
-     * @deprecated
-     *
-     * @param Folder $category
-     */
-    public function setCategory($category)
-    {
-//        $this->category = $category;
-    }
-
-    /**
      * @return Folder
      */
     public function getCategory()
@@ -164,7 +111,6 @@ class Event extends EventBase
             self::RENDER_FORMAT_JSON     => Renderer\Javascript::class,
             self::RENDER_FORMAT_VCAL     => Renderer\VObject::class,
             self::RENDER_FORMAT_CSV      => Renderer\Csv::class,
-            self::RENDER_FORMAT_JSON_PBL => Mggs\Renderer\Javascript::class,
         ];
     }
 }

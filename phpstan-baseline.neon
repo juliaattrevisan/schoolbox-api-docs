@@ -1311,27 +1311,32 @@ parameters:
 			path: library/Custom/Lc/Survey/Controller.php
 
 		-
-			message: "#^Method Custom\\\\Mggs\\\\Calendar\\\\Event\\\\Type\\\\Submission\\\\Renderer\\\\Javascript\\:\\:getStatus\\(\\) should return string but returns null\\.$#"
-			count: 2
-			path: library/Custom/Mggs/Calendar/Event/Type/Submission/Renderer/Javascript.php
+			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
+			count: 1
+			path: library/Custom/Ms/Pastoral/Module.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: library/Custom/Ms/Pastoral/StudentInvolvement/Report/Factory.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
-			path: library/Custom/Mggs/Learning/Personalised/Admin/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getHouseMapper\\(\\) should return HouseMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Mggs/Learning/Upcoming/Controller.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Right side of && is always true\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getSubjectMapper\\(\\) should return Schoolbox\\\\External\\\\SubjectMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Mggs/Learning/Upcoming/Controller.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Custom/Ms/Pastoral/Module.php
 
