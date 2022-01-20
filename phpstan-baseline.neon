@@ -926,11 +926,6 @@ parameters:
 			path: library/Calendar/Event/Type/ResourceBooking/Renderer/VObject.php
 
 		-
-			message: "#^Property Calendar\\\\Event\\\\Type\\\\Submission\\\\Event\\:\\:\\$category \\(Schoolbox\\\\Resource\\\\Folder\\\\Model\\) does not accept default value of type int\\.$#"
-			count: 1
-			path: library/Calendar/Event/Type/Submission/Event.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 2
 			path: library/Calendar/Event/Type/Submission/Renderer/VObject.php
