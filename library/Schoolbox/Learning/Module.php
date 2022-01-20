@@ -225,6 +225,7 @@ class Module extends BaseModule
                 $database = $this->getInjector()->get('databaseInternal');
                 return new Folder\ClassListFactory($database);
             }),
+            'database'              => $this->getInjector()->get('databaseInternal'),
         ];
     }
 

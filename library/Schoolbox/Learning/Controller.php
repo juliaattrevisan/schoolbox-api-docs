@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
@@ -90,6 +91,12 @@ class Controller extends Base
      */
     private $rosettaStone;
 
+    /**
+     * for building the assessment query
+     * @var IConnector $database
+     */
+    private IConnector $database;
+
     private const LABEL_KEY = 'label';
 
     private const ISCHECKED_KEY = 'isChecked';
@@ -110,6 +117,7 @@ class Controller extends Base
      * @param Folder\Log\Mapper          $logMapper
      * @param External_ClassInterface    $externalClass
      * @param RosettaStone               $rosettaStone
+     * @param IConnector                 $database
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -122,7 +130,8 @@ class Controller extends Base
         UserMapper $userMapper,
         Folder\Log\Mapper $logMapper,
         External_ClassInterface $externalClass,
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        IConnector $database
     ) {
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
         $this->termMapper                 = $termMapper;
@@ -135,6 +144,7 @@ class Controller extends Base
         $this->logMapper                  = $logMapper;
         $this->externalClass              = $externalClass;
         $this->rosettaStone               = $rosettaStone;
+        $this->database               = $database;
     }
 
 
@@ -505,17 +515,94 @@ class Controller extends Base
      */
     public function getAssessmentAudit(Folder\Model $folder)
     {
-        $assMapper = Assessment\DataModel\Mapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
-        //get all children folders
-        $allFolders = $folderMapper->findAllChildren($folder->getId(), true);
-        //start finding the assessments within the current folder
-        $assessments = $assMapper->findAllForFolderId($folder->getId(), $assMapper->getPredicateBuilder());
-        foreach ($allFolders as $folder) {
-            //grab all assessments within each child folder
-            $ass = $assMapper->findAllForFolderId($folder->getId(), $assMapper->getPredicateBuilder());
-            $assessments = $assessments->merge($ass);
-        }
+        /**
+         * get all folders that we will be needing
+         * build and combine the folder array and hydrate the objects
+         */
+//        //get all children folders
+        $childrenFolders = $this->folderMapper->findAllChildren($folder->getId(), true);
+        $allFolders = new Collection([$folder]);
+        $allFolders = $allFolders->merge($childrenFolders);
+        $allFolders = $this->folderMapper->hydrateCollection($allFolders);
+
+        /**
+         * grab all assignments for folderIds
+         * with all the required information:
+         *
+         * from the v_assessment_relation table grab all entries for a folder_id, confirm their implementation / specification, course / unit ids, and save them
+            grab folder details for the current folder
+
+            grab folder.name from folder where folder_id
+            grab folder_code.code from folder_code where folder_id
+            grab lu_year_level.name from lu_year_level where lu_year_level.id = folder_year_level.year_level_id and folder_year_level.folder_id
+
+            from the assessment object grab title, course_managed (common assessment task), work type name from lu_work_type where work_type_id matches id
+
+            from the submission_box object
+            grab
+            submission_grade_group name where submission_grade_group_id matches id and submission_mark_type hr_name = letter
+            submission_mark_type hr_name where mark_type = submission_mark_type.mark_type_id
+            use_rubric, accept_submissions, multi_submission, similarity_check_enabled
+            rubric_capability.name where rubric_capability.id = rubric_capability_usage.rubric_capability_id and submission_box.id = rubric_capability_usage.submission_box_id
+         *
+         *
+         * the sql should be similar to:
+         * SELECT
+        v_assessment_relation.assessment_id AS assessmentId,
+        assessment.title AS assessmentTitle,
+        lu_work_type.name AS assessmentWorkType,
+        v_assessment_relation.course_implementation_id AS course_implementation_id,
+        v_assessment_relation.course_unit_implementation_id AS course_unit_implementation_id,
+        v_assessment_relation.course_specification_id AS course_specification_id,
+        v_assessment_relation.course_unit_specification_id AS course_unit_specification_id,
+        submission_box.accept_submission AS acceptSubmission,
+        submission_box.multi_submission AS multiSubmission,
+        submission_box.use_rubric AS useRubric,
+        submission_box.similarity_check_enabled AS simCheck,
+        submission_mark_type.hr_name AS markType,
+        submission_grade_group.name AS gradeGroup,
+        assessment.course_managed AS commonTask,
+        submission_box.rubric_capability_mark_type_id AS capabilityMarkType,
+        submission_box.rubric_capability_grade_group_id AS capabilityGradeGroup
+
+        FROM v_assessment_relation
+        JOIN assessment ON assessment_id = assessment.id
+        JOIN submission_box ON assessment.id = submission_box.assessment_id
+        JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+        JOIN submission_mark_type ON submission_box.mark_type = submission_mark_type.mark_type_id
+        JOIN submission_grade_group ON submission_box.submission_grade_group_id = submission_grade_group.id
+        WHERE v_assessment_relation.folder_id = 83
+         */
+
+        //grab all assignments and associated data
+
+        $statement = $this->database->prepareQuery("SELECT
+        v_assessment_relation.assessment_id AS assessmentId,
+        assessment.title AS assessmentTitle,
+       v_assessment_relation.folder_id AS folderID,
+        lu_work_type.name AS assessmentWorkType,
+        v_assessment_relation.course_implementation_id AS course_implementation_id,
+        v_assessment_relation.course_unit_implementation_id AS course_unit_implementation_id,
+        v_assessment_relation.course_specification_id AS course_specification_id,
+        v_assessment_relation.course_unit_specification_id AS course_unit_specification_id,
+        submission_box.accept_submission AS acceptSubmission,
+        submission_box.multi_submission AS multiSubmission,
+        submission_box.use_rubric AS useRubric,
+        submission_box.similarity_check_enabled AS simCheck,
+        submission_mark_type.hr_name AS markType,
+        submission_grade_group.name AS gradeGroup,
+        assessment.course_managed AS commonAssessment,
+        submission_box.rubric_capability_mark_type_id AS capabilityMarkType,
+        submission_box.rubric_capability_grade_group_id AS capabilityGradeGroup
+
+        FROM v_assessment_relation
+        JOIN assessment ON assessment_id = assessment.id
+        JOIN submission_box ON assessment.id = submission_box.assessment_id
+        JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+        JOIN submission_mark_type ON submission_box.mark_type = submission_mark_type.mark_type_id
+        JOIN submission_grade_group ON submission_box.submission_grade_group_id = submission_grade_group.id
+        WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")");
+
 
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
@@ -526,16 +613,62 @@ class Controller extends Base
 
         $fp = fopen("php://output", 'w');
         fputcsv($fp, $rowHeadings);
-        foreach ($assessments as $assessment) {
+
+        $exe = $statement->execute();
+        /**
+         * send csv data to the client
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            //grab course specification or implementationId
+            $courseFolderId = null;
+            if (null !== $row['course_specification_id']) {
+                $courseFolderId = $row['course_specification_id'];
+            } elseif (null !== $row['course_implementation_id']) {
+                $courseFolderId = $row['course_implementation_id'];
+            }
+            //grab unit specification or implementationId
+            $unitCourseFolderId = null;
+            if (null !== $row['course_unit_specification_id']) {
+                $unitCourseFolderId = $row['course_unit_specification_id'];
+            } elseif (null !== $row['course_unit_implementation_id']) {
+                $unitCourseFolderId = $row['course_unit_implementation_id'];
+            }
+            //workout why style of online submissions
+            $onlineSubs = 'None';
+            if ($row['multiSubmission']) {
+                $onlineSubs = 'Multiple';
+            } elseif ($row['acceptSubmission']) {
+                $onlineSubs = 'Single';
+            }
             fputcsv($fp, [
-                $assessment->getId(),
-                $assessment->getTitle(),
-//                $assessment->getContextFolder()->getId(),
-//                $assessment->getContextFolder()->getTitle(),
-//                $assessment->getContextFolder()->getCodeString(),
-//                $assessment->getWorkType()->getName()
+                $row['assessmentId'],
+                $row['assessmentTitle'],
+                $row['folderID'],
+                $allFolders[$row['folderID']]->getName(),
+                'yearLevels',
+                $allFolders[$row['folderID']]->getCodeString(),
+                $courseFolderId,
+                $unitCourseFolderId,
+                $row['assessmentWorkType'],
+                $this->boolToString($row['commonAssessment']),
+                $onlineSubs,
+                $this->boolToString($row['simCheck']),
+                $row['markType'],
+                $row['gradeGroup'],
+                $this->boolToString($row['useRubric']),
+                $row['capabilityMarkType'],
+                $row['capabilityGradeGroup']
             ]);
         }
         fclose($fp);
+    }
+    private function boolToString(bool $value): string
+    {
+        switch ($value) {
+            case 1:
+                return 'true';
+            default:
+                return 'false';
+        }
     }
 }
