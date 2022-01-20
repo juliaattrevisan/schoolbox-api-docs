@@ -112,11 +112,13 @@ class Redirect
         );
 
         /* Find out if $folderCode exists in canvas as a course identifier
+         * Only care about the states "claimed" and "available", according to the cox
          */
         $query = "
             SELECT *
             FROM course_dim
-            WHERE code = :courseCode  
+            WHERE code = :courseCode
+            AND workflow_state IN ('claimed', 'available')
         ";
 
         $statement = $this->canvasDb->build()->prepareQuery($query);
