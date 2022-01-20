@@ -66,13 +66,13 @@ class Controller extends Base
         switch ($jwtIdToUse) {
             case 'new':
                 // delete existing
-                $this->tokenMapper->deleteByColumn('user_id', $user->getId());
-                // generate
-                $jwtId     = $this->tokenMapper->generateUuid();
-                $userJwtId = $this->tokenMapper->createModel()
-                                               ->setUser($user)
-                                               ->setJwtId($jwtId);
+                $existing = $this->tokenMapper->findByColumn('user_id', $user->getId());
+                $this->tokenMapper->softDelete($existing);
+                // create new
+                $userJwtId = $this->tokenMapper->createModel()->setUser($user);
                 $this->tokenMapper->save($userJwtId);
+                // get the new one
+                $userJwtId    = $this->tokenMapper->findOneByColumn('user_id', $user->getId());
                 $showExisting = true;
                 break;
             case 'existing':

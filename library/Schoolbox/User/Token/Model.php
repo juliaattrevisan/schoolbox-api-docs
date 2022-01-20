@@ -12,10 +12,14 @@ declare(strict_types=1);
 namespace Schoolbox\User\Token;
 
 use Alaress_Date_Format;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 
-class Model
+class Model implements ISoftDeletable
 {
+    use DeletedAtDate;
+
     /**
      * @var string|null
      */

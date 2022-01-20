@@ -29,14 +29,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('jwt_id', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
         $this->uses('expiry', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-    }
-
-    /**
-     * @return string
-     */
-    public function generateUuid(): string
-    {
-        return md5(uniqid(mt_rand(), true));
     }
 }
