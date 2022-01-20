@@ -172,7 +172,6 @@ cleanup_deleted_and_log_files(){
   /vagrant/tools/gc-storage.php $long_verbose -n 10000000 -p;
   log "Cleaning: log and cache files";
   rm -f "$long_verbose" "$INSTANCE_DATA_DIR"/*.log{,.gz};
-  rm -f "$long_verbose" -R "$INSTANCE_DATA_DIR"/cache/logs;
   rm -f "$long_verbose" -R "$INSTANCE_DATA_DIR"/storage/css;
   /vagrant/tools/clean-cache-dir.sh
   /vagrant/tools/create-data-dirs.sh "$INSTANCE_DATA_DIR"
