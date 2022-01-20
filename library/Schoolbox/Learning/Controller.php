@@ -518,7 +518,9 @@ class Controller extends Base
         }
 
         //build the csv
-        $rowHeadings = ['AssessmentId', 'AssessmentTitle'];//, /*'folderId', 'folderName', 'classCode',*/ 'workType'];//, 'commonTask', 'OnlineSubs', 'SimCheck', 'MarkType'];
+        $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
+                        'UnitFolderId', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'GradingSchemeScale'];
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
 
