@@ -82,6 +82,15 @@ class Report extends CliTool\App
      * Recognised key patterns
      */
     private const KEY_PATTERNS = [
+//        Redis::INSTANCE_CACHE => [
+//            // Cache-only patterns go here
+//        ],
+//        Redis::INSTANCE_STORAGE => [
+//            // Storage-only patterns go here
+//        ],
+//        Redis::INSTANCE_QUEUE_PUBLISH => [
+//            // Queue patterns go here
+//        ],
         '^msg:' . INSTANCE_ID . ':m:.+',
         '^pad:g\.',
         '^msg:' . INSTANCE_ID . ':q:\D.+',
