@@ -21,8 +21,10 @@ class ListFactory implements IListFactory, Serializable
     /** @var string */
     private $instanceId;
 
-    /** @var ClientInterface */
-    private $redis;
+    /**
+     * The Redis instance where notification content is stored.
+     */
+    private ClientInterface $redis;
 
 
     /**
@@ -117,11 +119,15 @@ class ListFactory implements IListFactory, Serializable
     /**
      * Constructs the object from the serial string given
      *
+     * TODO remove serialize/unserialize methods?
+     *
      * @param string $serialized
      */
     public function unserialize($serialized)
     {
         $this->instanceId = $serialized;
-        $this->redis = Redis::getClientInstance(Redis::INSTANCE_CACHE); // TODO IoC
+
+        // Messages are stored in the persistent Redis instance
+        $this->redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE); // TODO IoC
     }
 }
