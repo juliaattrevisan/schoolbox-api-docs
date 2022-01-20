@@ -234,7 +234,8 @@ class PostMapper extends Mapper implements FeedableMapperInterface
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('thread', 'thread')},
-                   {$this->getJoinColumnString('owner', 'owner')}
+                   {$this->getJoinColumnString('owner', 'owner')},
+                   {$this->getJoinColumnString('parent', 'parent')}
         ";
     }
 
@@ -248,6 +249,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('thread', '', 'thread', false)}
             INNER JOIN {$this->getJoinSql('owner', '', 'owner', false)}
+            LEFT JOIN {$this->getJoinSql('parent', '', 'parent', false)}
         ";
     }
 
@@ -266,8 +268,13 @@ class PostMapper extends Mapper implements FeedableMapperInterface
         while ($row = $statement->fetch()) {
             $post = $this->hydrate($row)
                 ->setOwner($this->hydrateJoin($row, 'owner', 'owner'))
-                ->setParent($this->hydrateJoin($row, 'parent', 'parent'))
-            ;
+                ->setThread($this->hydrateJoin($row, 'thread', 'thread'));
+            /**
+             * check if the post has a parent, if so, hydrate
+             */
+            if (null !== $row['parentID']) {
+                $post->setParent($this->hydrateJoin($row, 'parent', 'parent'));
+            }
             $collection[$post->getId()] = $post;
         }
 
