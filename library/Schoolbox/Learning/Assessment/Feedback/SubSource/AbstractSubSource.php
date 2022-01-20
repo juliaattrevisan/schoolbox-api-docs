@@ -130,7 +130,7 @@ abstract class AbstractSubSource implements IFeedbackDataSource
 
                     // Also add assessment into the feedback's response,
                     // if it exists in `$assessments`
-                    if ($feedback->getResponse()) {
+                    if ($feedback->getResponse() && $feedback->getResponse()->getAssessable()) {
                         $responseAssessment = $assessments[$feedback->getResponse()->getAssessable()->getId()] ?? null;
                         if ($responseAssessment) {
                             $feedback->getResponse()->setAssessable($responseAssessment);
