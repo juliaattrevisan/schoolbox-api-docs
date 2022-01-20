@@ -31,6 +31,8 @@ class Redis
      * storing persistent data. The process of writing to permanent storage
      * makes this instance slower and less efficient than the cache-only
      * instance, so this should only be used when persistence is required.
+     *
+     * TODO consider splitting into message and session storage
      */
     public const INSTANCE_STORAGE = 'storage';
 
