@@ -110,7 +110,6 @@ HELP;
 
         $defaultDueTime = $this->getConfig()->get('lms_duetime_default');
 
-        $mapperFactory = $this->getDi()->get('mapperFactory');
         $result        = (new \Schoolbox\Assessment\Course\Import\CsvImporter(
             FolderMapper::getInstance(),
             UserMapper::getInstance(),
@@ -127,7 +126,6 @@ HELP;
                 UnitImplementationMapper::getInstance(),
                 Component_InstanceMapper::getInstance(),
                 Component_ConfigDefinitionMapper::getInstance(),
-
                 Component_ConfigMapper::getInstance()
             ),
             $this->getDi()->get('assessmentDataSource')
