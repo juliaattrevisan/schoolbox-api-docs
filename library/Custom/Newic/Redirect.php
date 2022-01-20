@@ -29,6 +29,20 @@ class Redirect
 
 
     /**
+     * Canvas urls for Due Works and Quizzes respectively
+     * Note that Due Works and Quizzes each have their own url
+     */
+    private const DUE_WORK_URL = '%s/assignments/%s';
+    private const QUIZ_URL = '%s/quizzes/%s';
+
+
+    /**
+     * The button renders with this text
+     */
+    private const NAME = 'View in Canvas';
+
+
+    /**
      * The host url for canvas instance at this school
      * Typically found in config.canvas_url
      *
@@ -78,14 +92,12 @@ class Redirect
      * @param IAssessable     $assessment
      * @return array|null
      * @throws \Alaress\Database\Exception
+     * @throws \PDOException
      */
     public function generateAssessmentRedirect(
         \Schoolbox\User $user,
         IAssessable $assessment
     ): ?array {
-        $canvasId = '';
-        $query = '';
-        $canvasUrl = '';
 
         /* If the currently logged in user is staff or students,
          * They can visit a link to canvas
@@ -95,18 +107,17 @@ class Redirect
             return null;
         }
 
-        /* Tasks, apparently, go nowhere
+        /* Go digging in the submission_box and assess tables via assessment_specification_implementation
+         * to find the external_id that was given to this assessment's specification
+         *
+         * Assessment implementations don't get an external_id set when you run import.php
+         * so you have to go ask its specification for it. I don't know what that is.
+         * It's an Andyism
          */
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Task\Model) {
-            return null;
-        }
 
-        /* Due Works have an external id somewhere
+        /* Due work
          */
         if ($assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
-            /** \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
-            $canvasId = trim((string)$assessment->getExternalId());
-
             /* Find out if external_id exists in canvas as an assignment identifier
              */
             $query = "
@@ -115,16 +126,18 @@ class Redirect
                 WHERE canvas_id = :assessmentCanvasId  
             ";
 
-            $canvasUrl = '%s/assignments/%s';
+            return $this->buildAssessmentUrl(
+                $assessment,
+                $query,
+                $this->findDueWorkExternalId($assessment),
+                self::DUE_WORK_URL
+            );
         }
 
-        /* Quizzes have an external id somewhere
+        /* Quiz
          */
         if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-            /** \Schoolbox\Learning\Assessment\Quiz\Model $assessment */
-            $canvasId = trim((string)$assessment->getExternalId());
-
-            /* Find out if external_id exists in canvas as an assignment identifier
+            /* Find out if external_id exists in canvas as a quiz identifier
              */
             $query = "
                 SELECT *
@@ -132,7 +145,116 @@ class Redirect
                 WHERE canvas_id = :assessmentCanvasId  
             ";
 
-            $canvasUrl = '%s/quizzes/%s';
+            return $this->buildAssessmentUrl(
+                $assessment,
+                $query,
+                $this->findQuizExternalId($assessment),
+                self::QUIZ_URL
+            );
+        }
+
+        /* I suppose Tasks and Projects might fall under this clause somehow
+         * no trabajo
+         */
+        return null;
+    }
+
+
+    /**
+     * For the given Due Work assessment,
+     * find its specification record and then grab its corresponding external_id value
+     * returns null if it can't be found for whatever reason
+     *
+     * @param IAssessable $assessment
+     * @return string|null
+     * @throws \PDOException
+     */
+    private function findDueWorkExternalId(IAssessable $assessment): ?string
+    {
+        $query = "
+            SELECT sb2.external_id
+            FROM submission_box sb
+            INNER JOIN assessment_specification_implementation asi ON sb.assessment_id = asi.implementation_assessment_id
+            INNER JOIN submission_box sb2 ON asi.specification_assessment_id = sb2.assessment_id
+            WHERE sb.assessment_id = :assessmentId
+        ";
+
+        $statement = $this->db->prepare($query);
+        $statement->execute([
+            'assessmentId' => $assessment->getId()
+        ]);
+
+        $row = $statement->fetch();
+
+        /* We didn't find the external_id via the specification
+         * I guess we just leave
+         */
+        if (!$row) {
+            return null;
+        }
+
+        /* Otherwise, grab it and go
+         */
+        return $row['external_id'];
+    }
+
+
+    /**
+     * For the given Quiz assessment,
+     * find its specification record and then grab its corresponding external_id value
+     * returns null if it can't be found for whatever reason
+     *
+     * @param IAssessable $assessment
+     * @return string|null
+     * @throws \PDOException
+     */
+    private function findQuizExternalId(IAssessable $assessment): ?string
+    {
+        $query = "
+            SELECT a2.external_id
+            FROM assess a
+            INNER JOIN assessment_specification_implementation asi ON a.assessment_id = asi.implementation_assessment_id
+            INNER JOIN assess a2 ON asi.specification_assessment_id = a2.assessment_id
+            WHERE a.assessment_id = :assessmentId
+        ";
+
+        $statement = $this->db->prepare($query);
+        $statement->execute([
+            'assessmentId' => $assessment->getId()
+        ]);
+
+        $row = $statement->fetch();
+
+        /* We didn't find the external_id via the specification
+         * I guess we just leave
+         */
+        if (!$row) {
+            return null;
+        }
+
+        /* Otherwise, grab it and go
+         */
+        return $row['external_id'];
+    }
+
+
+    /**
+     * Build a (url, name) tuple corresponding to a canvas url for the given assessment
+     *
+     * @param IAssessable $assessment
+     * @param string      $query
+     * @param string|null $canvasId
+     * @param string      $canvasUrl
+     * @return array|null
+     * @throws \Alaress\Database\Exception
+     * @throws \PDOException
+     */
+    private function buildAssessmentUrl(IAssessable $assessment, string $query, ?string $canvasId, string $canvasUrl): ?array
+    {
+        /* Didn't find a canvas identifier, thus I can't build the url; just leave
+         */
+        if (null === $canvasId) {
+            return null;
         }
 
         /* For the given duework/quiz assessment, look at the external id
@@ -142,19 +264,9 @@ class Redirect
          *
          * The existing function generateFirstAvailableRedirect()
          * can be used to generate the first half of the url
-         * to which you can append /assignments/123456
+         * to which you can append the suffixes
+         * /assignments/123456 or /quizzes/123456
          */
-        if ('' === $canvasId) {
-            return null;
-        }
-
-        /* No query? No trabajo
-         * I suppose Projects might fall under this clause somehow
-         */
-        if ('' === $query || '' === $canvasUrl) {
-            return null;
-        }
-
         $prefix = $this->generateFirstAvailableRedirect($assessment->getBaseContext()->getFolder());
 
         /* If we didn't find a meaningful $prefix, the folder code doesn't exist in canvas
@@ -190,7 +302,7 @@ class Redirect
                 rtrim($prefix, '/'),
                 $row['canvas_id']
             ),
-            'name' => 'View in Canvas'
+            'name' => self::NAME
         ];
     }
 
@@ -203,6 +315,7 @@ class Redirect
      * @param \Schoolbox\Resource\Folder\Model $folder
      * @return string|null
      * @throws \Alaress\Database\Exception
+     * @throws \PDOException
      */
     public function generateFirstAvailableRedirect(\Schoolbox\Resource\Folder\Model $folder): ?string
     {
@@ -235,10 +348,14 @@ class Redirect
         return null;
     }
 
+
     /**
      * Redirect from schoolbox homepage to canvas somewhere
      *
+     * @param string $folderCode
+     * @return string|null
      * @throws \Alaress\Database\Exception
+     * @throws \PDOException
      */
     private function generateRedirect(string $folderCode): ?string
     {
