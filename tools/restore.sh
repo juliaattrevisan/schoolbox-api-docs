@@ -884,6 +884,33 @@ else
 	echo -e " - OK";
 fi
 
+# Sync plan-type with instance registry
+function get_plan_type_from_instance_registry() {
+  local instance_registry_url="$(schoolbox-instance-registry --url)";
+  local puppet_cert="$(schoolbox-instance-registry --puppet-cert)";
+  local api_key="$(schoolbox-instance-registry --api-key)";
+
+  # send API request to IR - /api/hosts/{cert}/instances
+  local ir_host_instances_json="$(curl \
+    --silent \
+    "$instance_registry_url/api/v2/host/$puppet_cert/instances" \
+    -H "Authorization: Bearer $api_key" \
+    -H "Content-Type: application/json")";
+
+  echo "$ir_host_instances_json" \
+    | jq -r \
+      --arg instance_id "$destination_instance_id" \
+      '.ir_host_instances | .[] | select(.instance_id == $instance_id) | .plan_type';
+}
+
+plan_type="$(get_plan_type_from_instance_registry)";
+
+echo -e "\nSyncing plan type with instance registry"
+echo "Setting plan type to: '$plan_type'";
+
+# Invoke set-plan.php to sync plan with IR
+php set-plan.php --plan "$plan_type";
+
 # Restart schoolbox services
 echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
 /usr/share/"$package"/tools/notif/allrestart "$destination_instance_id"
