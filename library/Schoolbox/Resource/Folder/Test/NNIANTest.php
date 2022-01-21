@@ -392,8 +392,8 @@ class NNIANTest extends TestCase
 
 
     /**
-     * @param array $folderData
-     * @return GenericCollection|Folder\Model[]
+     * @param null|array $folderData
+     * @return GenericCollection
      * @throws UnexpectedValueException
      */
     private function getFolders(array $folderData = null): GenericCollection

@@ -48,7 +48,7 @@ use function preg_match;
  *
  * @package Schoolbox\Resource\Folder
  * @method null|Model getParent()
- * @method GenericCollection|self[] static createCollection()
+ * @method GenericCollection createCollection()
  */
 class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel
 {
