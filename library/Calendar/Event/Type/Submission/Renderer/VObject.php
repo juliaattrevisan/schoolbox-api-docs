@@ -32,6 +32,6 @@ class VObject extends Base
      */
     protected function getCategories(): string
     {
-        return $this->getEvent()->getIsAssessment() ? 'Quiz' : 'Due Work';
+        return $this->getEvent()->getAssessment()->getFamilyName() . ',' . $this->getEvent()->getAssessment()->getTypeName();
     }
 }
