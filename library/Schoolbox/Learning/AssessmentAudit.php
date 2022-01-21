@@ -89,7 +89,7 @@ class AssessmentAudit
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
                         'UnitFolderId', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
-                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale'];
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'SpecificationImplementation'];
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
 
@@ -101,19 +101,25 @@ class AssessmentAudit
          * send csv data to the client
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            //set if the assignment is a Specification or Implementation or not
+            $specImplem = null;
             //grab COURSE specificationId or implementationId
             $courseFolderId = null;
             if (null !== $row['course_specification_id']) {
+                $specImplem = 'Specification';
                 $courseFolderId = $row['course_specification_id'];
             } elseif (null !== $row['course_implementation_id']) {
+                $specImplem = 'Implementation';
                 $courseFolderId = $row['course_implementation_id'];
             }
 
             //grab UNIT specificationId or implementationId
             $unitCourseFolderId = null;
             if (null !== $row['course_unit_specification_id']) {
+                $specImplem = 'Specification';
                 $unitCourseFolderId = $row['course_unit_specification_id'];
             } elseif (null !== $row['course_unit_implementation_id']) {
+                $specImplem = 'Implementation';
                 $unitCourseFolderId = $row['course_unit_implementation_id'];
             }
 
@@ -153,7 +159,8 @@ class AssessmentAudit
                 $markGradingSchemeScale,
                 $this->boolToString($row['useRubric']),
                 $row['capabilityMarkType'],
-                $capabilityGradeSchemeScale
+                $capabilityGradeSchemeScale,
+                $specImplem
             ]);
         }
 
