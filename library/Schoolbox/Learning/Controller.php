@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
@@ -90,6 +91,12 @@ class Controller extends Base
      */
     private $rosettaStone;
 
+    /**
+     * for building the assessment query
+     * @var IConnector $database
+     */
+    private IConnector $database;
+
     private const LABEL_KEY = 'label';
 
     private const ISCHECKED_KEY = 'isChecked';
@@ -110,6 +117,7 @@ class Controller extends Base
      * @param Folder\Log\Mapper          $logMapper
      * @param External_ClassInterface    $externalClass
      * @param RosettaStone               $rosettaStone
+     * @param IConnector                 $database
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -122,7 +130,8 @@ class Controller extends Base
         UserMapper $userMapper,
         Folder\Log\Mapper $logMapper,
         External_ClassInterface $externalClass,
-        RosettaStone $rosettaStone
+        RosettaStone $rosettaStone,
+        IConnector $database
     ) {
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
         $this->termMapper                 = $termMapper;
@@ -135,6 +144,7 @@ class Controller extends Base
         $this->logMapper                  = $logMapper;
         $this->externalClass              = $externalClass;
         $this->rosettaStone               = $rosettaStone;
+        $this->database               = $database;
     }
 
 
@@ -493,5 +503,20 @@ class Controller extends Base
         }
 
         return json_encode($result);
+    }
+
+    /**
+     * downloads csv of all assessments within a folder
+     *
+     *
+     * @api   GET /learning/assessment-audit/{folder}
+     *
+     * @param Folder\Model $folder
+     */
+    public function getAssessmentAudit(Folder\Model $folder)
+    {
+        $assessmentAudit = new AssessmentAudit($this->folderMapper, $this->database);
+        $assessmentAudit->getAssessmentAudit($folder);
+        exit(1);
     }
 }

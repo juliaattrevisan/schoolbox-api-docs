@@ -15,9 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use InvalidArgumentException;
 use Twig\Error\LoaderError;
 use UnexpectedValueException;
-
-use function array_key_exists;
-
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -35,6 +32,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Timetable_ColourMapper;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Resource\Folder;
+
+use function array_key_exists;
 
 class Module extends BaseModule
 {
@@ -81,6 +80,7 @@ class Module extends BaseModule
         $this->register('GET', '/class/lists/{folderId}', 'getStudentListByClassId', $this->canAccessClassLists(), $preloadFolder);
 
         $this->register('GET', '/class/{folderId}', 'getClassListPage', $this->canAccessClassLists(), $preloadFolder);
+        $this->register('GET', '/assessment-audit/{folderId}', 'getAssessmentAudit', new Rule\IsSuperuser(), $preloadFolder);
     }
 
     /**
@@ -224,6 +224,7 @@ class Module extends BaseModule
                 $database = $this->getInjector()->get('databaseInternal');
                 return new Folder\ClassListFactory($database);
             }),
+            'database'              => $this->getInjector()->get('databaseInternal'),
         ];
     }
 
