@@ -731,7 +731,21 @@ class Controller extends Base
     public function postCommentInsert(Model $record): void
     {
         $post = $this->getRequest()->post;
-        if (!empty(trim($post["comment_body"]))) {
+        /**
+         * grab the users permission to the current pastoral record
+         */
+        $writePermission = null;
+        foreach ($record->getAccessWithPermission() as $perm) {
+            if ($writePermission < $perm->getAccessLevel($this->getUser())) {
+                $writePermission = $perm->getAccessLevel($this->getUser());
+            }
+        }
+        /**
+         * if the user does not have write permission to the pastoral entry, do not allow them to add a comment.
+         */
+        if (UserAccess::ACCESS_WRITE >= $writePermission) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
+        } else if (!empty(trim($post["comment_body"]))) {
             // Insert the comment to the internal database
             $comment = $this->pastoralCommentMapper->createModel();
             $comment->setPastoral($record);
