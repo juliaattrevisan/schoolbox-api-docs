@@ -580,6 +580,12 @@
     font-family: $font-family-icon;
 }
 
+.icon-notifications-hollow:before,
+.icon-bell-hollow:before {
+    content: '\e924';
+    font-family: $font-family-icon;
+}
+
 .icon-office-365:before {
     content: '\e64e';
     font-family: $font-family-icon;

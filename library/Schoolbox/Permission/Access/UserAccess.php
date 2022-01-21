@@ -141,6 +141,9 @@ class UserAccess implements IModel
     /** @var int */
     protected $accessLevel;
 
+    /** @var bool */
+    protected bool $favourite = false;
+
 
     /**
      * Returns the set of all known access levels
@@ -277,5 +280,23 @@ class UserAccess implements IModel
     public function getAccessLevel()
     {
         return $this->accessLevel;
+    }
+
+    /**
+     * @param bool $favourite
+     * @return self
+     */
+    public function setFavourite(bool $favourite): self
+    {
+        $this->favourite = $favourite;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getFavourite(): bool
+    {
+        return $this->favourite;
     }
 }

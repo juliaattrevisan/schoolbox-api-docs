@@ -96,14 +96,13 @@ class Mapper extends BaseMapper
     {
 
         $query = "
-            SELECT `ua`.sid, `f`.name, msg_reroute_override.delivery
+            SELECT `ua`.sid, `f`.name
             FROM userAccess `ua`
             JOIN `folder` AS `f` ON `f`.id = `ua`.sid AND `f`.`deleted_at` IS NULL
             JOIN `homepage_config` ON `f`.id = `homepage_config`.cid
-            LEFT JOIN `msg_reroute_override` ON `ua`.uid = msg_reroute_override.user_id AND msg_route_key = CONCAT('service.1.',f.id)
             WHERE `ua`.`service` = :service AND `ua`.`uid` = :userId
             AND `ua`.`type` != :userAccess
-            AND (msg_route_key is null OR `msg_reroute_override`.delivery != :muted )
+            AND `ua`.`favourite` = 1
             ORDER BY `f`.`name`
         ";
 
@@ -111,7 +110,6 @@ class Mapper extends BaseMapper
             'userId' => $user->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
             'userAccess' => UserAccess::ACCESS_AWAITING_AUTHORISATION,
-            'muted' => RoutePermission::MUTE,
         ];
 
         $statement = $this->getDatabase()->prepare($query);

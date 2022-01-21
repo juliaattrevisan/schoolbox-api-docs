@@ -202,6 +202,9 @@ module.exports = {
         // Class
         classList: './library/Schoolbox/Learning/vue/classList.js',
 
+        // Groups
+        manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
+
         // Pastoral
         pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
         pastoralRecordCommentsPublic: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js',

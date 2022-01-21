@@ -204,71 +204,6 @@ class Controller extends BaseController
         return $this->config;
     }
 
-
-    /**
-     * Does this user have
-     *
-     * @return array
-     */
-    protected function calculateFollowment()
-    {
-        // as much as we'd like get this as cached in session, we can't include subjects here
-        $accesses = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());
-
-        $folderIds = $accesses->getColumnValues('serviceIdentifier');
-
-        /** @var \Schoolbox\Collection|Folder\Model[] $folders */
-        $folders = $this->getFolderMapper()->findByColumn('id', $folderIds)->sortBy('name', 'asc');
-        $service = UserAccess::SERVICE_HOMEPAGE;
-
-        $muted = [
-            'unfollow' => $this->getUser()->getId(),
-            'disabled' => 0,
-        ];
-
-        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
-        foreach ($muted as $k => $id) {
-            $muted[$k] = $this->getRerouteOverrideMapper()
-                ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                ->map(
-                    function ($override) use ($routeKeyRegex) {
-                        /** @var RerouteOverride $override */
-                        preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                        return is_array($matches) ? $matches[1] : null;
-                    },
-                    false
-                )
-                ->getAll();
-        }
-
-        $followment = [];
-
-        // following
-        foreach ($folders as $folder) {
-            $forced = false;
-
-            // forced hydration
-            $folder = $this->getFolderMapper()
-                           ->findById($folder->getId());
-
-            if ($grp = $folder->getGroup()) {
-                $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
-            }
-
-            $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
-
-
-            $followment[$folder->getId()] = [
-                'name'   => $folder->getName(),
-                'follow' => $follow,
-                'force'  => $forced,
-            ];
-        }
-
-        return $followment;
-    }
-
-
     /**
      * Shows the message configuration form
      *
@@ -337,7 +272,6 @@ class Controller extends BaseController
                 'perms'   => $this->getConfig()->getPermissionList($digest, $mobile),
                 'digest'  => $digest,
                 'mobile'  => $mobile,
-                'groups'  => $this->calculateFollowment(),
                 'config'  => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
             ],
         ]);
@@ -353,7 +287,6 @@ class Controller extends BaseController
         $post = $this->getRequest()->post;
 
         $postData   = isset($post['data']) ? $post['data'] : [];
-        $postFollow = isset($post['follow']) ? $post['follow'] : [];
 
         $conf = [];
 
@@ -364,11 +297,6 @@ class Controller extends BaseController
                     $conf[$slug][$key][$sourceId] = $this->getConfig()->persistUser($this->getUser(), $slug, $key, $settings);
                 }
             }
-        }
-
-        // update following if it was sent
-        if (count($postFollow)) {
-            $conf['follow'] = $this->getConfig()->persistFollow($this->getUser(), $postFollow);
         }
 
         if ($this->getRequest()->isXhr()) {

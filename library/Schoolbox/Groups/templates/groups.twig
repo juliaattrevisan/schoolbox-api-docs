@@ -1,0 +1,10 @@
+<div id="manage-groups-container">
+    <manage-groups
+        endpoint-add="{{ endpointAdd }}"
+        endpoint-delete="{{ endpointDelete }}"
+        endpoint-notify="{{ endpointNotify }}"
+        endpoint-favourite="{{ endpointFavourite }}"
+        :groups="{{ groupList|json_encode }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/manageGroups.js"></script>

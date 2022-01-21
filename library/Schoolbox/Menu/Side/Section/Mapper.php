@@ -41,7 +41,7 @@ class Mapper extends BaseMapper
             'subjects' => 'My Subjects',
             'menu' => $config->get('title'),
             'children' => 'My Students',
-            'groups' => 'My Groups',
+            'groups' => 'My favourite groups',
             'bookmarks' => 'My Links'
         ];
     }

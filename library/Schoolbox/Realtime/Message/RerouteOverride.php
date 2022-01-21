@@ -31,10 +31,12 @@ class RerouteOverride
 
     /**
      * @param string $msgRouteKey
+     * @return static
      */
     public function setRouteKey($msgRouteKey)
     {
         $this->routeKey = $msgRouteKey;
+        return $this;
     }
 
     /**
@@ -65,10 +67,12 @@ class RerouteOverride
 
     /**
      * @param User $user
+     * @return static
      */
     public function setUser($user)
     {
         $this->user = $user;
+        return $this;
     }
 
     /**

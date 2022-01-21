@@ -506,7 +506,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Get group
      *
-     * @return \Schoolbox\Resource\Group
+     * @return null|\Schoolbox\Resource\Group
      */
     public function getGroup()
     {
