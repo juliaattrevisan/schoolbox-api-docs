@@ -1436,16 +1436,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\TeacherFetcher\\:\\:getStaffUsers\\(\\) should return iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\IModel\\>&Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/TeacherFetcher.php
-
-		-
-			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\TeacherFetcher\\:\\:getStaffWhoGaveFeedback\\(\\) should return iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\IModel\\>&Schoolbox\\\\GenericCollection\\.$#"
-			count: 2
-			path: library/Custom/Tigs/Summative/SubjectReport/TeacherFetcher.php
-
-		-
 			message: "#^Method DAV_Auth_Digest\\:\\:getDigestHash\\(\\) should return string\\|null but returns false\\.$#"
 			count: 1
 			path: library/DAV/Auth/Digest.php

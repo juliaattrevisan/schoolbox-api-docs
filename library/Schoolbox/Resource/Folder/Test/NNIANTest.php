@@ -399,7 +399,7 @@ class NNIANTest extends TestCase
     private function getFolders(array $folderData = null): GenericCollection
     {
         $folderData = $folderData ?? self::FOLDER_DATA;
-        $folders    = \Schoolbox\Resource\Folder\Mapper::getInstance()->createCollection(;
+        $folders    = \Schoolbox\Resource\Folder\Mapper::getInstance()->createCollection();
         $folders->setOffset(Folder\Model::ROOT_ID, (new Folder\Model())->setId(Folder\Model::ROOT_ID));
         foreach ($folderData as [$id, $parentId, $inherit]) {
             $folders->setOffset(
