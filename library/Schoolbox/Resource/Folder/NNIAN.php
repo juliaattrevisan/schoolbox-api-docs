@@ -113,7 +113,7 @@ class NNIAN
      * The first item will be the passed in folder, the last item will be the NNIAN folder.
      *
      * @param Model $folder Must have folder.id hydrated
-     * @return GenericCollection<Model>|Model[] Indexed by folder.id
+     * @return GenericCollection Indexed by folder.id
      * @throws DefinitionException
      * @throws Deleted
      * @throws Exception
@@ -134,7 +134,7 @@ class NNIAN
         }
 
         // Folders from $folder to NNIAN, inclusive
-        $interimNodes = (Model::createCollection())->setOffset($folder->getId(), $folder);
+        $interimNodes = \Schoolbox\Resource\Folder\Mapper::getInstance()->createCollection()->setOffset($folder->getId(), $folder);
         $node         = $folder;
         while ($node->getInherit()) {
             // Check we don't have a cyclic inheritance tree (where cycle composed of 3+ nodes)

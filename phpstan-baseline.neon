@@ -1436,16 +1436,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\TeacherFetcher\\:\\:getStaffUsers\\(\\) should return iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\IModel\\>&Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/TeacherFetcher.php
-
-		-
-			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\TeacherFetcher\\:\\:getStaffWhoGaveFeedback\\(\\) should return iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\IModel\\>&Schoolbox\\\\GenericCollection\\.$#"
-			count: 2
-			path: library/Custom/Tigs/Summative/SubjectReport/TeacherFetcher.php
-
-		-
 			message: "#^Method DAV_Auth_Digest\\:\\:getDigestHash\\(\\) should return string\\|null but returns false\\.$#"
 			count: 1
 			path: library/DAV/Auth/Digest.php
@@ -7706,27 +7696,12 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Model.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\) but returns Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
-			message: "#^PHPDoc tag @return with type array\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Resource\\\\Folder\\\\Model and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 

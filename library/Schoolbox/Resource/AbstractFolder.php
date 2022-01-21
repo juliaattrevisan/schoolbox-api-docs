@@ -167,7 +167,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Get parent
      *
-     * @return self
+     * @return null|AbstractFolder
      */
     public function getParent()
     {

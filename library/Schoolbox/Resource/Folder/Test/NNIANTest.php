@@ -392,14 +392,14 @@ class NNIANTest extends TestCase
 
 
     /**
-     * @param array $folderData
-     * @return GenericCollection|Folder\Model[]
+     * @param null|array $folderData
+     * @return GenericCollection
      * @throws UnexpectedValueException
      */
     private function getFolders(array $folderData = null): GenericCollection
     {
         $folderData = $folderData ?? self::FOLDER_DATA;
-        $folders    = Folder\Model::createCollection();
+        $folders    = \Schoolbox\Resource\Folder\Mapper::getInstance()->createCollection();
         $folders->setOffset(Folder\Model::ROOT_ID, (new Folder\Model())->setId(Folder\Model::ROOT_ID));
         foreach ($folderData as [$id, $parentId, $inherit]) {
             $folders->setOffset(
@@ -421,8 +421,8 @@ class NNIANTest extends TestCase
     /**
      * Returns a mock Folder Mapper whose methods will simulate a specific folder tree
      *
-     * @param GenericCollection|Folder\Model[] $folders
-     * @param bool                             $isCacheEnabled
+     * @param GenericCollection $folders
+     * @param bool              $isCacheEnabled
      * @return Folder\Mapper
      * @throws Framework\Exception
      */

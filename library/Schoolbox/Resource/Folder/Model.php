@@ -47,8 +47,8 @@ use function preg_match;
  * The SBFS Folder Model. Represents a folder within SBFS.
  *
  * @package Schoolbox\Resource\Folder
- * @method Model getParent()
- * @method static GenericCollection|self[] createCollection()
+ * @method null|Model getParent()
+ * @method GenericCollection createCollection()
  */
 class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel, IModel
 {
