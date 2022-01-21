@@ -66,6 +66,13 @@ class Model extends AbstractAssessment
      */
     private $completionMessage;
 
+    /**
+     * External system identifier
+     *
+     * @var null|string
+     */
+    private $externalId;
+
 
     /**
      * @return string
@@ -386,5 +393,25 @@ class Model extends AbstractAssessment
     public function getFeedbackClass()
     {
         return QuizReview::class;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

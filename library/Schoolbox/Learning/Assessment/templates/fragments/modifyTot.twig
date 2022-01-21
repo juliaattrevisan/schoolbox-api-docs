@@ -10,9 +10,13 @@
  # @param string|null   $similarityReportRoute  (optional) the route to the Similarity Report for this Due Work
  # @param bool          $canShowcase            a boolean for students' ability to Showcase to their eportfolio
  # @param bool          $isShowcased            whether this assessment is already showcased on a user's eportfolio
+ # @param array         $externalRedirectUrl    A third party redirect url/application name tuple (url, name)
  #}
-{% if viewRoute or modifyRoute or (similarityReportRoute is defined and similarityReportRoute) or (canShowcase is defined and canShowcase) %}
+{% if viewRoute or modifyRoute or (similarityReportRoute is defined and similarityReportRoute) or (canShowcase is defined and canShowcase) or (externalRedirectUrl is defined and externalRedirectUrl) %}
     <nav>
+        {% if externalRedirectUrl is defined and externalRedirectUrl %}
+            <a href="{{ externalRedirectUrl.url }}" class="icon-view alert" title="{{ externalRedirectUrl.name }}"></a>
+        {% endif %}
         <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul data-dropdown-content id="header-options" class="f-dropdown">
