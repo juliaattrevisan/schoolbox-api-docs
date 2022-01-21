@@ -5046,16 +5046,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Factory.php
 
 		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Component.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Filter/Filters/Assessment/NullableContext/Project/Factory.php
-
-		-
 			message: "#^Class Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\RubricUsage\\\\Definition referenced with incorrect case\\: Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\RubricUsage\\\\DEFINITION\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
