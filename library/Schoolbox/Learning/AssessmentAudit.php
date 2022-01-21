@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Downloads csv of all assessments within a folder and children folders
+ * where the assessments are not deleted
+ * /learning/assessment-audit/{folder}
+ *
+ * @author      Justin Clarke <justin.clarke@schoolbox.com.au>
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 namespace Schoolbox\Learning;
 
 use Alaress\Database\Connector\IConnector;
