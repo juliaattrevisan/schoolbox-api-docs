@@ -7706,11 +7706,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
 		-
-			message: "#^PHPDoc tag @return with type array\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
