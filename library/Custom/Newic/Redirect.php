@@ -131,6 +131,11 @@ class Redirect
             INNER JOIN course_specification cs ON ci.course_specification_id = cs.id
             INNER JOIN folder f2 ON cs.folder_id = f2.id
             WHERE fc.code = :folderCode
+            AND fc.deleted_at IS NULL
+            AND f.deleted_at IS NULL
+            AND ci.deleted_at IS NULL
+            AND cs.deleted_at IS NULL
+            AND f2.deleted_at IS NULL
             GROUP BY name
         ";
 
