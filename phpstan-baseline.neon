@@ -7706,11 +7706,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Model.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\) but returns Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
@@ -7722,11 +7717,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @return with type array\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Resource\\\\Folder\\\\Model and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
