@@ -175,11 +175,6 @@ class AssessmentAudit
      */
     private function boolToString(bool $value): string
     {
-        switch ($value) {
-            case 1:
-                return 'true';
-            default:
-                return 'false';
-        }
+        return $value ? 'true' : 'false';
     }
 }
