@@ -553,7 +553,7 @@ class Controller extends Base
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
         JOIN submission_box ON assessment.id = submission_box.assessment_id
-        JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+        LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
         LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
         LEFT JOIN submission_mark_type as capabilityMarkTypeTable ON submission_box.rubric_capability_mark_type_id = capabilityMarkTypeTable.mark_type_id
         LEFT JOIN submission_grade_group as gradeGroupTable ON submission_box.submission_grade_group_id = gradeGroupTable.id
