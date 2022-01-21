@@ -109,7 +109,7 @@ export default {
 
     created () {
         this.selectionTypes = selectionTypes; //to access within the template   
-        this.$emit('on-groups-filtered', this.groupsFiltered, false); //dipsatch to set up the initial group selection on manage-groups.vue
+        this.$emit('on-groups-filtered', this.groupsFiltered); //dipsatch to set up the initial group selection on manage-groups.vue
     },
 
     mounted () {

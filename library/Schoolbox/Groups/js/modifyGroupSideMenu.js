@@ -3,39 +3,62 @@
  *
  */
 
+import { insertElementBefore, insertElementAfter } from '@js/util/domUtils';
+import { slideDown } from '@js/util/animateUtils';
+
 const sideMenuId = 'side-menu-mygroups';
 
+
 /**
- * Add the group link to the side menu
+ * Add the group newLink to the side menu
  * 
  * @param { String } 
  * @param { String }
  */
 export function addGroupToSideMenu (title, href) {
-    
     if (document.getElementById(sideMenuId)) { //may not be set to display in the admin settings 
+        const newElement = getListItem(title, href);
+        insertSortedAlphabetically(newElement);
+        document.getElementById(sideMenuId).classList.remove('hide'); //ensure the list is visible, as this newLink could have been the first
+        slideDown(newElement);
+    }
+}
 
-        const groupLinks = document.getElementById(sideMenuId).querySelector('ul');
+/**
+ * Create the new list link
+ * 
+ * @param { String } 
+ * @param { String }
+ */
+function getListItem (title, href) {
+    const newLink = document.createElement('a');
+    newLink.setAttribute('href', href);
+    newLink.innerText = title;
+    const newElement = document.createElement('li');
+    newElement.appendChild(newLink);
+    return newElement;
+}
 
-        const link = document.createElement('a');
-        link.setAttribute('href', href);
-        link.innerText = title;
-        
-        const linkListItem = document.createElement('li');
-        linkListItem.appendChild(link);
-        groupLinks.appendChild(linkListItem);
+/**
+ * Inser the new link into the list in the correct alphabetically sorted position
+ * 
+ * @param { HTMLLIElement } 
+ */
+function insertSortedAlphabetically (newElement) {
 
-        const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' }); //to sort naturally
-        const groupLinksArray = [...groupLinks.children]; //get the children so we can sort
-        groupLinksArray.sort((a,b) => { //sort alphabetically
-            return collator.compare(a.innerText, b.innerText);
-        });
-        groupLinksArray.forEach((node) => { //use the newly sorted array to update the children
-            groupLinks.appendChild(node);
-        });
+    const groupLinks = document.getElementById(sideMenuId).querySelector('ul');
+    const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' }); //to sort naturally
 
-        document.getElementById('side-menu-mygroups').classList.remove('hide'); //ensure the list is visible, as this link could have been the first
-
+    let isAlreadyInserted = false;
+    [...groupLinks.children].forEach((element) => {
+        const isAboveElement = collator.compare(element.innerText, newElement.innerText) === 1 ? true : false; //can add current element if true
+        if (isAboveElement && !isAlreadyInserted) {
+            insertElementBefore(element, newElement);
+            isAlreadyInserted = true; //don't keep looping through the list
+        }
+    });
+    if (!isAlreadyInserted) { //must be at the end if it's not already inserted
+        insertElementAfter(groupLinks.lastChild, newElement);
     }
 
 }
@@ -51,10 +74,9 @@ export function addGroupToSideMenu (title, href) {
 
         const groupLinks = document.getElementById(sideMenuId).querySelector('ul');
 
-        const groupLinksArray = [...groupLinks.children];
-        groupLinksArray.forEach((node, index) => { //look through the list, finding the matched id
-            if (node.querySelector('a').href.includes(`/${id}/`)) {
-                groupLinks.removeChild(node); //and remove once found
+        [...groupLinks.children].forEach((element) => { //look through the list, finding the matched id
+            if (element.querySelector('a').href.includes(`/${id}/`)) {
+                groupLinks.removeChild(element); //and remove once found
                 return;
             }
         });
