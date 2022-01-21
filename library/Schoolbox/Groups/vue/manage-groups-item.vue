@@ -95,7 +95,7 @@ export default {
         getImageStyles () {
             let imageStyles = {
                 backgroundColor: `#${this.group.colour}`,
-                borderBottom: `10px solid #${this.group.colour}`,
+                // borderLeft: `10px solid #${this.group.colour}`,
             }
             if (this.group.coverImageHash) {
                 imageStyles = { 
@@ -296,7 +296,7 @@ export default {
                         <button v-else class="group-action icon-favourite-hollow" title="Add to Favourites" key="add-favourite" @click="addToFavourites">Add to Favourites</button>
                         <template v-if="!group.isForceFollow">
                             <button v-if="isNotificationsOn" class="group-action icon-notifications" title="Remove from Notifications" key="remove-notification" @click="removeFromNotifications">Remove from Notifications</button>
-                            <button class="group-action icon-notifications-hollow" title="Add to Notifications" key="add-notification" @click="addToNotifications">Add to Notifications</button>
+                            <button v-else class="group-action icon-notifications-hollow" title="Add to Notifications" key="add-notification" @click="addToNotifications">Add to Notifications</button>
                         </template>
                     </div>
                 </div>
@@ -340,8 +340,7 @@ export default {
 }
 
 .group-actions { //to put them in the top right corner
-    background: rgba(43, 51, 63, 0.85);
-    border: 2px solid white;
+    background: rgba(0, 102, 176, 0.85);
     display: inline-block;
     position: absolute;
     right: 10px;
