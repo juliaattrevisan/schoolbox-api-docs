@@ -91,6 +91,20 @@ class Report extends CliTool\App
     ];
 
     /**
+     * Redis instances which are aliases of one another.
+     *
+     * Keys which are found in an instance but aren't in `self::KEY_PATTERNS`
+     * for that instance are ignored if they are in one of the aliases key
+     * patterns.
+     */
+    private const REDIS_INSTANCE_ALIASES = [
+        [
+            Redis::INSTANCE_CACHE,
+            Redis::INSTANCE_QUEUE_PUBLISH,
+        ]
+    ];
+
+    /**
      * Recognised key patterns
      */
     private const KEY_PATTERNS = [
@@ -280,12 +294,15 @@ class Report extends CliTool\App
                 // Log every 1000 at a higher level to show progression at less verbosity
                 $level = $count % 1000 === 0 ? Logger::NOTICE : Logger::DEBUG;
                 $this->getLogger()->log($level, "$count) $key");
-                [$keyPattern, $payload, $ttl, $length] = $this->processKey($redis, $key, $instanceName);
-                $rawData[$keyPattern][$payload][] = [
-                    'ttl'    => $ttl,
-                    'length' => $length,
-                ];
-                $count++;
+                $processed = $this->processKey($redis, $key, $instanceName);
+                if (isset($processed)) {
+                    [$keyPattern, $payload, $ttl, $length] = $this->processKey($redis, $key, $instanceName);
+                    $rawData[$keyPattern][$payload][] = [
+                        'ttl'    => $ttl,
+                        'length' => $length,
+                    ];
+                    $count++;
+                }
             }
         }
         return $rawData;
@@ -300,9 +317,13 @@ class Report extends CliTool\App
      * @param string                 $instanceName The name of the instance to
      *                                             scan: used to filter the list
      *                                             of keys to process
-     * @return array
+     * @return array{string, string, int, int}|null
+     *         [key pattern, payload type, ttl, length], or null if this key is
+     *         to be ignored completely in the report.
+     *         (This happens if this key is not in `$instanceName`'s keys, but
+     *          is in an alias' keys.)
      */
-    private function processKey(Predis\ClientInterface $redis, string $key, string $instanceName): array
+    private function processKey(Predis\ClientInterface $redis, string $key, string $instanceName): ?array
     {
         /** @var Predis\Response\Status $type */
         $type = $redis->type($key);
@@ -342,6 +363,23 @@ class Report extends CliTool\App
                 }
                 foreach ($patterns as $pattern) {
                     if (preg_match("/$pattern/", $key)) {
+                        // Check each alias
+                        foreach (self::REDIS_INSTANCE_ALIASES as $alias) {
+                            if (in_array($instanceName, $alias) && in_array($keyPatternInstanceName, $alias)) {
+                                // This key pattern is referred to in an alias:
+                                // ignore it completely
+                                $this->getLogger()->debug(
+                                    sprintf(
+                                        'Aliased key: %s expected in %s, found in alias %s',
+                                        $key,
+                                        $keyPatternInstanceName,
+                                        $instanceName,
+                                    )
+                                );
+                                return null;
+                            }
+                        }
+
                         $this->getLogger()->warning(
                             sprintf(
                                 'Misplaced key: %s expected in %s, found in %s',
