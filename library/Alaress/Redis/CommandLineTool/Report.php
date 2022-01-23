@@ -346,8 +346,8 @@ class Report extends CliTool\App
                             sprintf(
                                 'Misplaced key: %s expected in %s, found in %s',
                                 $key,
-                                $instanceName,
                                 $keyPatternInstanceName,
+                                $instanceName,
                             )
                         );
                         $keyPattern = 'misplaced';
