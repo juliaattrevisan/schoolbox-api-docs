@@ -82,55 +82,116 @@ class Report extends CliTool\App
      * Recognised key patterns
      */
     private const KEY_PATTERNS = [
-//        Redis::INSTANCE_CACHE => [
-//            // Cache-only patterns go here
-//        ],
-//        Redis::INSTANCE_STORAGE => [
-//            // Storage-only patterns go here
-//        ],
-//        Redis::INSTANCE_QUEUE_PUBLISH => [
-//            // Queue patterns go here
-//        ],
-        '^msg:' . INSTANCE_ID . ':m:.+',
-        '^pad:g\.',
-        '^msg:' . INSTANCE_ID . ':q:\D.+',
-        // Old remember me format
-        "^[0-9a-f]{40}$",
-        // New remember me format
-        "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
-        '^msg:' . INSTANCE_ID . ':s:.+',
-        '^token2author:',
-        '^author2sessions:',
-        '^mapper2author:',
-        '^group2sessions:g\.',
-        // Old and new scrub
-        '^scrub.html:',
-        '^scrub.htmlAbsoluteUri:',
-        '^fc:' . INSTANCE_ID . ':scrub.html:',
-        '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
-        // Old and new Verso API
-        '^verso_api',
-        '^fc:' . INSTANCE_ID . ':verso_api:',
-        '^sessionstorage:',
-        '^globalAuthor:',
-        '^ueberDB:keys:',
-        '^PHPREDIS_SESSION:',
-        '^pad2readonly:g\.',
-        '^readonly2pad:r\.',
-        '^group:g\.',
-        '^session:s\.',
-        '^msg:' . INSTANCE_ID . ':q:\d+:unread',
-        '^msg:' . INSTANCE_ID . ':q:\d+:listed',
-        '^msg:' . INSTANCE_ID . ':q:\d+:digest',
-        "^m:" . INSTANCE_ID . ":routes",
-        "^schedule:" . INSTANCE_ID . ":index",
-        "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
-        "^groups$",
-        // Old and new external
-        "^External_.+",
-        '^fc:' . INSTANCE_ID . ':External_',
-        "^vcal.[0-9a-f]{64}",
-        '^accessToken:' . INSTANCE_ID . ':.+',
+        // Cache-only patterns go here
+        Redis::INSTANCE_CACHE => [
+            // Old and new scrub
+            '^scrub.html:',
+            '^scrub.htmlAbsoluteUri:',
+            '^fc:' . INSTANCE_ID . ':scrub.html:',
+            '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
+
+            // Old and new Verso API
+            '^verso_api',
+            '^fc:' . INSTANCE_ID . ':verso_api:',
+
+            // Old and new external
+            "^External_.+",
+            '^fc:' . INSTANCE_ID . ':External_',
+
+            // vCal cache
+            "^vcal.[0-9a-f]{64}",
+        ],
+        // Storage-only patterns go here
+        Redis::INSTANCE_STORAGE => [
+            // Old and new remember me
+            "^[0-9a-f]{40}$",
+            "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
+
+            // Message contents
+            '^msg:' . INSTANCE_ID . ':m:.+',
+
+            // Pointer to messages?
+            '^msg:' . INSTANCE_ID . ':s:.+',
+
+            // Sessions
+            '^PHPREDIS_SESSION:',
+
+            // Route cache
+            "^m:" . INSTANCE_ID . ":routes",
+
+            // Scheduled triggers?
+            // (Don't know if this is even used, or where it should be if it is)
+            "^schedule:" . INSTANCE_ID . ":index",
+            "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
+
+            // Access tokens for LTI assessments
+            '^accessToken:' . INSTANCE_ID . ':.+',
+
+            // Etherpad patterns
+            '^pad:g\.',
+            '^token2author:',
+            '^author2sessions:',
+            '^mapper2author:',
+            '^group2sessions:g\.',
+            '^sessionstorage:',
+            '^globalAuthor:',
+            '^ueberDB:keys:',
+            '^pad2readonly:g\.',
+            '^readonly2pad:r\.',
+            '^group:g\.',
+            '^session:s\.',
+            "^groups$",
+        ],
+        // Queue patterns go here
+        // (Note that queue is the same instance as cache, so it's not an issue
+        //  if queue patterns are found in cache and v.v.)
+        Redis::INSTANCE_QUEUE_PUBLISH => [
+            // Message queue
+            '^msg:' . INSTANCE_ID . ':q:\D.+',
+            '^msg:' . INSTANCE_ID . ':q:\d+:unread',
+            '^msg:' . INSTANCE_ID . ':q:\d+:listed',
+            '^msg:' . INSTANCE_ID . ':q:\d+:digest',
+        ],
+//        '^msg:' . INSTANCE_ID . ':m:.+',
+//        '^pad:g\.',
+//        '^msg:' . INSTANCE_ID . ':q:\D.+',
+//        // Old remember me format
+//        "^[0-9a-f]{40}$",
+//        // New remember me format
+//        "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
+//        '^msg:' . INSTANCE_ID . ':s:.+',
+//        '^token2author:',
+//        '^author2sessions:',
+//        '^mapper2author:',
+//        '^group2sessions:g\.',
+//        // Old and new scrub
+//        '^scrub.html:',
+//        '^scrub.htmlAbsoluteUri:',
+//        '^fc:' . INSTANCE_ID . ':scrub.html:',
+//        '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
+//        // Old and new Verso API
+//        '^verso_api',
+//        '^fc:' . INSTANCE_ID . ':verso_api:',
+//        '^sessionstorage:',
+//        '^globalAuthor:',
+//        '^ueberDB:keys:',
+//        '^PHPREDIS_SESSION:',
+//        '^pad2readonly:g\.',
+//        '^readonly2pad:r\.',
+//        '^group:g\.',
+//        '^session:s\.',
+//        '^msg:' . INSTANCE_ID . ':q:\d+:unread',
+//        '^msg:' . INSTANCE_ID . ':q:\d+:listed',
+//        '^msg:' . INSTANCE_ID . ':q:\d+:digest',
+//        "^m:" . INSTANCE_ID . ":routes",
+//        "^schedule:" . INSTANCE_ID . ":index",
+//        "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
+//        "^groups$",
+//        // Old and new external
+//        "^External_.+",
+//        '^fc:' . INSTANCE_ID . ':External_',
+//        "^vcal.[0-9a-f]{64}",
+//        '^accessToken:' . INSTANCE_ID . ':.+',
     ];
 
     /**
