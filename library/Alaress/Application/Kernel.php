@@ -1677,7 +1677,7 @@ abstract class Kernel
             'lti.accessTokenCache',
             $di->lazy(function () use ($di) {
                 /** @var Predis\ClientInterface $redis */
-                $redis = $di->get('redis.cache');
+                $redis = $di->get('redis.storage');
                 /** @var RegistrationRepositoryInterface $registrationRepository */
                 $registrationRepository = $di->get('lti.registrations');
                 return new ItemPool(
