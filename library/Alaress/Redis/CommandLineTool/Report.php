@@ -79,6 +79,18 @@ class Report extends CliTool\App
     ];
 
     /**
+     * Which Redis instances exist?
+     *
+     * (Note that INSTANCE_CACHE and INSTANCE_QUEUE_PUBLISH are currently the
+     *  same)
+     */
+    private const REDIS_INSTANCES = [
+        Redis::INSTANCE_CACHE,
+        Redis::INSTANCE_STORAGE,
+        Redis::INSTANCE_QUEUE_PUBLISH,
+    ];
+
+    /**
      * Recognised key patterns
      */
     private const KEY_PATTERNS = [
@@ -234,15 +246,17 @@ class Report extends CliTool\App
         }
 
         // TODO report separately on cache and storage
-        $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
-        if (!$redis) {
-            $this->getLogger()->error("Unable to fetch redis connection");
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-        }
+        foreach (self::REDIS_INSTANCES as $instanceName) {
+            $redis = Redis::getClientInstance($instanceName);
+            if (!$redis) {
+                $this->getLogger()->error("Unable to fetch redis connection: $instanceName");
+                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+            }
 
-        $rawData    = $this->scanKeys($redis);
-        $aggregated = $this->aggregateData($rawData);
-        $this->renderResults($aggregated);
+            $rawData    = $this->scanKeys($redis, $instanceName);
+            $aggregated = $this->aggregateData($rawData);
+            $this->renderResults($aggregated);
+        }
     }
 
 
@@ -250,20 +264,23 @@ class Report extends CliTool\App
      * Scans all keys in redis, groups by key pattern, and gets each key's TTL and data size
      *
      * @param Predis\ClientInterface $redis
+     * @param string                 $instanceName The name of the instance to
+     *                                             scan: used to filter the list
+     *                                             of keys to process
      * @return array
      */
-    private function scanKeys(Predis\ClientInterface $redis): array
+    private function scanKeys(Predis\ClientInterface $redis, string $instanceName): array
     {
         $rawData = [];
         $cursor  = null;
         $count   = 1;
         while ($cursor !== '0') {
             [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => '*', 'COUNT' => 10000]);
-            foreach ($elements as $str_key) {
+            foreach ($elements as $key) {
                 // Log every 1000 at a higher level to show progression at less verbosity
                 $level = $count % 1000 === 0 ? Logger::NOTICE : Logger::DEBUG;
-                $this->getLogger()->log($level, "$count) $str_key");
-                [$keyPattern, $payload, $ttl, $length] = $this->processKey($redis, $str_key);
+                $this->getLogger()->log($level, "$count) $key");
+                [$keyPattern, $payload, $ttl, $length] = $this->processKey($redis, $key, $instanceName);
                 $rawData[$keyPattern][$payload][] = [
                     'ttl'    => $ttl,
                     'length' => $length,
@@ -280,9 +297,12 @@ class Report extends CliTool\App
      *
      * @param Predis\ClientInterface $redis
      * @param string                 $key
+     * @param string                 $instanceName The name of the instance to
+     *                                             scan: used to filter the list
+     *                                             of keys to process
      * @return array
      */
-    private function processKey(Predis\ClientInterface $redis, string $key): array
+    private function processKey(Predis\ClientInterface $redis, string $key, string $instanceName): array
     {
         /** @var Predis\Response\Status $type */
         $type = $redis->type($key);
@@ -305,7 +325,7 @@ class Report extends CliTool\App
 
 
         $keyPattern = 'unrecognised';
-        foreach (self::KEY_PATTERNS as $pattern) {
+        foreach (self::KEY_PATTERNS[$instanceName] as $pattern) {
             if (preg_match("/$pattern/", $key)) {
                 $keyPattern = $pattern;
                 break;
@@ -373,7 +393,7 @@ class Report extends CliTool\App
 
         // Column totals
         $countRows = count($aggregated);
-        foreach (array_keys($aggregated[0]) as $idx => $columnTitle) {
+        foreach (array_keys($aggregated[0] ?? []) as $idx => $columnTitle) {
             if ($idx === 0) {
                 $columnValue = "Totals";
             } elseif (stripos($columnTitle, 'count') !== false || stripos($columnTitle, 'size')) {
@@ -421,7 +441,7 @@ class Report extends CliTool\App
         $table = [];
 
         // Column headers
-        foreach (array_keys($aggregated[0]) as $columnKey) {
+        foreach (array_keys($aggregated[0] ?? []) as $columnKey) {
             $columnTitle = self::LABELS[$columnKey];
             $width       = $columnWidths[$columnKey];
             $table[0][]  = str_pad('', $width, '*');
@@ -443,7 +463,7 @@ class Report extends CliTool\App
 
         // Column Footer
         $nextRow = count($table);
-        foreach (array_keys($aggregated[0]) as $columnKey) {
+        foreach (array_keys($aggregated[0] ?? []) as $columnKey) {
             $width       = $columnWidths[$columnKey];
             $columnValue = $aggregated[count($aggregated) - 1][$columnKey];
 
