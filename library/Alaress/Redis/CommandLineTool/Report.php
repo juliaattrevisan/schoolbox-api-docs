@@ -255,7 +255,7 @@ class Report extends CliTool\App
 
             $rawData    = $this->scanKeys($redis, $instanceName);
             $aggregated = $this->aggregateData($rawData);
-            $this->renderResults($aggregated);
+            $this->renderResults($aggregated, $instanceName);
         }
     }
 
@@ -323,15 +323,43 @@ class Report extends CliTool\App
         $ttl = $redis->ttl($key);
         $this->getLogger()->info("payload: {$type->getPayload()}, ttl: $ttl, length: $length");
 
-
-        $keyPattern = 'unrecognised';
+        // Search this instance's key patterns
+        $keyPattern = null;
         foreach (self::KEY_PATTERNS[$instanceName] as $pattern) {
             if (preg_match("/$pattern/", $key)) {
                 $keyPattern = $pattern;
                 break;
             }
         }
-        if ($keyPattern === 'unrecognised') {
+
+        // Not found?
+        // Check the other instance's key patterns: if it's found in another
+        // instance, report on it
+        if (!isset($keyPattern)) {
+            foreach (self::KEY_PATTERNS as $keyPatternInstanceName => $patterns) {
+                if ($keyPatternInstanceName === $instanceName) {
+                    continue;
+                }
+                foreach ($patterns as $pattern) {
+                    if (preg_match("/$pattern/", $key)) {
+                        $this->getLogger()->warning(
+                            sprintf(
+                                'Misplaced key: %s expected in %s, found in %s',
+                                $key,
+                                $instanceName,
+                                $keyPatternInstanceName,
+                            )
+                        );
+                        $keyPattern = 'misplaced';
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Still not found? Report this key as unrecognised
+        if (!isset($keyPattern)) {
+            $keyPattern = 'unrecognised';
             $this->getLogger()->warning("Unrecognised key: $key");
         }
         return [$keyPattern, $type->getPayload(), $ttl, $length];
@@ -420,9 +448,10 @@ class Report extends CliTool\App
     /**
      * Renders aggregated raw data into a suitable display format
      *
-     * @param array $aggregated
+     * @param array  $aggregated
+     * @param string $instanceName
      */
-    private function renderResults(array $aggregated): void
+    private function renderResults(array $aggregated, string $instanceName): void
     {
         // Calculate column widths from widest column header or value
         $columnWidths = [];
@@ -476,6 +505,15 @@ class Report extends CliTool\App
             $table[$idx] = "|" . implode('|', $row) . '|';
         }
 
+        fwrite(
+            $this->getOutStream(),
+            sprintf(
+                (empty($table)
+                    ? "\nNo usage for instance \"%s\" found."
+                    : "\nUsage for instance \"%s\":"),
+                $instanceName,
+            )
+        );
         fwrite($this->getOutStream(), "\n" . implode("\n", $table) . "\n");
     }
 }
