@@ -288,7 +288,7 @@
                                     <span class="full-width {% if certExpiry < 7 %}alert{% elseif certExpiry < 30 or isCustomCert %}warning{% else %}success{% endif %} label">{{ certMessage }}</span>
                                 </div>
                             </li>
-                            {% if not isCustomCert %}
+                            {% if show_port_80_availability_check %}
                             <li>
                                 <div class="small-5 columns content">
                                     SSL Renewal
