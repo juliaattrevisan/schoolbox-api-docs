@@ -259,7 +259,7 @@ class Report extends CliTool\App
             exit;
         }
 
-        // TODO report separately on cache and storage
+        $aggregated = [];
         foreach (self::REDIS_INSTANCES as $instanceName) {
             $redis = Redis::getClientInstance($instanceName);
             if (!$redis) {
@@ -267,9 +267,11 @@ class Report extends CliTool\App
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
 
-            $rawData    = $this->scanKeys($redis, $instanceName);
-            $aggregated = $this->aggregateData($rawData);
-            $this->renderResults($aggregated, $instanceName);
+            $rawData                   = $this->scanKeys($redis, $instanceName);
+            $aggregated[$instanceName] = $this->aggregateData($rawData);
+        }
+        foreach (self::REDIS_INSTANCES as $instanceName) {
+            $this->renderResults($aggregated[$instanceName], $instanceName);
         }
     }
 
