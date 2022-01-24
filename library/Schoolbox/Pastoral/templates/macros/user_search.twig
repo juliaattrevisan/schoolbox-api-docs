@@ -202,7 +202,7 @@
 
                     var countFound = 0;
                     {% if limitRoles %}
-                    let roles = [ '{{ limitRoles.propertyValues('name') | join("','") | raw }}'];
+                    let roles = [ '{{ limitRoles.propertyValues('id') | join("','") | raw }}'];
                     {% else %}
                     let roles = [];
                     {% endif %}
@@ -221,7 +221,7 @@
                         {# Only action this person if they're not already in the group #}
 
                         if (window.modalInternalUsersAdded['{{ guid }}'][results[i].id] !== true
-                                && (roles.indexOf(results[i].role) >= 0 || moderatorIds.indexOf(results[i].id) >= 0)) {
+                                && (roles.indexOf(results[i].role_id) >= 0 || moderatorIds.indexOf(results[i].id) >= 0)) {
 
                             {# Create the HTML markup for the user in the search results #}
 
