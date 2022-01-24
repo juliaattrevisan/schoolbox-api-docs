@@ -40,6 +40,7 @@ class Report extends CliTool\App
 
     private const COLUMN_KEY_PATTERN = 'keyPattern';
     private const COLUMN_PAYLOAD = 'payload';
+    private const COLUMN_STATUS = 'status';
     private const COLUMN_TOTAL_COUNT = 'totalCount';
     private const COLUMN_NO_TTL_COUNT = 'noTtlCount';
     private const COLUMN_WITH_TTL_COUNT = 'withTtlCount';
@@ -54,6 +55,7 @@ class Report extends CliTool\App
     private const ALIGNMENTS = [
         self::COLUMN_KEY_PATTERN    => STR_PAD_RIGHT,
         self::COLUMN_PAYLOAD        => STR_PAD_RIGHT,
+        self::COLUMN_STATUS         => STR_PAD_RIGHT,
         self::COLUMN_TOTAL_COUNT    => STR_PAD_LEFT,
         self::COLUMN_NO_TTL_COUNT   => STR_PAD_LEFT,
         self::COLUMN_WITH_TTL_COUNT => STR_PAD_LEFT,
@@ -69,6 +71,7 @@ class Report extends CliTool\App
     private const LABELS = [
         self::COLUMN_KEY_PATTERN    => 'Key Pattern',
         self::COLUMN_PAYLOAD        => 'Payload',
+        self::COLUMN_STATUS         => 'Status',
         self::COLUMN_TOTAL_COUNT    => 'Total Count',
         self::COLUMN_NO_TTL_COUNT   => 'No TTL Count',
         self::COLUMN_WITH_TTL_COUNT => 'With TTL Count',
@@ -259,10 +262,11 @@ class Report extends CliTool\App
                 $this->getLogger()->log($level, "$count) $key");
                 $processed = $this->processKey($redis, $key, $instanceName);
                 if (isset($processed)) {
-                    [$keyPattern, $payload, $ttl, $length] = $this->processKey($redis, $key, $instanceName);
+                    [$keyPattern, $payload, $ttl, $length, $status] = $processed;
                     $rawData[$keyPattern][$payload][] = [
                         'ttl'    => $ttl,
                         'length' => $length,
+                        'status' => $status,
                     ];
                     $count++;
                 }
@@ -280,9 +284,9 @@ class Report extends CliTool\App
      * @param string                 $instanceName The name of the instance to
      *                                             scan: used to filter the list
      *                                             of keys to process
-     * @return array{string, string, int, int}|null
-     *         [key pattern, payload type, ttl, length], or null if this key is
-     *         to be ignored completely in the report.
+     * @return array{string, string, int, int, string}|null
+     *         [key pattern, payload type, ttl, length, status], or null if this
+     *         key is to be ignored completely in the report.
      *         (This happens if this key is not in `$instanceName`'s keys, but
      *          is in an alias' keys.)
      */
@@ -309,9 +313,11 @@ class Report extends CliTool\App
 
         // Search this instance's key patterns
         $keyPattern = null;
+        $status     = false;
         foreach (self::KEY_PATTERNS[$instanceName] as $pattern) {
             if (preg_match("/$pattern/", $key)) {
                 $keyPattern = $pattern;
+                $status     = 'ok';
                 break;
             }
         }
@@ -351,7 +357,8 @@ class Report extends CliTool\App
                                 $keyPatternInstanceName,
                             )
                         );
-                        $keyPattern = 'misplaced';
+                        $keyPattern = $pattern;
+                        $status     = 'misp';
                         break;
                     }
                 }
@@ -361,9 +368,10 @@ class Report extends CliTool\App
         // Still not found? Report this key as unrecognised
         if (!isset($keyPattern)) {
             $keyPattern = 'unrecognised';
+            $status     = 'unrec';
             $this->getLogger()->warning("Unrecognised key: $key");
         }
-        return [$keyPattern, $type->getPayload(), $ttl, $length];
+        return [$keyPattern, $type->getPayload(), $ttl, $length, $status];
     }
 
 
@@ -380,9 +388,11 @@ class Report extends CliTool\App
             foreach ($patternData as $payload => $matches) {
                 $countNoTtl = $countHasTtl = $sumTtl = $sumLength = 0;
                 $minTtl     = $maxTtl = null;
+                $status     = null;
                 foreach ($matches as $row) {
                     $sumLength += $row['length'];
                     $ttl       = $row['ttl'];
+                    $status    = $row['status'];
                     switch ($ttl) {
                         case -2:
                             break;
@@ -400,6 +410,7 @@ class Report extends CliTool\App
                 $aggregated[] = [
                     self::COLUMN_KEY_PATTERN    => $pattern,
                     self::COLUMN_PAYLOAD        => $payload,
+                    self::COLUMN_STATUS         => $status,
                     self::COLUMN_TOTAL_COUNT    => count($matches),
                     self::COLUMN_NO_TTL_COUNT   => $countNoTtl,
                     self::COLUMN_WITH_TTL_COUNT => $countHasTtl,
