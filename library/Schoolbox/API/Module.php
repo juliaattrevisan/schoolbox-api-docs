@@ -13,6 +13,7 @@ use Aura\Di\ContainerInterface;
 use Authenticator;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -45,6 +46,7 @@ class Module extends BaseModule
                     'userMapper'     => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'registryMapper' => $this->getMapperFactory()->getLazy(RegistryMapper::class),
                     'serviceMapper'  => $this->getMapperFactory()->getLazy(ServiceMapper::class),
+                    'tokenMapper'    => $this->getMapperFactory()->getLazy(TokenMapper::class),
                     'tokenValidator' => $injector->lazyGet('user.tokenBuilder'),
                 ]
             )

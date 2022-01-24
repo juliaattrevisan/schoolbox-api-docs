@@ -26,12 +26,14 @@ use Aura\Web\Response;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
 use Schoolbox\User;
@@ -622,21 +624,37 @@ class Kernel extends WebKernelAbstract
             } catch (Throwable $e) {
                 throw new Unauthenticated('Token could not be parsed', 0, $e);
             }
-            if (isset($claims['sub'])) {
+            if (isset($claims[MessagePayloadInterface::CLAIM_SUB])) {
                 // It's valid for the JWT's subject claim to be empty.
                 // In this case, the request will be performed with the context
                 // of an unknown user.
                 // (The request is still subject to authorization rules.)
-                if ($claims['sub'] === '') {
+                if ($claims[MessagePayloadInterface::CLAIM_SUB] === '') {
                     return null;
                 }
                 /** @var MapperFactory $mapperFactory */
                 $mapperFactory = $this->di->get('mapperFactory');
                 /** @var UserMapper $userMapper */
                 $userMapper = $mapperFactory->get(UserMapper::class);
-                $user       = $userMapper->findByUsername($claims['sub']);
+                $user       = $userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
                 if (!$user) {
                     throw new Unauthenticated('User in token not found');
+                }
+                if ($tokenValidator->issuedBySchoolbox($claims) && isset($claims[MessagePayloadInterface::CLAIM_JTI])) {
+                    // if issued by schoolbox and jti is provided, validate the jti
+                    /** @var User\Token\Mapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->get(User\Token\Mapper::class);
+
+                    try {
+                        $tokenMapper->findOneByColumnList(
+                            [
+                                'user_id' => $user->getId(),
+                                'jwt_id'  => $claims[MessagePayloadInterface::CLAIM_JTI],
+                            ]
+                        );
+                    } catch (MapperException $e) {
+                        throw new Unauthenticated('Invalid JWT ID: ' . $e->getMessage());
+                    }
                 }
             } else {
                 throw new Unauthenticated('Token does not contain a "sub" claim');

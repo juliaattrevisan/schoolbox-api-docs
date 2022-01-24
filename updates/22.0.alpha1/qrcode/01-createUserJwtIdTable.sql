@@ -1,7 +1,7 @@
 -- Create relational table
 CREATE TABLE user_jwt_id
 (
-    jwt_id  VARCHAR(36) CHARACTER SET ascii NOT NULL PRIMARY KEY UNIQUE,
+    jwt_id  VARCHAR(64) CHARACTER SET ascii NOT NULL PRIMARY KEY UNIQUE,
     user_id INT(4) UNSIGNED                 NOT NULL,
     expiry  DATETIME,
     deleted_at DATETIME,

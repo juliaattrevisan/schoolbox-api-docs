@@ -15,6 +15,7 @@ use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT as JwtLibrary;
 use Firebase\JWT\SignatureInvalidException;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Factory;
@@ -72,7 +73,7 @@ class Jwt
      *                                   standard 'iss', 'sub', 'exp'. 'jti'
      * @return string
      */
-    public function generate(User $user, ?\Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = []): string
+    public function generate(User $user, ?Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = []): string
     {
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
@@ -80,14 +81,14 @@ class Jwt
         // Not before: not used for now
         // May add ability to regenerate tokens later?
         $claims = [
-            'iss' => (new Factory($this->config))->buildFullyQualified()->getHost(),
-            'sub' => $user->getUsername(),
+            MessagePayloadInterface::CLAIM_ISS => $this->getSchoolboxIssuer(),
+            MessagePayloadInterface::CLAIM_SUB => $user->getUsername(),
         ];
         if ($expiry !== null && !$expiry->isNull()) {
-            $claims['exp'] = $expiry;
+            $claims[MessagePayloadInterface::CLAIM_EXP] = $expiry;
         }
         if ($jwtId !== null) {
-            $claims['jti'] = $jwtId;
+            $claims[MessagePayloadInterface::CLAIM_JTI] = $jwtId;
         }
         return JwtLibrary::encode(
             array_merge($claims, $additionalClaims),
@@ -155,5 +156,23 @@ class Jwt
         }
         [, $payload,] = $parts;
         return (array)JwtLibrary::jsonDecode(JwtLibrary::urlsafeB64Decode($payload));
+    }
+
+    /**
+     * @param array $claims
+     * @return bool
+     */
+    public function issuedBySchoolbox(array $claims): bool
+    {
+        return isset($claims[MessagePayloadInterface::CLAIM_ISS])
+            && $claims[MessagePayloadInterface::CLAIM_ISS] === $this->getSchoolboxIssuer();
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getSchoolboxIssuer(): ?string
+    {
+        return (new Factory($this->config))->buildFullyQualified()->getHost();
     }
 }
