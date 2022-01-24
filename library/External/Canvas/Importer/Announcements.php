@@ -345,7 +345,7 @@ class Announcements
                     $announcement['context_code'],
                     $announcement['id'],
                     $announcement['title'],
-                    $announcement['author']['display_name']
+                    $announcement['author']['display_name'] ?? 'unknown author'
                 ));
 
                 continue;
@@ -359,7 +359,7 @@ class Announcements
                     $announcement['context_code'],
                     $announcement['id'],
                     $announcement['title'],
-                    $announcement['author']['display_name']
+                    $announcement['author']['display_name'] ?? 'unknown author'
                 ));
 
                 continue;
