@@ -732,18 +732,15 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
         /**
-         * grab the users permission to the current pastoral record
+         * confirm if the user can view / edit the private part of the record
          */
-        $writePermission = null;
-        foreach ($record->getAccessWithPermission() as $perm) {
-            if ($writePermission < $perm->getAccessLevel($this->getUser())) {
-                $writePermission = $perm->getAccessLevel($this->getUser());
-            }
-        }
+        $accessLevel       = (new AccessLevelCensor())->getAccessLevel($record, $this->getUser());
+        $allowPrivate = $accessLevel > PastoralAccessMapper::ACCESS_PUBLIC;
+
         /**
-         * if the user does not have write permission to the pastoral entry, do not allow them to add a comment.
+         * if the user is does not have private access, and is trying to set a private comment, fail
          */
-        if (UserAccess::ACCESS_WRITE >= $writePermission) {
+        if (!$allowPrivate && $post["comment_private"]) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
         } else if (!empty(trim($post["comment_body"]))) {
             // Insert the comment to the internal database
