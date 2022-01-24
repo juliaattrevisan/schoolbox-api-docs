@@ -206,9 +206,9 @@ class Announcements
          * them in the canvas api
          */
         $query = "
-            SELECT 
-                CONCAT('course_', canvas_id) AS contextCode, 
-                name, 
+            SELECT
+                CONCAT('course_', canvas_id) AS contextCode,
+                name,
                 code
             FROM course_dim
         ";
@@ -378,7 +378,7 @@ class Announcements
              *
              * Shamefully the author id might not exist in canvas...
              */
-            if ('' !== trim((string)$announcement['author']['id'])) {
+            if (isset($announcement['author']['id']) && '' !== trim((string)$announcement['author']['id'])) {
                 $endpoint = sprintf(
                     'api/v1/users/%s',
                     $announcement['author']['id']
@@ -453,14 +453,19 @@ class Announcements
              * Published === announcement[delayed_post_at]
              * Expires === as set in config "news_default_expiry", if set; otherwise, postedAt
              */
-            $postedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
+            if ('' === (string)$announcement['posted_at']) {
+                // likely that delayed_post_at is set
+                $postedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['created_at']));
+            } else {
+                $postedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
+            }
 
             /* Set presumed expiry date using instance config
              * This is the same implementation as found elsewhere in comms/news
              *
              * If the config var didn't contain anything, just expire immediately I guess
              */
-            $expiresAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['posted_at']));
+            $expiresAt = clone $postedAt;
 
             $expireDateOffset = (string)$this->configLoader->get(ConfigMapper::_EXPIRY_DATE_OFFSET);
 
