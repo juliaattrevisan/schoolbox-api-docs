@@ -38,12 +38,6 @@ class PipeManagerFactory
      * @var ClientInterface
      */
     private $redis;
-
-    /**
-     * The storage-backed Redis instance: used for sessions.
-     */
-    private ClientInterface $redisStorage;
-
     /**
      * @var Async\Client
      */
@@ -81,7 +75,6 @@ class PipeManagerFactory
      * @param HandlerInterface          $handler
      * @param LoggerInterface           $log
      * @param ClientInterface           $redis
-     * @param ClientInterface           $redisStorage
      * @param Async\Client              $asyncRedis
      * @param int                       $sessionLength
      * @param IConnector                $db
@@ -94,7 +87,6 @@ class PipeManagerFactory
         HandlerInterface $handler,
         LoggerInterface $log,
         ClientInterface $redis,
-        ClientInterface $redisStorage,
         Async\Client $asyncRedis,
         int $sessionLength,
         IConnector $db,
@@ -106,7 +98,6 @@ class PipeManagerFactory
         $this->handler       = $handler;
         $this->log           = $log;
         $this->redis         = $redis;
-        $this->redisStorage  = $redisStorage;
         $this->asyncRedis    = $asyncRedis;
         $this->sessionLength = $sessionLength;
         $this->db            = $db;
@@ -121,7 +112,7 @@ class PipeManagerFactory
      */
     public function build()
     {
-        $validator   = new SessionValidator($this->redisStorage, $this->handler, $this->sessionLength, $this->db);
+        $validator   = new SessionValidator($this->redis, $this->handler, $this->sessionLength, $this->db);
         $pipes       = new PipeCollection($validator, $this->log);
         $subFactory  = new Subscription\Redis\SubscriptionFactory($this->redis, $this->asyncRedis);
         $subManager  = new Subscription\SubscriptionManager($this->instanceId, $subFactory, $this->log);
