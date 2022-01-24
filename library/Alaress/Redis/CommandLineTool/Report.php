@@ -90,7 +90,7 @@ class Report extends CliTool\App
     private const REDIS_INSTANCES = [
         Redis::INSTANCE_CACHE,
         Redis::INSTANCE_STORAGE,
-        Redis::INSTANCE_QUEUE_PUBLISH,
+        Redis::INSTANCE_SIGNAL_QUEUE,
     ];
 
     /**
@@ -103,7 +103,7 @@ class Report extends CliTool\App
     private const REDIS_INSTANCE_ALIASES = [
         [
             Redis::INSTANCE_CACHE,
-            Redis::INSTANCE_QUEUE_PUBLISH,
+            Redis::INSTANCE_SIGNAL_QUEUE,
         ]
     ];
 
@@ -185,7 +185,7 @@ class Report extends CliTool\App
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
         //  if queue patterns are found in cache and v.v.)
-        Redis::INSTANCE_QUEUE_PUBLISH => [
+        Redis::INSTANCE_SIGNAL_QUEUE => [
             // Signal queues
             'scheduled.' . INSTANCE_ID . '.*',
             'routed.' . INSTANCE_ID . '.*',

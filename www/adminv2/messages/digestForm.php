@@ -45,7 +45,7 @@ foreach ($_POST['role'] as $roleId => $data) {
     \Schoolbox\RoleMapper::getInstance()->save($role);
 }
 
-$redis    = Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH);
+$redis    = Redis::getClientInstance(Redis::INSTANCE_SIGNAL_QUEUE);
 $instance = INSTANCE_ID;
 
 // advise digest daemon to reload

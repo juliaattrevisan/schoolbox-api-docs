@@ -46,7 +46,7 @@ if (!isset($opts['d'])) {
     $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 
     /** @var \Redis $redis */
-    $redis = Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH);
+    $redis = Redis::getClientInstance(Redis::INSTANCE_SIGNAL_QUEUE);
 
     $loop = isset($opts['loop']) ? (int)($opts['loop']) : 1;
 
@@ -92,6 +92,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 
     /** @var Redis\Async\Client $client */
-    $client = $di->get('redis.queue.sub');
+    $client = $di->get('redis.signalQueue.sub');
     $client->subscribe($daemon, new TestListener($log));
 });

@@ -37,12 +37,12 @@ class Redis
     public const INSTANCE_STORAGE = 'storage';
 
     /**
-     * Identifier for the queue publish Redis instance.
+     * Identifier for the signal queue Redis instance.
      *
      * Currently, this instance is the same as the cache-only instance: it has a
      * separate identifier in case it is moved.
      */
-    public const INSTANCE_QUEUE_PUBLISH = 'queuePublish';
+    public const INSTANCE_SIGNAL_QUEUE = 'signalQueue';
 
     /**
      * Prefix all function call Redis keys with this value.

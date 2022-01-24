@@ -82,8 +82,8 @@ class Kernel extends WebKernelAbstract
         // (The subscription to this queue doesn't exist in the standard kernel,
         //  only in the daemon kernel: this is because it requires the event
         //  loop)
-        Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_QUEUE_PUBLISH);
-        $di->set('redis.queue.pub', Redis::getClientInstance(Redis::INSTANCE_QUEUE_PUBLISH));
+        Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
+        $di->set('redis.signalQueue.pub', Redis::getClientInstance(Redis::INSTANCE_SIGNAL_QUEUE));
 
         // Default Redis connection:
         // uses cache, and raises a warning telling you to choose a connector

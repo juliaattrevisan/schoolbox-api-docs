@@ -392,7 +392,7 @@ EOL;
         }));
 
         // Redis queue subscription (not persistent)
-        $di->set('redis.queue.sub', $di->lazy(function () use ($di) {
+        $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
             return new AsyncRedisClient($conf->get('redis_ephemeral_url'), $this->loop);

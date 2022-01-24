@@ -52,7 +52,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $stomp = $di->get('stomp');
 
     /** @var Async\Client $asyncRedis */
-    $asyncRedis = $di->get('redis.queue.sub');
+    $asyncRedis = $di->get('redis.signalQueue.sub');
 
     try {
         /** @var AMQPInterface $amqp */
