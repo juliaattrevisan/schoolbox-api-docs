@@ -893,14 +893,13 @@ function get_plan_type_from_instance_registry() {
   # send API request to IR - /api/hosts/{cert}/instances
   local ir_host_instances_json="$(curl \
     --silent \
-    "$instance_registry_url/api/v2/host/$puppet_cert/instances" \
+    "$instance_registry_url/api/v2/host/$puppet_cert/instances?instance_id=$(get_destination_instance_id)" \
     -H "Authorization: Bearer $api_key" \
     -H "Content-Type: application/json")";
 
   echo "$ir_host_instances_json" \
     | jq -r \
-      --arg instance_id "$destination_instance_id" \
-      '.ir_host_instances | .[] | select(.instance_id == $instance_id) | .plan_type';
+      '.ir_host_instances | .[] | .plan_type';
 }
 
 plan_type="$(get_plan_type_from_instance_registry)";
