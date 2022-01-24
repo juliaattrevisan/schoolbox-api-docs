@@ -89,10 +89,10 @@ class Kernel extends WebKernelAbstract
         // uses cache, and raises a warning telling you to choose a connector
         $di->set('redis', $di->lazy(function () use ($di) {
             trigger_error(
-                'The default "redis" connection is deprecated; falling back to using "redis.cache". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
+                'The default "redis" connection is deprecated; falling back to using "redis.storage". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
                 E_USER_WARNING,
             );
-            return $di->get('redis.cache');
+            return $di->get('redis.storage');
         }));
 
         $di->set('amqp', $di->lazy(function () {
