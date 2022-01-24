@@ -178,46 +178,6 @@ class Report extends CliTool\App
             '^msg:' . INSTANCE_ID . ':q:\d+:listed',
             '^msg:' . INSTANCE_ID . ':q:\d+:digest',
         ],
-//        '^msg:' . INSTANCE_ID . ':m:.+',
-//        '^pad:g\.',
-//        '^msg:' . INSTANCE_ID . ':q:\D.+',
-//        // Old remember me format
-//        "^[0-9a-f]{40}$",
-//        // New remember me format
-//        "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
-//        '^msg:' . INSTANCE_ID . ':s:.+',
-//        '^token2author:',
-//        '^author2sessions:',
-//        '^mapper2author:',
-//        '^group2sessions:g\.',
-//        // Old and new scrub
-//        '^scrub.html:',
-//        '^scrub.htmlAbsoluteUri:',
-//        '^fc:' . INSTANCE_ID . ':scrub.html:',
-//        '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
-//        // Old and new Verso API
-//        '^verso_api',
-//        '^fc:' . INSTANCE_ID . ':verso_api:',
-//        '^sessionstorage:',
-//        '^globalAuthor:',
-//        '^ueberDB:keys:',
-//        '^PHPREDIS_SESSION:',
-//        '^pad2readonly:g\.',
-//        '^readonly2pad:r\.',
-//        '^group:g\.',
-//        '^session:s\.',
-//        '^msg:' . INSTANCE_ID . ':q:\d+:unread',
-//        '^msg:' . INSTANCE_ID . ':q:\d+:listed',
-//        '^msg:' . INSTANCE_ID . ':q:\d+:digest',
-//        "^m:" . INSTANCE_ID . ":routes",
-//        "^schedule:" . INSTANCE_ID . ":index",
-//        "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
-//        "^groups$",
-//        // Old and new external
-//        "^External_.+",
-//        '^fc:' . INSTANCE_ID . ':External_',
-//        "^vcal.[0-9a-f]{64}",
-//        '^accessToken:' . INSTANCE_ID . ':.+',
     ];
 
     /**
@@ -267,6 +227,7 @@ class Report extends CliTool\App
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
 
+            $this->getLogger()->notice("Scanning redis connection: $instanceName");
             $rawData                   = $this->scanKeys($redis, $instanceName);
             $aggregated[$instanceName] = $this->aggregateData($rawData);
         }
@@ -372,10 +333,10 @@ class Report extends CliTool\App
                                 // ignore it completely
                                 $this->getLogger()->debug(
                                     sprintf(
-                                        'Aliased key: %s expected in %s, found in alias %s',
+                                        'Aliased key: %s found in %s (expected in alias %s)',
                                         $key,
-                                        $keyPatternInstanceName,
                                         $instanceName,
+                                        $keyPatternInstanceName,
                                     )
                                 );
                                 return null;
@@ -384,10 +345,10 @@ class Report extends CliTool\App
 
                         $this->getLogger()->warning(
                             sprintf(
-                                'Misplaced key: %s expected in %s, found in %s',
+                                'Misplaced key: %s found in %s (expected in %s)',
                                 $key,
-                                $keyPatternInstanceName,
                                 $instanceName,
+                                $keyPatternInstanceName,
                             )
                         );
                         $keyPattern = 'misplaced';
