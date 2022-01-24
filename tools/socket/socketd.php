@@ -37,7 +37,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';
 
-    $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
+    $redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
     $redisStorage = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
 
     /** @var IConfigLoader $config */

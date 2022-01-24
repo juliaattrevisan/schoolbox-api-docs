@@ -59,6 +59,7 @@ try {
 
     try {
         // test redis is online
+        // TODO add separate tests for ephemeral and storage-backed instances
         $r = $kernel->get('redis.cache');
         $r->executeCommand($r->createCommand('get', array('test')));
         $d->notice('Redis is online', array('char' => '+'));

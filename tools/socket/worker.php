@@ -27,7 +27,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $writer = new \Alaress\WorkerCrew\Worker\PipeWriter($strat, $log, fopen('php://fd/3', 'wb'));
 
     /** @var ClientInterface $redis */
-    $redis = $di->get('redis.cache');
+    $redis = $di->get('redis.storage');
 
     $listFactory = new ListFactory(INSTANCE_ID, $redis);
 

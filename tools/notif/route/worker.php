@@ -28,7 +28,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     // extract things from DI and build the worker
 
     /** @var ClientInterface $client */
-    $client = $di->get('redis.cache');
+    $client = $di->get('redis.storage');
 
     /** @var IConfigLoader $config */
     $config = $di->get('config');

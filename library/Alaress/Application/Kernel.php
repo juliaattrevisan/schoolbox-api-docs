@@ -718,10 +718,7 @@ abstract class Kernel
             /** @var StepMapper $tourStepMapper */
             $tourStepMapper = $mapperFactory->get(StepMapper::class);
             $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
-
-            /** @var Predis\ClientInterface $redis */
-            $redis   = $di->get('redis.cache');
-            $output  = new Output\ThemedHtml();
+            $output   = new Output\ThemedHtml();
 
             /** @var Environment $templateEngine */
             $templateEngine = $di->get('templateEngine');
@@ -738,6 +735,8 @@ abstract class Kernel
             /** @var BookmarkMapper $bookMarkMapper */
             $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
 
+            /** @var Predis\ClientInterface $redisStorage */
+            $redisStorage = $di->get('redis.storage');
             $output
                 ->setTemplateEngine($templateEngine)
                 ->addDataGenerator(
@@ -745,7 +744,7 @@ abstract class Kernel
                     new Output\DataGenerator\Websocket(
                         $config,
                         $session->getAuthUser(),
-                        new UnreadRetriever($redis),
+                        new UnreadRetriever($redisStorage),
                         INSTANCE_ID
                     )
                 )
@@ -1590,6 +1589,7 @@ abstract class Kernel
 
 
         // Lock factory
+        // TODO inject this everywhere a lock is used
         $di->set(
             'lockFactory',
             $di->lazy(function () use ($di) {

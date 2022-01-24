@@ -89,7 +89,7 @@ $app = new class extends CliTool\App{
      */
     private function checkRedis($args, $regexMode): void
     {
-        $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
+        $redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
         $decorator = new Decorator();
 
         if (!$redis) {

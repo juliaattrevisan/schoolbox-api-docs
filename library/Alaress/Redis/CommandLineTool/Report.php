@@ -129,6 +129,10 @@ class Report extends CliTool\App
 
             // vCal cache
             "^vcal.[0-9a-f]{64}",
+
+            // Locks?
+            // Mapper caches?
+            // Atlas API?
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [

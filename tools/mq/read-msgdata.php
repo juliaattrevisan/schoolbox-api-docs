@@ -30,7 +30,7 @@ $app = new class extends CliTool\App
             $key = sprintf('msg:%s:m:%s', INSTANCE_ID, $matches[0]);
 
             /** @var Instance $instance */
-            $instance = unserialize(gzuncompress(Redis::getClientInstance(Redis::INSTANCE_CACHE)->get($key)));
+            $instance = unserialize(gzuncompress(Redis::getClientInstance(Redis::INSTANCE_STORAGE)->get($key)));
 
             $output[$matches[1]][$matches[2]] = $instance->jsonSerialize();
         }

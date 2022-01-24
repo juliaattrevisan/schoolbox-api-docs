@@ -232,7 +232,7 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
     $exit = 0;
 
     try {
-        $trigger = frame2trigger(Redis::getClientInstance(Redis::INSTANCE_CACHE), $input);
+        $trigger = frame2trigger(Redis::getClientInstance(Redis::INSTANCE_STORAGE), $input);
         $log->info(sprintf("Trigger '%s' will fire at %s; testing callbacks", $trigger->getIdString(), (new Alaress_Date_Format($trigger->getTimestamp(), 'U'))->getDatabase()));
 
         foreach ($trigger->getCallbacks() as $callback) {
@@ -322,7 +322,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         $event = extractEvent($input);
 
         /** @var Redis|ClientInterface $redis */
-        $redis = $di->get('redis.cache');
+        $redis = $di->get('redis.storage');
 
         $amqp  = Connector::getInstance();
 

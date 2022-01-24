@@ -59,7 +59,7 @@ try {
 
             try {
                 // get the cache handler
-                $jit = new RedisCache(Redis::getClientInstance(Redis::INSTANCE_CACHE), $log, INSTANCE_ID);
+                $jit = new RedisCache(Redis::getClientInstance(Redis::INSTANCE_STORAGE), $log, INSTANCE_ID);
                 $tff = new TriggerFactoryFactory(true);
 
                 $splitter = new Splitter(new NotifierInflector(new Configurator($di)), $tff);
@@ -68,7 +68,7 @@ try {
                 $amqp = $di->get('amqp');
 
                 /** @var ClientInterface $redis */
-                $redis = $di->get('redis.cache');
+                $redis = $di->get('redis.storage');
 
                 /** @var IClient $stomp */
                 $stomp = $di->get('stomp');

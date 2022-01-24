@@ -27,7 +27,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Redis Notif Messup', [
 ]);
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
-    $redis  = Redis::getClientInstance(Redis::INSTANCE_CACHE);
+    $redis  = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
     $count  = (int)$opts['count'];
     $expiry = (int)$opts['expiry'];
     $log->notice(sprintf('Creating %d junk keys with expiry %d seconds...', $count, $expiry));

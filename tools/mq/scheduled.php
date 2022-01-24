@@ -46,7 +46,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $conf = $di->get('config');
 
     /** @var ClientInterface $redis */
-    $redis = $di->get('redis.cache');
+    $redis = $di->get('redis.storage');
 
     /** @var IClient $stomp */
     $stomp = $di->get('stomp');
@@ -70,7 +70,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         $strat          = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $flags);
         $scheduler      = new Scheduler($loop, $strat, $log, new Clock(), $conf, new ResolutionManager(), $postman);
 
-        $scheduler->setJitCache(new RedisCache(Redis::getClientInstance(Redis::INSTANCE_CACHE), $log, INSTANCE_ID));
+        $scheduler->setJitCache(new RedisCache($redis, $log, INSTANCE_ID));
 
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established

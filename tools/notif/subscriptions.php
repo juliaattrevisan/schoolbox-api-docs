@@ -72,7 +72,6 @@ try {
         public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
         {
             $this->log   = $log;
-            $this->redis = $di->get('redis.cache');
 
             /** @var ReadCache $subscriptionCache */
             $subscriptionCache = $di->get('subscriptionCache.readonly');
