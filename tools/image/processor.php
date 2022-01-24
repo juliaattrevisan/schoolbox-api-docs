@@ -64,6 +64,7 @@ $limits           = [
     3 => Monolog\Logger::DEBUG,    // max verbosity: EV-ER-Y-THING...
 ];
 
+// TODO inject lock inspector instaed of cache
 /** @var ClientInterface $redis */
 $redis  = $kernel->get('redis.cache');
 $parent = new Image\Processor\Manager(
