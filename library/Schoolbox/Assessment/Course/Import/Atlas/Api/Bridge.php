@@ -60,7 +60,7 @@ class Bridge
                 return $this->makeRequests($requests);
             },
             $redisClient,
-            'atlasApi',
+            'atlasApi:' . INSTANCE_ID,
             self::CACHE_EXPIRY
         );
         $this->decoder = $decoder;

@@ -133,8 +133,8 @@ class Report extends CliTool\App
             // Locks
             '^lock:' . INSTANCE_ID . ':',
 
-            // Mapper caches?
             // Atlas API?
+            '^atlasApi:' . INSTANCE_ID . '.',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
