@@ -74,6 +74,11 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+    /**
      * Controller constructor.
      *
      * @param UserMapper                $userMapper
@@ -107,7 +112,8 @@ class Controller extends Assessment\Controller
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
-        Replicator $replicator
+        Replicator $replicator,
+        \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -126,6 +132,7 @@ class Controller extends Assessment\Controller
         $this->quizMapper        = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;
+        $this->folderMapper      = $folderMapper;
     }
 
 
@@ -192,7 +199,7 @@ class Controller extends Assessment\Controller
             $externalRedirectUrl = (new \Custom\Newic\Redirect(
                 $this->getConfigLoader()->get('canvas_url'),
                 new CanvasDb(),
-                $this->getUserMapper()->getDatabase()
+                $this->folderMapper,
             ))->generateAssessmentRedirect(
                 $this->getUser(),
                 $assessment
