@@ -132,6 +132,9 @@ class Report extends CliTool\App
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
+            // Sessions
+            '^PHPREDIS_SESSION:',
+
             // Old and new remember me
             "^[0-9a-f]{40}$",
             "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
@@ -152,9 +155,9 @@ class Report extends CliTool\App
             '^msg:' . INSTANCE_ID . ':q:\d+:unread',
             '^msg:' . INSTANCE_ID . ':q:\d+:listed',
             '^msg:' . INSTANCE_ID . ':q:\d+:digest',
-
-            // Sessions
-            '^PHPREDIS_SESSION:',
+            // Not sure if the below are used
+//            '^msg:' . INSTANCE_ID . ':q:\d+:push',
+//            '^msg:' . INSTANCE_ID . ':q:\d+:alert',
 
             // Route cache
             "^m:" . INSTANCE_ID . ":routes",
@@ -189,9 +192,6 @@ class Report extends CliTool\App
             // Signal queues
             'scheduled.' . INSTANCE_ID . '.*',
             'routed.' . INSTANCE_ID . '.*',
-
-            // Instant alert queues
-            '^msg:' . INSTANCE_ID . ':q:\d+:alert',
         ],
     ];
 
