@@ -130,7 +130,9 @@ class Report extends CliTool\App
             // vCal cache
             "^vcal.[0-9a-f]{64}",
 
-            // Locks?
+            // Locks
+            '^lock:' . INSTANCE_ID . ':',
+
             // Mapper caches?
             // Atlas API?
         ],
@@ -319,6 +321,9 @@ class Report extends CliTool\App
                 break;
             case 'none':
                 $length = 0;
+                break;
+            case 'zset':
+                $length = array_sum(array_map('strlen', $redis->zrange($key, 0, -1)));
                 break;
             default:
                 $this->getLogger()->warning("Unrecognised payload: '{$type->getPayload()}'");
