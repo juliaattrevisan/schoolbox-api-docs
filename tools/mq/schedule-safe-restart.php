@@ -333,7 +333,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         $broker = new Broker($instanceId, $amqp, $redis);
 
         // handle this message by splitting this event and propagating its triggers
-        (new Propagator($splitter, $redis, $broker, $instanceId))->propagateEvent($event);
+        (new Propagator($splitter, $broker, $instanceId))->propagateEvent($event);
     } catch (CompressionException $e) {
         $log->debug($e->getMessage());
 

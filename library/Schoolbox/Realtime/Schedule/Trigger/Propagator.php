@@ -29,9 +29,6 @@ class Propagator implements IPropagator
     /** @var Splitter */
     private $splitter;
 
-    /** @var ClientInterface */
-    private $redis;
-
     /** @var IBroker */
     private $broker;
 
@@ -41,14 +38,12 @@ class Propagator implements IPropagator
 
     /**
      * @param Splitter        $splitter
-     * @param ClientInterface $redis
      * @param IBroker         $broker
      * @param string          $instanceId
      */
-    public function __construct(Splitter $splitter, ClientInterface $redis, IBroker $broker, $instanceId)
+    public function __construct(Splitter $splitter, IBroker $broker, $instanceId)
     {
         $this->splitter   = $splitter;
-        $this->redis      = $redis;
         $this->broker     = $broker;
         $this->instanceId = $instanceId;
     }
@@ -91,28 +86,5 @@ class Propagator implements IPropagator
         }
 
         return null;
-    }
-
-
-    /**
-     * @param object $object
-     * @param string $prefix
-     * @return string
-     */
-    private function toRedis($object, $prefix)
-    {
-        if ($object instanceof JsonSerializable) {
-            // we *prefer* JSON if possible
-            $serial = json_encode($object);
-        } else {
-            $serial = serialize($object);
-        }
-
-        $hash   = sha1($serial);
-        $key    = trim("$prefix:$hash", ':');
-
-        $this->redis->set($key, $serial);
-
-        return $key;
     }
 }

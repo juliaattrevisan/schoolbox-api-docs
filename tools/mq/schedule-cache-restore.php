@@ -75,7 +75,7 @@ try {
 
                 $broker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
 
-                $propagator = new Propagator($splitter, $redis, $broker, INSTANCE_ID);
+                $propagator = new Propagator($splitter, $broker, INSTANCE_ID);
 
                 // restore data if possible
                 $restored = $jit->restoreSchedule(new Connector(), $propagator, $q);

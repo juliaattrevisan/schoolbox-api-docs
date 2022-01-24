@@ -705,8 +705,6 @@ abstract class Mapper implements IMapper, Serializable
                                     'factory'   => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
                                 ]
                             ),
-                            // TODO remove as this is unused
-                            'redis'      => $this->getDi()->lazyGet('redis.cache'),
                             'broker'     => $this->getDi()->lazyNew(
                                 Broker::class,
                                 [
