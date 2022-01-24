@@ -45,7 +45,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '', 'getTokenForSelf', $isLoggedIn);
-        $this->register('GET', '/{userId}', 'getTokenForUser', $isUserOrSuperUser, $preloadUser);
+        $this->register('POST', '/{userId}', 'getTokenForUser', $isUserOrSuperUser, $preloadUser);
     }
 
 
@@ -78,7 +78,10 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['tokenBuilder' => $injector->lazyGet('user.tokenBuilder'),]
+                [
+                    'tokenBuilder'     => $injector->lazyGet('user.tokenBuilder'),
+                    'tokenMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+                ]
             )
         );
     }

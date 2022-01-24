@@ -726,11 +726,19 @@
             The Schoolbox API is documented at
             <a href="https://api.schoolbox.com.au/" target="_blank">https://api.schoolbox.com.au/</a>.
         </p>
-        <textarea readonly id="userToken-text" rows="6">{{ token }}</textarea>
+        <textarea readonly id="userToken-text" rows="6"></textarea>
         <div class="component-action">
-            <section>
+            <div class="small-12 medium-7 column">
+                <select id="jwt-id-to-use">
+                    <option value="new">use a new JWT ID</option>
+                    <option value="existing" {% if token.count == 0 %}class="hide"{% endif %}>use a previously generated JWT ID</option>
+                    <option value="no">do not use a JWT ID</option>
+                </select>
+            </div>
+            <div class="small-12 medium-5 column">
+                <button id="generate-token-button">Generate Token</button>
                 <button id="copy-button" data-clipboard-target="#userToken-text">Copy to Clipboard</button>
-            </section>
+            </div>
         </div>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
@@ -1014,6 +1022,17 @@
             }
         });
 
+        // Generate token
+        $('#generate-token-button').on('click', function () {
+            $.post('{{ routeLookup('userToken.getTokenForUser', {userId: user.id, user: user}) }}',
+                    {jwtIdToUse: $('#jwt-id-to-use').val()})
+                    .done(function(data) {
+                        $('#userToken-text').val(data.token);
+                        if (data.showExisting) {
+                            $('#jwt-id-to-use option[value="existing"]').removeClass('hide');
+                        }
+                    })
+        });
 
         // Copy user token to clipboard
         $.fn.clipboardSelector({

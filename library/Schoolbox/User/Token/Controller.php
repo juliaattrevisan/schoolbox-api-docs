@@ -11,6 +11,7 @@ namespace Schoolbox\User\Token;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
@@ -21,24 +22,27 @@ class Controller extends Base
     /**
      * @var Jwt
      */
-    private $tokenBuilder;
+    private Jwt $tokenBuilder;
 
+    private Mapper $tokenMapper;
 
     /**
      * Constructor
      *
-     * @param Jwt $tokenBuilder
+     * @param Jwt    $tokenBuilder
+     * @param Mapper $tokenMapper
      */
-    public function __construct(Jwt $tokenBuilder)
+    public function __construct(Jwt $tokenBuilder, Mapper $tokenMapper)
     {
         $this->tokenBuilder = $tokenBuilder;
+        $this->tokenMapper  = $tokenMapper;
     }
 
 
     /**
      * Retrieve an auth token for the current user.
      *
-     * @api /user/token
+     * @api   /user/token
      * @since 20.1
      */
     public function getTokenForSelf()
@@ -49,18 +53,51 @@ class Controller extends Base
     /**
      * Retrieve an auth token for a specified user.
      *
-     * @api /user/token/{userId}
-     * @since 20.1
      * @param User $user
+     * @throws Exception
+     * @api   /user/token/{userId}
+     * @since 20.1
      */
     public function getTokenForUser(User $user): void
     {
+        $jwtIdToUse = $this->request->post->get('jwtIdToUse') ?? 'no';
+        $userJwtId  = null;
+        $showExisting = false;
+        switch ($jwtIdToUse) {
+            case 'new':
+                // delete existing
+                $existing = $this->tokenMapper->findByColumn('user_id', $user->getId());
+                $this->tokenMapper->softDelete($existing);
+                // create new
+                $userJwtId = $this->tokenMapper->createModel()->setUser($user);
+                $this->tokenMapper->save($userJwtId);
+                // get the new one
+                $userJwtId    = $this->tokenMapper->findOneByColumn('user_id', $user->getId());
+                $showExisting = true;
+                break;
+            case 'existing':
+                try {
+                    $userJwtId = $this->tokenMapper->findOneByColumn('user_id', $user->getId());
+                    $showExisting = true;
+                } catch (Exception $e) {
+                    // this is not expected to happen, but if happens fall back to no jwtId
+                }
+                break;
+            case 'no':
+            default:
+        }
+
         // JSON response:
         // generate from JWT generator
         $this->response->content->set(
             $this->buildJsonOutput(
                 [
-                    'token' => $this->tokenBuilder->generate($user),
+                    'token' => $this->tokenBuilder->generate(
+                        $user,
+                        $userJwtId ? $userJwtId->getExpiry() : null,
+                        $userJwtId ? $userJwtId->getJwtId() : null
+                    ),
+                    'showExisting' => $showExisting,
                 ]
             )
         );

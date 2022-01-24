@@ -25,6 +25,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 
@@ -127,7 +128,7 @@ class Module extends BaseModule
                     'cmsLogMapper' => $this->getMapperFactory()->getLazy(CMSLogMapper::class),
                     'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                     'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
-                    'tokenBuilder' => $injector->get('user.tokenBuilder'),
+                    'tokenMapper' => $this->getMapperFactory()->getLazy(TokenMapper::class),
                     'yearLevelMapper' => $this->getMapperFactory()->getLazy(YearLevel\Mapper::class),
                 ]
             )
