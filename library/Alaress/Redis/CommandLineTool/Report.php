@@ -127,7 +127,8 @@ class Report extends CliTool\App
             "^External_.+",
             '^fc:' . INSTANCE_ID . ':External_',
 
-            // vCal cache
+            // vCal cache: not partitioned by instance ID
+            // (it may need to be one day)
             "^vcal.[0-9a-f]{64}",
 
             // Locks
