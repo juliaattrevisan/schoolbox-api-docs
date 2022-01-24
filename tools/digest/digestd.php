@@ -1,21 +1,6 @@
 #!/usr/bin/php
 <?php
 
-use Alaress\Date\Clock;
-use Alaress\Redis\Async;
-use Aura\Di;
-use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
-use Predis\ClientInterface;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\RoleMapper;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Realtime\Digest\DigestScheduler;
-use Schoolbox\Realtime\Digest\MailNotifier;
-use Schoolbox\Realtime\MessageList\ListFactory;
-use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
-use Schoolbox\UserMapper;
-
 /**
  * The Digest Daemon.
  *
@@ -24,7 +9,21 @@ use Schoolbox\UserMapper;
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Date\Clock;
+use Alaress\Redis\Async;
+use Aura\Di;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
+use Predis\ClientInterface;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
+use Schoolbox\RoleMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Digest\DigestScheduler;
+use Schoolbox\Realtime\Digest\MailNotifier;
+use Schoolbox\Realtime\MessageList\ListFactory;
+use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 

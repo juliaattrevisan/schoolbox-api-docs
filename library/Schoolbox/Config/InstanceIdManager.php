@@ -22,7 +22,6 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use UnderflowException;
 use UnexpectedValueException;
 
-
 /**
  * A CLI tool for updating a school's instance ID.
  *
@@ -121,7 +120,7 @@ class InstanceIdManager extends CliTool\App
         $this->getLogger()->notice('Updating conf file');
         $siteRootParts = explode('/', SITE_root);
         $package = end($siteRootParts);
-        if($package === 'vagrant'){
+        if ($package === 'vagrant') {
             $package = 'schoolbox';
         }
         $iniFile = "/etc/$package/instances.ini";
