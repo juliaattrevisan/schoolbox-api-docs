@@ -136,11 +136,22 @@ class Report extends CliTool\App
             "^[0-9a-f]{40}$",
             "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
 
-            // Message contents
+            // Message instance, detailing the content of a message
+            // (an `\Alaress\Async\Notification\Instance\Instance` instance)
             '^msg:' . INSTANCE_ID . ':m:.+',
 
-            // Pointer to messages?
+            // Message trigger, detailing when, how and why of a message
+            // (a `\Schoolbox\Realtime\Schedule\Trigger\TriggerInterface`
+            //  instance)
             '^msg:' . INSTANCE_ID . ':s:.+',
+
+            // Set of message keys relating to a particular object
+            '^msg:' . INSTANCE_ID . ':q:\D.+',
+
+            // Set of message keys relating to a particular user
+            '^msg:' . INSTANCE_ID . ':q:\d+:unread',
+            '^msg:' . INSTANCE_ID . ':q:\d+:listed',
+            '^msg:' . INSTANCE_ID . ':q:\d+:digest',
 
             // Sessions
             '^PHPREDIS_SESSION:',
@@ -175,11 +186,12 @@ class Report extends CliTool\App
         // (Note that queue is the same instance as cache, so it's not an issue
         //  if queue patterns are found in cache and v.v.)
         Redis::INSTANCE_QUEUE_PUBLISH => [
-            // Message queue
-            '^msg:' . INSTANCE_ID . ':q:\D.+',
-            '^msg:' . INSTANCE_ID . ':q:\d+:unread',
-            '^msg:' . INSTANCE_ID . ':q:\d+:listed',
-            '^msg:' . INSTANCE_ID . ':q:\d+:digest',
+            // Signal queues
+            'scheduled.' . INSTANCE_ID . '.*',
+            'routed.' . INSTANCE_ID . '.*',
+
+            // Instant alert queues
+            '^msg:' . INSTANCE_ID . ':q:\d+:alert',
         ],
     ];
 
