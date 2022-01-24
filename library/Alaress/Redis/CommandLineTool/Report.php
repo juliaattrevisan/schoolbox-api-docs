@@ -349,6 +349,7 @@ class Report extends CliTool\App
                 foreach ($patterns as $pattern) {
                     if (preg_match("/$pattern/", $key)) {
                         // Check each alias
+                        // @phpstan-ignore-next-line: this is currently empty, but may not always be
                         foreach (self::REDIS_INSTANCE_ALIASES as $alias) {
                             if (in_array($instanceName, $alias) && in_array($keyPatternInstanceName, $alias)) {
                                 // This key pattern is referred to in an alias:

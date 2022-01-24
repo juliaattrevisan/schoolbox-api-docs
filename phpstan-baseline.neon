@@ -446,11 +446,6 @@ parameters:
 			path: library/Alaress/Probe.php
 
 		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 1
-			path: library/Alaress/Redis.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Alaress/Redis/Async/Client.php
@@ -554,11 +549,6 @@ parameters:
 			message: "#^Method Alaress\\\\Session\\\\BaseSessionSegment\\:\\:load\\(\\) should return null but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Session/BaseSessionSegment.php
-
-		-
-			message: "#^Property Alaress\\\\Session\\\\Phpfunc\\:\\:\\$redis is never read, only written\\.$#"
-			count: 1
-			path: library/Alaress/Session/Phpfunc.php
 
 		-
 			message: "#^Property Aura\\\\Session\\\\Segment\\:\\:\\$name \\(string\\) in isset\\(\\) is not nullable\\.$#"
@@ -7199,11 +7189,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Trigger/Compressed/CompressedTrigger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Propagator\\:\\:toRedis\\(\\) is unused\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Trigger/Propagator.php
 
 		-
 			message: "#^Dead catch \\- BadMethodCallException is never thrown in the try block\\.$#"
