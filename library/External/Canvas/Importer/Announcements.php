@@ -490,16 +490,23 @@ class Announcements
                 $publishedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['delayed_post_at']));
             }
 
+            // need to save draft before publishing to trigger notification
+            // set trigger effector first
+            $this->newsMapper->setSessionData(['user' => $author]);
+            // save draft
+            $this->newsMapper->save($article);
+
             $article
                 ->setSubmittedAt($postedAt)
                 ->setAcceptedAt($postedAt)
                 ->setAcceptedBy($author)
                 ->setPublishAt($publishedAt)
                 ->setExpiresAt($expiresAt);
+            // finally publish
+            $this->newsMapper->save($article);
 
             /* Shank it into comms_news_article
              */
-            $this->newsMapper->save($article);
 
             /* Update the article source table so we know this article's origins
              * That allows us to skip over it faster next time
