@@ -9,8 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy\Cli;
 
+use Alaress\Lock\InstanceLockFactory;
+use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Clipboard\Hierarchy\Factory;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\RedisStore;
+
 
 /**
  * Encapsulated cli tool
@@ -19,11 +26,32 @@ class HierarchyTool extends CliTool\App
 {
 
     /**
+     * Lock name
+     */
+    public const CLIPBOARD_HIERARCHY_LOCK_NAME = 'clipboard_hierarchy';
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
      */
     private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * --instance=...
+     */
+    private const OPT_LONG_INSTANCE = 'instance:';
+
+
+    /**
+     * Lock ttl (seconds)
+     *
+     * Reserves this amount for every iteration,
+     * refreshing at the start of every iteration
+     */
+    private const LOCK_TTL = 60;
 
 
     /**
@@ -47,37 +75,68 @@ class HierarchyTool extends CliTool\App
 
 Import Clipboard Category/Subcategory/Teams into schoolbox Divisions/Teams equivalent.
 
-Usage: hierarchy.php
+Usage: php hierarchy.php
 
 
 HELP;
             exit;
         }
 
-        $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
+        /* Check that this isn't currently running
+         */
+
+        /** @var ClientInterface $redis */
+        $redis      = $this->getDi()->get('redis');
+        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
+
+        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
+        $lock        = $lockFactory->createLock(self::CLIPBOARD_HIERARCHY_LOCK_NAME, self::LOCK_TTL);
 
         try {
-            $composites = (new Factory(
-                $this->getLogger(),
-                $this->perform(),
-                (string)$this->getConfig()->get('clipboard_endpoint_host'),
-                (string)$this->getConfig()->get('clipboard_endpoint_token'),
-            ))->produce();
-        } catch (\DomainException $e) {
-            $this->getLogger()->warning($e->getMessage());
-
-            return;
+            $acquired = $lock->acquire();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            $acquired = false;
         }
 
-        /* TODO Wrap in transaction
-         * TODO Wrap in lock file
-         */
-        foreach ($composites as $composite) {
-            $composite->import();
-        }
-        
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
+        if ($acquired) {
+            $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
+
+            try {
+                $composites = (new Factory(
+                    $this->getLogger(),
+                    $this->perform(),
+                    (string)$this->getConfig()->get('clipboard_endpoint_host'),
+                    (string)$this->getConfig()->get('clipboard_endpoint_token'),
+                ))->produce();
+            } catch (\DomainException $e) {
+                $this->getLogger()->warning($e->getMessage());
+
+                return;
+            }
+
+            /* TODO Wrap in transaction
+             */
+            foreach ($composites as $composite) {
+                $composite->import();
+
+                $this->getLogger()->debug(sprintf(
+                    'Refreshing lock for another %s seconds',
+                    self::LOCK_TTL
+                ));
+
+                $lock->refresh();
+            }
+
+            if (!$this->perform()) {
+                $this->getLogger()->info('Planning finished.');
+            }
+
+            /* Releasing control
+             */
+            $lock->release();
+        } else {
+            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
+            exit;
         }
     }
 
