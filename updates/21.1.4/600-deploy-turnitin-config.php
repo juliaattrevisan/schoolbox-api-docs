@@ -10,7 +10,9 @@ use Schoolbox\Instance;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * Fetchs TurnItIn credentials from IR and populates instance's database
+ * Fetches TurnItIn credentials from IR
+ * Populates instance's database
+ * Calls TurnItIn to register webhook
  */
 $app = new class extends CliTool\App {
 
@@ -27,6 +29,7 @@ $app = new class extends CliTool\App {
         [$irUrl, $puppetCert, $irApiKey] = $this->getIrConfigOrExit();
         [$turnitinApiKey, $turnitinApiHost] = $this->fetchTurnItInCredentials($irUrl, $puppetCert, $irApiKey);
         $this->updateTurnItInConfig($turnitinApiKey, $turnitinApiHost);
+        exit($this->runTurnItInWebHook());
     }
 
 
@@ -37,6 +40,8 @@ $app = new class extends CliTool\App {
      */
     private function getIrConfigOrExit(): array
     {
+        $this->getLogger()->info("Fetching IR API credentials from disk...");
+
         $irUrl = exec("/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null");
         if (empty($irUrl)) {
             $this->getLogger()->error("IR URL appears invalid: '$irUrl'");
@@ -72,6 +77,8 @@ $app = new class extends CliTool\App {
      */
     private function fetchTurnItInCredentials(string $irUrl, string $puppetCert, string $irApiKey): array
     {
+        $this->getLogger()->info("Fetching Turnitin credentials from IR API...");
+
         $client   = new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
         $options  = [
             'headers' => [
@@ -79,7 +86,8 @@ $app = new class extends CliTool\App {
                 "Content-Type"  => "application/json",
             ],
         ];
-        $response = $client->get("$irUrl/api/v2/host/$puppetCert/instances", $options);
+        $instanceId = INSTANCE_ID;
+        $response = $client->get("$irUrl/api/v2/host/$puppetCert/instances?instance_id=$instanceId", $options);
 
         if ($response->getStatusCode() !== 200) {
             $this->getLogger()->error("Unable to fetch instance data from IR: ({$response->getStatusCode()})'{$response->getReasonPhrase()}'");
@@ -90,7 +98,7 @@ $app = new class extends CliTool\App {
         $instances = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
         foreach ($instances["ir_host_instances"] as $instance) {
-            if ($instance["instance_id"] !== INSTANCE_ID) {
+            if ($instance["instance_id"] !== $instanceId) {
                 continue;
             }
             return [$instance["turnitin_api_key"], $instance["turnitin_api_host"]];
@@ -109,21 +117,33 @@ $app = new class extends CliTool\App {
      */
     private function updateTurnItInConfig(?string $turnitinApiKey, ?string $turnitinApiHost): void
     {
+        $this->getLogger()->info("Updating instance's DB with Turnitin credentials...");
         $irConfig = [
             "turnitin_api_key"  => $turnitinApiKey,
-            "turnitin_api_host" => $turnitinApiHost,
+            "turnitin_api_host" => "https://$turnitinApiHost",
         ];
         foreach ($irConfig as $configName => $configValue) {
-            // TODO consider whether we do want to clear values if they have been cleared in IR
-            if ($configValue === null) {
-                continue;
-            }
             $this->getDatabaseInternal()->executeQuery("UPDATE config SET value = :value WHERE name = :name", [
                 "value" => $configValue,
                 "name"  => $configName,
             ]);
             $this->getLogger()->notice("Updated '$configName' to '$configValue'");
         }
+    }
+
+    /**
+     * @return int
+     * @see /tools/turnitin/webhook.php
+     */
+    private function runTurnItInWebHook(): int
+    {
+        $this->getLogger()->info("Executing turnitin webhook...");
+        $filePath = __DIR__ .  '/../../tools/turnitin/webhook.php';
+        passthru("php $filePath --reset --perform", $returnVar);
+        if($returnVar){
+            $this->getLogger()->error("Webhook invocation returned non-0 exit code");
+        }
+        return $returnVar;
     }
 };
 
