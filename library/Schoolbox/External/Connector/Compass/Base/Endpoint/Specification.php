@@ -114,7 +114,9 @@ class Specification
             ],
             [
                 'endpoint' => 'schedule/v1/GetSchedule',
-                'params' => [],
+                'params' => [
+                    'year' => date('Y')
+                ],
             ],
             [
                 'endpoint' => 'schedule/v1/GetStandardClassDetails',
