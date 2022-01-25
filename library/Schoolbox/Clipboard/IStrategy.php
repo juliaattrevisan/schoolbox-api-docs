@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Clipboard;
 
 /**
- * Interface IInterface
+ * Interface IStrategy
  *
  * Every importer strat must provide this method
  *
