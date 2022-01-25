@@ -120,7 +120,9 @@ $app = new class extends CliTool\App {
         $this->getLogger()->info("Updating instance's DB with Turnitin credentials...");
         $irConfig = [
             "turnitin_api_key"  => $turnitinApiKey,
-            "turnitin_api_host" => "https://$turnitinApiHost",
+            "turnitin_api_host" => (isset($turnitinApiHost) && $turnitinApiHost !== '')
+                ? "https://$turnitinApiHost"
+                : null,
         ];
         foreach ($irConfig as $configName => $configValue) {
             $this->getDatabaseInternal()->executeQuery("UPDATE config SET value = :value WHERE name = :name", [
