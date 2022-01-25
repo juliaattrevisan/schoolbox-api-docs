@@ -339,6 +339,19 @@ class Events implements IStrategy
                      * the wrong place. In that case it retries and dies
                      */
 
+                    /* Unknown activity type
+                     */
+                    if (!isset(self::ACTIVITY_TYPES[$activityType])) {
+                        $this->log->debug(sprintf(
+                            'Activity %s starting on %s has an unknown activityType %s; skipping',
+                            $activity['name'],
+                            $activity['start'],
+                            $activityType
+                        ));
+
+                        continue;
+                    }
+
                     /* Only import specific Activity Types
                      */
                     if (!self::ACTIVITY_TYPES[$activityType]['allowed']) {
