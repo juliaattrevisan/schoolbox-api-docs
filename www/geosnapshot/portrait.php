@@ -37,7 +37,11 @@ $headers = getallheaders();
 /** @var IConfigLoader $config */
 $config = $kernel->getDependencyInjector()->get('config');
 
-if ($config->get('geosnapshot_redaction_key') !== $headers['X-Api-Key']) {
+if (
+    !$config->get('geosnapshot_enabled') ||
+    $config->get('geosnapshot_api_key') === '' ||
+    $config->get('geosnapshot_api_key') !== $headers['X-Api-Key']
+) {
     SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 404);
     exit;
 }
