@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy\Cli;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
@@ -102,7 +103,8 @@ HELP;
 
             /* Used to shank a database instance
              */
-            $db = \Schoolbox\UserMapper::getInstance()->getDatabase();
+            /** @var IConnector $db */
+            $db = $this->getDi()->get('databaseInternal');
 
             try {
                 $composites = (new Factory(
