@@ -220,6 +220,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                     $this->parse('files_block', 'files', true);
                 }
+                $this->parse('has_file_block', 'has_file');
             } else {
                 $this->setVar('files_block', '');
             }
@@ -233,8 +234,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             }
             $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
-
-        $this->parse('has_file_block', 'has_file');
 
         return true;
     }
