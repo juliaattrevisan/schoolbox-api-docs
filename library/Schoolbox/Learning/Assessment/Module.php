@@ -419,6 +419,7 @@ class Module extends BaseModule
         $dc['kamiMapper'] = $this->getMapperFactory()->getLazy(Kami\Mapper::class);
         $dc['pdfGenerator'] = $injector->lazyGet('pdfGenerator');
         $dc['turnitinFileMapper'] = $this->getMapperFactory()->getLazy(\Schoolbox\Learning\Turnitin\File\Mapper::class);
+        $dc['folderMapper'] = $this->injector->lazyNew(\Schoolbox\Resource\Folder\Mapper::class);
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];
@@ -428,6 +429,7 @@ class Module extends BaseModule
         $qc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
         $qc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
         $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
+        $dc['folderMapper'] = $this->injector->lazyNew(\Schoolbox\Resource\Folder\Mapper::class);
 
         // task specific
         $tc =& $injector->params[Assessment\Task\Controller::class];

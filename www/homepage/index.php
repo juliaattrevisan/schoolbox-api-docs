@@ -78,8 +78,8 @@ if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getDi()->get(
     $redirect = (new \Custom\Newic\Redirect(
         (string)$this->getDi()->get('config')->get(\Schoolbox\Config\ConfigMapper::_CANVAS_URL),
         new \External\Canvas\Importer\CanvasDb(),
-        $folderMapper->getDatabase()
-    ))->generateFirstAvailableRedirect($folder);
+        $folderMapper
+    ))->generateRedirect($folder);
 
     if (null !== $redirect) {
         $this->localRedir($redirect);

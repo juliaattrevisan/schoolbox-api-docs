@@ -60,6 +60,12 @@ class Redirect
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
      * A direct connection to our local schoolbox db
      *
      * @var IDatabase
@@ -70,15 +76,16 @@ class Redirect
     /**
      * Constructor.
      *
-     * @param string     $canvasUrl
-     * @param CanvasDb   $canvasDb
-     * @param IDatabase  $db
+     * @param string                            $canvasUrl
+     * @param CanvasDb                          $canvasDb
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
-    public function __construct(string $canvasUrl, CanvasDb $canvasDb, IDatabase $db)
+    public function __construct(string $canvasUrl, CanvasDb $canvasDb, \Schoolbox\Resource\Folder\Mapper $folderMapper)
     {
         $this->canvasUrl = trim($canvasUrl);
         $this->canvasDb = $canvasDb;
-        $this->db = $db;
+        $this->folderMapper = $folderMapper;
+        $this->db = $folderMapper->getDatabase();
     }
 
 
@@ -267,7 +274,7 @@ class Redirect
          * to which you can append the suffixes
          * /assignments/123456 or /quizzes/123456
          */
-        $prefix = $this->generateFirstAvailableRedirect($assessment->getBaseContext()->getFolder());
+        $prefix = $this->generateRedirect($assessment->getBaseContext()->getFolder());
 
         /* If we didn't find a meaningful $prefix, the folder code doesn't exist in canvas
          * so we can't construct the first part of the url; get the heck out of here
@@ -308,16 +315,18 @@ class Redirect
 
 
     /**
-     * For all the folder codes available to $folder,
-     * Try to redirect to canvas - one of the might go somewhere meaningful
-     * especially if you created it directly in schoolbox expecting it to "just work"
+     * Redirect from schoolbox homepage to canvas somewhere
+     *
+     * Try to redirect to canvas - assume the parent folder contains the Year as its folder code
      *
      * @param \Schoolbox\Resource\Folder\Model $folder
      * @return string|null
      * @throws \Alaress\Database\Exception
-     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function generateFirstAvailableRedirect(\Schoolbox\Resource\Folder\Model $folder): ?string
+    public function generateRedirect(\Schoolbox\Resource\Folder\Model $folder): ?string
     {
 
         /* I suppose you don't generate links to canvas if you didn't specify the url
@@ -326,96 +335,29 @@ class Redirect
             return null;
         }
 
-        /* Otherwise, test each folder code and expect one of them
-         * might end up in canvas somewhere
-         */
-        $folderCodes = $folder->getCodes();
-
-        /* Try each of the folder codes associated. If one of them matches a place in canvas,
-         * that's where we're going. There's supposed to be a 1:1 relationship but I don't...
-         * I don't really trust that opinion
-         */
-        foreach ($folderCodes as $folderCode) {
-            $redirect = $this->generateRedirect($folderCode->getCode());
-
-            if (null !== $redirect) {
-                return $redirect;
-            }
-        }
-
-        /* No redirects found
-         */
-        return null;
-    }
-
-
-    /**
-     * Redirect from schoolbox homepage to canvas somewhere
-     *
-     * @param string $folderCode
-     * @return string|null
-     * @throws \Alaress\Database\Exception
-     * @throws \PDOException
-     */
-    private function generateRedirect(string $folderCode): ?string
-    {
-        /* Append the current year, because that's a canvas convention apparently
-         * The original naive approach was to just go to the destination:
+        /* Assume the parent of $folder is the year node
+         * e.g. "2022 (2022)"
+         * And get the Course Code using that folder's folder code
          *
-                $courseCode = sprintf(
-                    '%s%s',
-                    $folderCode,
-                    date('Y')
-                );
+         * If you don't have a parent folder, just return null
+         * That isn't supposed to happen
          */
-        $query = "
-            SELECT f2.name
-            FROM folder_code fc
-            INNER JOIN folder f ON fc.folder_id = f.id
-            INNER JOIN course_implementation ci ON ci.folder_id = f.id
-            INNER JOIN course_specification cs ON ci.course_specification_id = cs.id
-            INNER JOIN folder f2 ON cs.folder_id = f2.id
-            WHERE fc.code = :folderCode
-            AND fc.deleted_at IS NULL
-            AND f.deleted_at IS NULL
-            AND ci.deleted_at IS NULL
-            AND cs.deleted_at IS NULL
-            AND f2.deleted_at IS NULL
-            GROUP BY name
-        ";
-
-        $statement = $this->db->prepare($query);
-
-        $statement->execute([
-            'folderCode' => $folderCode
-        ]);
-
-        $row = $statement->fetch();
-
-        /* Couldn't find a course specification folder that matches $folderCode
-         * Something in the join tree didn't match, returning a null set
-         */
-        if (!$row) {
+        if (null === $folder->getParent()) {
             return null;
         }
 
-        /* Otherwise, you get back a folder name like this:
+        /* There are some big assumptions about this folder tree, but I can't really
+         * move the pieces around in andy's importer without incurring a penalty
          *
-         * 11 IB Chemistry B 2022 (canvas-course-group-11SCICIBHLB2022)
-         *
-         * Now you have to regex out the course code
+         * Just blindly assume the parent a) exists b) works c) has a course code
          */
-        preg_match('/canvas-course-group-([A-za-z0-9]+)/', $row['name'], $matches);
+        $parentFolder = $this->folderMapper->findById($folder->getParent()->getId());
 
-        /* Couldn't match the regex on the folder name
-         */
-        if (!isset($matches[1])) {
-            return null;
-        }
-
-        /* Otherwise, keep digging out the course code
-         */
-        $courseCode = $matches[1];
+        $courseCode = sprintf(
+            '%s%s',
+            $folder->getCodeString(),
+            $parentFolder->getCodeString()
+        );
 
         /* Find out if $folderCode exists in canvas as a course identifier
          * Only care about the states "claimed" and "available", according to the cox

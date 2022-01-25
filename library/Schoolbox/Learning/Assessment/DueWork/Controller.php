@@ -124,29 +124,37 @@ class Controller extends Assessment\Controller
     /** @var Assessment\Feedback\IFeedbackDataSource */
     private $feedbackDataSource;
 
+
     /**
-     * @param UserMapper                    $userMapper
-     * @param Error\Mapper                  $errorMapper
-     * @param AssessmentDataSource          $assessmentMapper
-     * @param WorkTypeMapper                $workTypeMapper
-     * @param Access                        $access
-     * @param Transactor                    $transactor
-     * @param Assessment\Breadcrumb\Factory $bakery
-     * @param RubricDataSource              $rubricMapper
-     * @param RubricResultSetMapper         $resultSetMapper
-     * @param DueWorkResponseMapper         $dueWorkResponseMapper
-     * @param ParticipantMapper             $participantMapper
-     * @param Term\Mapper                   $termMapper
-     * @param SingleFile\Mapper             $submissionFileMapper
-     * @param Kami\Connector                $kamiConnector
-     * @param Kami\Mapper                   $kamiMapper
-     * @param Participant\DataSource        $participantDataSource
-     * @param CourseSpecificationMapper     $courseSpecificationMapper
-     * @param UnitSpecificationMapper       $unitSpecificationMapper
-     * @param Replicator                    $replicator
-     * @param Gotenberg\Client              $pdfGenerator
-     * @param Turnitin\File\Mapper          $turnitinFileMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
+     * @param UserMapper                              $userMapper
+     * @param Error\Mapper                            $errorMapper
+     * @param AssessmentDataSource                    $assessmentMapper
+     * @param WorkTypeMapper                          $workTypeMapper
+     * @param Access                                  $access
+     * @param Transactor                              $transactor
+     * @param Assessment\Breadcrumb\Factory           $bakery
+     * @param RubricDataSource                        $rubricMapper
+     * @param RubricResultSetMapper                   $resultSetMapper
+     * @param DueWorkResponseMapper                   $dueWorkResponseMapper
+     * @param ParticipantMapper                       $participantMapper
+     * @param Term\Mapper                             $termMapper
+     * @param SingleFile\Mapper                       $submissionFileMapper
+     * @param Kami\Connector                          $kamiConnector
+     * @param Kami\Mapper                             $kamiMapper
+     * @param Participant\DataSource                  $participantDataSource
+     * @param CourseSpecificationMapper               $courseSpecificationMapper
+     * @param UnitSpecificationMapper                 $unitSpecificationMapper
+     * @param Replicator                              $replicator
+     * @param Gotenberg\Client                        $pdfGenerator
+     * @param Turnitin\File\Mapper                    $turnitinFileMapper
      * @param Assessment\Feedback\IFeedbackDataSource $feedbackDataSource
+     * @param \Schoolbox\Resource\Folder\Mapper       $folderMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -170,7 +178,8 @@ class Controller extends Assessment\Controller
         Replicator $replicator,
         Gotenberg\Client $pdfGenerator,
         Turnitin\File\Mapper $turnitinFileMapper,
-        Assessment\Feedback\IFeedbackDataSource $feedbackDataSource
+        Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
+        \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -196,6 +205,7 @@ class Controller extends Assessment\Controller
         $this->pdfGenerator          = $pdfGenerator;
         $this->turnitinFileMapper    = $turnitinFileMapper;
         $this->feedbackDataSource    = $feedbackDataSource;
+        $this->folderMapper          = $folderMapper;
     }
 
 
@@ -307,7 +317,7 @@ class Controller extends Assessment\Controller
             $externalRedirectUrl = (new \Custom\Newic\Redirect(
                 $this->getConfigLoader()->get('canvas_url'),
                 new CanvasDb(),
-                $this->getUserMapper()->getDatabase()
+                $this->folderMapper,
             ))->generateAssessmentRedirect(
                 $this->getUser(),
                 $assessment
