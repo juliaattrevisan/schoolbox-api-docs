@@ -88,34 +88,42 @@ class Factory
          */
         $api = new Api($this->host, $this->token);
 
+        /* Various mappers that we need to save bits and pieces inside each strat
+         */
+        $seasonMapper = \Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $sportMapper = \Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $positionMapper = \Schoolbox\Fixtures\Position\Mapper::getInstance();
+        $divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
+
         /* Set up composite bus - everybody's data gets on board and shuttled off
          * into schoolbox town
          */
         return (new GenericCollection(IStrategy::class))
             ->add(new Prepare(
                 $this->log,
-                \Schoolbox\Fixtures\Season\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Sport\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Position\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Division\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Team\Mapper::getInstance()
+                $seasonMapper,
+                $sportMapper,
+                $positionMapper,
+                $divisionMapper,
+                $teamMapper
             ))
             ->add(new Team(
                 $this->log,
                 $api,
-                \Schoolbox\Fixtures\Season\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Sport\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Position\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Division\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Team\Mapper::getInstance()
+                $seasonMapper,
+                $sportMapper,
+                $positionMapper,
+                $divisionMapper,
+                $teamMapper
             ))
             ->add(new Cleanup(
                 $this->log,
-                \Schoolbox\Fixtures\Season\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Sport\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Position\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Division\Mapper::getInstance(),
-                \Schoolbox\Fixtures\Team\Mapper::getInstance()
+                $seasonMapper,
+                $sportMapper,
+                $positionMapper,
+                $divisionMapper,
+                $teamMapper
             ));
     }
 }
