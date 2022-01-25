@@ -142,7 +142,7 @@ $app = new class extends CliTool\App {
         $this->getLogger()->info("Executing turnitin webhook...");
         $filePath = __DIR__ .  '/../../tools/turnitin/webhook.php';
         passthru("php $filePath --reset --perform", $returnVar);
-        if($returnVar){
+        if ($returnVar) {
             $this->getLogger()->error("Webhook invocation returned non-0 exit code");
         }
         return $returnVar;
