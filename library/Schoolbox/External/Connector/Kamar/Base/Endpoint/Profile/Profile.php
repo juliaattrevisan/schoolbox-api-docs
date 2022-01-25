@@ -250,8 +250,9 @@ class Profile implements IStrategy
              */
             if ('' === $username) {
                 $this->log->warning(sprintf(
-                    'Skipping base profile for student %s - no username detected',
-                    trim("{$firstname} {$lastname}")
+                    'Skipping base profile for student %s (%s) - no username detected',
+                    trim("{$firstname} {$lastname}"),
+                    $externalId
                 ));
 
                 continue;
@@ -261,8 +262,9 @@ class Profile implements IStrategy
              */
             if ($startingDate && $startingDate->isFuture()) {
                 $this->log->warning(sprintf(
-                    'Skipping base profile for student %s - start date in the future',
-                    trim("{$firstname} {$lastname}")
+                    'Skipping base profile for student %s (%s) - start date in the future',
+                    trim("{$firstname} {$lastname}"),
+                    $externalId
                 ));
 
                 continue;
