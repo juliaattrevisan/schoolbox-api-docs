@@ -105,6 +105,14 @@ HELP;
                 exit();
             }
 
+            /* Used to shank a database instance
+             */
+            $db = \Schoolbox\UserMapper::getInstance()->getDatabase();
+
+            /* Wrap in transaction so changes are atomic
+             */
+            $db->beginTransaction();
+
             /** @var StrategyFactory $strategyFactory */
             $strategyFactory = $this->getDi()->get('commsNewsAudienceStrategyFactory');
 
@@ -125,7 +133,13 @@ HELP;
                 $lock
             ))->import();
 
-            if (!$this->perform()) {
+            /* Only commit changes in Perform mode
+             */
+            if ($this->perform()) {
+                $db->commit();
+            } else {
+                $db->rollBack();
+
                 $this->getLogger()->info('Planning finished.');
             }
 
