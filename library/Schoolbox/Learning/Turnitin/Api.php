@@ -226,6 +226,19 @@ class Api
             ), 404);
         }
 
+        if (409 === $result->getStatusCode()) {
+            throw new Exception\Conflict(
+                sprintf(
+                    'Turnitin: endpoint %s %s returned %s - %s',
+                    $method,
+                    $endpoint,
+                    $result->getStatusCode(),
+                    $result->getReasonPhrase()
+                ),
+                409
+            );
+        }
+
         /* I guess we succeeded, which should be the case most of the time,
          * but we should check for other errors in the caller function to decide
          * what happens next and how those errors might be logged/presented to users

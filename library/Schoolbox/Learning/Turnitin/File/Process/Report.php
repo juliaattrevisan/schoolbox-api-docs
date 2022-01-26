@@ -254,9 +254,9 @@ class Report
      * then I guess we're ready to move onto the next step which is to request a report generation
      *
      * @param Turnitin\File\Model $model
-     * @param array|null          $reportInfo The report info as retrieved from
-     *                                        the API, or passed from the
-     *                                        webhook: null if not known
+     * @param array|null          $existingInfo Existing info as retrieved from
+     *                                          the API, or passed from the
+     *                                          webhook: null if not known
      * @return array|null
      * @throws BadEndpoint
      * @throws Credentials
@@ -268,13 +268,13 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getReportInfo(Turnitin\File\Model $model, ?array $reportInfo): ?array
+    public function getReportInfo(Turnitin\File\Model $model, ?array $existingInfo): ?array
     {
-        // Does the report info indicate an error happened?
+        // Does the existing report info indicate an error happened?
         // Log that and short-circuit, because attempting to retrieve the
         // submission again will just raise another error.
-        if (self::UPLOAD_ERROR === $reportInfo['status']) {
-            $this->changeToErrorState($model, $reportInfo);
+        if (self::UPLOAD_ERROR === $existingInfo['status']) {
+            $this->changeToErrorState($model, $existingInfo);
             return null;
         }
 
@@ -299,6 +299,9 @@ class Report
              */
             $similarity = $this->generateReport($model);
 
+            return null;
+        } catch (Turnitin\Exception\Conflict $e) {
+            $this->changeToErrorState($model, $existingInfo);
             return null;
         }
 
