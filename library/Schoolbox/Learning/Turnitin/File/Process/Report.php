@@ -132,7 +132,7 @@ class Report
      */
     public function processPreparedReports(Turnitin\File\Model $model): void
     {
-        $reportInfo = $this->getReportInfo($model);
+        $reportInfo = $this->getReportInfo($model, null);
 
         /* If we got report data, cache some of it locally
          * then clear away all previous errors I suppose,
@@ -227,17 +227,7 @@ class Report
              * Save the error state
              */
             if (self::UPLOAD_ERROR === $uploadResult['status']) {
-                $this->logWarning(sprintf(
-                    'Report %s: upload contains error code %s',
-                    $model->getId(),
-                    $uploadResult['error_code']
-                ));
-
-                $model->setErrorCode($uploadResult['error_code'])
-                    ->setStatus(Turnitin\File\Model::STATUS_ERROR);
-
-                $this->turnitinMapper->save($model);
-
+                $this->changeToErrorState($model, $uploadResult);
                 return null;
             }
 
@@ -264,6 +254,9 @@ class Report
      * then I guess we're ready to move onto the next step which is to request a report generation
      *
      * @param Turnitin\File\Model $model
+     * @param array|null          $reportInfo The report info as retrieved from
+     *                                        the API, or passed from the
+     *                                        webhook: null if not known
      * @return array|null
      * @throws BadEndpoint
      * @throws Credentials
@@ -275,8 +268,16 @@ class Report
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getReportInfo(Turnitin\File\Model $model): ?array
+    public function getReportInfo(Turnitin\File\Model $model, ?array $reportInfo): ?array
     {
+        // Does the report info indicate an error happened?
+        // Log that and short-circuit, because attempting to retrieve the
+        // submission again will just raise another error.
+        if (self::UPLOAD_ERROR === $reportInfo['status']) {
+            $this->changeToErrorState($model, $reportInfo);
+            return null;
+        }
+
         try {
             $reportResult = $this->api->retrieve('GET', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/similarity", []);
         } catch (BadEndpoint $e) {
@@ -421,6 +422,29 @@ class Report
         $model->setErrorCode(null)
             ->setErrorMessage(null)
             ->setStatus($status);
+
+        $this->turnitinMapper->save($model);
+    }
+
+    /**
+     * Change the state of this report to an error state.
+     *
+     * @param Turnitin\File\Model $model
+     * @param array               $uploadResult
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function changeToErrorState(Turnitin\File\Model $model, array $uploadResult)
+    {
+        $this->logWarning(
+            sprintf(
+                'Report %s: upload contains error code %s',
+                $model->getId(),
+                $uploadResult['error_code']
+            )
+        );
+
+        $model->setErrorCode($uploadResult['error_code'])
+              ->setStatus(Turnitin\File\Model::STATUS_ERROR);
 
         $this->turnitinMapper->save($model);
     }
