@@ -9,18 +9,28 @@
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
 use Alaress\Database\Predicate\Builder;
+use Aura\Di\Exception\ServiceNotFound;
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Course\DataModel\AbstractUnitMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\LTI\Assessment\Model as LtiAssessment;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\HomepageConfig;
+use Sentry\State\HubInterface;
 
 use function is_array;
 
@@ -65,8 +75,43 @@ class Mapper extends AbstractUnitMapper
     public function softDeleteAssessments(Model $unitImpl)
     {
         $assessmentMapper = AssessmentMapper::getInstance();
+        /** @var SubmissionBoxMapper $submissionBoxMapper */
+        $submissionBoxMapper = $assessmentMapper->getJoinMapper('duework');
+        /** @var \Schoolbox\Learning\Quiz\Mapper $quizMapper */
+        $quizMapper = $assessmentMapper->getJoinMapper('quiz');
+        /** @var TaskMapper $taskMapper */
+        $taskMapper = $assessmentMapper->getJoinMapper('task');
+        /** @var \Schoolbox\Learning\Assessment\DataModel\Project\Mapper $projectMapper */
+        $projectMapper = $assessmentMapper->getJoinMapper('project');
+        /** @var \Schoolbox\LTI\Assessment\Mapper $ltiAssessmentMapper */
+        $ltiAssessmentMapper = $assessmentMapper->getJoinMapper('ltiAssessment');
+
         $assessments = $assessmentMapper->findByColumn('v_ui.course_unit_implementation_id', $unitImpl->getId(), ['deleted' => true]);
-        $assessmentMapper->delete($assessments);
+        // To get pre/post delete triggers work properly, we need to delete separately by assessment type
+        // as in library/Schoolbox/Learning/Assessment/DataModel/MapperProxy::delete
+        foreach ($assessments as $assessment) {
+            try {
+                if ($assessment->getDueWork() instanceof DueWork) {
+                    $submissionBoxMapper->delete($assessment->getDueWork());
+                } elseif ($assessment->getQuiz() instanceof Quiz) {
+                    $quizMapper->delete($assessment->getQuiz());
+                } elseif ($assessment->getTask() instanceof Task) {
+                    $taskMapper->delete($assessment->getTask());
+                } elseif ($assessment->getProject() instanceof Project) {
+                    $projectMapper->delete($assessment->getProject());
+                } elseif ($assessment->getLtiAssessment() instanceof LtiAssessment) {
+                    $ltiAssessmentMapper->delete($assessment->getLtiAssessment());
+                }
+            } catch (MapperException $e) {
+                try {
+                    /** @var HubInterface $sentry */
+                    $sentry = self::getDi()->get('sentry');
+                } catch (ServiceNotFound $e) {
+                    return;
+                }
+                $sentry->captureException($e);
+            }
+        }
     }
 
 
