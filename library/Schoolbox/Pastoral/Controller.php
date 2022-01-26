@@ -731,7 +731,18 @@ class Controller extends Base
     public function postCommentInsert(Model $record): void
     {
         $post = $this->getRequest()->post;
-        if (!empty(trim($post["comment_body"]))) {
+        /**
+         * confirm if the user can view / edit the private part of the record
+         */
+        $accessLevel       = (new AccessLevelCensor())->getAccessLevel($record, $this->getUser());
+        $allowPrivate = $accessLevel > PastoralAccessMapper::ACCESS_PUBLIC;
+
+        /**
+         * if the user is does not have private access, and is trying to set a private comment, fail
+         */
+        if (!$allowPrivate && $post["comment_private"]) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
+        } else if (!empty(trim($post["comment_body"]))) {
             // Insert the comment to the internal database
             $comment = $this->pastoralCommentMapper->createModel();
             $comment->setPastoral($record);
