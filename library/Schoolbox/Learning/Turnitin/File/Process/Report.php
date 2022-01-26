@@ -296,12 +296,14 @@ class Report
             );
 
             /* Schedule a report for generation (don't know if we need $similarity yet)
+             * Also, log the conflict if there is one
              */
-            $similarity = $this->generateReport($model);
+            try {
+                $similarity = $this->generateReport($model);
+            } catch (Turnitin\Exception\Conflict $e) {
+                $this->changeToErrorState($model, $existingInfo);
+            }
 
-            return null;
-        } catch (Turnitin\Exception\Conflict $e) {
-            $this->changeToErrorState($model, $existingInfo);
             return null;
         }
 
@@ -336,6 +338,7 @@ class Report
      * @return array|null
      * @throws BadEndpoint
      * @throws Credentials
+     * @throws Turnitin\Exception\Conflict
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
