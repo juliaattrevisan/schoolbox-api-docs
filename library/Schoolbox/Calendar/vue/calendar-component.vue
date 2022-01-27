@@ -34,10 +34,9 @@ export default {
         },
         title: {
             type: String,
-            required: true,
+            required: false,
             default: () => {
-                /* This is a default string that should never appear
-                 * It should always be using the component config's componentName value
+                /* Will be using the component config's componentName value when available otherwise
                  */
                 return 'Calendar';
             }
