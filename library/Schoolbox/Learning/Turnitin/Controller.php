@@ -141,7 +141,7 @@ class Controller extends Base
         /* If we found it, tell turnitin to make a report for it
          * Everything after here is kind of a rip from the cli tools
          */
-        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->getReportInfo($data['model']);
+        (new Turnitin\File\Process\Report($this->produceApi(), $this->turnitinFileMapper))->getReportInfo($data['model'], $data['payload']);
     }
 
 
