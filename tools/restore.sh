@@ -885,13 +885,13 @@ else
 fi
 
 # Sync plan-type with instance registry
-function get_plan_type_from_instance_registry() {
-  local instance_registry_url="$(schoolbox-instance-registry --url)";
-  local puppet_cert="$(schoolbox-instance-registry --puppet-cert)";
-  local api_key="$(schoolbox-instance-registry --api-key)";
+get_plan_type_from_instance_registry() {
+  local -r instance_registry_url="$(schoolbox-instance-registry --url)";
+  local -r puppet_cert="$(schoolbox-instance-registry --puppet-cert)";
+  local -r api_key="$(schoolbox-instance-registry --api-key)";
 
   # send API request to IR - /api/hosts/{cert}/instances
-  local ir_host_instances_json="$(curl \
+  local -r ir_host_instances_json="$(curl \
     --silent \
     "$instance_registry_url/api/v2/host/$puppet_cert/instances?instance_id=$(get_destination_instance_id)" \
     -H "Authorization: Bearer $api_key" \
