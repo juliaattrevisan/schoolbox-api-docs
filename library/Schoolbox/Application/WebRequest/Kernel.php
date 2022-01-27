@@ -646,12 +646,16 @@ class Kernel extends WebKernelAbstract
                     $tokenMapper = $mapperFactory->get(User\Token\Mapper::class);
 
                     try {
-                        $tokenMapper->findOneByColumnList(
+                        /** @var User\Token\Model $token */
+                        $token = $tokenMapper->findOneByColumnList(
                             [
                                 'user_id' => $user->getId(),
                                 'jwt_id'  => $claims[MessagePayloadInterface::CLAIM_JTI],
                             ]
                         );
+                        if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
+                            throw new Unauthenticated('Token has expired');
+                        }
                     } catch (MapperException $e) {
                         throw new Unauthenticated('Invalid JWT ID: ' . $e->getMessage());
                     }
