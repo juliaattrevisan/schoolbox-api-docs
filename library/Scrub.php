@@ -438,15 +438,15 @@ class Scrub
         $text = self::getMarkdownConverter()->convertToHtml($text)->getContent();
         $text = nl2br(trim($text));
         // Removing extra <br /> tags in lists
-        $text = preg_replace('/\<ul>(\s*)\<br \/\>(\s*)<li>/', "<ul>\n<li>", $text);
-        $text = preg_replace('/\<ol>(\s*)\<br \/\>(\s*)<li>/', "<ol>\n<li>", $text);
-        $text = preg_replace('/\<\/li\>(\s*)\<br \/\>(\s*)<li>/', "</li>\n<li>", $text);
-        $text = preg_replace('/\<\/li\>(\s*)\<br \/\>(\s*)\<\/ul\>/', "</li>\n</ul>", $text);
-        $text = preg_replace('/\<\/li\>(\s*)\<br \/\>(\s*)\<\/ol\>/', "</li>\n</ol>", $text);
-        $text = preg_replace('/\<li\>(\s*)\<br \/\>(\s*)\<ul\>/', "<li>\n<ul>", $text);
-        $text = preg_replace('/\<li\>(\s*)\<br \/\>(\s*)\<ol\>/', "<li>\n<ol>", $text);
-        $text = preg_replace('/\<\/ul>(\s*)\<br \/\>(\s*)<\/li>/', "</ul>\n</li>", $text);
-        $text = preg_replace('/\<\/ol>(\s*)\<br \/\>(\s*)<\/li>/', "</ol>\n</li>", $text);
+        $text = str_replace("<ul><br />\n<li>", "<ul>\n<li>", $text);
+        $text = str_replace("<ol><br />\n<li>", "<ol>\n<li>", $text);
+        $text = str_replace("</li><br />\n<li>", "</li>\n<li>", $text);
+        $text = str_replace("</li><br />\n</ul>", "</li>\n</ul>", $text);
+        $text = str_replace("</li><br />\n</ol>", "</li>\n</ol>", $text);
+        $text = str_replace("<li><br />\n<ul>", "<li>\n<ul>", $text);
+        $text = str_replace("<li><br />\n\<ol>", "<li>\n<ol>", $text);
+        $text = str_replace("</ul><br />\n</li>", "</ul>\n</li>", $text);
+        $text = str_replace("</ol><br />\n</li>", "</ol>\n</li>", $text);
         return $text;
     }
 
