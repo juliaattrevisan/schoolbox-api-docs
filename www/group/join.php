@@ -7,6 +7,12 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
+/*
+ * redirect to new groups page, this page is no longer used [SA-12873]
+ */
+header("location: {$this->routeLookup('groups.getNewGroups')}#groups-i-can-join", true);
+exit;
+
 $this->setFile(TEMPLATE_content, 'group/join.html');
 $this->setBlock(TEMPLATE_content, 'free_list', 'free_list_block');
 $this->setBlock(TEMPLATE_content, 'moderated_list', 'moderated_list_block');
