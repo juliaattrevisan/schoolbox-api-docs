@@ -1,0 +1,10 @@
+{% extends '@intellischool/base.twig' %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{% block breadcrumbs %}
+    {{ bread.crumbs(
+        ['Classes', '/course/list'],
+        ['Cohort Analytics']
+    ) }}
+{% endblock breadcrumbs %}

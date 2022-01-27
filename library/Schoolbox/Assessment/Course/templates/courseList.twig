@@ -60,6 +60,12 @@ Usage:
             {% if atlasImportUrl %}
                 <a href="{{ atlasImportUrl }}?{{ returnUrlKey }}={{ encodedReturnUrl }}" class="icon-curriculum" title="Import from Atlas"></a>
             {% endif %}
+            {# intellischool anlytics, hide if it is not setup, both routes, have the same perms (settings) #}
+            {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
+            {% if intellischoolCohortUrl %}
+                <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" class="icon-curriculum-details"></a>
+                <a href="{{ routeLookup('intellischool.getTaskDashboard') }}" title="Task Adherence" class="icon-task"></a>
+            {% endif %}
         </nav>
     {% endif %}
 </div>

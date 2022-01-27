@@ -19,6 +19,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
+use Schoolbox\Url\Factory;
 use Schoolbox\UserMapper;
 
 /**
@@ -46,6 +47,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL, $this->getConfig()),
         );
         $staffPermission = new Rule\Any(
             new Rule\IsSuperuser(),
@@ -105,6 +107,20 @@ class Module extends BaseModule
             new Rule\All($basePermission, $staffPermission),
             $classCodePreload,
         );
+        //cohort profile
+        $this->register(
+            BaseModule::METHOD_GET,
+            "/cohort",
+            'getCohortProfile',
+            new Rule\All($basePermission, $staffPermission),
+        );
+        //Task Adherence Dashboard
+        $this->register(
+            BaseModule::METHOD_GET,
+            "/task",
+            'getTaskDashboard',
+            new Rule\All($basePermission, $staffPermission),
+        );
     }
 
     /**
@@ -125,6 +141,8 @@ class Module extends BaseModule
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
+                            (new Factory($this->getConfig()))->buildFullyQualified()->toString()
                         );
                     }),
                 ]
