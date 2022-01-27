@@ -809,6 +809,8 @@ restore_pre_v20.1_config_dirs;
 ## Fix SQL config paths to data directory
 "$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mysql -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
 
+mysql -h"$sqlhost" -u"$sqluser" -p"$sqlpasswd" "$sqldb" -e "UPDATE config SET value = '/var/log/schoolbox/$destination_instance_id' WHERE name = 'logs_dir'"
+
 echo -e "\nEnsuring data dirs exist on disk"
 "$instdir"/tools/site/create-data-dirs.sh --instance "$destination_instance_id"
 
