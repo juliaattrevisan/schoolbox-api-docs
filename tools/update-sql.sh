@@ -156,15 +156,6 @@ execute_upgrade_scripts(){
   end=$3
 
   log "Updating database to new version";
-
-  # Set Site Package version in config will be blank in vagrant
-  local package_version
-  if dpkg -l | grep -qE "\sschoolbox\s"; then
-    package_version=$(dpkg -s schoolbox | grep Version | awk '{print $2}')
-  fi
-  log "Setting 'site_package' to '$package_version'"
-  mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
-
   # Run update scripts in release order, SQL first then PHP for each release
   for release in $(echo "$version_list" | sed -n "$start","$end"p ); do
     log "Running update $release";
@@ -220,12 +211,25 @@ check_system_dependencies(){
   fi
 }
 
+set_site_package(){
+  # Set Site Package version in config will be blank in vagrant
+  local package_version
+  if dpkg -l | grep -qE "\s${package}\s"; then
+    package_version=$(dpkg -s $package | grep Version | awk '{print $2}')
+  fi
+  log "Setting 'site_package' to '$package_version'"
+  mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
+}
+
 
 # Main logic flow
 main(){
   check_instance_id
   check_run_as_root
   derive_global_vars "$@"
+
+  # Always execute this, regardless of whether SQL upgrades required, as we may be deploying a dataset that doesn't require SQL updates
+  set_site_package
 
   # Build update version list, derive latest version, collect current SQL version
   version_list=$(find /usr/share/schoolbox/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
