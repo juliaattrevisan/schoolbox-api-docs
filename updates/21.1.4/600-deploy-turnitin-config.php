@@ -61,7 +61,7 @@ $app = new class extends CliTool\App {
                 $this->getLogger()->debug("No IR API_KEY and instance is development. That's fine. Exiting.");
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
-            $this->getLogger()->error("No IR API_KEY and instance is not development.");
+            $this->getLogger()->error("No IR API_KEY and instance ($siteType) is not development.");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
         return [$irUrl, $puppetCert, $irApiKey];
