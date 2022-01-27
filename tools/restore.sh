@@ -285,7 +285,7 @@ setSyncType() {
 setSyncType $1;
 liveCheck;
 tempconffile="$conffile";
-readconf;
+INSTANCE_ID="$destination_instance_id" readconf;
 
 sqluser="$tempsqluser";
 sqlpasswd="$tempsqlpasswd";
@@ -382,7 +382,7 @@ do
 		if [ -f $localinstall ];
 		then
 			tempconffile=`readlink -f $localinstall`;
-			readconf;
+			INSTANCE_ID="$destination_instance_id" readconf;
 			readsqlver;
 			tempfiledir=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
 			if [ ! -z $tempfiledir ];
@@ -716,13 +716,13 @@ fi
 
 # Re-read the conf file to ensure safety
 tempconffile="$conffile";
-readconf;
+INSTANCE_ID="$destination_instance_id" readconf;
 readsqlconfig;
 cd $curdir;
 
 # Backup this installs database
 echo -e "\nPerforming backup of current database";
-newbackup=`$instdir/tools/backup-database.sh`;
+newbackup=$(INSTANCE_ID=$destination_instance_id "$instdir"/tools/backup-database.sh);
 if [ `echo $newbackup | grep 'Backup of database at version' | wc -l` -eq 0 ];
 then
 	errmsg="An error occured during the database backup";
@@ -772,7 +772,7 @@ fi
 ## We may have just imported an old DB schema, which has configs that don't align to the current script.
 ## In this case, apply custom fixes.
 function restore_pre_v20.1_config_dirs(){
-  readconf;
+  INSTANCE_ID="$destination_instance_id" readconf;
   readsqlver;
   local sql_ver="$tempsqlver";
   local xml_dir;
