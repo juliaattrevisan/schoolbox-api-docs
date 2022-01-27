@@ -53,17 +53,13 @@ fullpath=${filepath%/*};
 conffile=`readlink -f $fullpath/../www/conf/conf.php`;
 
 instdir=`readlink -f $fullpath/../`;
-package=${instdir##*/};
 
 curdir=`pwd`;
 
 # Outputs the instance_id of the destination. Typically the staging instance.
 # If multiple found, prompts user to select one.
 get_destination_instance_id(){
-  local etc_dir="/etc/$package"
-  if [[ $package == "vagrant" ]]; then
-    etc_dir="/etc/schoolbox"
-  fi
+  local etc_dir="/etc/schoolbox"
   local ini_file="$etc_dir/instances.ini"
   local instance_list
   instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list)
@@ -245,11 +241,7 @@ truncateTables() {
 liveCheck() {
   echo "Checking site_type of instance being restored to..."
 
-  if [[ $package == 'schoolboxdev' ]]; then
-    temp_ini_file="/etc/schoolboxdev/instances.ini"
-  else
-    temp_ini_file="/etc/schoolbox/instances.ini"
-  fi
+  temp_ini_file="/etc/schoolbox/instances.ini"
   read_ini "$destination_instance_id"
   destination_site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
 
@@ -313,7 +305,6 @@ fi
 # TODO - maybe this should already work on a fresh install with no DB loaded at some point
 echo -e "* Details of this install *";
 echo "Using db credentials from: "`readlink -f $conffile`;
-echo "Package: $package";
 echo "SQL Version: $sqlver";
 echo "Install Directory: $instdir";
 conf_backup_dir=$(mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'");
@@ -386,7 +377,7 @@ fi
 for localinstall in $searchlist;
 do
 	# Search for local installs, but ignore the current install if listed
-	if [ `echo $localinstall | grep -v "$package/" | wc -l` -gt 0 ];
+	if [ `echo $localinstall | grep -v "schoolbox/" | wc -l` -gt 0 ];
 	then
 		if [ -f $localinstall ];
 		then
@@ -524,7 +515,7 @@ if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
 
   # Provide feedback for confirmation of what is to be done based on above questions.
   echo -e "\n $restorepretty";
-  echo -e "\n     Restore into '$package' at '$instdir'";
+  echo -e "\n     Restore into 'schoolbox' at '$instdir'";
   while true; do
     echo -e "\nIs this the correct option? (y/n): \c" && read -r confirm;
     if [[ $confirm =~ [ynYN] ]]; then
@@ -823,7 +814,7 @@ fi
 
 ## Run SQL updates to current install
 echo "";
-INSTANCE_ID="$destination_instance_id" "$instdir"/tools/update-sql.sh 2>&1 | tee -a /var/log/"$package"/upgrade.log;
+INSTANCE_ID="$destination_instance_id" "$instdir"/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/"$destination_instance_id"/upgrade.log;
 
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
@@ -913,7 +904,7 @@ INSTANCE_ID="$destination_instance_id" php "$instdir"/tools/set-plan.php --plan 
 
 # Restart schoolbox services
 echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
-/usr/share/"$package"/tools/notif/allrestart "$destination_instance_id"
+/usr/share/schoolbox/tools/notif/allrestart "$destination_instance_id"
 
 echo -e "Rebuilding cron jobs (because timezone may be different in new DB). Assuming this host is primary"
 schoolboxcloud-rebuild-cronjobs --is-primary-host 1
