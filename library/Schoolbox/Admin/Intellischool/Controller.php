@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\Intellischool;
+
+use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Intellischool\JwtFactory;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
+class Controller extends Base
+{
+    /**
+     * Factory for creating JWTs for sending to Intellischool.
+     */
+    private JwtFactory $jwtFactory;
+
+    /**
+     * Constructor
+     *
+     * @param JwtFactory $jwtFactory
+     */
+    public function __construct(JwtFactory $jwtFactory)
+    {
+        $this->jwtFactory = $jwtFactory;
+    }
+
+    /**
+     * Display the admin console for Intellischool for admins to edit settings in Albitros themselves
+     *
+     */
+    public function getConsole()
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminIntellischool/console.twig', [
+            'pageCurrent'      => $this->router->generate('adminIntellischool.getConsole'),
+            'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminIntellischool.getConsole')),
+            'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
+            'jwt'         => $this->jwtFactory->buildForAdminView($this->getUser()),
+            'title' => 'Intellischool - Admin Console'
+        ])->setTitle('Intellischool - Admin Console'));
+    }
+}

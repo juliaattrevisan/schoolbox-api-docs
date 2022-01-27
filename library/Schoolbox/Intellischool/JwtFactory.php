@@ -137,6 +137,18 @@ class JwtFactory
     }
 
     /**
+     * Build a JWT for the Admin dashboard.
+     *
+     * @return string
+     */
+    public function buildForAdminView(User $currentUser): string
+    {
+        $claims = $this->buildBaseClaims($currentUser);
+        $claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] = 'https://analytics.intellischool.cloud/console/schoolbox';
+        return JWT::encode($claims, $this->privateKey, $this->privateKeySigningAlgorithm);
+    }
+
+    /**
      * Build a JWT for the given cohort dashboard.
      *
      * @param User   $currentUser
