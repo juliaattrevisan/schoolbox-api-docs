@@ -909,7 +909,7 @@ echo -e "\nSyncing plan type with instance registry"
 echo "Setting plan type to: '$plan_type'";
 
 # Invoke set-plan.php to sync plan with IR
-php "$instdir"/tools/set-plan.php --plan "$plan_type";
+INSTANCE_ID="$destination_instance_id" php "$instdir"/tools/set-plan.php --plan "$plan_type";
 
 # Restart schoolbox services
 echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
