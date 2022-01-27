@@ -64,7 +64,6 @@ Usage:
             {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
             {% if intellischoolCohortUrl %}
                 <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" class="icon-curriculum-details"></a>
-                <a href="{{ routeLookup('intellischool.getTaskDashboard') }}" title="Task Adherence" class="icon-task"></a>
             {% endif %}
         </nav>
     {% endif %}
