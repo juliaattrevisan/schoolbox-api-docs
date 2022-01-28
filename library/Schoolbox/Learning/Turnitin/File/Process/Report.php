@@ -301,7 +301,7 @@ class Report
             try {
                 $similarity = $this->generateReport($model);
             } catch (Turnitin\Exception\Conflict $e) {
-                $this->changeToErrorState($model, $existingInfo);
+                $this->changeToErrorState($model, $existingInfo ?? ['error_code' => 'unknown']);
             }
 
             return null;
