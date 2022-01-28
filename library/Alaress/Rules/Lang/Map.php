@@ -73,7 +73,7 @@ class Map implements Construct
         $output = [];
         foreach ($inputValue as $input) {
             foreach ($this->map as $mapKey => $mapVal) {
-                if (fnmatch($mapKey, $input, FNM_CASEFOLD)) {
+                if ($mapKey === $input || fnmatch($mapKey, $input, FNM_CASEFOLD)) {
                     if (is_array($mapVal)) {
                         $output = array_merge($output, $this->flattenArray($mapVal));
                     } else {
