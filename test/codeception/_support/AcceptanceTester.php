@@ -123,6 +123,38 @@ class AcceptanceTester extends Actor
     }
 
     /**
+     * Impersonate
+     * @param $userId
+     * @throws Exception
+     */
+    public function impersonateViaModifyUserPage($fullname)
+    {
+        $i = $this;
+        $i->amOnPage('/user/recoverSession');
+        $i->searchBar($fullname);
+        $i->click('a[title="Modify User"]');
+        $i->click('a.icon-more');
+        $i->click('a[title="Login as user"]');
+        $i->waitForText($fullname, 5);
+        $i->deleteSessionSnapshot($fullname);
+        $i->deleteSessionSnapshot('login:alaress');
+    }
+
+    /**
+     * search for an user using the search bar
+     * @param $fullname
+     * @throws Exception
+     */
+    public function searchBar($fullname)
+    {
+        $i = $this;
+        $i->click('label.icon-search.no-text');
+        $i->type($fullname);
+        $i->click('ul.results.information-list');
+        $i->waitForText($fullname, 5);
+    }
+
+    /**
      * Fill in CKEditor
      * @param $element_id
      * @param $content

@@ -21,6 +21,16 @@ class Common
     public const CLASS_CHEMISTRY_1_3 = 'Chemistry 1 3';
     public const CLASS_ID_CHEMISTRY_1_3 = 176;
 
+    public const USER_JACKCOLES = 'Mr Jack Coles';
+    public const USER_ID_JACKCOLES = 22;
+    public const USER_LOUISASMITH = 'Louisa Smith';
+    public const USER_ID_LOUISASMITH = 55;
+    public const USER_JAMALALI = 'Jamal Ali';
+    public const USER_ID_JAMALALI = 60;
+
+    public const CLASS_9AENG = '9A English';
+    public const CLASS_ID_9AENG = 83;
+
     public const SELECTOR_JELLY_TOT = '#content a.icon-more';
 
     /**
