@@ -53,17 +53,13 @@ fullpath=${filepath%/*};
 conffile=`readlink -f $fullpath/../www/conf/conf.php`;
 
 instdir=`readlink -f $fullpath/../`;
-package=${instdir##*/};
 
 curdir=`pwd`;
 
 # Outputs the instance_id of the destination. Typically the staging instance.
 # If multiple found, prompts user to select one.
 get_destination_instance_id(){
-  local etc_dir="/etc/$package"
-  if [[ $package == "vagrant" ]]; then
-    etc_dir="/etc/schoolbox"
-  fi
+  local etc_dir="/etc/schoolbox"
   local ini_file="$etc_dir/instances.ini"
   local instance_list
   instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list)
@@ -245,11 +241,7 @@ truncateTables() {
 liveCheck() {
   echo "Checking site_type of instance being restored to..."
 
-  if [[ $package == 'schoolboxdev' ]]; then
-    temp_ini_file="/etc/schoolboxdev/instances.ini"
-  else
-    temp_ini_file="/etc/schoolbox/instances.ini"
-  fi
+  temp_ini_file="/etc/schoolbox/instances.ini"
   read_ini "$destination_instance_id"
   destination_site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
 
@@ -293,7 +285,7 @@ setSyncType() {
 setSyncType $1;
 liveCheck;
 tempconffile="$conffile";
-readconf;
+INSTANCE_ID="$destination_instance_id" readconf;
 
 sqluser="$tempsqluser";
 sqlpasswd="$tempsqlpasswd";
@@ -313,7 +305,6 @@ fi
 # TODO - maybe this should already work on a fresh install with no DB loaded at some point
 echo -e "* Details of this install *";
 echo "Using db credentials from: "`readlink -f $conffile`;
-echo "Package: $package";
 echo "SQL Version: $sqlver";
 echo "Install Directory: $instdir";
 conf_backup_dir=$(mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'");
@@ -371,7 +362,7 @@ searchlist='/usr/share/schoolbox/conf.php /usr/share/schoolboxdev/conf.php /vagr
 rm -f $sbrl;
 
 ## Detect database backups for this install
-thisinstall=$(ls -1 $thisdatadir/{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null);
+thisinstall="$(ls -1 $thisdatadir/{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox_*-*-*.sql.gz} 2> /dev/null)";
 echo -e "Local installs \c"
 if [ ! -z "$thisinstall" ];
 then
@@ -386,12 +377,12 @@ fi
 for localinstall in $searchlist;
 do
 	# Search for local installs, but ignore the current install if listed
-	if [ `echo $localinstall | grep -v "$package/" | wc -l` -gt 0 ];
+	if [ `echo $localinstall | grep -v "schoolbox/" | wc -l` -gt 0 ];
 	then
 		if [ -f $localinstall ];
 		then
 			tempconffile=`readlink -f $localinstall`;
-			readconf;
+			INSTANCE_ID="$destination_instance_id" readconf;
 			readsqlver;
 			tempfiledir=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
 			if [ ! -z $tempfiledir ];
@@ -524,7 +515,7 @@ if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
 
   # Provide feedback for confirmation of what is to be done based on above questions.
   echo -e "\n $restorepretty";
-  echo -e "\n     Restore into '$package' at '$instdir'";
+  echo -e "\n     Restore into 'schoolbox' at '$instdir'";
   while true; do
     echo -e "\nIs this the correct option? (y/n): \c" && read -r confirm;
     if [[ $confirm =~ [ynYN] ]]; then
@@ -725,13 +716,13 @@ fi
 
 # Re-read the conf file to ensure safety
 tempconffile="$conffile";
-readconf;
+INSTANCE_ID="$destination_instance_id" readconf;
 readsqlconfig;
 cd $curdir;
 
 # Backup this installs database
 echo -e "\nPerforming backup of current database";
-newbackup=`$instdir/tools/backup-database.sh`;
+newbackup=$(INSTANCE_ID=$destination_instance_id "$instdir"/tools/backup-database.sh);
 if [ `echo $newbackup | grep 'Backup of database at version' | wc -l` -eq 0 ];
 then
 	errmsg="An error occured during the database backup";
@@ -781,7 +772,7 @@ fi
 ## We may have just imported an old DB schema, which has configs that don't align to the current script.
 ## In this case, apply custom fixes.
 function restore_pre_v20.1_config_dirs(){
-  readconf;
+  INSTANCE_ID="$destination_instance_id" readconf;
   readsqlver;
   local sql_ver="$tempsqlver";
   local xml_dir;
@@ -825,7 +816,7 @@ fi
 
 ## Run SQL updates to current install
 echo "";
-INSTANCE_ID="$destination_instance_id" "$instdir"/tools/update-sql.sh 2>&1 | tee -a /var/log/"$package"/upgrade.log;
+INSTANCE_ID="$destination_instance_id" "$instdir"/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/"$destination_instance_id"/upgrade.log;
 
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
@@ -887,17 +878,18 @@ else
 fi
 
 # Sync plan-type with instance registry
-function get_plan_type_from_instance_registry() {
-  local instance_registry_url="$(schoolbox-instance-registry --url)";
-  local puppet_cert="$(schoolbox-instance-registry --puppet-cert)";
-  local api_key="$(schoolbox-instance-registry --api-key)";
+get_plan_type_from_instance_registry() {
+  local -r instance_registry_url="$(schoolbox-instance-registry --url)";
+  local -r puppet_cert="$(schoolbox-instance-registry --puppet-cert)";
+  local -r api_key="$(schoolbox-instance-registry --api-key)";
 
   # send API request to IR - /api/hosts/{cert}/instances
-  local ir_host_instances_json="$(curl \
+  local -r ir_host_instances_json="$(curl \
     --silent \
-    "$instance_registry_url/api/v2/host/$puppet_cert/instances?instance_id=$(get_destination_instance_id)" \
+    "$instance_registry_url/api/v2/host/$puppet_cert/instances?instance_id=$destination_instance_id" \
     -H "Authorization: Bearer $api_key" \
-    -H "Content-Type: application/json")";
+    -H "Content-Type: application/json"
+  )";
 
   echo "$ir_host_instances_json" \
     | jq -r \
@@ -910,11 +902,11 @@ echo -e "\nSyncing plan type with instance registry"
 echo "Setting plan type to: '$plan_type'";
 
 # Invoke set-plan.php to sync plan with IR
-php "$instdir"/tools/set-plan.php --plan "$plan_type";
+INSTANCE_ID="$destination_instance_id" php "$instdir"/tools/set-plan.php --plan "$plan_type";
 
 # Restart schoolbox services
 echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
-/usr/share/"$package"/tools/notif/allrestart "$destination_instance_id"
+/usr/share/schoolbox/tools/notif/allrestart "$destination_instance_id"
 
 echo -e "Rebuilding cron jobs (because timezone may be different in new DB). Assuming this host is primary"
 schoolboxcloud-rebuild-cronjobs --is-primary-host 1
