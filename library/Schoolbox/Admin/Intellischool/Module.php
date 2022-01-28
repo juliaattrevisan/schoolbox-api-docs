@@ -20,6 +20,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Admin\Intellischool\Controller;
 use Schoolbox\Intellischool\JwtFactory;
 use Schoolbox\Mapper;
+use Schoolbox\Url\Factory;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -76,6 +77,8 @@ class Module extends BaseModule
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
                             $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
+                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
+                            (new Factory($this->getConfig()))->buildFullyQualified()->toString(),
                         );
                     }),
                 ]
