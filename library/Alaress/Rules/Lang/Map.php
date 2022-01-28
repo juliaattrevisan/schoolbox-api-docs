@@ -93,7 +93,7 @@ class Map implements Construct
                 }
             }
         }
-        return array_unique($output);
+        return array_values(array_unique($output));
     }
 
     /**
