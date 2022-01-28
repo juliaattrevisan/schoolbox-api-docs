@@ -134,7 +134,13 @@ class MapTest extends TestCase
         ];
 
         // Vagaries of fnmatch
-        yield 'leading period does not match' => [
+        yield 'leading period in input does not match' => [
+            ['test' => '1'],
+            ['.test'],
+            [],
+        ];
+
+        yield 'leading period in map does not match' => [
             ['.test' => '1'],
             ['test'],
             [],
