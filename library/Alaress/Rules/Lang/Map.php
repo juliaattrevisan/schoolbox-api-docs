@@ -1,32 +1,43 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Rules\Lang;
 
+/**
+ * A language construct for mapping SIS output (possibly modified with tokens)
+ * to one or more final values.
+ */
 class Map implements Construct
 {
-    /** @var string */
-    protected $field;
+    /**
+     * The field within the object which is to be modified by this mapping.
+     */
+    private string $field;
 
     /**
-     * Each element may be a scalar or itself an array
+     * The mapping itself.
      *
-     * @var array
+     * key:   the value which will be compared to each `$inputValue` passed to
+     *        `apply()`.
+     *        This pattern may contain wildcards: "*" matches any character
+     *        sequence, "?" matches any single character.
+     *        (@see https://www.php.net/fnmatch)
+     * value: the value(s) which will be set in the object. This may be a
+     *        multidimensional array: it will be converted into a flat array.
+     *
+     * @var array<string, string|array>
      */
-    protected $map;
-
+    private array $map;
 
     /**
      * @param string $field
      * @param array  $map
      */
-    public function __construct($field, array $map)
+    public function __construct(string $field, array $map)
     {
         $this->field = $field;
         $this->map   = $map;
