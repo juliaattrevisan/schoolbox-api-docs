@@ -273,7 +273,7 @@ class Report
         // Does the existing report info indicate an error happened?
         // Log that and short-circuit, because attempting to retrieve the
         // submission again will just raise another error.
-        if (self::UPLOAD_ERROR === $existingInfo['status']) {
+        if (isset($existingInfo) && self::UPLOAD_ERROR === $existingInfo['status']) {
             $this->changeToErrorState($model, $existingInfo);
             return null;
         }
