@@ -150,6 +150,7 @@ class Database implements IDatabase, Serializable
                 )
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connection->prepare("SET SESSION max_statement_time = CAST(? AS INT)")->execute([SQL_MAX_STATEMENT_TIME_SECONDS]);
             $this->setTimezone($this->fetchTimezone());
         } catch (PDOException $exception) {
             if (isset($options['throw']) && $options['throw']) {
