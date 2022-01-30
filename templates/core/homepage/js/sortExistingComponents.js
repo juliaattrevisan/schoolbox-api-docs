@@ -297,7 +297,6 @@ function addPlaceHolderComponents () {
  * @returns { Boolean }
  */
 function canAddPlaceHolderComponent (parentContainer) {
-    // return (parentContainer.children.length === 0);
     return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
            (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
 }
