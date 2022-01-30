@@ -21,17 +21,17 @@ const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed
 /**
  * initiate the setings toggle and form
  */
-export const initUpdateComponentsSettings = () => {
+export function initUpdateComponentsSettings () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
     document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
 }
 
 /**
- * 
+ * Fire it up
  * 
  * @param { Element } 
  */
-const init = (component) => {
+function init (component) {
     initToggleButton(component);
     initForm(component);
 }   
@@ -41,7 +41,7 @@ const init = (component) => {
  * 
  * @param { Element } 
  */
-const initToggleButton = (component) => {
+function initToggleButton (component) {
     const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
     toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -57,7 +57,7 @@ const initToggleButton = (component) => {
  * 
  * @returns { Boolean }
  */
-const isOpen = (component) => {
+function isOpen (component) {
     const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
     return toggleButton.getAttribute(STATE_ATTRIBUTE) === 'opened';
 }
@@ -67,7 +67,7 @@ const isOpen = (component) => {
  * 
  * @param { Element } 
  */
-const open = (component) => {
+function open (component) {
     const panel = component.querySelector(SETTINGS_PANEL_SELECTOR);
     const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, 'opened');
@@ -82,7 +82,7 @@ const open = (component) => {
  * 
  * @returns { String }  
  */
-const getQueryString = (component) => {
+function getQueryString (component) {
     const panelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
     const formData = Object.fromEntries(new FormData(panelForm));
     return Object.keys(formData).map(key => key + '=' + encodeURIComponent(formData[key])).join('&'); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
@@ -93,7 +93,7 @@ const getQueryString = (component) => {
  * 
  * @param { Element } 
  */
-const close = async (component) => {
+async function close (component) {
     const panel = component.querySelector(SETTINGS_PANEL_SELECTOR);
     const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, 'closed');
@@ -105,7 +105,7 @@ const close = async (component) => {
  * 
  * @param { Element } 
  */
-const initForm = (component) => {
+function initForm (component) {
     const panelForm = component.querySelector(SETTINGS_PANEL_SELECTOR).querySelector('form');
     const toggleButton = component.querySelector(SETTINGS_BUTTON_SELECTOR);
     panelForm.addEventListener('submit', (event) => {
@@ -120,7 +120,7 @@ const initForm = (component) => {
  * @param { Element } 
  * @param { HTMLFormElement } 
  */
-const saveComponentSettings = async (component, form) => {
+async function saveComponentSettings (component, form) {
     const submitFormButton = form.querySelector('input[type="submit"]');
     try {
         submitFormButton.disabled = true;
@@ -147,7 +147,7 @@ const saveComponentSettings = async (component, form) => {
  * 
  * @returns { Object }  
  */
-const getSaveComponentSettingsParams = (form) => {
+function getSaveComponentSettingsParams (form) {
     const formData = Object.fromEntries(new FormData(form));
     const queryString = Object.keys(formData).map(key => key + '=' + encodeURIComponent(formData[key])).join('&'); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
     const params = new URLSearchParams(queryString);
@@ -161,7 +161,7 @@ const getSaveComponentSettingsParams = (form) => {
  * @param { Element } 
  * @param { String } 
  */
-const updateComponent = async (component, responseData) => {
+ async function updateComponent (component, responseData) {
     
     const updatedComponent = getUpdatedComponent(component, responseData);
 
@@ -195,7 +195,7 @@ const updateComponent = async (component, responseData) => {
  * 
  * @returns { Element }  
  */
-const getUpdatedComponent = (component, documentString) => {
+function getUpdatedComponent (component, documentString) {
     const parser = new DOMParser();
     const document = parser.parseFromString(documentString, 'text/html');
     return document.documentElement.querySelector(`#${component.id}`);
@@ -207,7 +207,7 @@ const getUpdatedComponent = (component, documentString) => {
  * @param { Element } 
  * @param { Element } 
  */
-const updateComponentTitle = (oldComponent, updatedComponent) => {
+function updateComponentTitle (oldComponent, updatedComponent) {
     const componentTitle = oldComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
     const updatedComponentTitle = updatedComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
     if (componentTitle.innerText !== updatedComponentTitle.innerText) {

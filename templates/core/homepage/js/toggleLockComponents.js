@@ -8,7 +8,7 @@ import { EXISTING_COMPONENT_SELECTOR } from './updateHomepage';
 /**
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
-export const initToggleLockComponents = () => {
+export function initToggleLockComponents () {
     const componentLockSwitch = document.getElementById('component-lock-switch').querySelector('input');
     componentLockSwitch.addEventListener('change', (event) => {
         document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => updateComponentDisplay(component, event.target.checked));
@@ -18,7 +18,7 @@ export const initToggleLockComponents = () => {
 /**
  * Show or hide the relevant component editing elements 
  */
-export const updateComponentDisplay = (component, isUnlocked) => {
+export function updateComponentDisplay (component, isUnlocked) {
     component.querySelectorAll('a[data-component-settings], [data-component-handle]').forEach((element) => {
         isUnlocked ? element.style.display = 'inline-block' : element.style.display = 'none';
     });
@@ -30,6 +30,6 @@ export const updateComponentDisplay = (component, isUnlocked) => {
  * 
  * @returns { Boolean }
  */
-export const isToggleUnlocked = () => {
+export function isToggleUnlocked () {
     return document.getElementById('component-lock-switch').querySelector('input').checked;
 }

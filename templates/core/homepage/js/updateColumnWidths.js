@@ -10,7 +10,7 @@ import { removeClassesThatContain } from '@js/util/cssUtils';
  * 
  * @todo look to remove the jQuery foundation reference 
  */
-export const initUpdateColumnWidths = () => {
+export function initUpdateColumnWidths () {
     $('[data-interaction="column-width"]').on('change.fndtn.slider', function(event) {
         updateColumnWidths(parseInt(event.target.getAttribute('data-slider')));
     });
@@ -21,7 +21,7 @@ export const initUpdateColumnWidths = () => {
  * 
  * @param { Number } 
  */
-const updateColumnWidths = (width) => {
+function updateColumnWidths (width) {
 
     const leftContainer = document.querySelector('[data-position="left"]');
     removeClassesThatContain(leftContainer, 'large-'); //remove any previous class that set width

@@ -10,7 +10,7 @@ import { updateDeletedComponent } from './deleteComponents';
 /**
  * Submit the new component order to the DB
  */
-export const saveComponentOrder = async (component) => {
+export async function saveComponentOrder (component) {
     try {
         const response = await fetch(UPDATE_URL, {
             method: 'POST',
@@ -32,7 +32,7 @@ export const saveComponentOrder = async (component) => {
  * 
  * @returns { FormData }  
  */
-const getFormData = (component) => {
+function getFormData (component) {
     const formData = new FormData();
     formData.append('column1', getContainerComponentIDs(document.querySelector('[data-position="left"]'))); //left side panel
     formData.append('column2', getContainerComponentIDs(document.querySelector('[data-position="right"]'))); //right side panel
@@ -50,7 +50,7 @@ const getFormData = (component) => {
  * 
  * @returns { String } 
  */
-const getContainerComponentIDs = (componentContainer) => {
+function getContainerComponentIDs (componentContainer) {
     let containerComponentIDList = []; //add all ids into an array
     componentContainer.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((sortable) => {
         if (sortable.id) { //the <div class="masonry-placeholder" /> exists in each parent container, so we don't want that

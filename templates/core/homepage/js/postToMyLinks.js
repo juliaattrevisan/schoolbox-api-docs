@@ -6,7 +6,7 @@
 /**
  * Listen for the button press and then save the link to DB and dipslay it on the page
  */
-export const initPostToMyLinks = () => {
+export function initPostToMyLinks () {
     document.getElementById('postToMyLinks').addEventListener('click', (event) => {
         event.preventDefault();
         postLink();
@@ -16,7 +16,7 @@ export const initPostToMyLinks = () => {
 /**
  * Save the settings to the DB
  */
-const postLink = async () => {
+async function postLink () {
     try {
         await fetch('/cms/myLinksForm.php', {
             method: 'POST',
@@ -34,7 +34,7 @@ const postLink = async () => {
  * 
  * @returns { FormData }  
  */
-const getFormData = () => {
+function getFormData () {
     const formData = new FormData();
     formData.append('url', document.getElementById('homepageURL').value);
     formData.append('description', document.getElementById('heading').value);
@@ -44,7 +44,7 @@ const getFormData = () => {
 /**
  * Add the link to the side panel
  */
-const displayLinkOnPage = () => {
+function displayLinkOnPage () {
     
     const link = document.createElement('a');
     link.setAttribute('href', document.getElementById('homepageURL').value);

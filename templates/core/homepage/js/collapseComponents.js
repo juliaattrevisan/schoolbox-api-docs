@@ -15,7 +15,7 @@ const ANIMATE_SPEED = 0.4; //the speed of animations
 /**
  * Set up all components and listen for newly added ones
  */
-export const initCollapseComponents = () => {
+export function initCollapseComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
     document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
 }
@@ -25,7 +25,7 @@ export const initCollapseComponents = () => {
  * 
  * @param { Element } 
  */
-const init = (component) => {
+function init (component) {
     const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
     collapseButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -40,17 +40,17 @@ const init = (component) => {
  * 
  * @returns { Boolean }
  */
-export const isComponentUncollapsed = (component) => {
+export function isComponentUncollapsed (component) {
     const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
     return collapsePanel.getAttribute('data-collapse-state') === 'uncollapsed';
 }
 
 /**
- * Unollapse a component, sliding the content within down
+ * Uncollapse a component, sliding the content within down
  * 
  * @params { Element }
  */
-export const uncollapseComponent = async (component) => {
+export async function uncollapseComponent (component) {
     const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
     gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
     const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
@@ -63,7 +63,7 @@ export const uncollapseComponent = async (component) => {
  * 
  * @params { Element }
  */
-export const collapseComponent = async (component) => {
+export async function collapseComponent (component) {
     const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
     gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
     const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
@@ -78,7 +78,7 @@ export const collapseComponent = async (component) => {
  * 
  * @returns { Boolean }
  */
-export const isCollapseComponentSelected = (component) => {
+export function isCollapseComponentSelected (component) {
     const collapseCheckbox = component.querySelector(`#${component.id}-collapse`);
     return collapseCheckbox.getAttribute('checked') === 'checked' ? true : false;
 }

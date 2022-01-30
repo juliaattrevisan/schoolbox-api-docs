@@ -26,7 +26,7 @@ export const ON_COMPONENT_REMOVED = 'updateHomepage.ON_COMPONENT_REMOVED'; //dis
  * 
  * @returns { String } 
  */
-export const getComponentID = (component) => {
+export function getComponentID (component) {
     return component.id.replace('component', ''); //strip the 'component' at the start to just get the id number
 }
 

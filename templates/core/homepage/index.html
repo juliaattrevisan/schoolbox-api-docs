@@ -61,79 +61,80 @@
 
 <script type="text/javascript">
     $(function() {
+        
         var url = '/homepage/configForm.php';
 
-        var homepage = $('#component-layout');
-        homepage.masonry({
-            context: {
-                cid: '{ID}'
-            },
-            component: {
-                url: url,
-                handleSelector: '[using-sortableComponents]', //to use sortableComponents.js to sort existing components instead - the whole of jquery.masonry.js will soon be replaced
-                calcSequenceData: function (columns) {
-                    var masonry = this,
-                        data  = { type: 'components' },
-                        order = ['left','right','top','bottom'];
+        // var homepage = $('#component-layout');
+        // homepage.masonry({
+        //     context: {
+        //         cid: '{ID}'
+        //     },
+        //     component: {
+        //         url: url,
+        //         handleSelector: '[using-sortableComponents]', //to use sortableComponents.js to sort existing components instead - the whole of jquery.masonry.js will soon be replaced
+        //         calcSequenceData: function (columns) {
+        //             var masonry = this,
+        //                 data  = { type: 'components' },
+        //                 order = ['left','right','top','bottom'];
 
-                    $.each(columns, function (position, column) {
-                        var key = 'column' + (order.indexOf(position) + 1);
+        //             $.each(columns, function (position, column) {
+        //                 var key = 'column' + (order.indexOf(position) + 1);
 
-                        data[key] = column.children(masonry.options.component.selector).map(function () {
-                            /*
-                             * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
-                             * and always appear in the same positions. So we do a check to see if
-                             * an id is set. If it isn't, and we don't do the check, the script breaks
-                             * and components cannot be relocated successfully
-                             */
-                            if (this.id) {
-                                return this.id.substr(9);
-                            }
-                        }).toArray().join(',');
-                    });
+        //                 data[key] = column.children(masonry.options.component.selector).map(function () {
+        //                     /*
+        //                      * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+        //                      * and always appear in the same positions. So we do a check to see if
+        //                      * an id is set. If it isn't, and we don't do the check, the script breaks
+        //                      * and components cannot be relocated successfully
+        //                      */
+        //                     if (this.id) {
+        //                         return this.id.substr(9);
+        //                     }
+        //                 }).toArray().join(',');
+        //             });
 
-                    return data;
-                }
-            },
-            column: {
-                leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
-                placeholderTpl: '<div class="masonry-placeholder" />'
-            },
-            palette: {
-                url: url,
-                selector: '#tabs-1',
-                containerSelector: '.tabs-content',
-                handleSelector: '[data-component-palette]',
-                refreshItem: function () {
-                    this.find('[data-relation="count"]').text(this.data('count'));
-                }
-            },
-            spectrum: {
-                selector: '#tabs-2',
-                colours: colours,
-                restoreBtnSelector: '[data-role="reset-to-default"]',
-                cancelBtnSelector: '[data-role="undo"]',
-                saveBtnSelector: '[data-role="save"]',
-                saveLabelSelector: '[data-relation="saveLayout"]',
-                url: url
-            },
-            slider: {
-                selector: '[data-interaction="column-width"]',
-                url: url
-            }
-        });
+        //             return data;
+        //         }
+        //     },
+        //     column: {
+        //         leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
+        //         placeholderTpl: '<div class="masonry-placeholder" />'
+        //     },
+        //     palette: {
+        //         url: url,
+        //         selector: '#tabs-1',
+        //         containerSelector: '.tabs-content',
+        //         handleSelector: '[data-component-palette]',
+        //         refreshItem: function () {
+        //             this.find('[data-relation="count"]').text(this.data('count'));
+        //         }
+        //     },
+        //     spectrum: {
+        //         selector: '#tabs-2',
+        //         colours: colours,
+        //         restoreBtnSelector: '[data-role="reset-to-default"]',
+        //         cancelBtnSelector: '[data-role="undo"]',
+        //         saveBtnSelector: '[data-role="save"]',
+        //         saveLabelSelector: '[data-relation="saveLayout"]',
+        //         url: url
+        //     },
+        //     slider: {
+        //         selector: '[data-interaction="column-width"]',
+        //         url: url
+        //     }
+        // });
 
         // Fix slider on tab
         $('[data-tab]').on('toggled', function (event, tab) {
             tab.foundation('reflow');
 
             // What tab is this?
-            var tabData = tab.data();
-            if ('hideEmpty' in tabData) {
-                homepage.removeClass('show-empty');
-            } else if ('showEmpty' in tabData) {
-                homepage.addClass('show-empty');
-            }
+            // var tabData = tab.data();
+            // if ('hideEmpty' in tabData) {
+            //     homepage.removeClass('show-empty');
+            // } else if ('showEmpty' in tabData) {
+            //     homepage.addClass('show-empty');
+            // }
         });
 
 
@@ -141,11 +142,11 @@
         /* Tab toggler
          * Deal with special components placeholder
          */
-        $.fn.tabActivator({
-            onTabClose: function(tabActivator) {
-                homepage.removeClass('show-empty');
-            }
-        });
+        // $.fn.tabActivator({
+        //     onTabClose: function(tabActivator) {
+        //         homepage.removeClass('show-empty');
+        //     }
+        // });
 
         /* Attach Course Selector Modal listeners
          */

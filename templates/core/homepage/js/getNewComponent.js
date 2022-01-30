@@ -10,7 +10,7 @@ import { updateComponentDisplay, isToggleUnlocked } from './toggleLockComponents
 /**
  * Submit the new component to the DB and add to display
  */
-export const getNewComponent = async (component) => {
+export async function getNewComponent (component) {
     try {
         const response = await fetch(UPDATE_URL, {
             method: 'POST',
@@ -32,7 +32,7 @@ export const getNewComponent = async (component) => {
  * 
  * @returns { Element }  
  */
-const replaceExistingComponent = (component, newComponentHTML) => {
+function replaceExistingComponent (component, newComponentHTML) {
     const tempElement = document.createElement('div'); //just use to insert the updated component html
     tempElement.innerHTML = newComponentHTML; //now insert it
     const newComponent = tempElement.firstElementChild; //and then extract the element
@@ -48,7 +48,7 @@ const replaceExistingComponent = (component, newComponentHTML) => {
  * 
  * @returns { FormData }  
  */
-const getFormData = (component) => {
+function getFormData (component) {
     const formData = new FormData();
     formData.append('add', component.firstElementChild.getAttribute('rel')); //this is to retrieve the new component id to know which type of component to create
     formData.append('cid', document.getElementById('categoryID').value);

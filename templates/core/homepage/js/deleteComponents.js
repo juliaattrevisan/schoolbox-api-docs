@@ -13,7 +13,7 @@ const ANIMATE_SPEED = 0.4;
 /**
  * Toggle the delete palette and manage the confirm/deny actions
  */
-export const initDeleteComponents = () => {
+export function initDeleteComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
     document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
 }
@@ -23,7 +23,7 @@ export const initDeleteComponents = () => {
  * 
  * @param { Element } 
  */
-const init = (component) => {
+function init (component) {
     const panel = component.querySelector('[data-component-panel="delete"]');
     const toggleButton = component.querySelector('[data-target="delete"]');
     initToggleButon(panel, toggleButton);
@@ -37,7 +37,7 @@ const init = (component) => {
  * @param { Element } 
  * @param { Element } 
  */
-const initToggleButon = (panel, toggleButton) => {
+function initToggleButon (panel, toggleButton) {
     toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
         if (toggleButton.getAttribute('data-state') === 'closed') {
@@ -59,7 +59,7 @@ const initToggleButon = (panel, toggleButton) => {
  * @param { Element } 
  * @param { Element } 
  */
-const initCancelButton = (component, panel, toggleButton) => {
+function initCancelButton (component, panel, toggleButton) {
     const cancelDeleteButton = component.querySelector('[data-remove="0"]');
     cancelDeleteButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -75,7 +75,7 @@ const initCancelButton = (component, panel, toggleButton) => {
  * 
  * @param { Element } 
  */
-const initConfirmButton = (component) => {
+function initConfirmButton (component) {
     const comfirmDeleteButton = component.querySelector('[data-remove="1"]');
     comfirmDeleteButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -88,7 +88,7 @@ const initConfirmButton = (component) => {
  * 
  * @param { Element } 
  */
-const deleteComponent = async (component) => {
+async function deleteComponent (component) {
     try {
         await fetch(UPDATE_URL, {
             method: 'POST',
@@ -115,7 +115,7 @@ const deleteComponent = async (component) => {
  * 
  * @returns { FormData }  
  */
-const getFormData = (component) => {
+function getFormData (component) {
     const formData = new FormData();
     formData.append('cid', document.getElementById('categoryID').value);
     formData.append('delete', getComponentID(component));
@@ -129,7 +129,7 @@ const getFormData = (component) => {
  * 
  * @param { Element } 
  */
-export const updateDeletedComponent = (component) => {
+export function updateDeletedComponent (component) {
 
     component.querySelector('[data-component-handle]').remove(); //remove the drag trigger 
     component.querySelector('[data-component-titlebar-container] > nav').remove(); //as well as the edit controls to prevent any further interactions on this component
