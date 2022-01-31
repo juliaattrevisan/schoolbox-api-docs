@@ -273,7 +273,7 @@ class Report
         // Does the existing report info indicate an error happened?
         // Log that and short-circuit, because attempting to retrieve the
         // submission again will just raise another error.
-        if (self::UPLOAD_ERROR === $existingInfo['status']) {
+        if (isset($existingInfo) && self::UPLOAD_ERROR === $existingInfo['status']) {
             $this->changeToErrorState($model, $existingInfo);
             return null;
         }
@@ -301,7 +301,7 @@ class Report
             try {
                 $similarity = $this->generateReport($model);
             } catch (Turnitin\Exception\Conflict $e) {
-                $this->changeToErrorState($model, $existingInfo);
+                $this->changeToErrorState($model, $existingInfo ?? ['error_code' => 'unknown']);
             }
 
             return null;
