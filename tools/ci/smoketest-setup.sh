@@ -47,7 +47,6 @@ cp -rf $initialdir/configfiles/nginx/* /etc/nginx
 cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
 cp -rf $initialdir/configfiles/php/7.4/fpm/* $CONFIG_DIR
 cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
-cp -f $initialdir/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
 cp -rf $initialdir/data/* /vagrant/data
 cp -rf $initialdir/configfiles/bin/* /usr/local/bin
 
@@ -58,7 +57,6 @@ echo "Deploying schoolbox config files"
 mkdir -p /etc/schoolbox
 cp tools/ci/etc/config.ini /etc/schoolbox/config.ini
 cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
-tools/set-plan.php --plan=elite
 export INSTANCE_ID=smoketest
 
 ## Extract the NPM build
@@ -72,6 +70,9 @@ chmod 777 -R /vagrant/data/*
 
 ## Push out a dns record to the hosts file to ensure all the linkage works properly
 echo '127.0.0.1 vagrant.dev.schoolbox.cloud' >> /etc/hosts
+
+## Set the plan to the highest level
+tools/set-plan.php --plan=elite
 
 ## Start the services!
 service $PHP_SERVICE start
