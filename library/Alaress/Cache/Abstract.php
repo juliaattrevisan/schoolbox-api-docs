@@ -78,6 +78,13 @@ abstract class Alaress_Cache_Abstract
      */
     protected $cachedFile = '';
 
+    /**
+     * Request Timeout
+     *
+     * @var int
+     */
+    protected $requestTimeout = 60;
+
 
     /* These are for logging purposes, using the Observer Design Pattern
      */
@@ -95,8 +102,13 @@ abstract class Alaress_Cache_Abstract
      * This is deliberately empty so you can instantiate an instance and set custom options
      * such as expiry durations, urls, etc
      */
-    public function __construct()
+    public function __construct($requestTimeout = 60)
     {
+        /*
+         * set the request timeout
+         */
+        $this->requestTimeout = $requestTimeout;
+
         /* Allow subclasses to specify their own settings
          */
         $this->setup();
@@ -224,7 +236,10 @@ abstract class Alaress_Cache_Abstract
             $url = $this->url;
         }
 
-        $httpClient = new GuzzleClient(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
+        $httpClient = new GuzzleClient([
+            'curl'      => Proxy\Server::getInstance()->buildCurlOptions(),
+            'timeout'   => $this->requestTimeout
+                                       ]);
 
         try {
             $headers = ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'];
