@@ -12,6 +12,7 @@ import { initSortExistingComponents } from './sortExistingComponents';
 import { initUpdateComponentsSettings } from './updateComponentsSettings';
 import { initDeleteComponents } from './deleteComponents';
 import { initCollapseComponents } from './collapseComponents';
+import { init as updateComponentCounts } from './updateComponentCounts';
         
 export const EXISTING_COMPONENT_SELECTOR = '[data-component]'; 
 export const UPDATE_URL = '/homepage/configForm.php'; 
@@ -42,4 +43,5 @@ export function getComponentID (component) {
     initUpdateComponentsSettings();
     initDeleteComponents();
     initCollapseComponents();
+    updateComponentCounts();
 });

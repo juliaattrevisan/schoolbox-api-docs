@@ -420,10 +420,6 @@ async function onActiveComponentExpanded () {
 
     if (__hasNewComponent) {
         
-        let componentCount = parseInt(__newComponentClone.querySelector('[data-relation="count"]').innerText);
-        componentCount++;
-        __newComponentClone.querySelector('[data-relation="count"]').innerText = componentCount;
-
         __newComponentPaletteContainer.appendChild(__newComponentClone);
 
         const newDraggable = getDraggable(__newComponentClone);
