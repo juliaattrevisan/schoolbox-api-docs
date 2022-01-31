@@ -33,13 +33,17 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $emptyState = true;
             $noConfig   = true;
         } else {
-            // Initialise feed
-            $rss = new Alaress_Rss_Stream($this->getConfig('url'));
-            $rss->setLimit($this->getConfig('size'));
-            $rss->stream();
+            try {
+                // Initialise feed
+                $rss = new Alaress_Rss_Stream($this->getConfig('url'));
+                $rss->setLimit($this->getConfig('size'));
+                $rss->stream();
 
-            // Process each item in feed
-            $allRss = $rss->getOutput();
+                // Process each item in feed
+                $allRss = $rss->getOutput();
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                $allRss = null;
+            }
 
             if (count($allRss) == 0) {
                 $emptyState = true;
