@@ -323,7 +323,7 @@ class Controller extends BaseController
             $folder = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
             if ($folder) {
                 $subject['folder'] = $folder;
-                $subject['perms']  = $this->access->getAccessLevel($this->getUser(), $folder->getId());
+                $subject['perms']  = $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_HOMEPAGE, $folder->getId());
 
                 /* At this point we know the folder exists
                  * if the user has >= READ access, then they can view the link to the folder
