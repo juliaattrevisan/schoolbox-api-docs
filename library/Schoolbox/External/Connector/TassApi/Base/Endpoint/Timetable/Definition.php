@@ -155,6 +155,7 @@ class Definition implements IStrategy
         /* $ext is a key to identify this cycle and associate it with an luCampus record
          * Also happens to be synonymous with $cycle['id'], only because I said so earlier
          */
+
         foreach ($cycles as $ttid => $cycle) {
             $ext = (string)$ttid;
             $cycleName = $cycle['name'];
@@ -279,12 +280,8 @@ class Definition implements IStrategy
      */
     private function preloadCycleConfiguration(array $cycles): array
     {
-        $currentDate = date('Y-m-d');
+        $today   = date('Y-m-d');
         $payload = [];
-
-        /* Intermediary step
-         */
-        $stack = [];
 
         foreach ($cycles as $ttid => $cycle) {
             $timetableCalendar = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTimetableCalendar', [
@@ -302,33 +299,32 @@ class Definition implements IStrategy
                 continue;
             }
 
-            /* Precautionary init, in case $timetableCalendar had records but none
-             * of those records were in the past and had DAY_CODE values in them
-             * $stack[$ttid] would be nonexistent and uksort() would detonate on you
+            /*
+             * Index the $timetableCalendar data by (ttid, value)
+             * ensuring we only remember meaningful records:
+             *   the date (and record) closest to today, but not in the future, or
+             *   the date (and record) closest to today in the future ,to avoid calculating day number from self::CYCLE_START
              */
-            $stack[$ttid] = [];
-
-            /* Otherwise continue processing its contents
-             *
-             * Index the $timetableCalendar data by (ttid, value) where VALUE <= today's date
-             * ensuring we only remember meaningful records, discarding ones that aren't applicable
-             */
+            $closestPast   = ['VALUE' => ''];
+            $closestFuture = ['VALUE' => ''];
             foreach ($timetableCalendar['tt_calendar'] as $current) {
-                if ($current['VALUE'] <= $currentDate) {
-                    $stack[$ttid][$current['VALUE']][] = $current;
+                // if DAY_CODE is not set (i.e. 0, '', null), move on
+                if (empty($current['DAY_CODE'])) {
+                    continue;
+                }
+                if (
+                    ('' === $closestFuture['VALUE'])
+                    || ($today < $current['VALUE'] && $current['VALUE'] < $closestFuture['VALUE'])
+                ) {
+                    $closestFuture = $current;
+                }
+                if ($closestPast['VALUE'] < $current['VALUE'] && $current['VALUE'] <= $today) {
+                    $closestPast = $current;
                 }
             }
 
-            /* Sort them so in chronological order, then pop the last value
-             * That's the date (and record) closest to today, but not in the future
-             */
-            uksort($stack[$ttid], static function ($a, $b) {
-                return $a > $b;
-            });
-
-            if (\count($stack[$ttid])) {
-                $record = array_pop($stack[$ttid])[0];
-
+            if ('' !== $closestFuture['VALUE'] || '' !== $closestPast['VALUE']) {
+                $record = '' !== $closestPast['VALUE'] ? $closestPast : $closestFuture;
                 /* Mine it for all its worth
                  */
                 $payload[$ttid] = [
@@ -339,7 +335,7 @@ class Definition implements IStrategy
 
                     /* Starting Day number
                      */
-                    'dayStart' => $record['DAY_CODE']
+                    'dayStart'   => $record['DAY_CODE'],
                 ];
             }
         }
