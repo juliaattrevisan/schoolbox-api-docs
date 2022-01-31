@@ -170,6 +170,8 @@ export default {
                 const responseData = await this.getResponseData(this.endpointAdd);
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
+                } else if (responseData.status === 400) {
+                    this.$emit('on-edit-error', responseData.title);
                 } else {
                     this.group.enrolmentStatus = responseData.enrolmentStatus; //could be either 'enrolled' or 'pending'
                     this.$emit('on-edit-success', 'Group joined');
@@ -192,6 +194,8 @@ export default {
                 const responseData = await this.getResponseData(this.endpointDelete);
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
+                } else if (responseData.status === 400) {
+                    this.$emit('on-edit-error', responseData.title);
                 } else {
                     this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
                     this.$emit('on-edit-success', 'Group left');
