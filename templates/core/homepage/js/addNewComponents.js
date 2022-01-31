@@ -11,7 +11,7 @@ const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/l
 const COMPONENT_SELECTOR = '[data-component-palette]'; //any component that will be dragged/added/sorted
 const SORTABLE_SELECTOR = '[data-component]'; //existing components that can be sorted
 const ANIMATE_SPEED = 0.3; //the speed of animations
-const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
+const MIN_MOVEMENT = 100; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
 let __placeHolderComponentsList = []; //to contain the place holder instances
@@ -207,8 +207,8 @@ function extractActiveComponent () {
     setStylesOnElement(__activeComponent, { //Update position and styles to match now that the __activeComponent has been moved out of context
         position: 'absolute',
         top: `${__placeHolderComponent.getBoundingClientRect().top + window.scrollY}px`,
-        left: `${__placeHolderComponent.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
-        width: `${__placeHolderComponent.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
+        left: `${__placeHolderComponent.getBoundingClientRect().left}px`, //subtracting 16 to deal with 1rem padding-left that's applied
+        width: `${__placeHolderComponent.getBoundingClientRect().width}px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
 }
 
@@ -264,20 +264,49 @@ function updateSortableElements () {
 function onDrag () {
     if (canCheckForChange()) { 
 
-        //if the draggedelement is hitting the tabs, put it in the tab container
-        if (__activeDraggable.hitTest('#tabs-1')) {
-            console.warn('into tabs');
+        if (__activeDraggable.hitTest('#tabs-1')) { //if the draggedelement is hitting the tabs, put it in the tab container
+            
+            __hasNewComponent = false;
+
+            if (!__newComponentPaletteContainer.contains(__placeHolderComponent)) { //put it back where it came from only if it's already been dragged out
+
+                if (!__isFlipping) { //don't allow multiple FLIPs to prevent quick shifts / weird jarring behaviour
+                    
+                    __isFlipping = true;
+                    __startDragPoint = updateDragPoint();
+            
+                    const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
+                    
+                    __newComponentPaletteContainer.appendChild(__placeHolderComponent);
+                    __placeHolderComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
+                    
+                    Flip.from(state, {
+                        duration: ANIMATE_SPEED,
+                        onComplete: () => {
+                            __isFlipping = false;
+                            onDrag(); //check after Flip to see if another is required
+                        }
+                    });
+                    
+                }
+
+            }
+
+        } else {
+
+            const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
+            const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
+            if (closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
+                if (isElementAboveOtherElement(__activeComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
+                    addNewComponentToPage(closestElement, true);
+                } else if (isElementBelowOtherElement(__activeComponent, closestElement)) {
+                    addNewComponentToPage(closestElement, false);
+                }
+            }
+
         }
 
-        const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
-        const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
-        if (closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
-            if (isElementAboveOtherElement(__activeComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
-                flipState(closestElement, true);
-            } else if (isElementBelowOtherElement(__activeComponent, closestElement)) {
-                flipState(closestElement, false);
-            }
-        }
+        
     }
 }
 
@@ -296,14 +325,13 @@ function canCheckForChange () {
 }
 
 /**
- * Use Flip to shift the elements around, recording the difference in shift 
- * for when the dragged element is released
+ * Use Flip to add the new compoenent to the page or move it to a different spot
  * Refer to https://greensock.com/docs/v3/Plugins/Flip for more info on Flip
  * 
  * @param { Element }  
  * @param { Boolean }  
  */
-function flipState (closestElement, isShiftingDown) {
+function addNewComponentToPage (closestElement, isShiftingDown) {
     
     __hasNewComponent = true;
 
@@ -409,7 +437,6 @@ function onSnapBackActiveComponentComplete () {
 
     gsap.set(__activeComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     __activeComponent.style.position = 'static'; //was absolute, now sitting as it should
-    __activeComponent.setAttribute('data-component', ''); //so it can be dragged again
 
     insertElementAfter(__placeHolderComponent, __activeComponent); //the element was taken out, so put it back where it now belongs
     __placeHolderComponent.remove(); //and now the placeholder can be pulled out

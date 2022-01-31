@@ -19,6 +19,8 @@ export const UPDATE_URL = '/homepage/configForm.php';
 
 export const ON_COMPONENT_ADDED = 'updateHomepage.ON_COMPONENT_ADDED'; //dispatched with the { Element } component
 export const ON_COMPONENT_REMOVED = 'updateHomepage.ON_COMPONENT_REMOVED'; //dispatched with the { Element } component
+export const SHOW_PLACE_HOLDERS = 'updateHomepage.SHOW_PLACE_HOLDERS'; //to show the 'You can drag into this space' placeholders when tab opened or sorting
+export const HIDE_PLACE_HOLDERS = 'updateHomepage.HIDE_PLACE_HOLDERS'; //to hide the 'You can drag into this space' placeholders when tab opened or sorting
 
 /**
  * To retrieve the component id

@@ -7,14 +7,14 @@
  import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED } from './updateHomepage';
  
  
- /**
-  * Toggle the delete palette and manage the confirm/deny actions
-  */
+/**
+ * Toggle the delete palette and manage the confirm/deny actions
+ */
 export function init () {
     initListeners();
 }
 
- /**
+/**
  * To respond to any events that require action
  */
 function initListeners () {
@@ -28,7 +28,7 @@ function initListeners () {
 function initOnComponentAddedListener () {
     document.addEventListener(ON_COMPONENT_ADDED, (event) => {
         const counterElement = getCounterElement(event.detail.component);
-        counterElement.innerText = parseInt(counterElement.innerText) + 1;
+        counterElement.textContent = parseInt(counterElement.textContent) + 1;
     });
 }
 
@@ -38,7 +38,7 @@ function initOnComponentAddedListener () {
 function initOnComponentRemovedListener () {
     document.addEventListener(ON_COMPONENT_REMOVED, (event) => {
         const counterElement = getCounterElement(event.detail.component);
-        counterElement.innerText = parseInt(counterElement.innerText) - 1;
+        counterElement.textContent = parseInt(counterElement.textContent) - 1;
     });
 }
 
