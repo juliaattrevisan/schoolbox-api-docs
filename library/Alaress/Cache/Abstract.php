@@ -13,6 +13,7 @@ use GuzzleHttp\Exception\RequestException as RequestException;
 abstract class Alaress_Cache_Abstract
 {
     private const REQUEST_TIMEOUT = 60;
+    private const CONNECT_TIMEOUT = 5;
 
     /**
      * The url of the stream you just got
@@ -86,6 +87,13 @@ abstract class Alaress_Cache_Abstract
      */
     protected $requestTimeout = self::REQUEST_TIMEOUT;
 
+    /**
+     * Connect Timeout
+     *
+     * @var int
+     */
+    protected $connectTimeout = self::CONNECT_TIMEOUT;
+
 
     /* These are for logging purposes, using the Observer Design Pattern
      */
@@ -103,12 +111,13 @@ abstract class Alaress_Cache_Abstract
      * This is deliberately empty so you can instantiate an instance and set custom options
      * such as expiry durations, urls, etc
      */
-    public function __construct($requestTimeout = self::REQUEST_TIMEOUT)
+    public function __construct($requestTimeout = self::REQUEST_TIMEOUT, $connectTimeout = self::CONNECT_TIMEOUT)
     {
         /*
-         * set the request timeout
+         * set the request and connection timeouts
          */
         $this->requestTimeout = $requestTimeout;
+        $this->connectTimeout = $connectTimeout;
 
         /* Allow subclasses to specify their own settings
          */
@@ -238,8 +247,9 @@ abstract class Alaress_Cache_Abstract
         }
 
         $httpClient = new GuzzleClient([
-            'curl'      => Proxy\Server::getInstance()->buildCurlOptions(),
-            'timeout'   => $this->requestTimeout
+            'curl'              => Proxy\Server::getInstance()->buildCurlOptions(),
+            'timeout'           => $this->requestTimeout,
+            'connect_timeout'   => $this->connectTimeout
                                        ]);
 
         try {
