@@ -1,6 +1,6 @@
 import { gsap, Draggable, Flip } from 'gsap/all';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
-    isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
+         isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from './saveComponentOrder';
 import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED } from './updateHomepage';

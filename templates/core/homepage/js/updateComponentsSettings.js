@@ -7,7 +7,7 @@ import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { timeout } from '@js/util/jsUtils';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, getComponentID } from './updateHomepage';
-import { updateDeletedComponent } from './removeComponents';
+import { updateRemovedComponent } from './removeComponents';
 import { isComponentUncollapsed, collapseComponent, uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
 
 const ANIMATE_SPEED = 0.4;
@@ -130,7 +130,7 @@ async function saveComponentSettings (component, form) {
         await updateComponent(component, responseData);
     } catch (error) {
         console.warn(error);
-        updateDeletedComponent(component); //currently the assumed error, that the component no longer exists
+        updateRemovedComponent(component); //currently the assumed error, that the component no longer exists
         slideUp(component.querySelector(SETTINGS_PANEL_SELECTOR), ANIMATE_SPEED);
     } finally { //now the update is complete notify with the button and close the settings, enabling once the settings are closed 
         submitFormButton.value = 'Updated';

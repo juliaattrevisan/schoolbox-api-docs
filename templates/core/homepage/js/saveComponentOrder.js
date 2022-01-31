@@ -4,7 +4,7 @@
  */
 
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from './updateHomepage';
-import { updateDeletedComponent } from './removeComponents';
+import { updateRemovedComponent } from './removeComponents';
 
 
 /**
@@ -18,7 +18,7 @@ export async function saveComponentOrder (component) {
         });
         const responseData = await response.json();
         if (responseData.hasComponentBeenDeleted) {
-            updateDeletedComponent(component);
+            updateRemovedComponent(component);
         }
     } catch (error) {
         console.warn(error);

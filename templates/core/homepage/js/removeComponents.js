@@ -13,7 +13,7 @@ const ANIMATE_SPEED = 0.4;
 /**
  * Toggle the delete palette and manage the confirm/deny actions
  */
-export function initDeleteComponents () {
+export function initRemoveComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
     document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
 }
@@ -128,7 +128,7 @@ function getFormData (component) {
  * 
  * @param { Element } 
  */
-export function updateDeletedComponent (component) {
+export function updateRemovedComponent (component) {
 
     component.querySelector('[data-component-handle]').remove(); //remove the drag trigger 
     component.querySelector('[data-component-titlebar-container] > nav').remove(); //as well as the edit controls to prevent any further interactions on this component
