@@ -8,7 +8,7 @@ import { gsap, Draggable, Flip } from 'gsap/all';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
     isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { saveComponentOrder } from './saveComponentOrder';
-import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED } from './updateHomepage';
+import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from './updateHomepage';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -19,7 +19,6 @@ const ANIMATE_SPEED = 0.3; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
-let __placeHolderComponentsList = []; //to contain the place holder instances
 let __activeComponent; //the component that's currently being dragged/sorted around
 let __placeHolderComponent; //the element that subs in for the __activeComponent being sorted
 let __hasSortChange = false; //to know whether to update the DB with sort change
@@ -42,7 +41,6 @@ let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position cha
 export function initSortExistingComponents () {
     initDraggables();
     initListeners();
-    initPlaceHolderComponents();
 }
 
 /**
@@ -107,23 +105,6 @@ function initOnComponentRemovedListener () {
     });
 }
 
-/**
- * Need to run through and check each parent container for children
- * if there's no children need to show that items can be dragged into this container
- */
-function initPlaceHolderComponents () {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((container, index) => {
-        const placeHolderComponent = document.createElement('div');
-        placeHolderComponent.id = `placeHolderComponent-${index}`;
-        placeHolderComponent.classList.add('masonry-placeholder');
-        placeHolderComponent.style.display = 'block';
-        placeHolderComponent.style.height = '51px';
-        placeHolderComponent.dataset.component = 'true';
-        placeHolderComponent.dataset.placeHolderComponent = 'true';
-        placeHolderComponent.innerText = 'You can drag components into this space';
-        __placeHolderComponentsList = [...__placeHolderComponentsList, placeHolderComponent];
-    });
-}
 
 
 /*****************************************************************
@@ -248,7 +229,7 @@ function collapseExistingComponentContent () {
     
     __isChangingSize = true;
     
-    const existingComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]');
+    const existingComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]'); //just assume it may be open
     gsap.to(existingComponentSettingsPanel, { 
         onStart: () => existingComponentSettingsPanel.style.overflow = 'hidden',
         height: 0, 
@@ -256,7 +237,7 @@ function collapseExistingComponentContent () {
         duration: ANIMATE_SPEED,
     } );
 
-    const existingComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]');
+    const existingComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]'); //just assume it may be open
     gsap.to(existingComponentDeletePanel, { 
         onStart: () => existingComponentDeletePanel.style.overflow = 'hidden',
         height: 0, 
@@ -271,7 +252,8 @@ function collapseExistingComponentContent () {
         duration: ANIMATE_SPEED,
         onComplete: () => {
             __isChangingSize = false;
-            addPlaceHolderComponents();
+            // addPlaceHolderComponents();
+            document.dispatchEvent(new Event(ADD_PLACE_HOLDERS));
         }
     } );
 
@@ -281,14 +263,14 @@ function collapseExistingComponentContent () {
  * Need to run through and check each parent container for children
  * if there's no children except the .masonry-placeholder need to show that items can be dragged into this container
  */
-function addPlaceHolderComponents () {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
-        if (canAddPlaceHolderComponent(parentContainer)) { //something going on in here.. with FLIP
-            const placeHolderComponent = __placeHolderComponentsList[index];
-            parentContainer.append(placeHolderComponent);
-        }
-    });
-}
+// function addPlaceHolderComponents () {
+//     document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
+//         if (canAddPlaceHolderComponent(parentContainer)) { //something going on in here.. with FLIP
+//             const placeHolderComponent = __placeHolderComponentsList[index];
+//             parentContainer.append(placeHolderComponent);
+//         }
+//     });
+// }
 
 /**
  * There's a bit of an issue where we can FLIP on sort change, and then also remove the placeHolderComponent
@@ -298,10 +280,10 @@ function addPlaceHolderComponents () {
  * 
  * @returns { Boolean }
  */
-function canAddPlaceHolderComponent (parentContainer) {
-    return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
-           (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
-}
+// function canAddPlaceHolderComponent (parentContainer) {
+//     return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
+//            (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
+// }
 
 /**
  * To be able to sort elements and snap back to correct position
@@ -379,13 +361,14 @@ function flipState (closestElement, isShiftingDown) {
             insertElementBefore(closestElement, __placeHolderComponent);
         }
 
-        removePlaceHolderComponents(); //remove prior to recording the new co-ordinates so can snap back on release to correct location
-        
+        clearFlipElements(); //check for flip bug
+        document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
+
         __activeComponent.dataset.leftDifference = __placeHolderComponent.getBoundingClientRect().left - parseInt(__placeHolderComponent.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
         __activeComponent.dataset.topDifference = (__placeHolderComponent.getBoundingClientRect().top + window.scrollY) - parseInt(__placeHolderComponent.dataset.originalTop);
         gsap.to(__activeComponent, { width: __placeHolderComponent.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 
-        addPlaceHolderComponents(); //now check if need to add them back in
+        document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
 
         Flip.from(state, {
             duration: ANIMATE_SPEED,
@@ -400,11 +383,14 @@ function flipState (closestElement, isShiftingDown) {
 }
 
 /**
- * Remove and re-add as parent containers have changed
+ * Flip currently sometimes leaves a left over element while dragging between elements. It's cleared on mouse release, but we need 
+ * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
  */
-function removePlaceHolderComponents () {
-    document.querySelectorAll('[data-place-holder-component]').forEach((placeHolderComponent) => {
-        placeHolderComponent.remove();
+function clearFlipElements () {
+    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
+        if (parentContainer.children.length === 1 && !parentContainer.children[0].id) { //there's the flip element here, so we should clear it out
+            parentContainer.removeChild(parentContainer.children[0]);
+        }
     });
 }
 
@@ -420,7 +406,7 @@ function removePlaceHolderComponents () {
  */
 function onDragEnd () {
     updateDraggablesStatus(false); //prevent quick reclicks on elements
-    removePlaceHolderComponents();
+    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS));
     showExistingMasonryPlaceHolders();
     snapBackActiveComponent();
 }

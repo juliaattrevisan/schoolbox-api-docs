@@ -10,14 +10,7 @@
 /**
  * Toggle the delete palette and manage the confirm/deny actions
  */
-export function init () {
-    initListeners();
-}
-
-/**
- * To respond to any events that require action
- */
-function initListeners () {
+export function initUpdateComponentCounts () {
     initOnComponentAddedListener();
     initOnComponentRemovedListener();
 }
