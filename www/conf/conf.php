@@ -70,3 +70,4 @@ define('TEMPLATE_body', $config['TEMPLATE_body']);
 define('TEMPLATE_content', $config['TEMPLATE_content']);
 define('SENTRY_TOKEN', $config['SENTRY_TOKEN']);
 define('SENTRY_PROJECT', $config['SENTRY_PROJECT']);
+define('SQL_MAX_STATEMENT_TIME_SECONDS', (int)$config['SQL_MAX_STATEMENT_TIME_SECONDS']);
