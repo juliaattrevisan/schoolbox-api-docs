@@ -54,10 +54,18 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $sourceId = 0;
         }
 
-        // Content permission: based on alt source if it's there
-        // Control permission: always based on current context
-        $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $sourceId), $this->getMaximumPermission()));
-        $this->setContextPermission(min($this->access->getFolderAccess($this->getUser(), $contextId), $this->getMaximumPermission()));
+        try {
+            // Content permission: based on alt source if it's there
+            // Control permission: always based on current context
+            $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $sourceId), $this->getMaximumPermission()));
+            $this->setContextPermission(min($this->access->getFolderAccess($this->getUser(), $contextId), $this->getMaximumPermission()));
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            /**
+             * catch if the folder, either the current, or alt source has been deleted, so it doesn't crash the whole page.
+             * we will make sure this displays the correct error to the correct users later
+             */
+            return false;
+        }
     }
 
 
