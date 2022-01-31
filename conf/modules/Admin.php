@@ -28,6 +28,9 @@ class Admin implements ModuleConfigInterface
         // Admin course builder page
         (new \Schoolbox\Admin\CourseBuilder\Module($di))->init('/adminv2/course-builder');
 
+        // Bulk course import
+        (new \Schoolbox\Admin\BulkCourseImport\Module($di))->init('/adminv2/bulkCourseImport');
+
         // Eportfolio
         (new \Schoolbox\Admin\Eportfolio\Module($di))->init('/adminv2/eportfolio');
 

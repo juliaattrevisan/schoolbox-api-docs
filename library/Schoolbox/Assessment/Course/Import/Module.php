@@ -17,7 +17,6 @@ use Component_DefinitionMapper;
 use Component_InstanceMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course;
@@ -98,17 +97,21 @@ class Module extends \Alaress\Module\Module
                 'courseSpecificationMapper'       => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
                 'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
                 'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
-                'componentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(Component_ConfigDefinitionMapper::class),
-                'componentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
-                'errorMapper'                     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'access'                          => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
-                'importFactory'                   => $injector->lazyNew(ImportFactory::class),
-                'replicator'                      => $injector->lazyNew(Replicator::class, [
+                'importFactory'                   => $injector->lazyNew(ImportFactory::class, [
                     'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                    'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                    'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
+                    'replicator'                      => $injector->lazyNew(Replicator::class, [
+                        'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                        'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
+                        'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
+                    ]),
+                    'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
+                    'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
+                    'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
+                    'componentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(Component_ConfigDefinitionMapper::class),
+                    'componentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
                 ]),
-                'assessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
+                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
             ])
         );
     }

@@ -3156,38 +3156,8 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/Atlas/Module.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getFolder\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
-			count: 3
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getUnits\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:setUnits\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 5
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
 		-
@@ -3239,41 +3209,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
-
-		-
-			message: "#^Cannot call method count\\(\\) on array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Project\\>\\.$#"
-			count: 3
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
-
-		-
-			message: "#^Cannot call method getOffset\\(\\) on array\\<Schoolbox\\\\GenericCollection\\>\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
-
-		-
-			message: "#^Cannot call method getOffset\\(\\) on array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Project\\>\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
-
-		-
-			message: "#^Cannot call method keys\\(\\) on array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Project\\>\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
-
-		-
-			message: "#^Cannot call method setOffset\\(\\) on array\\<Schoolbox\\\\GenericCollection\\>\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
-
-		-
-			message: "#^Cannot call method setOffset\\(\\) on array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Project\\>\\.$#"
-			count: 4
-			path: library/Schoolbox/Assessment/Course/Import/ImportFactory.php
 
 		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Markbook\\\\CourseMarkbook\\:\\:getAssessmentImplAverages\\(\\) should return array\\<array\\<float\\>\\> but returns array\\<float\\>\\.$#"
@@ -5284,11 +5219,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Calendar\\\\Events\\\\Controller\\:\\:\\$visibility is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Component/Homepage/Builder/Controller.php
 
 		-
 			message: "#^If condition is always true\\.$#"

@@ -10,15 +10,29 @@ namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
+use Alaress_Date_Format;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\User;
+use UnexpectedValueException;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessment;
+use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
@@ -42,13 +56,41 @@ class ImportFactory
      */
     private $assessmentCache;
 
+    private MapperProxy $assessmentMapperProxy;
+
+    private Replicator $replicator;
+
+    private CourseImplementationMapper $courseImplementationMapper;
+
+    private UnitImplementationMapper $unitImplementationMapper;
+
+    private \Component_InstanceMapper $componentInstanceMapper;
+
+    private \Component_ConfigDefinitionMapper $componentConfigDefinitionMapper;
+
+    private \Component_ConfigMapper $componentConfigInstanceMapper;
+
     /**
      * ImportFactory constructor.
      */
-    public function __construct()
-    {
-        $this->database        = \Database::getInstance();
-        $this->assessmentCache = new GenericCollection(IAssessable::class);
+    public function __construct(
+        MapperProxy $assessmentMapperProxy,
+        Replicator $replicator,
+        CourseImplementationMapper $courseImplementationMapper,
+        UnitImplementationMapper $unitImplementationMapper,
+        \Component_InstanceMapper $componentInstanceMapper,
+        \Component_ConfigDefinitionMapper $componentConfigDefinitionMapper,
+        \Component_ConfigMapper $componentConfigInstanceMapper
+    ) {
+        $this->assessmentMapperProxy           = $assessmentMapperProxy;
+        $this->replicator                      = $replicator;
+        $this->courseImplementationMapper      = $courseImplementationMapper;
+        $this->unitImplementationMapper        = $unitImplementationMapper;
+        $this->componentInstanceMapper         = $componentInstanceMapper;
+        $this->componentConfigDefinitionMapper = $componentConfigDefinitionMapper;
+        $this->componentConfigInstanceMapper   = $componentConfigInstanceMapper;
+        $this->database                        = \Database::getInstance();
+        $this->assessmentCache                 = new GenericCollection(IAssessable::class);
     }
 
     /**
@@ -412,7 +454,7 @@ class ImportFactory
         // Put the specIds in the keys for O(1) lookup. Strip out values that equate to false (eg NULL)
         $specToImplMap = array_flip(array_filter($assessmentImplToSpecMap));
 
-        /** @var Project[] $projectSpecs */
+        /** @var GenericCollection|Project[] $projectSpecs */
         $projectSpecs = new GenericCollection(Project::class);
         foreach ($assessmentSpecs as $unitSpecId => $unitAssessmentSpecs) {
             foreach ($unitAssessmentSpecs as $specId => $assessmentSpec) {
@@ -492,7 +534,7 @@ class ImportFactory
         /**
          * Indexed by Assessment.id
          *
-         * @var Project[] $projectImpls
+         * @var GenericCollection|Project[] $projectImpls
          */
         $projectImpls = new GenericCollection(Project::class);
         foreach ($assessmentImpls as $unitSpecId => $unitAssessmentImpls) {
@@ -578,29 +620,21 @@ class ImportFactory
     {
         /**
          * Sets of Project Specs, grouped by UnitSpec.id
-         *
-         * @var GenericCollection[] $unitProjectSpecs
          */
         $unitProjectSpecs = new GenericCollection(GenericCollection::class);
 
         /**
          * Sets of Project Impls, grouped by UnitSpec.id
-         *
-         * @var GenericCollection[] $unitProjectImpls
          */
         $unitProjectImpls = new GenericCollection(GenericCollection::class);
 
         /**
          * Indexed by assessment.id
-         *
-         * @var Project[] $projectSpecs
          */
         $projectSpecs = new GenericCollection(Project::class);
 
         /**
          * Indexed by assessment.id
-         *
-         * @var Project[] $projectImpls
          */
         $projectImpls = new GenericCollection(Project::class);
 
@@ -697,10 +731,10 @@ class ImportFactory
     }
 
     /**
-     * @param string $dateString
+     * @param string|null $dateString
      * @return \Alaress_Date_Format
      */
-    protected function createDate($dateString)
+    protected function createDate(?string $dateString): Alaress_Date_Format
     {
         if (is_null($dateString)) {
             return new \Alaress_Date_NullDate();
@@ -720,7 +754,7 @@ class ImportFactory
      * @return IAssessable|null
      * @throws InvalidDataStateException if the assessment has no determinable type
      */
-    protected function buildAssessmentSpecFromRow($row)
+    protected function buildAssessmentSpecFromRow(array $row)
     {
         // Short-circuit if there's no assessment at all
         if (is_null($row['sa.id'])) {
@@ -851,5 +885,323 @@ class ImportFactory
             $assessment->setAcceptsNone();
         }
         return $assessment;
+    }
+
+
+    /**
+     * Creates courseImpls for given classFolders, when courseSpec is provided and courseImplId is not provided.
+     * Modifies courseImpl when courseImplId is provided (courseSpec will be ignored).
+     *
+     * @param CourseSpecification|null  $courseSpec
+     * @param array                     $unitSpecIds
+     * @param Collection                $classFolders
+     * @param CourseImplementation|null $courseImpl
+     * @return CourseImplementation[]
+     * @throws MapperException
+     */
+    public function createCourseImpls(?CourseSpecification $courseSpec, array $unitSpecIds, Collection $classFolders, ?CourseImplementation $courseImpl): array
+    {
+        /** @var CourseImplementation[] $courseImpls */
+        $courseImpls = [];
+        $unitFolders = [];
+        if ($courseSpec) {
+            foreach ($courseSpec->getUnits() as $unitSpec) {
+                if (in_array((int)$unitSpec->getId(), $unitSpecIds, true)) {
+                    $unitFolders[] = $unitSpec->getFolder()->getId();
+                }
+            }
+        }
+
+        if (null === $courseImpl) {
+            // We are creating a new import
+            foreach ($classFolders as $classFolder) {
+                $courseImpl = $this->courseImplementationMapper->createModel();
+                $courseImpl->setSpecification($courseSpec);
+                $courseImpl->setFolder($classFolder);
+                $courseImpls[$classFolder->getId()] = $courseImpl;
+
+                //Save unit criteria to class page
+                $allFolders = array_merge([$courseSpec->getFolder()->getId()], $unitFolders);
+                $this->copyIndicator($allFolders, $classFolder->getId());
+            }
+        } else {
+            // We are modifying an existing import
+            // We can only modify a single Course Import at a time.
+            $courseImpls[$courseImpl->getFolder()->getId()] = $courseImpl;
+
+            // Load UnitImplementations
+            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
+
+            // Load IAssessables
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImpl->getId()]));
+            }
+
+            //Save unit criteria to class page
+            $classFolderId = $classFolders->first()->getId();
+
+            $this->copyIndicator($unitFolders, $classFolderId);
+        }
+        return $courseImpls;
+    }
+
+    /**
+     * Imports unit to a courseImpl
+     * @param CourseImplementation $courseImpl
+     * @param UnitSpecification    $unitSpec
+     * @param Alaress_Date_Format  $unitImplOpenDate
+     * @param Alaress_Date_Format  $unitImplCloseDate
+     * @return UnitImplementation|null
+     * @throws MapperException
+     */
+    public function importUnit(CourseImplementation $courseImpl, UnitSpecification $unitSpec, Alaress_Date_Format $unitImplOpenDate, Alaress_Date_Format $unitImplCloseDate): ?UnitImplementation
+    {
+        // Does the CourseImpl already contain this Unit ?
+        $unitSpecId = $unitSpec->getId();
+        $callback   = function ($unitImpl) use ($unitSpecId) {
+            /** @var UnitImplementation $unitImpl */
+            return (int)$unitSpecId === (int)$unitImpl->getSpecification()->getId();
+        };
+        /** @var UnitImplementation|null $unitImpl */
+        $unitImpl = $courseImpl->getUnits()->filter($callback)->first();
+
+        // Did we already delete this UnitImpl ?
+        if ($unitImpl && $unitImpl->isDeleted()) {
+            return null;
+        }
+
+        // If the CourseImpl does not yet contain this UnitSpec
+        if (!$unitImpl) {
+            // Create a UnitImpl from this UnitSpec
+            $unitImpl = $this->unitImplementationMapper->createModel();
+            $unitImpl->setSpecification($unitSpec);
+            $unitImpl->setCourse($courseImpl);
+            $unitImpl->setTitle($unitSpec->getFolder()->getTitle());
+            $courseImpl->getUnits()->add($unitImpl);
+        }
+        $unitImpl->setOpenDate($unitImplOpenDate);
+        $unitImpl->setDueDate($unitImplCloseDate);
+        $this->unitImplementationMapper->save($unitImpl);
+
+        return $unitImpl;
+    }
+
+    /**
+     * Creates assessment impl in a given context
+     *
+     * @param int|null          $implAssessmentId
+     * @param IAssessable|null  $specAssessment
+     * @param AssessmentContext $context
+     * @param bool              $delete
+     * @param User              $user
+     * @param array             $dateData
+     * @return IAssessable|null
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    public function importAssessment(
+        ?int $implAssessmentId,
+        ?IAssessable $specAssessment,
+        AssessmentContext $context,
+        bool $delete,
+        User $user,
+        array $dateData
+    ): ?IAssessable {
+        if (!$implAssessmentId && !$specAssessment) {
+            throw new UnexpectedValueException();
+        }
+
+        $notifier = $this->assessmentMapperProxy->getNotifier();
+
+        $before = [];
+        if ($implAssessmentId) {
+            // We have been passed the Assessment Impl
+            // Retrieve AssessmentImpl from UnitImpl
+            $filter         = function ($impl) use ($implAssessmentId) {
+                /** @var IAssessable $impl */
+                return (int)$impl->getId() === $implAssessmentId;
+            };
+            $specAssessment = $context->getAssessables()->filter($filter)->first();
+            $before         = $notifier->dehydrate($specAssessment);
+        }
+
+        // Base Case #2 - Is item unselected ? (and already imported)
+        if ($delete) {
+            $this->assessmentMapperProxy->delete($specAssessment);
+            $notifier->notify($specAssessment, $user, $before);
+            return null;
+        }
+
+        // Item is checked.
+
+        // Apply dates regardless of whether it is a Spec or Impl. (If Spec, they will be cloned to the Impl)
+        $specAssessment = $this->applyDates($specAssessment, $dateData);
+
+        if (!$implAssessmentId) {
+            // INSERT - Create Impl from Spec
+            $newAssessment = $this->replicator->replicateInNewContext($specAssessment, $context, $user);
+            $notifier->notify($newAssessment, $user, $before);
+        } else {
+            // UPDATE
+            $newAssessment = null;
+            $this->assessmentMapperProxy->save($specAssessment, $user);
+            $notifier->notify($specAssessment, $user, $before);
+        }
+        return $newAssessment ?: $specAssessment;
+    }
+
+    /**
+     * Apply date strings from an array to the specified Assessment
+     *
+     * @param IAssessable $assessment
+     * @param string[]    $dates
+     * @return IAssessable
+     * @throws \DomainException if property isn't recognized
+     */
+    protected function applyDates(IAssessable $assessment, array $dates): IAssessable
+    {
+        // Set/Update Dates
+        foreach ($dates as $property => $local) {
+            if (!in_array($property, ['publish', 'open', 'due', 'close'])) {
+                continue;
+            }
+            $date = Alaress_Date_Format::newLocal($local);
+            switch (strtolower($property)) {
+                case 'publish':
+                    $assessment->setPublishAt($date);
+                    break;
+
+                case 'open':
+                    $assessment->setOpenAt($date);
+                    break;
+
+                case 'due':
+                    $assessment->setDueAt($date);
+                    break;
+
+                case 'close':
+                    $assessment->setCloseAt($date);
+                    break;
+
+                default:
+                    // ignore
+            }
+        }
+        return $assessment;
+    }
+
+    /**
+     * Copies indicators and capabilities from units which are not existing in the destination folder
+     *
+     * @param int[] $sourceIds
+     * @param int   $destinationId
+     * @return static
+     * @throws MapperException
+     */
+    private function copyIndicator(array $sourceIds, int $destinationId): self
+    {
+        $indicatorMapper = IndicatorMapper::getInstance();
+
+        // Save copy of indicators with class page as parent
+        foreach ($indicatorMapper->findForFolder($sourceIds) as $indicator) {
+            $indicatorMapper->findOrCreateOneForFolderByKey(
+                $destinationId,
+                $indicator->getName(),
+                $indicator->getCapability()->getName(),
+                false,
+                $indicator->getCapability()->getCurriculumNodes(),
+                $indicator->getCurriculumNodes()
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Attempts to find a Course Outline ComponentInstance on the specifed page
+     * that is not currently linked to a CourseImport.
+     *
+     * @param int $folderId
+     * @return \Component_Instance|null
+     */
+    public function findAvailableCourseOutlineComponent($folderId): ?\Component_Instance
+    {
+        $module        = \Component_Definition::MODULE_HOMEPAGE;
+        $class         = HomepageOutlineComponentController::class;
+        $compInstances = $this->componentInstanceMapper->findByContextAndClass($module, $folderId, $class);
+        $compInstances->sortBy('sequence', 'ASC');
+        foreach ($compInstances as $component) {
+            // If this component has no associated Course, or the course is not valid
+            if (
+                !$component->getConfigArray()['importedCourse'] ||
+                !$component->getConfigArray()['importedCourse']['value']
+            ) {
+                // Conclude the Component is available, and use it
+                return $component;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Configures the specified component to display the specified course.
+     *
+     * Creates the component if none specified.
+     *
+     * @param CourseImplementation     $courseImpl
+     * @param \Component_Instance|null $compInstance
+     * @return string The name of the new Component
+     * @throws MapperException
+     * @throws \PDOException
+     */
+    public function injectImportIntoComponent(
+        CourseImplementation $courseImpl,
+        ?\Component_Instance $compInstance
+    ): string {
+        // Did we find an available component?
+        if ($compInstance) {
+            // Find its 'importedCourse' config
+            /** @var \Component_ConfigDefinition|null $configDefinition */
+            $configDefinition = null;
+            foreach ($compInstance->getConfig() as $configItem) {
+                if ('importedCourse' === $configItem->getKey()) {
+                    $configDefinition = $configItem;
+                    break;
+                }
+            }
+            if (!$configDefinition) {
+                $configDefinition = $this->componentConfigDefinitionMapper->findByColumnList(
+                    [
+                        'component_definition_id' => $compInstance->getDefinitionId(),
+                        'key'                     => 'importedCourse',
+                    ]
+                )->first();
+                $configDefinition->setKey('importedCourse');
+            }
+            $configInstance = $this->componentConfigInstanceMapper->findByColumnList(
+                [
+                    'component_config_definition_id' => $configDefinition->getId(),
+                    'component_instance_id'          => $compInstance->getId(),
+                ]
+            )->first();
+            if (!$configInstance) {
+                $configInstance = $this->componentConfigInstanceMapper->createModel();
+                $configInstance->setConfigDefinitionId($configDefinition->getId());
+                $configInstance->setInstanceId($compInstance->getId());
+            }
+            $configInstance->setValue($courseImpl->getId());
+            $this->componentConfigInstanceMapper->save($configInstance);
+        } else {
+            // No available component, create one.
+            $folder             = $courseImpl->getFolder();
+            $configDefinition   = ['importedCourse' => $courseImpl->getId()];
+            $courseOutlineClass = HomepageOutlineComponentController::class;
+            $compInstance       = $this->componentInstanceMapper->injectNewComponent($folder, $configDefinition, $courseOutlineClass);
+            $compInstance       = $this->componentInstanceMapper->findByInstanceId($compInstance->getId());
+        }
+        $config        = $compInstance->getConfigArray();
+        $componentName = $config['componentname']['value'] ?: $config['componentname']['defaultValue'];
+        return $componentName;
     }
 }
