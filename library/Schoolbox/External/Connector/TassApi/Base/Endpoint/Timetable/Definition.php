@@ -308,8 +308,8 @@ class Definition implements IStrategy
             $closestPast   = ['VALUE' => ''];
             $closestFuture = ['VALUE' => ''];
             foreach ($timetableCalendar['tt_calendar'] as $current) {
-                // if DAY_CODE is not set, move on
-                if ('' === trim($current['DAY_CODE'])) {
+                // if DAY_CODE is not set (i.e. 0, '', null), move on
+                if (empty($current['DAY_CODE'])) {
                     continue;
                 }
                 if (
