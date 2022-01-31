@@ -42,6 +42,9 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                 // Process each item in feed
                 $allRss = $rss->getOutput();
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                /**
+                 * Either requesting the RSS feed, or the RSS feed failed, error out here.
+                 */
                 $allRss = [];
             }
 
