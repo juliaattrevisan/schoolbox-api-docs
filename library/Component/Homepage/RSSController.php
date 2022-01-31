@@ -42,7 +42,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                 // Process each item in feed
                 $allRss = $rss->getOutput();
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-                $allRss = null;
+                $allRss = [];
             }
 
             if (count($allRss) == 0) {
