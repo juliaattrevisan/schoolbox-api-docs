@@ -98,13 +98,12 @@ async function deleteComponent (component) {
     } catch (error) {
         console.warn(error);
     } finally {
-        document.dispatchEvent(new CustomEvent(ON_COMPONENT_REMOVED, { //dispatch to allow removing from the sortable list in addAndSortComponents.js
+        document.dispatchEvent(new CustomEvent(ON_COMPONENT_REMOVED, { //dispatch to allow removing from the sortable list in sortExistingComponents.js
             detail: {
                 component: component 
             }
         })); 
         component.remove();
-        // if it was the last component in a column, reshow the placeholder
     }
 }
 

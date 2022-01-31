@@ -74,8 +74,6 @@ function getDraggable (component) {
  */
 function initListeners () {
     // initComponentLockSwitchListener(); - may add in again when actually adding the palette functionality
-    initOnComponentAddedListener();
-    initOnComponentRemovedListener();
 }
 
 /**
@@ -93,31 +91,6 @@ function initListeners () {
  */
 function updateDraggablesStatus (isEnabled) {
     __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
-}
-
-/**
- * To add a newly created component to the sortable list
- */
-function initOnComponentAddedListener () {
-    document.addEventListener(ON_COMPONENT_ADDED, (event) => {
-        const newDraggable = getDraggable(event.detail.component);
-        const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
-        newDraggable.enabled(componentLockSwitchStatus); //check 
-        __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
-        updateSortableElements(); //update the position of all elements due to the new element that's been added
-    });
-}
-
-/**
- * To remove a component from the sortable list
- */
-function initOnComponentRemovedListener () {
-    document.addEventListener(ON_COMPONENT_REMOVED, (event) => {
-        const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
-        draggableToRemove.kill(); //disables the Draggable instance
-        __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
-        updateSortableElements(); //update the position of all elements due to the new element being added
-    });
 }
 
 /**
