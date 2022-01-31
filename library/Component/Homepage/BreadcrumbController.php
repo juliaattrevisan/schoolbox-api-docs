@@ -42,7 +42,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         /* Decide whether to show Component Title using !showComponentTitle
          * Inverted from "Hide headings from readonly users" via compactMode
          */
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
+        if ($this->getContextPermission() < UserAccess::ACCESS_WRITE && !$this->getConfig('showComponentTitle')) {
             $this->setVar('CONFIGURATION', '');
             $this->setBlock('source_folder_exists', 'header', 'header_block');
             $this->setBlock('source_folder_exists', 'dashboard_header', 'dashboard_header_block');
