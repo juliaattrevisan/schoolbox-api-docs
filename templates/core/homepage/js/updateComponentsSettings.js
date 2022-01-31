@@ -7,7 +7,7 @@ import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { timeout } from '@js/util/jsUtils';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, getComponentID } from './updateHomepage';
-import { updateDeletedComponent } from './deleteComponents';
+import { updateDeletedComponent } from './removeComponents';
 import { isComponentUncollapsed, collapseComponent, uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
 
 const ANIMATE_SPEED = 0.4;

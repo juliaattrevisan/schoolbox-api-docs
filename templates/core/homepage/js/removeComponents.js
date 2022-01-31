@@ -14,8 +14,8 @@ const ANIMATE_SPEED = 0.4;
  * Toggle the delete palette and manage the confirm/deny actions
  */
 export function initDeleteComponents () {
-    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
-    document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
+    document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
 }
 
 /**

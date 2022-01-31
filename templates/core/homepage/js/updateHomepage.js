@@ -10,7 +10,7 @@ import { initUpdateColumnWidths } from './updateColumnWidths';
 import { initAddNewComponents } from './addNewComponents';
 import { initSortExistingComponents } from './sortExistingComponents';
 import { initUpdateComponentsSettings } from './updateComponentsSettings';
-import { initDeleteComponents } from './deleteComponents';
+import { initDeleteComponents } from './removeComponents';
 import { initCollapseComponents } from './collapseComponents';
 import { init as updateComponentCounts } from './updateComponentCounts';
         
