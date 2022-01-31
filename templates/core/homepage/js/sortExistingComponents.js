@@ -50,15 +50,17 @@ export function initSortExistingComponents () {
  */
 function initDraggables () {
     document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
-        __draggablesList = [...__draggablesList, getDraggable(component)];
+        __draggablesList = [...__draggablesList, addNewDraggable(component)];
     });
 }
 
 /**
  * To enable Dragging functionality on a component
  * Refer to https://greensock.com/docs/v3/Plugins/Draggable for further info
+ * 
+ * @returns { Draggable }
  */
-function getDraggable (component) {
+function addNewDraggable (component) {
     const componentTrigger = component.querySelector(COMPONENT_TRIGGER_SELECTOR);
     componentTrigger.addEventListener('click', (event) => event.preventDefault());
     componentTrigger.addEventListener('dblclick', (event) => event.preventDefault());
@@ -85,7 +87,7 @@ function initListeners () {
  */
 function initOnComponentAddedListener () {
     document.addEventListener(ON_COMPONENT_ADDED, (event) => {
-        const newDraggable = getDraggable(event.detail.component);
+        const newDraggable = addNewDraggable(event.detail.component);
         const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
         newDraggable.enabled(componentLockSwitchStatus); //check 
         __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
@@ -328,7 +330,7 @@ function onDrag () {
     if (canCheckForChange()) { 
         const sortablesToCheckList = Array.from(document.querySelectorAll(COMPONENT_SELECTOR)); //grab all sortable elements 
         const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
-        if (closestElement && closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
+        if (closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
             if (isElementAboveOtherElement(__activeComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
                 flipState(closestElement, true);
             } else if (isElementBelowOtherElement(__activeComponent, closestElement)) {
