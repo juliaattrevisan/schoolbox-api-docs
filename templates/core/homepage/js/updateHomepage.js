@@ -6,10 +6,10 @@
 
 import { initToggleLockComponents } from './toggleLockComponents';
 import { initPostToMyLinks } from './postToMyLinks';
-import { initUpdateColumnWidths } from './updateColumnWidths';
+import { initUpdateColumnWidths } from './editColumns/updateColumnWidths';
 import { initAddNewComponents } from './addNewComponents';
-import { initSortExistingComponents } from './sortExistingComponents';
-import { initUpdateComponentsSettings } from './updateComponentsSettings';
+import { initSortExistingComponents } from './existingComponents/sortExistingComponents';
+import { initUpdateComponentsSettings } from './existingComponents/updateComponentsSettings';
 import { initRemoveComponents } from './removeComponents';
 import { initCollapseComponents } from './collapseComponents';
 import { initUpdateComponentCounts } from './updateComponentCounts';

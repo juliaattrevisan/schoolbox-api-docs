@@ -6,7 +6,7 @@
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { timeout } from '@js/util/jsUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, getComponentID } from './updateHomepage';
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, getComponentID } from '../updateHomepage';
 import { updateRemovedComponent } from './removeComponents';
 import { isComponentUncollapsed, collapseComponent, uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
 
