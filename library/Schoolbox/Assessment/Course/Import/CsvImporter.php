@@ -157,8 +157,10 @@ class CsvImporter
             // Update any already-imported AssessmentImpls
 
             foreach ($courseImpls as $classFolderId => $courseImpl) {
+                $insertComponent = false;
                 if (!isset($existingCourseImpls[$courseSpec->getId()][$classFolderId])) {
                     $existingCourseImpls[$courseSpec->getId()][$classFolderId] = $courseImpl;
+                    $insertComponent = true;
                 }
                 // Even if an import-modify, we need to explicitly save to update timestamps (and possibly the folderId)
                 $this->courseImplementationMapper->save($courseImpl);
@@ -195,9 +197,11 @@ class CsvImporter
                     }
                 }
 
-                // Associate the CourseImpl with a CourseOutline Component
-                $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId, $courseImpl->getId());
-                $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
+                if ($insertComponent) {
+                    // Associate the CourseImpl with a CourseOutline Component
+                    $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId, $courseImpl->getId());
+                    $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
+                }
 
                 $imported[] = $unitImpl;
             }
