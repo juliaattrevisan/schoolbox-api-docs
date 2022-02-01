@@ -62,9 +62,6 @@
 <script type="text/javascript">
     $(function() {
         
-        var url = '/homepage/configForm.php';
-
-        var homepage = $('#component-layout');
         // homepage.masonry({
         //     context: {
         //         cid: '{ID}'
@@ -123,30 +120,6 @@
         //         url: url
         //     }
         // });
-
-        // Fix slider on tab
-        $('[data-tab]').on('toggled', function (event, tab) {
-            tab.foundation('reflow');
-
-            // What tab is this?
-            const tabData = tab.data();
-            if ('hideEmpty' in tabData) {
-                homepage.removeClass('show-empty');
-            } else if ('showEmpty' in tabData) {
-                homepage.addClass('show-empty');
-            }
-        });
-
-
-
-        /* Tab toggler
-         * Deal with special components placeholder
-         */
-        $.fn.tabActivator({
-            onTabClose: function(tabActivator) {
-                homepage.removeClass('show-empty');
-            }
-        });
 
         /* Attach Course Selector Modal listeners
          */

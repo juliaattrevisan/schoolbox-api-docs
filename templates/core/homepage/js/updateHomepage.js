@@ -4,16 +4,17 @@
  */
 
 
-import { initToggleLockComponents } from './toggleLockComponents';
+import { initToggleLockComponents } from './existingComponents/toggleLockComponents';
 import { initPostToMyLinks } from './postToMyLinks';
 import { initUpdateColumnWidths } from './editColumns/updateColumnWidths';
-import { initAddNewComponents } from './addNewComponents';
+import { initAddNewComponents } from './newComponents/addNewComponents';
 import { initSortExistingComponents } from './existingComponents/sortExistingComponents';
 import { initUpdateComponentsSettings } from './existingComponents/updateComponentsSettings';
-import { initRemoveComponents } from './removeComponents';
-import { initCollapseComponents } from './collapseComponents';
+import { initRemoveComponents } from './existingComponents/removeComponents';
+import { initCollapseComponents } from './existingComponents/collapseComponents';
 import { initUpdateComponentCounts } from './updateComponentCounts';
 import { initUpdatePlaceHolders } from './updatePlaceHolders';
+import { initNewComponentsTab } from './newComponents/newComponentsTab';
         
 export const EXISTING_COMPONENT_SELECTOR = '[data-component]'; 
 export const UPDATE_URL = '/homepage/configForm.php'; 
@@ -48,4 +49,5 @@ export function getComponentID (component) {
     initCollapseComponents();
     initUpdateComponentCounts();
     initUpdatePlaceHolders();
+    initNewComponentsTab();
 });

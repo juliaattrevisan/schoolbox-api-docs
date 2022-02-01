@@ -4,7 +4,7 @@
  */
 
 import { UPDATE_URL, ON_COMPONENT_ADDED } from '../updateHomepage';
-import { updateComponentDisplay, isToggleUnlocked } from './toggleLockComponents';
+import { updateComponentDisplay, isToggleUnlocked } from '../existingComponents/toggleLockComponents';
 
 
 /**

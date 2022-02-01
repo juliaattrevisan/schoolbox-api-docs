@@ -3,7 +3,7 @@
  *
  */
 
-import { EXISTING_COMPONENT_SELECTOR } from './updateHomepage';
+import { EXISTING_COMPONENT_SELECTOR } from '../updateHomepage';
 
 /**
  * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch

@@ -8,7 +8,11 @@ import { gsap, Draggable, Flip } from 'gsap/all';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
     isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { saveComponentOrder } from './saveComponentOrder';
+import { slideUp, slideDown } from '@js/util/animateUtils';
 import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
+import { isOpen as isSettingsPanelOpen } from './updateComponentsSettings';
+import { isOpen as isRemovePanelOpen } from './removeComponents';
+import { isOpen as isComponentOpen } from './collapseComponents';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -20,7 +24,7 @@ const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
 let __activeComponent; //the component that's currently being dragged/sorted around
-let __placeHolderComponent; //the element that subs in for the __activeComponent being sorted
+let __referenceElement; //the element that subs in for the __activeComponent being sorted, used to know where the __activeComponent will be placed
 let __hasSortChange = false; //to know whether to update the DB with sort change
 let __isScrollingTimeout = false; //to prevent sorting when moving a sortable up/down the window
 let __isScrolling = false;
@@ -120,13 +124,14 @@ function initOnComponentRemovedListener () {
  */
 function onDragStart (event) {
     __activeComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
-    __placeHolderComponent = getPlaceholderElement();
+    __referenceElement = getReferenceElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
     updateDocumentOnDragStart();
     disableAllOtherDraggables();
     extractActiveComponent();
     updateSortableElements(); //ensure we have the most up to date positions
-    collapseExistingComponentContent();
+    collapseActiveComponentContent();
+    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS));
 }
 
 /**
@@ -135,14 +140,14 @@ function onDragStart (event) {
  * 
  * @returns { Element }  
  */
-function getPlaceholderElement () {
-    const cloneElement = __activeComponent.cloneNode(true);
-    cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference, so remove all component controls that can be expanded
-    cloneElement.querySelector('[data-component-panel="settings"]').remove(); 
-    cloneElement.querySelector('[data-component-panel="delete"]').remove();
-    cloneElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed 
-    insertElementBefore(__activeComponent, cloneElement);
-    return cloneElement;
+function getReferenceElement () {
+    const referenceElement = __activeComponent.cloneNode(true);
+    referenceElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference, so remove all component controls that can be expanded
+    referenceElement.querySelector('[data-component-panel="settings"]').remove(); 
+    referenceElement.querySelector('[data-component-panel="delete"]').remove();
+    referenceElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed 
+    insertElementBefore(__activeComponent, referenceElement);
+    return referenceElement;
 }
 
 /**
@@ -190,7 +195,7 @@ function disableAllOtherDraggables () {
 }
 
 /**
- * With the __placeHolderComponent in place, the __activeComponent is pulled out
+ * With the __referenceElement in place, the __activeComponent is pulled out
  * so it doesn't impact our ability to sort through the items and can go into any container
  */
 function extractActiveComponent () {
@@ -198,24 +203,24 @@ function extractActiveComponent () {
     __activeComponent.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
     setStylesOnElement(__activeComponent, { //Update position and styles to match now that the __activeComponent has been moved out of context
         position: 'absolute',
-        top: `${__placeHolderComponent.getBoundingClientRect().top + window.scrollY}px`,
-        left: `${__placeHolderComponent.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
-        width: `${__placeHolderComponent.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
+        top: `${__referenceElement.getBoundingClientRect().top + window.scrollY}px`,
+        left: `${__referenceElement.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
+        width: `${__referenceElement.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
-    updateExistingComponentComputedStyles(__activeComponent);
+    updateActiveComponentComputedStyles(__activeComponent);
 }
 
 /**
  * Ensure custom set colour vars are respected and set when moving between parent containers
  */
-function updateExistingComponentComputedStyles () {
+function updateActiveComponentComputedStyles () {
 
-    const containerPosition = __placeHolderComponent.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
+    const containerPosition = __referenceElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
 
-    const headBg = getComputedStyle(__placeHolderComponent).getPropertyValue(`--${containerPosition}-head-bg`); //use __placeHolderComponent as it still exists in the correct context
+    const headBg = getComputedStyle(__referenceElement).getPropertyValue(`--${containerPosition}-head-bg`); //use __referenceElement as it still exists in the correct context
     __activeComponent.querySelectorAll('.component-titlebar').forEach((item) => item.style.backgroundColor = headBg );
 
-    const headFont = getComputedStyle(__placeHolderComponent).getPropertyValue(`--${containerPosition}-head-font`);
+    const headFont = getComputedStyle(__referenceElement).getPropertyValue(`--${containerPosition}-head-font`);
     __activeComponent.querySelectorAll('.component-titlebar h2').forEach((item) => item.style.color = headFont );
     __activeComponent.querySelectorAll('.component-titlebar a').forEach((item) => item.style.color = headFont );
 
@@ -225,65 +230,22 @@ function updateExistingComponentComputedStyles () {
  * Shrink down the element to the top bar, which is used to sort to 
  * avoid trying to sort tall height elements
  */
-function collapseExistingComponentContent () {
-    
+async function collapseActiveComponentContent () {
     __isChangingSize = true;
-    
-    const existingComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]'); //just assume it may be open
-    gsap.to(existingComponentSettingsPanel, { 
-        onStart: () => existingComponentSettingsPanel.style.overflow = 'hidden',
-        height: 0, 
-        padding: 0,
-        duration: ANIMATE_SPEED,
-    } );
-
-    const existingComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]'); //just assume it may be open
-    gsap.to(existingComponentDeletePanel, { 
-        onStart: () => existingComponentDeletePanel.style.overflow = 'hidden',
-        height: 0, 
-        padding: 0,
-        duration: ANIMATE_SPEED,
-    } );
-    
-    const existingComponentContent = __activeComponent.querySelector('[data-collapsable]');
-    gsap.to(existingComponentContent, { 
-        onStart: () => existingComponentContent.style.overflow = 'hidden',
-        height: 0, 
-        duration: ANIMATE_SPEED,
-        onComplete: () => {
-            __isChangingSize = false;
-            // addPlaceHolderComponents();
-            document.dispatchEvent(new Event(ADD_PLACE_HOLDERS));
-        }
-    } );
-
+    if (isSettingsPanelOpen(__activeComponent)) {
+        const activeComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]'); //just assume it may be open
+        slideUp(activeComponentSettingsPanel, ANIMATE_SPEED);
+    }
+    if (isRemovePanelOpen(__activeComponent)) {
+        const activeComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]'); //just assume it may be open
+        slideUp(activeComponentDeletePanel, ANIMATE_SPEED);
+    }
+    if (isComponentOpen(__activeComponent)) {
+        const activeComponentContent = __activeComponent.querySelector('[data-collapsable]');
+        await slideUp(activeComponentContent, ANIMATE_SPEED);
+    }
+    __isChangingSize = false;
 }
-
-/**
- * Need to run through and check each parent container for children
- * if there's no children except the .masonry-placeholder need to show that items can be dragged into this container
- */
-// function addPlaceHolderComponents () {
-//     document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
-//         if (canAddPlaceHolderComponent(parentContainer)) { //something going on in here.. with FLIP
-//             const placeHolderComponent = __placeHolderComponentsList[index];
-//             parentContainer.append(placeHolderComponent);
-//         }
-//     });
-// }
-
-/**
- * There's a bit of an issue where we can FLIP on sort change, and then also remove the placeHolderComponent
- * that is within the FLIP. This causes an issue we need to check for
- * 
- * @param { Element }
- * 
- * @returns { Boolean }
- */
-// function canAddPlaceHolderComponent (parentContainer) {
-//     return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
-//            (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
-// }
 
 /**
  * To be able to sort elements and snap back to correct position
@@ -314,16 +276,16 @@ function onDrag () {
         const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
         if (closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
             if (isElementAboveOtherElement(__activeComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
-                flipState(closestElement, true);
+                updateActiveComponentPosition(closestElement, true);
             } else if (isElementBelowOtherElement(__activeComponent, closestElement)) {
-                flipState(closestElement, false);
+                updateActiveComponentPosition(closestElement, false);
             }
         }
     }
 }
 
 /**
- * Don't be checking while have hardly dragged, while the window is scrolling or while the __activeComponent is still shrinking in collapseExistingComponentContent()
+ * Don't be checking while have hardly dragged, while the window is scrolling or while the __activeComponent is still shrinking in collapseActiveComponentContent()
  * 
  * @returns { Boolean } 
  */
@@ -333,7 +295,7 @@ function canCheckForChange () {
         top: __activeComponent.getBoundingClientRect().top + window.scrollY
     }
     const distance = Math.sqrt(Math.pow(__startDragPoint.left - currentDragPoint.left, 2) + Math.pow(__startDragPoint.top - currentDragPoint.top, 2));
-    return distance > MIN_MOVEMENT && !__isScrolling && !__isChangingSize;
+    return distance > MIN_MOVEMENT && !__isScrolling && !__isChangingSize && !__isFlipping;
 }
 
 /**
@@ -344,42 +306,44 @@ function canCheckForChange () {
  * @param { Element }  
  * @param { Boolean }  
  */
-function flipState (closestElement, isShiftingDown) {
+function updateActiveComponentPosition (closestElement, isShiftingDown) {
     
     __hasSortChange = true;
+    __isFlipping = true;
+    __startDragPoint = updateDragPoint();
 
-    if (!__isFlipping) { //don't allow multiple FLIPs to prevent quick shifts / weird jarring behaviour
-
-        __isFlipping = true;
-        __startDragPoint = updateDragPoint();
-
-        const state = Flip.getState(document.querySelectorAll(COMPONENT_SELECTOR));
-        
-        if (isShiftingDown) {
-            insertElementAfter(closestElement, __placeHolderComponent);
-        } else {
-            insertElementBefore(closestElement, __placeHolderComponent);
-        }
-
-        clearFlipElements(); //check for flip bug
-        document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
-
-        __activeComponent.dataset.leftDifference = __placeHolderComponent.getBoundingClientRect().left - parseInt(__placeHolderComponent.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
-        __activeComponent.dataset.topDifference = (__placeHolderComponent.getBoundingClientRect().top + window.scrollY) - parseInt(__placeHolderComponent.dataset.originalTop);
-        gsap.to(__activeComponent, { width: __placeHolderComponent.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
-
-        document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
-
-        Flip.from(state, {
-            duration: ANIMATE_SPEED,
-            onComplete: () => {
-                __isFlipping = false;
-                onDrag(); //check after Flip to see if another is required
-            }
-        });
-        
+    const state = Flip.getState(document.querySelectorAll(COMPONENT_SELECTOR));
+    
+    if (isShiftingDown) {
+        insertElementAfter(closestElement, __referenceElement);
+    } else {
+        insertElementBefore(closestElement, __referenceElement);
     }
 
+    clearFlipElements(); //check for flip bug
+    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
+
+    __activeComponent.dataset.leftDifference = __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+    __activeComponent.dataset.topDifference = (__referenceElement.getBoundingClientRect().top + window.scrollY) - parseInt(__referenceElement.dataset.originalTop);
+    gsap.to(__activeComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+
+    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
+
+    animateFlip(state);
+        
+}
+
+/**
+ * Animate the sorting position change
+ */
+function animateFlip (state) {
+    Flip.from(state, {
+        duration: ANIMATE_SPEED,
+        onComplete: () => {
+            __isFlipping = false;
+            onDrag(); //check after Flip to see if another is required
+        }
+    });
 }
 
 /**
@@ -407,7 +371,6 @@ function clearFlipElements () {
 function onDragEnd () {
     updateDraggablesStatus(false); //prevent quick reclicks on elements
     document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS));
-    showExistingMasonryPlaceHolders();
     snapBackActiveComponent();
 }
 
@@ -421,29 +384,13 @@ function updateDraggablesStatus (isEnabled) {
 }
 
 /**
- * When the add components tab is open, there would be a double up of place holders in parent containers
- * so need to hide them while dragging, and they are shown again when drag is released
- */
-const showExistingMasonryPlaceHolders = () => {
-    const addComponentTabs = document.getElementById('tabs-1');
-    if (addComponentTabs.classList.contains('active')) { 
-        document.querySelectorAll('.masonry-placeholder').forEach((placeHolder) => {
-            if (placeHolder.dataset.placeHolderComponent !== 'true') { //make sure they are not the placeHolderComponents we need to allow proper sorting 
-                placeHolder.style.position = 'static'; 
-                placeHolder.style.visibility = 'visible';
-            }
-        });
-    }
-}
-
-/**
  * Move the component back to its original spot or its new updated by sort spot
  */
 function snapBackActiveComponent () {
     gsap.to(__activeComponent, {
         x: 0 + parseInt(__activeComponent.dataset.leftDifference), //to accommodate for potential position changes that have occured
         y: 0 + parseInt(__activeComponent.dataset.topDifference),
-        width: __placeHolderComponent.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
+        width: __referenceElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
         duration: ANIMATE_SPEED,
         overwrite: true,
         onComplete: () => onSnapBackActiveComponentComplete()
@@ -461,47 +408,33 @@ function onSnapBackActiveComponentComplete () {
     gsap.set(__activeComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     __activeComponent.style.position = 'static'; //was absolute, now sitting as it should
     __activeComponent.setAttribute('data-component', ''); //so it can be dragged again
-    updateExistingComponentComputedStyles(); //ensure the defined colours are respected
+    updateActiveComponentComputedStyles(); //ensure the defined colours are respected
 
-    insertElementAfter(__placeHolderComponent, __activeComponent); //the element was taken out, so put it back where it now belongs
-    __placeHolderComponent.remove(); //and now the placeholder can be pulled out
+    insertElementAfter(__referenceElement, __activeComponent); //the element was taken out, so put it back where it now belongs
+    __referenceElement.remove(); //and now the placeholder can be pulled out
 
-    expandExistingComponent();
+    expandActiveComponent();
     
 }
 
 /**
- * Expand out the existingComponent again now that's its back in place
+ * Expand out the activeComponent again now that's its back in place
  * The panels will animate regardless of whether they are opened or closed
  */
-function expandExistingComponent () {
-
-    const existingComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]');
-    gsap.to(existingComponentSettingsPanel, { 
-        height: 'auto', 
-        padding: '1rem',
-        duration: ANIMATE_SPEED,
-        onComplete: () => existingComponentSettingsPanel.style.overflow = 'visible'
-    } );
-
-    const existingComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]');
-    gsap.to(existingComponentDeletePanel, { 
-        height: 'auto', 
-        padding: '1rem',
-        duration: ANIMATE_SPEED,
-        onComplete: () => existingComponentDeletePanel.style.overflow = 'visible'
-    } );
-
-    const existingComponentContent = __activeComponent.querySelector('[data-collapsable]');
-    gsap.to(existingComponentContent, { 
-        height: 'auto', 
-        duration: ANIMATE_SPEED, 
-        onComplete: () => {
-            existingComponentContent.style.overflow = 'visible';
-            onActiveComponentExpanded();
-        }
-    } ); 
-
+async function expandActiveComponent () {
+    if (isSettingsPanelOpen(__activeComponent)) {
+        const activeComponentSettingsPanel = __activeComponent.querySelector('[data-component-panel="settings"]'); 
+        slideDown(activeComponentSettingsPanel, ANIMATE_SPEED);
+    }
+    if (isRemovePanelOpen(__activeComponent)) {
+        const activeComponentDeletePanel = __activeComponent.querySelector('[data-component-panel="delete"]'); 
+        slideDown(activeComponentDeletePanel, ANIMATE_SPEED);
+    }
+    if (isComponentOpen(__activeComponent)) {
+        const activeComponentContent = __activeComponent.querySelector('[data-collapsable]');
+        await slideDown(activeComponentContent, ANIMATE_SPEED);
+    }
+    onActiveComponentExpanded();
 }
 
 /**

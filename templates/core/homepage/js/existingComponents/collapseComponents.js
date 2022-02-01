@@ -5,10 +5,10 @@
 
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-import { EXISTING_COMPONENT_SELECTOR, ON_COMPONENT_ADDED } from './updateHomepage';
+import { EXISTING_COMPONENT_SELECTOR, ON_COMPONENT_ADDED } from '../updateHomepage';
 
-const COLLAPSABLE_SELECTOR = '[data-collapsable="true"]';
-const COLLAPSE_BUTTON_SELECTOR = '[data-collapser="true"]';
+const PANEL_SELECTOR = '[data-collapsable="true"]';
+const BUTTON_SELECTOR = '[data-collapser="true"]';
 const ANIMATE_SPEED = 0.4; //the speed of animations
 
 
@@ -26,10 +26,10 @@ export function initCollapseComponents () {
  * @param { Element } 
  */
 function init (component) {
-    const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
+    const collapseButton = component.querySelector(BUTTON_SELECTOR);
     collapseButton.addEventListener('click', (event) => {
         event.preventDefault();
-        isComponentUncollapsed(component) ? collapseComponent(component) : uncollapseComponent(component);
+        isOpen(component) ? close(component) : open(component);
     });
 } 
 
@@ -40,8 +40,8 @@ function init (component) {
  * 
  * @returns { Boolean }
  */
-export function isComponentUncollapsed (component) {
-    const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
+export function isOpen (component) {
+    const collapsePanel = component.querySelector(PANEL_SELECTOR);
     return collapsePanel.getAttribute('data-collapse-state') === 'uncollapsed';
 }
 
@@ -50,10 +50,10 @@ export function isComponentUncollapsed (component) {
  * 
  * @params { Element }
  */
-export async function uncollapseComponent (component) {
-    const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
+export async function open (component) {
+    const collapseButton = component.querySelector(BUTTON_SELECTOR);
     gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-    const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
+    const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute('data-collapse-state', 'uncollapsed');
     await slideDown(collapsePanel, ANIMATE_SPEED);
 }
@@ -63,10 +63,10 @@ export async function uncollapseComponent (component) {
  * 
  * @params { Element }
  */
-export async function collapseComponent (component) {
-    const collapseButton = component.querySelector(COLLAPSE_BUTTON_SELECTOR);
+export async function close (component) {
+    const collapseButton = component.querySelector(BUTTON_SELECTOR);
     gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-    const collapsePanel = component.querySelector(COLLAPSABLE_SELECTOR);
+    const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute('data-collapse-state', 'collapsed');
     await slideUp(collapsePanel, ANIMATE_SPEED);
 }

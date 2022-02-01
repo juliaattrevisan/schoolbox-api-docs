@@ -154,7 +154,7 @@ export function isElementBelowOtherElement (firstElement, secondElement) {
 }
 
 /**
- * Is the midpoint of an element below the midpoint of another element
+ * Add styles to an element
  * 
  * @param { Element }  
  * @param { Styles } for example { position: 'absolute', top: '20px' } 

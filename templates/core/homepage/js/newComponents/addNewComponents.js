@@ -2,8 +2,9 @@ import { gsap, Draggable, Flip } from 'gsap/all';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
          isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
-import { saveComponentOrder } from './existingComponents/saveComponentOrder';
-import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED } from './updateHomepage';
+import { saveComponentOrder } from '../existingComponents/saveComponentOrder';
+import { ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
+import { animate } from 'highcharts';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -14,10 +15,9 @@ const ANIMATE_SPEED = 0.3; //the speed of animations
 const MIN_MOVEMENT = 100; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
-let __placeHolderComponentsList = []; //to contain the place holder instances
-let __activeComponent; //the component that's currently being dragged/sorted around
-let __activeDraggable; //the current Draggable instance linked to the __activeComponent
-let __placeHolderComponent; //the element that subs in for the __activeComponent being sorted
+let __newComponent; //the component that's currently being dragged/sorted around
+let __activeDraggable; //the current Draggable instance linked to the __newComponent
+let __referenceElement; //the element that subs in for the __newComponent being sorted, so we know where it's going to be placed
 let __hasNewComponent = false; //to know whether to update the DB with sort change
 let __isScrollingTimeout = false; //to prevent sorting when moving a sortable up/down the window
 let __isScrolling = false;
@@ -38,7 +38,6 @@ let __newComponentPaletteContainer; //to reset the newComponent back to its base
  */
 export function initAddNewComponents () {
     initDraggables();
-    initPlaceHolderComponents();
 }
 
 /**
@@ -95,23 +94,6 @@ function updateDraggablesStatus (isEnabled) {
     __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
-/**
- * need to run through and check each parent container for children
- * if there's no children need to show that items can be dragged into this container
- */
-function initPlaceHolderComponents () {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((container, index) => {
-        const placeHolderComponent = document.createElement('div');
-        placeHolderComponent.id = `placeHolderComponent-${index}`;
-        placeHolderComponent.classList.add('masonry-placeholder');
-        placeHolderComponent.style.display = 'block';
-        placeHolderComponent.style.height = '51px';
-        placeHolderComponent.dataset.component = 'true';
-        placeHolderComponent.dataset.placeHolderComponent = 'true';
-        placeHolderComponent.innerText = 'You can drag components into this space';
-        __placeHolderComponentsList = [...__placeHolderComponentsList, placeHolderComponent];
-    });
-}
 
 
 /*****************************************************************
@@ -121,35 +103,35 @@ function initPlaceHolderComponents () {
  ****************************************************************/
 
 /**
- * Sub in a placeholder to use in place of the element being dragged, 
+ * Sub in a referenceElement to use in place of the element being dragged, 
  * which gets pulled out so it can go into any other parent container 
  * that contains the COMPONENT_SELECTOR
  */
 function onDragStart (event) {
-    __activeComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
-    __activeDraggable = getDraggable(__activeComponent); //to check whether the component is within the tabs, and if so don't create a new component
-    __newComponentClone = __activeComponent.cloneNode(true);
-    __placeHolderComponent = getPlaceholderElement();
+    __newComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
+    __activeDraggable = getDraggable(__newComponent); //to check whether the component is within the tabs, and if so don't create a new component
+    __newComponentClone = __newComponent.cloneNode(true);
+    __referenceElement = getReferenceElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
     updateDocumentOnDragStart();
     disableAllOtherDraggables();
-    extractActiveComponent();
+    extractNewComponent();
     updateSortableElements(); //ensure we have the most up to date positions
-    addPlaceHolderComponents();
+    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS));
 }
 
 /**
- * Create a clone of the __activeComponent being dragged to use as a placeholder 
- * and to keep it in position as the __activeComponent will be pulled out of context
+ * Create a clone of the __newComponent being dragged to use as a placeholder 
+ * and to keep it in position as the __newComponent will be pulled out of context
  * 
  * @returns { Element }  
  */
-function getPlaceholderElement () {
-    const cloneElement = __activeComponent.cloneNode(true);
-    cloneElement.setAttribute('data-component', ''); //so it can be considered when sorting
-    cloneElement.style.opacity = 0.5; //displayed as reference where the __activeComponent is currently placed 
-    insertElementBefore(__activeComponent, cloneElement);
-    return cloneElement;
+function getReferenceElement () {
+    const referenceElement = __newComponent.cloneNode(true);
+    referenceElement.setAttribute('data-component', ''); //so it can be considered when sorting
+    referenceElement.style.opacity = 0.5; //displayed as reference where the __newComponent is currently placed 
+    insertElementBefore(__newComponent, referenceElement);
+    return referenceElement;
 }
 
 /**
@@ -159,8 +141,8 @@ function getPlaceholderElement () {
  */
 function updateDragPoint () {
     return { 
-        left: __activeComponent.getBoundingClientRect().left,
-        top: __activeComponent.getBoundingClientRect().top + window.scrollY
+        left: __newComponent.getBoundingClientRect().left,
+        top: __newComponent.getBoundingClientRect().top + window.scrollY
     }
 }
 
@@ -190,52 +172,26 @@ function onScroll () {
  */
 function disableAllOtherDraggables () {
     __draggablesList.forEach((draggable) => { 
-        if (draggable.target.id !== __activeComponent.id) { //to avoid disabling the current
+        if (draggable.target.id !== __newComponent.id) { //to avoid disabling the current
             draggable.disable();
         }
     }); 
 }
 
 /**
- * With the __placeHolderComponent in place, the __activeComponent is pulled out
+ * With the __referenceElement in place, the __newComponent is pulled out
  * so it doesn't impact our ability to sort through the items and can go into any container
  */
-function extractActiveComponent () {
-    __newComponentPaletteContainer = __activeComponent.parentElement; //so can put a copy of the __activeComponent back into the palette once the addition is complete
-    document.body.appendChild(__activeComponent);
-    __activeComponent.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
-    setStylesOnElement(__activeComponent, { //Update position and styles to match now that the __activeComponent has been moved out of context
+function extractNewComponent () {
+    __newComponentPaletteContainer = __newComponent.parentElement; //so can put a copy of the __newComponent back into the palette once the addition is complete
+    document.body.appendChild(__newComponent);
+    __newComponent.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
+    setStylesOnElement(__newComponent, { //Update position and styles to match now that the __newComponent has been moved out of context
         position: 'absolute',
-        top: `${__placeHolderComponent.getBoundingClientRect().top + window.scrollY}px`,
-        left: `${__placeHolderComponent.getBoundingClientRect().left}px`, //subtracting 16 to deal with 1rem padding-left that's applied
-        width: `${__placeHolderComponent.getBoundingClientRect().width}px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
+        top: `${__referenceElement.getBoundingClientRect().top + window.scrollY}px`,
+        left: `${__referenceElement.getBoundingClientRect().left}px`, //subtracting 16 to deal with 1rem padding-left that's applied
+        width: `${__referenceElement.getBoundingClientRect().width}px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
-}
-
-/**
- * need to run through and check each parent container for children
- * if there's no children except the .masonry-placeholder need to show that items can be dragged into this container
- */
-function addPlaceHolderComponents () {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
-        if (canAddPlaceHolderComponent(parentContainer)) { //something going on in here.. with FLIP
-            const placeHolderComponent = __placeHolderComponentsList[index];
-            parentContainer.append(placeHolderComponent);
-        }
-    });
-}
-
-/**
- * there's a bit of an issue where we can FLIP on sort change, and then also remove the placeHolderComponent
- * that is within the FLIP. This causes an issue we need to check for
- * 
- * @param { Element }
- * 
- * @returns { Boolean }
- */
-function canAddPlaceHolderComponent (parentContainer) {
-    return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
-           (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
 }
 
 /**
@@ -262,52 +218,31 @@ function updateSortableElements () {
  * based on whether a move is valid
  */
 function onDrag () {
+
     if (canCheckForChange()) { 
 
-        if (__activeDraggable.hitTest('#tabs-1')) { //if the draggedelement is hitting the tabs, put it in the tab container
+        if (__activeDraggable.hitTest('#tabs-1') && __hasNewComponent) { //if the draggedelement is hitting the tabs, put it in the tab container
             
             __hasNewComponent = false;
-
-            if (!__newComponentPaletteContainer.contains(__placeHolderComponent)) { //put it back where it came from only if it's already been dragged out
-
-                if (!__isFlipping) { //don't allow multiple FLIPs to prevent quick shifts / weird jarring behaviour
-                    
-                    __isFlipping = true;
-                    __startDragPoint = updateDragPoint();
+            __isFlipping = true;
+            __startDragPoint = updateDragPoint();
+    
+            const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
             
-                    const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
-                    
-                    __newComponentPaletteContainer.appendChild(__placeHolderComponent);
-                    __placeHolderComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
-                    
-                    Flip.from(state, {
-                        duration: ANIMATE_SPEED,
-                        onComplete: () => {
-                            __isFlipping = false;
-                            onDrag(); //check after Flip to see if another is required
-                        }
-                    });
-                    
-                }
-
-            }
+            __newComponentPaletteContainer.appendChild(__referenceElement);
+            __referenceElement.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
+            __newComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
+            
+            animateFlip(state);
 
         } else {
 
-            const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
-            const closestElement = getClosestElement(__activeComponent, sortablesToCheckList); //the element nearest to the dragged element
-            if (closestElement.id !== __activeComponent.id) { //no need to FLIP if the closest element is still the __activeComponent
-                if (isElementAboveOtherElement(__activeComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
-                    addNewComponentToPage(closestElement, true);
-                } else if (isElementBelowOtherElement(__activeComponent, closestElement)) {
-                    addNewComponentToPage(closestElement, false);
-                }
-            }
+            showNewComponentOnPage();
 
         }
 
-        
     }
+
 }
 
 /**
@@ -317,11 +252,25 @@ function onDrag () {
  */
 function canCheckForChange () {
     const currentDragPoint = { 
-        left: __activeComponent.getBoundingClientRect().left,
-        top: __activeComponent.getBoundingClientRect().top + window.scrollY
+        left: __newComponent.getBoundingClientRect().left,
+        top: __newComponent.getBoundingClientRect().top + window.scrollY
     }
     const distance = Math.sqrt(Math.pow(__startDragPoint.left - currentDragPoint.left, 2) + Math.pow(__startDragPoint.top - currentDragPoint.top, 2));
-    return distance > MIN_MOVEMENT && !__isScrolling;
+    return distance > MIN_MOVEMENT && !__isScrolling && !__isFlipping;
+}
+
+/**
+ * The component has been dragged over the page, so show where it will be current placed 
+ * relative to where it has been dragged
+ */
+function showNewComponentOnPage () {
+    const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
+    const closestElement = getClosestElement(__newComponent, sortablesToCheckList); //the element nearest to the dragged element
+    if (isElementAboveOtherElement(__newComponent, closestElement)) { //determine movement direction, up or down into the container
+        addNewComponentToPage(closestElement, true);
+    } else if (isElementBelowOtherElement(__newComponent, closestElement)) {
+        addNewComponentToPage(closestElement, false);
+    }
 }
 
 /**
@@ -334,49 +283,55 @@ function canCheckForChange () {
 function addNewComponentToPage (closestElement, isShiftingDown) {
     
     __hasNewComponent = true;
+    __isFlipping = true;
+    __startDragPoint = updateDragPoint();
 
-    if (!__isFlipping) { //don't allow multiple FLIPs to prevent quick shifts / weird jarring behaviour
-
-        __isFlipping = true;
-        __startDragPoint = updateDragPoint();
-
-        const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
-        
-        if (isShiftingDown) {
-            insertElementAfter(closestElement, __placeHolderComponent);
-        } else {
-            insertElementBefore(closestElement, __placeHolderComponent);
-        }
-
-        __placeHolderComponent.style.marginBottom = '2rem'; //existing components all have a margin
-        __activeComponent.style.marginBottom = '2rem'; //existing components all have a margin
-
-        removePlaceHolderComponents(); //remove prior to recording the new co-ordinates so can snap back on release to correct location
-        
-        __activeComponent.dataset.leftDifference = __placeHolderComponent.getBoundingClientRect().left - parseInt(__placeHolderComponent.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
-        __activeComponent.dataset.topDifference = (__placeHolderComponent.getBoundingClientRect().top + window.scrollY) - parseInt(__placeHolderComponent.dataset.originalTop);
-        gsap.to(__activeComponent, { width: __placeHolderComponent.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
-
-        addPlaceHolderComponents(); //now check if need to add them back in
-
-        Flip.from(state, {
-            duration: ANIMATE_SPEED,
-            onComplete: () => {
-                __isFlipping = false;
-                onDrag(); //check after Flip to see if another is required
-            }
-        });
-        
+    const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
+    
+    if (isShiftingDown) {
+        insertElementAfter(closestElement, __referenceElement);
+    } else {
+        insertElementBefore(closestElement, __referenceElement);
     }
 
+    __referenceElement.style.marginBottom = '2rem'; //existing components all have a margin
+    __newComponent.style.marginBottom = '2rem'; //existing components all have a margin
+
+    clearFlipElements(); //check for flip bug
+    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
+    
+    __newComponent.dataset.leftDifference = __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+    __newComponent.dataset.topDifference = (__referenceElement.getBoundingClientRect().top + window.scrollY) - parseInt(__referenceElement.dataset.originalTop);
+    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+
+    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
+
+    animateFlip(state);
+    
 }
 
 /**
- * Remove and re-add as parent containers have changed
+ * Show either the new component being added to the page, or being put back into the tabs
  */
-function removePlaceHolderComponents () {
-    document.querySelectorAll('[data-place-holder-component]').forEach((placeHolderComponent) => {
-        placeHolderComponent.remove();
+function animateFlip (state) {
+    Flip.from(state, {
+        duration: ANIMATE_SPEED,
+        onComplete: () => {
+            __isFlipping = false;
+            onDrag(); //check after Flip to see if another is required
+        }
+    });
+}
+
+/**
+ * Flip currently sometimes leaves a left over element while dragging between elements. It's cleared on mouse release, but we need 
+ * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
+ */
+ function clearFlipElements () {
+    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
+        if (parentContainer.children.length === 1 && !parentContainer.children[0].id) { //there's the flip element here, so we should clear it out
+            parentContainer.removeChild(parentContainer.children[0]);
+        }
     });
 }
 
@@ -392,38 +347,20 @@ function removePlaceHolderComponents () {
  */
 function onDragEnd () {
     updateDraggablesStatus(false); //prevent quick reclicks on elements
-    removePlaceHolderComponents();
-    showExistingMasonryPlaceHolders();
-    snapBackActiveComponent();
+    snapBackNewComponent();
 }
 
 /**
- * When the add components tab is open, there would be a double up of place holders in parent containers
- * so need to hide them while dragging, and they are shown again when drag is released
+ * Move the component back to its original spot or its new position on the page
  */
-function showExistingMasonryPlaceHolders () {
-    const addComponentTabs = document.getElementById('tabs-1');
-    if (addComponentTabs.classList.contains('active')) { 
-        document.querySelectorAll('.masonry-placeholder').forEach((placeHolder) => {
-            if (placeHolder.dataset.placeHolderComponent !== 'true') { //make sure they are not the placeHolderComponents we need to allow proper sorting 
-                placeHolder.style.position = 'static'; 
-                placeHolder.style.visibility = 'visible';
-            }
-        });
-    }
-}
-
-/**
- * Move the component back to its original spot or its new updated by sort spot
- */
-function snapBackActiveComponent () {
-    gsap.to(__activeComponent, {
-        x: 0 + parseInt(__activeComponent.dataset.leftDifference), //to accommodate for potential position changes that have occured
-        y: 0 + parseInt(__activeComponent.dataset.topDifference),
-        width: __placeHolderComponent.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
+function snapBackNewComponent () {
+    gsap.to(__newComponent, {
+        x: 0 + parseInt(__newComponent.dataset.leftDifference), //to accommodate for potential position changes that have occured
+        y: 0 + parseInt(__newComponent.dataset.topDifference),
+        width: __referenceElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
         duration: ANIMATE_SPEED,
         overwrite: true,
-        onComplete: () => onSnapBackActiveComponentComplete()
+        onComplete: () => onSnapBackNewComponentComplete()
     });
 }
 
@@ -433,25 +370,24 @@ function snapBackActiveComponent () {
  * 
  * @param { Element }  
  */
-function onSnapBackActiveComponentComplete () {
+function onSnapBackNewComponentComplete () {
 
-    gsap.set(__activeComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
-    __activeComponent.style.position = 'static'; //was absolute, now sitting as it should
+    gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
+    __newComponent.style.position = 'static'; //was absolute, now sitting as it should
 
-    insertElementAfter(__placeHolderComponent, __activeComponent); //the element was taken out, so put it back where it now belongs
-    __placeHolderComponent.remove(); //and now the placeholder can be pulled out
+    insertElementAfter(__referenceElement, __newComponent); //the element was taken out, so put it back where it now belongs
+    __referenceElement.remove(); //and now the placeholder can be pulled out
 
-    onActiveComponentExpanded();
+    updateDocumentOnDragEnd();
+    updateSortableElements();
+    addNewComponent();
 
 }
 
 /**
  * To set up for another possible drag of elements
  */
-async function onActiveComponentExpanded () {
-
-    updateDocumentOnDragEnd();
-    updateSortableElements();
+async function addNewComponent () {
 
     if (__hasNewComponent) {
         
@@ -463,7 +399,7 @@ async function onActiveComponentExpanded () {
         __draggablesList = [...__draggablesList, newDraggable];
         //disable if only allowed one element
 
-        const newComponent = await getNewComponent(__activeComponent);
+        const newComponent = await getNewComponent(__newComponent);
         await saveComponentOrder(newComponent);
         __hasNewComponent = false;
     } 

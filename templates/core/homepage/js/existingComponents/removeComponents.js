@@ -5,10 +5,12 @@
 
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, getComponentID } from './updateHomepage';
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, getComponentID } from '../updateHomepage';
 
-const ANIMATE_SPEED = 0.4;
-
+const ANIMATE_SPEED = 0.3;
+const BUTTON_SELECTOR = '[data-target="delete"]';
+const STATE_ATTRIBUTE = 'data-state'; //can be 'opened' or 'closed'
+const PANEL_SELECTOR = '[data-component-panel="delete"]';
 
 /**
  * Toggle the delete palette and manage the confirm/deny actions
@@ -24,10 +26,8 @@ export function initRemoveComponents () {
  * @param { Element } 
  */
 function init (component) {
-    const panel = component.querySelector('[data-component-panel="delete"]');
-    const toggleButton = component.querySelector('[data-target="delete"]');
-    initToggleButon(panel, toggleButton);
-    initCancelButton(component, panel, toggleButton);
+    initToggleButon(component);
+    initCancelButton(component);
     initConfirmButton(component);
 }   
 
@@ -37,19 +37,49 @@ function init (component) {
  * @param { Element } 
  * @param { Element } 
  */
-function initToggleButon (panel, toggleButton) {
+function initToggleButon (component) {
+    const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
-        if (toggleButton.getAttribute('data-state') === 'closed') {
-            toggleButton.setAttribute('data-state', 'opened');
-            gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-            slideDown(panel, ANIMATE_SPEED);
-        } else {
-            toggleButton.setAttribute('data-state', 'closed');
-            gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-            slideUp(panel, ANIMATE_SPEED);
-        }
+        gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+        isOpen(component) ? close(component) : open(component);
     });
+}
+
+/**
+ * Determine the state of the remove panel
+ * 
+ * @param { Element } 
+ * 
+ * @returns { Boolean }
+ */
+export function isOpen (component) {
+    const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    return toggleButton.getAttribute(STATE_ATTRIBUTE) === 'opened';
+}
+
+/**
+ * Open the settings panel
+ * 
+ * @param { Element } 
+ */
+function open (component) {
+    const panel = component.querySelector(PANEL_SELECTOR);
+    const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    toggleButton.setAttribute(STATE_ATTRIBUTE, 'opened');
+    slideDown(panel, ANIMATE_SPEED);
+}
+
+/**
+ * Close the settings panel
+ * 
+ * @param { Element } 
+ */
+async function close (component) {
+    const panel = component.querySelector(PANEL_SELECTOR);
+    const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    toggleButton.setAttribute(STATE_ATTRIBUTE, 'closed');
+    await slideUp(panel, ANIMATE_SPEED);
 }
 
 /**
@@ -59,13 +89,12 @@ function initToggleButon (panel, toggleButton) {
  * @param { Element } 
  * @param { Element } 
  */
-function initCancelButton (component, panel, toggleButton) {
+function initCancelButton (component) {
     const cancelDeleteButton = component.querySelector('[data-remove="0"]');
     cancelDeleteButton.addEventListener('click', (event) => {
         event.preventDefault();
-        if (toggleButton.getAttribute('data-state') === 'opened') {
-            toggleButton.setAttribute('data-state', 'closed');
-            slideUp(panel, ANIMATE_SPEED);
+        if (isOpen(component)) {
+            close(component);
         } 
     });
 }
