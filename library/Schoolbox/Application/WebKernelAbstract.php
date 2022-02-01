@@ -123,12 +123,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $code    = $e->getHttpStatusCode();
                     $message = $e->getMessage();
                     $info    = '';
+                } elseif (
+                    ($e instanceof \PDOException && $e->getCode() === "70100") ||
+                    ($e instanceof \Alaress\Database\Exception && $e->getPrevious() instanceof \PDOException && $e->getPrevious()->getCode() === "70100")
+                ) {
+                    $code    = 599;
+                    $message = "SQL query execution was interrupted (max_statement_time exceeded)";
                 } elseif ($e instanceof \PDOException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
-                } elseif ($e instanceof \Alaress\Database\Exception && $e->getPrevious() instanceof \PDOException && $e->getPrevious()->getCode() === "70100") {
-                    $code    = 599;
-                    $message = "SQL query execution was interrupted (max_statement_time exceeded)";
                 } elseif ($e instanceof RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
