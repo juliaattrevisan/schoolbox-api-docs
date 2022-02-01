@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
 use Alaress_Date_Format;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model;
 use Schoolbox\User;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
@@ -1118,13 +1119,14 @@ class ImportFactory
     }
 
     /**
-     * Attempts to find a Course Outline ComponentInstance on the specifed page
+     * Attempts to find a Course Outline ComponentInstance on the specified page
      * that is not currently linked to a CourseImport.
      *
      * @param int $folderId
+     * @param CourseImplementation|null $courseImpl
      * @return \Component_Instance|null
      */
-    public function findAvailableCourseOutlineComponent($folderId): ?\Component_Instance
+    public function findAvailableCourseOutlineComponent(int $folderId, ?CourseImplementation $courseImpl = null): ?\Component_Instance
     {
         $module        = \Component_Definition::MODULE_HOMEPAGE;
         $class         = HomepageOutlineComponentController::class;
@@ -1137,6 +1139,9 @@ class ImportFactory
                 !$component->getConfigArray()['importedCourse']['value']
             ) {
                 // Conclude the Component is available, and use it
+                return $component;
+            }
+            if (null !== $courseImpl && (int)$component->getConfigArray()['importedCourse']['value'] === $courseImpl->getId()) {
                 return $component;
             }
         }

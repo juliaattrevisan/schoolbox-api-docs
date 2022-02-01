@@ -18,7 +18,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\UserMapper;
 
 class CsvImporter
@@ -197,7 +196,7 @@ class CsvImporter
                 }
 
                 // Associate the CourseImpl with a CourseOutline Component
-                $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId);
+                $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId, $courseImpl);
                 $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
 
                 $imported[] = $unitImpl;
