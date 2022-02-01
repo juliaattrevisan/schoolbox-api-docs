@@ -115,21 +115,18 @@ class Notif implements NotifInterface
             HandlerFactory::SYS_EXCEPTION_MAIL
         ];
 
+        // Resolve the base stack
+        $handlers = $this->factory->getStack($stack);
+
+        // System topics: add a file log handler
         if ($this->isSystemTopic($this->topic)) {
-            if (in_array($this->topic, [ self::TOPIC_AUTH, self::TOPIC_CMS ], true)) {
-                // this may well come back to bite me
-                $stack[] = $this->topic;
-            }
-
-            // resolve the stack so far
-            $handlers = $this->factory->getStack($stack);
-
-            // append a file logger
             $handlers[] = $this->factory->getFileLogHandler($this->topic);
-        } else {
-            // resolve the stack so far
-            $handlers = $this->factory->getStack($stack);
         }
+
+        // Add this topic's handler.
+        // This could easily be a null handler: that's fine. It could also be
+        // an `InvalidArgumentException`.
+        $handlers[] = $this->factory->getHandler($this->topic);
 
         // finally append debug handlers
         return array_merge($handlers, $this->factory->getStack([

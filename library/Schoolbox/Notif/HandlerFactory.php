@@ -151,7 +151,9 @@ class HandlerFactory
     public function getHandler($tag)
     {
         if (empty($this->handlers[$tag])) {
-            $this->handlers[$tag] = $this->handlerGenerators[$tag]();
+            $this->handlers[$tag] = is_callable($this->handlerGenerators[$tag])
+                ? $this->handlerGenerators[$tag]()
+                : new NullHandler();
         }
 
         return $this->handlers[$tag];
