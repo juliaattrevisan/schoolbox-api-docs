@@ -3,7 +3,7 @@
  *
  */
 
- import { ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
+import { ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
 
 
 /**
@@ -40,4 +40,14 @@ export function initNewComponentsTab () {
         }
     });
 
+}
+
+/**
+ * Is the tabs open?
+ * 
+ * @returns { Boolean } 
+ */
+export function isOpen () {
+    const tabs = document.getElementById('tabs-1');
+    return tabs.classList.contains('active');
 }

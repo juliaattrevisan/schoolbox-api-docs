@@ -12,11 +12,10 @@ const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/l
 const COMPONENT_SELECTOR = '[data-component-palette]'; //any component that will be dragged/added/sorted
 const SORTABLE_SELECTOR = '[data-component]'; //existing components that can be sorted
 const ANIMATE_SPEED = 0.3; //the speed of animations
-const MIN_MOVEMENT = 100; //minimum amount of movement before we can FLIP again
+const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
 let __newComponent; //the component that's currently being dragged/sorted around
-let __activeDraggable; //the current Draggable instance linked to the __newComponent
 let __referenceElement; //the element that subs in for the __newComponent being sorted, so we know where it's going to be placed
 let __hasNewComponent = false; //to know whether to update the DB with sort change
 let __isScrollingTimeout = false; //to prevent sorting when moving a sortable up/down the window
@@ -69,23 +68,6 @@ function addNewDraggable (component) {
 }
 
 /**
- * Get a specific Draggable instance to further update/control
- * 
- * @param { Element }  
- * 
- * @returns { Draggable }
- */
- function getDraggable (component) {
-    let targetDraggable;
-    __draggablesList.forEach((draggable) => {
-        if (draggable.target === component) {
-            targetDraggable = draggable; 
-        }
-    }); 
-    return targetDraggable; 
-}
-
-/**
  * Run through each Draggable instance and enable/disable
  * 
  * @param { Boolean }  
@@ -109,7 +91,6 @@ function updateDraggablesStatus (isEnabled) {
  */
 function onDragStart (event) {
     __newComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
-    __activeDraggable = getDraggable(__newComponent); //to check whether the component is within the tabs, and if so don't create a new component
     __newComponentClone = __newComponent.cloneNode(true);
     __referenceElement = getReferenceElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
@@ -218,31 +199,11 @@ function updateSortableElements () {
  * based on whether a move is valid
  */
 function onDrag () {
-
-    if (canCheckForChange()) { 
-
-        if (__activeDraggable.hitTest('#tabs-1') && __hasNewComponent) { //if the draggedelement is hitting the tabs, put it in the tab container
-            
-            __hasNewComponent = false;
-            __isFlipping = true;
-            __startDragPoint = updateDragPoint();
-    
-            const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
-            
-            __newComponentPaletteContainer.appendChild(__referenceElement);
-            __referenceElement.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
-            __newComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
-            
-            animateFlip(state);
-
-        } else {
-
-            showNewComponentOnPage();
-
-        }
-
+    if (canCheckForChange() && isNewComponentOverPage()) { //add the component to the page
+        showNewComponentOnPage();
+    } else if (canCheckForChange() && __hasNewComponent) { //if the new component has been added to page already, but it back into the tabs
+        putComponentBackIntoTabs();
     }
-
 }
 
 /**
@@ -260,17 +221,51 @@ function canCheckForChange () {
 }
 
 /**
+ *  Has the new component been dragged into the new page area?
+ *  Or is it in around the tabs area - so it wouldn't be added on mouse release
+ * 
+ * @returns { Boolean } 
+ */
+function isNewComponentOverPage () {
+    const topContainer = document.querySelector('[data-position="top"]'); //the container thew new component is dragged from
+    const topContainerTopPoint = topContainer.getBoundingClientRect().top + window.scrollY;
+    const newComponentTopPoint = __newComponent.getBoundingClientRect().top + window.scrollY;
+    return newComponentTopPoint > topContainerTopPoint; //the new component has been dragged below the tabs container into the page
+}
+
+/**
  * The component has been dragged over the page, so show where it will be current placed 
  * relative to where it has been dragged
  */
 function showNewComponentOnPage () {
     const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
     const closestElement = getClosestElement(__newComponent, sortablesToCheckList); //the element nearest to the dragged element
-    if (isElementAboveOtherElement(__newComponent, closestElement)) { //determine movement direction, up or down into the container
-        addNewComponentToPage(closestElement, true);
-    } else if (isElementBelowOtherElement(__newComponent, closestElement)) {
-        addNewComponentToPage(closestElement, false);
+    if (closestElement.id !== __newComponent.id) { //no need to FLIP if the closest element is still the __newComponent
+        if (isElementAboveOtherElement(__newComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
+            addNewComponentToPage(closestElement, true);
+        } else if (isElementBelowOtherElement(__newComponent, closestElement)) {
+            addNewComponentToPage(closestElement, false);
+        }
     }
+}
+
+/**
+ * Was on the page, but has been dragged back into the tabs area, so put it back in
+ */
+function putComponentBackIntoTabs () {
+
+    __hasNewComponent = false;
+    __isFlipping = true;
+    __startDragPoint = updateDragPoint();
+
+    const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
+    
+    __newComponentPaletteContainer.appendChild(__referenceElement);
+    __referenceElement.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
+    __newComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
+    
+    animateFlip(state);
+
 }
 
 /**

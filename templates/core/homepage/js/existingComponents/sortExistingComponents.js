@@ -13,6 +13,7 @@ import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, ADD_PLACE_HOLDERS, REMOVE_PLA
 import { isOpen as isSettingsPanelOpen } from './updateComponentsSettings';
 import { isOpen as isRemovePanelOpen } from './removeComponents';
 import { isOpen as isComponentOpen } from './collapseComponents';
+import { isOpen as isNewComponentTabsOpen } from '../newComponents/newComponentsTabs';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -285,7 +286,8 @@ function onDrag () {
 }
 
 /**
- * Don't be checking while have hardly dragged, while the window is scrolling or while the __activeComponent is still shrinking in collapseActiveComponentContent()
+ * Don't be checking while have hardly dragged, while the window is scrolling or 
+ * while the __activeComponent is still shrinking in collapseActiveComponentContent()
  * 
  * @returns { Boolean } 
  */
@@ -370,8 +372,10 @@ function clearFlipElements () {
  */
 function onDragEnd () {
     updateDraggablesStatus(false); //prevent quick reclicks on elements
-    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS));
     snapBackActiveComponent();
+    if (!isNewComponentTabsOpen()) { //don't hide them when the new component tabs is open
+        document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS));
+    }
 }
 
 /**

@@ -14,7 +14,7 @@ import { initRemoveComponents } from './existingComponents/removeComponents';
 import { initCollapseComponents } from './existingComponents/collapseComponents';
 import { initUpdateComponentCounts } from './updateComponentCounts';
 import { initUpdatePlaceHolders } from './updatePlaceHolders';
-import { initNewComponentsTab } from './newComponents/newComponentsTab';
+import { initNewComponentsTab } from './newComponents/newComponentsTabs';
         
 export const EXISTING_COMPONENT_SELECTOR = '[data-component]'; 
 export const UPDATE_URL = '/homepage/configForm.php'; 

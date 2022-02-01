@@ -52,8 +52,7 @@ function addPlaceHolderComponents () {
 }
 
 /**
- * There's a bit of an issue where we can FLIP on sort change, and then also remove the placeHolderComponent
- * that is within the FLIP. This causes an issue we need to check for
+ * Is the parent container empty? If so a place holder can be added
  * 
  * @param { Element }
  * 
@@ -61,8 +60,6 @@ function addPlaceHolderComponents () {
  */
 function canAddPlaceHolderComponent (parentContainer) {
     return parentContainer.children.length === 0;
-    // return (parentContainer.children.length === 0) || //only the existing .masonry-placeholder is in the container
-        //    (parentContainer.children.length === 2 && !parentContainer.children[1].id); //the existing .masonry-placeholder and also a div that's left over from FLIP, which won't contain an ID
 }
 
 /**

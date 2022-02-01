@@ -58,7 +58,7 @@ function getCounterElement (component) {
 function getTargetClassName (component) {
     let targetClassName;
     component.classList.forEach((className) => {
-        if (className.includes('_Component_Homepage_Controller')) { //currently assumed that every component contains this class at its root...
+        if (className.includes('_Component_Homepage')) { //currently assumed that every component contains this class at its root...
             targetClassName = className;
         }
     });
