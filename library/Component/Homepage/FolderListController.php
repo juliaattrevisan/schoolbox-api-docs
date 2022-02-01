@@ -109,7 +109,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                      * Check for folder colour and apply colour from list if no colour exists
                      */
                     if (empty($currentFolder['colour'])) {
-                        $folderColour = $folderColours->getNewColour()->getHexColour();
+                        $folderColour = $folderColours->getNewColour();
                     } else {
                         $folderColour = Scrub::text($currentFolder['colour']);
                     }
