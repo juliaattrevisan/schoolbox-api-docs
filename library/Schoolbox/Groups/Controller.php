@@ -9,11 +9,8 @@
 
 namespace Schoolbox\Groups;
 
-use Alaress\Color\Color;
-use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Crell\ApiProblem\ApiProblem;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;

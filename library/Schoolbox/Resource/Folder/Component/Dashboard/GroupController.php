@@ -10,13 +10,9 @@
 
 namespace Schoolbox\Resource\Folder\Component\Dashboard;
 
-use Alaress\Color\Color;
-use Alaress\Color\ColorFactory;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\FolderColour;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;

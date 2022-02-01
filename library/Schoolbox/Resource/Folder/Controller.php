@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use ArrayAccess;
