@@ -356,6 +356,26 @@ class Profile implements IStrategy
                 $enrolment = $this->findDate($enrolmentDate);
                 $leaving = $this->findDate($leavingDate);
 
+                /* Shank another endpoint to find email data
+                 * We need their personId first
+                 */
+                $personId = (string)$student['relationships']['person']['data']['id'];
+
+                /* Access the endpoint and if the personId doesn't exist
+                 * or if they're broken, just ignore it - they go in without
+                 * an email address
+                 */
+                try {
+                    $emailPayload = $this->api->retrieveDocument("enrolments/person/{$personId}?include=emails");
+
+                    /* Each guy could have multiple emails;
+                     * Assume the first one is enough
+                     */
+                    $email = trim(($emailPayload['data']['relationships']['emails']['data'][0]['attributes']['email'] ?? ''));
+                } catch (\InvalidArgumentException | \DomainException $e) {
+                    // noop - endpoint died
+                }
+
                 /* Smoosh it all together
                  */
                 $studentProfile
@@ -1073,7 +1093,7 @@ class Profile implements IStrategy
                 $positionTitle = (string)$staff['attributes']['jobTitle'];
                 $room = '';
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
-                $username = '';
+                $username = (string)$staff['attributes']['timetableCode'];
 
                 /* Disregard inactive staff
                  */
@@ -1103,7 +1123,19 @@ class Profile implements IStrategy
                  */
                 $endpoint = "enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers";
 
-                $staffPayload = $this->api->retrieveDocument($endpoint);
+                try {
+                    $staffPayload = $this->api->retrieveDocument($endpoint);
+                } catch (\InvalidArgumentException $e) {
+                    /* This endpoint might try to access someone who doesn't exist
+                     * resulting in a dead payload - can't do anything with that
+                     */
+                    $this->log->warning(sprintf(
+                        'Skipping base profile for staff %s - bad payload',
+                        trim("{$firstname} {$lastname}")
+                    ));
+
+                    continue;
+                }
 
                 $firstname = (string)$staffPayload['data']['attributes']['firstName'];
                 $lastname = (string)$staffPayload['data']['attributes']['lastName'];
