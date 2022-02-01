@@ -14,11 +14,9 @@ use Psr\Log\LoggerInterface;
 interface NotifInterface extends LoggerInterface
 {
 
-    /** Note - If you create any extra topics, ensure they are added to the following for auto create:
-     * tools/create-data-dirs.sh
-     *
-     * You will also need to add to `\Schoolbox\Notif\Notif::SYSTEM_TOPICS` if
-     * you want to log this topic to a log file.
+    /**
+     * You will need to add to `\Schoolbox\Notif\Notif::SYSTEM_TOPICS` if you
+     * want to log this topic to a log file.
      */
     const TOPIC_SYSTEM = 'sys';           // notifications about top-level events
     const TOPIC_NOTIFICATION = 'notif';   //     "           "   the notification system
