@@ -24,15 +24,26 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
  */
 class Notif implements NotifInterface
 {
+    /**
+     * The various system-level topics in Schoolbox: all of these should have a
+     * file logger.
+     *
+     * Note that `TOPIC_AUTH` and `TOPIC_CMS` do _not_ log to file.
+     */
+    public const SYSTEM_TOPICS = [
+        self::TOPIC_SYSTEM,
+        self::TOPIC_NOTIFICATION,
+        self::TOPIC_DATABASE,
+        self::TOPIC_APPLICATION,
+        self::TOPIC_SYNERGY,
+        self::TOPIC_ADMIN,
+    ];
 
     /** @var string */
     protected $topic;
 
     /** @var HandlerFactory */
     protected $factory;
-
-    /** @var array */
-    protected $topic_cache;
 
     /**
      * Notif constructor.
@@ -101,21 +112,18 @@ class Notif implements NotifInterface
             HandlerFactory::SYS_EXCEPTION_MAIL
         ];
 
+        // Resolve the base stack
+        $handlers = $this->factory->getStack($stack);
+
+        // System topics: add a file log handler
         if ($this->isSystemTopic($this->topic)) {
-            if (in_array($this->topic, [ self::TOPIC_AUTH, self::TOPIC_CMS ], true)) {
-                // this may well come back to bite me
-                $stack[] = $this->topic;
-            }
-
-            // resolve the stack so far
-            $handlers = $this->factory->getStack($stack);
-
-            // append a file logger
             $handlers[] = $this->factory->getFileLogHandler($this->topic);
-        } else {
-            // resolve the stack so far
-            $handlers = $this->factory->getStack($stack);
         }
+
+        // Add this topic's handler.
+        // This could easily be a null handler: that's fine. It could also be
+        // an `InvalidArgumentException`.
+        $handlers[] = $this->factory->getHandler($this->topic);
 
         // finally append debug handlers
         return array_merge($handlers, $this->factory->getStack([
@@ -131,15 +139,7 @@ class Notif implements NotifInterface
      */
     public function isSystemTopic($topic)
     {
-        if (!isset($this->topic_cache)) {
-            $this->topic_cache = array();
-            // use a little reflection to get the available constants
-            $rf = new \ReflectionClass($this);
-            foreach ($rf->getConstants() as $name => $value) {
-                $this->topic_cache[$name] = $value;
-            }
-        }
-        return in_array($topic, $this->topic_cache, true);
+        return in_array($topic, self::SYSTEM_TOPICS, true);
     }
 
 

@@ -6761,11 +6761,6 @@ parameters:
 			path: library/Schoolbox/Notif/MQ/Test/MockAMQPConnector.php
 
 		-
-			message: "#^Property Schoolbox\\\\Notif\\\\Notif\\:\\:\\$topic_cache \\(array\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/Notif.php
-
-		-
 			message: "#^Constructor of class Schoolbox\\\\Notif\\\\Queue\\\\Bindings\\\\Generator has an unused parameter \\$userAccessMapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
