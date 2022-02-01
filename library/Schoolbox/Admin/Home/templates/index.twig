@@ -332,6 +332,12 @@
 
             <div class="small-12 large-7 island">
                 <h2 class="subheader">Recent Updates</h2>
+                {% if updates_rss is empty %}
+                <div class="empty-state">
+                    <i class="icon-rss"></i>
+                    <p>We checked and there is no recent update news available.</p>
+                </div>
+                {% else %}
                 <section>
                     <ul class="information-list">
                         {% for article in updates_rss %}
@@ -348,8 +354,10 @@
                             </div>
                         </li>
                         {% endfor %}
+
                     </ul>
                 </section>
+                {% endif %}
                 <div class="actions-small-2 row">
                     <div class="list-item">
                         <div class="small-12 columns">
