@@ -84,19 +84,8 @@ class FolderColour
     {
         foreach ($folderList as $folder) {
             if (!$folder->getColour()) {
-                $hexColour = $this->colourList[$this->colourIndex]->getHexColour();
-
-                // Build colour object from hex string and cache the colour object
-                if (!$this->colourCache->offsetExists($hexColour)) {
-                    $this->colourCache->setOffset($hexColour, $this->colourFactory->build($hexColour));
-                }
-
-                $folder->setColour($this->colourCache->getOffset($hexColour));
-
-                //sets or loops the colour index back to the start if we overflow
-                $this->colourIndex = ($this->colourIndex + 1) % $this->colourList->count();
+                $folder->setColour($this->getNewColour());
             }
         }
     }
-
 }
