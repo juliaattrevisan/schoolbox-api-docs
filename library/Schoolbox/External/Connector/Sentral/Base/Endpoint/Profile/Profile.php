@@ -359,7 +359,7 @@ class Profile implements IStrategy
                 /* Shank another endpoint to find email data
                  * We need their personId first
                  */
-                $personId = (string)$student['relationships']['person']['data']['id']
+                $personId = (string)$student['relationships']['person']['data']['id'];
 
                 /* Access the endpoint and if the personId doesn't exist
                  * or if they're broken, just ignore it - they go in without
