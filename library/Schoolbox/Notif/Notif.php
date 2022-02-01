@@ -45,9 +45,6 @@ class Notif implements NotifInterface
     /** @var HandlerFactory */
     protected $factory;
 
-    /** @var array */
-    protected $topic_cache;
-
     /**
      * Notif constructor.
      *
