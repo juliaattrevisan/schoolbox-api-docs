@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy\Cli;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
