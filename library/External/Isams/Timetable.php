@@ -57,8 +57,8 @@ class External_Isams_Timetable implements External_TimetableInterface
         foreach ($periods as $period) {
             $definition = [];
             $definition["desc"] = $period["Description"];
-            $definition["start"] = $period["StartTime"];
-            $definition["end"] = $period["EndTime"];
+            $definition["start"] = date("g:ia", strtotime($period["StartTime"]));
+            $definition["end"] = date("g:ia", strtotime($period["EndTime"]));
             $definition["number"] = $period["PeriodNumber"];
             $definition["sequence"] = $period["PeriodNumberSeq"];
 

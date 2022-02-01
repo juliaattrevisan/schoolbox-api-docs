@@ -189,8 +189,8 @@ class External_Schooledge_Timetable implements External_TimetableInterface
 
         foreach ($periods as $period) {
             $definition['desc'][]     = $period['Name'];
-            $definition['start'][]    = $period['StartTime'];
-            $definition['end'][]      = $period['EndTime'];
+            $definition['start'][]    = date("g:ia", strtotime($period['StartTime']));
+            $definition['end'][]      = date("g:ia", strtotime($period['EndTime']));
             $definition['number'][]   = $period['PeriodNumber'];
             $definition['sequence'][] = 1;
         }

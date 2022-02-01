@@ -60,8 +60,8 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
         foreach ($iterator as $currentDefinition) {
             if (!$day || ($day == $currentDefinition['DayNumber'])) {
                 $allDefinitions['desc'][] = $currentDefinition['PeriodDescription'];
-                $allDefinitions['start'][] = $currentDefinition['TimeFrom'];
-                $allDefinitions['end'][] = $currentDefinition['TimeTo'];
+                $allDefinitions['start'][] = date("g:ia", strtotime($currentDefinition['TimeFrom']));
+                $allDefinitions['end'][] = date("g:ia", strtotime($currentDefinition['TimeTo']));
                 $allDefinitions['number'][] = $currentDefinition['PeriodNumber'];
                 $allDefinitions['dayNumber'][] = $currentDefinition['DayNumber'];
                 $allDefinitions['sequence'][] = 1;

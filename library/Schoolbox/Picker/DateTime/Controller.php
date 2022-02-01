@@ -278,16 +278,6 @@ class Controller extends Base
         foreach ($user->getCampusCollection() as $campus) {
             $campusTimetable = $this->timetableHandler->getTimetableDefinition(null, $campus);
 
-            // start and end date comes out in different format...
-            foreach ($campusTimetable as $key => $values) {
-                if (!in_array($key, ['start', 'end'])) {
-                    continue;
-                }
-                foreach ($values as $valueKey => $value) {
-                    $campusTimetable[$key][$valueKey] = date("g:ia", strtotime($value));
-                }
-            }
-
             if ($campusTimetable) {
                 $campusInfo['campusId']   = $campus->getId();
                 $campusInfo['campusName'] = $campus->getName();

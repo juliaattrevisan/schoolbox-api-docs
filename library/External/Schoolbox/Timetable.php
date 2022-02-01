@@ -58,8 +58,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         foreach ($periodList as $period) {
             $timetableDef['desc'][]     = $period['title'];
-            $timetableDef['start'][]    = $period['start'];
-            $timetableDef['end'][]      = $period['finish'];
+            $timetableDef['start'][]    = date("g:ia", strtotime($period['start']));
+            $timetableDef['end'][]      = date("g:ia", strtotime($period['finish']));
             $timetableDef['number'][]   = $period[$periodCount + 1];
             $timetableDef['sequence'][] = $period['sequence'];
         }
