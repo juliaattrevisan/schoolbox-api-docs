@@ -196,7 +196,7 @@ class CsvImporter
                 }
 
                 // Associate the CourseImpl with a CourseOutline Component
-                $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId, $courseImpl);
+                $componentInstance = $this->importFactory->findAvailableCourseOutlineComponent($classFolderId, $courseImpl->getId());
                 $this->importFactory->injectImportIntoComponent($courseImpl, $componentInstance);
 
                 $imported[] = $unitImpl;
