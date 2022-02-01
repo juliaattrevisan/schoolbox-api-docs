@@ -24,7 +24,7 @@ class FolderColour
      * This will always have at least some data in side it, unless someone manually goes in the DB and removed it
      * @var GenericCollection|null
      */
-    protected ?GenericCollection $colourList;
+    protected ?GenericCollection $colourList = null;
 
     /**
      * the colour index we are currently up to
