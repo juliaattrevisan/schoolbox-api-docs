@@ -40,7 +40,7 @@ class Xml
 
         /* Set up cached file
          */
-        $this->cache = new Alaress_Rss_Cache();
+        $this->cache = new Alaress_Rss_Cache(2, 2);
 
         $this->cache->init($url);
 
