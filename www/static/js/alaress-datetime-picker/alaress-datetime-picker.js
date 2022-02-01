@@ -430,7 +430,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                             "] option:selected"
                                         )
                                         .attr("data-" + periodTime + "-time"),
-                                    "h:mm:ss"
+                                    "h:mma"
                                 );
                                 newDate = newDate
                                     .hour(newTime.hour())
