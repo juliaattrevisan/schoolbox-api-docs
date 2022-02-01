@@ -64,7 +64,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
              * If the alt source has been deleted, catch that here
              * So that it doesn't escalate to the kernel and 404 the whole page
              */
-            $this->setContentPermission(0);
+            $this->setContentPermission(UserAccess::ACCESS_DENY);
         }
     }
 
