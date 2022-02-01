@@ -24,6 +24,20 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
  */
 class Notif implements NotifInterface
 {
+    /**
+     * The various system-level topics in Schoolbox: all of these should have a
+     * file logger.
+     *
+     * Note that `TOPIC_AUTH` and `TOPIC_CMS` do _not_ log to file.
+     */
+    public const SYSTEM_TOPICS = [
+        self::TOPIC_SYSTEM,
+        self::TOPIC_NOTIFICATION,
+        self::TOPIC_DATABASE,
+        self::TOPIC_APPLICATION,
+        self::TOPIC_SYNERGY,
+        self::TOPIC_ADMIN,
+    ];
 
     /** @var string */
     protected $topic;
@@ -131,15 +145,7 @@ class Notif implements NotifInterface
      */
     public function isSystemTopic($topic)
     {
-        if (!isset($this->topic_cache)) {
-            $this->topic_cache = array();
-            // use a little reflection to get the available constants
-            $rf = new \ReflectionClass($this);
-            foreach ($rf->getConstants() as $name => $value) {
-                $this->topic_cache[$name] = $value;
-            }
-        }
-        return in_array($topic, $this->topic_cache, true);
+        return in_array($topic, self::SYSTEM_TOPICS, true);
     }
 
 
