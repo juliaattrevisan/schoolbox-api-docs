@@ -1073,7 +1073,7 @@ class Profile implements IStrategy
                 $positionTitle = (string)$staff['attributes']['jobTitle'];
                 $room = '';
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
-                $username = '';
+                $username = (string)$staff['attributes']['timetableCode'];
 
                 /* Disregard inactive staff
                  */
