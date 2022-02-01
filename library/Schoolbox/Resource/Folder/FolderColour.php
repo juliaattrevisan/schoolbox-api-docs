@@ -48,7 +48,7 @@ class FolderColour
      * @param \Timetable_ColourMapper $timetableColourMapper
      * @return void
      */
-    public function __controller(\Timetable_ColourMapper $timetableColourMapper)
+    public function __construct(\Timetable_ColourMapper $timetableColourMapper)
     {
         $this->timetableColourMapper = $timetableColourMapper;
         $this->colourList = $this->timetableColourMapper->findAll();
@@ -69,7 +69,9 @@ class FolderColour
             $this->colourCache->setOffset($hexColour, $this->colourFactory->build($hexColour));
         }
 
+        //sets or loops the colour index back to the start if we overflow
         $this->colourIndex = ($this->colourIndex + 1) % $this->colourList->count();
+
         return $this->colourCache->getOffset($hexColour);
     }
 
