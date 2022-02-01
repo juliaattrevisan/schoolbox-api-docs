@@ -49,6 +49,12 @@ class Registry
 
 
     /**
+     * @var bool
+     */
+    private bool $perform;
+
+
+    /**
      * Set up a local cache for (sport, division, team) tuples
      *
      * @var array
@@ -93,6 +99,7 @@ class Registry
      * Also spawns an arbitrary Season to encompass everything we import
      *
      * @param LoggerInterface                     $log
+     * @param bool                                $perform
      * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
      * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
@@ -101,6 +108,7 @@ class Registry
      */
     public function __construct(
         LoggerInterface $log,
+        bool $perform,
         \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Position\Mapper $positionMapper,
@@ -108,6 +116,7 @@ class Registry
         \Schoolbox\Fixtures\Team\Mapper $teamMapper
     ) {
         $this->log = $log;
+        $this->perform = $perform;
         $this->seasonMapper = $seasonMapper;
         $this->sportMapper = $sportMapper;
         $this->positionMapper = $positionMapper;
@@ -177,7 +186,9 @@ class Registry
 
         /* We saw this during the import and thus we should keep it
          */
-        $this->seasonMapper->save($season);
+        if ($this->perform) {
+            $this->seasonMapper->save($season);
+        }
 
         return $season;
     }
@@ -241,7 +252,9 @@ class Registry
 
             /* We saw this during the import and thus we should keep it
              */
-            $this->sportMapper->save($sport);
+            if ($this->perform) {
+                $this->sportMapper->save($sport);
+            }
 
             $this->lookup[$teamActivityId] = [
                 'instance' => $sport,
@@ -316,7 +329,9 @@ class Registry
 
             /* We saw this during the import and thus we should keep it
              */
-            $this->divisionMapper->save($division);
+            if ($this->perform) {
+                $this->divisionMapper->save($division);
+            }
 
             $this->lookup[$teamActivityId]['divisions'][$divisionName] = [
                 'instance' => $division,
@@ -390,7 +405,9 @@ class Registry
 
             /* We saw this during the import and thus we should keep it
              */
-            $this->teamMapper->save($team);
+            if ($this->perform) {
+                $this->teamMapper->save($team);
+            }
 
             $this->lookup[$teamActivityId]['divisions'][$division->getName()]['teams'][$teamId]['instance'] = $team;
         } else {
@@ -457,7 +474,9 @@ class Registry
 
             /* We saw this during the import and thus we should keep it
              */
-            $this->positionMapper->save($position);
+            if ($this->perform) {
+                $this->positionMapper->save($position);
+            }
 
             $this->lookup[$teamActivityId]['positions'][$positionId]['instance'] = $position;
         } else {

@@ -25,6 +25,12 @@ class Cleanup implements IStrategy
 
 
     /**
+     * @var bool
+     */
+    private bool $perform;
+
+
+    /**
      * @var \Schoolbox\Fixtures\Season\Mapper
      */
     private \Schoolbox\Fixtures\Season\Mapper $seasonMapper;
@@ -56,6 +62,7 @@ class Cleanup implements IStrategy
 
     /**
      * @param LoggerInterface                     $log
+     * @param bool                                $perform
      * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
      * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
@@ -64,6 +71,7 @@ class Cleanup implements IStrategy
      */
     public function __construct(
         LoggerInterface $log,
+        bool $perform,
         \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Position\Mapper $positionMapper,
@@ -71,6 +79,7 @@ class Cleanup implements IStrategy
         \Schoolbox\Fixtures\Team\Mapper $teamMapper
     ) {
         $this->log = $log;
+        $this->perform = $perform;
         $this->seasonMapper = $seasonMapper;
         $this->sportMapper = $sportMapper;
         $this->positionMapper = $positionMapper;
@@ -96,11 +105,13 @@ class Cleanup implements IStrategy
      */
     public function import(): void
     {
-        $this->seasonMapper->getDatabase()->query("UPDATE {$this->seasonMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-        $this->sportMapper->getDatabase()->query("UPDATE {$this->sportMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-        $this->positionMapper->getDatabase()->query("UPDATE {$this->positionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-        $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-        $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+        if ($this->perform) {
+            $this->seasonMapper->getDatabase()->query("UPDATE {$this->seasonMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->sportMapper->getDatabase()->query("UPDATE {$this->sportMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->positionMapper->getDatabase()->query("UPDATE {$this->positionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+        }
 
         $this->log->info('Soft-deleting seasons, sports, positions, divisions and teams that did not appear in the import.');
         $this->log->info('Use the orphan remover separately after the second import completes to fully purge stale data.');

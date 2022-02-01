@@ -101,14 +101,10 @@ HELP;
         if ($acquired) {
             $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
 
-            /* Used to shank a database instance
-             */
-            /** @var IConnector $db */
-            $db = $this->getDi()->get('databaseInternal');
-
             try {
                 $composites = (new Factory(
                     $this->getLogger(),
+                    $this->perform(),
                     (string)$this->getConfig()->get('clipboard_endpoint_host'),
                     (string)$this->getConfig()->get('clipboard_endpoint_token'),
                 ))->produce();
@@ -117,10 +113,6 @@ HELP;
 
                 return;
             }
-
-            /* Wrap in transaction so changes are atomic
-             */
-            $db->beginTransaction();
 
             foreach ($composites as $composite) {
                 $composite->import();
@@ -135,11 +127,7 @@ HELP;
 
             /* Only commit changes in Perform mode
              */
-            if ($this->perform()) {
-                $db->commit();
-            } else {
-                $db->rollBack();
-
+            if (!$this->perform()) {
                 $this->getLogger()->info('Planning finished.');
             }
 

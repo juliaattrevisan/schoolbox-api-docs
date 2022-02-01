@@ -29,6 +29,12 @@ class Team implements IStrategy
 
 
     /**
+     * @var bool
+     */
+    private bool $perform;
+
+
+    /**
      * @var IApi
      */
     private IApi $api;
@@ -72,6 +78,7 @@ class Team implements IStrategy
 
     /**
      * @param LoggerInterface                     $log
+     * @param bool                                $perform
      * @param IApi                                $api
      * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
@@ -81,6 +88,7 @@ class Team implements IStrategy
      */
     public function __construct(
         LoggerInterface $log,
+        bool $perform,
         IApi $api,
         \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
@@ -89,6 +97,7 @@ class Team implements IStrategy
         \Schoolbox\Fixtures\Team\Mapper $teamMapper
     ) {
         $this->log = $log;
+        $this->perform = $perform;
         $this->api = $api;
         $this->divisionCodec = new Codec\Division();
         $this->seasonMapper = $seasonMapper;
@@ -113,6 +122,7 @@ class Team implements IStrategy
          */
         $registry = new Registry(
             $this->log,
+            $this->perform,
             $this->seasonMapper,
             $this->sportMapper,
             $this->positionMapper,
