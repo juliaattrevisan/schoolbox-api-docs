@@ -33,20 +33,13 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $emptyState = true;
             $noConfig   = true;
         } else {
-            try {
-                // Initialise feed
-                $rss = new Alaress_Rss_Stream($this->getConfig('url'));
-                $rss->setLimit($this->getConfig('size'));
-                $rss->stream();
+            // Initialise feed
+            $rss = new Alaress_Rss_Stream($this->getConfig('url'));
+            $rss->setLimit($this->getConfig('size'));
+            $rss->stream();
 
-                // Process each item in feed
-                $allRss = $rss->getOutput();
-            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-                /**
-                 * Either requesting the RSS feed, or the RSS feed failed, error out here.
-                 */
-                $allRss = [];
-            }
+            // Process each item in feed
+            $allRss = $rss->getOutput();
 
             if (count($allRss) == 0) {
                 $emptyState = true;

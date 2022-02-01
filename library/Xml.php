@@ -42,7 +42,15 @@ class Xml
          */
         $this->cache = new Alaress_Rss_Cache(2, 2);
 
-        $this->cache->init($url);
+        try {
+            $this->cache->init($url);
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            /**
+             * Either requesting the RSS feed, or the RSS feed failed, error out here.
+             * May have been a request or connection timeout.
+             */
+            return;
+        }
 
         /* Load from cached file
          * Delete the cached file if it can't be loaded correctly

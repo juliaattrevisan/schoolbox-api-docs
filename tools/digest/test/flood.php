@@ -25,9 +25,15 @@ Database::getInstance()->exec("UPDATE news_items SET item_deleted = 1");
 $rss = new Alaress_Rss_Stream(Config::get('welcome_rss_url'));
 $size = $count ?: Config::get('welcome_rss_limit');
 $rss->setLimit($size);
-$rss->stream();
-
-$allRss = $rss->getOutput();
+try {
+    $rss->stream();
+    $allRss = $rss->getOutput();
+} catch (\GuzzleHttp\Exception\GuzzleException $e) {
+    /**
+     * Either requesting the RSS feed, or the RSS feed failed, error out here.
+     */
+    $allRss = [];
+}
 
 foreach ($allRss as $item) {
     $title = Scrub::text($item['title']);
