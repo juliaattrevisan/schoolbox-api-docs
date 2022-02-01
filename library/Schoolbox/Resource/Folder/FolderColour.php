@@ -22,9 +22,9 @@ class FolderColour
     /**
      * list of all available colours (coming from the timetable colour list)
      * This will always have at least some data in side it, unless someone manually goes in the DB and removed it
-     * @var GenericCollection
+     * @var GenericCollection|null
      */
-    protected GenericCollection $colourList;
+    protected ?GenericCollection $colourList;
 
     /**
      * the colour index we are currently up to
@@ -51,7 +51,6 @@ class FolderColour
     public function __construct(\Timetable_ColourMapper $timetableColourMapper)
     {
         $this->timetableColourMapper = $timetableColourMapper;
-        $this->colourList = $this->timetableColourMapper->findAll();
         $this->colourFactory = new ColorFactory();
         $this->colourCache   = new GenericCollection(Color::class);
     }
@@ -62,6 +61,11 @@ class FolderColour
      */
     public function getNewColour()
     {
+        //check if colourlist has been created or not...
+        if (null === $this->colourList) {
+            $this->colourList = $this->timetableColourMapper->findAll();
+        }
+
         $hexColour = $this->colourList[$this->colourIndex]->getHexColour();
 
         // Build colour object from hex string and cache the colour object
