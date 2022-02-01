@@ -76,30 +76,25 @@ class FolderColour
     }
 
     /**
-     * old attempt at de duping code.
      * If a folder does not have a colour, sets its colour from the configured timetable colours
      *
      * @param GenericCollection|Model[] $folderList
      */
-    protected function applyFolderColours(GenericCollection $folderList): void
+    public function applyFolderColours(GenericCollection $folderList): void
     {
-        // Get Timetable colours to use as random colours for null set folders
-        $colourList  = $this->timetableColourMapper->findAll();
-        $colourIndex = 0;
-
-        $colourFactory = new ColorFactory();
-        $colourCache   = new GenericCollection(Color::class);
         foreach ($folderList as $folder) {
             if (!$folder->getColour()) {
-                $hexColour = $colourList[$colourIndex]->getHexColour();
+                $hexColour = $this->colourList[$this->colourIndex]->getHexColour();
 
                 // Build colour object from hex string and cache the colour object
-                if (!$colourCache->offsetExists($hexColour)) {
-                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
+                if (!$this->colourCache->offsetExists($hexColour)) {
+                    $this->colourCache->setOffset($hexColour, $this->colourFactory->build($hexColour));
                 }
 
-                $folder->setColour($colourCache->getOffset($hexColour));
-                $colourIndex = ($colourIndex + 1) % $colourList->count();
+                $folder->setColour($this->colourCache->getOffset($hexColour));
+
+                //sets or loops the colour index back to the start if we overflow
+                $this->colourIndex = ($this->colourIndex + 1) % $this->colourList->count();
             }
         }
     }
