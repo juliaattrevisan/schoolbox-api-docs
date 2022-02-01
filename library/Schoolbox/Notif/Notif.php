@@ -121,9 +121,12 @@ class Notif implements NotifInterface
         }
 
         // Add this topic's handler.
-        // This could easily be a null handler: that's fine. It could also be
-        // an `InvalidArgumentException`.
-        $handlers[] = $this->factory->getHandler($this->topic);
+        // This could be null: that's fine.
+        // It could also be an `InvalidArgumentException`.
+        $topicHandler = $this->factory->getHandler($this->topic);
+        if ($topicHandler) {
+            $handlers[] = $topicHandler;
+        }
 
         // finally append debug handlers
         return array_merge($handlers, $this->factory->getStack([
