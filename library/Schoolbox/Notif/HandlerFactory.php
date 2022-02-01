@@ -51,7 +51,7 @@ class HandlerFactory
     /** @var LoggerInterface */
     protected $log;
 
-    /** @var HandlerInterface[] */
+    /** @var HandlerInterface|null[] */
     protected $handlers;
 
     /** @var callable[] */
@@ -146,16 +146,15 @@ class HandlerFactory
 
     /**
      * @param string $tag
-     * @return HandlerInterface
+     * @return HandlerInterface|null
      */
     public function getHandler($tag)
     {
-        if (empty($this->handlers[$tag])) {
+        if (!array_key_exists($tag, $this->handlers)) {
             $this->handlers[$tag] = is_callable($this->handlerGenerators[$tag] ?? null)
                 ? $this->handlerGenerators[$tag]()
-                : new NullHandler();
+                : null;
         }
-
         return $this->handlers[$tag];
     }
 
@@ -173,15 +172,19 @@ class HandlerFactory
         $stack = [];
 
         foreach ($tags as $tag) {
+            $handler = null;
             if ($suppressFailures) {
                 try {
-                    array_push($stack, $this->getHandler($tag));
+                    $handler = $this->getHandler($tag);
                 } catch (InvalidArgumentException $e) {
                     $this->log->alert($e->getMessage(), [ 'exception' => $e ]);
                 }
             } else {
                 // exceptions not being suppressed
-                array_push($stack, $this->getHandler($tag));
+                $handler = $this->getHandler($tag);
+            }
+            if (isset($handler)) {
+                $stack[] = $handler;
             }
         }
 
