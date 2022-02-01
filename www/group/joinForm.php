@@ -76,30 +76,13 @@ foreach ($groupsSelected as $groupId => $isJoining) {
     } elseif (!$group->isPrivate() && ($ua->getAccessLevel() < UserAccess::ACCESS_FULL)) {
         // non admin in moderated/free group can leave
         // delete the record that matches the given params
-        $count = $uaMapper->deleteByColumnList(
+        $uaMapper->deleteByColumnList(
             array(
                 'service' => UserAccess::SERVICE_HOMEPAGE,
                 'uid'     => $user->getId(),
                 'sid'     => $groupId
             )
         );
-
-        if ($count) {
-            $response = 'left';
-
-            // we need to manually raise a DELETE notification
-            // since the Mapper can't automagically do it for this Model
-            $model = new UserAccess();
-            $model->setUser($user)
-                ->setFavourite(false)
-                ->setAccessLevel(UserAccess::ACCESS_DENY)
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setServiceIdentifier($groupId);
-
-            $event = new Event($user, Mapper::METHOD_DELETE, $model, $uaMapper);
-            $notif = Notifactory::create(Notif::TOPIC_APPLICATION);
-            $notif->notice(serialize($event));
-        }
     }
 }
 
