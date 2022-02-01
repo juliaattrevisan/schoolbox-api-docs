@@ -228,8 +228,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             if (!isset($this->userCache[$userId])) {
                 $this->userStaffCache[$userId] = $this->userMapper->findById($userId)->getRole()->isStaff();
             }
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             $this->userStaffCache[$userId] = false;
         }
 
