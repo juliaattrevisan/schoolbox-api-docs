@@ -57,9 +57,9 @@ class FolderColour
 
     /**
      * creates a new colour for use for folders and adds that colour to the list, for reuse once all colours have been consumed
-     * @return mixed
+     * @return \Alaress\Color\Color
      */
-    public function getNewColour()
+    public function getNewColour(): \Alaress\Color\Color
     {
         //check if colourlist has been created or not...
         if (null === $this->colourList) {
