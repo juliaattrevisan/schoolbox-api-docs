@@ -17,32 +17,32 @@ class FolderColour
      * Timetable Colour Mapper
      * @var \Timetable_ColourMapper
      */
-    protected $timetableColourMapper;
+    protected \Timetable_ColourMapper $timetableColourMapper;
 
     /**
      * list of all available colours (coming from the timetable colour list)
      * This will always have at least some data in side it, unless someone manually goes in the DB and removed it
      * @var GenericCollection
      */
-    protected $colourList;
+    protected GenericCollection $colourList;
 
     /**
      * the colour index we are currently up to
      * @var int
      */
-    protected $colourIndex = 0;
+    protected int $colourIndex = 0;
 
     /**
      * the colour factory
      * @var ColorFactory
      */
-    protected $colourFactory;
+    protected ColorFactory $colourFactory;
 
     /**
      * The current cache of the used colours
      * @var GenericCollection
      */
-    protected $colourCache;
+    protected GenericCollection $colourCache;
 
     /**
      * @param \Timetable_ColourMapper $timetableColourMapper
