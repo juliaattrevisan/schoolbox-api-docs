@@ -1103,7 +1103,19 @@ class Profile implements IStrategy
                  */
                 $endpoint = "enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers";
 
-                $staffPayload = $this->api->retrieveDocument($endpoint);
+                try {
+                    $staffPayload = $this->api->retrieveDocument($endpoint);
+                } catch (\InvalidArgumentException $e) {
+                    /* This endpoint might try to access someone who doesn't exist
+                     * resulting in a dead payload - can't do anything with that
+                     */
+                    $this->log->warning(sprintf(
+                        'Skipping base profile for staff %s - bad payload',
+                        trim("{$firstname} {$lastname}")
+                    ));
+
+                    continue;
+                }
 
                 $firstname = (string)$staffPayload['data']['attributes']['firstName'];
                 $lastname = (string)$staffPayload['data']['attributes']['lastName'];

@@ -171,7 +171,7 @@ class Preloader
                     $data['person']['externalId']
                 ));
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException | \DomainException $e) {
             /* We can't process any timetables in those cases, so log it and continue
              */
             $this->log->warning(sprintf(
