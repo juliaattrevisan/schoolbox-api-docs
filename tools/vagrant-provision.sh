@@ -364,16 +364,16 @@ then
     echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
     if [ -f /vagrant/tools/xdebug.ini ]; then
         echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
-        cp -f /vagrant/tools/xdebug.ini /etc/php/7.4/mods-available/xdebug.ini;
+        cp -f /vagrant/tools/xdebug.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
     else
         echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
-        cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.4/mods-available/xdebug.ini;
+        cp -f /vagrant/tools/xdebug.default.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
     fi
 
-    ln -sf /etc/php/7.4/mods-available/xdebug.ini   /etc/php/7.4/fpm/conf.d/20-xdebug.ini
-    ln -sf /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/fpm/conf.d/20-tideways.ini
-    ln -sf /etc/php/7.4/mods-available/xdebug.ini   /etc/php/7.4/cli/conf.d/20-xdebug.ini
-    ln -sf /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/cli/conf.d/20-tideways.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini
 
 
     # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
@@ -408,15 +408,15 @@ then
 
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
-    rm -f /etc/php/7.4/cli/conf.d/20-xdebug.ini;
-    rm -f /etc/php/7.4/cli/conf.d/20-tideways.ini;
-    rm -f /etc/php/7.4/fpm/conf.d/20-xdebug.ini;
-    rm -f /etc/php/7.4/fpm/conf.d/20-tideways.ini;
+    rm -f /etc/php/$phpversion_supported/cli/conf.d/20-xdebug.ini;
+    rm -f /etc/php/$phpversion_supported/cli/conf.d/20-tideways.ini;
+    rm -f /etc/php/$phpversion_supported/fpm/conf.d/20-xdebug.ini;
+    rm -f /etc/php/$phpversion_supported/fpm/conf.d/20-tideways.ini;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart;
-service php7.4-fpm restart
+eval "service php${phpversion_supported}-fpm restart"
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
