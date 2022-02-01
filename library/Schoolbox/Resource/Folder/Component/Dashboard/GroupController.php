@@ -17,6 +17,7 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\FolderColour;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Timetable_ColourMapper;
@@ -62,8 +63,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     public function execute()
     {
         /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = Timetable_ColourMapper::getInstance()->findAll();
-        $colourIndex = 0;
+        $folderColours = new FolderColour(Timetable_ColourMapper::getInstance());
         $userAccess  = array();
 
         $allFolders = FolderMapper::getInstance()->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true);
@@ -75,17 +75,9 @@ class GroupController extends Component_Dashboard_ControllerAbstract
             }
         }
 
-        $colourFactory = new ColorFactory();
-        $colourCache   = new GenericCollection(Color::class);
         foreach ($filteredFolders->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
-                /* Apply colour from list if no colour exists */
-                $hexColour = $colourList[$colourIndex]->getHexColour();
-                if (!$colourCache->offsetExists($hexColour)) {
-                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
-                }
-                $folder->setColour($colourCache->getOffset($hexColour));
-                $colourIndex = ($colourIndex + 1) % $colourList->count();
+                $folder->setColour($folderColours->getNewColour());
             }
             $accessType = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());
             switch ($accessType) {

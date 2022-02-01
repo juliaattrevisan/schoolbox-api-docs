@@ -910,12 +910,9 @@ class Controller extends BaseController
     public function getGroups(): void
     {
         /* Get Timetable colours to use as random colours for null set folders */
-        $colourList = Timetable_ColourMapper::getInstance()->findAll();
-        $colourIndex = 0;
+        $folderColours = new FolderColour(Timetable_ColourMapper::getInstance());
         $folderList = new Collection();
         $userAccess  = [];
-        $colourFactory = new ColorFactory();
-        $colourCache = new GenericCollection(Color::class);
 
         /** @var \Schoolbox\Resource\Folder\Model $folder */
         foreach (
@@ -923,13 +920,7 @@ class Controller extends BaseController
                      ->sortBy('name', 'asc') as $folder
         ) {
             if (!$folder->getColour()) {
-                $hexColour = $colourList[$colourIndex]->getHexColour();
-                if (!$colourCache->offsetExists($hexColour)) {
-                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
-                }
-                /* Apply colour from list if no colour exists */
-                $folder->setColour($colourCache->getOffset($hexColour));
-                $colourIndex = ($colourIndex + 1) % $colourList->count();
+                $folder->setColour($folderColours->getNewColour());
             }
             try {
                 $userAccess[$folder->getId()] = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
