@@ -610,10 +610,10 @@ class Controller extends Base
             }
 
             if ($allowStudents && $roleCurrent->isStudent()) {
+                $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = 0;
                 if ($record->getStudent()) {
                     if ($record->getStudent()->getRole()->getId() == $roleCurrent->getId()) {
-                        $roles->add($roleCurrent);
                         $roleUsers[$roleCurrent->getId()]++;
                     }
                 }
