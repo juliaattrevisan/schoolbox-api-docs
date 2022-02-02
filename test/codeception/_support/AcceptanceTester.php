@@ -87,7 +87,7 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Impersonate
+     * Impersonate a user via user profile drop when alaress is presented in the drop
      * @param $fullname
      * @throws Exception
      */
@@ -105,7 +105,7 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Impersonate
+     * Impersonate a user via user profile drop
      * @param $fullname
      * @throws Exception
      */
@@ -123,7 +123,7 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Impersonate
+     * Impersonate a user via modify screen
      * @param $userId
      * @throws Exception
      */

@@ -11,6 +11,7 @@ namespace Page;
 
 class Common
 {
+    //legacy data
     public const USER_ZANE = 'Mr Zane Smith';
     public const USER_ID_ZANE = 151;
     public const USER_RACHEL = 'Rachel Rhodes';
@@ -21,6 +22,7 @@ class Common
     public const CLASS_CHEMISTRY_1_3 = 'Chemistry 1 3';
     public const CLASS_ID_CHEMISTRY_1_3 = 176;
 
+    //sales data
     public const USER_JACKCOLES = 'Mr Jack Coles';
     public const USER_ID_JACKCOLES = 22;
     public const USER_LOUISASMITH = 'Louisa Smith';

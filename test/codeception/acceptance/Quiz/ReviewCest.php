@@ -5,6 +5,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Quiz;
+
 /**
  * Steps:
  * 1. Provision legacy.tar.gz data
@@ -15,6 +17,7 @@
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Quiz/ReviewCest:<test method name>
  */
 
+use AcceptanceTester;
 use Page\Quiz\AssessmentForm;
 use Page\Quiz\StatusPage;
 use Page\Quiz\SectionForm;
@@ -24,6 +27,7 @@ use Page\Quiz\AttemptForm;
 use Page\Quiz\QuestionForm;
 use Page\Common;
 use Codeception\Util\Locator;
+use Exception;
 
 /**
  * Test create, attempt and review of quiz
@@ -52,9 +56,9 @@ class ReviewCest
 
         $className = Common::CLASS_9AENG;
         $classId = Common::CLASS_ID_9AENG;
-        $student1 = Common::USER_LOUISASMITH;  //rachel
+        $student1 = Common::USER_LOUISASMITH;
         $student1Id = Common::USER_ID_LOUISASMITH;
-        $student2 = Common::USER_JAMALALI; //davi
+        $student2 = Common::USER_JAMALALI;
         $student2Id = Common::USER_ID_JAMALALI;
         $teacher = Common::USER_JACKCOLES;
 
@@ -86,7 +90,7 @@ class ReviewCest
         $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        // As Rachel, click into the quiz
+        // As Louisa Smith, click into the quiz
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
     }
@@ -193,7 +197,7 @@ class ReviewCest
         $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        // As Rachel, click into the due work
+        // As Louisa Smith, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
     }
@@ -236,7 +240,7 @@ class ReviewCest
         // TODO: enter something
         $reviewForm->finalise();
 
-        // As Rachel, check notification
+        // As Louisa Smith, check notification
         $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifNotExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
@@ -342,14 +346,14 @@ class ReviewCest
             $attemptForm->createAttempt($quizTitle, $correctAnswer);
         }
 
-        // As Zane, check notification
+        // As Jack Coles, check notification
         $i->impersonate($teacher);
         // TODO:: the following works only for two students
         // @see schoolbox/library/Schoolbox/Realtime/Notification/Decorator.php
         sort($students);
         $i->assertNotifExists(implode(' and ', $students) . ' attempted ' . $quizTitle . ' in ' . $className);
 
-        // As Zane, click into the quiz -> brings to status page
+        // As Jack Coles, click into the quiz -> brings to status page
         $i->click($quizTitle, '#content');
         $i->waitForText('Status of ' . $quizTitle);
     }
