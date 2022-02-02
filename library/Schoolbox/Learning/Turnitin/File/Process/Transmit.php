@@ -511,6 +511,10 @@ class Transmit
              */
             'title' => $ssf->getFilename(),
             'owner_default_permission_set' => 'LEARNER',
+            /* Historical documents get processed with extract_text_only true
+             * (it's false by default)
+             */
+            'extract_text_only' => $model->getHistorical(),
             'metadata' => [
                 'owners' => [
                     [
