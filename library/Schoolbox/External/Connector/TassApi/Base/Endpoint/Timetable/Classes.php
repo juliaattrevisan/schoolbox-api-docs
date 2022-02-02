@@ -233,8 +233,16 @@ class Classes implements IStrategy
 
                         /* This is the current teacher of the subject
                          * Multiple teachers are coming through as comma-separated
+                         *
+                         * Apparently TCH_CODE might not be a string at all,
+                         * so force it to be a string instead of relying on tass
                          */
-                        $allTeacherCodes = explode(',', $subject['TCH_CODE']);
+                        $this->log->debug(sprintf(
+                            'Inspecting teacher code %s for multiple teachers',
+                            $subject['TCH_CODE']
+                        ));
+
+                        $allTeacherCodes = explode(',', (string)$subject['TCH_CODE']);
 
                         $teacherStack = [];
 
