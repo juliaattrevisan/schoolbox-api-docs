@@ -164,7 +164,7 @@ class Registry
              */
             /** @var \Schoolbox\Fixtures\Season\Model $season */
             $season = $e->getDeletedObject();
-            $season ->setDeletedAt(null);
+            $season->setDeletedAt(null);
 
             $this->log->debug(sprintf(
                 'Resurrecting previously-deleted season %s',
