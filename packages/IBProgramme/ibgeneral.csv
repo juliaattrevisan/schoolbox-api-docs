@@ -1,0 +1,66 @@
+id,curriculum_node_parent_id,curriculum_learning_level_id,curriculum_learning_area_id,name,code,reference,order,description,created_at,modified_at,deleted_at
+1,NULL,NULL,NULL,"Learner Profile",,,0,"The IB learner profle represents 10 attributes valued by IB World Schools. We believe these attributes, and others like them, can help individuals and groups become responsible members of local, national and global communities.
+","2021-11-04 09:21:19","2021-11-04 09:21:19",NULL
+2,1,NULL,NULL,Inquirers,LP-INQ,,0,"We nurture our curiosity, developing skills for inquiry and research. We know how to learn independently and with others. We learn with enthusiasm and sustain our love of learning throughout life.
+","2021-11-04 09:21:45","2021-11-04 09:21:45",NULL
+3,1,NULL,NULL,Knowledgeable,LP-KNO,,0,"We develop and use conceptual understanding, exploring knowledge across a range of disciplines. We engage with issues and ideas that have local and global significance.
+","2021-11-04 09:22:42","2021-11-04 09:22:42",NULL
+4,1,NULL,NULL,Thinkers,LP-THI,,0,"We use critical and creative thinking skills to analyse and take responsible action on complex problems. We exercise initiative in making reasoned ethical decisions.
+","2021-11-04 09:23:04","2021-11-04 09:23:04",NULL
+5,1,NULL,NULL,Communicator,LP-COM,,0,"We express ourselves confidently and creatively in more than one language and in many ways. We collaborate effectively, listening carefully to the perspectives of other individuals and groups.
+","2021-11-04 09:23:21","2021-11-04 09:23:21",NULL
+6,1,NULL,NULL,Principled,LP-PRI,,0,"We act with integrity and honesty, with a strong sense of fairness and justice, and with respect for the dignity and rights of people everywhere. We take responsibility for our actions and their consequences.
+","2021-11-04 09:23:37","2021-11-04 09:23:37",NULL
+7,1,NULL,NULL,Open-Minded,LP-OPE,,0,"We critically appreciate our own cultures and personal histories, as well as the values and traditions of others. We seek and evaluate a range of points of view, and we are willing to grow from the experience.
+","2021-11-04 09:24:29","2021-11-04 09:24:29",NULL
+8,1,NULL,NULL,Caring,LP-CAR,,0,"We show empathy, compassion and respect. We have a commitment to service, and we act to make a positive difference in the lives of others and in the world around us.
+","2021-11-04 09:25:43","2021-11-04 09:27:05",NULL
+9,1,NULL,NULL,Risk-Takers,LP-RIS,,0,"We approach uncertainty with forethought and determination; we work independently and cooperatively to explore new ideas and innovative strategies. We are resourceful and resilient in the face of challenges and change.
+","2021-11-04 09:26:11","2021-11-04 09:26:11",NULL
+10,1,NULL,NULL,Balanced,LP-BAL,,0,"We understand the importance of balancing different aspects of our lives—intellectual, physical, and emotional—to achieve well-being for ourselves and others. We recognize our interdependence with other people and with the world in which we live.
+","2021-11-04 09:26:32","2021-11-04 09:26:32",NULL
+11,1,NULL,NULL,Reflective,LP-REF,,0,"We thoughtfully consider the world and our own ideas and experience. We work to understand our strengths and weaknesses in order to support our learning and personal development.
+","2021-11-04 09:26:46","2021-11-04 09:26:46",NULL
+12,NULL,NULL,NULL,"Global Contexts",,,0,,"2021-11-04 09:27:17","2021-11-04 09:27:17",NULL
+13,12,NULL,NULL,"Identities and relationships",GC-ID,,0,"Who am I? Who are we? 
+","2021-11-04 09:27:40","2021-11-04 09:27:40",NULL
+14,13,NULL,NULL,"1. Students will explore identity.",GC-ID-a,,0,,"2021-11-04 09:28:00","2021-11-04 09:28:00",NULL
+15,13,NULL,NULL,"2. Students will explore beliefs and values.",GC-ID-b,,0,,"2021-11-04 09:28:11","2021-11-04 09:28:11",NULL
+16,13,NULL,NULL,"3. Students will explore personal, physical, mental, social and spiritual health.",GC-ID-c,,0,,"2021-11-04 09:28:29","2021-11-04 09:28:29",NULL
+17,13,NULL,NULL,"4. Students will explore human relationships including families, friends, communities and cultures.",GC-ID-d,,0,,"2021-11-04 09:29:57","2021-11-04 09:29:57",NULL
+18,13,NULL,NULL,"5. Students will explore what it means to be human.",GC-ID-e,,0,,"2021-11-04 09:34:49","2021-11-04 09:34:49",NULL
+19,12,NULL,NULL,"Orientation in space and time ",GC-OR,,0,"What is the meaning of “where” and  “when”?
+","2021-11-04 09:35:10","2021-11-04 09:35:10",NULL
+20,19,NULL,NULL,"1. Students will explore personal histories.",GC-OR-a,,0,,"2021-11-04 09:35:31","2021-11-04 09:35:31",NULL
+21,19,NULL,NULL,"2. Students will explore homes and journeys.",GC-OR-b,,0,,"2021-11-04 09:35:45","2021-11-04 09:35:45",NULL
+22,19,NULL,NULL,"3. Students will explore turning points in humankind.",GC-OR-c,,0,,"2021-11-04 09:35:57","2021-11-04 09:35:57",NULL
+23,19,NULL,NULL,"4. Students will explore discoveries.",GC-OR-d,,0,,"2021-11-04 09:36:11","2021-11-04 09:36:11",NULL
+24,19,NULL,NULL,"5. Students will explore explorations and migrations of humankind.",GC-OR-e,,0,,"2021-11-04 09:36:23","2021-11-04 09:36:23",NULL
+25,19,NULL,NULL,"6. Students will explore the relationships between, and the interconnectedness of, individuals and civilizations, from personal, local and global perspectives.",GC-OR-f,,0,,"2021-11-04 09:36:39","2021-11-04 09:36:39",NULL
+26,12,NULL,NULL,"Personal and cultural expression",GC-PE,,0,"What is the nature and purpose of  creative expression?
+","2021-11-04 09:36:59","2021-11-04 09:37:11",NULL
+27,26,NULL,NULL,"1. Students will explore the ways in  which we discover and express ideas, feelings, nature, culture, beliefs and values.",GC-PE-a,,0,,"2021-11-04 09:37:33","2021-11-04 09:37:33",NULL
+28,26,NULL,NULL,"2. Students will explore the ways in which we reflect on, extend and enjoy our creativity.",GC-PE-b,,0,,"2021-11-04 09:37:45","2021-11-04 09:37:45",NULL
+29,26,NULL,NULL,"3. Students will explore our appreciation of the aesthetic.",GC-PE-c,,0,,"2021-11-04 09:37:57","2021-11-04 09:37:57",NULL
+30,12,NULL,NULL,"Scientific and technical innovation",GC-SC,,0,"How do we understand the world in  which we live? 
+","2021-11-04 09:38:15","2021-11-04 09:38:15",NULL
+31,30,NULL,NULL,"1. Students will explore the natural world and its laws.",GC-SC-a,,0,,"2021-11-04 09:38:30","2021-11-04 09:38:30",NULL
+32,30,NULL,NULL,"2. Students will explore the interaction between people and the natural world.",GC-SC-b,,0,,"2021-11-04 09:38:41","2021-11-04 09:38:41",NULL
+33,30,NULL,NULL,"3. Students will explore how humans use their understanding of scientific principles.",GC-SC-c,,0,,"2021-11-04 09:38:58","2021-11-04 09:38:58",NULL
+34,30,NULL,NULL,"4. Students will explore the impact of scientific and technological advances on communities and environments.",GC-SC-d,,0,,"2021-11-04 09:39:17","2021-11-04 09:39:17",NULL
+35,30,NULL,NULL,"5. Students will explore the impact of environments on human activity.",GC-SC-e,,0,,"2021-11-04 09:39:29","2021-11-04 09:39:29",NULL
+36,30,NULL,NULL,"6. Students will explore how humans adapt environments to their needs.",GC-SC-f,,0,,"2021-11-04 09:39:44","2021-11-04 09:39:44",NULL
+37,12,NULL,NULL,"Globalization and sustainability",GC-GL,,0,"How is everything connected? 
+","2021-11-04 09:40:07","2021-11-04 09:40:07",NULL
+38,37,NULL,NULL,"1. Students will explore the interconnectedness of human-made systems and communities.",GC-GL-a,,0,,"2021-11-04 09:40:18","2021-11-04 09:40:18",NULL
+39,37,NULL,NULL,"2. Students will explore the relationship between local and global processes.",GC-GL-b,,0,,"2021-11-04 09:40:33","2021-11-04 09:40:33",NULL
+40,37,NULL,NULL,"3. Students will explore how local experiences mediate the global.",GC-GL-c,,0,,"2021-11-04 09:40:48","2021-11-04 09:40:48",NULL
+41,37,NULL,NULL,"4. Students will explore the opportunities and tensions provided by world interconnectedness.",GC-GL-d,,0,,"2021-11-04 09:40:59","2021-11-04 09:40:59",NULL
+42,37,NULL,NULL,"5. Students will explore the impact of decision-making on humankind and the environment.",GC-GL-e,,0,,"2021-11-04 09:41:11","2021-11-04 09:41:11",NULL
+43,12,NULL,NULL,"Fairness and development",GC-FA,,0,"What are the consequences of our common humanity? 
+","2021-11-04 09:41:41","2021-11-04 09:41:41",NULL
+44,43,NULL,NULL,"1. Students will explore rights and responsibilities.",GC-FA-a,,0,,"2021-11-04 09:41:53","2021-11-04 09:41:53",NULL
+45,43,NULL,NULL,"2. Students will explore the relationship between communities.",GC-FA-b,,0,,"2021-11-04 09:42:04","2021-11-04 09:42:04",NULL
+46,43,NULL,NULL,"3. Students will explore sharing finite resources with other people and with other living things.",GC-FA-c,,0,,"2021-11-04 09:42:23","2021-11-04 09:42:23",NULL
+47,43,NULL,NULL,"4. Students will explore access to equal opportunities.",GC-FA-d,,0,,"2021-11-04 09:42:34","2021-11-04 09:42:34",NULL
+48,43,NULL,NULL,"5. Students will explore peace and conflict resolution.",GC-FA-e,,0,,"2021-11-04 09:42:45","2021-11-04 09:42:45",NULL
