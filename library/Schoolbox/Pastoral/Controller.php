@@ -578,7 +578,8 @@ class Controller extends Base
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
-        $allowParents = $this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
+        $allowParents  = $this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
+        $allowStudents = $this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
         // Only want staff/parent roles
 
@@ -604,6 +605,16 @@ class Controller extends Base
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
                             $roleUsers[$roleCurrent->getId()]++;
                         }
+                    }
+                }
+            }
+
+            if ($allowStudents && $roleCurrent->isStudent()) {
+                $roleUsers[$roleCurrent->getId()] = 0;
+                if ($record->getStudent()) {
+                    if ($record->getStudent()->getRole()->getId() == $roleCurrent->getId()) {
+                        $roles->add($roleCurrent);
+                        $roleUsers[$roleCurrent->getId()]++;
                     }
                 }
             }
