@@ -93,19 +93,19 @@ HELP;
          * There Are Questions both Unanswered and Answered, Feature Requests
          */
         $newFolderForum = [
-            '[QIT]'     => 2793,
-            '[QTL]'     => 2794,
-            '[QC]'      => 2795,
-            '[QO]'      => 2798,
-            '[QITANS]'  => 2886,
-            '[QTLANS]'  => 2888,
-            '[QCANS]'   => 2885,
-            '[QOANS]'   => 2887,
-            '[FRO]'     => 2871,
-            '[FRTL]'    => 2867,
-            '[FRCOM]'   => 2868,
-            '[FRIT]'    => 2869,
-            '[FRUX]'    => 2870
+            'QIT'     => 2793,
+            'QTL'     => 2794,
+            'QC'      => 2795,
+            'QO'      => 2798,
+            'QITANS'  => 2886,
+            'QTLANS'  => 2888,
+            'QCANS'   => 2885,
+            'QOANS'   => 2887,
+            'FRO'     => 2871,
+            'FRTL'    => 2867,
+            'FRCOM'   => 2868,
+            'FRIT'    => 2869,
+            'FRUX'    => 2870
         ];
 
 
