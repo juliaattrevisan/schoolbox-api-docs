@@ -52,7 +52,7 @@ class HandlerFactory
     protected $log;
 
     /** @var HandlerInterface|null[] */
-    protected $handlers;
+    protected $handlers = [];
 
     /** @var callable[] */
     protected $handlerGenerators;
