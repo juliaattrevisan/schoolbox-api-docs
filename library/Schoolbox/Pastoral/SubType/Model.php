@@ -43,6 +43,10 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      */
     private ?string $template = null;
 
+    /**
+     * @var string|null
+     */
+    private ?string $templatePrivate = null;
 
     /**
      * This type's color.
@@ -167,6 +171,25 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     public function setTemplate(?string $template): self
     {
         $this->template = $template;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTemplatePrivate(): ?string
+    {
+        return $this->templatePrivate;
+    }
+
+
+    /**
+     * @param string|null $templatePrivate
+     * @return Model
+     */
+    public function setTemplatePrivate(?string $templatePrivate): self
+    {
+        $this->templatePrivate = $templatePrivate;
         return $this;
     }
 
