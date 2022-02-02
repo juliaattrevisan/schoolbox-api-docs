@@ -16,6 +16,7 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -73,30 +74,52 @@ class Module extends BaseModule
                 )
             );
 
-        $permissionParentOfStudent =
-            new Rule\LazyCallback(function () {
+        $userIdSource = static function (array $params) {
+            if (isset($params['studentId'])) {
+                return $params['studentId'];
+            } elseif (isset($params['recordId'])) {
+                try {
+                    $record = PastoralMapper::getInstance()->findById($params['recordId']);
+                    return $record->getStudent()->getId();
+                } catch (MapperException $e) {
+                }
+            }
+            return null;
+        };
+
+        $permissionParentOfStudent = new Rule\LazyCallback(
+            function () use ($userIdSource) {
                 return new Rule\All(
                     new Rule\IsLoggedIn(),
-                    new IsParentAccessAllowed(),
                     new Rule\HasRole(Role::PARENT),
+                    new Rule\IsConfigSetTo(
+                        ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED,
+                        true,
+                        $this->getConfig(),
+                    ),
                     new Rule\IsParentOfUser(
                         $this->getExternalUser(),
                         UserMapper::getInstance(),
-                        static function (array $params) {
-                            if (isset($params['studentId'])) {
-                                return $params['studentId'];
-                            } elseif (isset($params['recordId'])) {
-                                try {
-                                    $record = PastoralMapper::getInstance()->findById($params['recordId']);
-                                    return $record->getStudent()->getId();
-                                } catch (MapperException $e) {
-                                }
-                            }
-                            return null;
-                        }
+                        $userIdSource,
                     )
                 );
-            });
+            }
+        );
+
+        $permissionStudent = new Rule\LazyCallback(
+            function () use ($userIdSource) {
+                return new Rule\All(
+                    new Rule\IsLoggedIn(),
+                    new Rule\HasRole(Role::STUDENT),
+                    new Rule\IsConfigSetTo(
+                        ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED,
+                        true,
+                        $this->getConfig(),
+                    ),
+                    new Rule\IsUser($userIdSource),
+                );
+            }
+        );
 
         // User is in the audience of the pastoral record
 
@@ -107,7 +130,8 @@ class Module extends BaseModule
         $permissionStudentView = new Rule\Any(
             $permissionPastoralModerator,
             $permissionStaff,
-            $permissionParentOfStudent
+            $permissionParentOfStudent,
+            $permissionStudent,
         );
 
         // Permissions required to view/update/delete a pastoral record (any staff member can insert)
@@ -120,12 +144,12 @@ class Module extends BaseModule
         $permissionRecordView = new Rule\Any(
             $permissionPastoralModerator,
             new Rule\All(
-                $permissionStaff,
-                $permissionInRecordAudience
-            ),
-            new Rule\All(
-                $permissionParentOfStudent,
-                $permissionInRecordAudience
+                $permissionInRecordAudience,
+                new Rule\Any(
+                    $permissionStaff,
+                    $permissionParentOfStudent,
+                    $permissionStudent,
+                ),
             )
         );
 
@@ -143,17 +167,7 @@ class Module extends BaseModule
             )
         );
 
-        $permissionAttachmentView = new Rule\Any(
-            $permissionPastoralModerator,
-            new Rule\All(
-                $permissionStaff,
-                $permissionInRecordAudience
-            ),
-            new Rule\All(
-                $permissionParentOfStudent,
-                $permissionInRecordAudience
-            )
-        );
+        $permissionAttachmentView = $permissionRecordView;
 
         // Permissions required to insert/delete a pastoral comment
 
@@ -177,7 +191,8 @@ class Module extends BaseModule
                 $permissionParentOfStudent,
                 $permissionInRecordAudience,
                 $permissionParentCommentAllowed
-            )
+            ),
+            // For now students aren't allowed to comment
         );
 
         $permissionCommentDelete = new Rule\All(
