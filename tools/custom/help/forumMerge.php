@@ -60,7 +60,7 @@ HELP;
          * release ID => folderId
          * @var array
          */
-        $deliveredFolder = [
+        $deliveredFolders = [
             '11.0'  => 319,
             '11.5'  => 381,
             '12.0'  => 382,
@@ -252,7 +252,7 @@ HELP;
                 $actioned = true;
                 $this->getLogger()->info("Merge Forums based on [DELIVERED \d+\.\d]");
                 $mergeId = $matches[1];
-                $newFolder = $deliveredFolder[$mergeId];
+                $newFolder = $deliveredFolders[$mergeId];
                 if ($forum->getCategory()->getId() === $newFolder) {
                     //as we aren't changing the title, don't move again, exit here
                     $this->getLogger()->info("Forum already in the correct folder, moving on to the next");
@@ -287,16 +287,17 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                     /**
                      * Historic 'Delivered v20.0 and before' folder place here please
                      */
-                    if ($forum->getCategory()->getId() === 2686) {
+                    $deliveredFolder = 2686;
+                    if ($forum->getCategory()->getId() === $deliveredFolder) {
                         //as we aren't changing the title, don't move again, exit here
                         $this->getLogger()->info("Forum already in the correct folder, moving on to the next");
                         continue;
                     }
-                    $this->getLogger()->notice("Found Forum '{$title}' to move into folder 2881");
-                    $forum->setCategory($folderMapper->findCheaplyById('2881'));
+                    $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$deliveredFolder}");
+                    $forum->setCategory($folderMapper->findCheaplyById($deliveredFolder));
                     $forum->setLocked(true);
                     if ($this->perform()) {
-                        $this->getLogger()->notice("Moved Forum '{$title}' into folder 2881, and locked it");
+                        $this->getLogger()->notice("Moved Forum '{$title}' into folder {$deliveredFolder}, and locked it");
                         $threadMapper->save($forum);
                     }
                     continue;
