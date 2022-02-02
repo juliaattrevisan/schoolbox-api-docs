@@ -26,6 +26,7 @@ config:
   pastoral_severity: {hide: true}
   pastoral_individual_access: {hide: true}
   pastoral_parent_access: {value: false, hide: true}
+  pastoral_student_access: {value: false, hide: true}
   pastoral_page_size: {hide: true}
   pastoral_page_visible: {hide: true}
   pastoral_create_tag_enable: {hide: true}
