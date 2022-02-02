@@ -118,6 +118,14 @@ class Model implements ISoftDeletable
             return null;
         }
 
+        // Is this a student rule?
+        // (Only applies if the student is viewing their own record)
+        if ($user->getRole()->isStudent()) {
+            return $user->getId() === $this->getPastoral()->getStudent()->getId()
+                ? $this->access
+                : null;
+        }
+
         // Roles match, and roleType is staff
         if ($user->getRole()->isStaff()) {
             return $this->access;
