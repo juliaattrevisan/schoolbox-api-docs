@@ -268,9 +268,8 @@ HELP;
                 }
                 $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$newFolder}");
                 $forum->setCategory($folderMapper->findCheaplyById($newFolder));
-                $forum->setLocked(true);
                 if ($this->perform()) {
-                    $this->getLogger()->notice("Moved Forum '{$title}' into folder {$newFolder}, and locked it");
+                    $this->getLogger()->notice("Moved Forum '{$title}' into folder {$newFolder}");
                     $threadMapper->save($forum);
                 }
             }
@@ -306,9 +305,8 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                     }
                     $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$deliveredFolder}");
                     $forum->setCategory($folderMapper->findCheaplyById($deliveredFolder));
-                    $forum->setLocked(true);
                     if ($this->perform()) {
-                        $this->getLogger()->notice("Moved Forum '{$title}' into folder {$deliveredFolder}, and locked it");
+                        $this->getLogger()->notice("Moved Forum '{$title}' into folder {$deliveredFolder}");
                         $threadMapper->save($forum);
                     }
                     continue;
