@@ -556,12 +556,6 @@ class SubmissionBoxMapper extends BaseMapper
     public function softDelete($object): bool
     {
         $collection = $this->getModelAsCollection($object);
-        $notDeleted = $collection->filter(function (SubmissionBox $model) {
-            return !$model->isDeleted();
-        });
-        if (!\count($notDeleted)) {
-            return false;
-        }
 
         // Trigger the pre-trigger
         foreach ($collection as $model) {
@@ -573,18 +567,17 @@ class SubmissionBoxMapper extends BaseMapper
         // This is neither a PRE or POST action - it is the action.
         /** @var AssessmentMapper $assessmentMapper */
         $assessmentMapper = $this->getJoinMapper('assessmentModel');
+        /** @var SubmissionBox $model */
         foreach ($collection as $model) {
+            if ($model->getAssessmentModel()->isDeleted()) {
+                continue;
+            }
             $assessmentMapper->softDelete($model->getAssessmentModel());
         }
 
         // Trigger the post-trigger
         foreach ($collection as $model) {
             $this->triggerCallbacks(self::CALLBACK_POSTSOFTDELETE, $model);
-        }
-
-        // Send the notification action
-        foreach ($collection as $model) {
-            $this->raiseNotification($model, self::METHOD_DELETE);
         }
 
         return true;

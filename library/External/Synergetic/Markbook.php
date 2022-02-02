@@ -57,8 +57,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private const GLOBAL_STAFF_ID = 0;
 
     /**
-     * These values are set in the config table via a varaible 'synergetic_mark_sync_value'. This will configure what
-     * type of mark we will syncronise back to the SIS.  Either human readable or normalised.  The default is normalised.
+     * These values are set in the config table via a variable 'synergetic_mark_sync_value'. This will configure what
+     * type of mark we will synchronise back to the SIS.  Either human readable or normalised.  The default is normalised.
      */
     private const NORMALISED = 0;
     private const HUMAN_READABLE = 1;
@@ -278,7 +278,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $markbookId = $this->getMarkbookIdentifier($assessment);
+        $markbookId = $this->getMarkbookIdentifier($assessment, true);
         if (!isset($markbookId)) {
             return false;
         }
@@ -819,20 +819,22 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Returns the string used to identify this assessment in the markbook.
      *
      * @param IAssessable $assessment
+     * @param bool        $includeDeleted
      * @return string|null
      */
-    private function getMarkbookIdentifier(IAssessable $assessment): ?string
+    private function getMarkbookIdentifier(IAssessable $assessment, bool $includeDeleted = false): ?string
     {
         // This column is limited to 10 characters
         // Need the original ID as well here?
         $prefix  = '';
         $syncIds = [];
+        $param = $includeDeleted ? ['deleted' => true] : [];
         if ($assessment instanceof DueWork) {
             $prefix  = self::SUBMISSION_PREFIX;
-            $syncIds = SubmissionBoxMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
+            $syncIds = SubmissionBoxMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId(), $param);
         } elseif ($assessment instanceof Quiz) {
             $prefix  = self::ASSESSMENT_PREFIX;
-            $syncIds = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId());
+            $syncIds = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $assessment->getId(), $param);
         }
 
         // Must be exactly one item
