@@ -16,7 +16,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
- * Migrate portraits on the local filesystem into Storage
+ * Merges forums into either existing forums, or onto existing pages
+ * Build specifically for help.schoolbox.com.au
  */
 $app = new class extends CliTool\App {
 // --help: print help
@@ -45,8 +46,11 @@ $app = new class extends CliTool\App {
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
-
+Actions a number of things:
 Merges Forum threads with '[MERGE id:\d+]' in the title into the thread identified by 'merge :id'
+Merges Forum threads with '[DELIVERED]' in the title into the 'RELEASE V20.0' homepage
+Merges Forum threads with '[DELIVERED xx.x]' in the title into the ReleaseNotes homepage for version xx.x
+Merges Forum threads with various '[CODE]' in the title into the specific question / feature request homepages
 
 Usage: forumMerge.php [-v] [-p]
         -p Actually merge, else just display what would occur
@@ -159,9 +163,9 @@ HELP;
         ];
 
 
-        $threadMapper = ThreadMapper::getInstance();
-        $postMapper = PostMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
+        $threadMapper   = ThreadMapper::getInstance();
+        $postMapper     = PostMapper::getInstance();
+        $folderMapper   = FolderMapper::getInstance();
 
         if (!$this->perform()) {
             $this->getLogger()->alert("Preview Mode");
@@ -170,11 +174,9 @@ HELP;
         }
 
         /**
-         * get list of all forum threads with [MERGE :id]
-         * then merge the included posts to the :id forum thread
+         * get list of all forum threads with [*] in the title, we will then narrow down the search after
          * */
 
-        //get list of forum threads with "[MERGE :id]" if the thread is not deleted
         $predicate = $threadMapper->getPredicateBuilder();
         $predicate->like('title', '[%]%');
         $forums = $threadMapper->findByPredicates($predicate);
@@ -192,11 +194,14 @@ HELP;
             $title = $forum->getTitle();
             $this->getLogger()->info("Forum: {$title}");
             $actioned = false;
-            //get the forum ID to merge into.
+
+            /**
+             * Now match forums with the title like [MERGE x] where x is the new forum id,
+             * then merge the included posts to the forum id thread
+             */
             $matches = '';
             preg_match("[MERGE (\d+)]", $forum->getTitle(), $matches);
-
-            //if matched here merge thr forum into the new forum
+            //if matched here merge the forum into the new forum
             if (!empty($matches)) {
                 $actioned = true;
                 $this->getLogger()->info("Merge Forums based on [MERGE \d+]");
@@ -244,6 +249,9 @@ HELP;
                 }
             }
 
+            /**
+             * Now match forums with the title like [DELIVERED xx.x] where x are numbers, we are looking specifically for version numbers.
+             */
             //clear $matches
             $matches = '';
             preg_match("[DELIVERED (\d+\.\d)]", $forum->getTitle(), $matches);
@@ -268,6 +276,9 @@ HELP;
             }
 
 
+            /**
+             * Now match forums with the title like [DELIVERED], [CODE], [ETC]
+             */
             //clear $matches
             $matches = '';
             preg_match("[(\w+)]", $forum->getTitle(), $matches);
