@@ -207,6 +207,7 @@ HELP;
                 $forum->setCategory($folderMapper->findCheaplyById($newFolder));
                 $forum->setLocked(true);
                 if ($this->perform()) {
+                    $this->getLogger()->notice("Moved Forum '${title}' into folder '{$newFolder}, and locked it");
                     $threadMapper->save($forum);
                 }
             }
@@ -218,12 +219,38 @@ HELP;
             //if matched here merge the forum into the new folder
             if (!empty($matches) && false ===  $actioned) {
                 $actioned = true;
+                if ("RESOLVED" === $matches[0] || 'Resolved' === $matches[0]) {
+                    /**
+                     * Don't try to move forums with the title '[RESOLVED]'
+                     * PST will need to fix this, as we don't know where they need to go.
+                     */
+                    $this->getLogger()->warning("Unknown [Resolved] forum title, Please update it to [Delivered xx.x]
+or to the correct Question Folder. For Forum: {$forum->getID()} then run this again.");
+                    continue;
+                }
+                if ( "DELIVERED" === $matches[0]) {
+                    /**
+                     * Don't try to move forums with the title '[DELIVERED]' with no version number
+                     * PST will need to fix this, as we don't know where they need to go.
+                     */
+                    $this->getLogger()->warning("Un Specified Delivered Version Number, Please set it for Forum: {$forum->getID()} and run this again.");
+                    continue;
+                }
+                if ("ANSWERED" === $matches[0]) {
+                    /**
+                     * Don't try to move forums with the title '[ANSWERED]'
+                     * PST will need to fix this, as we don't know where they need to go.
+                     */
+                    $this->getLogger()->warning("Unknown ANSWERED forum title, Please update it to the correct question folder. For Forum: {$forum->getID()} then run this again.");
+                    continue;
+                }
                 $this->getLogger()->info("Merge Forums based on [\w+]");
                 $mergeId = $matches[1];
                 $newFolder = $newFolderForum[$mergeId];
                 $this->getLogger()->notice("Found Forum '${title}' to move into folder '{$newFolder}");
                 $forum->setCategory($folderMapper->findCheaplyById($newFolder));
                 if ($this->perform()) {
+                    $this->getLogger()->notice("Moved Forum '${title}' into folder '{$newFolder}");
                     $threadMapper->save($forum);
                 }
             }
