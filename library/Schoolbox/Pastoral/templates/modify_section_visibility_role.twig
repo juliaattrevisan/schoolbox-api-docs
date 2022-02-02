@@ -68,14 +68,20 @@
                                 <p>{{ role.name }}</p>
                                 <p class="meta">
                                     System Role
-                                    {% if not role.isParent or not bulkCreate %}
+
+                                    {# Don't show the user count if: bulk create and (parent or student) #}
+                                    {% if not (bulkCreate and (role.isParent or role.isStudent)) %}
                                         ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
                                     {% endif %}
+
+                                    {% if role.isStudent %}
+                                        <br />
+                                        (Only {{ record.student.firstName ?? 'the student' }} will be able to view this record.)
+                                    {% endif %}
+
                                     {% if role.isParent %}
                                         <br />
-                                        (Only
-                                        {{ (record is defined and record.student is defined and record.student) ? record.student.firstName : 'the student' }}'s
-                                        parents will be able to view this record.)
+                                        (Only {{ record.student.firstName ?? 'the student' }}'s parents will be able to view this record.)
                                     {% endif %}
                                 </p>
                             </div>
