@@ -203,6 +203,11 @@ HELP;
                 $this->getLogger()->info("Merge Forums based on [DELIVERED \d+\.\d]");
                 $mergeId = $matches[1];
                 $newFolder = $deliveredFolder[$mergeId];
+                if ($forum->getCategory()->getId() === $newFolder) {
+                    //as we aren't changing the title, don't move again, exit here
+                    $this->getLogger()->info("Forum already in the correct folder, moving on to the next");
+                    continue;
+                }
                 $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$newFolder}");
                 $forum->setCategory($folderMapper->findCheaplyById($newFolder));
                 $forum->setLocked(true);
@@ -232,6 +237,11 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                     /**
                      * Historic 'Delivered v20.0 and before' folder place here please
                      */
+                    if ($forum->getCategory()->getId() === 2881) {
+                        //as we aren't changing the title, don't move again, exit here
+                        $this->getLogger()->info("Forum already in the correct folder, moving on to the next");
+                        continue;
+                    }
                     $this->getLogger()->notice("Found Forum '{$title}' to move into folder 2881");
                     $forum->setCategory($folderMapper->findCheaplyById('2881'));
                     $forum->setLocked(true);
@@ -252,6 +262,11 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                 $this->getLogger()->info("Merge Forums based on [\w+]");
                 $mergeId = $matches[1];
                 $newFolder = $newFolderForum[$mergeId];
+                if ($forum->getCategory()->getId() === $newFolder) {
+                    //as we aren't changing the title, don't move again, exit here
+                    $this->getLogger()->info("Forum already in the correct folder, moving on to the next");
+                    continue;
+                }
                 $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$newFolder}");
                 $forum->setCategory($folderMapper->findCheaplyById($newFolder));
                 if ($this->perform()) {
