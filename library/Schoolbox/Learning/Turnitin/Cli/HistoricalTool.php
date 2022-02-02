@@ -151,15 +151,9 @@ HELP;
                 $start->getDatabase(),
                 $end->getDatabase()
             ));
-//
-//
-//            $this->getLogger()->info(sprintf(
-//                'Retrofitting student submission files for assessment %s',
-//                $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
-//            ));
-//
-//            (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), $this->getLogger()))
-//                ->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+
+            (new Turnitin\Historical(Turnitin\File\Mapper::getInstance(), $this->getLogger()))
+                ->historical($start, $end, $lock);
 
             $this->getLogger()->info('Done.');
 

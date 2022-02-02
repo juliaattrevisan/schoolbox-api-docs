@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Turnitin;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception;
+use Symfony\Component\Lock\LockInterface;
 use UnexpectedValueException;
 
 /**
@@ -59,12 +60,15 @@ class Historical
      *
      * @param \Alaress_Date_Format $start
      * @param \Alaress_Date_Format $end
+     * @param LockInterface|null   $lock
      * @return void
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      */
-    public function historical(\Alaress_Date_Format $start, \Alaress_Date_Format $end): void
+    public function historical(\Alaress_Date_Format $start, \Alaress_Date_Format $end, ?LockInterface $lock): void
     {
         /* Find the most recent student_submission records
          * and from there, find all the student_submission_file_id values
@@ -137,6 +141,15 @@ class Historical
                 $turnitinFile->getId(),
                 File\Model::STATUS_TRANSMIT_PENDING
             ));
+
+            /* Refresh lock while we're still processing; keep using another
+             * $timeout seconds until we're done, or until we died
+             */
+            if ($lock) {
+                $this->logDebug('Refreshing lock');
+
+                $lock->refresh();
+            }
         }
     }
 }
