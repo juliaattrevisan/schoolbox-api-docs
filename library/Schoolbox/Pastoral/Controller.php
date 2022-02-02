@@ -644,10 +644,12 @@ class Controller extends Base
         $subtypes = $this->pastoralSubTypeMapper->findAll();
 
         $typesIndex       = [];
+        $typesIndexPrivate       = [];
         $audienceDefaults = [];
 
         foreach ($types as $type) {
             $typesIndex[$type->getId()] = $type->getTemplate();
+            $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
             if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $type->getId(),
@@ -658,9 +660,11 @@ class Controller extends Base
         }
 
         $subtypesIndex = [];
+        $subtypesIndexPrivate = [];
 
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
+            $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
             if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $subtype->getPastoralType()->getId(),
@@ -681,8 +685,10 @@ class Controller extends Base
                     'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                     'allowParents'      => $allowParents,
                     'types'             => $types,
-                    'typesIndex'        => $typesIndex,
+                    'typesIndexPrivate' => $typesIndex,
+                    'typesIndex'        => $typesIndexPrivate,
                     'subTypes'          => $subtypes,
+                    'subtypesIndexPrivate'  => $subtypesIndexPrivate,
                     'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
