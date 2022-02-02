@@ -228,7 +228,7 @@ HELP;
 or to the correct Question Folder. For Forum: {$forum->getID()} then run this again.");
                     continue;
                 }
-                if ( "DELIVERED" === $matches[0]) {
+                if ("DELIVERED" === $matches[0]) {
                     /**
                      * Don't try to move forums with the title '[DELIVERED]' with no version number
                      * PST will need to fix this, as we don't know where they need to go.
