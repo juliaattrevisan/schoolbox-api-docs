@@ -11,6 +11,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Forum\PostMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -56,13 +57,35 @@ HELP;
         }
         /**
          * Delivered folder Array
+         * release ID => folderId
          * @var array
          */
         $deliveredFolder = [
-            '20.1' => 111,
-            '20.2' => 111,
-            '21.0' => 111,
-            '21.1' => 111,
+            '11.0'  => 319,
+            '11.5'  => 381,
+            '12.0'  => 382,
+            '12.5'  => 383,
+            '13.0'  => 384,
+            '13.5'  => 385,
+            '14.0'  => 386,
+            '14.5'  => 387,
+            '15.0'  => 388,
+            '15.5'  => 389,
+            '15.6'  => 570,
+            '16.0'  => 993,
+            '16.5'  => 1427,
+            '17.0'  => 1792,
+            '17.5'  => 2138,
+            'v18'   => 2239,
+            'v18.1' => 2385,
+            'v18.2' => 2448,
+            'v19'   => 2476,
+            'v19.2' => 2567,
+            'v20'   => 2686,
+            'v20.1' => 2968,
+            'v20.2' => 3050,
+            'v21'   => 3067,
+            'v21.1' => 3174,
         ];
 
         /**
@@ -70,12 +93,25 @@ HELP;
          * There Are Questions both Unanswered and Answered, Feature Requests
          */
         $newFolderForum = [
-            'QIT'   => 111,
+            '[QIT]'     => 2793,
+            '[QTL]'     => 2794,
+            '[QC]'      => 2795,
+            '[QO]'      => 2798,
+            '[QITANS]'  => 2886,
+            '[QTLANS]'  => 2888,
+            '[QCANS]'   => 2885,
+            '[QOANS]'   => 2887,
+            '[FRO]'     => 2871,
+            '[FRTL]'    => 2867,
+            '[FRCOM]'   => 2868,
+            '[FRIT]'    => 2869,
+            '[FRUX]'    => 2870
         ];
 
 
         $threadMapper = ThreadMapper::getInstance();
         $postMapper = PostMapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
 
         if (!$this->perform()) {
             $this->getLogger()->alert("Preview Mode");
@@ -168,9 +204,11 @@ HELP;
                 $mergeId = $matches[1];
                 $newFolder = $deliveredFolder[$mergeId];
                 $this->getLogger()->notice("Found Forum '${title}' to move into folder '{$newFolder}");
-                $forum->setCategory($newFolder);
+                $forum->setCategory($folderMapper->findCheaplyById($newFolder));
                 $forum->setLocked(true);
-                $threadMapper->save($forum);
+                if ($this->perform()) {
+                    $threadMapper->save($forum);
+                }
             }
 
 
@@ -184,8 +222,10 @@ HELP;
                 $mergeId = $matches[1];
                 $newFolder = $newFolderForum[$mergeId];
                 $this->getLogger()->notice("Found Forum '${title}' to move into folder '{$newFolder}");
-                $forum->setCategory($newFolder);
-                $threadMapper->save($forum);
+                $forum->setCategory($folderMapper->findCheaplyById($newFolder));
+                if ($this->perform()) {
+                    $threadMapper->save($forum);
+                }
             }
         }
         $this->getLogger()->info("All Complete.");
