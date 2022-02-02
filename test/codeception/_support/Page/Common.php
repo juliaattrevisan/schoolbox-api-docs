@@ -32,6 +32,7 @@ class Common
 
     public const CLASS_9AENG = '9A English';
     public const CLASS_ID_9AENG = 83;
+    public const CLASS_ID_DEMO2 = 106;
 
     public const SELECTOR_JELLY_TOT = '#content a.icon-more';
 
