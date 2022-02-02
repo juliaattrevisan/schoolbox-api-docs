@@ -287,7 +287,7 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                     /**
                      * Historic 'Delivered v20.0 and before' folder place here please
                      */
-                    if ($forum->getCategory()->getId() === 2881) {
+                    if ($forum->getCategory()->getId() === 2686) {
                         //as we aren't changing the title, don't move again, exit here
                         $this->getLogger()->info("Forum already in the correct folder, moving on to the next");
                         continue;
