@@ -109,13 +109,12 @@ class Model implements ISoftDeletable
             return null;
         }
 
-        // Is this a parent rule?
-        if ($user->getRole()->isParent()) {
-            // Rule only applies if user is actually a parent of the student.
-            if ($user->isParentOf($this->getPastoral()->getStudent())) {
-                return $this->access;
-            }
-            return null;
+        // Test in order of expected expensiveness:
+        // staff, then student, then parent
+
+        // Roles match, and roleType is staff
+        if ($user->getRole()->isStaff()) {
+            return $this->access;
         }
 
         // Is this a student rule?
@@ -126,10 +125,15 @@ class Model implements ISoftDeletable
                 : null;
         }
 
-        // Roles match, and roleType is staff
-        if ($user->getRole()->isStaff()) {
-            return $this->access;
+        // Is this a parent rule?
+        if ($user->getRole()->isParent()) {
+            // Rule only applies if user is actually a parent of the student.
+            if ($user->isParentOf($this->getPastoral()->getStudent())) {
+                return $this->access;
+            }
+            return null;
         }
+
         return null;
     }
 
