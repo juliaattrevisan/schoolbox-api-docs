@@ -230,10 +230,15 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                 }
                 if ("DELIVERED" === $matches[0]) {
                     /**
-                     * Don't try to move forums with the title '[DELIVERED]' with no version number
-                     * PST will need to fix this, as we don't know where they need to go.
+                     * Historic 'Delivered v20.0 and before' folder place here please
                      */
-                    $this->getLogger()->warning("Un Specified Delivered Version Number, Please set it for Forum: {$forum->getID()} and run this again.");
+                    $this->getLogger()->notice("Found Forum '{$title}' to move into folder 2881");
+                    $forum->setCategory($folderMapper->findCheaplyById('2881'));
+                    $forum->setLocked(true);
+                    if ($this->perform()) {
+                        $this->getLogger()->notice("Moved Forum '{$title}' into folder 2881, and locked it");
+                        $threadMapper->save($forum);
+                    }
                     continue;
                 }
                 if ("ANSWERED" === $matches[0]) {
