@@ -187,8 +187,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
                 // Convert the start/end time which are in minutes from midnight into a readable time string
 
-                $definition["start"] = $this->helper->getTimeFromMinutes($period_start);
-                $definition["end"] = $this->helper->getTimeFromMinutes($period_end);
+                $definition["start"] = date("g:ia", strtotime($this->helper->getTimeFromMinutes($period_start)));
+                $definition["end"] = date("g:ia", strtotime($this->helper->getTimeFromMinutes($period_end)));
                 $definition["number"] = $period["PeriodNumber"];
                 $definition["sequence"] = $period["PeriodNumberSeq"];
 

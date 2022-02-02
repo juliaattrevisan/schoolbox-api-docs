@@ -100,8 +100,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         foreach ($timetableDays as $timetableDay) {
             $result['desc'][]     = $timetableDay['HEADING'];
-            $result['start'][]    = $timetableDay['TIME_START'];
-            $result['end'][]      = $timetableDay['TIME_END'];
+            $result['start'][]    = date("g:ia", strtotime($timetableDay['TIME_START']));
+            $result['end'][]      = date("g:ia", strtotime($timetableDay['TIME_END']));
             $result['number'][]   = $timetableDay['NUMBER'];
             $result['sequence'][] = 1;
         }

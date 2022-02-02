@@ -33,8 +33,8 @@ interface External_TimetableInterface extends External\IConnector
      * Has the structure for each period
      *
      * $timetableDef['desc'][]
-     * $timetableDef['start'][]
-     * $timetableDef['end'][]
+     * $timetableDef['start'][] "g:ia"
+     * $timetableDef['end'][]   "g:ia"
      * $timetableDef['number'][]
      * $timetableDef['sequence'][]
      *

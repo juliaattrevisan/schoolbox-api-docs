@@ -204,8 +204,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
         foreach ($periods as $period) {
             $timetableDef['desc'][]     = sprintf('Period %s', $period['period']);
-            $timetableDef['start'][]    = $period['startTime'];
-            $timetableDef['end'][]      = $period['endTime'];
+            $timetableDef['start'][]    = date("g:ia", strtotime($period['startTime']));
+            $timetableDef['end'][]      = date("g:ia", strtotime($period['endTime']));
             $timetableDef['sequence'][] = $period['period'];
         }
 
@@ -228,8 +228,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             if (!isset($this->userCache[$userId])) {
                 $this->userStaffCache[$userId] = $this->userMapper->findById($userId)->getRole()->isStaff();
             }
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             $this->userStaffCache[$userId] = false;
         }
 
