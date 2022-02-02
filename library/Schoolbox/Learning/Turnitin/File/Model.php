@@ -149,6 +149,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var bool|null
+     */
+    private ?bool $historical = false;
+
+
+    /**
      * Turnitin report finished processing
      *
      * @return bool
@@ -378,6 +384,26 @@ class Model implements ISoftDeletable
     public function setSubmittedWorksMatchPercentage(?float $submittedWorksMatchPercentage): self
     {
         $this->submittedWorksMatchPercentage = $submittedWorksMatchPercentage;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getHistorical(): ?bool
+    {
+        return $this->historical;
+    }
+
+
+    /**
+     * @param bool|null $historical
+     * @return Model
+     */
+    public function setHistorical(?bool $historical): self
+    {
+        $this->historical = $historical;
         return $this;
     }
 }

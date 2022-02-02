@@ -103,6 +103,7 @@ class Historical
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $models[] = $this->turnitinFileMapper->createModel()
                 ->setStudentSubmissionFileId((int)$row['id'])
+                ->setHistorical(true)
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
             $this->logDebug(sprintf(
