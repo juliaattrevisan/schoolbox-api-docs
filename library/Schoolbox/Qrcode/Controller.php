@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Qrcode;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -22,22 +21,20 @@ class Controller extends Base
 {
 
     /**
-     * @var ErrorMapper
-     */
-    private ErrorMapper $errorMapper;
-
-
-    /**
      * Controller constructor.
-     *
-     * @param ErrorMapper $errorMapper
      */
-    public function __construct(ErrorMapper $errorMapper)
+    public function __construct()
     {
-        $this->errorMapper = $errorMapper;
     }
 
 
+    /**
+     * QR Code generation page
+     *
+     * @api   GET /qrcode/:folderId
+     * @since 22.0
+     * @param Folder $folder
+     */
     public function getListPage(Folder $folder): void
     {
         $this->response->content->set(

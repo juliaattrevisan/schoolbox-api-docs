@@ -9,14 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Qrcode;
 
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -43,17 +44,8 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $preloadFolder = function (array $params) {
-            try {
-                if (($params['folder'] ?? null) instanceof Folder) {
-                    $folder = $params['folder'];
-                } else {
-                    $folder = $this->getFolderMapper()->findById($params['folderId']);
-                }
-                return ['folder' => $folder];
-            } catch (Mapper\Exception $e) {
-                throw new NotFound("No folder found for id: {$params['folderId']}", 0, $e);
-            }
+        $preloadFolder = function ($params) {
+            return $this->preloadFolder($params);
         };
 
         $canGenerate = new Rule\All(
@@ -65,12 +57,26 @@ class Module extends BaseModule
                     new Rule\HasHomepageAccess(
                         UserAccess::ACCESS_WRITE,
                         function ($params) {
-                            if (($params['folder'] ?? null) instanceof Folder) {
-                                return $params['folder'];
-                            }
-                            throw new NotFound("No folder found for id: {$params['folderId']}");
+                            return $params['folderId'];
                         },
                         Access::getInstance()
+                    ),
+                    // Check whether QR code generation is enabled via folder year level
+                    new Rule\Callback(
+                        function (array $params) {
+                            try {
+                                if (($params['folder'] ?? null) instanceof Folder) {
+                                    $folder = $params['folder'];
+                                } else {
+                                    $folder = $this->getFolderMapper()->findById($params['folderId']);
+                                }
+                                if (!$folder->isQrcodeEnabled()) {
+                                    throw new InvalidPath("QR Generation is not available for folder: {$folder->getId()}");
+                                }
+                            } catch (Mapper\Exception $e) {
+                                throw new InvalidPath("No folder found for id: {$params['folderId']}", 0, $e);
+                            }
+                        }
                     )
                 )
             ),
@@ -122,5 +128,29 @@ class Module extends BaseModule
     protected function getFolderMapper()
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
+    }
+
+
+    /**
+     * Loads Folder Model instance from route params
+     *
+     * @param array $params
+     * @return array
+     * @throws MapperException
+     */
+    private function preloadFolder(array $params): array
+    {
+        $folder   = 'folder';
+        $folderId = 'folderId';
+
+        if (($params[$folder] ?? null) instanceof Folder) {
+            $preload[$folder] = $params[$folder];
+        } elseif (!array_key_exists($folderId, $params)) {
+            throw new \UnexpectedValueException("No 'folderId' found in route params");
+        } else {
+            $preload[$folder] = $this->getFolderMapper()->findById($params[$folderId]);
+        }
+
+        return $preload;
     }
 }
