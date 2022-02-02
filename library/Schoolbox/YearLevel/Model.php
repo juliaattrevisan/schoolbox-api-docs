@@ -44,49 +44,54 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     private $overallGrade;
 
     /** @var bool */
-    private $showOverallGrade = false;
+    private bool $showOverallGrade = false;
 
     /** @var bool */
-    private $displayGradePage = false;
+    private bool $displayGradePage = false;
 
     /**
      * Grade Page: Class Results
      * @var bool
      */
-    private $displayAssessmentGrade = false;
+    private bool $displayAssessmentGrade = false;
 
     /**
      * Grade Page: Learning Levels
      * @var bool
      */
-    private $displayRubricGrade = false;
+    private bool $displayRubricGrade = false;
 
     /**
      * Grade Page: Capability Marks
      * @var bool
      */
-    private $displayCapabilityGrade = false;
+    private bool $displayCapabilityGrade = false;
 
     /**
      * Grade Page: Progression
      * @var bool
      */
-    private $displayProgressionGrade = false;
+    private bool $displayProgressionGrade = false;
 
     /**
      * @var bool
      */
-    private $showRubricPoints = false;
+    private bool $showRubricPoints = false;
 
     /**
      * @var bool
      */
-    private $lmsCohortComparison = false;
+    private bool $lmsCohortComparison = false;
 
     /**
      * @var bool
      */
-    private $learningMomentsEnabled = false;
+    private bool $learningMomentsEnabled = false;
+
+    /**
+     * @var bool
+     */
+    private bool $qrcodeEnabled = false;
 
     /**
      * @return string
@@ -303,6 +308,24 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     public function setLearningMomentsEnabled(bool $learningMomentsEnabled): self
     {
         $this->learningMomentsEnabled = $learningMomentsEnabled;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getQrcodeEnabled(): bool
+    {
+        return $this->qrcodeEnabled;
+    }
+
+    /**
+     * @param bool $qrcodeEnabled
+     * @return static
+     */
+    public function setQrcodeEnabled(bool $qrcodeEnabled): self
+    {
+        $this->qrcodeEnabled = $qrcodeEnabled;
         return $this;
     }
 
