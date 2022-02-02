@@ -295,13 +295,21 @@ class Report
                 Turnitin\File\Model::STATUS_REPORT_ANALYSING
             );
 
-            /* Schedule a report for generation (don't know if we need $similarity yet)
-             * Also, log the conflict if there is one
+            /* TODO Branch out here for historical documents, which require indexing only
+             * https://developers.turnitin.com/docs/tca#index-a-submission
+             * Everything else does generateReport, as usual, then ends.
              */
-            try {
-                $similarity = $this->generateReport($model);
-            } catch (Turnitin\Exception\Conflict $e) {
-                $this->changeToErrorState($model, $existingInfo ?? ['error_code' => 'unknown']);
+            if ($model->getHistorical()) {
+                $this->indexReport($model);
+            } else {
+                /* Schedule a report for generation (don't know if we need $similarity yet)
+                 * Also, log the conflict if there is one
+                 */
+                try {
+                    $similarity = $this->generateReport($model);
+                } catch (Turnitin\Exception\Conflict $e) {
+                    $this->changeToErrorState($model, $existingInfo ?? ['error_code' => 'unknown']);
+                }
             }
 
             return null;
