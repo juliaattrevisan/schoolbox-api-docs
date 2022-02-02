@@ -146,9 +146,11 @@ class ReviewCest
         // #attempts > tbody > tr:nth-child(1) > td:nth-child(4)
         // TODO: check only latest one is reviewed
         // TODO: USE ACTUAL REVIEW TIME!!!
-        $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $year = date("Y");
+        $i->canSee($year, '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
-        $i->cantSee('2021', '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
+        $i->cantSee($year, '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
+        $i->canSee('—', '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(2) > td:nth-child(5)');
     }
 
@@ -242,7 +244,8 @@ class ReviewCest
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
         // shouldn't see any grades
-        $i->cantSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $year = date("Y");
+        $i->cantSee($year, '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
 
         // Az Jack Coles, change visibility
@@ -267,8 +270,9 @@ class ReviewCest
         // As Louisa Smith, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
-        // shouldn't see any grades
-        $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        // should see grade
+        $year = date("Y");
+        $i->canSee($year, '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
     }
 
