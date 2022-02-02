@@ -69,8 +69,8 @@
                                 <p class="meta">
                                     System Role
 
-                                    {# Don't show the user count if: bulk create and (parent or student) #}
-                                    {% if not (bulkCreate and (role.isParent or role.isStudent)) %}
+                                    {# Don't show the user count if: a student role, or bulk create and parent role #}
+                                    {% if not (role.isStudent or (bulkCreate and role.isParent)) %}
                                         ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
                                     {% endif %}
 
