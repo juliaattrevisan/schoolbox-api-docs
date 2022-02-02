@@ -108,6 +108,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
         $this->setBlock($templateHandle, 'class_analytics_link', 'class_analytics_link_block');
+        $this->setBlock($templateHandle, 'qrcode_link', 'qrcode_link_block');
 
         // Determine the term for the grades link
         $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
@@ -208,6 +209,29 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar([
                 'assessment_calendar_link_block' => ''
             ]);
+        }
+
+        // Generate QR Code
+        $qrcodeParams = [
+            'folderId' => $this->getContext()->getId(),
+            'folder'   => $this->getContext(),
+        ];
+        if (
+            ($isClassPage || $isGroupPage)
+            && $this->getContext()->isQrcodeEnabled()
+            && $authorizer->isPathAuthorizedForUser('qrcode.getListPage', $qrcodeParams, $this->getUser())
+        ) {
+            $this->setVar(
+                'QRCODE_LINK',
+                $this->getRouter()->generate(
+                    'qrcode.getListPage',
+                    $qrcodeParams
+                )
+            );
+            $this->parse('qrcode_link_block', 'qrcode_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('qrcode_link_block', '');
         }
 
         $involvedInGroup = $isGroupPage && $this->getAccess()->involvedInGroup(
