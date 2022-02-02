@@ -13,6 +13,7 @@ namespace Schoolbox\Pastoral;
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -142,7 +143,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
-        $parentAccessEnabled = $this->conf->get('pastoral_parent_access') == '1';
+        $parentAccessEnabled = $this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED) == '1';
 
         /** @var Collection|PastoralAccess[] $accessRecords */
         $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());

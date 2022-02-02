@@ -203,7 +203,7 @@ class Controller extends Base
     {
         $staffPb = $this->roleMapper->getPredicateBuilder()->equals('group_type', Role::STAFF)->equals('access_pastoral', 1);
         $pb = $this->roleMapper->getPredicateBuilder()->all($staffPb);
-        if ($this->getConfigLoader()->get('pastoral_parent_access')) {
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
             $pb->equals('group_type', Role::PARENT);
             $pb = $this->roleMapper->getPredicateBuilder()->any($pb);
         }

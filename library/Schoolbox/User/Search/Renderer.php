@@ -158,7 +158,7 @@ class Renderer extends Handler
                     && Config::get('pastoral_enabled')
                     && (
                         ($currentUser->isStaffWithPastoralAccess())
-                        || ($currentUserIsParentOfResult && Config::get('pastoral_parent_access'))
+                        || ($currentUserIsParentOfResult && Config::get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED))
                     )
                 ) {
                     $this->getPage()->parse('pastoral_block', 'pastoral');

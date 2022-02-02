@@ -578,7 +578,7 @@ class Controller extends Base
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
-        $allowParents = $this->config->get('pastoral_parent_access');
+        $allowParents = $this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
 
         // Only want staff/parent roles
 

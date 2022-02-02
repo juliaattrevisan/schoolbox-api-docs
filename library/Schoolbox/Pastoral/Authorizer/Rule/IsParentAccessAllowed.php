@@ -13,6 +13,7 @@ namespace Schoolbox\Pastoral\Authorizer\Rule;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 
 class IsParentAccessAllowed implements IAuthorizationRule
@@ -22,7 +23,7 @@ class IsParentAccessAllowed implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        if (!Config::get('pastoral_parent_access')) {
+        if (!Config::get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
             throw new Unauthorized();
         }
 
