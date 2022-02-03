@@ -142,6 +142,14 @@ class Model implements IModel
         return $this->hidden;
     }
 
+    /**
+     * @return bool
+     */
+    public function isHidden(): ?bool
+    {
+        return $this->getHidden();
+    }
+
 
     /**
      * @param bool $hidden
@@ -164,7 +172,7 @@ class Model implements IModel
     /**
      * @return string
      */
-    public function isInstalledString(): string
+    public function getInstalledString(): string
     {
         return $this->installed ? 'Installed' : 'Not Installed';
     }

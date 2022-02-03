@@ -96,7 +96,7 @@ HELP;
         foreach ($allPackages as $package) {
             $listPackages[$package->getId()] = "\t";
             $listPackages[$package->getId()] .= str_pad("{$package->getTitle()}", $this->maxTitleLength);
-            $listPackages[$package->getId()] .= str_pad("{$package->isInstalledString()}", $this->maxInstalledLength);
+            $listPackages[$package->getId()] .= str_pad("{$package->getInstalledString()}", $this->maxInstalledLength);
             $listPackages[$package->getId()] .= str_pad("{$package->getHiddenString()}", $this->maxHiddenLength);
         }
         $listPackages[0] = "Exit";
