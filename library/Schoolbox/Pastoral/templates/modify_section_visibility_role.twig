@@ -89,6 +89,24 @@
                         </a>
                     </li>
                 {% endfor %}
+
+                {# Students: a role type, rather than a role #}
+                {# TODO consider exposing parents as a role type instead #}
+                {% if allowStudents %}
+                    <li data-role-type-add="student" data-role-type-name="Student">
+                        <a class="list-item link-row">
+                            <div class="card small-12">
+                                <i class="icon-group alert size-32"></i>
+                                <p>Student</p>
+                                <p class="meta">
+                                    System Role Type
+                                    <br />
+                                    (Only {{ record.student.firstName ?? 'the student' }} will be able to view this record.)
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </section>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
