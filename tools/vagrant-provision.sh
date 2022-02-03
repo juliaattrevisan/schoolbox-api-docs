@@ -18,6 +18,7 @@ external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 enable_xdebug="true";
 force_upgrade=0
 instance_registry_url="https://manage.schoolbox.cloud"
+declare phpversion_supported                                # Must be specified via script arg
 
 function log(){
   $LOG $L_INFO "$1"
@@ -29,8 +30,8 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
-if [[ $# -ne 10 ]]; then
-  error "Script requires 10 params, found $#"
+if [[ $# -ne 11 ]]; then
+  error "Script requires 11 params, found $#"
   exit 1
 fi
 
@@ -50,6 +51,11 @@ if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
 if [ -n "$8" ] && [[ "$8" != '0' ]] && [[ "$8" != 'false' ]]; then force_upgrade=1; fi;
 if [ -n "$9" ]; then instance_registry_url="$9"; fi;
 extra_hostname=${10}
+phpversion_supported="${11}"
+if [[ -z $phpversion_supported ]]; then
+  echo "You must declare desired PHP major version via script arg" >&2
+  exit 1
+fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -59,7 +65,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion_current=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
-phpversion_supported='7.4';
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion_current, supported: $phpversion_supported";
 #if [ "$phpversion_current" != "7.4" ];
 #then
@@ -250,7 +255,7 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.
 
 # Set up the host for the newly-installed instance
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
-FACTER_vagrant_extra_hostname="$extra_hostname" /vagrant/puppet-apply.sh
+FACTER_vagrant_extra_hostname="$extra_hostname" FACTER_primary_php_majver="$phpversion_supported" /vagrant/puppet-apply.sh
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
@@ -409,10 +414,10 @@ then
 
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
-    rm -f /etc/php/$phpversion_supported/cli/conf.d/20-xdebug.ini;
-    rm -f /etc/php/$phpversion_supported/cli/conf.d/20-tideways.ini;
-    rm -f /etc/php/$phpversion_supported/fpm/conf.d/20-xdebug.ini;
-    rm -f /etc/php/$phpversion_supported/fpm/conf.d/20-tideways.ini;
+    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini;
+    rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini;
+    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini;
+    rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
