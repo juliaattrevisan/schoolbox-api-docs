@@ -876,7 +876,9 @@ class Controller extends Base
         $accesses = $this->pastoralAccessMapper->createCollection();
 
         if (is_array($post["role"])) {
-            $foundRoles = [];
+            $foundRoles       = [];
+            $allowedRoles     = $this->determineAllowedRoles();
+            $allowedRoleTypes = $this->determineAllowedRoleTypes();
             foreach ($post["role"] as $roleId => $accessLevel) {
                 if (in_array($roleId, $foundRoles)) {
                     // should not happen
@@ -889,13 +891,15 @@ class Controller extends Base
 
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
+                    if (!in_array($matches['roleType'], $allowedRoleTypes)) {
+                        continue;
+                    }
                     $access->setRoleType($matches['roleType']);
                 } else {
-                    try {
-                        $role   = $this->roleMapper->findById($roleId);
+                    $role = $allowedRoles[$roleId] ?? null;
+                    if ($role) {
                         $access->setRole($role);
-                    } catch (MapperException $e) {
-                        // Noop but don't attempt to save
+                    } else {
                         continue;
                     }
                 }
@@ -1520,7 +1524,7 @@ class Controller extends Base
         if ($this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
             $allowedRoleTypes[] = Role::PARENT;
         }
-        return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes);
+        return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
     }
 
     /**
