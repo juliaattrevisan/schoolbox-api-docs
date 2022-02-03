@@ -152,4 +152,12 @@ class Model implements IModel
         $this->hidden = $hidden;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getHiddenString(): string
+    {
+        return $this->hidden ? 'true' : 'false';
+    }
 }
