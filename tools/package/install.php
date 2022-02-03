@@ -58,6 +58,7 @@ HELP;
 
         $packageMapper = Package\Mapper::getInstance();
         $userMapper = UserMapper::getInstance();
+        $selectedPackage = $this->getOpt('package');
         if (!$this->perform()) {
             $this->getLogger()->alert("Preview Mode");
         } else {
