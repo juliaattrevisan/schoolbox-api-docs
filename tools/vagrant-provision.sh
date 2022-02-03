@@ -59,7 +59,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion_current=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
-phpversion_supported='8.0';
+phpversion_supported='7.4';
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion_current, supported: $phpversion_supported";
 #if [ "$phpversion_current" != "7.4" ];
 #then

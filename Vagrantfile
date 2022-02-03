@@ -171,7 +171,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     puppet.facter = {
       "suppress_instance_configuration" => true,
-      "primary_php_majver" => "8.0",
+      "primary_php_majver" => "7.4",
     }
   end
 
