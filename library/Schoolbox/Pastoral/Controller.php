@@ -588,6 +588,22 @@ class Controller extends Base
 
         $rolesAll = $this->roleMapper->findAll();
 
+        // When student ids are provided to copy this record to, prefill Create duplicate record field.
+        // Also: fill the `$roleUsers` values.
+        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
+        $duplicates   = $this->userMapper->findByColumnList([
+            'id'           => $duplicateIds,
+            'g.group_type' => Role::STUDENT,
+        ]);
+        $students = [];
+        /** @var User $student */
+        foreach ($duplicates as $student) {
+            $students[] = [
+                'id'   => $student->getId(),
+                'name' => $student->getFullName(),
+            ];
+        }
+
         /** @var Role $roleCurrent */
         foreach ($rolesAll as $roleCurrent) {
             // Staff role? Show all users
@@ -629,21 +645,6 @@ class Controller extends Base
             } else {
                 $typeAudiences[$audience->getType()->getId()][] = $audience;
             }
-        }
-
-        // When student ids are provided to copy this record to, prefill Create duplicate record field.
-        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
-        $duplicates   = $this->userMapper->findByColumn('id', $duplicateIds);
-        $students     = [];
-        /** @var User $student */
-        foreach ($duplicates as $student) {
-            if (!$student->getRole()->isStudent()) {
-                continue;
-            }
-            $students[] = [
-                'id'   => $student->getId(),
-                'name' => $student->getFullName(),
-            ];
         }
 
         /* Build a hash lookup of (typeId => html) and (subtypeId => html) tuples
