@@ -27,7 +27,7 @@ fi
 rabbitmq_management_port=$(rabbitmqctl status | grep -Eo "http,[0-9]+" | awk -F',' '{ print $2 }')
 
 # This will fail to start when VM booted because /vagrant may not yet be mounted
-service php7.4-fpm restart
+service php8.0-fpm restart
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
