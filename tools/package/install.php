@@ -58,62 +58,60 @@ HELP;
 
         $packageMapper = Package\Mapper::getInstance();
         $userMapper = UserMapper::getInstance();
-        $selectedPackage = $this->getOpt('package');
         if (!$this->perform()) {
             $this->getLogger()->alert("Preview Mode");
         } else {
             $this->getLogger()->alert("Action Mode");
         }
 
+        $allPackages = $packageMapper->findAll();
+        $listPackages = [];
         /**
-         * if no package specified, list all available packages, including hidden ones
+         * list all available packages
          */
-        if (null === $selectedPackage) {
-            $allPackages = $packageMapper->findAll();
+        $this->getLogger()->info("Name of Package\tHidden?\tInstalled");
+        /** @var Package\Model $package */
+        foreach ($allPackages as $package) {
+            $this->getLogger()->info("{$package->getTitle()}, {$package->isInstalledString()}, {$package->getHiddenString()}");
+            $listPackages[$package->getId()] = "\t{$package->getTitle()}\t{$package->isInstalledString()}\t{$package->getHiddenString()}";
+        }
+
+        /**
+         * get choice for which package we want to install...
+         */
+        $packageId = $this->getChoice("Pick which Package you want to install", $listPackages);
+        //fix for array base 0
+        $packageId -=1;
+        $this->getLogger()->info("Selected Id: {$packageId}");
+        $package = $allPackages[$packageId];
+        $this->getLogger()->info("Found {$package->getTitle()}");
+        /**
+         * package found, is it already installed?
+         */
+        if (true === $package->isInstalled()) {
+            $this->getLogger()->error("Package is already installed.");
+            exit;
+        }
+        /**
+         * Lets attempt to install the package
+         */
+        try {
             /**
-             * list all available packages
+             * lets just say we are alaress, and installing as such
              */
-            $this->getLogger()->info("Name of Package\tLocation\tHidden?\tInstalled");
-            /** @var Package\Model $package */
-            foreach ($allPackages as $package) {
-                $this->getLogger()->info("{$package->getTitle()}, {$package->getLocation()}, {$package->getHiddenString()}, {$package->isInstalledString()}");
+            if ($this->perform()) {
+                $user             = $userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+                $packageInstaller = new Package\Installer($packageMapper);
+                $packageInstaller->installPackage($package, $user);
+                $this->getLogger()->alert("Installed {$package->getTitle()}");
+            } else {
+                $this->getLogger()->alert("Would have installed {$package->getTitle()}");
             }
-        } else {
-            /**
-             * confirm this package exists, and run with that
-             */
-            $this->getLogger()->notice("Requested to install {$selectedPackage}");
-            try {
-                /** @var Package\Model $package */
-                $package = $packageMapper->findOneByColumn('location', $selectedPackage);
-            } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
-                $this->getLogger()->error("Package not found, confirm you are attempting to install the correct package");
+        } catch (Schoolbox\Application\Exception\Exception $e) {
+            if (null !== $e->getPrevious()) {
+                $this->getLogger()->error("Previous Error:{$e->getPrevious()->getMessage()}");
             }
-            $this->getLogger()->info("Found {$package->getTitle()}");
-            /**
-             * package found, is it already installed?
-             */
-            if (true === $package->isInstalled()) {
-                $this->getLogger()->error("Package is already installed.");
-            }
-            /**
-             * Lets attempt to install the package
-             */
-            try {
-                /**
-                 * lets just say we are alaress, and installing as such
-                 */
-                if ($this->perform()) {
-                    $user             = $userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
-                    $packageInstaller = new Package\Installer($packageMapper);
-                    $packageInstaller->installPackage($package, $user);
-                    $this->getLogger()->info("Installed {$package->getTitle()}");
-                } else {
-                    $this->getLogger()->info("Would have installed {$package->getTitle()}");
-                }
-            } catch (Schoolbox\Application\Exception\Exception $e) {
-                $this->getLogger()->error($e->getMessage());
-            }
+            $this->getLogger()->error("Current Error:{$this->getLogger()->error($e->getMessage())}");
         }
 
         $this->getLogger()->info("All Complete.");

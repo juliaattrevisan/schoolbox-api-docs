@@ -158,7 +158,7 @@ class Model implements IModel
      */
     public function getHiddenString(): string
     {
-        return $this->hidden ? 'true' : 'false';
+        return $this->hidden ? 'Hidden' : 'Not Hidden';
     }
 
     /**
@@ -166,6 +166,6 @@ class Model implements IModel
      */
     public function isInstalledString(): string
     {
-        return $this->installed ? 'true' : 'false';
+        return $this->installed ? 'Installed' : 'Not Installed';
     }
 }
