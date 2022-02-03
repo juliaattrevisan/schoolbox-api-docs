@@ -12,7 +12,7 @@ use GuzzleHttp\Exception\RequestException as RequestException;
  */
 abstract class Alaress_Cache_Abstract
 {
-    private const REQUEST_TIMEOUT = 10;
+    private const REQUEST_TIMEOUT = 20;
     private const CONNECT_TIMEOUT = 10;
 
     /**
