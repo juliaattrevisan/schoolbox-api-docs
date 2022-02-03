@@ -18,6 +18,7 @@ namespace Quiz;
  */
 
 use AcceptanceTester;
+use Page\Homepage;
 use Page\Quiz\AssessmentForm;
 use Page\Quiz\StatusPage;
 use Page\Quiz\SectionForm;
@@ -218,6 +219,11 @@ class ReviewCest
         $student2Id = Common::USER_ID_JAMALALI;
         $teacher = Common::USER_JACKCOLES;
         $quizTitle = 'Cest Four ' . Common::gentext(6);
+
+        //adding a quiz component into the homepage
+        $i->amOnPage('/homepage/83');
+        $addComponent = new Homepage($i);
+        $addComponent->addComponent($addComponent::ELEMENT_ADD_COMPONENT_SECTION_LEARNING, 'Quizzes');
 
         // As Jack Coles, create a quiz
         $i->impersonate($teacher);
