@@ -204,7 +204,7 @@ class Controller extends BaseController
                                                                           'sid' => $post['group'],
                                                                       ]);
             //user is already part of the group, error out.
-            $problem = (new ApiProblem('User is already part of the group'))
+            $problem = (new ApiProblem('User is already part of the group. Please refresh the page to ensure everything is up to date.'))
                 ->setStatus(400)
                 ->asArray();
             $this->getResponse()->status->setCode(400);

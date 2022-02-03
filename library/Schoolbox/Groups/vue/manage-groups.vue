@@ -93,6 +93,7 @@ export default {
         onGroupsSelected (groupsSelection) {
             this.selectedGroups = groupsSelection;
             window.location.hash = this.selectedGroups;
+            this.checkForDropdowns();
         },
 
         /**
@@ -104,6 +105,17 @@ export default {
         onGroupsFiltered (groups, isSearchActive=false) {
             this.filteredGroups = groups;
             this.isSearchActive = isSearchActive;
+            this.checkForDropdowns();
+        },
+
+        /**
+         * If there's no groups visible on the page on initial display, foundations dropdowns won't work
+         * So we need to check for them on every select / filter change to ensure they work properly
+         */
+        checkForDropdowns () {
+            this.$nextTick(() => {
+                $(document).foundation('dropdown', 'reflow');
+            });
         },
 
         /**

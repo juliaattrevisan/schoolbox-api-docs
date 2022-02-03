@@ -170,6 +170,8 @@ export default {
                 const responseData = await this.getResponseData(this.endpointAdd);
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
+                } else if (responseData.status === 400) {
+                    this.$emit('on-edit-error', responseData.title);
                 } else {
                     this.group.enrolmentStatus = responseData.enrolmentStatus; //could be either 'enrolled' or 'pending'
                     this.$emit('on-edit-success', 'Group joined');
@@ -192,6 +194,8 @@ export default {
                 const responseData = await this.getResponseData(this.endpointDelete);
                 if (responseData.error) {
                     this.$emit('on-edit-error', responseData.error);
+                } else if (responseData.status === 400) {
+                    this.$emit('on-edit-error', responseData.title);
                 } else {
                     this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
                     this.$emit('on-edit-success', 'Group left');
@@ -362,7 +366,7 @@ export default {
                     <div v-if="isAdmin" class="expand private" key="admin">Group Admin</div>
                     <div v-else-if="isPrivate" class="expand private" key="private">Private</div>
                     <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave" :disabled="isProcessing">Leave</button>
-                    <div v-else-if="isMembershipPending" class="expand membership-pending" key="membershipPending">Membership pending</div>
+                    <button v-else-if="isMembershipPending" class="button expand icon-logout alert" title="Cancel membership request"  key="membershipPending" @click="leave" :disabled="isProcessing">Cancel membership request</button>
                     <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join" :disabled="isProcessing">Request to join</button>
                     <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join" :disabled="isProcessing">Join</button>
                 </transition>
