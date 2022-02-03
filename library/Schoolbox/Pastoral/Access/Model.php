@@ -20,7 +20,8 @@ use Schoolbox\User;
 /**
  * Pastoral care access control
  *
- * This allows the user to audience a pastoral care record to individual users, roles and user defined pastoral groups
+ * This allows the user to audience a pastoral care record to individual users,
+ * roles, role types and user defined pastoral groups.
  *
  * @package Schoolbox\Pastoral\Access
  */
@@ -35,6 +36,11 @@ class Model implements ISoftDeletable
 
     /** @var null|Role $role */
     protected $role;
+
+    /**
+     * The role type for this pastoral care access, if any.
+     */
+    private ?string $roleType = null;
 
     /** @var null|User $user */
     protected $user;
@@ -200,6 +206,24 @@ class Model implements ISoftDeletable
     public function getRole(): ?Role
     {
         return $this->role;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRoleType(): ?string
+    {
+        return $this->roleType;
+    }
+
+    /**
+     * @param string|null $roleType
+     * @return $this
+     */
+    public function setRoleType(?string $roleType): self
+    {
+        $this->roleType = $roleType;
+        return $this;
     }
 
     /**

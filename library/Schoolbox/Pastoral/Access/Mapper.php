@@ -19,6 +19,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -49,6 +50,13 @@ class Mapper extends BaseMapper
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
+        $this->uses(
+            'role_type',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'roleType',
+            [Role::GUEST, Role::STUDENT, Role::PARENT, Role::STAFF],
+        );
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
