@@ -58,6 +58,12 @@ HELP;
 
         $packageMapper = Package\Mapper::getInstance();
         $userMapper = UserMapper::getInstance();
+
+        //nicely format the output
+        $maxHiddenLength = strlen('Not Hidden\  ');
+        $maxInstalledLength = strlen('Not Installed\    ');
+        $maxTitleLength   = 60;
+
         if (!$this->perform()) {
             $this->getLogger()->alert("Preview Mode");
         } else {
@@ -73,7 +79,11 @@ HELP;
         /** @var Package\Model $package */
         foreach ($allPackages as $package) {
             $this->getLogger()->info("{$package->getTitle()}, {$package->isInstalledString()}, {$package->getHiddenString()}");
-            $listPackages[$package->getId()] = "\t{$package->getTitle()}\t{$package->isInstalledString()}\t{$package->getHiddenString()}";
+            $listPackages[$package->getId()] = "\t";
+            $listPackages[$package->getId()] .= str_pad("{$package->getTitle()}",$maxTitleLength);
+            $listPackages[$package->getId()] .= str_pad("{$package->isInstalledString()}",$maxInstalledLength);
+            $listPackages[$package->getId()] .= str_pad("{$package->getHiddenString()}",$maxHiddenLength);
+
         }
 
         /**
