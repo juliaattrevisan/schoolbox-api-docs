@@ -93,7 +93,7 @@
                 {# Students: a role type, rather than a role #}
                 {# TODO consider exposing parents as a role type instead #}
                 {% if allowStudents %}
-                    <li data-role-type-add="student" data-role-type-name="Student">
+                    <li data-role-add="type-student" data-role-name="Student">
                         <a class="list-item link-row">
                             <div class="card small-12">
                                 <i class="icon-group alert size-32"></i>
@@ -172,7 +172,7 @@
                         var roleId = $(this).attr('data-role-id');
 
                         if (roleId !== '{ID}') {
-                            if (window.rolesAdded.indexOf(parseInt(roleId)) !== -1) {
+                            if (window.rolesAdded.indexOf(roleId) !== -1) {
                                 $("[data-role-add=" + roleId + "]").addClass('hide');
                             } else {
                                 $("[data-role-add=" + roleId + "]").removeClass('hide');
@@ -206,7 +206,7 @@
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
 
-                    window.rolesAdded.push(parseInt(roleId));
+                    window.rolesAdded.push(roleId);
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
