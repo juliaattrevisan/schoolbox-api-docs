@@ -85,11 +85,16 @@ HELP;
             $listPackages[$package->getId()] .= str_pad("{$package->getHiddenString()}",$maxHiddenLength);
 
         }
+        $listPackages[0] = "Exit";
 
         /**
          * get choice for which package we want to install...
          */
         $packageId = $this->getChoice("Pick which Package you want to install", $listPackages);
+        if (0 === $packageId) {
+            $this->getLogger()->info("Quitting");
+            exit;
+        }
         //fix for array base 0
         $packageId -=1;
         $this->getLogger()->info("Selected Id: {$packageId}");
