@@ -160,4 +160,12 @@ class Model implements IModel
     {
         return $this->hidden ? 'true' : 'false';
     }
+
+    /**
+     * @return string
+     */
+    public function isInstalledString(): string
+    {
+        return $this->installed ? 'true' : 'false';
+    }
 }

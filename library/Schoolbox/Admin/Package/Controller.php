@@ -60,29 +60,8 @@ class Controller extends Base
 
         $package = $this->packageMapper->findById($post['id']);
 
-        if (!$package->isInstalled()) {
-            include(SITE_root . '/packages/' . $package->getLocation() . '/Installer.php');
-            $class = '\\' . $package->getLocation() . '\\Installer';
-            $installer = new $class();
-            if (!$installer instanceof IPackageInstall) {
-                throw $this->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package class not found");
-            }
-
-            $db = $this->packageMapper->getDatabase();
-            $db->beginTransaction();
-            try {
-                $installer->install($this->getUser());
-            } catch (\Throwable $e) {
-                $db->rollBack();
-                throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to install package, rolling back.");
-            }
-            $db->commit();
-
-            $package->setInstalled(true);
-            $this->packageMapper->save($package);
-        } else {
-            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package is already installed.");
-        }
+        $packageInstaller = new Installer($this->packageMapper);
+        $packageInstaller->installPackage($package, $this->getUser());
 
         $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
     }
