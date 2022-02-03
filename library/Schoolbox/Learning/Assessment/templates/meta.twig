@@ -20,7 +20,7 @@
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
     {% endif %}
-    {% if participant is null and 'student' == student.role.type %}
+    {% if participant is null and student.role.isStudent %}
         <li class="icon-close">Excluded from {{ locale.assessment }}</li>
     {% endif %}
 </ul>
