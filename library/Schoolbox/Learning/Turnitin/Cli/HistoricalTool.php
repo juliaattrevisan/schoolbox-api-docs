@@ -135,15 +135,15 @@ HELP;
             /* Interpret the date range from cli options
              */
             if ($this->getOpt(self::OPT_LONG_START)) {
-                $start = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_START)));
+                $start = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_START)))->startOfDay();
             } else {
-                $start = \Alaress_Date_Format::now()->addYears(-1);
+                $start = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
             }
 
             if ($this->getOpt(self::OPT_LONG_END)) {
-                $end = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_END)));
+                $end = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_END)))->endOfDay();
             } else {
-                $end = \Alaress_Date_Format::now();
+                $end = \Alaress_Date_Format::now()->endOfDay();
             }
 
             $this->getLogger()->debug(sprintf(
