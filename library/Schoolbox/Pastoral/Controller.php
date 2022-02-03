@@ -1125,7 +1125,14 @@ class Controller extends Base
                     ->replace(trim($post->get('body_public')), $student)
             );
 
-            $record->setBodyPrivate(trim($post->get('body_private')));
+            /* Perform token replacements, basically a square bracket phplib
+             * that performs a one-way substitution
+             */
+            $record->setBodyPrivate(
+                (new TokenReplacer\Student(new TokenReplacer\Simple()))
+                    ->replace(trim($post->get('body_private')), $student)
+            );
+
             $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
 
             // Only set owner if this is a new record
