@@ -12,8 +12,8 @@ use GuzzleHttp\Exception\RequestException as RequestException;
  */
 abstract class Alaress_Cache_Abstract
 {
-    private const REQUEST_TIMEOUT = 5;
-    private const CONNECT_TIMEOUT = 5;
+    private const REQUEST_TIMEOUT = 20;
+    private const CONNECT_TIMEOUT = 10;
 
     /**
      * The url of the stream you just got
