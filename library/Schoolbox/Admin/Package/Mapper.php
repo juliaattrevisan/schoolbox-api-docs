@@ -15,6 +15,7 @@ use Schoolbox\Mapper as BaseMapper;
  * Mapper for Schoolbox Installation Packages
  *
  * @package Schoolbox\Admin\Package
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {

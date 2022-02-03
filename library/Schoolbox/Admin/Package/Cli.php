@@ -137,7 +137,7 @@ HELP;
             } else {
                 $this->getLogger()->alert("Would have installed {$package->getTitle()}");
             }
-        } catch (\Schoolbox\Application\Exception\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             if (null !== $e->getPrevious()) {
                 $this->getLogger()->error("Previous Error:{$e->getPrevious()->getMessage()}");
             }
