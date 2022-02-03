@@ -4,7 +4,6 @@ import { insertElementBefore, insertElementAfter, getClosestElement, isElementAb
 import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from '../existingComponents/saveComponentOrder';
 import { ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
-import { animate } from 'highcharts';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -261,9 +260,11 @@ function putComponentBackIntoTabs () {
     const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
     
     __newComponentPaletteContainer.appendChild(__referenceElement);
+    
     __referenceElement.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
     __newComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
-    
+
+    saveComponentsNewPosition();
     animateFlip(state);
 
 }
@@ -292,15 +293,7 @@ function addNewComponentToPage (closestElement, isShiftingDown) {
     __referenceElement.style.marginBottom = '2rem'; //existing components all have a margin
     __newComponent.style.marginBottom = '2rem'; //existing components all have a margin
 
-    clearFlipElements(); //check for flip bug
-    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
-    
-    __newComponent.dataset.leftDifference = __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
-    __newComponent.dataset.topDifference = (__referenceElement.getBoundingClientRect().top + window.scrollY) - parseInt(__referenceElement.dataset.originalTop);
-    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
-
-    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
-
+    saveComponentsNewPosition();
     animateFlip(state);
     
 }
@@ -308,14 +301,13 @@ function addNewComponentToPage (closestElement, isShiftingDown) {
 /**
  * Show either the new component being added to the page, or being put back into the tabs
  */
-function animateFlip (state) {
-    Flip.from(state, {
-        duration: ANIMATE_SPEED,
-        onComplete: () => {
-            __isFlipping = false;
-            onDrag(); //check after Flip to see if another is required
-        }
-    });
+function saveComponentsNewPosition () {
+    clearFlipElements(); //check for flip bug
+    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
+    __newComponent.dataset.leftDifference = __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+    __newComponent.dataset.topDifference = (__referenceElement.getBoundingClientRect().top + window.scrollY) - parseInt(__referenceElement.dataset.originalTop);
+    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
+    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
 }
 
 /**
@@ -323,9 +315,24 @@ function animateFlip (state) {
  * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
  */
  function clearFlipElements () {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
+    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer) => {
         if (parentContainer.children.length === 1 && !parentContainer.children[0].id) { //there's the flip element here, so we should clear it out
             parentContainer.removeChild(parentContainer.children[0]);
+        }
+    });
+}
+
+/**
+ * Show either the new component being added to the page, or being put back into the tabs
+ * 
+ * @param { FlipState }
+ */
+function animateFlip (state) {
+    Flip.from(state, {
+        duration: ANIMATE_SPEED,
+        onComplete: () => {
+            __isFlipping = false;
+            onDrag(); //check after Flip to see if another is required
         }
     });
 }
