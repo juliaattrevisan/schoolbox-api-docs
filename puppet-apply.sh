@@ -27,7 +27,7 @@ function main() {
   local manifest_file
   manifest_file=$(find /tmp/vagrant-puppet/ -maxdepth 1 -iname 'manifests-*')"/site.pp"
 
-  FACTER_primary_php_majver='8.0' /opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/puppet/bin/puppet apply \
+  FACTER_primary_php_majver='7.4' /opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/puppet/bin/puppet apply \
     --modulepath "$module_path" \
     --hiera_config="$hiera_config" \
     --detailed-exitcodes \
