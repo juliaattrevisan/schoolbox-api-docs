@@ -334,26 +334,25 @@
                  * current value is the same as the Subtype template or if the General
                  * Template's current value is empty string
                  */
-                replaceTemplate($.trim(subtypesIndex[subtypeVal]));
-                replaceTemplatePrivate($.trim(subtypesIndexPrivate[subtypeVal]));
+                replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
                  * html iff the General Template's current value is the same as the
                  * Type template or if the General Template's current value is empty string
                  */
-                replaceTemplate($.trim(typesIndex[typeVal]));
-                replaceTemplatePrivate($.trim(typesIndexPrivate[typeVal]));
+                replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
             }
         }
 
 
         /**
-         * Put a Subtype template html into General
+         * Put a Subtype template html into General and Confidential
          *
          * @param template
+         * @param templatePrivate
          */
-        function replaceTemplate(template) {
+        function replaceTemplate(template, templatePrivate) {
             /**
              * Normalizes spaces in the value: required for determining whether a
              * CKEditor's current value has meaningfully changed from its template.
@@ -365,6 +364,7 @@
                 return $.trim(value.replace(/\s+/g, ' '));
             };
             let current = normalizeSpace(generalTemplate.getData());
+            let currentPrivate = normalizeSpace(confidentialTemplate.getData());
 
             /* If the current data is the same as the template contents,
              * then you're safe to swap it to another template
@@ -375,34 +375,9 @@
                 generalTemplate.setData(template);
                 lastTemplate = template;
             }
-        }
-
-        /**
-         * Put a Subtype template html into Confidential
-         *
-         * @param template
-         */
-        function replaceTemplatePrivate(template) {
-            /**
-             * Normalizes spaces in the value: required for determining whether a
-             * CKEditor's current value has meaningfully changed from its template.
-             *
-             * @param {String} value
-             * @returns {String}
-             */
-            let normalizeSpace = function (value) {
-                return $.trim(value.replace(/\s+/g, ' '));
-            };
-            let current = normalizeSpace(confidentialTemplate.getData());
-
-            /* If the current data is the same as the template contents,
-             * then you're safe to swap it to another template
-             *
-             * If the current data is empty, you can fill it with another template
-             */
-            if (current === '' || current === normalizeSpace(lastTemplatePrivate)) {
-                confidentialTemplate.setData(template);
-                lastTemplatePrivate = template;
+            if (currentPrivate === '' || currentPrivate === normalizeSpace(lastTemplatePrivate)) {
+                confidentialTemplate.setData(templatePrivate);
+                lastTemplatePrivate = templatePrivate;
             }
         }
     });

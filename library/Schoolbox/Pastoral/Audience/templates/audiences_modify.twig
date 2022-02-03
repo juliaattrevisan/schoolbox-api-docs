@@ -181,7 +181,7 @@
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="template">Confidential Template</label>
+                            <label for="templatePrivate">Confidential Template</label>
 
                             <p class="meta">
                                 This text will automatically populate into the confidential text of a {{ locale.pastoral }}
@@ -194,49 +194,6 @@
                                 {% autoescape 'js' %}
                                 $(function () {
                                     $('#templatePrivate').alaressEditor($.alaressEditorConfigWithUserTokens());
-
-                                    let colorInput = document.getElementById('pastoralColor'),
-                                            iconSelect = document.getElementById('pastoralIcon'),
-                                            flagPreview = document.getElementById('pastoralFlagPreview');
-                                    $(colorInput).spectrum({
-                                        allowEmpty: false,
-                                        showAlpha: false,
-                                        showInput: true,
-                                        preferredFormat: 'hex',
-                                        clickoutFiresChange: true,
-                                        showInitial: true,
-                                    });
-
-                                    $().add(colorInput).add(iconSelect).on('change', function () {
-                                        let color = colorInput.value,
-                                                icon = iconSelect.value;
-                                        if (color.length === 0 || icon.length === 0) {
-                                            flagPreview.classList.add('hide');
-                                        } else {
-                                            // Remove hide and all icon classes
-                                            flagPreview.classList.remove('hide');
-                                            flagPreview.classList.remove(
-                                                    ...Array.from(flagPreview.classList.values()).filter((v) => v.startsWith('icon-'))
-                                            );
-
-                                            // Add new icon class and set color
-                                            flagPreview.classList.add('icon-' + icon);
-                                            flagPreview.style.color = color;
-
-                                            // Background color:
-                                            // same hue/saturation/alpha as foreground,
-                                            // but contrasting luminance
-                                            let colorHsl = new tinycolor(color).toHsl(),
-                                                    baseBackgroundHsl = tinycolor.mostReadable(color, ['{{ flagColors.baseLight }}', '{{ flagColors.baseDark }}']).toHsl(),
-                                                    actualBackground = new tinycolor({
-                                                        h: colorHsl.h,
-                                                        s: colorHsl.s,
-                                                        l: baseBackgroundHsl.l,
-                                                        a: colorHsl.a,
-                                                    });
-                                            flagPreview.style.backgroundColor = actualBackground.toHslString();
-                                        }
-                                    });
                                 });
                                 {% endautoescape %}
                             </script>
