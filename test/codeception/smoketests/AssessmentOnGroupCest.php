@@ -490,8 +490,6 @@ class AssessmentOnGroupCest
 
 
         #WHEN
-        $i->impersonateUser($admin->getId());
-
         $referrer                = "/learning/assessments/$assessmentPageId/{$admin->getId()}/submit";
         $url                     = "/learning/assessments/$assessmentPageId/{$admin->getId()}/submit";
         $submitAssessmentPayload = new Payload\Base('POST', $referrer, $url);
