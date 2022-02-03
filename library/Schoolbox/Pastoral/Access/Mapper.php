@@ -76,11 +76,11 @@ class Mapper extends BaseMapper
         // (e.g. An access is for a User, and user is soft-deleted)
 
         return "
-			SELECT      {$this->getColumnString()},
+            SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('role', 'r')},
                         {$this->getJoinColumnString('user', 'u')},
                         {$this->getJoinColumnString('group', 'g')}
-			FROM        {$this->getTable()}
+            FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
@@ -98,9 +98,9 @@ class Mapper extends BaseMapper
         $results = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            // The record must have a user, role or group specified
+            // The record must have a user, role, role type or group specified
 
-            if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
+            if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id']) && empty($row['role_type'])) {
                 continue;
             }
 
