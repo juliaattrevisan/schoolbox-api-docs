@@ -67,7 +67,7 @@ class Installer implements IPackageInstall
          */
         foreach ($csv as $row) {
             $node = $curriculumMapper->createModel()
-                ->setParent($row['curriculum_node_parent_id'] !== 'NULL' ? $parentLookup[$row['curriculum_node_parent_id']] : null)
+                ->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null)
                 ->setName($row['name'])
                 ->setDescription($row['description'])
                 ->setCode($row['code'])

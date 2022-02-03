@@ -1,5 +1,5 @@
 id,curriculum_node_parent_id,name,code,order,description
-1,NULL,General Capabilities,,0,
+1,,General Capabilities,,0,
 2,1,Ethical Understanding,GCEU,0,
 3,2,Understanding ethical concepts and issues,GCEU-UECI,0,
 4,3,Recognise ethical concepts,GCEU-REC,0,

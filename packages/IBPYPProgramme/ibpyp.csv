@@ -1,106 +1,106 @@
 id,curriculum_node_parent_id,curriculum_learning_level_id,curriculum_learning_area_id,name,code,reference,order,description,created_at,modified_at,deleted_at
-1,NULL,NULL,NULL,"PYP Transdisciplinary themes",,,0,,"2021-11-17 09:39:07","2021-11-17 09:39:07",NULL
-2,1,NULL,NULL,"Who we are",P-TT-WW,,0,,"2021-11-17 09:39:28","2021-11-17 09:39:28",NULL
-3,2,NULL,NULL,"An inquiry into the nature of the self",P-TT-WW-a,,0,,"2021-11-17 09:40:06","2021-11-17 09:40:06",NULL
-4,2,NULL,NULL,"An inquiry into beliefs and values",P-TT-WW-b,,0,,"2021-11-17 09:40:17","2021-11-17 09:40:17",NULL
-5,2,NULL,NULL,"An inquiry into personal, physical, mental, social and spiritual health",P-TT-WW-c,,0,,"2021-11-17 09:40:28","2021-11-17 09:40:28",NULL
-6,2,NULL,NULL,"An inquiry into human relationships including families, friends, communities and cultures",P-TT-WW-d,,0,,"2021-11-17 09:42:45","2021-11-17 09:42:45",NULL
-7,2,NULL,NULL,"An inquiry into rights and responsibilities",P-TT-WW-e,,0,,"2021-11-17 09:42:57","2021-11-17 09:42:57",NULL
-8,2,NULL,NULL,"An inquiry into what it means to be human",P-TT-WW-f,,0,,"2021-11-17 09:43:07","2021-11-17 09:43:07",NULL
-9,1,NULL,NULL,"Where we are in place in and time",P-TT-PT,,0,,"2021-11-17 09:43:19","2021-11-17 09:43:19",NULL
-10,9,NULL,NULL,"An inquiry into orientation in place and time",P-TT-PT-a,,0,,"2021-11-17 09:43:32","2021-11-17 09:43:32",NULL
-11,9,NULL,NULL,"An inquiry into personal histories",P-TT-PT-b,,0,,"2021-11-17 09:43:43","2021-11-17 09:43:43",NULL
-12,9,NULL,NULL,"An inquiry into homes and journeys.",P-TT-PT-c,,0,,"2021-11-17 09:46:41","2021-11-17 09:46:41",NULL
-13,9,NULL,NULL,"An inquiry into the discoveries, explorations and migrations of humankind",P-TT-PT-d,,0,,"2021-11-17 09:46:54","2021-11-17 09:46:54",NULL
-14,9,NULL,NULL,"An inquiry into the relationships between, and the interconnectedness of, individuals and civilizations from local and global perspectives",P-TT-PT-e,,0,,"2021-11-17 09:47:04","2021-11-17 09:47:04",NULL
-15,1,NULL,NULL,"How we express ourselves",P-TT-EX,,0,,"2021-11-17 09:47:18","2021-11-17 09:47:18",NULL
-16,15,NULL,NULL,"An inquiry into the ways in which we discover and express ideas, feelings, nature, culture, beliefs and values",P-TT-EX-a,,0,,"2021-11-17 09:47:28","2021-11-17 09:47:28",NULL
-17,15,NULL,NULL,"An inquiry into the ways in which we reflect on, extend and enjoy our creativity",P-TT-EX-b,,0,,"2021-11-17 09:47:40","2021-11-17 09:47:40",NULL
-18,15,NULL,NULL,"An inquiry into our appreciation of the aesthetic",P-TT-EX-c,,0,,"2021-11-17 09:47:51","2021-11-17 09:47:51",NULL
-19,1,NULL,NULL,"How the world works",P-TT-WO,,0,,"2021-11-17 09:51:15","2021-11-17 09:51:22",NULL
-20,19,NULL,NULL,"An inquiry into the natural world and its laws",P-TT-WO-a,,0,,"2021-11-17 09:51:30","2021-11-17 09:51:30",NULL
-21,19,NULL,NULL,"An inquiry into the interaction between the natural world (physical and biological) and human societies",P-TT-WO-b,,0,,"2021-11-17 09:51:41","2021-11-17 09:51:41",NULL
-22,19,NULL,NULL,"An inquiry into how humans use their understanding of scientific principles",P-TT-WO-c,,0,,"2021-11-17 09:51:52","2021-11-17 09:51:52",NULL
-23,19,NULL,NULL,"An inquiry into the impact of scientific and technological advances on society and on the environment",P-TT-WO-d,,0,,"2021-11-17 09:52:02","2021-11-17 09:52:02",NULL
-24,1,NULL,NULL,"How we organize ourselves",P-TT-OR,,0,,"2021-11-17 09:52:16","2021-11-17 09:52:16",NULL
-25,24,NULL,NULL,"An inquiry into the interconnectedness of human-made systems and communities",P-TT-OR-a,,0,,"2021-11-17 09:52:25","2021-11-17 09:52:25",NULL
-26,24,NULL,NULL,"An inquiry into the structure and function of organizations",P-TT-OR-b,,0,,"2021-11-17 09:52:35","2021-11-17 09:52:35",NULL
-27,24,NULL,NULL,"An inquiry into societal decision making",P-TT-OR-c,,0,,"2021-11-17 09:52:49","2021-11-17 09:52:49",NULL
-28,24,NULL,NULL,"An inquiry into economic activities and their impact on humankind and the environment",P-TT-OR-d,,0,,"2021-11-17 09:52:58","2021-11-17 09:52:58",NULL
-29,1,NULL,NULL,"Sharing the planet",P-TT-SH,,0,,"2021-11-17 09:53:11","2021-11-17 09:53:11",NULL
-30,29,NULL,NULL,"An inquiry into rights and responsibilities in the struggle to share finite resources with other people and with other living things",P-TT-SH-a,,0,,"2021-11-17 09:53:22","2021-11-17 09:53:22",NULL
-31,29,NULL,NULL,"An inquiry into communities and the relationships within and between them",P-TT-SH-b,,0,,"2021-11-17 09:53:33","2021-11-17 09:53:33",NULL
-32,29,NULL,NULL,"An inquiry into access to equal opportunities",P-TT-SH-c,,0,,"2021-11-17 09:53:42","2021-11-17 09:53:42",NULL
-33,29,NULL,NULL,"An inquiry into peace and conflict resolution",P-TT-SH-d,,0,,"2021-11-17 09:53:52","2021-11-17 09:53:52",NULL
-34,NULL,NULL,NULL,"PYP Key Concepts",,,0,"A concept is a “big idea”—a principle or notion that is enduring and is not constrained by a particular origin, subject matter or place in time (Erickson 2008). Concepts represent ideas that are broad, abstract, timeless and universal. Concepts add depth and rigour in student thinking to the traditional “two dimensional” curriculum consisting of facts and skills. Concepts place no limits on breadth of knowledge or on depth of understanding, and therefore are accessible to every student.
-","2021-11-17 09:54:14","2021-11-17 09:54:14",NULL
-35,34,NULL,NULL,Form,P-KC-FO,,0,"What is it like?
+1,,,,"PYP Transdisciplinary themes",,,0,,"2021-11-17 09:39:07","2021-11-17 09:39:07",
+2,1,,,"Who we are",P-TT-WW,,0,,"2021-11-17 09:39:28","2021-11-17 09:39:28",
+3,2,,,"An inquiry into the nature of the self",P-TT-WW-a,,0,,"2021-11-17 09:40:06","2021-11-17 09:40:06",
+4,2,,,"An inquiry into beliefs and values",P-TT-WW-b,,0,,"2021-11-17 09:40:17","2021-11-17 09:40:17",
+5,2,,,"An inquiry into personal, physical, mental, social and spiritual health",P-TT-WW-c,,0,,"2021-11-17 09:40:28","2021-11-17 09:40:28",
+6,2,,,"An inquiry into human relationships including families, friends, communities and cultures",P-TT-WW-d,,0,,"2021-11-17 09:42:45","2021-11-17 09:42:45",
+7,2,,,"An inquiry into rights and responsibilities",P-TT-WW-e,,0,,"2021-11-17 09:42:57","2021-11-17 09:42:57",
+8,2,,,"An inquiry into what it means to be human",P-TT-WW-f,,0,,"2021-11-17 09:43:07","2021-11-17 09:43:07",
+9,1,,,"Where we are in place in and time",P-TT-PT,,0,,"2021-11-17 09:43:19","2021-11-17 09:43:19",
+10,9,,,"An inquiry into orientation in place and time",P-TT-PT-a,,0,,"2021-11-17 09:43:32","2021-11-17 09:43:32",
+11,9,,,"An inquiry into personal histories",P-TT-PT-b,,0,,"2021-11-17 09:43:43","2021-11-17 09:43:43",
+12,9,,,"An inquiry into homes and journeys.",P-TT-PT-c,,0,,"2021-11-17 09:46:41","2021-11-17 09:46:41",
+13,9,,,"An inquiry into the discoveries, explorations and migrations of humankind",P-TT-PT-d,,0,,"2021-11-17 09:46:54","2021-11-17 09:46:54",
+14,9,,,"An inquiry into the relationships between, and the interconnectedness of, individuals and civilizations from local and global perspectives",P-TT-PT-e,,0,,"2021-11-17 09:47:04","2021-11-17 09:47:04",
+15,1,,,"How we express ourselves",P-TT-EX,,0,,"2021-11-17 09:47:18","2021-11-17 09:47:18",
+16,15,,,"An inquiry into the ways in which we discover and express ideas, feelings, nature, culture, beliefs and values",P-TT-EX-a,,0,,"2021-11-17 09:47:28","2021-11-17 09:47:28",
+17,15,,,"An inquiry into the ways in which we reflect on, extend and enjoy our creativity",P-TT-EX-b,,0,,"2021-11-17 09:47:40","2021-11-17 09:47:40",
+18,15,,,"An inquiry into our appreciation of the aesthetic",P-TT-EX-c,,0,,"2021-11-17 09:47:51","2021-11-17 09:47:51",
+19,1,,,"How the world works",P-TT-WO,,0,,"2021-11-17 09:51:15","2021-11-17 09:51:22",
+20,19,,,"An inquiry into the natural world and its laws",P-TT-WO-a,,0,,"2021-11-17 09:51:30","2021-11-17 09:51:30",
+21,19,,,"An inquiry into the interaction between the natural world (physical and biological) and human societies",P-TT-WO-b,,0,,"2021-11-17 09:51:41","2021-11-17 09:51:41",
+22,19,,,"An inquiry into how humans use their understanding of scientific principles",P-TT-WO-c,,0,,"2021-11-17 09:51:52","2021-11-17 09:51:52",
+23,19,,,"An inquiry into the impact of scientific and technological advances on society and on the environment",P-TT-WO-d,,0,,"2021-11-17 09:52:02","2021-11-17 09:52:02",
+24,1,,,"How we organize ourselves",P-TT-OR,,0,,"2021-11-17 09:52:16","2021-11-17 09:52:16",
+25,24,,,"An inquiry into the interconnectedness of human-made systems and communities",P-TT-OR-a,,0,,"2021-11-17 09:52:25","2021-11-17 09:52:25",
+26,24,,,"An inquiry into the structure and function of organizations",P-TT-OR-b,,0,,"2021-11-17 09:52:35","2021-11-17 09:52:35",
+27,24,,,"An inquiry into societal decision making",P-TT-OR-c,,0,,"2021-11-17 09:52:49","2021-11-17 09:52:49",
+28,24,,,"An inquiry into economic activities and their impact on humankind and the environment",P-TT-OR-d,,0,,"2021-11-17 09:52:58","2021-11-17 09:52:58",
+29,1,,,"Sharing the planet",P-TT-SH,,0,,"2021-11-17 09:53:11","2021-11-17 09:53:11",
+30,29,,,"An inquiry into rights and responsibilities in the struggle to share finite resources with other people and with other living things",P-TT-SH-a,,0,,"2021-11-17 09:53:22","2021-11-17 09:53:22",
+31,29,,,"An inquiry into communities and the relationships within and between them",P-TT-SH-b,,0,,"2021-11-17 09:53:33","2021-11-17 09:53:33",
+32,29,,,"An inquiry into access to equal opportunities",P-TT-SH-c,,0,,"2021-11-17 09:53:42","2021-11-17 09:53:42",
+33,29,,,"An inquiry into peace and conflict resolution",P-TT-SH-d,,0,,"2021-11-17 09:53:52","2021-11-17 09:53:52",
+34,,,,"PYP Key Concepts",,,0,"A concept is a “big idea”—a principle or notion that is enduring and is not constrained by a particular origin, subject matter or place in time (Erickson 2008). Concepts represent ideas that are broad, abstract, timeless and universal. Concepts add depth and rigour in student thinking to the traditional “two dimensional” curriculum consisting of facts and skills. Concepts place no limits on breadth of knowledge or on depth of understanding, and therefore are accessible to every student.
+","2021-11-17 09:54:14","2021-11-17 09:54:14",
+35,34,,,Form,P-KC-FO,,0,"What is it like?
 The understanding that everything has a form with recognizable features that can be observed, identified, described and categorized.
-","2021-11-17 09:54:48","2021-11-17 09:54:48",NULL
-36,34,NULL,NULL,Function,P-KC-FU,,0,"How does it work?
+","2021-11-17 09:54:48","2021-11-17 09:54:48",
+36,34,,,Function,P-KC-FU,,0,"How does it work?
 The understanding that everything has a purpose, a role or a way of behaving that can be investigated.
-","2021-11-17 09:55:09","2021-11-17 09:55:09",NULL
-37,34,NULL,NULL,Causation,P-KC-CA,,0,"Why is it as it is?
+","2021-11-17 09:55:09","2021-11-17 09:55:09",
+37,34,,,Causation,P-KC-CA,,0,"Why is it as it is?
 The understanding that things do not just happen; there are causal relationships at work, and that actions have consequences.
-","2021-11-17 09:55:26","2021-11-17 09:55:26",NULL
-38,34,NULL,NULL,Change,P-KC-CH,,0,"How is it transforming?
+","2021-11-17 09:55:26","2021-11-17 09:55:26",
+38,34,,,Change,P-KC-CH,,0,"How is it transforming?
 The understanding that change is the process of movement from one state to another. It is universal and inevitable.
-","2021-11-17 09:55:43","2021-11-17 09:55:43",NULL
-39,34,NULL,NULL,Connection,P-KC-CO,,0,"How is it linked to other things?
+","2021-11-17 09:55:43","2021-11-17 09:55:43",
+39,34,,,Connection,P-KC-CO,,0,"How is it linked to other things?
 The understanding that we live in a world of interacting systems in which the actions of any individual element affect others.
-","2021-11-17 09:55:57","2021-11-17 09:55:57",NULL
-40,34,NULL,NULL,Perspective,P-KC-PE,,0,"What are the points of view?
+","2021-11-17 09:55:57","2021-11-17 09:55:57",
+40,34,,,Perspective,P-KC-PE,,0,"What are the points of view?
 The uderstanding that knowledge is moderated by different points of view which lead to different interpretations, understandings and findings; perspectives may be individual, group, cultural or subject-specific.
-","2021-11-17 09:56:15","2021-11-17 09:56:15",NULL
-41,34,NULL,NULL,Responsibility,P-KC-RE,,0,"What are our obligations?
+","2021-11-17 09:56:15","2021-11-17 09:56:15",
+41,34,,,Responsibility,P-KC-RE,,0,"What are our obligations?
 The understanding that people make choices based on their understandings, beliefs and values, and the actions they take as a result do make a difference.
-","2021-11-17 09:56:30","2021-11-17 09:56:30",NULL
-42,NULL,NULL,NULL,"PYP Approaches to Learning",,,0,"Beyond the skills of literacy and numeracy, there is a range of interrelated approaches to learning that are  transferable across contexts. These skills support purposeful inquiry and set the foundations for lifelong  learning. The development of these skills is frequently identified in education literature as crucial in supporting students to effectively learn and succeed inside and outside of school. 
-","2021-11-17 09:58:31","2021-11-17 09:58:31",NULL
-43,42,NULL,NULL,"Thinking skills",P-ATL-TH,,0,,"2021-11-17 09:58:45","2021-11-17 09:58:45",NULL
-44,43,NULL,NULL,"Critical thinking",P-ATL-THCI,,0,"Analysing and evaluating issues and ideas, and forming decisions.
-","2021-11-17 09:59:03","2021-11-17 09:59:03",NULL
-45,44,NULL,NULL,"Analysing - Observe carefully in order to recognize problems",P-ATL-THCI-a,,0,,"2021-11-17 09:59:19","2021-11-17 09:59:19",NULL
-46,44,NULL,NULL,"Analysing - Consider meaning of materials",P-ATL-THCI-b,,0,,"2021-11-17 09:59:29","2021-11-17 09:59:29",NULL
-47,44,NULL,NULL,"Analysing - Take knowledge or ideas apart by separating them into component parts",P-ATL-THCI-c,,0,,"2021-11-17 09:59:50","2021-11-17 09:59:50",NULL
-48,44,NULL,NULL,"Analysing - Use models and simulations to explore complex systems and issues",P-ATL-THCI-d,,0,,"2021-11-17 10:00:01","2021-11-17 10:00:01",NULL
-49,44,NULL,NULL,"Evaluating - Organize relevant information to formulate an argument",P-ATL-THCI-e,,0,,"2021-11-17 10:00:41","2021-11-17 10:00:41",NULL
-50,44,NULL,NULL,"Evaluating - Evaluate evidence and arguments, and associated decisions",P-ATL-THCI-f,,0,,"2021-11-17 10:00:51","2021-11-17 10:00:51",NULL
-51,44,NULL,NULL,"Evaluating - Recognize unstated assumptions and biases",P-ATL-THCI-g,,0,,"2021-11-17 10:01:02","2021-11-17 10:01:02",NULL
-52,44,NULL,NULL,"Evaluating - Consider ideas from multiple perspectives",P-ATL-THCI-h,,0,,"2021-11-17 10:01:11","2021-11-17 10:01:11",NULL
-53,44,NULL,NULL,"Evaluating - Synthesize new understandings by finding unique characteristics; seeing relationships and connections",P-ATL-THCI-i,,0,,"2021-11-17 10:01:40","2021-11-17 10:01:40",NULL
-54,44,NULL,NULL,"Evaluating - Test generalizations and conclusions",P-ATL-THCI-j,,0,,"2021-11-17 10:01:53","2021-11-17 10:01:53",NULL
-55,44,NULL,NULL,"Evaluating - Identify obstacles and challenges",P-ATL-THCI-k,,0,,"2021-11-17 10:02:03","2021-11-17 10:02:03",NULL
-56,44,NULL,NULL,"Forming decisions - Develop contrary or opposing arguments",P-ATL-THCI-l,,0,,"2021-11-17 10:02:16","2021-11-17 10:02:16",NULL
-57,44,NULL,NULL,"Forming decisions - Propose and evaluate a variety of solutions",P-ATL-THCI-m,,0,,"2021-11-17 10:02:28","2021-11-17 10:02:28",NULL
-58,44,NULL,NULL,"Forming decisions - Revise understandings based on new information and evidence",P-ATL-THCI-n,,0,,"2021-11-17 10:02:40","2021-11-17 10:02:40",NULL
-59,44,NULL,NULL,"Forming decisions - Draw conclusions and generalizations",P-ATL-THCI-o,,0,,"2021-11-17 10:02:50","2021-11-17 10:02:50",NULL
-60,43,NULL,NULL,"Creative thinking",P-ATL-THCE,,0,"Generating novel ideas and considering new perspectives
-","2021-11-17 10:03:27","2021-11-17 10:03:27",NULL
-61,60,NULL,NULL,"Generating novel ideas - Use discussions and diagrams to generate new ideas and inquiries",P-ATL-THCE-a,,0,,"2021-11-17 10:04:55","2021-11-17 10:04:55",NULL
-62,60,NULL,NULL,"Generating novel ideas - Practise “visible thinking” strategies and techniques",P-ATL-THCE-b,,0,,"2021-11-17 10:05:06","2021-11-17 10:05:06",NULL
-63,60,NULL,NULL,"Generating novel ideas - Make unexpected or unusual connections between objects and/or ideas",P-ATL-THCE-c,,0,,"2021-11-17 10:05:20","2021-11-17 10:05:20",NULL
-64,60,NULL,NULL,"Generating novel ideas - Design improvements to existing products, processes, media and technologies",P-ATL-THCE-d,,0,,"2021-11-17 10:05:32","2021-11-17 10:05:32",NULL
-65,60,NULL,NULL,"Considering new perspectives - Ask “what if” questions and generate testable hypotheses",P-ATL-THCE-e,,0,,"2021-11-17 10:05:44","2021-11-17 10:05:44",NULL
-66,60,NULL,NULL,"Considering new perspectives - Apply existing knowledge to design new products processes, media and technologies",P-ATL-THCE-f,,0,,"2021-11-17 10:05:55","2021-11-17 10:05:55",NULL
-67,60,NULL,NULL,"Considering new perspectives - Consider multiple alternatives, including those that might be unlikely or impossible",P-ATL-THCE-g,,0,,"2021-11-17 10:06:07","2021-11-17 10:06:07",NULL
-68,60,NULL,NULL,"Considering new perspectives - Practise flexible thinking—develop multiple opposing, contradictory and complementary arguments",P-ATL-THCE-h,,0,,"2021-11-17 10:06:32","2021-11-17 10:06:32",NULL
-69,60,NULL,NULL,"Considering new perspectives - Practise “visible thinking” strategies and techniques",P-ATL-THCE-i,,0,,"2021-11-17 10:06:43","2021-11-17 10:06:43",NULL
-70,60,NULL,NULL,"Considering new perspectives - Generate metaphors and analogies",P-ATL-THCE-j,,0,,"2021-11-17 10:06:53","2021-11-17 10:06:53",NULL
-71,43,NULL,NULL,"Information Transfer",P-ATL-THTR,,0,"Using skills and knowledge in multiple contexts.
-","2021-11-17 10:07:13","2021-11-17 10:07:13",NULL
-72,71,NULL,NULL,"Use memory techniques to develop long-term memory",P-ATL-THTR-a,,0,,"2021-11-17 10:07:28","2021-11-17 10:07:28",NULL
-73,71,NULL,NULL,"Inquire in different contexts to gain different perspectives",P-ATL-THTR-b,,0,,"2021-11-17 10:07:38","2021-11-17 10:07:38",NULL
-74,71,NULL,NULL,"Make connections between units of inquiry and between subjects",P-ATL-THTR-c,,0,,"2021-11-17 10:07:49","2021-11-17 10:07:49",NULL
-75,71,NULL,NULL,"Transfer conceptual understandings across transdisciplinary themes and subjects",P-ATL-THTR-d,,0,,"2021-11-17 10:08:03","2021-11-17 10:08:03",NULL
-76,71,NULL,NULL,"Combine knowledge, conceptual understandings and skills to create products or solutions",P-ATL-THTR-e,,0,,"2021-11-17 10:08:21","2021-11-17 10:08:21",NULL
-77,71,NULL,NULL,"Apply skills and knowledge in unfamiliar situations or outside of school",P-ATL-THTR-f,,0,,"2021-11-17 10:08:31","2021-11-17 10:08:31",NULL
-78,71,NULL,NULL,"Help others develop conceptual understandings and skills",P-ATL-THTR-g,,0,,"2021-11-17 10:08:40","2021-11-17 10:08:40",NULL
-79,43,NULL,NULL,"Reflection and metacognition",P-ATL-THRE,,0,"Using thinking skills to reflect on the process of learning
-","2021-11-17 10:08:58","2021-11-17 10:08:58",NULL
-80,79,NULL,NULL,"Identify strengths and areas for improvement",P-ATL-THTR-a,,0,,"2021-11-17 10:09:07","2021-11-17 10:09:07",NULL
-81,79,NULL,NULL,"Consider new skills, techniques and strategies for effective learning",P-ATL-THTR-b,,0,,"2021-11-17 10:09:16","2021-11-17 10:09:16",NULL
-82,79,NULL,NULL,"Record thinking and reflection processes",P-ATL-THTR-c,,0,"Reflect on their learning by asking questions such as:
+","2021-11-17 09:56:30","2021-11-17 09:56:30",
+42,,,,"PYP Approaches to Learning",,,0,"Beyond the skills of literacy and numeracy, there is a range of interrelated approaches to learning that are  transferable across contexts. These skills support purposeful inquiry and set the foundations for lifelong  learning. The development of these skills is frequently identified in education literature as crucial in supporting students to effectively learn and succeed inside and outside of school. 
+","2021-11-17 09:58:31","2021-11-17 09:58:31",
+43,42,,,"Thinking skills",P-ATL-TH,,0,,"2021-11-17 09:58:45","2021-11-17 09:58:45",
+44,43,,,"Critical thinking",P-ATL-THCI,,0,"Analysing and evaluating issues and ideas, and forming decisions.
+","2021-11-17 09:59:03","2021-11-17 09:59:03",
+45,44,,,"Analysing - Observe carefully in order to recognize problems",P-ATL-THCI-a,,0,,"2021-11-17 09:59:19","2021-11-17 09:59:19",
+46,44,,,"Analysing - Consider meaning of materials",P-ATL-THCI-b,,0,,"2021-11-17 09:59:29","2021-11-17 09:59:29",
+47,44,,,"Analysing - Take knowledge or ideas apart by separating them into component parts",P-ATL-THCI-c,,0,,"2021-11-17 09:59:50","2021-11-17 09:59:50",
+48,44,,,"Analysing - Use models and simulations to explore complex systems and issues",P-ATL-THCI-d,,0,,"2021-11-17 10:00:01","2021-11-17 10:00:01",
+49,44,,,"Evaluating - Organize relevant information to formulate an argument",P-ATL-THCI-e,,0,,"2021-11-17 10:00:41","2021-11-17 10:00:41",
+50,44,,,"Evaluating - Evaluate evidence and arguments, and associated decisions",P-ATL-THCI-f,,0,,"2021-11-17 10:00:51","2021-11-17 10:00:51",
+51,44,,,"Evaluating - Recognize unstated assumptions and biases",P-ATL-THCI-g,,0,,"2021-11-17 10:01:02","2021-11-17 10:01:02",
+52,44,,,"Evaluating - Consider ideas from multiple perspectives",P-ATL-THCI-h,,0,,"2021-11-17 10:01:11","2021-11-17 10:01:11",
+53,44,,,"Evaluating - Synthesize new understandings by finding unique characteristics; seeing relationships and connections",P-ATL-THCI-i,,0,,"2021-11-17 10:01:40","2021-11-17 10:01:40",
+54,44,,,"Evaluating - Test generalizations and conclusions",P-ATL-THCI-j,,0,,"2021-11-17 10:01:53","2021-11-17 10:01:53",
+55,44,,,"Evaluating - Identify obstacles and challenges",P-ATL-THCI-k,,0,,"2021-11-17 10:02:03","2021-11-17 10:02:03",
+56,44,,,"Forming decisions - Develop contrary or opposing arguments",P-ATL-THCI-l,,0,,"2021-11-17 10:02:16","2021-11-17 10:02:16",
+57,44,,,"Forming decisions - Propose and evaluate a variety of solutions",P-ATL-THCI-m,,0,,"2021-11-17 10:02:28","2021-11-17 10:02:28",
+58,44,,,"Forming decisions - Revise understandings based on new information and evidence",P-ATL-THCI-n,,0,,"2021-11-17 10:02:40","2021-11-17 10:02:40",
+59,44,,,"Forming decisions - Draw conclusions and generalizations",P-ATL-THCI-o,,0,,"2021-11-17 10:02:50","2021-11-17 10:02:50",
+60,43,,,"Creative thinking",P-ATL-THCE,,0,"Generating novel ideas and considering new perspectives
+","2021-11-17 10:03:27","2021-11-17 10:03:27",
+61,60,,,"Generating novel ideas - Use discussions and diagrams to generate new ideas and inquiries",P-ATL-THCE-a,,0,,"2021-11-17 10:04:55","2021-11-17 10:04:55",
+62,60,,,"Generating novel ideas - Practise “visible thinking” strategies and techniques",P-ATL-THCE-b,,0,,"2021-11-17 10:05:06","2021-11-17 10:05:06",
+63,60,,,"Generating novel ideas - Make unexpected or unusual connections between objects and/or ideas",P-ATL-THCE-c,,0,,"2021-11-17 10:05:20","2021-11-17 10:05:20",
+64,60,,,"Generating novel ideas - Design improvements to existing products, processes, media and technologies",P-ATL-THCE-d,,0,,"2021-11-17 10:05:32","2021-11-17 10:05:32",
+65,60,,,"Considering new perspectives - Ask “what if” questions and generate testable hypotheses",P-ATL-THCE-e,,0,,"2021-11-17 10:05:44","2021-11-17 10:05:44",
+66,60,,,"Considering new perspectives - Apply existing knowledge to design new products processes, media and technologies",P-ATL-THCE-f,,0,,"2021-11-17 10:05:55","2021-11-17 10:05:55",
+67,60,,,"Considering new perspectives - Consider multiple alternatives, including those that might be unlikely or impossible",P-ATL-THCE-g,,0,,"2021-11-17 10:06:07","2021-11-17 10:06:07",
+68,60,,,"Considering new perspectives - Practise flexible thinking—develop multiple opposing, contradictory and complementary arguments",P-ATL-THCE-h,,0,,"2021-11-17 10:06:32","2021-11-17 10:06:32",
+69,60,,,"Considering new perspectives - Practise “visible thinking” strategies and techniques",P-ATL-THCE-i,,0,,"2021-11-17 10:06:43","2021-11-17 10:06:43",
+70,60,,,"Considering new perspectives - Generate metaphors and analogies",P-ATL-THCE-j,,0,,"2021-11-17 10:06:53","2021-11-17 10:06:53",
+71,43,,,"Information Transfer",P-ATL-THTR,,0,"Using skills and knowledge in multiple contexts.
+","2021-11-17 10:07:13","2021-11-17 10:07:13",
+72,71,,,"Use memory techniques to develop long-term memory",P-ATL-THTR-a,,0,,"2021-11-17 10:07:28","2021-11-17 10:07:28",
+73,71,,,"Inquire in different contexts to gain different perspectives",P-ATL-THTR-b,,0,,"2021-11-17 10:07:38","2021-11-17 10:07:38",
+74,71,,,"Make connections between units of inquiry and between subjects",P-ATL-THTR-c,,0,,"2021-11-17 10:07:49","2021-11-17 10:07:49",
+75,71,,,"Transfer conceptual understandings across transdisciplinary themes and subjects",P-ATL-THTR-d,,0,,"2021-11-17 10:08:03","2021-11-17 10:08:03",
+76,71,,,"Combine knowledge, conceptual understandings and skills to create products or solutions",P-ATL-THTR-e,,0,,"2021-11-17 10:08:21","2021-11-17 10:08:21",
+77,71,,,"Apply skills and knowledge in unfamiliar situations or outside of school",P-ATL-THTR-f,,0,,"2021-11-17 10:08:31","2021-11-17 10:08:31",
+78,71,,,"Help others develop conceptual understandings and skills",P-ATL-THTR-g,,0,,"2021-11-17 10:08:40","2021-11-17 10:08:40",
+79,43,,,"Reflection and metacognition",P-ATL-THRE,,0,"Using thinking skills to reflect on the process of learning
+","2021-11-17 10:08:58","2021-11-17 10:08:58",
+80,79,,,"Identify strengths and areas for improvement",P-ATL-THTR-a,,0,,"2021-11-17 10:09:07","2021-11-17 10:09:07",
+81,79,,,"Consider new skills, techniques and strategies for effective learning",P-ATL-THTR-b,,0,,"2021-11-17 10:09:16","2021-11-17 10:09:16",
+82,79,,,"Record thinking and reflection processes",P-ATL-THTR-c,,0,"Reflect on their learning by asking questions such as:
 What did I learn today?
 What don’t I yet understand?
 What questions do I have now?
@@ -108,229 +108,229 @@ What can I already do?
 What will I work on next?
 What can I do to become a more effective learner?
 What factors are important for helping me learn well?
-","2021-11-17 10:09:26","2021-11-17 10:09:42",NULL
-83,79,NULL,NULL,"Have I been a principled and balanced thinker? (for example, considering ethical, cultural and environmental implications)",P-ATL-THTR-d,,0,,"2021-11-17 10:09:54","2021-11-17 10:09:54",NULL
-84,42,NULL,NULL,"Research skills",P-ATL-RE,,0,,"2021-11-17 10:10:07","2021-11-17 10:10:07",NULL
-85,84,NULL,NULL,"Information literacy",P-ATL-REIN,,0,"Formulating and planning, data gathering and recording, synthesizing and interpreting, evaluating and communicating.
-","2021-11-17 10:10:17","2021-11-17 10:10:26",NULL
-86,85,NULL,NULL,"Formulating and planning - Ask or design relevant questions of interest that can be researched",P-ATL-REIN-a,,0,,"2021-11-17 10:10:43","2021-11-17 10:10:43",NULL
-87,85,NULL,NULL,"Formulating and planning - Outline a plan for finding necessary information",P-ATL-REIN-b,,0,,"2021-11-17 10:10:54","2021-11-17 10:10:54",NULL
-88,85,NULL,NULL,"Formulating and planning - Evaluate and select appropriate information sources and/or digital tools based on the task",P-ATL-REIN-c,,0,,"2021-11-17 10:11:03","2021-11-17 10:11:03",NULL
-89,85,NULL,NULL,"Data gathering and recording - Gather information from a variety of primary and secondary sources",P-ATL-REIN-d,,0,,"2021-11-17 10:11:13","2021-11-17 10:11:13",NULL
-90,85,NULL,NULL,"Data gathering and recording - Use all senses to find and notice relevant details",P-ATL-REIN-e,,0,,"2021-11-17 10:11:24","2021-11-17 10:11:28",NULL
-91,85,NULL,NULL,"Data gathering and recording - Record observations by drawing, note taking, charting, tallying, writing statements, annotating images",P-ATL-REIN-f,,0,,"2021-11-17 10:11:39","2021-11-17 10:11:39",NULL
-92,85,NULL,NULL,"Synthesizing and interpreting - Sort and categorize information: arrange information into understandable forms such as narratives, explanatory and procedural writing, tables, timelines, graphs and diagrams",P-ATL-REIN-g,,0,,"2021-11-17 10:11:52","2021-11-17 10:11:52",NULL
-93,85,NULL,NULL,"Synthesizing and interpreting - Use critical literacy skills to analyse and interpret information",P-ATL-REIN-h,,0,,"2021-11-17 10:12:05","2021-11-17 10:12:05",NULL
-94,85,NULL,NULL,"Evaluating and communicating - Draw conclusions from relationships and patterns that emerge from data",P-ATL-REIN-i,,0,,"2021-11-17 10:12:17","2021-11-17 10:12:17",NULL
-95,85,NULL,NULL,"Evaluating and communicating - Present information in a variety of formats and platforms",P-ATL-REIN-j,,0,,"2021-11-17 10:12:27","2021-11-17 10:12:27",NULL
-96,85,NULL,NULL,"Evaluating and communicating - Understand the significance of academic integrity and intellectual property rights",P-ATL-REIN-k,,0,,"2021-11-17 10:12:38","2021-11-17 10:12:38",NULL
-97,85,NULL,NULL,"Evaluating and communicating - Create references and citations, use footnotes/endnotes and construct a bibliography according to recognized conventions",P-ATL-REIN-l,,0,,"2021-11-17 10:12:49","2021-11-17 10:12:49",NULL
-98,84,NULL,NULL,"Media literacy",P-ATL-REME,,0,"Interacting with media to use and create ideas and information.
-","2021-11-17 10:13:05","2021-11-17 10:13:20",NULL
-99,98,NULL,NULL,"Locate, organize, analyse, evaluate and synthesize information from a variety of trusted sources, social media and online networks",P-ATL-REME-a,,0,,"2021-11-17 10:13:37","2021-11-17 10:13:37",NULL
-100,98,NULL,NULL,"Compare, contrast and draw connections among (multi)media resources",P-ATL-REME-b,,0,,"2021-11-17 10:13:51","2021-11-17 10:13:51",NULL
-101,98,NULL,NULL,"Demonstrate awareness of media interpretations of events and ideas",P-ATL-REME-d,,0,,"2021-11-17 10:14:01","2021-11-17 10:14:01",NULL
-102,98,NULL,NULL,"Seek a range of perspectives from multiple and varied media sources",P-ATL-REME-c,,0,,"2021-11-17 10:14:13","2021-11-17 10:14:13",NULL
-103,98,NULL,NULL,"Communicate information and ideas effectively to multiple audiences using a variety of media and modalities",P-ATL-REME-e,,0,,"2021-11-17 10:14:23","2021-11-17 10:14:23",NULL
-104,84,NULL,NULL,"Ethical use of media/information",P-ATL-REET,,0,"Understanding and applying social and ethical technology.
-","2021-11-17 10:14:35","2021-11-17 10:14:43",NULL
-105,104,NULL,NULL,"Use media ethically to communicate, share and connect with others",P-ATL-REET-a,,0,,"2021-11-17 10:14:54","2021-11-17 10:14:54",NULL
-106,104,NULL,NULL,"Differentiate reliable from unreliable resources",P-ATL-REET-b,,0,,"2021-11-17 10:15:03","2021-11-17 10:15:03",NULL
-107,104,NULL,NULL,"Understand the impact of media representations and modes of presentation",P-ATL-REET-c,,0,,"2021-11-17 10:15:12","2021-11-17 10:15:12",NULL
-108,42,NULL,NULL,"Communication skills",P-ATL-CO,,0,,"2021-11-17 10:15:31","2021-11-17 10:15:31",NULL
-109,108,NULL,NULL,"Exchanging information",P-ATL-COEX,,0,,"2021-11-17 10:15:43","2021-11-17 10:15:43",NULL
-110,109,NULL,NULL,"Listening - Listen to, and follow the information and directions of others",P-ATL-COEX-a,,0,,"2021-11-17 10:15:58","2021-11-17 10:15:58",NULL
-111,109,NULL,NULL,"Listening - Listen actively to other perspectives and ideas",P-ATL-COEX-b,,0,,"2021-11-17 10:16:07","2021-11-17 10:16:07",NULL
-112,109,NULL,NULL,"Listening - Ask for clarifications",P-ATL-COEX-c,,0,,"2021-11-17 10:16:16","2021-11-17 10:16:16",NULL
-113,109,NULL,NULL,"Listening - Listen actively and respectfully while others speak",P-ATL-COEX-d,,0,,"2021-11-17 10:16:26","2021-11-17 10:16:26",NULL
-114,109,NULL,NULL,"Interpreting - nterpret visual, audio and oral communication: recognizing and creating signs, interpreting and using symbols and sounds",P-ATL-COEX-e,,0,,"2021-11-17 10:16:37","2021-11-17 10:16:37",NULL
-115,109,NULL,NULL,"Interpreting - Understand the ways in which images and language interact to convey ideas",P-ATL-COEX-f,,0,,"2021-11-17 10:16:46","2021-11-17 10:16:46",NULL
-116,109,NULL,NULL,"Interpreting - Recognize the meaning of kinaesthetic communication (body language)",P-ATL-COEX-g,,0,,"2021-11-17 10:16:57","2021-11-17 10:16:57",NULL
-117,109,NULL,NULL,"Interpreting - Be aware of cultural differences when providing and interpreting communication",P-ATL-COEX-h,,0,,"2021-11-17 10:17:07","2021-11-17 10:17:07",NULL
-118,109,NULL,NULL,"Speaking - Speak and express ideas clearly and logically in small and large groups",P-ATL-COEX-i,,0,,"2021-11-17 10:17:17","2021-11-17 10:17:17",NULL
-119,109,NULL,NULL,"Speaking - Give and receive meaningful feedback and feedforward",P-ATL-COEX-j,,0,,"2021-11-17 10:17:26","2021-11-17 10:17:26",NULL
-120,109,NULL,NULL,"Speaking - State opinions clearly, logically and respectfully",P-ATL-COEX-k,,0,,"2021-11-17 10:17:36","2021-11-17 10:17:36",NULL
-121,109,NULL,NULL,"Speaking - Discuss and negotiate ideas and knowledge with peers and teachers",P-ATL-COEX-l,,0,,"2021-11-17 10:17:46","2021-11-17 10:17:46",NULL
-122,109,NULL,NULL,"Speaking - Communicate with peers, experts and members of the learning community using a variety of digital environments and media",P-ATL-COEX-m,,0,,"2021-11-17 10:18:00","2021-11-17 10:18:00",NULL
-123,108,NULL,NULL,Literacy,P-ATL-COLE,,0,"Reading, writing and using language to gather and communicate information.
-","2021-11-17 10:18:23","2021-11-17 10:18:23",NULL
-124,123,NULL,NULL,"Reading - Read a variety of sources for information and for pleasure",P-ATL-COLE-a,,0,,"2021-11-17 10:18:32","2021-11-17 10:18:32",NULL
-125,123,NULL,NULL,"Reading - Read critically and for comprehension",P-ATL-COLE-b,,0,,"2021-11-17 10:18:41","2021-11-17 10:18:41",NULL
-126,123,NULL,NULL,"Reading - Make inferences and draw conclusions",P-ATL-COLE-c,,0,,"2021-11-17 10:18:50","2021-11-17 10:18:50",NULL
-127,123,NULL,NULL,"Reading - Use and interpret a range of terms and symbols",P-ATL-COLE-d,,0,,"2021-11-17 10:19:01","2021-11-17 10:19:01",NULL
-128,123,NULL,NULL,"Writing - Use appropriate forms of writing for different purposes and audiences",P-ATL-COLE-e,,0,,"2021-11-17 10:19:11","2021-11-17 10:19:11",NULL
-129,123,NULL,NULL,"Writing - Paraphrase accurately and concisely",P-ATL-COLE-f,,0,,"2021-11-17 10:19:20","2021-11-17 10:19:20",NULL
-130,123,NULL,NULL,"Writing - Record information and observations by hand and through digital technologies",P-ATL-COLE-g,,0,,"2021-11-17 10:19:30","2021-11-17 10:19:30",NULL
-131,123,NULL,NULL,"Writing - Use a variety of scaffolding for writing tasks",P-ATL-COLE-h,,0,,"2021-11-17 10:19:41","2021-11-17 10:19:41",NULL
-132,123,NULL,NULL,"Writing - Organize information logically",P-ATL-COLE-i,,0,,"2021-11-17 10:19:51","2021-11-17 10:19:51",NULL
-133,123,NULL,NULL,"Writing - Make summary notes",P-ATL-COLE-j,,0,,"2021-11-17 10:20:00","2021-11-17 10:20:00",NULL
-134,123,NULL,NULL,"Writing - Communicate using a range of technologies and media",P-ATL-COLE-k,,0,,"2021-11-17 10:20:10","2021-11-17 10:20:18",NULL
-135,123,NULL,NULL,"Writing - Understand and use mathematical notation and other symbols",P-ATL-COLE-l,,0,,"2021-11-17 10:20:30","2021-11-17 10:20:30",NULL
-136,123,NULL,NULL,"Writing - Responsibly participate in, and contribute to, digital social media networks",P-ATL-COLE-m,,0,,"2021-11-17 10:20:40","2021-11-17 10:20:40",NULL
-137,108,NULL,NULL,ICT,P-ATL-COIC,,0,"Communicating using technology to gather, investigate and share information
-","2021-11-17 10:21:06","2021-11-17 10:21:06",NULL
-138,137,NULL,NULL,"Understand the impact of media representations and modes of presentation",P-ATL-COIC-a,,0,,"2021-11-17 10:21:16","2021-11-17 10:21:16",NULL
-139,137,NULL,NULL,"Make informed choices about modes of communication based on audience",P-ATL-COIC-b,,0,,"2021-11-17 10:21:25","2021-11-17 10:21:25",NULL
-140,137,NULL,NULL,"Communicate information and ideas effectively to multiple audiences using a variety of media and modalities",P-ATL-COIC-c,,0,,"2021-11-17 10:21:34","2021-11-17 10:21:34",NULL
-142,42,NULL,NULL,"Social skills",P-ATL-SO,,0,,"2021-11-17 10:22:02","2021-11-17 10:22:02",NULL
-143,142,NULL,NULL,"Interpersonal relationships, social and emotional intelligence",P-ATL-SOIN,,0,"Developing positive interpersonal relationships and collaboration.
-","2021-11-17 10:22:22","2021-11-17 10:22:22",NULL
-144,143,NULL,NULL,"Interpersonal relationships - Practise empathy and care for others",P-ATL-SOIN-a,,0,,"2021-11-17 10:22:32","2021-11-17 10:22:32",NULL
-145,143,NULL,NULL,"Interpersonal relationships - Listen closely to others’ perspectives and to instructions",P-ATL-SOIN-b,,0,,"2021-11-17 10:22:42","2021-11-17 10:22:42",NULL
-146,143,NULL,NULL,"Interpersonal relationships - Be respectful to others",P-ATL-SOIN-c,,0,,"2021-11-17 10:22:52","2021-11-17 10:22:52",NULL
-147,143,NULL,NULL,"Interpersonal relationships - Learn cooperatively in a group: being courteous, sharing, taking turns",P-ATL-SOIN-d,,0,,"2021-11-17 10:23:02","2021-11-17 10:23:02",NULL
-148,143,NULL,NULL,"Interpersonal relationships - Help others to succeed",P-ATL-SOIN-e,,0,,"2021-11-17 10:23:13","2021-11-17 10:23:13",NULL
-149,143,NULL,NULL,"Interpersonal relationships - Build consensus and negotiate effectively",P-ATL-SOIN-f,,0,,"2021-11-17 10:23:23","2021-11-17 10:23:23",NULL
-150,143,NULL,NULL,"Interpersonal relationships - Make fair and equitable decisions",P-ATL-SOIN-g,,0,,"2021-11-17 10:23:33","2021-11-17 10:23:33",NULL
-151,143,NULL,NULL,"Interpersonal relationships - Encourage others to contribute",P-ATL-SOIN-h,,0,,"2021-11-17 10:23:43","2021-11-17 10:23:43",NULL
-152,143,NULL,NULL,"Interpersonal relationships - Take on a variety of roles in group learning",P-ATL-SOIN-i,,0,,"2021-11-17 10:23:52","2021-11-17 10:23:52",NULL
-153,143,NULL,NULL,"Interpersonal relationships - Advocate for one’s own rights and needs, and those of others",P-ATL-SOIN-j,,0,,"2021-11-17 10:24:01","2021-11-17 10:24:01",NULL
-154,143,NULL,NULL,"Social and emotional intelligence - Be aware of own and others’ emotions",P-ATL-SOIN-k,,0,,"2021-11-17 10:24:15","2021-11-17 10:24:15",NULL
-155,143,NULL,NULL,"Social and emotional intelligence - Manage anger and resolve conflict",P-ATL-SOIN-l,,0,,"2021-11-17 10:24:24","2021-11-17 10:24:24",NULL
-156,143,NULL,NULL,"Social and emotional intelligence - Be self and socially aware",P-ATL-SOIN-m,,0,,"2021-11-17 10:24:34","2021-11-17 10:24:34",NULL
-157,143,NULL,NULL,"Social and emotional intelligence - Be aware of own and others’ impact as a member of a learning group",P-ATL-SOIN-n,,0,,"2021-11-17 10:24:44","2021-11-17 10:24:44",NULL
-159,42,NULL,NULL,"Self-management skills",P-ATL-SE,,0,,"2021-11-17 10:25:17","2021-11-17 10:25:17",NULL
-160,159,NULL,NULL,Organization,P-ATL-SEOR,,0,"Managing time and tasks effectively.
-","2021-11-17 10:25:29","2021-11-17 10:25:29",NULL
-161,160,NULL,NULL,"Plan short- and long-term tasks",P-ATL-SEOR-a,,0,,"2021-11-17 10:25:44","2021-11-17 10:25:44",NULL
-162,160,NULL,NULL,"Set goals that are challenging and realistic",P-ATL-SEOR-b,,0,,"2021-11-17 10:25:52","2021-11-17 10:25:52",NULL
-163,160,NULL,NULL,"Use time effectively and appropriately",P-ATL-SEOR-c,,0,,"2021-11-17 10:26:01","2021-11-17 10:26:01",NULL
-164,160,NULL,NULL,"Bring necessary equipment and supplies to class",P-ATL-SEOR-d,,0,,"2021-11-17 10:26:12","2021-11-17 10:26:12",NULL
-165,160,NULL,NULL,"Keep an organized and logical system to document learning",P-ATL-SEOR-e,,0,,"2021-11-17 10:26:23","2021-11-17 10:26:23",NULL
-166,160,NULL,NULL,"Understand and use learning preferences",P-ATL-SEOR-f,,0,,"2021-11-17 10:26:33","2021-11-17 10:26:33",NULL
-167,160,NULL,NULL,"Use technology effectively and productively",P-ATL-SEOR-g,,0,,"2021-11-17 10:26:42","2021-11-17 10:26:42",NULL
-168,160,NULL,NULL,"Take on and complete tasks as agreed",P-ATL-SEOR-h,,0,,"2021-11-17 10:26:53","2021-11-17 10:26:53",NULL
-169,160,NULL,NULL,"Delegate and share responsibility for decision-making",P-ATL-SEOR-i,,0,,"2021-11-17 10:27:03","2021-11-17 10:27:03",NULL
-170,159,NULL,NULL,"States of mind",P-ATL-SEST,,0,"Using strategies that manage state of mind.
-","2021-11-17 10:27:34","2021-11-17 10:27:34",NULL
-171,170,NULL,NULL,"Mindfulness – Use strategies to support concentration and overcome distractions",P-ATL-SEST-a,,0,,"2021-11-17 10:27:44","2021-11-17 10:27:44",NULL
-172,170,NULL,NULL,"Mindfulness – Be aware of body–mind connections",P-ATL-SEST-b,,0,,"2021-11-17 10:27:53","2021-11-17 10:27:53",NULL
-173,170,NULL,NULL,"Perseverance – Demonstrate persistence",P-ATL-SEST-c,,0,,"2021-11-17 10:28:02","2021-11-17 10:28:02",NULL
-174,170,NULL,NULL,"Perseverance – Use strategies to remove barriers",P-ATL-SEST-d,,0,,"2021-11-17 10:28:10","2021-11-17 10:28:10",NULL
-175,170,NULL,NULL,"Emotional management – Take responsibility for one’s own actions",P-ATL-SEST-e,,0,,"2021-11-17 10:28:21","2021-11-17 10:28:21",NULL
-176,170,NULL,NULL,"Emotional management – Use strategies to prevent and eliminate bullying",P-ATL-SEST-f,,0,,"2021-11-17 10:28:31","2021-11-17 10:28:31",NULL
-177,170,NULL,NULL,"Emotional management – Use strategies to reduce stress and anxiety",P-ATL-SEST-g,,0,,"2021-11-17 10:28:41","2021-11-17 10:28:41",NULL
-178,170,NULL,NULL,"Emotional management – Manage anger and resolve conflict",P-ATL-SEST-h,,0,,"2021-11-17 10:28:50","2021-11-17 10:28:50",NULL
-179,170,NULL,NULL,"Self-motivation – Practice positive thinking and language that reinforces self-motivation",P-ATL-SEST-i,,0,,"2021-11-17 10:29:01","2021-11-17 10:29:01",NULL
-180,170,NULL,NULL,"Resilience – Manage setbacks",P-ATL-SEST-j,,0,,"2021-11-17 10:29:12","2021-11-17 10:29:12",NULL
-181,170,NULL,NULL,"Resilience – Work through adversity",P-ATL-SEST-k,,0,,"2021-11-17 10:29:21","2021-11-17 10:29:21",NULL
-182,170,NULL,NULL,"Resilience – Work through disappointment",P-ATL-SEST-l,,0,,"2021-11-17 10:29:31","2021-11-17 10:29:31",NULL
-183,170,NULL,NULL,"Resilience – Work through change",P-ATL-SEST-m,,0,,"2021-11-17 10:29:43","2021-11-17 10:29:43",NULL
-184,NULL,NULL,NULL,"PYP Action and international-mindedness",,,0,"Action, the core of student agency, is integral to the Primary Years Programme (PYP) learning process and to the programme’s overarching outcome of international-mindedness. Through taking individual and collective action, students come to understand the responsibilities associated with being internationally minded and to appreciate the benefits of working with others for a shared purpose. When students see tangible actions that they can choose to take to make a difference, they see themselves as competent, capable and active agents of change (Oxfam 2015).
-","2021-11-17 10:41:20","2021-11-17 10:41:20",NULL
-185,184,NULL,NULL,Participation,P-ACT-PA,,0,"Being actively involved in the learning community and showing commitment to contributing as individuals and as members of a group.
-","2021-11-17 10:41:38","2021-11-17 10:41:38",NULL
-186,184,NULL,NULL,Advocacy,P-ACT-AD,,0,"Taking action individually or collectively to publicly support positive social, environmental or political change.
-","2021-11-17 10:41:57","2021-11-17 10:41:57",NULL
-187,184,NULL,NULL,"Social justice",P-ACT-SJ,,0,"Taking action for positive change relating to human rights, equality and equity. Being concerned with the advantages and disadvantages within society, and with social well-being and justice for all.
-","2021-11-17 10:42:13","2021-11-17 10:42:13",NULL
-188,184,NULL,NULL,"Social entrepreneurship",P-ACT-SE,,0,"Supporting positive social change through responding to the needs of local, national and global communities; applying prior knowledge and skills to identify and address challenges and opportunities in innovative, resourceful and sustainable ways.
-","2021-11-17 10:42:30","2021-11-17 10:42:30",NULL
-189,184,NULL,NULL,"Lifestyle choice",P-ACT-LC,,0,"Making positive lifestyle changes in response to learning.
-","2021-11-17 10:42:46","2021-11-17 10:42:46",NULL
-190,NULL,NULL,NULL,"EY Approaches to Learning",,,0,"Beyond the skills of literacy and numeracy, there is a range of interrelated approaches to learning that are  transferable across contexts. These skills support purposeful inquiry and set the foundations for lifelong  learning. The development of these skills is frequently identified in education literature as crucial in supporting students to effectively learn and succeed inside and outside of school. 
-","2021-11-17 10:43:12","2021-11-17 10:43:12",NULL
-191,190,NULL,NULL,"Thinking skills",E-ATL-TH,,0,,"2021-11-17 10:43:24","2021-11-17 10:43:24",NULL
-192,191,NULL,NULL,"Critical thinking",E-ATL-THCI,,0,"Analysing and evaluating issues and ideas, and forming decisions.
-","2021-11-17 10:43:37","2021-11-17 10:43:37",NULL
-193,192,NULL,NULL,"Analysing - Observe carefully",E-ATL-THCI-a,,0,,"2021-11-17 10:43:49","2021-11-17 10:43:49",NULL
-194,192,NULL,NULL,"Analysing - Find unique characteristics",E-ATL-THCI-b,,0,,"2021-11-17 10:43:58","2021-11-17 10:43:58",NULL
-195,192,NULL,NULL,"Analysing - Consider meaning taken from materials and events",E-ATL-THCI-c,,0,,"2021-11-17 10:44:07","2021-11-17 10:44:07",NULL
-196,192,NULL,NULL,"Analysing - Synthesize new understandings by seeing relationships and connections",E-ATL-THCI-d,,0,,"2021-11-17 10:44:16","2021-11-17 10:44:16",NULL
-197,192,NULL,NULL,"Evaluating - Organize information",E-ATL-THCI-e,,0,,"2021-11-17 10:44:28","2021-11-17 10:44:28",NULL
-198,192,NULL,NULL,"Evaluating - Evaluate evidence",E-ATL-THCI-f,,0,,"2021-11-17 10:44:38","2021-11-17 10:44:38",NULL
-199,192,NULL,NULL,"Evaluating - Test generalizations, strategies or ideas",E-ATL-THCI-g,,0,,"2021-11-17 10:44:48","2021-11-17 10:44:48",NULL
-200,192,NULL,NULL,"Forming decisions - Revise understandings based on new information and evidence",E-ATL-THCI-h,,0,,"2021-11-17 10:45:00","2021-11-17 10:45:00",NULL
-201,192,NULL,NULL,"Forming decisions - Draw conclusions and generalizations",E-ATL-THCI-i,,0,,"2021-11-17 10:45:12","2021-11-17 10:45:12",NULL
-202,192,NULL,NULL,"Forming decisions - Apply rules, strategies and ideas from one context to another",E-ATL-THCI-j,,0,,"2021-11-17 10:45:21","2021-11-17 10:45:21",NULL
-203,191,NULL,NULL,"Creative thinking",E-ATL-THCE,,0,"Generating novel ideas and considering new perspectives.
-","2021-11-17 10:45:40","2021-11-17 10:45:40",NULL
-204,203,NULL,NULL,"Generating novel ideas - Use discussions and play to generate new ideas and inquiries",E-ATL-THCE-a,,0,,"2021-11-17 10:45:49","2021-11-17 10:45:49",NULL
-205,203,NULL,NULL,"Generating novel ideas - Make unexpected or unusual connections between objects and/or ideas",E-ATL-THCE-b,,0,,"2021-11-17 10:46:00","2021-11-17 10:46:00",NULL
-206,203,NULL,NULL,"Generating novel ideas - Practice some “visible thinking” routines (Ritchhart, Church and Morrison 2011)",E-ATL-THCE-c,,0,,"2021-11-17 10:46:13","2021-11-17 10:46:13",NULL
-207,203,NULL,NULL,"Considering new perspectives - Seek information",E-ATL-THCE-d,,0,,"2021-11-17 10:46:24","2021-11-17 10:46:24",NULL
-208,203,NULL,NULL,"Considering new perspectives - Consider alternative solutions, including those that might be unlikely or impossible, in play and other situations",E-ATL-THCE-e,,0,,"2021-11-17 10:46:35","2021-11-17 10:46:35",NULL
-209,203,NULL,NULL,"Considering new perspectives - Ask “what if” questions",E-ATL-THCE-f,,0,,"2021-11-17 10:46:48","2021-11-17 10:46:48",NULL
-210,203,NULL,NULL,"Considering new perspectives - Practise some “visible thinking” routines",E-ATL-THCE-g,,0,,"2021-11-17 10:46:59","2021-11-17 10:46:59",NULL
-211,191,NULL,NULL,"Information Transfer",E-ATL-THTR,,0,"Using skills and knowledge in multiple contexts.
-","2021-11-17 10:47:15","2021-11-17 10:47:25",NULL
-212,211,NULL,NULL,"Apply skills and knowledge in unfamiliar situations or outside of school",E-ATL-THTR-a,,0,,"2021-11-17 10:47:35","2021-11-17 10:47:35",NULL
-213,211,NULL,NULL,"Make connections between units of inquiry",E-ATL-THTR-b,,0,,"2021-11-17 10:47:45","2021-11-17 10:47:45",NULL
-214,191,NULL,NULL,"Reflection and metacognition",E-ATL-THRE,,0,"Using thinking skills to reflect on the process of learning.
-","2021-11-17 10:48:01","2021-11-17 10:48:01",NULL
-215,190,NULL,NULL,"Research skills",E-ATL-RE,,0,,"2021-11-17 10:50:10","2021-11-17 10:50:10",NULL
-216,215,NULL,NULL,"Information literacy",P-ATL-REIN,,0,"Formulating and planning, data gathering and recording, synthesizing and interpreting, evaluating and communicating.
-","2021-11-17 10:50:22","2021-11-17 10:50:22",NULL
-217,216,NULL,NULL,"Formulating and planning - Ask or express through play questions that can be researched",E-ATL-REIN-a,,0,,"2021-11-17 10:50:35","2021-11-17 10:50:35",NULL
-218,216,NULL,NULL,"Formulating and planning - Select information sources and digital tools",E-ATL-REIN-b,,0,,"2021-11-17 10:50:45","2021-11-17 10:50:45",NULL
-219,216,NULL,NULL,"Data gathering and recording (audio recording, drawing, photographing) - Gather information from a variety of sources (people, places, materials, literature)",E-ATL-REIN-c,,0,,"2021-11-17 10:51:06","2021-11-17 10:51:06",NULL
-220,216,NULL,NULL,"Data gathering and recording (audio recording, drawing, photographing) - Use all senses to observe and notice details",E-ATL-REIN-d,,0,,"2021-11-17 10:51:18","2021-11-17 10:51:18",NULL
-221,216,NULL,NULL,"Data gathering and recording (audio recording, drawing, photographing) - Record observations—drawing, charting, tallying—using emergent writing skills, when possible, to write comments, annotate images, and so on",E-ATL-REIN-e,,0,,"2021-11-17 10:51:31","2021-11-17 10:51:31",NULL
-222,216,NULL,NULL,"Synthesizing and interpreting - Sort and categorize information and materials; arrange into forms or order, for example, with graphs, marks or symbols using emergent writing skills",E-ATL-REIN-f,,0,,"2021-11-17 10:52:04","2021-11-17 10:52:04",NULL
-223,216,NULL,NULL,"Synthesizing and interpreting - Analyse and interpret information",E-ATL-REIN-g,,0,,"2021-11-17 10:52:17","2021-11-17 10:52:17",NULL
-224,216,NULL,NULL,"Evaluating and communicating - Notice relationships and patterns",E-ATL-REIN-h,,0,,"2021-11-17 10:52:26","2021-11-17 10:52:26",NULL
-225,216,NULL,NULL,"Evaluating and communicating - Present information in a variety of modalities",E-ATL-REIN-i,,0,,"2021-11-17 10:52:37","2021-11-17 10:52:37",NULL
-226,216,NULL,NULL,"Evaluating and communicating - Acknowledge sources, for example, from a book, movie or peer",E-ATL-REIN-j,,0,,"2021-11-17 10:52:47","2021-11-17 10:52:47",NULL
-227,215,NULL,NULL,"Media literacy",E-ATL-REME,,0,"Interacting with media to use and create ideas and information.
-","2021-11-17 10:53:01","2021-11-17 10:53:10",NULL
-228,227,NULL,NULL,"Draw connections among media resources",E-ATL-REME-a,,0,,"2021-11-17 10:53:27","2021-11-17 10:53:27",NULL
-229,227,NULL,NULL,"Use media to communicate, share and connect with others",E-ATL-REME-b,,0,,"2021-11-17 10:53:44","2021-11-17 10:53:44",NULL
-230,227,NULL,NULL,"Communicate information and ideas using a variety of media (as their skills progress)",E-ATL-REME-c,,0,,"2021-11-17 10:54:35","2021-11-17 10:54:35",NULL
-231,190,NULL,NULL,"Communication skills",E-ATL-CO,,0,,"2021-11-17 10:54:49","2021-11-17 10:54:49",NULL
-232,231,NULL,NULL,"Exchanging information",E-ATL-COEX,,0,"Listening, interpreting and speaking.
-","2021-11-17 10:55:05","2021-11-17 10:55:05",NULL
-233,232,NULL,NULL,"Listening - Listen to information",E-ATL-COEX-a,,0,,"2021-11-17 10:57:50","2021-11-17 10:57:50",NULL
-234,232,NULL,NULL,"Listening - Listen actively and respectfully to others’ ideas",E-ATL-COEX-b,,0,,"2021-11-17 10:58:00","2021-11-17 10:58:00",NULL
-235,232,NULL,NULL,"Listening - Ask for clarifications",E-ATL-COEX-c,,0,,"2021-11-17 10:58:09","2021-11-17 10:58:09",NULL
-236,232,NULL,NULL,"Interpreting - Interpret visual, audio and oral communication: recognizing and creating signs, interpreting and using symbols and sounds",E-ATL-COEX-d,,0,,"2021-11-17 10:58:20","2021-11-17 10:58:20",NULL
-237,232,NULL,NULL,"Interpreting - Understand the ways in which images and language interact to convey ideas",E-ATL-COEX-e,,0,,"2021-11-17 10:58:32","2021-11-17 10:58:32",NULL
-238,232,NULL,NULL,"Interpreting - Recognize the meaning of kinaesthetic communication (body language)",E-ATL-COEX-f,,0,,"2021-11-17 10:58:43","2021-11-17 10:58:43",NULL
-239,232,NULL,NULL,"Speaking - Express oneself using words and sentences",E-ATL-COEX-g,,0,,"2021-11-17 10:58:52","2021-11-17 10:58:52",NULL
-240,232,NULL,NULL,"Speaking - Participate in conversations",E-ATL-COEX-h,,0,,"2021-11-17 10:59:03","2021-11-17 10:59:03",NULL
-241,232,NULL,NULL,"Speaking - Negotiate ideas and knowledge with peers and teachers",E-ATL-COEX-i,,0,,"2021-11-17 10:59:12","2021-11-17 10:59:12",NULL
-242,231,NULL,NULL,"Symbolic exploration and expression",E-ATL-COSY,,0,"Reading, writing and using language to gather and communicate information.
-","2021-11-17 10:59:48","2021-11-17 10:59:48",NULL
-243,242,NULL,NULL,"Reading, writing and mathematics - Take on pretend roles and situations",E-ATL-COSY-a,,0,,"2021-11-17 11:00:02","2021-11-17 11:00:02",NULL
-244,242,NULL,NULL,"Reading, writing and mathematics - Understand symbols",E-ATL-COSY-b,,0,,"2021-11-17 11:00:15","2021-11-17 11:00:15",NULL
-245,242,NULL,NULL,"Reading, writing and mathematics - Access a variety of sources for information and for pleasure",E-ATL-COSY-c,,0,,"2021-11-17 11:00:25","2021-11-17 11:00:25",NULL
-246,242,NULL,NULL,"Reading, writing and mathematics - Make inferences and draw conclusions",E-ATL-COSY-d,,0,,"2021-11-17 11:00:35","2021-11-17 11:00:35",NULL
-247,242,NULL,NULL,"Reading, writing and mathematics - Understand that mark-making carries meaning",E-ATL-COSY-e,,0,,"2021-11-17 11:00:44","2021-11-17 11:00:44",NULL
-248,242,NULL,NULL,"Reading, writing and mathematics - Use mark-marking to convey meaning",E-ATL-COSY-f,,0,,"2021-11-17 11:00:54","2021-11-17 11:00:54",NULL
-249,242,NULL,NULL,"Reading, writing and mathematics - Document information and observations in a variety of ways",E-ATL-COSY-g,,0,,"2021-11-17 11:01:06","2021-11-17 11:01:06",NULL
-250,242,NULL,NULL,"Reading, writing and mathematics - Communicate using a range of technologies and materials",E-ATL-COSY-h,,0,,"2021-11-17 11:01:16","2021-11-17 11:01:16",NULL
-251,190,NULL,NULL,"Social Skills",E-ATL-SO,,0,,"2021-11-17 11:01:27","2021-11-17 11:01:35",NULL
-252,251,NULL,NULL,"Interpersonal relationships, social and emotional intelligence",E-ATL-SOIN,,0,"Developing positive interpersonal relationships and collaboration.
-","2021-11-17 11:01:50","2021-11-17 11:01:50",NULL
-253,252,NULL,NULL,"Interpersonal relationships - Practise empathy and care for others",E-ATL-SOIN-a,,0,,"2021-11-17 11:02:06","2021-11-17 11:02:06",NULL
-254,252,NULL,NULL,"Interpersonal relationships - Listen closely to others",E-ATL-SOIN-b,,0,,"2021-11-17 11:02:16","2021-11-17 11:02:16",NULL
-255,252,NULL,NULL,"Interpersonal relationships - Be respectful to others",E-ATL-SOIN-c,,0,,"2021-11-17 11:02:25","2021-11-17 11:02:25",NULL
-256,252,NULL,NULL,"Interpersonal relationships - Play cooperatively in a group: sharing, taking turns",E-ATL-SOIN-d,,0,,"2021-11-17 11:02:34","2021-11-17 11:02:34",NULL
-257,252,NULL,NULL,"Interpersonal relationships - Help others",E-ATL-SOIN-e,,0,,"2021-11-17 11:02:45","2021-11-17 11:02:45",NULL
-258,252,NULL,NULL,"Social and emotional intelligence - Be aware of own and others’ feelings",E-ATL-SOIN-f,,0,,"2021-11-17 11:02:54","2021-11-17 11:02:54",NULL
-259,252,NULL,NULL,"Social and emotional intelligence - Manage anger and resolve conflict",E-ATL-SOIN-g,,0,,"2021-11-17 11:03:04","2021-11-17 11:03:04",NULL
-260,252,NULL,NULL,"Social and emotional intelligence - Be self- and socially aware",E-ATL-SOIN-h,,0,,"2021-11-17 11:03:14","2021-11-17 11:03:14",NULL
-261,252,NULL,NULL,"Social and emotional intelligence - Be aware of own and others’ impact as a member of a learning group",E-ATL-SOIN-i,,0,,"2021-11-17 11:03:23","2021-11-17 11:03:23",NULL
-262,190,NULL,NULL,"Self-management skills",E-ATL-SE,,0,,"2021-11-17 11:03:43","2021-11-17 11:03:43",NULL
-263,262,NULL,NULL,Organization,E-ATL-SEOR,,0,"Managing time and tasks effectively.
-","2021-11-17 11:03:57","2021-11-17 11:03:57",NULL
-264,263,NULL,NULL,"Choose and complete tasks independently",E-ATL-SEOR-a,,0,,"2021-11-17 11:04:10","2021-11-17 11:04:10",NULL
-265,263,NULL,NULL,"Follow the directions of others",E-ATL-SEOR-b,,0,,"2021-11-17 11:04:19","2021-11-17 11:04:19",NULL
-266,263,NULL,NULL,"Follow classroom routines",E-ATL-SEOR-c,,0,,"2021-11-17 11:04:35","2021-11-17 11:04:35",NULL
-267,263,NULL,NULL,"Share responsibility for decision-making",E-ATL-SEOR-d,,0,,"2021-11-17 11:04:44","2021-11-17 11:04:44",NULL
-268,262,NULL,NULL,"States of mind",E-ATL-SEST,,0,"Using strategies that manage state of mind.
-","2021-11-17 11:04:55","2021-11-17 11:05:07",NULL
-269,268,NULL,NULL,"Mindfulness – Take responsibility for own well-being",E-ATL-SEST-a,,0,,"2021-11-17 11:05:18","2021-11-17 11:05:18",NULL
-270,268,NULL,NULL,"Mindfulness – Be aware of body–mind connections",E-ATL-SEST-b,,0,,"2021-11-17 11:05:26","2021-11-17 11:05:26",NULL
-271,268,NULL,NULL,"Perseverance – Demonstrate persistence in tasks",E-ATL-SEST-c,,0,,"2021-11-17 11:05:35","2021-11-17 11:05:35",NULL
-272,268,NULL,NULL,"Perseverance – Use strategies to problem-solve",E-ATL-SEST-d,,0,,"2021-11-17 11:05:44","2021-11-17 11:05:44",NULL
-273,268,NULL,NULL,"Perseverance – Manage own emotions",E-ATL-SEST-e,,0,,"2021-11-17 11:05:53","2021-11-17 11:05:53",NULL
-274,268,NULL,NULL,"Perseverance – Manage feelings and resolve conflict",E-ATL-SEST-f,,0,,"2021-11-17 11:06:02","2021-11-17 11:06:02",NULL
-275,268,NULL,NULL,"Resilience – Work through setbacks",E-ATL-SEST-g,,0,,"2021-11-17 11:06:15","2021-11-17 11:06:15",NULL
-276,268,NULL,NULL,"Resilience – Work through disappointment",E-ATL-SEST-h,,0,,"2021-11-17 11:06:24","2021-11-17 11:06:24",NULL
-277,268,NULL,NULL,"Resilience – Show ability to adjust to new situations",E-ATL-SEST-i,,0,,"2021-11-17 11:06:35","2021-11-17 11:06:35",NULL
-278,214,NULL,NULL,"Identify strengths and areas for improvement",E-ATL-THTR-a,,0,,"2021-11-19 11:37:19","2021-11-19 11:37:19",NULL
-279,214,NULL,NULL,"Reflect on their learning by asking questions",E-ATL-THTR-b,,0,"Reflect on their learning by asking questions such as:
+","2021-11-17 10:09:26","2021-11-17 10:09:42",
+83,79,,,"Have I been a principled and balanced thinker? (for example, considering ethical, cultural and environmental implications)",P-ATL-THTR-d,,0,,"2021-11-17 10:09:54","2021-11-17 10:09:54",
+84,42,,,"Research skills",P-ATL-RE,,0,,"2021-11-17 10:10:07","2021-11-17 10:10:07",
+85,84,,,"Information literacy",P-ATL-REIN,,0,"Formulating and planning, data gathering and recording, synthesizing and interpreting, evaluating and communicating.
+","2021-11-17 10:10:17","2021-11-17 10:10:26",
+86,85,,,"Formulating and planning - Ask or design relevant questions of interest that can be researched",P-ATL-REIN-a,,0,,"2021-11-17 10:10:43","2021-11-17 10:10:43",
+87,85,,,"Formulating and planning - Outline a plan for finding necessary information",P-ATL-REIN-b,,0,,"2021-11-17 10:10:54","2021-11-17 10:10:54",
+88,85,,,"Formulating and planning - Evaluate and select appropriate information sources and/or digital tools based on the task",P-ATL-REIN-c,,0,,"2021-11-17 10:11:03","2021-11-17 10:11:03",
+89,85,,,"Data gathering and recording - Gather information from a variety of primary and secondary sources",P-ATL-REIN-d,,0,,"2021-11-17 10:11:13","2021-11-17 10:11:13",
+90,85,,,"Data gathering and recording - Use all senses to find and notice relevant details",P-ATL-REIN-e,,0,,"2021-11-17 10:11:24","2021-11-17 10:11:28",
+91,85,,,"Data gathering and recording - Record observations by drawing, note taking, charting, tallying, writing statements, annotating images",P-ATL-REIN-f,,0,,"2021-11-17 10:11:39","2021-11-17 10:11:39",
+92,85,,,"Synthesizing and interpreting - Sort and categorize information: arrange information into understandable forms such as narratives, explanatory and procedural writing, tables, timelines, graphs and diagrams",P-ATL-REIN-g,,0,,"2021-11-17 10:11:52","2021-11-17 10:11:52",
+93,85,,,"Synthesizing and interpreting - Use critical literacy skills to analyse and interpret information",P-ATL-REIN-h,,0,,"2021-11-17 10:12:05","2021-11-17 10:12:05",
+94,85,,,"Evaluating and communicating - Draw conclusions from relationships and patterns that emerge from data",P-ATL-REIN-i,,0,,"2021-11-17 10:12:17","2021-11-17 10:12:17",
+95,85,,,"Evaluating and communicating - Present information in a variety of formats and platforms",P-ATL-REIN-j,,0,,"2021-11-17 10:12:27","2021-11-17 10:12:27",
+96,85,,,"Evaluating and communicating - Understand the significance of academic integrity and intellectual property rights",P-ATL-REIN-k,,0,,"2021-11-17 10:12:38","2021-11-17 10:12:38",
+97,85,,,"Evaluating and communicating - Create references and citations, use footnotes/endnotes and construct a bibliography according to recognized conventions",P-ATL-REIN-l,,0,,"2021-11-17 10:12:49","2021-11-17 10:12:49",
+98,84,,,"Media literacy",P-ATL-REME,,0,"Interacting with media to use and create ideas and information.
+","2021-11-17 10:13:05","2021-11-17 10:13:20",
+99,98,,,"Locate, organize, analyse, evaluate and synthesize information from a variety of trusted sources, social media and online networks",P-ATL-REME-a,,0,,"2021-11-17 10:13:37","2021-11-17 10:13:37",
+100,98,,,"Compare, contrast and draw connections among (multi)media resources",P-ATL-REME-b,,0,,"2021-11-17 10:13:51","2021-11-17 10:13:51",
+101,98,,,"Demonstrate awareness of media interpretations of events and ideas",P-ATL-REME-d,,0,,"2021-11-17 10:14:01","2021-11-17 10:14:01",
+102,98,,,"Seek a range of perspectives from multiple and varied media sources",P-ATL-REME-c,,0,,"2021-11-17 10:14:13","2021-11-17 10:14:13",
+103,98,,,"Communicate information and ideas effectively to multiple audiences using a variety of media and modalities",P-ATL-REME-e,,0,,"2021-11-17 10:14:23","2021-11-17 10:14:23",
+104,84,,,"Ethical use of media/information",P-ATL-REET,,0,"Understanding and applying social and ethical technology.
+","2021-11-17 10:14:35","2021-11-17 10:14:43",
+105,104,,,"Use media ethically to communicate, share and connect with others",P-ATL-REET-a,,0,,"2021-11-17 10:14:54","2021-11-17 10:14:54",
+106,104,,,"Differentiate reliable from unreliable resources",P-ATL-REET-b,,0,,"2021-11-17 10:15:03","2021-11-17 10:15:03",
+107,104,,,"Understand the impact of media representations and modes of presentation",P-ATL-REET-c,,0,,"2021-11-17 10:15:12","2021-11-17 10:15:12",
+108,42,,,"Communication skills",P-ATL-CO,,0,,"2021-11-17 10:15:31","2021-11-17 10:15:31",
+109,108,,,"Exchanging information",P-ATL-COEX,,0,,"2021-11-17 10:15:43","2021-11-17 10:15:43",
+110,109,,,"Listening - Listen to, and follow the information and directions of others",P-ATL-COEX-a,,0,,"2021-11-17 10:15:58","2021-11-17 10:15:58",
+111,109,,,"Listening - Listen actively to other perspectives and ideas",P-ATL-COEX-b,,0,,"2021-11-17 10:16:07","2021-11-17 10:16:07",
+112,109,,,"Listening - Ask for clarifications",P-ATL-COEX-c,,0,,"2021-11-17 10:16:16","2021-11-17 10:16:16",
+113,109,,,"Listening - Listen actively and respectfully while others speak",P-ATL-COEX-d,,0,,"2021-11-17 10:16:26","2021-11-17 10:16:26",
+114,109,,,"Interpreting - nterpret visual, audio and oral communication: recognizing and creating signs, interpreting and using symbols and sounds",P-ATL-COEX-e,,0,,"2021-11-17 10:16:37","2021-11-17 10:16:37",
+115,109,,,"Interpreting - Understand the ways in which images and language interact to convey ideas",P-ATL-COEX-f,,0,,"2021-11-17 10:16:46","2021-11-17 10:16:46",
+116,109,,,"Interpreting - Recognize the meaning of kinaesthetic communication (body language)",P-ATL-COEX-g,,0,,"2021-11-17 10:16:57","2021-11-17 10:16:57",
+117,109,,,"Interpreting - Be aware of cultural differences when providing and interpreting communication",P-ATL-COEX-h,,0,,"2021-11-17 10:17:07","2021-11-17 10:17:07",
+118,109,,,"Speaking - Speak and express ideas clearly and logically in small and large groups",P-ATL-COEX-i,,0,,"2021-11-17 10:17:17","2021-11-17 10:17:17",
+119,109,,,"Speaking - Give and receive meaningful feedback and feedforward",P-ATL-COEX-j,,0,,"2021-11-17 10:17:26","2021-11-17 10:17:26",
+120,109,,,"Speaking - State opinions clearly, logically and respectfully",P-ATL-COEX-k,,0,,"2021-11-17 10:17:36","2021-11-17 10:17:36",
+121,109,,,"Speaking - Discuss and negotiate ideas and knowledge with peers and teachers",P-ATL-COEX-l,,0,,"2021-11-17 10:17:46","2021-11-17 10:17:46",
+122,109,,,"Speaking - Communicate with peers, experts and members of the learning community using a variety of digital environments and media",P-ATL-COEX-m,,0,,"2021-11-17 10:18:00","2021-11-17 10:18:00",
+123,108,,,Literacy,P-ATL-COLE,,0,"Reading, writing and using language to gather and communicate information.
+","2021-11-17 10:18:23","2021-11-17 10:18:23",
+124,123,,,"Reading - Read a variety of sources for information and for pleasure",P-ATL-COLE-a,,0,,"2021-11-17 10:18:32","2021-11-17 10:18:32",
+125,123,,,"Reading - Read critically and for comprehension",P-ATL-COLE-b,,0,,"2021-11-17 10:18:41","2021-11-17 10:18:41",
+126,123,,,"Reading - Make inferences and draw conclusions",P-ATL-COLE-c,,0,,"2021-11-17 10:18:50","2021-11-17 10:18:50",
+127,123,,,"Reading - Use and interpret a range of terms and symbols",P-ATL-COLE-d,,0,,"2021-11-17 10:19:01","2021-11-17 10:19:01",
+128,123,,,"Writing - Use appropriate forms of writing for different purposes and audiences",P-ATL-COLE-e,,0,,"2021-11-17 10:19:11","2021-11-17 10:19:11",
+129,123,,,"Writing - Paraphrase accurately and concisely",P-ATL-COLE-f,,0,,"2021-11-17 10:19:20","2021-11-17 10:19:20",
+130,123,,,"Writing - Record information and observations by hand and through digital technologies",P-ATL-COLE-g,,0,,"2021-11-17 10:19:30","2021-11-17 10:19:30",
+131,123,,,"Writing - Use a variety of scaffolding for writing tasks",P-ATL-COLE-h,,0,,"2021-11-17 10:19:41","2021-11-17 10:19:41",
+132,123,,,"Writing - Organize information logically",P-ATL-COLE-i,,0,,"2021-11-17 10:19:51","2021-11-17 10:19:51",
+133,123,,,"Writing - Make summary notes",P-ATL-COLE-j,,0,,"2021-11-17 10:20:00","2021-11-17 10:20:00",
+134,123,,,"Writing - Communicate using a range of technologies and media",P-ATL-COLE-k,,0,,"2021-11-17 10:20:10","2021-11-17 10:20:18",
+135,123,,,"Writing - Understand and use mathematical notation and other symbols",P-ATL-COLE-l,,0,,"2021-11-17 10:20:30","2021-11-17 10:20:30",
+136,123,,,"Writing - Responsibly participate in, and contribute to, digital social media networks",P-ATL-COLE-m,,0,,"2021-11-17 10:20:40","2021-11-17 10:20:40",
+137,108,,,ICT,P-ATL-COIC,,0,"Communicating using technology to gather, investigate and share information
+","2021-11-17 10:21:06","2021-11-17 10:21:06",
+138,137,,,"Understand the impact of media representations and modes of presentation",P-ATL-COIC-a,,0,,"2021-11-17 10:21:16","2021-11-17 10:21:16",
+139,137,,,"Make informed choices about modes of communication based on audience",P-ATL-COIC-b,,0,,"2021-11-17 10:21:25","2021-11-17 10:21:25",
+140,137,,,"Communicate information and ideas effectively to multiple audiences using a variety of media and modalities",P-ATL-COIC-c,,0,,"2021-11-17 10:21:34","2021-11-17 10:21:34",
+142,42,,,"Social skills",P-ATL-SO,,0,,"2021-11-17 10:22:02","2021-11-17 10:22:02",
+143,142,,,"Interpersonal relationships, social and emotional intelligence",P-ATL-SOIN,,0,"Developing positive interpersonal relationships and collaboration.
+","2021-11-17 10:22:22","2021-11-17 10:22:22",
+144,143,,,"Interpersonal relationships - Practise empathy and care for others",P-ATL-SOIN-a,,0,,"2021-11-17 10:22:32","2021-11-17 10:22:32",
+145,143,,,"Interpersonal relationships - Listen closely to others’ perspectives and to instructions",P-ATL-SOIN-b,,0,,"2021-11-17 10:22:42","2021-11-17 10:22:42",
+146,143,,,"Interpersonal relationships - Be respectful to others",P-ATL-SOIN-c,,0,,"2021-11-17 10:22:52","2021-11-17 10:22:52",
+147,143,,,"Interpersonal relationships - Learn cooperatively in a group: being courteous, sharing, taking turns",P-ATL-SOIN-d,,0,,"2021-11-17 10:23:02","2021-11-17 10:23:02",
+148,143,,,"Interpersonal relationships - Help others to succeed",P-ATL-SOIN-e,,0,,"2021-11-17 10:23:13","2021-11-17 10:23:13",
+149,143,,,"Interpersonal relationships - Build consensus and negotiate effectively",P-ATL-SOIN-f,,0,,"2021-11-17 10:23:23","2021-11-17 10:23:23",
+150,143,,,"Interpersonal relationships - Make fair and equitable decisions",P-ATL-SOIN-g,,0,,"2021-11-17 10:23:33","2021-11-17 10:23:33",
+151,143,,,"Interpersonal relationships - Encourage others to contribute",P-ATL-SOIN-h,,0,,"2021-11-17 10:23:43","2021-11-17 10:23:43",
+152,143,,,"Interpersonal relationships - Take on a variety of roles in group learning",P-ATL-SOIN-i,,0,,"2021-11-17 10:23:52","2021-11-17 10:23:52",
+153,143,,,"Interpersonal relationships - Advocate for one’s own rights and needs, and those of others",P-ATL-SOIN-j,,0,,"2021-11-17 10:24:01","2021-11-17 10:24:01",
+154,143,,,"Social and emotional intelligence - Be aware of own and others’ emotions",P-ATL-SOIN-k,,0,,"2021-11-17 10:24:15","2021-11-17 10:24:15",
+155,143,,,"Social and emotional intelligence - Manage anger and resolve conflict",P-ATL-SOIN-l,,0,,"2021-11-17 10:24:24","2021-11-17 10:24:24",
+156,143,,,"Social and emotional intelligence - Be self and socially aware",P-ATL-SOIN-m,,0,,"2021-11-17 10:24:34","2021-11-17 10:24:34",
+157,143,,,"Social and emotional intelligence - Be aware of own and others’ impact as a member of a learning group",P-ATL-SOIN-n,,0,,"2021-11-17 10:24:44","2021-11-17 10:24:44",
+159,42,,,"Self-management skills",P-ATL-SE,,0,,"2021-11-17 10:25:17","2021-11-17 10:25:17",
+160,159,,,Organization,P-ATL-SEOR,,0,"Managing time and tasks effectively.
+","2021-11-17 10:25:29","2021-11-17 10:25:29",
+161,160,,,"Plan short- and long-term tasks",P-ATL-SEOR-a,,0,,"2021-11-17 10:25:44","2021-11-17 10:25:44",
+162,160,,,"Set goals that are challenging and realistic",P-ATL-SEOR-b,,0,,"2021-11-17 10:25:52","2021-11-17 10:25:52",
+163,160,,,"Use time effectively and appropriately",P-ATL-SEOR-c,,0,,"2021-11-17 10:26:01","2021-11-17 10:26:01",
+164,160,,,"Bring necessary equipment and supplies to class",P-ATL-SEOR-d,,0,,"2021-11-17 10:26:12","2021-11-17 10:26:12",
+165,160,,,"Keep an organized and logical system to document learning",P-ATL-SEOR-e,,0,,"2021-11-17 10:26:23","2021-11-17 10:26:23",
+166,160,,,"Understand and use learning preferences",P-ATL-SEOR-f,,0,,"2021-11-17 10:26:33","2021-11-17 10:26:33",
+167,160,,,"Use technology effectively and productively",P-ATL-SEOR-g,,0,,"2021-11-17 10:26:42","2021-11-17 10:26:42",
+168,160,,,"Take on and complete tasks as agreed",P-ATL-SEOR-h,,0,,"2021-11-17 10:26:53","2021-11-17 10:26:53",
+169,160,,,"Delegate and share responsibility for decision-making",P-ATL-SEOR-i,,0,,"2021-11-17 10:27:03","2021-11-17 10:27:03",
+170,159,,,"States of mind",P-ATL-SEST,,0,"Using strategies that manage state of mind.
+","2021-11-17 10:27:34","2021-11-17 10:27:34",
+171,170,,,"Mindfulness – Use strategies to support concentration and overcome distractions",P-ATL-SEST-a,,0,,"2021-11-17 10:27:44","2021-11-17 10:27:44",
+172,170,,,"Mindfulness – Be aware of body–mind connections",P-ATL-SEST-b,,0,,"2021-11-17 10:27:53","2021-11-17 10:27:53",
+173,170,,,"Perseverance – Demonstrate persistence",P-ATL-SEST-c,,0,,"2021-11-17 10:28:02","2021-11-17 10:28:02",
+174,170,,,"Perseverance – Use strategies to remove barriers",P-ATL-SEST-d,,0,,"2021-11-17 10:28:10","2021-11-17 10:28:10",
+175,170,,,"Emotional management – Take responsibility for one’s own actions",P-ATL-SEST-e,,0,,"2021-11-17 10:28:21","2021-11-17 10:28:21",
+176,170,,,"Emotional management – Use strategies to prevent and eliminate bullying",P-ATL-SEST-f,,0,,"2021-11-17 10:28:31","2021-11-17 10:28:31",
+177,170,,,"Emotional management – Use strategies to reduce stress and anxiety",P-ATL-SEST-g,,0,,"2021-11-17 10:28:41","2021-11-17 10:28:41",
+178,170,,,"Emotional management – Manage anger and resolve conflict",P-ATL-SEST-h,,0,,"2021-11-17 10:28:50","2021-11-17 10:28:50",
+179,170,,,"Self-motivation – Practice positive thinking and language that reinforces self-motivation",P-ATL-SEST-i,,0,,"2021-11-17 10:29:01","2021-11-17 10:29:01",
+180,170,,,"Resilience – Manage setbacks",P-ATL-SEST-j,,0,,"2021-11-17 10:29:12","2021-11-17 10:29:12",
+181,170,,,"Resilience – Work through adversity",P-ATL-SEST-k,,0,,"2021-11-17 10:29:21","2021-11-17 10:29:21",
+182,170,,,"Resilience – Work through disappointment",P-ATL-SEST-l,,0,,"2021-11-17 10:29:31","2021-11-17 10:29:31",
+183,170,,,"Resilience – Work through change",P-ATL-SEST-m,,0,,"2021-11-17 10:29:43","2021-11-17 10:29:43",
+184,,,,"PYP Action and international-mindedness",,,0,"Action, the core of student agency, is integral to the Primary Years Programme (PYP) learning process and to the programme’s overarching outcome of international-mindedness. Through taking individual and collective action, students come to understand the responsibilities associated with being internationally minded and to appreciate the benefits of working with others for a shared purpose. When students see tangible actions that they can choose to take to make a difference, they see themselves as competent, capable and active agents of change (Oxfam 2015).
+","2021-11-17 10:41:20","2021-11-17 10:41:20",
+185,184,,,Participation,P-ACT-PA,,0,"Being actively involved in the learning community and showing commitment to contributing as individuals and as members of a group.
+","2021-11-17 10:41:38","2021-11-17 10:41:38",
+186,184,,,Advocacy,P-ACT-AD,,0,"Taking action individually or collectively to publicly support positive social, environmental or political change.
+","2021-11-17 10:41:57","2021-11-17 10:41:57",
+187,184,,,"Social justice",P-ACT-SJ,,0,"Taking action for positive change relating to human rights, equality and equity. Being concerned with the advantages and disadvantages within society, and with social well-being and justice for all.
+","2021-11-17 10:42:13","2021-11-17 10:42:13",
+188,184,,,"Social entrepreneurship",P-ACT-SE,,0,"Supporting positive social change through responding to the needs of local, national and global communities; applying prior knowledge and skills to identify and address challenges and opportunities in innovative, resourceful and sustainable ways.
+","2021-11-17 10:42:30","2021-11-17 10:42:30",
+189,184,,,"Lifestyle choice",P-ACT-LC,,0,"Making positive lifestyle changes in response to learning.
+","2021-11-17 10:42:46","2021-11-17 10:42:46",
+190,,,,"EY Approaches to Learning",,,0,"Beyond the skills of literacy and numeracy, there is a range of interrelated approaches to learning that are  transferable across contexts. These skills support purposeful inquiry and set the foundations for lifelong  learning. The development of these skills is frequently identified in education literature as crucial in supporting students to effectively learn and succeed inside and outside of school.
+","2021-11-17 10:43:12","2021-11-17 10:43:12",
+191,190,,,"Thinking skills",E-ATL-TH,,0,,"2021-11-17 10:43:24","2021-11-17 10:43:24",
+192,191,,,"Critical thinking",E-ATL-THCI,,0,"Analysing and evaluating issues and ideas, and forming decisions.
+","2021-11-17 10:43:37","2021-11-17 10:43:37",
+193,192,,,"Analysing - Observe carefully",E-ATL-THCI-a,,0,,"2021-11-17 10:43:49","2021-11-17 10:43:49",
+194,192,,,"Analysing - Find unique characteristics",E-ATL-THCI-b,,0,,"2021-11-17 10:43:58","2021-11-17 10:43:58",
+195,192,,,"Analysing - Consider meaning taken from materials and events",E-ATL-THCI-c,,0,,"2021-11-17 10:44:07","2021-11-17 10:44:07",
+196,192,,,"Analysing - Synthesize new understandings by seeing relationships and connections",E-ATL-THCI-d,,0,,"2021-11-17 10:44:16","2021-11-17 10:44:16",
+197,192,,,"Evaluating - Organize information",E-ATL-THCI-e,,0,,"2021-11-17 10:44:28","2021-11-17 10:44:28",
+198,192,,,"Evaluating - Evaluate evidence",E-ATL-THCI-f,,0,,"2021-11-17 10:44:38","2021-11-17 10:44:38",
+199,192,,,"Evaluating - Test generalizations, strategies or ideas",E-ATL-THCI-g,,0,,"2021-11-17 10:44:48","2021-11-17 10:44:48",
+200,192,,,"Forming decisions - Revise understandings based on new information and evidence",E-ATL-THCI-h,,0,,"2021-11-17 10:45:00","2021-11-17 10:45:00",
+201,192,,,"Forming decisions - Draw conclusions and generalizations",E-ATL-THCI-i,,0,,"2021-11-17 10:45:12","2021-11-17 10:45:12",
+202,192,,,"Forming decisions - Apply rules, strategies and ideas from one context to another",E-ATL-THCI-j,,0,,"2021-11-17 10:45:21","2021-11-17 10:45:21",
+203,191,,,"Creative thinking",E-ATL-THCE,,0,"Generating novel ideas and considering new perspectives.
+","2021-11-17 10:45:40","2021-11-17 10:45:40",
+204,203,,,"Generating novel ideas - Use discussions and play to generate new ideas and inquiries",E-ATL-THCE-a,,0,,"2021-11-17 10:45:49","2021-11-17 10:45:49",
+205,203,,,"Generating novel ideas - Make unexpected or unusual connections between objects and/or ideas",E-ATL-THCE-b,,0,,"2021-11-17 10:46:00","2021-11-17 10:46:00",
+206,203,,,"Generating novel ideas - Practice some “visible thinking” routines (Ritchhart, Church and Morrison 2011)",E-ATL-THCE-c,,0,,"2021-11-17 10:46:13","2021-11-17 10:46:13",
+207,203,,,"Considering new perspectives - Seek information",E-ATL-THCE-d,,0,,"2021-11-17 10:46:24","2021-11-17 10:46:24",
+208,203,,,"Considering new perspectives - Consider alternative solutions, including those that might be unlikely or impossible, in play and other situations",E-ATL-THCE-e,,0,,"2021-11-17 10:46:35","2021-11-17 10:46:35",
+209,203,,,"Considering new perspectives - Ask “what if” questions",E-ATL-THCE-f,,0,,"2021-11-17 10:46:48","2021-11-17 10:46:48",
+210,203,,,"Considering new perspectives - Practise some “visible thinking” routines",E-ATL-THCE-g,,0,,"2021-11-17 10:46:59","2021-11-17 10:46:59",
+211,191,,,"Information Transfer",E-ATL-THTR,,0,"Using skills and knowledge in multiple contexts.
+","2021-11-17 10:47:15","2021-11-17 10:47:25",
+212,211,,,"Apply skills and knowledge in unfamiliar situations or outside of school",E-ATL-THTR-a,,0,,"2021-11-17 10:47:35","2021-11-17 10:47:35",
+213,211,,,"Make connections between units of inquiry",E-ATL-THTR-b,,0,,"2021-11-17 10:47:45","2021-11-17 10:47:45",
+214,191,,,"Reflection and metacognition",E-ATL-THRE,,0,"Using thinking skills to reflect on the process of learning.
+","2021-11-17 10:48:01","2021-11-17 10:48:01",
+215,190,,,"Research skills",E-ATL-RE,,0,,"2021-11-17 10:50:10","2021-11-17 10:50:10",
+216,215,,,"Information literacy",P-ATL-REIN,,0,"Formulating and planning, data gathering and recording, synthesizing and interpreting, evaluating and communicating.
+","2021-11-17 10:50:22","2021-11-17 10:50:22",
+217,216,,,"Formulating and planning - Ask or express through play questions that can be researched",E-ATL-REIN-a,,0,,"2021-11-17 10:50:35","2021-11-17 10:50:35",
+218,216,,,"Formulating and planning - Select information sources and digital tools",E-ATL-REIN-b,,0,,"2021-11-17 10:50:45","2021-11-17 10:50:45",
+219,216,,,"Data gathering and recording (audio recording, drawing, photographing) - Gather information from a variety of sources (people, places, materials, literature)",E-ATL-REIN-c,,0,,"2021-11-17 10:51:06","2021-11-17 10:51:06",
+220,216,,,"Data gathering and recording (audio recording, drawing, photographing) - Use all senses to observe and notice details",E-ATL-REIN-d,,0,,"2021-11-17 10:51:18","2021-11-17 10:51:18",
+221,216,,,"Data gathering and recording (audio recording, drawing, photographing) - Record observations—drawing, charting, tallying—using emergent writing skills, when possible, to write comments, annotate images, and so on",E-ATL-REIN-e,,0,,"2021-11-17 10:51:31","2021-11-17 10:51:31",
+222,216,,,"Synthesizing and interpreting - Sort and categorize information and materials; arrange into forms or order, for example, with graphs, marks or symbols using emergent writing skills",E-ATL-REIN-f,,0,,"2021-11-17 10:52:04","2021-11-17 10:52:04",
+223,216,,,"Synthesizing and interpreting - Analyse and interpret information",E-ATL-REIN-g,,0,,"2021-11-17 10:52:17","2021-11-17 10:52:17",
+224,216,,,"Evaluating and communicating - Notice relationships and patterns",E-ATL-REIN-h,,0,,"2021-11-17 10:52:26","2021-11-17 10:52:26",
+225,216,,,"Evaluating and communicating - Present information in a variety of modalities",E-ATL-REIN-i,,0,,"2021-11-17 10:52:37","2021-11-17 10:52:37",
+226,216,,,"Evaluating and communicating - Acknowledge sources, for example, from a book, movie or peer",E-ATL-REIN-j,,0,,"2021-11-17 10:52:47","2021-11-17 10:52:47",
+227,215,,,"Media literacy",E-ATL-REME,,0,"Interacting with media to use and create ideas and information.
+","2021-11-17 10:53:01","2021-11-17 10:53:10",
+228,227,,,"Draw connections among media resources",E-ATL-REME-a,,0,,"2021-11-17 10:53:27","2021-11-17 10:53:27",
+229,227,,,"Use media to communicate, share and connect with others",E-ATL-REME-b,,0,,"2021-11-17 10:53:44","2021-11-17 10:53:44",
+230,227,,,"Communicate information and ideas using a variety of media (as their skills progress)",E-ATL-REME-c,,0,,"2021-11-17 10:54:35","2021-11-17 10:54:35",
+231,190,,,"Communication skills",E-ATL-CO,,0,,"2021-11-17 10:54:49","2021-11-17 10:54:49",
+232,231,,,"Exchanging information",E-ATL-COEX,,0,"Listening, interpreting and speaking.
+","2021-11-17 10:55:05","2021-11-17 10:55:05",
+233,232,,,"Listening - Listen to information",E-ATL-COEX-a,,0,,"2021-11-17 10:57:50","2021-11-17 10:57:50",
+234,232,,,"Listening - Listen actively and respectfully to others’ ideas",E-ATL-COEX-b,,0,,"2021-11-17 10:58:00","2021-11-17 10:58:00",
+235,232,,,"Listening - Ask for clarifications",E-ATL-COEX-c,,0,,"2021-11-17 10:58:09","2021-11-17 10:58:09",
+236,232,,,"Interpreting - Interpret visual, audio and oral communication: recognizing and creating signs, interpreting and using symbols and sounds",E-ATL-COEX-d,,0,,"2021-11-17 10:58:20","2021-11-17 10:58:20",
+237,232,,,"Interpreting - Understand the ways in which images and language interact to convey ideas",E-ATL-COEX-e,,0,,"2021-11-17 10:58:32","2021-11-17 10:58:32",
+238,232,,,"Interpreting - Recognize the meaning of kinaesthetic communication (body language)",E-ATL-COEX-f,,0,,"2021-11-17 10:58:43","2021-11-17 10:58:43",
+239,232,,,"Speaking - Express oneself using words and sentences",E-ATL-COEX-g,,0,,"2021-11-17 10:58:52","2021-11-17 10:58:52",
+240,232,,,"Speaking - Participate in conversations",E-ATL-COEX-h,,0,,"2021-11-17 10:59:03","2021-11-17 10:59:03",
+241,232,,,"Speaking - Negotiate ideas and knowledge with peers and teachers",E-ATL-COEX-i,,0,,"2021-11-17 10:59:12","2021-11-17 10:59:12",
+242,231,,,"Symbolic exploration and expression",E-ATL-COSY,,0,"Reading, writing and using language to gather and communicate information.
+","2021-11-17 10:59:48","2021-11-17 10:59:48",
+243,242,,,"Reading, writing and mathematics - Take on pretend roles and situations",E-ATL-COSY-a,,0,,"2021-11-17 11:00:02","2021-11-17 11:00:02",
+244,242,,,"Reading, writing and mathematics - Understand symbols",E-ATL-COSY-b,,0,,"2021-11-17 11:00:15","2021-11-17 11:00:15",
+245,242,,,"Reading, writing and mathematics - Access a variety of sources for information and for pleasure",E-ATL-COSY-c,,0,,"2021-11-17 11:00:25","2021-11-17 11:00:25",
+246,242,,,"Reading, writing and mathematics - Make inferences and draw conclusions",E-ATL-COSY-d,,0,,"2021-11-17 11:00:35","2021-11-17 11:00:35",
+247,242,,,"Reading, writing and mathematics - Understand that mark-making carries meaning",E-ATL-COSY-e,,0,,"2021-11-17 11:00:44","2021-11-17 11:00:44",
+248,242,,,"Reading, writing and mathematics - Use mark-marking to convey meaning",E-ATL-COSY-f,,0,,"2021-11-17 11:00:54","2021-11-17 11:00:54",
+249,242,,,"Reading, writing and mathematics - Document information and observations in a variety of ways",E-ATL-COSY-g,,0,,"2021-11-17 11:01:06","2021-11-17 11:01:06",
+250,242,,,"Reading, writing and mathematics - Communicate using a range of technologies and materials",E-ATL-COSY-h,,0,,"2021-11-17 11:01:16","2021-11-17 11:01:16",
+251,190,,,"Social Skills",E-ATL-SO,,0,,"2021-11-17 11:01:27","2021-11-17 11:01:35",
+252,251,,,"Interpersonal relationships, social and emotional intelligence",E-ATL-SOIN,,0,"Developing positive interpersonal relationships and collaboration.
+","2021-11-17 11:01:50","2021-11-17 11:01:50",
+253,252,,,"Interpersonal relationships - Practise empathy and care for others",E-ATL-SOIN-a,,0,,"2021-11-17 11:02:06","2021-11-17 11:02:06",
+254,252,,,"Interpersonal relationships - Listen closely to others",E-ATL-SOIN-b,,0,,"2021-11-17 11:02:16","2021-11-17 11:02:16",
+255,252,,,"Interpersonal relationships - Be respectful to others",E-ATL-SOIN-c,,0,,"2021-11-17 11:02:25","2021-11-17 11:02:25",
+256,252,,,"Interpersonal relationships - Play cooperatively in a group: sharing, taking turns",E-ATL-SOIN-d,,0,,"2021-11-17 11:02:34","2021-11-17 11:02:34",
+257,252,,,"Interpersonal relationships - Help others",E-ATL-SOIN-e,,0,,"2021-11-17 11:02:45","2021-11-17 11:02:45",
+258,252,,,"Social and emotional intelligence - Be aware of own and others’ feelings",E-ATL-SOIN-f,,0,,"2021-11-17 11:02:54","2021-11-17 11:02:54",
+259,252,,,"Social and emotional intelligence - Manage anger and resolve conflict",E-ATL-SOIN-g,,0,,"2021-11-17 11:03:04","2021-11-17 11:03:04",
+260,252,,,"Social and emotional intelligence - Be self- and socially aware",E-ATL-SOIN-h,,0,,"2021-11-17 11:03:14","2021-11-17 11:03:14",
+261,252,,,"Social and emotional intelligence - Be aware of own and others’ impact as a member of a learning group",E-ATL-SOIN-i,,0,,"2021-11-17 11:03:23","2021-11-17 11:03:23",
+262,190,,,"Self-management skills",E-ATL-SE,,0,,"2021-11-17 11:03:43","2021-11-17 11:03:43",
+263,262,,,Organization,E-ATL-SEOR,,0,"Managing time and tasks effectively.
+","2021-11-17 11:03:57","2021-11-17 11:03:57",
+264,263,,,"Choose and complete tasks independently",E-ATL-SEOR-a,,0,,"2021-11-17 11:04:10","2021-11-17 11:04:10",
+265,263,,,"Follow the directions of others",E-ATL-SEOR-b,,0,,"2021-11-17 11:04:19","2021-11-17 11:04:19",
+266,263,,,"Follow classroom routines",E-ATL-SEOR-c,,0,,"2021-11-17 11:04:35","2021-11-17 11:04:35",
+267,263,,,"Share responsibility for decision-making",E-ATL-SEOR-d,,0,,"2021-11-17 11:04:44","2021-11-17 11:04:44",
+268,262,,,"States of mind",E-ATL-SEST,,0,"Using strategies that manage state of mind.
+","2021-11-17 11:04:55","2021-11-17 11:05:07",
+269,268,,,"Mindfulness – Take responsibility for own well-being",E-ATL-SEST-a,,0,,"2021-11-17 11:05:18","2021-11-17 11:05:18",
+270,268,,,"Mindfulness – Be aware of body–mind connections",E-ATL-SEST-b,,0,,"2021-11-17 11:05:26","2021-11-17 11:05:26",
+271,268,,,"Perseverance – Demonstrate persistence in tasks",E-ATL-SEST-c,,0,,"2021-11-17 11:05:35","2021-11-17 11:05:35",
+272,268,,,"Perseverance – Use strategies to problem-solve",E-ATL-SEST-d,,0,,"2021-11-17 11:05:44","2021-11-17 11:05:44",
+273,268,,,"Perseverance – Manage own emotions",E-ATL-SEST-e,,0,,"2021-11-17 11:05:53","2021-11-17 11:05:53",
+274,268,,,"Perseverance – Manage feelings and resolve conflict",E-ATL-SEST-f,,0,,"2021-11-17 11:06:02","2021-11-17 11:06:02",
+275,268,,,"Resilience – Work through setbacks",E-ATL-SEST-g,,0,,"2021-11-17 11:06:15","2021-11-17 11:06:15",
+276,268,,,"Resilience – Work through disappointment",E-ATL-SEST-h,,0,,"2021-11-17 11:06:24","2021-11-17 11:06:24",
+277,268,,,"Resilience – Show ability to adjust to new situations",E-ATL-SEST-i,,0,,"2021-11-17 11:06:35","2021-11-17 11:06:35",
+278,214,,,"Identify strengths and areas for improvement",E-ATL-THTR-a,,0,,"2021-11-19 11:37:19","2021-11-19 11:37:19",
+279,214,,,"Reflect on their learning by asking questions",E-ATL-THTR-b,,0,"Reflect on their learning by asking questions such as:
 What did I learn today?
 What can I already do?
 What will I work on next?
-","2021-11-19 11:37:50","2021-11-19 11:37:50",NULL
+","2021-11-19 11:37:50","2021-11-19 11:37:50",
