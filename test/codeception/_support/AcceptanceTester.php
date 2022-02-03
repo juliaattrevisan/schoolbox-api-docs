@@ -149,7 +149,7 @@ class AcceptanceTester extends Actor
     {
         $i = $this;
         $i->click('label.icon-search.no-text');
-        $i->type($fullname);
+        $i->fillField('input#search-field', $fullname);
         $i->click('ul.results.information-list');
         $i->waitForText($fullname, 5);
     }
