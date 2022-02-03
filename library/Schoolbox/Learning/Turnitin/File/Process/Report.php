@@ -96,6 +96,7 @@ class Report
      *
      * @param Turnitin\File\Model $model
      * @return void
+     * @throws Turnitin\Exception\Conflict
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      * @throws \PDOException
@@ -122,6 +123,7 @@ class Report
      * @param Turnitin\File\Model $model
      * @throws BadEndpoint
      * @throws Credentials
+     * @throws Turnitin\Exception\Conflict
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -132,14 +134,26 @@ class Report
      */
     public function processPreparedReports(Turnitin\File\Model $model): void
     {
-        $reportInfo = $this->getReportInfo($model, null);
-
-        /* If we got report data, cache some of it locally
-         * then clear away all previous errors I suppose,
-         * since they no longer have meaning...but is this wise?
+        /* Branch out here for historical documents, which require indexing only
+         * https://developers.turnitin.com/docs/tca#index-a-submission
+         * Everything else does generateReport, as usual, then ends.
          */
-        if (null !== $reportInfo) {
-            $this->cacheLocally($model, $reportInfo);
+        if ($model->getHistorical()) {
+            /* Historically added docs only get indexed; they don't get a report
+             * We don't need to do as much as we normally would, such as caching
+             * pieces of data locally etc.
+             */
+            $this->indexHistorical($model);
+        } else {
+            $reportInfo = $this->getReportInfo($model, null);
+
+            /* If we got report data, cache some of it locally
+             * then clear away all previous errors I suppose,
+             * since they no longer have meaning...but is this wise?
+             */
+            if (null !== $reportInfo) {
+                $this->cacheLocally($model, $reportInfo);
+            }
         }
     }
 
@@ -188,6 +202,7 @@ class Report
      * @return array|null
      * @throws BadEndpoint
      * @throws Credentials
+     * @throws Turnitin\Exception\Conflict
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -260,6 +275,7 @@ class Report
      * @return array|null
      * @throws BadEndpoint
      * @throws Credentials
+     * @throws Turnitin\Exception\Conflict
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
@@ -295,21 +311,13 @@ class Report
                 Turnitin\File\Model::STATUS_REPORT_ANALYSING
             );
 
-            /* Branch out here for historical documents, which require indexing only
-             * https://developers.turnitin.com/docs/tca#index-a-submission
-             * Everything else does generateReport, as usual, then ends.
+            /* Schedule a report for generation (don't know if we need $similarity yet)
+             * Also, log the conflict if there is one
              */
-            if ($model->getHistorical()) {
-                $historical = $this->indexHistorical($model);
-            } else {
-                /* Schedule a report for generation (don't know if we need $similarity yet)
-                 * Also, log the conflict if there is one
-                 */
-                try {
-                    $similarity = $this->generateReport($model);
-                } catch (Turnitin\Exception\Conflict $e) {
-                    $this->changeToErrorState($model, $existingInfo ?? ['error_code' => 'unknown']);
-                }
+            try {
+                $similarity = $this->generateReport($model);
+            } catch (Turnitin\Exception\Conflict $e) {
+                $this->changeToErrorState($model, $existingInfo ?? ['error_code' => 'unknown']);
             }
 
             return null;
@@ -362,9 +370,9 @@ class Report
                 'Report %s: indexing historical Turnitin submission %s; setting status [%s]',
                 $model->getId(),
                 $model->getTurnitinSubmissionId(),
-                Turnitin\File\Model::STATUS_REPORT_ANALYSING
+                Turnitin\File\Model::STATUS_REPORT_INDEXING
             ),
-            Turnitin\File\Model::STATUS_REPORT_ANALYSING
+            Turnitin\File\Model::STATUS_REPORT_INDEXING
         );
 
         /* No payload required when indexing a document, apparently
@@ -373,14 +381,37 @@ class Report
 
         $result = $this->api->retrieve('PUT', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/index", $payload);
 
-        $this->logDebug(sprintf(
-            'Report %s: Turnitin historical submission id %s - %s',
-            $model->getId(),
-            $model->getTurnitinSubmissionId(),
-            $result['message']
-        ));
+        if (null !== $result) {
+            if ($result['is_indexed']) {
+                $this->changeState(
+                    $model,
+                    sprintf(
+                        'Report %s: Turnitin indexed historical submission id %s; setting status [%s]',
+                        $model->getId(),
+                        $model->getTurnitinSubmissionId(),
+                        Turnitin\File\Model::STATUS_COMPLETE
+                    ),
+                    Turnitin\File\Model::STATUS_COMPLETE
+                );
 
-        return $result;
+                return $result;
+            }
+
+            /* If you didn't return by now, something went awry
+             */
+            $this->changeState(
+                $model,
+                sprintf(
+                    'Report %s: Turnitin could not index historical submission id %s; setting status [%s]',
+                    $model->getId(),
+                    $model->getTurnitinSubmissionId(),
+                    Turnitin\File\Model::STATUS_ERROR
+                ),
+                Turnitin\File\Model::STATUS_ERROR
+            );
+        }
+
+        return null;
     }
 
 

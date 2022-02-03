@@ -67,6 +67,10 @@ class Model implements ISoftDeletable
      */
     public const STATUS_REPORT_ANALYSING = 'analysing';
 
+    /* We started indexing a historical document in turnitin
+     */
+    public const STATUS_REPORT_INDEXING = 'indexing';
+
     /* We successfully completed turnitin analysis, yanking their overall percentage
      * and caching that locally
      */
@@ -178,7 +182,8 @@ class Model implements ISoftDeletable
             self::STATUS_TRANSMIT_UPLOADING,
             self::STATUS_TRANSMIT_LOADED,
             self::STATUS_REPORT_PREPARED,
-            self::STATUS_REPORT_ANALYSING
+            self::STATUS_REPORT_ANALYSING,
+            self::STATUS_REPORT_INDEXING
         ]);
     }
 

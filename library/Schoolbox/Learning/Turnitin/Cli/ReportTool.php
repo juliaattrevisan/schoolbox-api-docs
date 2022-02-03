@@ -238,13 +238,15 @@ HELP;
                 'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
                 'status' => [
                     Turnitin\File\Model::STATUS_REPORT_PREPARED,
-                    Turnitin\File\Model::STATUS_REPORT_ANALYSING
+                    Turnitin\File\Model::STATUS_REPORT_ANALYSING,
+                    Turnitin\File\Model::STATUS_REPORT_INDEXING
                 ]
             ]);
         } else {
             $models = Turnitin\File\Mapper::getInstance()->findByColumn('status', [
                 Turnitin\File\Model::STATUS_REPORT_PREPARED,
-                Turnitin\File\Model::STATUS_REPORT_ANALYSING
+                Turnitin\File\Model::STATUS_REPORT_ANALYSING,
+                Turnitin\File\Model::STATUS_REPORT_INDEXING
             ]);
         }
 
