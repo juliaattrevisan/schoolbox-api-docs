@@ -11,7 +11,7 @@
         {# Setup ckEditor #}
 
         $.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_public')}));
-        $.fn.alaressEditor({targetElements: $('#body_private')});
+        $.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_private')}));
 
         {# Pastoral Tag Selectize #}
 
@@ -333,6 +333,7 @@
                 /* If subtypeId != null, load its template html iff the General Template's
                  * current value is the same as the Subtype template or if the General
                  * Template's current value is empty string
+                 * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
             } else {
@@ -340,6 +341,7 @@
                 /* If subtypeId == null, look at the parent typeId. load its template
                  * html iff the General Template's current value is the same as the
                  * Type template or if the General Template's current value is empty string
+                 * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
             }
