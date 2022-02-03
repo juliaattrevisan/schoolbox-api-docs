@@ -41,7 +41,7 @@ class Controller extends Base
                 [
                     'pageCurrent' => $this->router->generate('adminPackage.getIndex'),
                     'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminPackage.getIndex')),
-                    'packages'    => $this->packageMapper->findAll(),
+                    'packages'    => $this->packageMapper->findAvailablePackages(),
                 ]
             )
         );

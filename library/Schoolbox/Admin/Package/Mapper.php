@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Admin\Package;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -32,5 +33,16 @@ class Mapper extends BaseMapper
         $this->uses('description', self::TYPE_STRING);
         $this->uses('location', self::TYPE_STRING);
         $this->uses('installed', self::TYPE_BOOLEAN);
+        $this->uses('hidden', self::TYPE_BOOL_ENUM);
+    }
+
+    /**
+     * Find all available packages
+     *
+     * @return GenericCollection
+     */
+    public function findAvailablePackages(): GenericCollection
+    {
+        return $this->findByColumnList(['hidden' => 'false']);
     }
 }
