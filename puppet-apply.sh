@@ -27,18 +27,14 @@ function main() {
   local manifest_file
   manifest_file=$(find /tmp/vagrant-puppet/ -maxdepth 1 -iname 'manifests-*')"/site.pp"
 
-  /opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/puppet/bin/puppet apply \
+  FACTER_primary_php_majver='8.0' /opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/puppet/bin/puppet apply \
     --modulepath "$module_path" \
     --hiera_config="$hiera_config" \
     --detailed-exitcodes \
     --environmentpath "$environment_path" \
     --environment "$environment" \
     "$manifest_file" "$@"
-
-  echo "[SB][$(date +%Y-%m-%d\ %X)] Enabling Schoolbox nginx vhost";
   chown -fR vagrant:vagrant /mnt/data/php_tmp;
-
-  service php7.4-fpm restart
 }
 
 ##################################################################################

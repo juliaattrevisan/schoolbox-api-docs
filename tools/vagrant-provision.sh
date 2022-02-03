@@ -59,7 +59,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion_current=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
-phpversion_supported='7.4';
+phpversion_supported='8.0';
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion_current, supported: $phpversion_supported";
 #if [ "$phpversion_current" != "7.4" ];
 #then
@@ -68,7 +68,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $ph
 
 # Schoolbox <= 20.1 requires PHP 7.1: >= 20.2 requires PHP 7.4
 if [ "$phpversion_current" != "$phpversion_supported" ]; then
-  error " Current and supported PHP versions do not match. Check 'ubuntu-1804-php71.vagrant.yaml' in puppet repo";
+  error " Current and supported PHP versions do not match. Check 'ubuntu-1804-php74.vagrant.yaml' in puppet repo";
   exit 1
 fi
 
@@ -365,16 +365,16 @@ then
     echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
     if [ -f /vagrant/tools/xdebug.ini ]; then
         echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
-        cp -f /vagrant/tools/xdebug.ini /etc/php/7.4/mods-available/xdebug.ini;
+        cp -f /vagrant/tools/xdebug.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
     else
         echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
-        cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.4/mods-available/xdebug.ini;
+        cp -f /vagrant/tools/xdebug.default.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
     fi
 
-    ln -sf /etc/php/7.4/mods-available/xdebug.ini   /etc/php/7.4/fpm/conf.d/20-xdebug.ini
-    ln -sf /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/fpm/conf.d/20-tideways.ini
-    ln -sf /etc/php/7.4/mods-available/xdebug.ini   /etc/php/7.4/cli/conf.d/20-xdebug.ini
-    ln -sf /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/cli/conf.d/20-tideways.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/cli/conf.d/20-xdebug.ini
+    ln -sf /etc/php/"$phpversion_supported"/mods-available/tideways.ini /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini
 
 
     # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
@@ -409,15 +409,15 @@ then
 
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
-    rm -f /etc/php/7.4/cli/conf.d/20-xdebug.ini;
-    rm -f /etc/php/7.4/cli/conf.d/20-tideways.ini;
-    rm -f /etc/php/7.4/fpm/conf.d/20-xdebug.ini;
-    rm -f /etc/php/7.4/fpm/conf.d/20-tideways.ini;
+    rm -f /etc/php/$phpversion_supported/cli/conf.d/20-xdebug.ini;
+    rm -f /etc/php/$phpversion_supported/cli/conf.d/20-tideways.ini;
+    rm -f /etc/php/$phpversion_supported/fpm/conf.d/20-xdebug.ini;
+    rm -f /etc/php/$phpversion_supported/fpm/conf.d/20-tideways.ini;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart;
-service php7.4-fpm restart
+eval "service php${phpversion_supported}-fpm restart"
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
