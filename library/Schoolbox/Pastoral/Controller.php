@@ -588,21 +588,14 @@ class Controller extends Base
 
         $rolesAll = $this->roleMapper->findAll();
 
-        // When student ids are provided to copy this record to, prefill Create duplicate record field.
-        // Also: fill the `$roleUsers` values.
+        // When student ids are provided to copy this record to:
+        // add all those students and their parents to the role user counts.
         $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
-        $duplicates   = $this->userMapper->findByColumnList([
+        /** @var User[] $duplicates */
+        $duplicates = $this->userMapper->findByColumnList([
             'id'           => $duplicateIds,
             'g.group_type' => Role::STUDENT,
         ]);
-        $students = [];
-        /** @var User $student */
-        foreach ($duplicates as $student) {
-            $students[] = [
-                'id'   => $student->getId(),
-                'name' => $student->getFullName(),
-            ];
-        }
 
         /** @var Role $roleCurrent */
         foreach ($rolesAll as $roleCurrent) {
@@ -623,13 +616,27 @@ class Controller extends Base
                         }
                     }
                 }
+                foreach ($duplicates as $duplicateStudent) {
+                    $duplicateStudent->loadParents();
+                    foreach ($duplicateStudent->getParents() as $parent) {
+                        if ($parent->getRole()->getId() == $roleCurrent->getId()) {
+                            $roleUsers[$roleCurrent->getId()]++;
+                        }
+                    }
+                }
             }
 
+            // Student role: show only the # of users in this role
             if ($allowStudents && $roleCurrent->isStudent()) {
                 $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = 0;
                 if ($record->getStudent()) {
                     if ($record->getStudent()->getRole()->getId() == $roleCurrent->getId()) {
+                        $roleUsers[$roleCurrent->getId()]++;
+                    }
+                }
+                foreach ($duplicates as $duplicateStudent) {
+                    if ($duplicateStudent->getRole()->getId() == $roleCurrent->getId()) {
                         $roleUsers[$roleCurrent->getId()]++;
                     }
                 }
@@ -645,6 +652,15 @@ class Controller extends Base
             } else {
                 $typeAudiences[$audience->getType()->getId()][] = $audience;
             }
+        }
+
+        // Prefill create duplicate record field with duplicate students
+        $students = [];
+        foreach ($duplicates as $student) {
+            $students[] = [
+                'id'   => $student->getId(),
+                'name' => $student->getFullName(),
+            ];
         }
 
         /* Build a hash lookup of (typeId => html) and (subtypeId => html) tuples
