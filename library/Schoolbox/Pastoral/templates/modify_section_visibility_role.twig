@@ -14,7 +14,7 @@
                     {% set roleName = userAccess.role.name %}
                 {% elseif userAccess.roleType %}
                     {% set roleId = 'role-type-' ~ userAccess.roleType %}
-                    {% set roleName = userAccess.roleType | upper %}
+                    {% set roleName = userAccess.roleType | capitalize %}
                 {% endif %}
 
                 {% if roleId %}
@@ -103,21 +103,29 @@
 
                 {# Students: a role type, rather than a role #}
                 {# TODO consider exposing parents as a role type instead #}
-                {% if allowStudents %}
-                    <li data-role-add="role-type-student" data-role-name="Student">
+                {% for roleType in roleTypes %}
+                    <li data-role-add="role-type-{{ roleType }}" data-role-name="{{ roleType | capitalize }}">
                         <a class="list-item link-row">
                             <div class="card small-12">
                                 <i class="icon-group alert size-32"></i>
-                                <p>Student</p>
+                                <p>{{ roleType | capitalize }}</p>
                                 <p class="meta">
                                     System Role
-                                    <br />
-                                    (Only {{ record.student.firstName ?? 'the student' }} will be able to view this record.)
+
+                                    {% if roleType == 'student' %}
+                                        <br />
+                                        (Only {{ record.student.firstName ?? 'the student' }} will be able to view this record.)
+                                    {% endif %}
+
+                                    {% if roleType == 'parent' %}
+                                        <br />
+                                        (Only {{ record.student.firstName ?? 'the student' }}'s parents will be able to view this record.)
+                                    {% endif %}
                                 </p>
                             </div>
                         </a>
                     </li>
-                {% endif %}
+                {% endfor %}
             </ul>
         </section>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>

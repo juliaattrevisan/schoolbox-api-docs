@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
@@ -25,6 +24,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -587,7 +587,7 @@ class Controller extends Base
         $roleUserCounts = [];
         $rolesWithUsers = [];
 
-        $rolesAll = $this->roleMapper->findByColumn('group_type', [Role::STAFF, Role::PARENT]);
+        $allowedRoles   = $this->determineAllowedRoles();
 
         // When student ids are provided to copy this record to:
         // add all those students and their parents to the role user counts.
@@ -599,7 +599,7 @@ class Controller extends Base
         ]);
 
         /** @var Role $roleCurrent */
-        foreach ($rolesAll as $roleCurrent) {
+        foreach ($allowedRoles as $roleCurrent) {
             $rolesWithUsers[$roleCurrent->getId()] = false;
             $roleUserCounts[$roleCurrent->getId()] = 0;
 
@@ -734,6 +734,7 @@ class Controller extends Base
                     'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
+                    'roleTypes'         => $this->determineAllowedRoleTypes(),
                     'roleUserCounts'    => $roleUserCounts,
                     'rolesWithUsers'    => $rolesWithUsers,
                     'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
@@ -1507,6 +1508,31 @@ class Controller extends Base
             $this->getResponse()->status->setCode(400);
         }
         $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * @return GenericCollection<Role>
+     */
+    private function determineAllowedRoles(): GenericCollection
+    {
+        $allowedRoleTypes = [Role::STAFF];
+        if ($this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::PARENT;
+        }
+        return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes);
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function determineAllowedRoleTypes(): array
+    {
+        $allowedRoleTypes = [];
+        if ($this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::STUDENT;
+        }
+        return $allowedRoleTypes;
     }
 }
 
