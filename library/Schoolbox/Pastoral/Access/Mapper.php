@@ -29,6 +29,8 @@ use Schoolbox\UserMapper;
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  *
  * @package Schoolbox\Pastoral\Access
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
@@ -55,7 +57,7 @@ class Mapper extends BaseMapper
             self::TYPE_STRING,
             self::COLUMN_ENUM,
             'roleType',
-            [Role::GUEST, Role::STUDENT, Role::PARENT, Role::STAFF],
+            [Role::GUEST, Role::STUDENT, Role::PARENT, Role::STAFF, null],
         );
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
