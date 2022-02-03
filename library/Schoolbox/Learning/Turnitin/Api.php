@@ -137,8 +137,9 @@ class Api
      * @param array  $params
      * @return array|null
      * @throws Exception\BadEndpoint
+     * @throws Exception\Conflict
      * @throws Exception\Credentials
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      * @throws \DomainException
      * @throws \JsonException
      * @throws \RuntimeException

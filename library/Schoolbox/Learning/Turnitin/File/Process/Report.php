@@ -487,14 +487,17 @@ class Report
         $this->turnitinMapper->save($model);
     }
 
+
     /**
      * Change the state of this report to an error state.
      *
      * @param Turnitin\File\Model $model
      * @param array               $uploadResult
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    private function changeToErrorState(Turnitin\File\Model $model, array $uploadResult)
+    private function changeToErrorState(Turnitin\File\Model $model, array $uploadResult): void
     {
         $this->logWarning(
             sprintf(
