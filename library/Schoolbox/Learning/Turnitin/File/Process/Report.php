@@ -295,12 +295,12 @@ class Report
                 Turnitin\File\Model::STATUS_REPORT_ANALYSING
             );
 
-            /* TODO Branch out here for historical documents, which require indexing only
+            /* Branch out here for historical documents, which require indexing only
              * https://developers.turnitin.com/docs/tca#index-a-submission
              * Everything else does generateReport, as usual, then ends.
              */
             if ($model->getHistorical()) {
-                $this->indexReport($model);
+                $historical = $this->indexHistorical($model);
             } else {
                 /* Schedule a report for generation (don't know if we need $similarity yet)
                  * Also, log the conflict if there is one
@@ -334,6 +334,53 @@ class Report
         ));
 
         return null;
+    }
+
+    /**
+     * Request turnitin to index this file's data, but not generate a report.
+     *
+     * @param Turnitin\File\Model $model
+     * @return array|null
+     * @throws BadEndpoint
+     * @throws Credentials
+     * @throws Turnitin\Exception\Conflict
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function indexHistorical(Turnitin\File\Model $model): ?array
+    {
+        /* Log the state change
+         */
+        $this->changeState(
+            $model,
+            sprintf(
+                'Report %s: indexing historical Turnitin submission %s; setting status [%s]',
+                $model->getId(),
+                $model->getTurnitinSubmissionId(),
+                Turnitin\File\Model::STATUS_REPORT_ANALYSING
+            ),
+            Turnitin\File\Model::STATUS_REPORT_ANALYSING
+        );
+
+        /* No payload required when indexing a document, apparently
+         */
+        $payload = [];
+
+        $result = $this->api->retrieve('PUT', "/api/v1/submissions/{$model->getTurnitinSubmissionId()}/index", $payload);
+
+        $this->logDebug(sprintf(
+            'Report %s: Turnitin historical submission id %s - %s',
+            $model->getId(),
+            $model->getTurnitinSubmissionId(),
+            $result['message']
+        ));
+
+        return $result;
     }
 
 
