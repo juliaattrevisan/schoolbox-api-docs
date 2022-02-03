@@ -463,7 +463,7 @@ class AssessmentOnGroupCest
     {
         #GIVEN
         $timestamp  = time();
-        $groupPage = $this->createHomepage($i, 'Testing Submit Assessment on Group Page at ' . $timestamp);
+        $groupPage = $this->createHomepage($i, 'Testing Full Access User Submits Assessment on Group Page at ' . $timestamp);
 
         $student = $i->grabUser('jreed');
         $teacher = $i->grabUser('jcoles');
@@ -482,7 +482,7 @@ class AssessmentOnGroupCest
         $i->sendRequest($setAccessLevels);
 
         $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
-        $assessment_title = 'Testing  Write User Able To Submit Assessment' . $groupPage->getId() . ' at ' . $timestamp;
+        $assessment_title = 'Testing  Full Access User Able To Submit Assessment' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
@@ -513,7 +513,7 @@ class AssessmentOnGroupCest
     {
         #GIVEN
         $timestamp  = time();
-        $groupPage = $this->createHomepage($i, 'Testing Submit Assessment on Group Page at ' . $timestamp);
+        $groupPage = $this->createHomepage($i, 'Testing Read Only Submits Assessment on Group Page at ' . $timestamp);
 
         $student = $i->grabUser('jreed');
         $teacher = $i->grabUser('jcoles');
@@ -532,8 +532,9 @@ class AssessmentOnGroupCest
         $i->sendRequest($setAccessLevels);
 
         $newAssessment    = new Payload\Assessable\Create(AssessmentContextType::TYPE_FOLDER, $groupPage->getId(), $groupPage->getId(), AssessmentType::TYPE_DUE_WORK);
-        $assessment_title = 'Testing  Write User Able To Submit Assessment' . $groupPage->getId() . ' at ' . $timestamp;
+        $assessment_title = 'Testing  Read Only User Able To Submit Assessment' . $groupPage->getId() . ' at ' . $timestamp;
         $newAssessment->setTitle($assessment_title);
+        $newAssessment->setFormParam('acceptOnline', 1);
         $i->amGoingTo("Send request create assessment on Group Page #{$groupPage->getId()}");
         $i->sendRequest($newAssessment);
         $assessmentPageId = $i->grabFirstAssessmentIdByTitle($assessment_title);
