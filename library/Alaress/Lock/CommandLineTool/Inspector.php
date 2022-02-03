@@ -15,6 +15,7 @@ use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Clipboard\Hierarchy\Cli\HierarchyTool;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
@@ -81,6 +82,10 @@ class Inspector extends CliTool\App
         /* Canvas Announcements Importer
          */
         AnnouncementsTool::CANVAS_ANNOUNCEMENTS_LOCK_NAME => 'Canvas Announcements Importer (./tools/canvas/announcements.php)',
+
+        /* Clipboard CLI Tools
+         */
+        HierarchyTool::CLIPBOARD_HIERARCHY_LOCK_NAME => 'Clipboard Sport/Division/Team Hierarchy (./tools/clipboard/hierarchy.php)',
     ];
 
 

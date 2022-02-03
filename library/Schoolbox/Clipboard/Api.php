@@ -11,6 +11,7 @@ namespace Schoolbox\Clipboard;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use GuzzleHttp\TransferStats;
 
 /**
  * Class Api
@@ -130,10 +131,22 @@ class Api implements IApi
                 $options = [];
 
                 if (!empty($params)) {
-                    $options[RequestOptions::JSON] = $params;
+                    $options[RequestOptions::QUERY] = $params;
+
+                    /* Debugging:
+                     * Find out what guzzle calculated as the endpoint + query string params
+                     */
+//                    $options['on_stats'] = function (TransferStats $stats) use (&$url) {
+//                        $url = $stats->getEffectiveUri();
+//                    };
                 }
 
                 $response = $this->client->request($method, $endpoint, $options);
+
+                /* Debugging:
+                 * Find out what guzzle calculated as the endpoint + query string params
+                 */
+//                print_r($url);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 
