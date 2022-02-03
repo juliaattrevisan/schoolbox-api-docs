@@ -876,22 +876,29 @@ class Controller extends Base
 
         if (is_array($post["role"])) {
             $foundRoles = [];
-            foreach ($post["role"] as $role_id => $accessLevel) {
-                if (in_array($role_id, $foundRoles)) {
+            foreach ($post["role"] as $roleId => $accessLevel) {
+                if (in_array($roleId, $foundRoles)) {
                     // should not happen
                     continue;
                 }
-                $foundRoles[] = $role_id;
+                $foundRoles[] = $roleId;
 
-                try {
-                    $role   = $this->roleMapper->findById($role_id);
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setAccess($accessLevel);
-                    $access->setRole($role);
-                    $accesses->add($access);
-                } catch (MapperException $e) {
-                    // Noop
+                $access = $this->pastoralAccessMapper->createModel();
+                $access->setAccess($accessLevel);
+
+                // Is this a role or a role type?
+                if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
+                    $access->setRoleType($matches['roleType']);
+                } else {
+                    try {
+                        $role   = $this->roleMapper->findById($roleId);
+                        $access->setRole($role);
+                    } catch (MapperException $e) {
+                        // Noop but don't attempt to save
+                        continue;
+                    }
                 }
+                $accesses->add($access);
             }
         }
 
