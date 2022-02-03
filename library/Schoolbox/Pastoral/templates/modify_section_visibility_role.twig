@@ -60,7 +60,8 @@
         <h2>Add Pastoral Role</h2>
         <section>
             <ul class="information-list">
-                {% for role in roles %}
+                {# Only show roles which actually have users #}
+                {% for role in roles|filter(r => rolesWithUsers[r.id]) %}
                     <li data-role-add="{{ role.id }}" data-role-name="{{ role.name }}">
                         <a class="list-item link-row">
                             <div class="card small-12">
@@ -69,9 +70,9 @@
                                 <p class="meta">
                                     System Role
 
-                                    {# Don't show the user count if: a student role, or bulk create and parent role #}
-                                    {% if not (role.isStudent or (bulkCreate and role.isParent)) %}
-                                        ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
+                                    {# Don't show the user count for student or parent roles #}
+                                    {% if role.isStaff %}
+                                        ({{ roleUserCounts[role.id] }} {% if roleUserCounts[role.id] == 1 %}User{% else %}Users{% endif %})
                                     {% endif %}
 
                                     {% if role.isStudent %}

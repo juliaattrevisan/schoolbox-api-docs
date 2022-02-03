@@ -581,10 +581,11 @@ class Controller extends Base
         $allowParents  = $this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
         $allowStudents = $this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
-        // Only want staff/parent roles
-
-        $roles     = new Collection();
-        $roleUsers = [];
+        // Tally counts for staff roles:
+        // for parent and student roles, only count if there is a user
+        $roles          = new Collection();
+        $roleUserCounts = [];
+        $rolesWithUsers = [];
 
         $rolesAll = $this->roleMapper->findAll();
 
@@ -599,45 +600,57 @@ class Controller extends Base
 
         /** @var Role $roleCurrent */
         foreach ($rolesAll as $roleCurrent) {
-            // Staff role? Show all users
+            $rolesWithUsers[$roleCurrent->getId()] = false;
+            $roleUserCounts[$roleCurrent->getId()] = 0;
+
+            // Staff role? Show user count
             if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {
                 $roles->add($roleCurrent);
-                $roleUsers[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
+                $roleUserCounts[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
+                $rolesWithUsers[$roleCurrent->getId()] = true;
             }
 
-            // Parent role? Show only the # of this student's parents in this role
+            // Parent role?
+            // Only track if there are users in the role who are a parent of a
+            // student, not the number
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
-                $roleUsers[$roleCurrent->getId()] = 0;
                 if ($record->getStudent()) {
                     foreach ($record->getStudent()->getParents() as $parent) {
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
-                            $roleUsers[$roleCurrent->getId()]++;
+                            $rolesWithUsers[$roleCurrent->getId()] = true;
+                            break;
                         }
                     }
                 }
                 foreach ($duplicates as $duplicateStudent) {
+                    if ($rolesWithUsers[$roleCurrent->getId()]) {
+                        break;
+                    }
                     $duplicateStudent->loadParents();
                     foreach ($duplicateStudent->getParents() as $parent) {
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
-                            $roleUsers[$roleCurrent->getId()]++;
+                            $rolesWithUsers[$roleCurrent->getId()] = true;
                         }
                     }
                 }
             }
 
-            // Student role: show only the # of users in this role
+            // Student role:
+            // Only track if there are student in the role not the number
             if ($allowStudents && $roleCurrent->isStudent()) {
                 $roles->add($roleCurrent);
-                $roleUsers[$roleCurrent->getId()] = 0;
                 if ($record->getStudent()) {
                     if ($record->getStudent()->getRole()->getId() == $roleCurrent->getId()) {
-                        $roleUsers[$roleCurrent->getId()]++;
+                        $rolesWithUsers[$roleCurrent->getId()] = true;
                     }
                 }
                 foreach ($duplicates as $duplicateStudent) {
+                    if ($rolesWithUsers[$roleCurrent->getId()]) {
+                        break;
+                    }
                     if ($duplicateStudent->getRole()->getId() == $roleCurrent->getId()) {
-                        $roleUsers[$roleCurrent->getId()]++;
+                        $rolesWithUsers[$roleCurrent->getId()] = true;
                     }
                 }
             }
@@ -720,7 +733,8 @@ class Controller extends Base
                     'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
-                    'roleUsers'         => $roleUsers,
+                    'roleUserCounts'    => $roleUserCounts,
+                    'rolesWithUsers'    => $rolesWithUsers,
                     'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
                     'moderator'         => $moderator,
                     'moderatorIds'      => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
