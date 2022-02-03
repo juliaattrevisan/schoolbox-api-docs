@@ -62,11 +62,10 @@ class Cli extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Displays a list of all available packages, or installs a specified packags
+Displays a list of all available packages, and will install a selected package
 
-Usage: tools/package/install.php [-v] [-p] [--package packageToInstall]
+Usage: tools/package/install.php [-v] [-p]
         -p Actually install the package, else just display what would occur
-        --package name of the package to install
         -v Verbose mode (may be provided up to 3 times for increasing verbosity)
 
 HELP;
