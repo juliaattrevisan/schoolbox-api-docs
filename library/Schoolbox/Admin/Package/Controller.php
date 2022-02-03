@@ -9,7 +9,6 @@ namespace Schoolbox\Admin\Package;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
 {

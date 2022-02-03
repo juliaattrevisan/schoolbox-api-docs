@@ -78,9 +78,12 @@ HELP;
             $this->getLogger()->alert("Action Mode");
         }
 
+        /**
+         * run the interaction loop
+         * show list of packages, and their status, then allow the user to exit, or install a package.
+         * if they install a package, loop to allow them to install another.
+         */
         $this->choiceInstall();
-
-        $this->getLogger()->info("All Complete.");
     }
     private function choiceInstall()
     {
@@ -111,6 +114,7 @@ HELP;
         $this->getLogger()->info("Selected Id: {$packageId}");
         $package = $allPackages[$packageId];
         $this->getLogger()->info("Found {$package->getTitle()}");
+
         /**
          * package found, is it already installed?
          */
@@ -118,6 +122,7 @@ HELP;
             $this->getLogger()->error("Package is already installed.");
             $this->choiceInstall();
         }
+
         /**
          * Lets attempt to install the package
          */
