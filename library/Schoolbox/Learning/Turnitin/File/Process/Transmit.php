@@ -162,7 +162,7 @@ class Transmit
             $this->changeState(
                 $model,
                 sprintf(
-                    'Report %s: Student Submission File %s not found; setting to status %s',
+                    'Report %s: Student Submission File %s not found; setting status [%s]',
                     $model->getId(),
                     $model->getStudentSubmissionFileId(),
                     Turnitin\File\Model::STATUS_ERROR
@@ -187,7 +187,7 @@ class Transmit
             $this->changeState(
                 $model,
                 sprintf(
-                    'Report %s: Student Submission File %s %s has an invalid mime type; setting to status %s',
+                    'Report %s: Student Submission File %s %s has an invalid mime type; setting status [%s]',
                     $model->getId(),
                     $ssf->getId(),
                     $ssf->getBasename(),
@@ -262,7 +262,7 @@ class Transmit
                         $this->changeState(
                             $model,
                             sprintf(
-                                'Report %s: Submission File Contents for submission file %s %s sent to Turnitin for processing; setting to status %s',
+                                'Report %s: Submission File Contents for submission file %s %s sent to Turnitin for processing; setting status [%s]',
                                 $model->getId(),
                                 $ssf->getId(),
                                 $ssf->getBasename(),
@@ -346,7 +346,7 @@ class Transmit
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: setting up turnitin Group for submission file %s %s to status %s',
+                'Report %s: setting up turnitin Group for submission file %s %s; setting status [%s]',
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
@@ -442,7 +442,7 @@ class Transmit
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: setting up turnitin Submission for submission file %s %s to status %s',
+                'Report %s: setting up turnitin Submission for submission file %s %s; setting status [%s]',
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
@@ -568,7 +568,7 @@ class Transmit
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: setting up turnitin Submission File Contents for submission file %s %s to status %s',
+                'Report %s: setting up turnitin Submission File Contents for submission file %s %sl; setting status [%s]',
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
