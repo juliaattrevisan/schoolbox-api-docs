@@ -67,8 +67,11 @@ class Model implements ISoftDeletable
         if ($this->getUser() instanceof User) {
             return $this->getUserAccessLevel($user);
         }
-        if ($this->getRole() instanceof Role) {
+        if ($this->getRoleType() || $this->getRole() instanceof Role) {
             return $this->getRoleAccessLevel($user);
+        }
+        if ($this->getRoleType()) {
+            return $this->getRoleTypeAccessLevel($user);
         }
         if ($this->getGroup() instanceof Group) {
             return $this->getPastoralGroupAccessLevel($user);
@@ -107,10 +110,16 @@ class Model implements ISoftDeletable
      */
     private function getRoleAccessLevel(User $user): ?int
     {
-        $thisRole = $this->getRole();
+        $isApplicable = false;
+        if ($this->getRole() && $user->getRole()->getId() === $this->getRole()->getId()) {
+            $isApplicable = true;
+        }
+        if ($this->getRoleType() && $user->getRole()->getType() === $this->getRoleType()) {
+            $isApplicable = true;
+        }
 
         // Not a role-based rule, or for a different role?
-        if (!$thisRole || $user->getRole()->getId() !== $thisRole->getId()) {
+        if (!$isApplicable) {
             // Does not apply
             return null;
         }
