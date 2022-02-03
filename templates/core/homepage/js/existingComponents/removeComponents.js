@@ -5,7 +5,9 @@
 
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, getComponentID } from '../updateHomepage';
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from '../updateHomepage';
+import UpdateHomepageEvents from '../updateHomepageEvents';
+
 
 const ANIMATE_SPEED = 0.3;
 const BUTTON_SELECTOR = '[data-target="delete"]';
@@ -17,7 +19,7 @@ const PANEL_SELECTOR = '[data-component-panel="delete"]';
  */
 export function initRemoveComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
-    document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
+    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
 }
 
 /**

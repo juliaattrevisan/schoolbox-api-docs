@@ -6,7 +6,8 @@
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { timeout } from '@js/util/jsUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, ON_COMPONENT_ADDED, getComponentID } from '../updateHomepage';
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from '../updateHomepage';
+import UpdateHomepageEvents from '../updateHomepageEvents';
 import { updateRemovedComponent } from './removeComponents';
 import { isOpen as isComponentOpen, close as collapseComponent, open as uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
 
@@ -23,7 +24,7 @@ const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed
  */
 export function initUpdateComponentsSettings () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
-    document.addEventListener(ON_COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => init(event.detail.component));
 }
 
 /**

@@ -9,11 +9,10 @@ import { insertElementBefore, insertElementAfter, getClosestElement, isElementAb
     isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { saveComponentOrder } from './saveComponentOrder';
 import { slideUp, slideDown } from '@js/util/animateUtils';
-import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED, ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
+import UpdateHomepageEvents from '../updateHomepageEvents';
 import { isOpen as isSettingsPanelOpen } from './updateComponentsSettings';
 import { isOpen as isRemovePanelOpen } from './removeComponents';
 import { isOpen as isComponentOpen } from './collapseComponents';
-import { isOpen as isNewComponentTabsOpen } from '../newComponents/newComponentsTabs';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -89,7 +88,7 @@ function initListeners () {
  * To add a newly created component to the sortable list
  */
 function initOnComponentAddedListener () {
-    document.addEventListener(ON_COMPONENT_ADDED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => {
         const newDraggable = addNewDraggable(event.detail.component);
         const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
         newDraggable.enabled(componentLockSwitchStatus); //check 
@@ -102,7 +101,7 @@ function initOnComponentAddedListener () {
  * To remove a component from the sortable list
  */
 function initOnComponentRemovedListener () {
-    document.addEventListener(ON_COMPONENT_REMOVED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_REMOVED, (event) => {
         const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
         draggableToRemove.kill(); //disables the Draggable instance
         __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
@@ -132,7 +131,7 @@ function onDragStart (event) {
     extractActiveComponent();
     updateSortableElements(); //ensure we have the most up to date positions
     collapseActiveComponentContent();
-    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS));
+    document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_START));
 }
 
 /**
@@ -323,13 +322,12 @@ function updateActiveComponentPosition (closestElement, isShiftingDown) {
     }
 
     clearFlipElements(); //check for flip bug
-    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
+
+    document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_UPDATE));
 
     __activeComponent.dataset.leftDifference = __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
     __activeComponent.dataset.topDifference = (__referenceElement.getBoundingClientRect().top + window.scrollY) - parseInt(__referenceElement.dataset.originalTop);
     gsap.to(__activeComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
-
-    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
 
     animateFlip(state);
         
@@ -373,9 +371,7 @@ function clearFlipElements () {
 function onDragEnd () {
     updateDraggablesStatus(false); //prevent quick reclicks on elements
     snapBackActiveComponent();
-    if (!isNewComponentTabsOpen()) { //don't hide them when the new component tabs is open
-        document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS));
-    }
+    document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_END));
 }
 
 /**

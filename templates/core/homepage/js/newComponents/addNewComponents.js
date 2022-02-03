@@ -3,7 +3,7 @@ import { insertElementBefore, insertElementAfter, getClosestElement, isElementAb
          isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
 import { saveComponentOrder } from '../existingComponents/saveComponentOrder';
-import { ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
+import UpdateHomepageEvents from '../updateHomepageEvents';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -54,7 +54,7 @@ function initDraggables () {
  * @returns { Draggable }
  */
 function addNewDraggable (component) {
-    component.addEventListener('click', (event) => event.preventDefault());
+    component.addEventListener('click', (event) => onNewComponentClicked(event));
     component.addEventListener('dblclick', (event) => event.preventDefault());
     return Draggable.create(component, {
         type: 'x, y',
@@ -64,6 +64,15 @@ function addNewDraggable (component) {
         onDrag: () => onDrag(),
         onDragEnd: () => onDragEnd(),
     })[0];
+}
+
+/**
+ * Add in the component to the top of the page
+ * 
+ * @param { MouseEvent }  
+ */
+function onNewComponentClicked (event) {
+    event.preventDefault();
 }
 
 /**
@@ -97,7 +106,6 @@ function onDragStart (event) {
     disableAllOtherDraggables();
     extractNewComponent();
     updateSortableElements(); //ensure we have the most up to date positions
-    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS));
 }
 
 /**
@@ -264,7 +272,12 @@ function putComponentBackIntoTabs () {
     __referenceElement.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
     __newComponent.style.marginBottom = 0; //a margin may have been placed if has been moved onto the page already
 
-    saveComponentsNewPosition();
+    document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENT_SORT_UPDATE)); 
+
+    __newComponent.dataset.leftDifference = __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
+    __newComponent.dataset.topDifference = (__referenceElement.getBoundingClientRect().top + window.scrollY) - parseInt(__referenceElement.dataset.originalTop);
+    gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+
     animateFlip(state);
 
 }
@@ -293,21 +306,17 @@ function addNewComponentToPage (closestElement, isShiftingDown) {
     __referenceElement.style.marginBottom = '2rem'; //existing components all have a margin
     __newComponent.style.marginBottom = '2rem'; //existing components all have a margin
 
-    saveComponentsNewPosition();
-    animateFlip(state);
-    
-}
-
-/**
- * Show either the new component being added to the page, or being put back into the tabs
- */
-function saveComponentsNewPosition () {
     clearFlipElements(); //check for flip bug
-    document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS)); //remove prior to recording the new co-ordinates so can snap back on release to correct location
+
+    document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENT_SORT_UPDATE)); 
+
     __newComponent.dataset.leftDifference = __referenceElement.getBoundingClientRect().left - parseInt(__referenceElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
     __newComponent.dataset.topDifference = (__referenceElement.getBoundingClientRect().top + window.scrollY) - parseInt(__referenceElement.dataset.originalTop);
-    document.dispatchEvent(new Event(ADD_PLACE_HOLDERS)); //now check if need to add them back in
+    
     gsap.to(__newComponent, { width: __referenceElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+
+    animateFlip(state);
+    
 }
 
 /**

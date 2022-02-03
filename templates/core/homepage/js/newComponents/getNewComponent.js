@@ -3,7 +3,8 @@
  *
  */
 
-import { UPDATE_URL, ON_COMPONENT_ADDED } from '../updateHomepage';
+import { UPDATE_URL } from '../updateHomepage';
+import UpdateHomepageEvents from '../updateHomepageEvents';
 import { updateComponentDisplay, isToggleUnlocked } from '../existingComponents/toggleLockComponents';
 
 
@@ -18,7 +19,7 @@ export async function getNewComponent (component) {
         });
         const newComponentHTML = await response.text();
         const newComponent = replaceExistingComponent(component, newComponentHTML)
-        document.dispatchEvent(new CustomEvent(ON_COMPONENT_ADDED, { detail: { component: newComponent } } ) ); 
+        document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.ON_COMPONENT_ADDED, { detail: { component: newComponent } } ) ); 
         return newComponent;
     } catch (error) {
         console.warn(error);

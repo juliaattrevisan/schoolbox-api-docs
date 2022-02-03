@@ -3,7 +3,7 @@
  *
  */
 
-import { ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from '../updateHomepage';
+import UpdateHomepageEvents from '../updateHomepageEvents';
 
 
 /**
@@ -31,11 +31,11 @@ export function initNewComponentsTab () {
     * Deal with special components placeholder
     */
     $.fn.tabActivator({
-        onTabOpen: function(tabActivator) {
-            document.dispatchEvent(new Event(ADD_PLACE_HOLDERS));
+        onTabOpen: function() {
+            document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENTS_TABS_OPENED));
         },
-        onTabClose: function(tabActivator) {
-            document.dispatchEvent(new Event(REMOVE_PLACE_HOLDERS));
+        onTabClose: function() {
+            document.dispatchEvent(new Event(UpdateHomepageEvents.NEW_COMPONENTS_TABS_CLOSED));
             homepage.removeClass('show-empty');
         }
     });

@@ -4,7 +4,7 @@
  *
  */
 
- import { ON_COMPONENT_ADDED, ON_COMPONENT_REMOVED } from './updateHomepage';
+ import UpdateHomepageEvents from './updateHomepageEvents';
  
  
 /**
@@ -19,7 +19,7 @@ export function initUpdateComponentCounts () {
  * To increment the relevant counter
  */
 function initOnComponentAddedListener () {
-    document.addEventListener(ON_COMPONENT_ADDED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => {
         const counterElement = getCounterElement(event.detail.component);
         counterElement.textContent = parseInt(counterElement.textContent) + 1;
     });
@@ -29,7 +29,7 @@ function initOnComponentAddedListener () {
  * To decrement the relevant counter
  */
 function initOnComponentRemovedListener () {
-    document.addEventListener(ON_COMPONENT_REMOVED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_REMOVED, (event) => {
         const counterElement = getCounterElement(event.detail.component);
         counterElement.textContent = parseInt(counterElement.textContent) - 1;
     });

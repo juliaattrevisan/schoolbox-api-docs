@@ -4,7 +4,8 @@
  *
  */
 
-import { ADD_PLACE_HOLDERS, REMOVE_PLACE_HOLDERS } from './updateHomepage';
+import UpdateHomepageEvents from './updateHomepageEvents';
+import { isOpen as isNewComponentTabsOpen } from './newComponents/newComponentsTabs';
 
 const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers
 
@@ -16,8 +17,12 @@ let __placeHolderComponentsList = []; //to contain the place holder instances
  */
  export function initUpdatePlaceHolders () {
     initPlaceHolderComponents();
-    document.addEventListener(ADD_PLACE_HOLDERS, addPlaceHolderComponents);
-    document.addEventListener(REMOVE_PLACE_HOLDERS, removePlaceHolderComponents);
+    document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_START, addPlaceHolderComponents);
+    document.addEventListener(UpdateHomepageEvents.NEW_COMPONENTS_TABS_OPENED, addPlaceHolderComponents);
+    document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
+    document.addEventListener(UpdateHomepageEvents.NEW_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
+    document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_END, onExistingComponentSortEnd);
+    document.addEventListener(UpdateHomepageEvents.NEW_COMPONENTS_TABS_CLOSED, removePlaceHolderComponents);
 }
 
 /**
@@ -65,8 +70,25 @@ function canAddPlaceHolderComponent (parentContainer) {
 /**
  * Remove and re-add as parent containers have changed
  */
+function updatePlaceHolderComponents () {
+    removePlaceHolderComponents();
+    addPlaceHolderComponents();
+}
+
+/**
+ * Remove all the placeholders only if the new component tabs aren't open
+ */
+function onExistingComponentSortEnd () {
+    if (!isNewComponentTabsOpen()) { //don't hide them when the new component tabs is open
+        removePlaceHolderComponents();
+    }
+}
+
+/**
+ * Remove all the placeholders
+ */
 function removePlaceHolderComponents () {
     document.querySelectorAll('[data-place-holder-component]').forEach((placeHolderComponent) => {
-        placeHolderComponent.remove();
+        placeHolderComponent.remove(); //will just fail silently if isn't in the DOM
     });
 }
