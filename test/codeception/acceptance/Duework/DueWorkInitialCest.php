@@ -1,5 +1,7 @@
 <?php
 
+namespace Duework;
+
 use Codeception\Util\Locator;
 use Facebook\WebDriver\WebDriverKeys;
 
