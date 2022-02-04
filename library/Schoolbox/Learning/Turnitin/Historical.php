@@ -35,6 +35,12 @@ class Historical
 
 
     /**
+     * @var bool
+     */
+    private bool $perform;
+
+
+    /**
      * @var File\Mapper
      */
     private File\Mapper $turnitinFileMapper;
@@ -44,11 +50,13 @@ class Historical
      * Historical constructor.
      *
      * @param File\Mapper          $turnitinFileMapper
+     * @param bool                 $perform
      * @param LoggerInterface|null $log
      */
-    public function __construct(File\Mapper $turnitinFileMapper, ?LoggerInterface $log = null)
+    public function __construct(File\Mapper $turnitinFileMapper, bool $perform, ?LoggerInterface $log = null)
     {
         $this->turnitinFileMapper = $turnitinFileMapper;
+        $this->perform = $perform;
         $this->log = $log;
     }
 
@@ -83,6 +91,7 @@ class Historical
             INNER JOIN (
                 SELECT student_submission.box_id, student_submission.owner, MAX(submitted_at) as maxdate
                 FROM student_submission
+                WHERE deleted_at IS NULL
                 GROUP BY box_id, owner
             ) maxdates ON sb.id = maxdates.box_id
             INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
@@ -91,6 +100,7 @@ class Historical
             WHERE ssf.created_at >= :startDate
             AND ssf.created_at <= :endDate
             AND tr.id IS NULL
+            AND ssf.deleted_at IS NULL
             ORDER BY ssf.id
         ';
 
@@ -110,9 +120,11 @@ class Historical
                 ->setHistorical(true)
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
-            $this->logDebug(sprintf(
-                'Student Submission File Id %s: preparing for historical addition',
+            $this->logInfo(sprintf(
+                'Student Submission File Id %s %s created on %s',
                 $row['id'],
+                $row['realname'],
+                $row['created_at']
             ));
         }
 
@@ -133,7 +145,9 @@ class Historical
          * but Support would lose the diagnostics)
          */
         foreach ($models as $turnitinFile) {
-            $this->turnitinFileMapper->save($turnitinFile);
+            if ($this->perform) {
+                $this->turnitinFileMapper->save($turnitinFile);
+            }
 
             $this->logDebug(sprintf(
                 'Student Submission File Id %s: historically adding into turnitin_report id %s with status [%s]',

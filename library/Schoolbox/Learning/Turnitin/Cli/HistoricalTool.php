@@ -152,10 +152,14 @@ HELP;
                 $end->getDatabase()
             ));
 
-            (new Turnitin\Historical(Turnitin\File\Mapper::getInstance(), $this->getLogger()))
+            (new Turnitin\Historical(Turnitin\File\Mapper::getInstance(), $this->perform(), $this->getLogger()))
                 ->historical($start, $end, $lock);
 
-            $this->getLogger()->info('Done.');
+            if (!$this->perform()) {
+                $this->getLogger()->info('Planning finished.');
+            } else {
+                $this->getLogger()->info('Done.');
+            }
 
             /* Releasing control
              */
