@@ -1170,6 +1170,7 @@ class Controller extends Base
             );
 
             $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
+            $record->setStudentCommentsAllowed((bool)$post->get('student_comments_allowed'));
 
             // Only set owner if this is a new record
             if (!$record->getId()) {

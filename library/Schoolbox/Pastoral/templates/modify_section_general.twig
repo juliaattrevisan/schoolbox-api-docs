@@ -76,5 +76,18 @@
             </div>
         </div>
         {% endif %}
+        {% if config.pastoral_student_access %}
+            <div class="small-12 columns">
+                <label for="student-comments-allowed">Allow students to read and post comments</label>
+                <div class="switch">
+                    <input id="student-comments-allowed" type="checkbox"
+                           name="student comments allowed" value="1" {% if record.studentCommentsAllowed %}checked="checked"{% endif %}>
+                    <label for="student-comments-allowed">
+                        <span>On</span>
+                        <span>Off</span>
+                    </label>
+                </div>
+            </div>
+        {% endif %}
     </fieldset>
 </section>
