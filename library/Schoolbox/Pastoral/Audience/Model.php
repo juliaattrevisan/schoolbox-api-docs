@@ -36,6 +36,11 @@ class Model implements ISoftDeletable
     /** @var null|Role  */
     private $role;
 
+    /**
+     * The role type for this pastoral care access, if any.
+     */
+    private ?string $roleType = null;
+
     /** @var null|Type */
     private $type;
 
@@ -61,6 +66,10 @@ class Model implements ISoftDeletable
         }
 
         if (($this->role xor $other->role) || ($this->role && (int)$this->role->getId() !== (int)$other->role->getId())) {
+            return false;
+        }
+
+        if ($this->roleType !== $other->roleType) {
             return false;
         }
 
@@ -137,6 +146,24 @@ class Model implements ISoftDeletable
     {
         $this->role = $role;
 
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRoleType(): ?string
+    {
+        return $this->roleType;
+    }
+
+    /**
+     * @param string|null $roleType
+     * @return $this
+     */
+    public function setRoleType(?string $roleType): self
+    {
+        $this->roleType = $roleType;
         return $this;
     }
 

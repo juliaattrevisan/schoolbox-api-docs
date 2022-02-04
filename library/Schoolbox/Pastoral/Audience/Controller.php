@@ -265,7 +265,11 @@ class Controller extends Base
                 'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'    => false,  //prevent user search from including student parents
                 'roles'           => $roles,
-                'roleUsers'       => $roleUsers,
+                'roleTypes'       => $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)
+                    ? [Role::STUDENT]
+                    : [],
+                'roleUserCounts'  => $roleUsers,
+                'rolesWithUsers'  => $roleUsers,
                 'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
                 'moderatorIds'    => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                 'type'            => $type,
@@ -385,14 +389,18 @@ class Controller extends Base
         // Build the posted rules
         $posted = $this->pastoralAudienceMapper->createCollection();
 
-        // Build role-based rules
+        // Build role and roletype-based rules
         foreach ($post["role"] ?? [] as $roleId => $accessLevel) {
-            $foundRoles[] = $roleId;
-            $role         = $this->roleMapper->findById($roleId);
-            $audience     = $this->pastoralAudienceMapper->createModel();
-            $subType ? $audience->setSubtype($subType) : $audience->setType($type);
-            $audience->setRole($role);
+            $audience = $this->pastoralAudienceMapper->createModel();
             $audience->setAccess((int)$accessLevel);
+            $subType ? $audience->setSubtype($subType) : $audience->setType($type);
+            if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
+                $audience->setRoleType($matches['roleType']);
+            } else {
+                $audience->setRole($this->roleMapper->findById($roleId));
+                $audience->setAccess((int)$accessLevel);
+            }
+
             $posted->add($audience);
         }
 

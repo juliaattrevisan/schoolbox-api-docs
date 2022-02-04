@@ -49,6 +49,13 @@ class Mapper extends BaseMapper
         $this->uses('access', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
+        $this->uses(
+            'role_type',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'roleType',
+            [Role::GUEST, Role::STUDENT, Role::PARENT, Role::STAFF, null],
+        );
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->joins('type_id', TypeMapper::class, 'id', null, null, 'type', 'type');
         $this->joins('subtype_id', SubTypeMapper::class, 'id', null, null, 'subtype', 'subtype');
@@ -159,7 +166,10 @@ class Mapper extends BaseMapper
             $errors[] = "Audience must have either a Type and SubType";
         }
 
-        $count = ($model->getUser() ? 1 : 0) + ($model->getRole() ? 1 : 0) + ($model->getGroup() ? 1 : 0);
+        $count = ($model->getUser() ? 1 : 0)
+            + ($model->getRole() ? 1 : 0)
+            + ($model->getRoleType() ? 1 : 0)
+            + ($model->getGroup() ? 1 : 0);
         if (!$count) {
             $errors[] = "Audience must have either a User, Role, or Group";
         } elseif ($count > 1) {
