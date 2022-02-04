@@ -143,7 +143,8 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
-        $parentAccessEnabled = $this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED) == '1';
+        $parentAccessEnabled  = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
+        $studentAccessEnabled = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
         /** @var Collection|PastoralAccess[] $accessRecords */
         $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
@@ -192,6 +193,15 @@ class Notifier extends AbstractModuleNotifier
                                 $targetUsers[$parent->getId()] = $parent;
                             }
                         }
+                    } elseif (
+                        $pastoralAccess->getRole()->isStudent()
+                        && $studentAccessEnabled
+                        && $student->getRole()->getId() === $pastoralAccess->getRole()->getId()
+                    ) {
+                        // Only send to student if student access is enabled
+                        // (Setting student access by role is not currently
+                        //  supported in frontend: only by role type)
+                        $targetUsers[$student->getId()] = $student;
                     }
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     // Sending to a pastoral group, make sure its hydrated
