@@ -70,9 +70,6 @@ class Model implements ISoftDeletable
         if ($this->getRoleType() || $this->getRole() instanceof Role) {
             return $this->getRoleAccessLevel($user);
         }
-        if ($this->getRoleType()) {
-            return $this->getRoleTypeAccessLevel($user);
-        }
         if ($this->getGroup() instanceof Group) {
             return $this->getPastoralGroupAccessLevel($user);
         }
