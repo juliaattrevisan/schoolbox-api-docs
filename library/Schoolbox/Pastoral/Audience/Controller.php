@@ -347,6 +347,7 @@ class Controller extends Base
             /* Save the "General Template" content
              */
             $subType->setTemplate($post['template']);
+            $subType->setTemplatePrivate($post['templatePrivate']);
             $subType->setIcon($post['icon'] ?: null);
             $subType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
             $subType->setVisibilityLocked($isVisibilityLocked);
@@ -367,6 +368,7 @@ class Controller extends Base
             /* Save the "General Template" content
              */
             $type->setTemplate($post['template']);
+            $type->setTemplatePrivate($post['templatePrivate']);
             $type->setIcon($post['icon'] ?: null);
             $type->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
             $type->setVisibilityLocked($isVisibilityLocked);

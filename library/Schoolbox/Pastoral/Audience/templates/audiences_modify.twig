@@ -179,6 +179,29 @@
                                       name="template">{% if subtype %}{{ subtype.template }}{% elseif type %}{{ type.template }}{% endif %}</textarea>
                         </div>
                     </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="templatePrivate">Confidential Template</label>
+
+                            <p class="meta">
+                                This text will automatically populate into the confidential text of a {{ locale.pastoral }}
+                                record when this type is selected. You may use the following tokens that will be
+                                substituted with the students details on creation: [firstname], [surname], [fullname],
+                                [year], [house]
+                            </p>
+
+                            <script type="text/javascript">
+                                {% autoescape 'js' %}
+                                $(function () {
+                                    $('#templatePrivate').alaressEditor($.alaressEditorConfigWithUserTokens());
+                                });
+                                {% endautoescape %}
+                            </script>
+
+                            <textarea id="templatePrivate"
+                                      name="templatePrivate">{% if subtype %}{{ subtype.templatePrivate }}{% elseif type %}{{ type.templatePrivate }}{% endif %}</textarea>
+                        </div>
+                    </fieldset>
                     <fieldset>
                         <div class="small-12 columns">
                             <label for="visibilityLocked">Lock Visibility</label>

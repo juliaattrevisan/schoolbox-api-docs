@@ -644,10 +644,12 @@ class Controller extends Base
         $subtypes = $this->pastoralSubTypeMapper->findAll();
 
         $typesIndex       = [];
+        $typesIndexPrivate       = [];
         $audienceDefaults = [];
 
         foreach ($types as $type) {
             $typesIndex[$type->getId()] = $type->getTemplate();
+            $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
             if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $type->getId(),
@@ -658,9 +660,11 @@ class Controller extends Base
         }
 
         $subtypesIndex = [];
+        $subtypesIndexPrivate = [];
 
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
+            $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
             if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $subtype->getPastoralType()->getId(),
@@ -681,8 +685,10 @@ class Controller extends Base
                     'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                     'allowParents'      => $allowParents,
                     'types'             => $types,
+                    'typesIndexPrivate' => $typesIndexPrivate,
                     'typesIndex'        => $typesIndex,
                     'subTypes'          => $subtypes,
+                    'subtypesIndexPrivate'  => $subtypesIndexPrivate,
                     'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
@@ -1119,7 +1125,14 @@ class Controller extends Base
                     ->replace(trim($post->get('body_public')), $student)
             );
 
-            $record->setBodyPrivate(trim($post->get('body_private')));
+            /* Perform token replacements, basically a square bracket phplib
+             * that performs a one-way substitution
+             */
+            $record->setBodyPrivate(
+                (new TokenReplacer\Student(new TokenReplacer\Simple()))
+                    ->replace(trim($post->get('body_private')), $student)
+            );
+
             $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
 
             // Only set owner if this is a new record
