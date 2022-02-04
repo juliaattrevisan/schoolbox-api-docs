@@ -203,6 +203,18 @@ class Notifier extends AbstractModuleNotifier
                         //  supported in frontend: only by role type)
                         $targetUsers[$student->getId()] = $student;
                     }
+                } elseif ($pastoralAccess->getRoleType()) {
+                    switch ($pastoralAccess->getRoleType()) {
+                        case Role::STUDENT:
+                            // Only notify student if student access enabled
+                            if ($studentAccessEnabled) {
+                                $targetUsers[$student->getId()] = $student;
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     // Sending to a pastoral group, make sure its hydrated
                     $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralAccess->getGroup()->getId());
