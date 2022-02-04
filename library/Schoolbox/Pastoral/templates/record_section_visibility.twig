@@ -111,23 +111,33 @@
 
                         <li>
                             <div class="small-12 card wrap-down">
-                                <div class="icon-group size-48" title="User Role"></div>
-                                {{ accessLevelLabel | raw }}
-{#                                {% if access.role.isParent and record.parentCommentsAllowed %}#}
-{#                                    <span class="neutral label right">Comments</span>#}
-{#                                {% endif %}#}
-                                <p>{{ access.roleType | capitalize }}</p>
-{#                                {% if access.role.isParent %}#}
-{#                                    {% for parent in record.student.parents %}#}
-{#                                        {% if parent.isDeleted() or record.student.hideContacts %}#}
-{#                                            {{ parent.fullName }}<br>#}
-{#                                        {% else %}#}
-{#                                            <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>#}
-{#                                        {% endif %}#}
-{#                                    {% endfor %}#}
-{#                                {% else %}#}
-{#                                    <p class="meta">User Role</p>#}
-{#                                {% endif %}#}
+                                {% if access.roleType == 'student' %}
+                                    <a href="{{ profile.link(record.student) }}">
+                                        {{ profile.imageSquare64(record.student) }}
+                                        <span class="neutral label right">Student</span>
+                                        <p>
+                                            {{ record.student.fullName }}
+                                        </p>
+                                    </a>
+                                {% elseif access.roleType == 'parent' %}
+                                    <div class="icon-group size-48" title="User Role"></div>
+                                    {{ accessLevelLabel | raw }}
+                                    {% if record.parentCommentsAllowed %}
+                                        <span class="neutral label right">Comments</span>
+                                    {% endif %}
+                                    <p>{{ access.roleType | capitalize }}</p>
+                                    {% for parent in record.student.parents %}
+                                        {% if parent.isDeleted() or record.student.hideContacts %}
+                                            {{ parent.fullName }}<br>
+                                        {% else %}
+                                            <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="icon-group size-48" title="User Role"></div>
+                                    {{ accessLevelLabel | raw }}
+                                    <p>{{ access.roleType | capitalize }}</p>
+                                {% endif %}
                             </div>
                         </li>
                     {% elseif access.user is not empty %}
