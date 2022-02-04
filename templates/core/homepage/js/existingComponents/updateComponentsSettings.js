@@ -24,7 +24,9 @@ const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed
  */
 export function initUpdateComponentsSettings () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => {
+        init(event.detail.component);
+    });
 }
 
 /**
@@ -33,22 +35,31 @@ export function initUpdateComponentsSettings () {
  * @param { Element } 
  */
 function init (component) {
-    initToggleButton(component);
+    initToggleButtons(component);
     initForm(component);
 }   
 
 /**
  * To show/hide the settings panel with the toggle button
+ * There's also sometimes a settings toggle button in the empty state as well,
+ * so check for that
  * 
  * @param { Element } 
  */
-function initToggleButton (component) {
+function initToggleButtons (component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
         gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
         isOpen(component) ? close(component) : open(component);
     });
+    const emptyStateToggleButton = component.querySelector(`${BUTTON_SELECTOR}.empty-edit`);
+    if (emptyStateToggleButton) {
+        emptyStateToggleButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            isOpen(component) ? close(component) : open(component);
+        });
+    }
 }
 
 /**
@@ -102,7 +113,7 @@ async function close (component) {
 }
 
 /**
- * Ensure updates to the setting panel are updated via AJAX
+ * Ensure updates to the settings panel are updated via AJAX
  * 
  * @param { Element } 
  */
