@@ -5,11 +5,13 @@
 
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-import { timeout } from '@js/util/jsUtils';
+// import { timeout } from '@js/util/jsUtils';
+import { setInnerHTML } from '@js/util/domUtils';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from '../updateHomepage';
 import UpdateHomepageEvents from '../updateHomepageEvents';
 import { updateRemovedComponent } from './removeComponents';
-import { isOpen as isComponentOpen, close as collapseComponent, open as uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
+// import { isOpen as isComponentOpen, close as collapseComponent, open as uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
+import { updateComponentDisplay, isToggleUnlocked } from './toggleLockComponents';
 
 const ANIMATE_SPEED = 0.3;
 const BUTTON_SELECTOR = '[data-target="settings"]';
@@ -164,7 +166,6 @@ function getSaveComponentSettingsParams (form) {
     const queryString = Object.keys(formData).map(key => key + '=' + encodeURIComponent(formData[key])).join('&'); //ie cid=80&type=config&component=3393&componentname=Class%20Page%20Banners&layoutId=34&src=&src-folder-id=80&collapse=0&showComponentTitle=0'
     const params = new URLSearchParams(queryString);
     return params;
-    // return { params };
 }
 
 /**
@@ -176,26 +177,33 @@ function getSaveComponentSettingsParams (form) {
  async function updateComponent (component, responseData) {
     
     const updatedComponent = getUpdatedComponent(component, responseData);
+    const tempElement = document.createElement('div'); //just use to insert the updated component html
+    setInnerHTML(tempElement, updatedComponent.outerHTML); //now insert it
+    const newComponent = tempElement.firstElementChild; //and then extract the element
+    component.replaceWith(newComponent); //switch over to the newly created component
+    updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
 
-    const componentCollapsable = component.querySelector('[data-collapsable="true"]');
-    const updatedComponentCollapsable = updatedComponent.querySelector('[data-collapsable="true"]');
-    const updatedComponentCollapsableFragment = document.createRange().createContextualFragment(updatedComponentCollapsable.innerHTML); //createContextualFragment ensures any </script> tags within the element are run
+    // const updatedComponent = getUpdatedComponent(component, responseData);
 
-    if (isComponentOpen(component)) { //and is currently uncollapsed
-        await collapseComponent(component); //hide the old component
-    }
+    // const componentCollapsable = component.querySelector('[data-collapsable="true"]');
+    // const updatedComponentCollapsable = updatedComponent.querySelector('[data-collapsable="true"]');
+    // const updatedComponentCollapsableFragment = document.createRange().createContextualFragment(updatedComponentCollapsable.innerHTML); //createContextualFragment ensures any </script> tags within the element are run
+
+    // if (isComponentOpen(component)) { //and is currently uncollapsed
+    //     await collapseComponent(component); //hide the old component
+    // }
     
-    componentCollapsable.innerHTML = ''; //empty the contents so any Vue instances can unmount
-    componentCollapsable.appendChild(updatedComponentCollapsableFragment); //add in the updated collapsable 
+    // componentCollapsable.innerHTML = ''; //empty the contents so any Vue instances can unmount
+    // componentCollapsable.appendChild(updatedComponentCollapsableFragment); //add in the updated collapsable 
    
-    await timeout(100); //adding a delay just ensures that component scripts have had a chance to initiate so we can accurately animate the height in uncollapseComponent()
+    // await timeout(100); //adding a delay just ensures that component scripts have had a chance to initiate so we can accurately animate the height in uncollapseComponent()
 
-    updateComponentTitle(component, updatedComponent);
+    // updateComponentTitle(component, updatedComponent);
 
-    if (!isCollapseComponentSelected(updatedComponent)) {
-        await uncollapseComponent(component); //hide the old component
-        window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
-    }
+    // if (!isCollapseComponentSelected(updatedComponent)) {
+    //     await uncollapseComponent(component); //hide the old component
+    //     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
+    // }
 
 }
 
@@ -219,12 +227,12 @@ function getUpdatedComponent (component, documentString) {
  * @param { Element } 
  * @param { Element } 
  */
-function updateComponentTitle (oldComponent, updatedComponent) {
-    const componentTitle = oldComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
-    const updatedComponentTitle = updatedComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
-    if (componentTitle.innerText !== updatedComponentTitle.innerText) {
-        gsap.set(componentTitle, { opacity: 0 } );
-        componentTitle.innerText = updatedComponentTitle.innerText;
-        gsap.to(componentTitle, { opacity: 1, duration: ANIMATE_SPEED } );
-    }
-}
+// function updateComponentTitle (oldComponent, updatedComponent) {
+//     const componentTitle = oldComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
+//     const updatedComponentTitle = updatedComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
+//     if (componentTitle.innerText !== updatedComponentTitle.innerText) {
+//         gsap.set(componentTitle, { opacity: 0 } );
+//         componentTitle.innerText = updatedComponentTitle.innerText;
+//         gsap.to(componentTitle, { opacity: 1, duration: ANIMATE_SPEED } );
+//     }
+// }

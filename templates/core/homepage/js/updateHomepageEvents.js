@@ -6,6 +6,7 @@
 export default Object.freeze({
     COMPONENT_ADDED: 'UPDATE_HOMEPAGE__COMPONENT_ADDED', //dispatched with the { Element } newComponent that's been added
     COMPONENT_REMOVED: 'UPDATE_HOMEPAGE__COMPONENT_REMOVED', //dispatched with the { Element } component that's been removed
+    COMPONENT_UPDATED: 'UPDATE_HOMEPAGE__COMPONENT_UPDATED', //dispatched with the { Element } component that's been updated
     EXISTING_COMPONENT_SORT_START: 'UPDATE_HOMEPAGE__EXISTING_COMPONENT_SORT_START', //
     EXISTING_COMPONENT_SORT_UPDATE: 'UPDATE_HOMEPAGE__EXISTING_COMPONENT_SORT_UPDATE', //
     EXISTING_COMPONENT_SORT_END: 'UPDATE_HOMEPAGE__EXISTING_COMPONENT_SORT_END', //
