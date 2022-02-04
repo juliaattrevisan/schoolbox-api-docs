@@ -15,7 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -23,6 +22,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\UserMapper;
 
 /**
  * Class Module
@@ -82,6 +82,7 @@ class Module extends BaseModule
             ),
         );
         $this->register('GET', '/{folderId:\d+}', 'getListPage', $canGenerate, $preloadFolder);
+        $this->register('POST', '/{folderId:\d+}/generate', 'generate', $canGenerate, $preloadFolder);
     }
 
 
@@ -116,7 +117,10 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'userMapper'    => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'tokenMapper'   => $this->getMapperFactory()->getLazy(\Schoolbox\User\Token\Mapper::class),
+            'tokenBuilder'  => $injector->lazyGet('user.tokenBuilder'),
+            'externalClass' => $this->getInjector()->lazyGet('externalClass'),
         ];
     }
 
