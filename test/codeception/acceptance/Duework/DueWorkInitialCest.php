@@ -114,7 +114,7 @@ class DueWorkInitialCest
         $i->canSee('Test Due Work');
     }
 
-    public function submitWork(AcceptanceTester $i)
+    public function submitWorkInPersonByStudent(AcceptanceTester $i)
     {
         $student = 'Eden Reed';
         $i->login('alaress', 'alaress');
@@ -189,5 +189,36 @@ class DueWorkInitialCest
         $i->canSee('Feedback by Mr Jack Coles');
         $i->canSee('Submitted in person by Ms Eden Reed');
         $i->canSee('65 %');
+    }
+
+
+    public function submitWorkTypingSomethingByTeacher(AcceptanceTester $i)
+    {
+        $teacher = 'Jack Coles';
+        $i->login('alaress', 'alaress');
+        $i->impersonate($teacher);
+        $i->amOnUrl($this->home_page_url);
+        $i->waitForText('Test Due Work', 5);
+        $i->click('Test Due Work');
+        $i->waitForText('Test Due Work', 5);
+        $i->click('a.submit.button');
+        $i->fillCkEditorById('editor-body', 'This is a due work submission by typing something!');
+        sleep(2);
+        $i->click('input[type=submit][value=Submit\ for\ assessment]');
+        $i->canSee('Submission by Mr Jack Coles');
+    }
+
+    public function submitWorkTypingSomethingByAdmin(AcceptanceTester $i)
+    {
+        $i->login('alaress', 'alaress');
+        $i->amOnUrl($this->home_page_url);
+        $i->waitForText('Test Due Work', 5);
+        $i->click('Test Due Work');
+        $i->waitForText('Test Due Work', 5);
+        $i->click('a.submit.button');
+        $i->fillCkEditorById('editor-body', 'This is a due work submission by typing something!');
+        sleep(2);
+        $i->click('input[type=submit][value=Submit\ for\ assessment]');
+        $i->canSee('Submission by Schoolbox Admin');
     }
 }
