@@ -264,6 +264,9 @@
                 {% if audience.role %}
                 window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access }}", visibilityLocked);
                 {% endif %}
+                {% if audience.roleType %}
+                window.addRole("role-type-{{ audience.roleType }}", "{{ audience.roleType | capitalize }}", "{{ audience.access }}", visibilityLocked);
+                {% endif %}
                 {% if audience.user %}
                 window.modalUserAdded({
                     'id': {{ audience.user.id }},
