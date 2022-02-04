@@ -12,7 +12,7 @@ import { initSortExistingComponents } from './existingComponents/sortExistingCom
 import { initUpdateComponentsSettings } from './existingComponents/updateComponentsSettings';
 import { initRemoveComponents } from './existingComponents/removeComponents';
 import { initCollapseComponents } from './existingComponents/collapseComponents';
-import { initUpdateComponentCounts } from './updateComponentCounts';
+import { initUpdateNewComponentButtons } from './newComponents/updateNewComponentButtons';
 import { initUpdatePlaceHolders } from './updatePlaceHolders';
 import { initNewComponentsTab } from './newComponents/newComponentsTabs';
         
@@ -43,7 +43,7 @@ export function getComponentID (component) {
     initUpdateComponentsSettings();
     initRemoveComponents();
     initCollapseComponents();
-    initUpdateComponentCounts();
+    initUpdateNewComponentButtons();
     initUpdatePlaceHolders();
     initNewComponentsTab();
 });

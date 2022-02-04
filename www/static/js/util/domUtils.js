@@ -190,3 +190,22 @@ export function setAndGetAttribute (element, attribute, value) {
     element.setAttribute(attribute, value)
     return element.getAttribute(attribute);
 }
+
+/**
+ * Set innerHTML while also ensuring <script> tags within get run
+ * https://stackoverflow.com/questions/2592092/executing-script-elements-inserted-with-innerhtml
+ * 
+ * @param { Element }  
+ * @param { String }
+ * 
+ */
+export function setInnerHTML (element, html) {
+    element.innerHTML = html;
+    Array.from(element.querySelectorAll("script")).forEach( oldScript => {
+      const newScript = document.createElement("script");
+      Array.from(oldScript.attributes)
+        .forEach( attr => newScript.setAttribute(attr.name, attr.value) );
+        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+  }

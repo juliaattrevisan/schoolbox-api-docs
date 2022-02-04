@@ -91,10 +91,10 @@ function onNewComponentClicked (event) {
         __newComponent.style.marginBottom = '2rem'; //add the appropriate margin in
 
         Flip.from(state, {
-            absolute: true,
+            absolute: true, //to accurately animate elements
             duration: ANIMATE_SPEED,
-            nested: true,
-            zIndex: 9999, 
+            nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
+            zIndex: 9999, //ensure it stays on top
             onComplete: () => {
                 __isFlipping = false;
                 __newComponent.style.position = 'static'; //was absolute, now sitting as it should
@@ -142,8 +142,8 @@ function updateDraggablesStatus (isEnabled) {
  */
 function onDragStart (event) {
     updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-    __referenceElement = getReferenceElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
+    __referenceElement = getReferenceElement(); //to use a refernce where the new component is / where it will be dragged to
     updateDocumentOnDragStart();
     disableAllOtherDraggables();
     extractNewComponent();
@@ -424,11 +424,18 @@ function snapBackNewComponent () {
  * @param { Element }  
  */
 function onSnapBackNewComponentComplete () {
+    gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
+    __newComponent.style.position = 'static'; //was absolute, now sitting as it should
+    __newComponent.setAttribute('data-component', ''); //so it can be dragged again
     insertElementAfter(__referenceElement, __newComponent); //the element was taken out, so put it back where it now belongs
     __referenceElement.remove(); //and now the placeholder can be pulled out
     updateDocumentOnDragEnd();
     updateSortableElements();
-    checkForNewComponent();
+    if (__hasNewComponent) {
+        addNewComponent();
+    } else {
+        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    }
 }
 
 /**
@@ -446,17 +453,14 @@ function onSnapBackNewComponentComplete () {
 /**
  * To set up for another possible drag of elements
  */
-async function checkForNewComponent () {
-    if (__hasNewComponent) {
-        reinsertNewComponentButton();
-        updateDraggablesWithNewComponentButton();
-        const newComponent = await getNewComponent(__newComponent);
-        await saveComponentOrder(newComponent);
-        document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_ADDED, { detail: { component: newComponent } } ) );
-        //disable if only allowed one element
-        __hasNewComponent = false;
-    } 
+async function addNewComponent () {
+    reinsertNewComponentButton();
+    updateDraggablesWithNewComponentButton();
+    const newComponent = await getNewComponent(__newComponent);
+    await saveComponentOrder(newComponent);
+    document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_ADDED, { detail: { component: newComponent } } ) );
     updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    __hasNewComponent = false;
 }
 
 /**
@@ -464,8 +468,9 @@ async function checkForNewComponent () {
  */
 function reinsertNewComponentButton () {
     __newComponentTabsContainer.appendChild(__newComponentClone); 
-    __newComponentClone.style.opacity = 0;
-    gsap.to(__newComponentClone, { duration: ANIMATE_SPEED, opacity: 1 } );
+    // __newComponentClone.style.opacity = 0;
+    // __newComponentClone.style.opacity = 1;
+    // gsap.to(__newComponentClone, { duration: ANIMATE_SPEED, opacity: 1 } );
 }
 
 /**
