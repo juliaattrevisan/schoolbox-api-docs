@@ -25,7 +25,6 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
 use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
-use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
 use Schoolbox\Pastoral\Authorizer\Rule\IsCommentAllowed;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
