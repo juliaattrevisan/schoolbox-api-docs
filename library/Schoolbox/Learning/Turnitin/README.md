@@ -239,6 +239,49 @@ Retrofit will occur when Similarity Check becomes enabled when it previously was
 
 To do it, you need to know the **assessment id** specifically. Supply it in the cli option as described in the tool. 
 
+### 4.4 Historical CLI Tool
+
+A school will sometimes have come from a plagscan era, where they had older documents in a different vendor. These schools want the older documents to be included in Turnitin's similarity checks without manufacturing a Turnitin Report.
+* These older documents' similarity checks are archived in storage and are serviced by whatever the previous vendor (Plagscan) did.
+* If you made a Turnitin Report for them now, you wouldn't get the same result anyway, because you're similarity checking them out of chronological order.
+
+Therefore, to include them into Turnitin's similarity repository, we follow a different code path that means we **index** the documents' contents instead of generating reports for them.
+
+This functions in largely the same manner as previously described; we still need to upload the data into Turnitin, create Submissions, etc. With two key variances:
+* When we create the Submission in Turnitin, we set a special flag `extract_text_only`.
+* Instead of generating a report, we access a different endpoint which `indexes` the document's contents.
+* A new status **indexing** can now appear. 
+
+This means we can reuse the existing paradigms for Transmit and Report. The database column `turnitin_report.historical` identifies when documents are historically added explicitly by us, or when they're created in the Turnitin system as normal by our users.
+
+> Historical documents have the integer 1 in turnitin_report.historical
+
+Historical additions are performed manually and explicitly by running the Historical CLI tool.
+
+```
+vagrant ssh;
+cd /vagrant/tools/turnitin;
+php historical.php --help
+
+php historical.php
+```
+
+You can specify the start and end dates for the tool and it'll only historically add submission files in that date range. If you don't specify the dates, the following are assumed:
+* created after "now minus one year, start of the day"
+* created before "now, end of the day"
+
+> Circumstantially this lets you historically add data "from the future" if you are clever enough to set the datetimes accordingly in student_submission_file.
+
+For historical additions, `turnitin_report`records experiences these five statuses during the Report Generation phase which it shares with the Report tool:
+
+* **loaded** We successfully sent the file's contents to Turnitin. This is the last step of Transmission.
+* **prepared** Turnitin processed the contents we uploaded in the previous step and now lets us schedule a report generation.
+* **indexing** The file's contents is being added to Turnitin's index, which is the data it uses for its similarity checks.
+* **complete** We finished generating the report and we saved some data locally. We can present information to our users now.
+* **error** something went wrong; check the `error_code` and `error_message` columns for more information about what went wrong
+
+> Historical additions takes the students' the most recent non-deleted submission in a submission box. If you made fifty submissions, Historical will only add the most recent non-deleted submission. This includes submissions with multiple files.
+
 ## 5 CLI Tools Appendix
 
 Here are some general statements about the cli tools. I couldn't think of a nice way to fit it all in earlier, so I'll collate them here.
@@ -263,7 +306,20 @@ The cli tools `group transmit report` are all in the crontab.
 
 `transmit` tool will always run with `--force` to ensure that anything currently in the incomplete statuses will get a little shove. It's true that some files might be in those states normally and aren't stuck at all; they'll still get a little shove anyway.
 
-### 5.2 misc
+### 5.2 Inspector
+
+The CLI tools have a lock mechanism that prevents you from running them on top of each other. I've added their identifiers to the lock inspector so you can manually unlock it.
+
+```
+vagrant ssh;
+cd /vagrant/tools/lock;
+
+php inspector.php
+```
+
+The inspector prompts you interactively.
+
+### 5.3 misc
 
 I did consider an Explorer tool so you can query things in Turnitin that aren't exposed anywhere else - e.g. _what files does Turnitin know about for this submission box_ in case you suspect Turnitin knows something that schoolbox doesn't (desync). I haven't built that yet. You'll have to make your own for now, in a test.php
 
@@ -340,30 +396,3 @@ This will figure out the absolute url of the schoolbox instance and tell Turniti
 For the most part you only need to run `php webhook.php --reset` at the time of setup and then you can not worry about it.
 
 > You can't register multiple webhooks with this tool; you can only register (and re-register) the Unified Turnitin Endpoint. Do that if the absolute url of your instance changes.
-
-### 6.4 Inspector
-
-The CLI tools have a lock mechanism that prevents you from running them on top of each other. I've added their identifiers to the lock inspector so you can manually unlock it.
-
-```
-vagrant ssh;
-cd /vagrant/tools/lock;
-
-php inspector.php
-```
-
-The inspector prompts you interactively.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
