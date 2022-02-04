@@ -239,7 +239,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     protected $config_loader;
 
-    /** @var Collection */
+    /**
+     * @var Collection|User[]
+     */
     protected $teacherCollection;
 
     /**
@@ -1366,7 +1368,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return Collection
+     * @return Collection<User>
      */
     public function getTeacherCollection()
     {
@@ -1374,7 +1376,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param Collection $teacherCollection
+     * @param Collection<User> $teacherCollection
      * @return $this
      */
     public function setTeacherCollection($teacherCollection)

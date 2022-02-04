@@ -177,9 +177,7 @@ class Notifier extends AbstractModuleNotifier
                     // The system should only notify staff if they are a teacher of the student
                     if ($pastoralAccess->getRole()->isStaff() && $pastoralAccess->getRole()->getAccessPastoral()) {
                         $student->loadTeachers();
-                        $teachers = $student->getTeacherCollection();
-                        /** @var User $teacher */
-                        foreach ($teachers as $teacher) {
+                        foreach ($student->getTeacherCollection() as $teacher) {
                             if ($teacher->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
                                 $targetUsers[$teacher->getId()] = $teacher;
                             }
@@ -187,8 +185,7 @@ class Notifier extends AbstractModuleNotifier
                     } elseif ($pastoralAccess->getRole()->isParent() && $parentAccessEnabled) {
                         // Only send to parents if pastoral parent access is enabled
                         $student->loadParents();
-                        $parents = $student->getParents();
-                        foreach ($parents as $parent) {
+                        foreach ($student->getParents() as $parent) {
                             if ($parent->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
                                 $targetUsers[$parent->getId()] = $parent;
                             }
@@ -205,10 +202,31 @@ class Notifier extends AbstractModuleNotifier
                     }
                 } elseif ($pastoralAccess->getRoleType()) {
                     switch ($pastoralAccess->getRoleType()) {
+                        case Role::STAFF:
+                            // Only notify student's teachers,
+                            // if their role allows it
+                            $student->loadTeachers();
+                            foreach ($student->getTeacherCollection() as $teacher) {
+                                if ($teacher->getRole()->getAccessPastoral()) {
+                                    $targetUsers[$teacher->getId()] = $teacher;
+                                }
+                            }
+                            break;
+
                         case Role::STUDENT:
                             // Only notify student if student access enabled
                             if ($studentAccessEnabled) {
                                 $targetUsers[$student->getId()] = $student;
+                            }
+                            break;
+
+                        case Role::PARENT:
+                            // Only notify parents if parent access enabled
+                            if ($parentAccessEnabled) {
+                                $student->loadParents();
+                                foreach ($student->getParents() as $parent) {
+                                    $targetUsers[$parent->getId()] = $parent;
+                                }
                             }
                             break;
 
