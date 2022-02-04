@@ -1,55 +1,55 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
-    
+    <script type='text/javascript' src='{CDN_PREFIX}/js/socialstream/threads/threads.js'></script>
+
+    <script type='text/javascript'>
+        /* Use flag to prevent double loading :(
+         */
+        var hasLoaded{COMPONENT_INSTANCE_ID} = false;
+
+        $(function() {
+
+            /**
+             * Validation
+             */
+            $('form[data-add-post-form]').each(function() {
+                $(this).alaressValidate({
+                    rules: {
+                        body: {
+                            required: {
+                                depends: function (element) {
+                                    return !$(element).parents('form').find('input[name="attachment[]"]').length &&
+                                            !$(element).parents('form').find('[data-ss-url]').val();
+                                }
+                            }
+                        }
+                    },
+                    messages: {
+                        body: "Please enter a message or attach a file."
+                    }
+                });
+            });
+
+            if (hasLoaded{COMPONENT_INSTANCE_ID} !== true) {
+                $('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
+                    instanceId: '{COMPONENT_INSTANCE_ID}',
+                    homepageId: '{HOMEPAGE_ID}',
+
+                    /* Slow
+                     */
+                    start: 0,
+
+                    offset: '{SOCIALSTREAM_AJAX_LIMIT}',
+                    numPosts: '{SOCIALSTREAM_NUM_POSTS}'
+                });
+
+                hasLoaded{COMPONENT_INSTANCE_ID} = true;
+            }
+        });
+    </script>
+
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <script type='text/javascript' src='{CDN_PREFIX}/js/socialstream/threads/threads.js'></script>
-
-        <script type='text/javascript'>
-            /* Use flag to prevent double loading :(
-            */
-            var hasLoaded{COMPONENT_INSTANCE_ID} = false;
-
-            $(function() {
-
-                /**
-                 * Validation
-                 */
-                $('form[data-add-post-form]').each(function() {
-                    $(this).alaressValidate({
-                        rules: {
-                            body: {
-                                required: {
-                                    depends: function (element) {
-                                        return !$(element).parents('form').find('input[name="attachment[]"]').length &&
-                                                !$(element).parents('form').find('[data-ss-url]').val();
-                                    }
-                                }
-                            }
-                        },
-                        messages: {
-                            body: "Please enter a message or attach a file."
-                        }
-                    });
-                });
-
-                if (hasLoaded{COMPONENT_INSTANCE_ID} !== true) {
-                    $('#socialstream-{COMPONENT_INSTANCE_ID}').socialstreamThreads({
-                        instanceId: '{COMPONENT_INSTANCE_ID}',
-                        homepageId: '{HOMEPAGE_ID}',
-
-                        /* Slow
-                        */
-                        start: 0,
-
-                        offset: '{SOCIALSTREAM_AJAX_LIMIT}',
-                        numPosts: '{SOCIALSTREAM_NUM_POSTS}'
-                    });
-
-                    hasLoaded{COMPONENT_INSTANCE_ID} = true;
-                }
-            });
-        </script>
         <div class="small-12 island">
             <section>
                 <!-- BEGIN source_folder_deleted -->
