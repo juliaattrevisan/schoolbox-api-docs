@@ -20,15 +20,10 @@
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
     {% endif %}
-    {% if participant is null and student.id != USER.id and assessment.getParticipantUsers() is not empty %}
-        {# logic:
-        if participant is null, the user is not in the list of participant users
-        confirm the user accessing the page is not the 'submitting user'
-        confirm the list of participant users is not empty.
-            this list will be empty when a normal (not class / group) has a due work on it (there will be no students contained within the page)
-
-        if all these are correct, the submitting user is not part of the filled list of users listed in the class / group who have been requested to complete this assessment.
-            which means they are excluded.
+    {% if assessment.getAllParticipants()[student.id] is defined and assessment.getAllParticipants()[student.id].getExcludedAt() %}
+        {#
+         # now using the same code as the assessment update page:
+         # library/Schoolbox/Learning/Assessment/templates/fragments/participation.twig:105
         #}
         <li class="icon-close">Excluded from {{ locale.assessment }}</li>
     {% endif %}
