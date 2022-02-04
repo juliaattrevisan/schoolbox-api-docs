@@ -110,41 +110,25 @@ class Historical
             'endDate' => $end->getDatabase()
         ]);
 
-        $models = [];
+        $numFiles = 0;
 
         /* Build a collection of models
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $models[] = $this->turnitinFileMapper->createModel()
+            $turnitinFile = $this->turnitinFileMapper->createModel()
                 ->setStudentSubmissionFileId((int)$row['id'])
                 ->setHistorical(true)
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
             $this->logInfo(sprintf(
-                'Student Submission File Id %s %s created on %s',
+                'Student Submission File Id %s created on %s: %s ',
                 $row['id'],
-                $row['realname'],
-                $row['created_at']
+                $row['created_at'],
+                $row['realname']
             ));
-        }
 
-        $numFiles = \count($models);
-
-        if (!$numFiles) {
-            $this->logInfo('There are no files for historical addition; exiting');
-
-            return;
-        }
-
-        $this->logInfo(sprintf(
-            '%s file(s) prepared for historical addition',
-            $numFiles
-        ));
-
-        /* Save them all (I can probably use Collections in the save
-         * but Support would lose the diagnostics)
-         */
-        foreach ($models as $turnitinFile) {
+            /* Only slam it into turnitin_report in Perform mode
+             */
             if ($this->perform) {
                 $this->turnitinFileMapper->save($turnitinFile);
             }
@@ -164,6 +148,19 @@ class Historical
 
                 $lock->refresh();
             }
+
+            $numFiles++;
         }
+
+        if (!$numFiles) {
+            $this->logInfo('There are no files for historical addition; exiting');
+
+            return;
+        }
+
+        $this->logInfo(sprintf(
+            '%s file(s) prepared for historical addition',
+            $numFiles
+        ));
     }
 }
