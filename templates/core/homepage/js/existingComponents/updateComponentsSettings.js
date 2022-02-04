@@ -24,7 +24,7 @@ const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed
  */
 export function initUpdateComponentsSettings () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
-    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
 }
 
 /**

@@ -17,6 +17,8 @@ let __placeHolderComponentsList = []; //to contain the place holder instances
  */
  export function initUpdatePlaceHolders () {
     initPlaceHolderComponents();
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, onComponentUpdate);
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, onComponentUpdate);
     document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_START, addPlaceHolderComponents);
     document.addEventListener(UpdateHomepageEvents.NEW_COMPONENTS_TABS_OPENED, addPlaceHolderComponents);
     document.addEventListener(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_UPDATE, updatePlaceHolderComponents);
@@ -37,10 +39,20 @@ function initPlaceHolderComponents () {
         placeHolderComponent.style.display = 'block';
         placeHolderComponent.style.height = '51px';
         placeHolderComponent.dataset.component = 'true';
-        placeHolderComponent.dataset.placeHolderComponent = 'true';
+        placeHolderComponent.dataset.placeHolderComponent = 'true'; //to distinguish it from the components, used in removePlaceHolderComponents()
         placeHolderComponent.innerText = 'You can drag components into this space';
         __placeHolderComponentsList = [...__placeHolderComponentsList, placeHolderComponent];
     });
+}
+
+/**
+ * Remove and re-add as a component has been added / removed
+ */
+ function onComponentUpdate () {
+    removePlaceHolderComponents();
+    if (isNewComponentTabsOpen()) { //only show them again when the tabs are open
+        addPlaceHolderComponents();
+    }
 }
 
 /**

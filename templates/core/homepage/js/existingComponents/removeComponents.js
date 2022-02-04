@@ -19,7 +19,7 @@ const PANEL_SELECTOR = '[data-component-panel="delete"]';
  */
 export function initRemoveComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
-    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
 }
 
 /**
@@ -129,12 +129,12 @@ async function deleteComponent (component) {
     } catch (error) {
         console.warn(error);
     } finally {
-        document.dispatchEvent(new CustomEvent(ON_COMPONENT_REMOVED, { //dispatch to allow removing from the sortable list in sortExistingComponents.js
+        component.remove();
+        document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_REMOVED, { 
             detail: {
                 component: component 
             }
         })); 
-        component.remove();
     }
 }
 

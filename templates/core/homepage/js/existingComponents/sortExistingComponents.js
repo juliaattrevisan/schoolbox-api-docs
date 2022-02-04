@@ -88,7 +88,7 @@ function initListeners () {
  * To add a newly created component to the sortable list
  */
 function initOnComponentAddedListener () {
-    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => {
         const newDraggable = addNewDraggable(event.detail.component);
         const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
         newDraggable.enabled(componentLockSwitchStatus); //check 
@@ -101,7 +101,7 @@ function initOnComponentAddedListener () {
  * To remove a component from the sortable list
  */
 function initOnComponentRemovedListener () {
-    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_REMOVED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, (event) => {
         const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
         draggableToRemove.kill(); //disables the Draggable instance
         __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
@@ -249,6 +249,7 @@ async function collapseActiveComponentContent () {
 
 /**
  * To be able to sort elements and snap back to correct position
+ * When sorting and snapping back, these points are used to animate the components movements
  */
 function updateSortableElements () {
     document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
@@ -311,14 +312,14 @@ function updateActiveComponentPosition (closestElement, isShiftingDown) {
     
     __hasSortChange = true;
     __isFlipping = true;
-    __startDragPoint = updateDragPoint();
+    __startDragPoint = updateDragPoint(); //reset the start point to consider MIN_MOVEMENT etc again before another shift
 
-    const state = Flip.getState(document.querySelectorAll(COMPONENT_SELECTOR));
+    const state = Flip.getState(document.querySelectorAll(COMPONENT_SELECTOR)); //record position of elements before we move them around
     
-    if (isShiftingDown) {
-        insertElementAfter(closestElement, __referenceElement);
+    if (isShiftingDown) { //now move the elements depending on position of the component being sorted
+        insertElementAfter(closestElement, __referenceElement); //below if below the element
     } else {
-        insertElementBefore(closestElement, __referenceElement);
+        insertElementBefore(closestElement, __referenceElement); //and above if... well above
     }
 
     clearFlipElements(); //check for flip bug
@@ -351,7 +352,7 @@ function animateFlip (state) {
  * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
  */
 function clearFlipElements () {
-    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer, index) => {
+    document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer) => {
         if (parentContainer.children.length === 1 && !parentContainer.children[0].id) { //there's the flip element here, so we should clear it out
             parentContainer.removeChild(parentContainer.children[0]);
         }

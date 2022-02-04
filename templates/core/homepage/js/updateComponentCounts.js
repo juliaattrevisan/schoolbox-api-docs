@@ -1,10 +1,10 @@
 /** 
- * To update the component counts in the palette when added / removed
+ * To update the component counts in the new components tabs when added / removed
  * For example Text Box (0) becomes Text Box (1)
  *
  */
 
- import UpdateHomepageEvents from './updateHomepageEvents';
+import UpdateHomepageEvents from './updateHomepageEvents';
  
  
 /**
@@ -19,7 +19,7 @@ export function initUpdateComponentCounts () {
  * To increment the relevant counter
  */
 function initOnComponentAddedListener () {
-    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_ADDED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => {
         const counterElement = getCounterElement(event.detail.component);
         counterElement.textContent = parseInt(counterElement.textContent) + 1;
     });
@@ -29,7 +29,7 @@ function initOnComponentAddedListener () {
  * To decrement the relevant counter
  */
 function initOnComponentRemovedListener () {
-    document.addEventListener(UpdateHomepageEvents.ON_COMPONENT_REMOVED, (event) => {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, (event) => {
         const counterElement = getCounterElement(event.detail.component);
         counterElement.textContent = parseInt(counterElement.textContent) - 1;
     });
@@ -58,7 +58,7 @@ function getCounterElement (component) {
 function getTargetClassName (component) {
     let targetClassName;
     component.classList.forEach((className) => {
-        if (className.includes('_Component_Homepage')) { //currently assumed that every component contains this class at its root...
+        if (className.includes('Component_')) { //currently assumed that every component contains this class string at its root...
             targetClassName = className;
         }
     });

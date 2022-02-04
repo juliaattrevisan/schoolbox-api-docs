@@ -4,7 +4,6 @@
  */
 
 import { UPDATE_URL } from '../updateHomepage';
-import UpdateHomepageEvents from '../updateHomepageEvents';
 import { updateComponentDisplay, isToggleUnlocked } from '../existingComponents/toggleLockComponents';
 
 
@@ -18,8 +17,7 @@ export async function getNewComponent (component) {
             body: getFormData(component),
         });
         const newComponentHTML = await response.text();
-        const newComponent = replaceExistingComponent(component, newComponentHTML)
-        document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.ON_COMPONENT_ADDED, { detail: { component: newComponent } } ) ); 
+        const newComponent = replaceExistingComponent(component, newComponentHTML);
         return newComponent;
     } catch (error) {
         console.warn(error);
@@ -28,6 +26,7 @@ export async function getNewComponent (component) {
 
 /**
  * Update the just added component to the actual component that's been loaded in
+ * @todo can this be handled better?
  * 
  * @params { String } the component that's been moved
  * 
@@ -51,7 +50,7 @@ function replaceExistingComponent (component, newComponentHTML) {
  */
 function getFormData (component) {
     const formData = new FormData();
-    formData.append('add', component.firstElementChild.getAttribute('rel')); //this is to retrieve the new component id to know which type of component to create
+    formData.append('add', component.querySelector('a').getAttribute('rel')); //this is to retrieve the new component id to know which type of component to create
     formData.append('cid', document.getElementById('categoryID').value);
     return formData;
 }
