@@ -212,9 +212,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             }
 
             $this->parse('source_folder_exists_block', 'source_folder_exists');
-        }
 
-        $this->parse('has_link_block', 'has_link');
+            $this->parse('has_link_block', 'has_link');
+        }
 
         return true;
     }
