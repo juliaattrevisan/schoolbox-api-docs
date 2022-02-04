@@ -26,7 +26,7 @@ use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
-use Schoolbox\Pastoral\Authorizer\Rule\IsParentCommentAllowed;
+use Schoolbox\Pastoral\Authorizer\Rule\IsCommentAllowed;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
@@ -176,7 +176,7 @@ class Module extends BaseModule
             $permissionStaff
         );
 
-        $permissionParentCommentAllowed = new IsParentCommentAllowed();
+        $permissionCommentAllowed = new IsCommentAllowed();
 
         $permissionCommentInsert = new Rule\Any(
             new Rule\All(
@@ -188,11 +188,9 @@ class Module extends BaseModule
                 )
             ),
             new Rule\All(
-                $permissionParentOfStudent,
                 $permissionInRecordAudience,
-                $permissionParentCommentAllowed
+                $permissionCommentAllowed,
             ),
-            // For now students aren't allowed to comment
         );
 
         $permissionCommentDelete = new Rule\All(
