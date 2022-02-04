@@ -207,8 +207,8 @@ class Factory
          */
         $registry = new Registry();
 
-        $monday = date('Y-m-d', strtotime('monday this week'));
-        $friday = date('Y-m-d', strtotime('friday this week'));
+        $monday = date('Y-m-d', strtotime('monday last week'));
+        $friday = date('Y-m-d', strtotime('friday next week'));
 
         /* A Definition Compiler
          */
