@@ -635,25 +635,6 @@ class Controller extends Base
                     }
                 }
             }
-
-//            // Student role:
-//            // Only track if there are student in the role not the number
-//            if ($allowStudents && $roleCurrent->isStudent()) {
-//                $roles->add($roleCurrent);
-//                if ($record->getStudent()) {
-//                    if ($record->getStudent()->getRole()->getId() == $roleCurrent->getId()) {
-//                        $rolesWithUsers[$roleCurrent->getId()] = true;
-//                    }
-//                }
-//                foreach ($duplicates as $duplicateStudent) {
-//                    if ($rolesWithUsers[$roleCurrent->getId()]) {
-//                        break;
-//                    }
-//                    if ($duplicateStudent->getRole()->getId() == $roleCurrent->getId()) {
-//                        $rolesWithUsers[$roleCurrent->getId()] = true;
-//                    }
-//                }
-//            }
         }
 
         $audiences        = $this->audienceMapper->findAll()->filter($this->audienceMapper->getPermissionCallback());
