@@ -144,9 +144,9 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             }
 
             $this->parse('source_folder_exists_block', 'source_folder_exists');
-        }
 
-        $this->parse('has_docs_block', 'has_docs');
+            $this->parse('has_docs_block', 'has_docs');
+        }
 
         return true;
     }
