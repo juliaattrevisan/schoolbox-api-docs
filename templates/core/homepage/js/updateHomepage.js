@@ -6,7 +6,7 @@
 
 import { initToggleLockComponents } from './existingComponents/toggleLockComponents';
 import { initPostToMyLinks } from './postToMyLinks';
-import { initUpdateColumnWidths } from './editColumns/updateColumnWidths';
+import { initEditColumns } from './editColumns/editColumns';
 import { initAddNewComponents } from './newComponents/addNewComponents';
 import { initSortExistingComponents } from './existingComponents/sortExistingComponents';
 import { initUpdateComponentsSettings } from './existingComponents/updateComponentsSettings';
@@ -37,7 +37,7 @@ export function getComponentID (component) {
  document.addEventListener('DOMContentLoaded', () => {
     initToggleLockComponents();
     initPostToMyLinks();
-    initUpdateColumnWidths();
+    initEditColumns();
     initAddNewComponents();
     initSortExistingComponents();
     initUpdateComponentsSettings();
