@@ -1356,10 +1356,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function __wakeup()
     {
-        if ($this->getConfigLoader() instanceof \__PHP_Incomplete_Class) {
-            // TODO SA-8354: destroy this
-            $this->setConfigLoader(new ConfigLoader());
-        }
         if (!$this->children) {
             // This property was added in 18.0.0
             // Any objects serialised in 17.5.x will cause bugs in 18.0.0+ if this property is iterated.
