@@ -1,5 +1,8 @@
 {% extends '@core/user/student.twig' %}
 
+{# turn off specific sections for year 6-12 students#}
+{% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+
 {# Turn off these tutor blocks
  # All the tutor stuff is dealt with in details_formTeacher
  # because Form and Tutor both represent Tutor data now
@@ -16,7 +19,7 @@
 {% block details_formTeacher %}
     {% if showClasses %}
         {# Horizontal Tutor #}
-        {% if tutorTeacher %}
+        {% if tutorTeacher and not isUpperYears %}
             <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>
             <dd class="small-8 medium-9 columns">
                 {% if tutorTeacher.id %}
@@ -27,15 +30,15 @@
             </dd>
         {% endif %}
 
-        {% if externalUser.StudentTutorDescription ?? false %}
+        {% if externalUser.StudentTutorDescription ?? false and not isUpperYears %}
             <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>
             <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
         {% endif %}
 
         {# Vertical Tutor #}
         {% if formTeacher %}
-            {% if externalUser.StudentYearLevel >= 6 and externalUser.StudentYearLevel <= 12 %}
-                <dt class="small-12 medium-3">Vertical Tutor:</dt>
+            {% if isUpperYears %}
+                <dt class="small-12 medium-3">Mentor:</dt>
             {% else %}
                 <dt class="small-12 medium-3">Class Teacher:</dt>
             {% endif %}
@@ -48,8 +51,8 @@
             </dd>
 
             {% if externalUser.StudentForm %}
-                {% if externalUser.StudentYearLevel is defined and externalUser.StudentYearLevel > 5 %}
-                    <dt class="small-12 medium-3">Vertical Tutor Group:</dt>
+                {% if isUpperYears %}
+                    <dt class="small-12 medium-3">Mentor Group:</dt>
                 {% else %}
                     <dt class="small-12 medium-3">Class Group:</dt>
                 {% endif %}
