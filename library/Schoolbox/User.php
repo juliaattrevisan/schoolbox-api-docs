@@ -1347,22 +1347,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $this;
     }
 
-
-
-    /**
-     * `Schoolbox\Config\Loader` got removed in 16.0.0, but it got serialized.
-     *
-     * Put a new config loader in.
-     */
-    public function __wakeup()
-    {
-        if (!$this->children) {
-            // This property was added in 18.0.0
-            // Any objects serialised in 17.5.x will cause bugs in 18.0.0+ if this property is iterated.
-            $this->children = new GenericCollection(self::class);
-        }
-    }
-
     /**
      * @return Collection<User>
      */
