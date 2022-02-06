@@ -20,6 +20,7 @@ const PANEL_SELECTOR = '[data-component-panel="delete"]';
 export function initRemoveComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
     document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => init(event.detail.component)); //newly added components
 }
 
 /**

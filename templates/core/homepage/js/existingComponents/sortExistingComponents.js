@@ -80,21 +80,21 @@ function addNewDraggable (component) {
  * To respond to any events that require action
  */
 function initListeners () {
-    initOnComponentAddedListener();
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => onComponentAddedOrUpdated(event.detail.component)); //newly added components
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => onComponentAddedOrUpdated(event.detail.component)); //updated components
     initOnComponentRemovedListener();
 }
 
 /**
- * To add a newly created component to the sortable list
+ * To add a newly created or udpated component to the sortable list
+ * @tod - pull out the old Dragable when re-added 
  */
-function initOnComponentAddedListener () {
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => {
-        const newDraggable = addNewDraggable(event.detail.component);
-        const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
-        newDraggable.enabled(componentLockSwitchStatus); //check 
-        __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
-        updateSortableElements(); //update the position of all elements due to the new element that's been added
-    });
+function onComponentAddedOrUpdated (component) {
+    const newDraggable = addNewDraggable(component);
+    const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
+    newDraggable.enabled(componentLockSwitchStatus); //check 
+    __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
+    updateSortableElements(); //update the position of all elements due to the new element that's been added
 }
 
 /**

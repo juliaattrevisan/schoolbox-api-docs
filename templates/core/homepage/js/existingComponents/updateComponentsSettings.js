@@ -26,9 +26,8 @@ const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed
  */
 export function initUpdateComponentsSettings () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => {
-        init(event.detail.component);
-    });
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
 }
 
 /**
@@ -181,29 +180,8 @@ function getSaveComponentSettingsParams (form) {
     setInnerHTML(tempElement, updatedComponent.outerHTML); //now insert it
     const newComponent = tempElement.firstElementChild; //and then extract the element
     component.replaceWith(newComponent); //switch over to the newly created component
+    document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_UPDATED, { detail: { component: newComponent } } ) );
     updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
-
-    // const updatedComponent = getUpdatedComponent(component, responseData);
-
-    // const componentCollapsable = component.querySelector('[data-collapsable="true"]');
-    // const updatedComponentCollapsable = updatedComponent.querySelector('[data-collapsable="true"]');
-    // const updatedComponentCollapsableFragment = document.createRange().createContextualFragment(updatedComponentCollapsable.innerHTML); //createContextualFragment ensures any </script> tags within the element are run
-
-    // if (isComponentOpen(component)) { //and is currently uncollapsed
-    //     await collapseComponent(component); //hide the old component
-    // }
-    
-    // componentCollapsable.innerHTML = ''; //empty the contents so any Vue instances can unmount
-    // componentCollapsable.appendChild(updatedComponentCollapsableFragment); //add in the updated collapsable 
-   
-    // await timeout(100); //adding a delay just ensures that component scripts have had a chance to initiate so we can accurately animate the height in uncollapseComponent()
-
-    // updateComponentTitle(component, updatedComponent);
-
-    // if (!isCollapseComponentSelected(updatedComponent)) {
-    //     await uncollapseComponent(component); //hide the old component
-    //     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
-    // }
 
 }
 
@@ -220,19 +198,3 @@ function getUpdatedComponent (component, documentString) {
     const document = parser.parseFromString(documentString, 'text/html');
     return document.documentElement.querySelector(`#${component.id}`);
 }
-
-/**
- * Check if the title has been updated, and if so fade in to show a change
- * 
- * @param { Element } 
- * @param { Element } 
- */
-// function updateComponentTitle (oldComponent, updatedComponent) {
-//     const componentTitle = oldComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
-//     const updatedComponentTitle = updatedComponent.querySelector(`#component-title-${getComponentID(oldComponent)}`);
-//     if (componentTitle.innerText !== updatedComponentTitle.innerText) {
-//         gsap.set(componentTitle, { opacity: 0 } );
-//         componentTitle.innerText = updatedComponentTitle.innerText;
-//         gsap.to(componentTitle, { opacity: 1, duration: ANIMATE_SPEED } );
-//     }
-// }

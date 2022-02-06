@@ -19,6 +19,7 @@ const ANIMATE_SPEED = 0.4; //the speed of animations
 export function initCollapseComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
     document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component));
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => init(event.detail.component));
 }
 
 /**
