@@ -272,7 +272,7 @@
 
             {% for userAccess in record.accessWithPermission %}
                 {% if userAccess.role %}
-                    window.rolesAdded.push({{ userAccess.role.id }});
+                    window.rolesAdded.push('{{ userAccess.role.id }}');
                 {% elseif userAccess.roleType %}
                     window.rolesAdded.push('role-type-{{ userAccess.roleType }}');
                 {% endif %}
