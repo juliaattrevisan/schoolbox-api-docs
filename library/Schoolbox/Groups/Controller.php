@@ -136,6 +136,16 @@ class Controller extends BaseController
             }
 
             $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
+            /**
+             * check if admin
+             * admin will have $userPerm[folderID] ACCESS_FULL
+             * Superuser will not.
+             */
+            $isAdmin = false;
+            if ($userPerms[$folder->getId()]) {
+                $isAdmin = UserAccess::ACCESS_FULL === $userPerms[$folder->getId()]->getAccessLevel();
+            }
+
 
             //get group edit access, for the edit link
             if (UserAccess::ACCESS_WRITE <= $access) {
@@ -156,7 +166,7 @@ class Controller extends BaseController
                 'isForceFollow'     => $notificationsList[$folder->getId()]['force'] ?: false,
                 'isFavourite'       => $isFavourite,
                 'type'              => $folder->getGroup()->getTypeString(),
-                'isAccessAdmin'     => ($access === UserAccess::ACCESS_FULL),
+                'isAccessAdmin'     => $isAdmin,
                 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
                 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
                 'isPrivate'         => $folder->getGroup()->isPrivate(),
