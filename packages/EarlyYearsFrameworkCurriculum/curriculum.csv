@@ -1,5 +1,5 @@
 id,curriculum_node_parent_id,name,code,order,description
-1,NULL,Early Years Learning Framework,EYLF,0,
+1,,Early Years Learning Framework,EYLF,0,
 2,1,Outcome 1: Children have a strong sense of identity,EYLF-1,0,
 3,1,Outcome 2: Children are connected with and contribute to their world ,EYLF-2,0,
 4,1,Outcome 3: Children have a strong sense of wellbeing ,EYLF-3,0,

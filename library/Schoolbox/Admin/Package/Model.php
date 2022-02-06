@@ -42,6 +42,9 @@ class Model implements IModel
      */
     protected ?bool $installed;
 
+    /** @var bool */
+    private ?bool $hidden;
+
     /**
      * @return string|null
      */
@@ -129,5 +132,48 @@ class Model implements IModel
         $this->installed = $installed;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getHidden(): ?bool
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden(): ?bool
+    {
+        return $this->getHidden();
+    }
+
+
+    /**
+     * @param bool $hidden
+     * @return $this
+     */
+    public function setHidden(bool $hidden): self
+    {
+        $this->hidden = $hidden;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHiddenString(): string
+    {
+        return $this->hidden ? 'Hidden' : 'Not Hidden';
+    }
+
+    /**
+     * @return string
+     */
+    public function getInstalledString(): string
+    {
+        return $this->installed ? 'Installed' : 'Not Installed';
     }
 }

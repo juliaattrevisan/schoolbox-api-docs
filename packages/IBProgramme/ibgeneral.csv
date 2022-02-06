@@ -1,0 +1,66 @@
+id,curriculum_node_parent_id,name,code,order,description
+1,,Learner Profile,,0,"The IB learner profle represents 10 attributes valued by IB World Schools. We believe these attributes, and others like them, can help individuals and groups become responsible members of local, national and global communities.
+"
+2,1,Inquirers,LP-INQ,0,"We nurture our curiosity, developing skills for inquiry and research. We know how to learn independently and with others. We learn with enthusiasm and sustain our love of learning throughout life.
+"
+3,1,Knowledgeable,LP-KNO,0,"We develop and use conceptual understanding, exploring knowledge across a range of disciplines. We engage with issues and ideas that have local and global significance.
+"
+4,1,Thinkers,LP-THI,0,"We use critical and creative thinking skills to analyse and take responsible action on complex problems. We exercise initiative in making reasoned ethical decisions.
+"
+5,1,Communicator,LP-COM,0,"We express ourselves confidently and creatively in more than one language and in many ways. We collaborate effectively, listening carefully to the perspectives of other individuals and groups.
+"
+6,1,Principled,LP-PRI,0,"We act with integrity and honesty, with a strong sense of fairness and justice, and with respect for the dignity and rights of people everywhere. We take responsibility for our actions and their consequences.
+"
+7,1,Open-Minded,LP-OPE,0,"We critically appreciate our own cultures and personal histories, as well as the values and traditions of others. We seek and evaluate a range of points of view, and we are willing to grow from the experience.
+"
+8,1,Caring,LP-CAR,0,"We show empathy, compassion and respect. We have a commitment to service, and we act to make a positive difference in the lives of others and in the world around us.
+"
+9,1,Risk-Takers,LP-RIS,0,"We approach uncertainty with forethought and determination; we work independently and cooperatively to explore new ideas and innovative strategies. We are resourceful and resilient in the face of challenges and change.
+"
+10,1,Balanced,LP-BAL,0,"We understand the importance of balancing different aspects of our lives—intellectual, physical, and emotional—to achieve well-being for ourselves and others. We recognize our interdependence with other people and with the world in which we live.
+"
+11,1,Reflective,LP-REF,0,"We thoughtfully consider the world and our own ideas and experience. We work to understand our strengths and weaknesses in order to support our learning and personal development.
+"
+12,,Global Contexts,,0,
+13,12,Identities and relationships,GC-ID,0,"Who am I? Who are we?
+"
+14,13,1. Students will explore identity.,GC-ID-a,0,
+15,13,2. Students will explore beliefs and values.,GC-ID-b,0,
+16,13,"3. Students will explore personal, physical, mental, social and spiritual health.",GC-ID-c,0,
+17,13,"4. Students will explore human relationships including families, friends, communities and cultures.",GC-ID-d,0,
+18,13,5. Students will explore what it means to be human.,GC-ID-e,0,
+19,12,Orientation in space and time ,GC-OR,0,"What is the meaning of “where” and  “when”?
+"
+20,19,1. Students will explore personal histories.,GC-OR-a,0,
+21,19,2. Students will explore homes and journeys.,GC-OR-b,0,
+22,19,3. Students will explore turning points in humankind.,GC-OR-c,0,
+23,19,4. Students will explore discoveries.,GC-OR-d,0,
+24,19,5. Students will explore explorations and migrations of humankind.,GC-OR-e,0,
+25,19,"6. Students will explore the relationships between, and the interconnectedness of, individuals and civilizations, from personal, local and global perspectives.",GC-OR-f,0,
+26,12,Personal and cultural expression,GC-PE,0,"What is the nature and purpose of  creative expression?
+"
+27,26,"1. Students will explore the ways in  which we discover and express ideas, feelings, nature, culture, beliefs and values.",GC-PE-a,0,
+28,26,"2. Students will explore the ways in which we reflect on, extend and enjoy our creativity.",GC-PE-b,0,
+29,26,3. Students will explore our appreciation of the aesthetic.,GC-PE-c,0,
+30,12,Scientific and technical innovation,GC-SC,0,"How do we understand the world in  which we live?
+"
+31,30,1. Students will explore the natural world and its laws.,GC-SC-a,0,
+32,30,2. Students will explore the interaction between people and the natural world.,GC-SC-b,0,
+33,30,3. Students will explore how humans use their understanding of scientific principles.,GC-SC-c,0,
+34,30,4. Students will explore the impact of scientific and technological advances on communities and environments.,GC-SC-d,0,
+35,30,5. Students will explore the impact of environments on human activity.,GC-SC-e,0,
+36,30,6. Students will explore how humans adapt environments to their needs.,GC-SC-f,0,
+37,12,Globalization and sustainability,GC-GL,0,"How is everything connected?
+"
+38,37,1. Students will explore the interconnectedness of human-made systems and communities.,GC-GL-a,0,
+39,37,2. Students will explore the relationship between local and global processes.,GC-GL-b,0,
+40,37,3. Students will explore how local experiences mediate the global.,GC-GL-c,0,
+41,37,4. Students will explore the opportunities and tensions provided by world interconnectedness.,GC-GL-d,0,
+42,37,5. Students will explore the impact of decision-making on humankind and the environment.,GC-GL-e,0,
+43,12,Fairness and development,GC-FA,0,"What are the consequences of our common humanity?
+"
+44,43,1. Students will explore rights and responsibilities.,GC-FA-a,0,
+45,43,2. Students will explore the relationship between communities.,GC-FA-b,0,
+46,43,3. Students will explore sharing finite resources with other people and with other living things.,GC-FA-c,0,
+47,43,4. Students will explore access to equal opportunities.,GC-FA-d,0,
+48,43,5. Students will explore peace and conflict resolution.,GC-FA-e,0,
