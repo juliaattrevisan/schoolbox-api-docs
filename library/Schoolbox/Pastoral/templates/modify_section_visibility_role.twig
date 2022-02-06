@@ -270,8 +270,12 @@
 
             window.rolesAdded = [];
 
-            {% for userAccess in record.accessWithPermission|filter(userAccess=>userAccess.role) %}
-                window.rolesAdded.push({{ userAccess.role.id }});
+            {% for userAccess in record.accessWithPermission %}
+                {% if userAccess.role %}
+                    window.rolesAdded.push({{ userAccess.role.id }});
+                {% elseif userAccess.roleType %}
+                    window.rolesAdded.push('role-type-{{ userAccess.roleType }}');
+                {% endif %}
             {% endfor %}
 
             updateRolePermissionsClick();
