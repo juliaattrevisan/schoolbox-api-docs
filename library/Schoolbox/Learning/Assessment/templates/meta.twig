@@ -20,10 +20,13 @@
     {% if submissionsBlocked %}
     <li class="icon-upload">{{ submissionsBlocked }}</li>
     {% endif %}
-    {% if assessment.getAllParticipants()[student.id] is defined and assessment.getAllParticipants()[student.id].getExcludedAt() %}
+    {% if assessment.getAllParticipants()[student.id].getExcludedAt().isNull() is defined and assessment.getAllParticipants()[student.id].getExcludedAt().isNull() is same as(false) %}
         {#
          # now using the same code as the assessment update page:
          # library/Schoolbox/Learning/Assessment/templates/fragments/participation.twig:105
+         #
+         # needed isNull is same as(false) to test if getExcludedAt() has valid data.
+         # I was not able to just test as getExcluedAt() is null, or find a better way
         #}
         <li class="icon-close">Excluded from {{ locale.assessment }}</li>
     {% endif %}
