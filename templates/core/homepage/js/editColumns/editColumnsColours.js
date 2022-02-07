@@ -22,8 +22,6 @@ export function initEditColumnsColours () {
     initCheckboxes();
     initColourPickers();
     displayDefaultColourPickerColours();
-    document.addEventListener(UpdateHomepageEvents.EDIT_COLUMNS_RESET, onResetSelected);
-    document.addEventListener(UpdateHomepageEvents.EDIT_COLUMNS_UNDO_CHANGES, onUndoChangesSelected);
 }
 
 /**
@@ -155,7 +153,7 @@ export function appendColours (formData) {
  * Reset all the colours back to the default selections
  * This represents the admin set colours used as the default
  */
-function onResetSelected () {
+export function resetColours () {
     updateAllColours(COLOURS.defaults);
 }
 
@@ -163,7 +161,7 @@ function onResetSelected () {
  * Reset all the colours back to the original selections
  * This represents the colours at page load, prior to any further Saves
  */
-function onUndoChangesSelected () {
+export function undoColourChanges () {
     updateAllColours(COLOURS.original);
 }
 
