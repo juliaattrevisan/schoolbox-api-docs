@@ -1,25 +1,30 @@
 <script>
+import qrcodeVue from 'qrcode.vue';
+
 export default {
     props: {
         endpointGenerate: {
             type: String,
             required: true,
         },
-        loginUrl: {
-            type: String,
-            required: true,
-        },
-        students: {
-            type: Array,
-            required: true,
-        }
+    },
+    components: {
+        qrcodeVue
     },
 
     data() {
         return {
+            students: [],
             selectedStudents: [],
-            destination: ''
+            destination: '',
+            expiry: '',
+            expiryMonth: '',
+            loginUrl: '',
         }
+    },
+
+    mounted: function () {
+        this.loadStudents();
     },
 
     methods: {
@@ -41,11 +46,32 @@ export default {
                     method: 'POST',
                     body: this.getFormData(),
                 });
-                window.location.href = window.location.pathname + '?destination=' + this.destination;
+
+                let data = await response.json();
+                this.students = data.students;
+                this.loginUrl = data.loginUrl;
+                this.expiry = data.expiry;
             } catch (error) {
                 console.warn(error);
             }
         },
+
+        async loadStudents() {
+            try {
+                const response = await fetch(this.endpointGenerate, {
+                    method: 'POST',
+                    body: [],
+                });
+
+                let data = await response.json();
+                this.students = data.students;
+                this.loginUrl = data.loginUrl;
+                this.expiry = data.expiry;
+            } catch (error) {
+                console.warn(error);
+            }
+        },
+
 
         getFormData() {
             const formData = new FormData();
@@ -53,6 +79,7 @@ export default {
                 formData.append('students[]', student.id);
             });
             formData.append('destination', this.destination);
+            formData.append('expiry', this.expiryMonth);
             return formData;
         },
 
@@ -60,34 +87,40 @@ export default {
 }
 </script>
 <template>
-    <div>
+    <div class="small-12 island">
         <div v-if="students.length === 0" class="empty-state">
             <p>No students</p>
         </div>
         <div v-else>
-            <section class="content small-12">
-                <div class="list-item">
-                    <div class="row" v-for="student in students" :key="student.id">
-                        <input type="checkbox"
-                               :id="'selectStudent-' + String(student.id)"
-                               :checked="isInSelectedStudents(student.id)"
-                               @change="onStudentSelected(student, $event.target.checked)"
-                        >
-                        <label :for="'selectStudent-' + String(student.id)" class="checkbox-label">
-                            {{ student.fullname }}
-                        </label>
-                        <p v-if="student.token">
-                            {{ loginUrl + student.token }} {{ student.expiry }}
-                        </p>
+            <div class="v-card-list">
+                <div class="v-card card" v-for="student in students" :key="student.id">
+                    <input type="checkbox"
+                           :id="'selectStudent-' + String(student.id)"
+                           :checked="isInSelectedStudents(student.id)"
+                           @change="onStudentSelected(student, $event.target.checked)"
+                    >
+                    <label :for="'selectStudent-' + String(student.id)" class="checkbox-label">
+                        {{ student.fullname }}
+                    </label>
+                    <div v-if="student.token">
+                        <qrcode-vue :value="loginUrl + student.token"/>
+                    </div>
+                    <div v-if="student.token">
+                        Expires {{ expiry }}
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
         <div>
-        <select v-model="destination">
-            <option value="homepage">Homepage</option>
-            <option value="dashboard">Dashboard</option>
-        </select>
+            <select v-model="destination">
+                <option value="homepage">Homepage</option>
+                <option value="dashboard">Dashboard</option>
+            </select>
+            <select v-model="expiryMonth">
+                <option value="1">1 month</option>
+                <option value="3">3 months</option>
+                <option value="6">6 months</option>
+            </select>
         </div>
         <a @click.prevent="generateCodes()" class="button" title="Generate Codes">Generate Codes</a>
     </div>

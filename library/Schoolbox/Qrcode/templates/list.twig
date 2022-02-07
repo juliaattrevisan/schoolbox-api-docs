@@ -3,11 +3,12 @@
     [folder.name, '/homepage/' ~ folder.id],
     ['Generate Login Codes']
 ) }}
+<div class="small-12 island">
+    <h1>Generate login codes for {{ folder.nameWithCodes }}</h1>
+</div>
 <div id="manage-qrcodes-container">
     <manage-qrcodes
             endpoint-generate="{{ routeLookupIfAuthorized('qrcode.generate', {folder:folder, folderId:folder.id}) }}"
-            login-url="{{ loginUrl }}"
-            :students="{{ students | json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/manageQrcodes.js"></script>

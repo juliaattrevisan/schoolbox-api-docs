@@ -218,7 +218,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ];
         if (
             ($isClassPage || $isGroupPage)
-            && $this->getContext()->isQrcodeEnabled()
             && $authorizer->isPathAuthorizedForUser('qrcode.getListPage', $qrcodeParams, $this->getUser())
         ) {
             $this->setVar(

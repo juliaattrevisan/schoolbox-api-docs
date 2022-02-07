@@ -36,9 +36,10 @@ class Mapper extends BaseMapper
 
     /**
      * @param User $user
+     * @return Model
      * @throws BaseMapper\Exception
      */
-    public function generateForUser(User $user): void
+    public function generateForUser(User $user): Model
     {
         // delete existing
         $existing = $this->findByColumn('user_id', $user->getId());
@@ -46,5 +47,7 @@ class Mapper extends BaseMapper
         // create new
         $userJwtId = $this->createModel()->setUser($user);
         $this->save($userJwtId);
+        // get the new one
+        return $this->findOneByColumn('user_id', $user->getId());
     }
 }
