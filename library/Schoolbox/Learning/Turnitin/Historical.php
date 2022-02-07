@@ -78,6 +78,13 @@ class Historical
      */
     public function historical(\Alaress_Date_Format $start, \Alaress_Date_Format $end, ?LockInterface $lock): void
     {
+
+        $this->logInfo(sprintf(
+            'Preparing the following files for indexing, which were created between %s and %s:',
+            $start->getLocal(),
+            $end->getLocal()
+        ));
+
         /* Find the most recent student_submission records
          * and from there, find all the student_submission_file_id values
          *
