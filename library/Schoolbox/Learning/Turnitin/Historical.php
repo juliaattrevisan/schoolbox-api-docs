@@ -79,11 +79,15 @@ class Historical
     public function historical(\Alaress_Date_Format $start, \Alaress_Date_Format $end, ?LockInterface $lock): void
     {
 
+        $this->logInfo('Preparing the following Student Submission Files for indexing.');
+
         $this->logInfo(sprintf(
-            'Preparing the following files for indexing, which were created between %s and %s:',
+            'They were created between %s and %s:',
             $start->getLocal(),
             $end->getLocal()
         ));
+
+        $this->logInfo('');
 
         /* Find the most recent student_submission records
          * and from there, find all the student_submission_file_id values
@@ -93,7 +97,9 @@ class Historical
          * transmission responsibilities etc.
          */
         $query = '
-            SELECT ssf.*
+            SELECT 
+                sb.name AS submission_box_name, 
+                ssf.*
             FROM submission_box sb
             INNER JOIN (
                 SELECT student_submission.box_id, student_submission.owner, MAX(submitted_at) as maxdate
@@ -128,10 +134,11 @@ class Historical
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
             $this->logInfo(sprintf(
-                'Student Submission File Id %s created on %s: %s ',
+                'Id %s (%s): %s, in "%s"',
                 $row['id'],
                 $row['created_at'],
-                $row['realname']
+                $row['realname'],
+                $row['submission_box_name']
             ));
 
             /* Only slam it into turnitin_report in Perform mode
