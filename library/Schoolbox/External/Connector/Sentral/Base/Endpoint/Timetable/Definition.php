@@ -47,7 +47,7 @@ class Definition implements IStrategy
     /**
      * Currently hardcoded to obtain mon-fri of the current week
      */
-    private const CYCLE_LENGTH = 5;
+    private const CYCLE_LENGTH = 10;
 
 
     /**
