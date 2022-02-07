@@ -3,15 +3,17 @@
  *
  */
 
-import { initEditColumnWidths } from './editColumnsWidths';
-import { initEditColumnButtons } from './editColumnsButtons';
+import { initEditColumnsWidths } from './editColumnsWidths';
+import { initEditColumnsColours } from './editColumnsColours';
+import { initEditColumnsButtons } from './editColumnsButtons';
 import { initSaveEditColumns } from './saveEditColumns';
 
 /**
  * Fire everything up 
  */
 export function initEditColumns () {
-    initEditColumnWidths();
-    initEditColumnButtons();
+    initEditColumnsWidths();
+    initEditColumnsColours();
+    initEditColumnsButtons();
     initSaveEditColumns();
 }

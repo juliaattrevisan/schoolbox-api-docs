@@ -10,7 +10,7 @@ import UpdateHomepageEvents from '../updateHomepageEvents';
 /**
  * Start listening for button events
  */
-export function initEditColumnButtons () {
+export function initEditColumnsButtons () {
     document.querySelector('[data-role="reset-to-default"]').addEventListener('click', onResetSelected);
     document.querySelector('[data-role="undo"]').addEventListener('click', onUndoChangesSelected);
     document.querySelector('[data-role="save"]').addEventListener('click', onSaveSelected);

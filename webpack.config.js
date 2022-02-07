@@ -118,14 +118,9 @@ module.exports = {
 
             './www/static/js/calendar/jquery.getExportCalendarLink.js'
         ],
-        masonry: {
+        spectrum: {
             import: [
-                // Colour handling
-                './node_modules/spectrum-colorpicker/spectrum.js',
-
-                // homepage editing
-                './www/static/js/masonry/jquery.masonry.js',
-                './www/static/js/masonry/jquery.masonry.spectrum.js'
+                './node_modules/spectrum-colorpicker/spectrum.js', // Colour handling
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },

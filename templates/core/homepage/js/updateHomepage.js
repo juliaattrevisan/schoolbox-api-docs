@@ -34,7 +34,7 @@ export function getComponentID (component) {
 /**
  * Fire everything up
  */
- document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     initToggleLockComponents();
     initPostToMyLinks();
     initEditColumns();

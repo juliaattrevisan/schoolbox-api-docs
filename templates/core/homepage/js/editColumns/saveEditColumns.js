@@ -6,6 +6,7 @@
 import { UPDATE_URL } from '../updateHomepage';
 import UpdateHomepageEvents from '../updateHomepageEvents';
 import { appendWidth } from './editColumnsWidths';
+import { appendColours } from './editColumnsColours';
 
 
 /**
@@ -53,18 +54,6 @@ function getFormData () {
     const formData = new FormData();
     formData.append('cid', document.getElementById('categoryID').value);
     appendWidth(formData);
-    formData.append('colors[top_head_font]', 'rgba(102, 163, 208, 1.000)');
-    formData.append('colors[top_head_font]', 'rgba(102, 163, 208, 1.000)');
-    formData.append('colors[top_head_bg]', 'rgba(229, 239, 247, 1.000)');
-    formData.append('colors[top_font_primary]', 'rgba(0, 0, 22, 1.000)');
-    formData.append('colors[top_bg_primary]', 'rgba(255, 255, 255, 1.000)');
-    formData.append('colors[left_head_font]', 'rgba(102, 163, 208, 1.000)');
-    formData.append('colors[left_head_bg]', 'rgba(229, 239, 247, 1.000)');
-    formData.append('colors[left_font_primary]', 'rgba(0, 0, 22, 1.000)');
-    formData.append('colors[left_bg_primary]', 'rgba(255, 255, 255, 1.000)');
-    formData.append('colors[right_head_font]', 'rgba(102, 163, 208, 1.000)');
-    formData.append('colors[right_head_bg]', 'rgba(229, 239, 247, 1.000)');
-    formData.append('colors[right_font_primary]', 'rgba(0, 0, 22, 1.000)');
-    formData.append('colors[right_bg_primary]', 'rgba(255, 255, 255, 1.000)')
+    appendColours(formData);
     return formData;
 }

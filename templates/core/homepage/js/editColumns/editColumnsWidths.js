@@ -10,7 +10,7 @@ import { removeClassesThatContain } from '@js/util/cssUtils';
  * 
  * @todo look to remove the jQuery foundation reference 
  */
-export function initEditColumnWidths () {
+export function initEditColumnsWidths () {
     $('[data-interaction="column-width"]').on('change.fndtn.slider', function(event) {
         updateColumnWidths(parseInt(event.target.getAttribute('data-slider')));
     });
