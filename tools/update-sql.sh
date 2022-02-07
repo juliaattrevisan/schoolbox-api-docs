@@ -214,8 +214,8 @@ check_system_dependencies(){
 set_site_package(){
   # Set Site Package version in config will be blank in vagrant
   local package_version
-  if dpkg -l | grep -qE "\s${package}\s"; then
-    package_version=$(dpkg -s $package | grep Version | awk '{print $2}')
+  if dpkg -l | grep -qE "\sschoolbox\s"; then
+    package_version=$(dpkg -s schoolbox | grep Version | awk '{print $2}')
   fi
   log "Setting 'site_package' to '$package_version'"
   mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
