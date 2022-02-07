@@ -22,6 +22,7 @@ class Configured implements IFactory
     private const IDENTITY_PROVIDER_TYPE_CLOUDWORK = 'cloudwork';
     private const IDENTITY_PROVIDER_TYPE_AZURE = 'azure';
     private const IDENTITY_PROVIDER_TYPE_ADFS = 'adfs';
+    private const IDENTITY_PROVIDER_TYPE_AZURE_B2C = 'azureb2c';
 
     /**
      * What type of identity provider is being configured?
@@ -65,9 +66,10 @@ class Configured implements IFactory
                 $factory = new Cloudwork($this->adaptor);
                 break;
 
-            // ADFS or generic: create a generic verifier factory
+            // ADFS, Azure B2C or generic: create a generic verifier factory
             case self::IDENTITY_PROVIDER_TYPE_ADFS:
             case self::IDENTITY_PROVIDER_TYPE_GENERIC:
+            case self::IDENTITY_PROVIDER_TYPE_AZURE_B2C:
                 $factory = new Generic($this->adaptor);
                 break;
 
