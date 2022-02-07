@@ -19,6 +19,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -117,10 +118,10 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userMapper'    => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'tokenMapper'   => $this->getMapperFactory()->getLazy(\Schoolbox\User\Token\Mapper::class),
-            'tokenBuilder'  => $injector->lazyGet('user.tokenBuilder'),
-            'externalClass' => $this->getInjector()->lazyGet('externalClass'),
+            'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'tokenMapper'      => $this->getMapperFactory()->getLazy(\Schoolbox\User\Token\Mapper::class),
+            'tokenBuilder'     => $injector->lazyGet('user.tokenBuilder'),
         ];
     }
 

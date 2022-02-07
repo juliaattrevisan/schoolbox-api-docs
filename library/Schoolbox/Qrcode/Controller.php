@@ -11,8 +11,11 @@ namespace Schoolbox\Qrcode;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Role;
 use Schoolbox\SortUsersByName;
 use Schoolbox\Url\Factory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
@@ -28,26 +31,25 @@ class Controller extends Base
 {
     private UserMapper $userMapper;
 
+    private UserAccessMapper $userAccessMapper;
+
     private TokenMapper $tokenMapper;
 
     private Jwt $tokenBuilder;
-
-    private \External_Class $externalClass;
-
 
     /**
      * Controller constructor.
      */
     public function __construct(
         UserMapper $userMapper,
+        UserAccessMapper $userAccessMapper,
         TokenMapper $tokenMapper,
-        Jwt $tokenBuilder,
-        \External_Class $externalClass
+        Jwt $tokenBuilder
     ) {
-        $this->userMapper    = $userMapper;
-        $this->tokenMapper   = $tokenMapper;
-        $this->tokenBuilder  = $tokenBuilder;
-        $this->externalClass = $externalClass;
+        $this->userMapper       = $userMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->tokenMapper      = $tokenMapper;
+        $this->tokenBuilder     = $tokenBuilder;
     }
 
     /**
@@ -84,12 +86,13 @@ class Controller extends Base
         $expiryMonth = $this->request->post->get('expiry') ?? null;
         $showCodes   = in_array($destination, ['homepage', 'dashboard']) && in_array($expiryMonth, [1, 3, 6]);
 
-        $externalStudents = $this->externalClass->getStudents($folder->getCodeString());
-        // Now convert those external user arrays into Schoolbox users
-        $users = $this->userMapper->findByColumn(
-            'synergy_id',
-            array_column($externalStudents, 'synergy_id')
-        )->sortByCallback((new SortUsersByName())->getCallable());
+        try {
+            $users = $this->userAccessMapper
+                ->findUsersInCategory($folder, Role::STUDENT, UserAccess::ACCESS_READ, true, false)
+                ->sortByCallback((new SortUsersByName())->getCallable());
+        } catch (MapperException $e) {
+            $users = $this->userMapper->createCollection();
+        }
 
         if (!$showCodes) {
             // name list only
@@ -119,7 +122,7 @@ class Controller extends Base
                 try {
                     $newToken = $this->tokenMapper->generateForUser($student);
                     $tokens->offsetSet($student->getId(), $newToken);
-                } catch (Exception $e) {
+                } catch (MapperException $e) {
                     // skip for now
                 }
             }
