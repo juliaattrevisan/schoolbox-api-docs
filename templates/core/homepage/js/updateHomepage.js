@@ -7,15 +7,10 @@
 import { initToggleLockComponents } from './existingComponents/toggleLockComponents';
 import { initPostToMyLinks } from './postToMyLinks';
 import { initEditColumns } from './editColumns/editColumns';
-import { initAddNewComponents } from './newComponents/addNewComponents';
-import { initSortExistingComponents } from './existingComponents/sortExistingComponents';
-import { initUpdateComponentsSettings } from './existingComponents/updateComponentsSettings';
-import { initRemoveComponents } from './existingComponents/removeComponents';
-import { initCollapseComponents } from './existingComponents/collapseComponents';
-import { initUpdateNewComponentButtons } from './newComponents/updateNewComponentButtons';
+import { initNewComponents } from './newComponents/newComponents';
+import { initExistingComponents } from './existingComponents/existingComponents';
 import { initUpdatePlaceHolders } from './updatePlaceHolders';
-import { initNewComponentsTab } from './newComponents/newComponentsTabs';
-        
+  
 export const EXISTING_COMPONENT_SELECTOR = '[data-component]'; 
 export const UPDATE_URL = '/homepage/configForm.php'; 
 
@@ -38,12 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initToggleLockComponents();
     initPostToMyLinks();
     initEditColumns();
-    initAddNewComponents();
-    initSortExistingComponents();
-    initUpdateComponentsSettings();
-    initRemoveComponents();
-    initCollapseComponents();
-    initUpdateNewComponentButtons();
+    initNewComponents();
+    initExistingComponents();
     initUpdatePlaceHolders();
-    initNewComponentsTab();
 });
