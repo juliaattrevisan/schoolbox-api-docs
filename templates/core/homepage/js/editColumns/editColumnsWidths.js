@@ -34,6 +34,23 @@ function updateColumnWidths (width) {
 }
 
 /**
+ * Undo any changes to the width, setting back to its original state
+ * @todo - Note, there was previously an issue where set_value was buggy: https://github.com/alaress/schoolbox/pull/7532
+ * This doesn't appear to be the case anymore however
+ * 
+ * @param { FormData } 
+ */
+export function undoWidthChanges () {
+    const $slider = $('[data-interaction="column-width"]');
+    $slider.foundation(
+        'slider',
+        'set_value',
+        $slider.data('original-value')
+    );
+    updateColumnWidths($slider.data('original-value'));
+}
+
+/**
  * Add the width setting into the form data to be saved
  * 
  * @param { FormData } 

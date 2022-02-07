@@ -6,6 +6,7 @@
 import { UPDATE_URL } from '../updateHomepage';
 import UpdateHomepageEvents from '../updateHomepageEvents';
 import { getFormData } from './editColumns';
+import { undoWidthChanges } from './editColumnsWidths';
 import { undoColourChanges } from './editColumnsColours';
  
  
@@ -25,7 +26,8 @@ async function onEditColumnsUndoChanges () {
     const $toast = $('[data-relation="saveLayout"]');
     try {
         $toast.toastActivate( { text: 'Saving...' } );
-        undoColourChanges();
+        undoWidthChanges();
+        undoColourChanges(); 
         await fetch(UPDATE_URL, {
             method: 'POST',
             body: getFormData(),
