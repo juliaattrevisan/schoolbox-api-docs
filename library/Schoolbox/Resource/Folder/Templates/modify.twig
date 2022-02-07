@@ -208,6 +208,11 @@
             #}
             $("#recursive-permissions").change(function() {
                 $("[data-alert-recursive-permissions]").toggleClass("hide", !this.checked);
+                $("[data-alert-recursive-permissions] span").toggleClass("hide", !$("#inherit")[0].checked);
+            });
+            {# confirm if inherit, as this will remove group / class codes also from children folders #}
+            $("#inherit").change(function() {
+                $("[data-alert-recursive-permissions] span").toggleClass("hide", !this.checked);
             });
         {% endif %}
 
