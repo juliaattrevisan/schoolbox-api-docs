@@ -208,6 +208,7 @@
             #}
             $("#recursive-permissions").change(function() {
                 $("[data-alert-recursive-permissions]").toggleClass("hide", !this.checked);
+                $("[data-alert-recursive-permissions] span").toggleClass("hide", !this.checked);
             });
         {% endif %}
 
