@@ -260,6 +260,10 @@ HELP;
                 $actioned = true;
                 $this->getLogger()->info("Merge Forums based on [DELIVERED \d+\.\d]");
                 $mergeId = $matches[1];
+                if (!isset($deliveredFolders[$mergeId])) {
+                    $this->getLogger()->warning("Folder 'Delivered $mergeId' was not found to merge forum into.");
+                    continue;
+                }
                 $newFolder = $deliveredFolders[$mergeId];
                 if ($forum->getCategory()->getId() === $newFolder) {
                     //as we aren't changing the title, don't move again, exit here
@@ -321,6 +325,10 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                 }
                 $this->getLogger()->info("Merge Forums based on [\w+]");
                 $mergeId = $matches[1];
+                if (!isset($newFolderForum[$mergeId])) {
+                    $this->getLogger()->warning("Folder '$mergeId' was not found to merge the forum into.");
+                    continue;
+                }
                 $newFolder = $newFolderForum[$mergeId];
                 if ($forum->getCategory()->getId() === $newFolder) {
                     //as we aren't changing the title, don't move again, exit here
