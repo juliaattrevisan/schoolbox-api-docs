@@ -190,6 +190,10 @@ class Uploader
                         $kamiDoc->getId(),
                         $kamiDoc->getFileStatus()
                     ));
+                } catch (Exception\NotFound $e) {
+                    //file not found, error out
+                    $this->logUploadFailure($kamiModel, $e);
+                    continue;
                 } catch (\Throwable $lastException) {
                     $successiveFailures++;
                     $kamiModel->setStatus(Model::STATUS_FAILED);
@@ -262,6 +266,9 @@ class Uploader
             } catch (ConnectException $e) {
                 // Network is unreachable.
                 $this->logUploadException($e, $kamiModel, $countFailedAttempts);
+                throw $e;
+            } catch (Exception\NotFound $e) {
+                // file not found
                 throw $e;
             } catch (\Throwable $e) {
                 // But if unknown, also print the trace to help debugging
