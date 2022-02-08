@@ -374,7 +374,7 @@ Data:
                 <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
                     {% if policy | length %}
                         <p>{{ policy | purify }}</p>
-                        {% if assessment.selfAssessable %}
+                        {% if requiresReflection %}
                             <p id="confirm-empty-self-assessment-comment" class="hide">
                                 (You should also provide a
                                 {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
@@ -386,7 +386,7 @@ Data:
                             <li><a class="button" data-reject>Cancel</a></li>
                         </ul>
                     {% else %}
-                        {% if assessment.selfAssessable %}
+                        {% if requiresReflection %}
                             <div id="confirm-empty-self-assessment-comment" class="hide">
                                 <h2>
                                     Are you sure you wish to submit an incomplete
