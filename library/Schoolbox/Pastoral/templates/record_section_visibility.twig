@@ -114,10 +114,13 @@
                                 {% if access.roleType == 'student' %}
                                     <a href="{{ profile.link(record.student) }}">
                                         {{ profile.imageSquare64(record.student) }}
-                                        <span class="neutral label right">Student</span>
+                                        {% if record.studentCommentsAllowed %}
+                                            <span class="neutral label right">Comments</span>
+                                        {% endif %}
                                         {{ accessLevelLabel | raw }}
                                         <p>{{ record.student.fullName }}</p>
                                     </a>
+                                    <p class="meta">Student</p>
                                 {% elseif access.roleType == 'parent' %}
                                     <div class="icon-group size-48" title="User Role"></div>
                                     {{ accessLevelLabel | raw }}
