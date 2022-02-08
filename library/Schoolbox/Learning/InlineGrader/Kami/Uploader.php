@@ -192,6 +192,8 @@ class Uploader
                     ));
                 } catch (Exception\NotFound $e) {
                     //file not found, error out
+                    $kamiModel->setStatus(Model::STATUS_FAILED);
+                    $this->saveKamiModel($kamiModel);
                     $this->logUploadFailure($kamiModel, $e);
                     continue;
                 } catch (\Throwable $lastException) {
