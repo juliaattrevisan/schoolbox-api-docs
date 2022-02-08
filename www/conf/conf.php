@@ -10,6 +10,9 @@ declare(strict_types=1);
 define('SITE_root', dirname(__DIR__, 2));
 define('WEB_root', SITE_root . '/www');
 
+# Per Schoolbox install config, common across all instances
+$config = parse_ini_file("/etc/schoolbox/config.ini");
+
 // Are we executing in the context of a specific tenant/instance?
 $instances  = parse_ini_file("/etc/schoolbox/instances.ini", true);
 $instanceId = null;
@@ -41,6 +44,7 @@ if (PHP_SAPI === 'cli') {
             $dbPass   = $dbPass ?? (getenv('SQL_PASS', true) ?: null);
         }
     }
+    $maxStatementTime = 0; // No limit
 } else {
     // Web request
     $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
@@ -55,6 +59,7 @@ if (PHP_SAPI === 'cli') {
             break;
         }
     }
+    $maxStatementTime = (int)$config['SQL_MAX_STATEMENT_TIME_SECONDS'];
 }
 define('INSTANCE_ID_LIST', array_keys($instances));
 define('INSTANCE_ID', $instanceId);
@@ -64,10 +69,8 @@ define('SQL_db', $dbSchema);
 define('SQL_passwd', $dbPass);
 define('SQL_dsn', 'mysql:host=' . SQL_host . ';dbname=' . SQL_db);
 
-# Per Schoolbox install config, common across all instances
-$config = parse_ini_file("/etc/schoolbox/config.ini");
 define('TEMPLATE_body', $config['TEMPLATE_body']);
 define('TEMPLATE_content', $config['TEMPLATE_content']);
 define('SENTRY_TOKEN', $config['SENTRY_TOKEN']);
 define('SENTRY_PROJECT', $config['SENTRY_PROJECT']);
-define('SQL_MAX_STATEMENT_TIME_SECONDS', (int)$config['SQL_MAX_STATEMENT_TIME_SECONDS']);
+define('SQL_MAX_STATEMENT_TIME_SECONDS', $maxStatementTime);
