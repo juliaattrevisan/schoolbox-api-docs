@@ -1,0 +1,35 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<li>
+    <div class="small-12 card wrap-down">
+        {% if access.roleType == 'student' %}
+            <a href="{{ profile.link(record.student) }}">
+                {{ profile.imageSquare64(record.student) }}
+                {% if record.studentCommentsAllowed %}
+                    <span class="neutral label right">Comments</span>
+                {% endif %}
+                {{ accessLevelLabel | raw }}
+                <p>{{ record.student.fullName }}</p>
+            </a>
+            <p class="meta">Student</p>
+        {% elseif access.roleType == 'parent' %}
+            <div class="icon-group size-48" title="User Role"></div>
+            {{ accessLevelLabel | raw }}
+            {% if record.parentCommentsAllowed %}
+                <span class="neutral label right">Comments</span>
+            {% endif %}
+            <p>Parent</p>
+            <p class="meta">User Role</p>
+        {% else %}
+            <div class="icon-group size-48" title="User Role"></div>
+            {{ accessLevelLabel | raw }}
+            <p>{{ access.roleType | capitalize }}</p>
+        {% endif %}
+    </div>
+</li>
+
+{% if access.roleType == 'parent' %}
+    {% include '@pastoral/record_section_visibility_parent_list.twig' with {
+        record: record,
+    } only %}
+{% endif %}

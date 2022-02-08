@@ -7,7 +7,17 @@
         {% if access.role.isParent and record.parentCommentsAllowed %}
             <span class="neutral label right">Comments</span>
         {% endif %}
+        {% if access.role.isStudent and record.studentCommentsAllowed %}
+            <span class="neutral label right">Comments</span>
+        {% endif %}
         <p>{{ access.role.name }}</p>
         <p class="meta">User Role</p>
     </div>
 </li>
+
+{# Parents #}
+{% if access.role.isParent %}
+    {% include '@pastoral/record_section_visibility_parent_list.twig' with {
+        record: record,
+    } only %}
+{% endif %}
