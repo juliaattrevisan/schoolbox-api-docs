@@ -295,7 +295,11 @@ Data:
             {% include '@learning/fragments/meta/workType.twig' %}
         </ul>
 
-        <form id="editor-form" data-feedback-form="{{ participant.user.id }}" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
+        <form id="editor-form"
+              data-feedback-form="{{ student.id }}"
+              method="post"
+              action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}"
+              enctype="multipart/form-data">
             {% set description = participant ? participant.description : assessment.description %}
             {% if description | length %}
                 <section class="content">

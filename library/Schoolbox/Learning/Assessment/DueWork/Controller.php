@@ -799,7 +799,7 @@ class Controller extends Assessment\Controller
 
         $feedback = null;
         if ($reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
-            $feedback = $participant->findMostRecentSelfAssessedFeedback();
+            $feedback = $participant ? $participant->findMostRecentSelfAssessedFeedback() : null;
         }
 
         if ($feedback instanceof Feedback\Model) {
@@ -829,8 +829,8 @@ class Controller extends Assessment\Controller
         /* Assume the most recent record is the latest submission
          */
         if ($allResponses->count()) {
-            /** @var Submission $latestResponse */
-            $latestResponse = $participant->findMostRecentResponse();
+            /** @var Submission|null $latestResponse */
+            $latestResponse = $participant ? $participant->findMostRecentResponse() : null;
 
             /* If the latest response is a draft, collect all its contents for editing
              */
