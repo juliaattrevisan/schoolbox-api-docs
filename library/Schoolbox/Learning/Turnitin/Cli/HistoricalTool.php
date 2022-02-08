@@ -96,11 +96,11 @@ but without having to go and manufacture billions of reports. Old files'
 similarity reports are serviced by plagscan documents.
 
 If a start date is provided, student submissions will be added as historical
-documents only if they were created after the start date. If omitted, it
+documents only if they were submitted after the start date. If omitted, it
 defaults to a year before the current date.
 
 If an end date is provided, student submissions will be added as historical
-documents only if they were created before the end date. If omitted, it
+documents only if they were submitted before the end date. If omitted, it
 defaults to the current date.
 
 Historical documents get added to turnitin_report in the same way as every

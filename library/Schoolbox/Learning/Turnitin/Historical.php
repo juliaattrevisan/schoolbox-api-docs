@@ -82,7 +82,7 @@ class Historical
         $this->logInfo('Preparing the following Student Submission Files for indexing.');
 
         $this->logInfo(sprintf(
-            'They were created between %s and %s:',
+            'They were submitted between %s and %s:',
             $start->getLocal(),
             $end->getLocal()
         ));
@@ -110,8 +110,8 @@ class Historical
             INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
             INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
             LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
-            WHERE ssf.created_at >= :startDate
-            AND ssf.created_at <= :endDate
+            WHERE ss.submitted_at >= :startDate
+            AND ss.submitted_at <= :endDate
             AND tr.id IS NULL
             AND ssf.deleted_at IS NULL
             ORDER BY ssf.id
