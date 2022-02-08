@@ -98,10 +98,7 @@ HELP;
             if ('' !== trim((string)$redaction['redact_photo_modified_at'])) {
                 $lastModified = $redaction['redact_photo_modified_at'];
             } else {
-                $lastModified = sprintf(
-                    'unknown; defaulting to current datetime %s',
-                    date('Y-m-d H:i:s')
-                );
+                $lastModified = 'unknown; clearing photo paths and timestamps';
             }
 
             /* The current redaction state of affairs for each guy
