@@ -16,15 +16,25 @@ Data:
 
 {% set isSubmitOnBehalfOf = USER.id != student.id %}
 
+{##
+ # self-reflection is only available for:
+ # * actual participants (i.e. no teacher testing the submission)
+ # ** this has the side effect of allowing self-assess for teachers after
+ #    they've particpated
+ # * the participant themselves (i.e. no submit on behalf of)
+ # * due works which accept self-assessment
+#}
+{% set requiresReflection = participant and (not isSubmitOnBehalfOf) and assessment.selfAssessable %}
+
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-        let $form             = $('#editor-form'),
-            $formSaveLabel    = $form.find('[data-save-draft]'),
-            acceptsOnline     = {{ acceptsOnline ? 'true' : 'false' }},
-            hasPolicy         = {{ (policy | length) > 0 ? 'true' : 'false' }},
-            hasSelfAssessment = {{ assessment.selfAssessable ? 'true' : 'false' }},
-            submitOnBehalfOf  = {{ isSubmitOnBehalfOf ? 'true' : 'false' }};
+        let $form              = $('#editor-form'),
+            $formSaveLabel     = $form.find('[data-save-draft]'),
+            acceptsOnline      = {{ acceptsOnline ? 'true' : 'false' }},
+            hasPolicy          = {{ (policy | length) > 0 ? 'true' : 'false' }},
+            requiresReflection = {{ requiresReflection ? 'true' : 'false' }},
+            submitOnBehalfOf   = {{ isSubmitOnBehalfOf ? 'true' : 'false' }};
         if (Number('{{ errorMessage|length }}') > 0) {
             // Just show error message in perma-toast
             $formSaveLabel.toastActivate({
@@ -161,7 +171,7 @@ Data:
          * @returns {Boolean}
          */
         let isSelfAssessmentCommentEmpty = function () {
-            if (!hasSelfAssessment) {
+            if (!requiresReflection) {
                 return false;
             }
             let $commentInput = $form.find('[name="comment"]');
@@ -278,16 +288,6 @@ Data:
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{##
- # self-reflection is only available for:
- # * actual participants (i.e. no teacher testing the submission)
- # ** this has the side effect of allowing self-assess for teachers after
- #    they've particpated
- # * the participant themselves (i.e. no submit on behalf of)
- # * due works which accept self-assessment
- #}
-{% set requiresReflection = participant and (not isSubmitOnBehalfOf) and assessment.selfAssessable %}
-
 <div class="row" id="assessment-status">
     <div class="small-12 island">
 
@@ -371,41 +371,43 @@ Data:
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
 
-                <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
-                    {% if policy | length %}
-                        <p>{{ policy | purify }}</p>
-                        {% if requiresReflection %}
-                            <p id="confirm-empty-self-assessment-comment" class="hide">
-                                (You should also provide a
-                                {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
-                                comment.)
-                            </p>
-                        {% endif %}
-                        <ul class="flex-list buttons">
-                            <li><a class="button submit" data-accept>Yes, I agree</a></li>
-                            <li><a class="button" data-reject>Cancel</a></li>
-                        </ul>
-                    {% else %}
-                        {% if requiresReflection %}
-                            <div id="confirm-empty-self-assessment-comment" class="hide">
-                                <h2>
-                                    Are you sure you wish to submit an incomplete
-                                    {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
-                                </h2>
-
-                                <p>
-                                    It is preferable to provide a
+                {% if requiresReflection or policy | length %}
+                    <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
+                        {% if policy | length %}
+                            <p>{{ policy | purify }}</p>
+                            {% if requiresReflection %}
+                                <p id="confirm-empty-self-assessment-comment" class="hide">
+                                    (You should also provide a
                                     {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
-                                    comment. Please confirm that you wish to provide no comment.
+                                    comment.)
                                 </p>
-                            </div>
+                            {% endif %}
+                            <ul class="flex-list buttons">
+                                <li><a class="button submit" data-accept>Yes, I agree</a></li>
+                                <li><a class="button" data-reject>Cancel</a></li>
+                            </ul>
+                        {% else %}
+                            {% if requiresReflection %}
+                                <div id="confirm-empty-self-assessment-comment" class="hide">
+                                    <h2>
+                                        Are you sure you wish to submit an incomplete
+                                        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
+                                    </h2>
+
+                                    <p>
+                                        It is preferable to provide a
+                                        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
+                                        comment. Please confirm that you wish to provide no comment.
+                                    </p>
+                                </div>
+                            {% endif %}
+                            <ul class="flex-list buttons">
+                                <li><a class="button submit" data-accept>Yes</a></li>
+                                <li><a class="button" data-reject>No</a></li>
+                            </ul>
                         {% endif %}
-                        <ul class="flex-list buttons">
-                            <li><a class="button submit" data-accept>Yes</a></li>
-                            <li><a class="button" data-reject>No</a></li>
-                        </ul>
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
             {% endif %}
 
             {# If this is a self-reflectable assessment, and is being submitted by the student, include the section for self-reflecting #}
