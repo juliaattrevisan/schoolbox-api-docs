@@ -1,7 +1,5 @@
 <?php
 
-namespace Survey;
-
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,6 +12,8 @@ namespace Survey;
  * 3. Execute cd /vagrant && ./vendor/bin/codecept run --steps acceptance Survey/QuestionBankCest
  * ./vendor/codeception/codeception/codecept --steps run acceptance Survey/QuestionBankCest
  */
+
+namespace Survey;
 
 use AcceptanceTester;
 use Page\Common;
