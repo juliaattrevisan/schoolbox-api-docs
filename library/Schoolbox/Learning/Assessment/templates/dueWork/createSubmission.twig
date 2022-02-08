@@ -278,7 +278,15 @@ Data:
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% set requiresReflection = not isSubmitOnBehalfOf and assessment.selfAssessable %}
+{##
+ # self-reflection is only available for:
+ # * actual participants (i.e. no teacher testing the submission)
+ # ** this has the side effect of allowing self-assess for teachers after
+ #    they've particpated
+ # * the participant themselves (i.e. no submit on behalf of)
+ # * due works which accept self-assessment
+ #}
+{% set requiresReflection = participant and (not isSubmitOnBehalfOf) and assessment.selfAssessable %}
 
 <div class="row" id="assessment-status">
     <div class="small-12 island">
