@@ -1,5 +1,7 @@
 <?php
 
+namespace Survey;
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,11 +15,13 @@
  * ./vendor/codeception/codeception/codecept --steps run acceptance Survey/QuestionBankCest
  */
 
+use AcceptanceTester;
 use Page\Common;
 use Page\Survey\SurveyForm;
 use Page\Survey\QuestionForm;
 use Page\Survey\SummaryPage;
 use Page\Survey\QuestionBankPage;
+use Exception;
 
 class QuestionBankCest
 {
@@ -39,7 +43,8 @@ class QuestionBankCest
      */
     public function questionBank(AcceptanceTester $i)
     {
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
+
+        $classId = Common::CLASS_ID_9AENG;
         $surveyTitle = 'Cest Survey One ' . Common::gentext(6);
         $sectionTitle = 'Cest Section One ' . Common::gentext(6);
         $question1 = Common::gentext(100);
