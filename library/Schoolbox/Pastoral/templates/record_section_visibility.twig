@@ -70,35 +70,12 @@
 
                     {% elseif access.user is not empty %}
                         {# Individual User Access #}
+                        {% include '@pastoral/record_section_visibility_user.twig' with {
+                            record: record,
+                            accessLevelLabel: accessLevelLabel,
+                            access: access,
+                        } only %}
 
-                        <li>
-                            <div class="small-12 card wrap-down">
-                                {% if access.user.isDeleted() %}
-                                    {{ profile.imageSquare64(access.user) }}
-                                    {{ accessLevelLabel | raw }}
-                                    <p>
-                                        {{ access.user.firstname }} {{ access.user.lastname }}
-                                    </p>
-                                    <p class="meta">
-                                        {{ access.user.role.name }}
-                                    </p>
-                                {% else %}
-                                    <a href="{{ profile.link(access.user) }}">
-                                        {{ profile.imageSquare64(access.user) }}
-                                        {{ accessLevelLabel | raw }}
-                                        {% if access.user.role.isParent and record.parentCommentsAllowed %}
-                                            <span class="neutral label right">Comments</span>
-                                        {% endif %}
-                                        <p>
-                                            {{ access.user.firstname }} {{ access.user.lastname }}
-                                        </p>
-                                        <p class="meta">
-                                            {{ access.user.role.name }}
-                                        </p>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </li>
                     {% endif %}
                 {% endfor %}
             {% endfor %}
