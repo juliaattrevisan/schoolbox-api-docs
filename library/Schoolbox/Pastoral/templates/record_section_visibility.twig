@@ -84,18 +84,11 @@
                         </li>
                     {% elseif access.role is not empty %}
                         {# User Role Access #}
-
-                        <li>
-                            <div class="small-12 card wrap-down">
-                                <div class="icon-group size-48" title="User Role"></div>
-                                {{ accessLevelLabel | raw }}
-                                {% if access.role.isParent and record.parentCommentsAllowed %}
-                                    <span class="neutral label right">Comments</span>
-                                {% endif %}
-                                <p>{{ access.role.name }}</p>
-                                <p class="meta">User Role</p>
-                            </div>
-                        </li>
+                        {% include '@pastoral/record_section_visibility_role.twig' with {
+                            record: record,
+                            accessLevelLabel: accessLevelLabel,
+                            access: access,
+                        } only %}
 
                         {% if access.role.isParent %}
                             {% include '@pastoral/record_section_visibility_parent_list.twig' with {
