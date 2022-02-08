@@ -7,6 +7,9 @@
 table.rb {
     color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    p {
+        white-space: pre-wrap;
+    }
 
     [colspan] {
         border-right-width: 0 !important;

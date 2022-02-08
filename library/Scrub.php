@@ -435,19 +435,7 @@ class Scrub
      */
     public static function markdown(string $text): string
     {
-        $text = self::getMarkdownConverter()->convertToHtml($text)->getContent();
-        $text = nl2br(trim($text));
-        // Removing extra <br /> tags in lists
-        $text = str_replace("<ul><br />\n<li>", "<ul>\n<li>", $text);
-        $text = str_replace("<ol><br />\n<li>", "<ol>\n<li>", $text);
-        $text = str_replace("</li><br />\n<li>", "</li>\n<li>", $text);
-        $text = str_replace("</li><br />\n</ul>", "</li>\n</ul>", $text);
-        $text = str_replace("</li><br />\n</ol>", "</li>\n</ol>", $text);
-        $text = str_replace("<li><br />\n<ul>", "<li>\n<ul>", $text);
-        $text = str_replace("<li><br />\n\<ol>", "<li>\n<ol>", $text);
-        $text = str_replace("</ul><br />\n</li>", "</ul>\n</li>", $text);
-        $text = str_replace("</ol><br />\n</li>", "</ol>\n</li>", $text);
-        return $text;
+        return self::getMarkdownConverter()->convertToHtml($text)->getContent();
     }
 
 
