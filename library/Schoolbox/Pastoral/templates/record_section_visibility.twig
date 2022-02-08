@@ -49,39 +49,11 @@
 
                         {# Pastoral Group Access #}
 
-                        <li>
-                            <div class="small-12 card wrap-down">
-                                <div class="icon-teacher size-48" title="Pastoral Group"></div>
-                                {{ accessLevelLabel | raw }}
-                                {# Display link to group if the user is a pastoral moderator #}
+                        {% include '@pastoral/record_section_visibility_group.twig' with {
+                            access: access,
+                            accessLevelLabel: accessLevelLabel,
+                        } only %}
 
-                                {% set routeGetGroupModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: access.group.id}) %}
-                                {% if routeGetGroupModify %}
-                                    <a href="{{ routeGetGroupModify }}">
-                                        <p>{{ access.group.name }}</p>
-                                    </a>
-                                {% else %}
-                                    <p>{{ access.group.name }}</p>
-                                {% endif %}
-
-                                <p class="meta">Pastoral Group</p>
-
-                                {# Display links to group members profiles #}
-
-                                <p class="meta">
-                                    {% for member in access.group.membersWithPermission %}
-                                        {% if member.user.isDeleted() %}
-                                            {{ member.user.fullName }}
-                                            ({{ member.user.role.name }})<br>
-                                        {% else %}
-                                            <a href="{{ profile.link(member.user) }}">{{ member.user.fullName }}</a>
-                                            ({{ member.user.role.name }})<br>
-                                        {% endif %}
-                                    {% endfor %}
-                                </p>
-
-                            </div>
-                        </li>
                     {% elseif access.role is not empty %}
                         {# User Role Access #}
                         {% include '@pastoral/record_section_visibility_role.twig' with {

@@ -1,0 +1,39 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<li>
+    <div class="small-12 card wrap-down">
+        <div class="icon-teacher size-48" title="Pastoral Group"></div>
+        {{ accessLevelLabel | raw }}
+        {# Display link to group if the user is a pastoral moderator #}
+
+        {% set routeGetGroupModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: access.group.id}) %}
+        {% if routeGetGroupModify %}
+            <a href="{{ routeGetGroupModify }}">
+                <p>{{ access.group.name }}</p>
+            </a>
+        {% else %}
+            <p>{{ access.group.name }}</p>
+        {% endif %}
+
+        <p class="meta">Pastoral Group</p>
+
+    </div>
+</li>
+
+{% for member in access.group.membersWithPermission %}
+    <li class="child">
+        <div class="tiny small-12 card wrap-down">
+            {% if member.user.deleted %}
+                {{ profile.imageSquare64(member.user) }}
+                {{ member.user.fullName }}
+                <span class="meta">({{ member.user.role.name }})</span>
+            {% else %}
+                <a href="{{ profile.link(member.user) }}">
+                    {{ profile.imageSquare64(member.user) }}
+                    {{ member.user.fullName }}
+                    <span class="meta">({{ member.user.role.name }})</span>
+                </a>
+            {% endif %}
+        </div>
+    </li>
+{% endfor %}
