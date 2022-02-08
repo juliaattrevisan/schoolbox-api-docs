@@ -8,13 +8,10 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
-use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DomainObject;
 use Schoolbox\Mapper;
 
@@ -100,27 +97,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dueWorkResponses = new GenericCollection(DomainObject::class);
 
         foreach ($mapperModels as $studentSubmission) {
-            $response = (new DomainObject())
-                ->setId($studentSubmission->getId())
-                ->setAssessable((new DueWork())->setId($studentSubmission->getSubmissionBox()->getAssessmentModel()->getId()))
-                ->setSubmittedBy($studentSubmission->getSubmittedBy())
-                ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
-                ->setCreatedAt($studentSubmission->getCreatedAt())
-                ->setDeletedAt(new \Alaress_Date_NullDate())
-                ->setUpdatedAt($studentSubmission->getUpdatedAt())
-                ->setSubmittedAt($studentSubmission->getSubmittedAt());
-
-            if ($studentSubmission->getFiles() !== null) {
-                $response->setAllFiles(new GenericCollection(SingleFile\Model::class));
-                foreach ($studentSubmission->getFiles() as $file) {
-                    // Translate the file subobject
-                    $responseFile = clone $file;
-                    $responseFile->setSubmission($response);
-                    $response->getAllFiles()->add($responseFile);
-                }
-            }
-
-            $dueWorkResponses->add($response);
+            $transformer ??= new Transformer();
+            $dueWorkResponses->add(
+                $transformer->transformModel($studentSubmission)
+            );
         }
 
         return $dueWorkResponses;
@@ -157,31 +137,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $dataModels = $this->getMapper()->createCollection();
 
         foreach ($domainObjects as $domainObject) {
-            // TODO consider whether the submission box should be looked up in save()
-            $dataModel = $this->getMapper()->createModel()
-                ->setId($domainObject->getId())
-                ->setSubmissionBox(
-                    (new DueWorkDataObject())
-                        ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
+            $transformer ??= new Transformer();
+            $dataModels->add(
+                $transformer->transformDomainObject(
+                    $domainObject,
+                    $this->getInternalValue($domainObject->getAssessable()->getId())
                 )
-                ->setSubmittedBy($domainObject->getSubmittedBy())
-                ->setOwner($domainObject->getSubmittedOnBehalfOf())
-                ->setCreatedAt($domainObject->getCreatedAt())
-                ->setSubmittedAt($domainObject->getSubmittedAt());
-
-            // Files
-            if ($domainObject->getAllFiles() !== null) {
-                $dataModel->setFiles(new GenericCollection(SingleFile\Model::class));
-                foreach ($domainObject->getAllFiles() as $file) {
-                    // The post-save of a file will have to handle saving of plagscan
-                    // (due to the new Plagscan object not holding a file ID)
-                    $dataModelFile = clone $file;
-                    $dataModelFile->setSubmission($dataModel);
-                    $dataModel->getFiles()->add($dataModelFile);
-                }
-            }
-
-            $dataModels->add($dataModel);
+            );
         }
 
         return $dataModels;
