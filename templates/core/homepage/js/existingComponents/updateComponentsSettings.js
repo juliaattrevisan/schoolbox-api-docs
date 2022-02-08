@@ -174,7 +174,6 @@ function getSaveComponentSettingsParams (form) {
  * @param { String } 
  */
  async function updateComponent (component, responseData) {
-    
     const updatedComponent = getUpdatedComponent(component, responseData);
     const tempElement = document.createElement('div'); //just use to insert the updated component html
     setInnerHTML(tempElement, updatedComponent.outerHTML); //now insert it
@@ -182,7 +181,6 @@ function getSaveComponentSettingsParams (form) {
     component.replaceWith(newComponent); //switch over to the newly created component
     document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_UPDATED, { detail: { component: newComponent } } ) );
     updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
-
 }
 
 /**

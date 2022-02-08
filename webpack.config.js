@@ -124,6 +124,17 @@ module.exports = {
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
+        masonry: {
+            import: [
+                // Colour handling
+                './node_modules/spectrum-colorpicker/spectrum.js',
+
+                // homepage editing
+                './www/static/js/masonry/jquery.masonry.js',
+                './www/static/js/masonry/jquery.masonry.spectrum.js',
+            ],
+            dependOn: 'main' //ensures jQuery is loaded prior
+        },
         dataTables: {
             import: [
                 './node_modules/datatables.net/js/jquery.dataTables.js',
