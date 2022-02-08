@@ -101,6 +101,22 @@ Usage: report.php [--instance=INSTANCE_ID] [--report=1234]
 
 ----
 
+Historical turnitin documents are also processed with this tool. They follow the same algorithm
+and basic steps; the main difference is that instead of generating a report, we just put the
+file's contents into turnitin's brain and leave it at that. To represent this step, we have
+a special status "indexing". Everything else remains more-or-less synonymous so you don't have
+to think too hard about this.
+
+1. An upload finished being sent to Turnitin; you start here                        [loaded]
+2. Turnitin finishes processing the upload and is ready for indexing                [prepared]
+3. Indexing the document's contents begins                                          [indexing]
+4. Indexing finished and there is nothing more to do                                [complete]
+
+There is no fundamental difference between historical documents and regular contemporary ones.
+Historical documents are simply processed in a different way.
+
+----
+
 (For those ancient support kings, Turnitin "report.php" is analogous to plag "scan.php")
 
 
@@ -238,13 +254,15 @@ HELP;
                 'id' => $this->getOpt(self::OPT_LONG_REPORT_ID),
                 'status' => [
                     Turnitin\File\Model::STATUS_REPORT_PREPARED,
-                    Turnitin\File\Model::STATUS_REPORT_ANALYSING
+                    Turnitin\File\Model::STATUS_REPORT_ANALYSING,
+                    Turnitin\File\Model::STATUS_REPORT_INDEXING
                 ]
             ]);
         } else {
             $models = Turnitin\File\Mapper::getInstance()->findByColumn('status', [
                 Turnitin\File\Model::STATUS_REPORT_PREPARED,
-                Turnitin\File\Model::STATUS_REPORT_ANALYSING
+                Turnitin\File\Model::STATUS_REPORT_ANALYSING,
+                Turnitin\File\Model::STATUS_REPORT_INDEXING
             ]);
         }
 

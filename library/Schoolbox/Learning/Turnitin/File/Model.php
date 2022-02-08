@@ -67,6 +67,10 @@ class Model implements ISoftDeletable
      */
     public const STATUS_REPORT_ANALYSING = 'analysing';
 
+    /* We started indexing a historical document in turnitin
+     */
+    public const STATUS_REPORT_INDEXING = 'indexing';
+
     /* We successfully completed turnitin analysis, yanking their overall percentage
      * and caching that locally
      */
@@ -149,6 +153,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var bool|null
+     */
+    private ?bool $historical = false;
+
+
+    /**
      * Turnitin report finished processing
      *
      * @return bool
@@ -172,7 +182,8 @@ class Model implements ISoftDeletable
             self::STATUS_TRANSMIT_UPLOADING,
             self::STATUS_TRANSMIT_LOADED,
             self::STATUS_REPORT_PREPARED,
-            self::STATUS_REPORT_ANALYSING
+            self::STATUS_REPORT_ANALYSING,
+            self::STATUS_REPORT_INDEXING
         ]);
     }
 
@@ -378,6 +389,26 @@ class Model implements ISoftDeletable
     public function setSubmittedWorksMatchPercentage(?float $submittedWorksMatchPercentage): self
     {
         $this->submittedWorksMatchPercentage = $submittedWorksMatchPercentage;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getHistorical(): ?bool
+    {
+        return $this->historical;
+    }
+
+
+    /**
+     * @param bool|null $historical
+     * @return Model
+     */
+    public function setHistorical(?bool $historical): self
+    {
+        $this->historical = $historical;
         return $this;
     }
 }

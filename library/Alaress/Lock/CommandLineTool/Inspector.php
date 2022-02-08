@@ -25,6 +25,7 @@ use Schoolbox\Learning\Turnitin\Cli\TransmitTool;
 use Schoolbox\Learning\Turnitin\Cli\ReportTool;
 use Schoolbox\Learning\Turnitin\Cli\GroupTool;
 use Schoolbox\Learning\Turnitin\Cli\RetrofitTool;
+use Schoolbox\Learning\Turnitin\Cli\HistoricalTool;
 use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Video\CommandLineTool\Processor;
 use Schoolbox\Intellischool\CommandLineTool\DataSync;
@@ -75,6 +76,7 @@ class Inspector extends CliTool\App
         ReportTool::TURNITIN_LOCK_NAME   => 'Turnitin Report Generator (./tools/turnitin/report.php)',
         RetrofitTool::TURNITIN_LOCK_NAME => 'Turnitin File Retrofitter (./tools/turnitin/retrofit.php)',
         CleanserTool::TURNITIN_LOCK_NAME => 'Turnitin Group Cleanser (./tools/turnitin/cleanser.php)',
+        HistoricalTool::TURNITIN_LOCK_NAME => 'Turnitin Historical (./tools/turnitin/historical.php)',
 
         //Intellischool CLI tool
         DataSync::LOCK_NAME      =>  'Intellischool Sync Handler (./tools/intellischool/dataSync.php)',

@@ -84,7 +84,7 @@ needed, put them into turnitin_report for processing. This occurs mainly when te
 activate Similarity Check after some students have submitted, but not others, and you
 needed to put those -others- into turnitin_report.
 
-Usage: group.php --assessment=1234 [--instance=INSTANCE_ID] 
+Usage: retrofit.php --assessment=1234 [--instance=INSTANCE_ID] 
 
 
 HELP;

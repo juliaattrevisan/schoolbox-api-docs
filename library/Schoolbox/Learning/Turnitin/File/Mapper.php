@@ -40,6 +40,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('internet_match_percentage', self::TYPE_DECIMAL);
         $this->uses('publication_match_percentage', self::TYPE_DECIMAL);
         $this->uses('submitted_works_match_percentage', self::TYPE_DECIMAL);
+        $this->uses('historical', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -71,6 +72,7 @@ class Mapper extends \Schoolbox\Mapper
         $model = $this->createModel()
             ->setStatus(Model::STATUS_TRANSMIT_PENDING)
             ->setStudentSubmissionFileId($file->getId())
+            ->setHistorical(false)
             ->setCreatedAt($now)
             ->setUpdatedAt($now);
 
