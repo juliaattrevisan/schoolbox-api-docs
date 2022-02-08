@@ -5,7 +5,7 @@
 <div class="small-12 {% if record.relatedRecords | length %}medium-6{% endif %} island">
     <h2 class="subheader">Content Visibility</h2>
     <section>
-        <ul class="information-list">
+        <ul class="information-list threaded">
 
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
             {# Record Owner #}
@@ -93,19 +93,16 @@
                                     <span class="neutral label right">Comments</span>
                                 {% endif %}
                                 <p>{{ access.role.name }}</p>
-                                {% if access.role.isParent %}
-                                    {% for parent in record.student.parents %}
-                                        {% if parent.isDeleted() or record.student.hideContacts %}
-                                            {{ parent.fullName }}<br>
-                                        {% else %}
-                                            <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <p class="meta">User Role</p>
-                                {% endif %}
+                                <p class="meta">User Role</p>
                             </div>
                         </li>
+
+                        {% if access.role.isParent %}
+                            {% include '@pastoral/record_section_visibility_parent_list.twig' with {
+                                record: record,
+                            } only %}
+                        {% endif %}
+
                     {% elseif access.roleType is not empty %}
                         {# User Role Type Access #}
 
@@ -127,14 +124,8 @@
                                     {% if record.parentCommentsAllowed %}
                                         <span class="neutral label right">Comments</span>
                                     {% endif %}
-                                    <p>{{ access.roleType | capitalize }}</p>
-                                    {% for parent in record.student.parents %}
-                                        {% if parent.isDeleted() or record.student.hideContacts %}
-                                            {{ parent.fullName }}<br>
-                                        {% else %}
-                                            <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
-                                        {% endif %}
-                                    {% endfor %}
+                                    <p>Parent</p>
+                                    <p class="meta">User Role</p>
                                 {% else %}
                                     <div class="icon-group size-48" title="User Role"></div>
                                     {{ accessLevelLabel | raw }}
@@ -142,6 +133,13 @@
                                 {% endif %}
                             </div>
                         </li>
+
+                        {% if access.roleType == 'parent' %}
+                            {% include '@pastoral/record_section_visibility_parent_list.twig' with {
+                                record: record,
+                            } only %}
+                        {% endif %}
+
                     {% elseif access.user is not empty %}
                         {# Individual User Access #}
 

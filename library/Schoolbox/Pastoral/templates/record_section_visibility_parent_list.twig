@@ -1,0 +1,17 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% for parent in record.student.parents %}
+    <li class="child">
+        <div class="tiny small-12 card wrap-down">
+            {% if parent.deleted or record.student.hideContacts %}
+                {{ profile.imageSquare64(record.student) }}
+                {{ parent.fullName }}
+            {% else %}
+                <a href="{{ profile.link(parent) }}">
+                    {{ profile.imageSquare64(parent) }}
+                    {{ parent.fullName }}
+                </a>
+            {% endif %}
+        </div>
+    </li>
+{% endfor %}
