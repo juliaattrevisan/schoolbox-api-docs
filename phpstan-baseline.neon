@@ -8052,7 +8052,7 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/User.php
 
 		-
