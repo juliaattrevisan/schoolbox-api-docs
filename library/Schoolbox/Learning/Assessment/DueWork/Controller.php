@@ -1099,10 +1099,6 @@ class Controller extends Assessment\Controller
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
         }
 
-        /* Feedback vars */
-        $participant = null;
-        $comment = null;
-        $mark = null;
         // Students can't mark themselves as requiring resubmission
         $resubmissionRequired = false;
         // Self-reflecters can't attach files to feedback, so this will always be null
@@ -1110,12 +1106,14 @@ class Controller extends Assessment\Controller
         // And we only need to know if the feedback was submitted from the inline grader in order to determine if
         // we need to process attachments, so this is a nope too
         $fromInlineGrader = false;
-        $publish = null;
-        $mostRecentFeedback = null;
-        $hasRubric = null;
 
         // Only try to create a feedback if this due work uses self reflect
         if ($reviewRoute != ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+            // Reload assessment's participation.
+            // There's a rare case where if a teacher submits feedback without
+            // being a participant: their participation is added but not
+            // recognised yet.
+            $assessment  = $this->participantMapper->loadParticipationIntoAssessment($assessment);
             $participant = $assessment->getParticipant($student);
             $comment     = $rq->post['comment'];
             // There might not be a mark: due works may have mark type none, in which case no mark will be posted
