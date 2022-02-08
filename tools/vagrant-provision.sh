@@ -253,6 +253,27 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/sql/vagrant.sql
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
 
 
+# Set ENV VARs for root + vagrant users from vagrant.yaml params
+declare -A env_vars=(
+  [INSTANCE_ID]="$instance_id_env_var"
+  [FACTER_primary_php_majver]="$phpversion_supported"
+  [FACTER_vagrant_extra_hostname]="$extra_hostname"
+)
+for config_name in "${!env_vars[@]}"; do
+  config_value=${env_vars[$config_name]}
+  for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
+    # Remove the config if it exists, then insert it
+    sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
+    echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
+  done
+  # Need to preserve these ENV vars for vagrant's sudo session
+  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
+    chmod a+w /etc/sudoers.d/vagrant;
+    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
+    chmod a-w /etc/sudoers.d/vagrant;
+  fi
+done
+
 # Set up the host for the newly-installed instance
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
 FACTER_vagrant_extra_hostname="$extra_hostname" FACTER_primary_php_majver="$phpversion_supported" /vagrant/puppet-apply.sh
@@ -396,14 +417,10 @@ then
             # Technically this is redundant for 'vagrant' sessions, but it required for vagrant sudo and root session
             echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
         fi
-
-        sed -i '/export INSTANCE_ID=/d' ${bashrcFile}
-        # Ensure that we always run tools with vagrant instance
-        echo "export INSTANCE_ID=\"$instance_id_env_var\"" >> ${bashrcFile};
     done
 
     # Need to preserve these ENV vars for vagrant's sudo session
-    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG INSTANCE_ID; do
+    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG; do
         if [[ -z `grep -E "^Defaults\s+env_keep\s*\+=\s*\".*$envVar" /etc/sudoers.d/vagrant` ]];
         then
             chmod a+w /etc/sudoers.d/vagrant;
