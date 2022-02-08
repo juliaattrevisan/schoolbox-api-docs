@@ -797,9 +797,16 @@ class Controller extends Assessment\Controller
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
         }
 
+        // Show the feedback for the student, if:
+        // * a self-assessment
+        // * the most recent feedback is a draft
+        //   (if it has been published, they need to re-create the self-assess)
         $feedback = null;
-        if ($reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
-            $feedback = $participant ? $participant->findMostRecentSelfAssessedFeedback() : null;
+        if ($reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $participant) {
+            $feedback = $participant->findMostRecentSelfAssessedFeedback();
+            if ($feedback && $feedback->isPublished()) {
+                $feedback = null;
+            }
         }
 
         if ($feedback instanceof Feedback\Model) {
