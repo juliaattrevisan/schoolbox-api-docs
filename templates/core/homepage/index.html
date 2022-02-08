@@ -432,3 +432,11 @@
 <input type="hidden" id="heading" value="{HEADING}" />
 
 <div id="resource-browser" class="hide"></div>
+
+<script type="text/javascript">
+    // all forms should submit without prevention
+    $(".homepage form").submit(function() {
+        debugger;
+        window.check = false;
+    });
+</script>
