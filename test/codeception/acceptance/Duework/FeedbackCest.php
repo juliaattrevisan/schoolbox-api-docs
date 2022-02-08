@@ -1,7 +1,5 @@
 <?php
 
-namespace Duework;
-
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -16,6 +14,8 @@ namespace Duework;
  * To run a specific test:
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest:<test method name>
  */
+
+namespace Duework;
 
 use AcceptanceTester;
 use Page\Common;
