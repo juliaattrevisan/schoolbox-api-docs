@@ -19,6 +19,12 @@ class RedactedPhotoList
 {
 
     /**
+     * They needed this specific format exactly
+     */
+    private const GEOSNAPSHOT_DATETIME_FORMAT = 'Y-m-d\TH:i:s\Z';
+
+
+    /**
      * @var string
      */
     private string $fqdn;
@@ -77,12 +83,15 @@ class RedactedPhotoList
 
             /* Calculate a modified date, where one might not already exist
              * redacted_at might be null when the user doesn't have a picture in the sis
+             * In that case, just send the current datetime
              */
-            $redactedAt = '';
-
-            if ('' !== (string)$redactedPhoto['redact_photo_modified_at']) {
-                $redactedAt = gmdate("Y-m-d\TH:i:s\Z", strtotime($redactedPhoto['redact_photo_modified_at']));
+            if ('' !== trim((string)$redactedPhoto['redact_photo_modified_at'])) {
+                $lastModified = strtotime($redactedPhoto['redact_photo_modified_at']);
+            } else {
+                $lastModified = \Alaress_Date_Format::now()->getUnixTimeStamp();
             }
+
+            $redactedAt = gmdate(self::GEOSNAPSHOT_DATETIME_FORMAT, $lastModified);
 
             /* Manufacture Geosnapshot-compatible format
              * Dedupe anything that might have been duped in connector land due to joins etc.
