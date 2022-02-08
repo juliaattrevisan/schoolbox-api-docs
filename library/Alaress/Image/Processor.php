@@ -210,7 +210,7 @@ class Processor
             LayeredNonGifException |
             CorruptImageException $e
         ) {
-            $transformModel->setState(Storage\Transform\Model::STATE_FAILED);
+            $transformModel->setState(Storage\Transform\Model::STATE_ERROR);
             $transformMapper->save($transformModel);
             throw $e;
         }
